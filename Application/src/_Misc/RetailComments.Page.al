@@ -66,19 +66,10 @@ page 6014492 "NPR Retail Comments"
     trigger OnOpenPage()
     begin
         if Rec."Table ID" = 6060001 then begin
-            StartdateVisible := true;
-            EndateVisible := true;
         end
         else begin
-            StartdateVisible := false;
-            EndateVisible := false;
         end;
     end;
 
-    var
-        [InDataSet]
-        EndateVisible: Boolean;
-        [InDataSet]
-        StartdateVisible: Boolean;
 }
 

@@ -18,7 +18,7 @@ codeunit 6060050 "NPR NpXml Value Item Worksh."
         Clear(RecRef);
         RecRef.Open("Table No.");
         RecRef.SetPosition("Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
 
 
@@ -38,25 +38,25 @@ codeunit 6060050 "NPR NpXml Value Item Worksh."
             case NpXmlElement."Element Name" of
                 'SalesPriceCurrencyCode':
                     begin
-                        GLSetup.Get;
+                        GLSetup.Get();
                         CustomValue := GLSetup."LCY Code";
                     end;
                 'PurchasePriceCurrencyCode':
                     begin
-                        GLSetup.Get;
+                        GLSetup.Get();
                         CustomValue := GLSetup."LCY Code";
                     end;
             end;
         end;
 
 
-        RecRef.Close;
+        RecRef.Close();
 
         Clear(RecRef);
 
         Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Modify();
     end;
 
     var

@@ -25,7 +25,7 @@ codeunit 6059965 "NPR MPOS Webservice"
         CompanyInformation.Get();
 
         CompanyInformation.CalcFields(Picture);
-        if CompanyInformation.Picture.HasValue then begin
+        if CompanyInformation.Picture.HasValue() then begin
             CompanyInformation.Picture.CreateInStream(InStr);
             PictureBase64 := Base64Convert.ToBase64(InStr);
         end;
@@ -46,7 +46,7 @@ codeunit 6059965 "NPR MPOS Webservice"
         CompanyInformation.Get();
 
         CompanyInformation.CalcFields(Picture);
-        if CompanyInformation.Picture.HasValue then begin
+        if CompanyInformation.Picture.HasValue() then begin
             CompanyInformation.Picture.CreateInStream(InStr);
             Base64String := Base64Convert.ToBase64(InStr);
         end;

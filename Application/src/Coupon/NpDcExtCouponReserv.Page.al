@@ -12,42 +12,42 @@ page 6151608 "NPR NpDc Ext. Coupon Reserv."
         {
             repeater(Group)
             {
-                field("External Document No."; "External Document No.")
+                field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Document No. field';
                 }
-                field("Inserted at"; "Inserted at")
+                field("Inserted at"; Rec."Inserted at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Inserted at field';
                 }
-                field("Document Type"; "Document Type")
+                field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Coupon Type"; "Coupon Type")
+                field("Coupon Type"; Rec."Coupon Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Coupon Type field';
                 }
-                field("Coupon No."; "Coupon No.")
+                field("Coupon No."; Rec."Coupon No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Coupon No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';

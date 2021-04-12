@@ -1,7 +1,5 @@
 codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
 {
-    var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', false, false)]
@@ -35,7 +33,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
             exit;
         end;
 
-        PaymentLine."Date Captured" := Today;
+        PaymentLine."Date Captured" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -54,7 +52,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
             exit;
         end;
 
-        PaymentLine."Date Refunded" := Today;
+        PaymentLine."Date Refunded" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -139,7 +137,6 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
     var
         XmlDomMng: Codeunit "XML DOM Management";
         XmlDoc: XmlDocument;
-        XNode: XmlNode;
         Response: Text;
     begin
         Clear(XmlDoc);
@@ -161,7 +158,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit;
 
         if MagentoPaymentGateway."Api Url" = '' then
@@ -224,7 +221,6 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
     local procedure PostedDocumentExists(PaymentLine: Record "NPR Magento Payment Line"): Boolean
     var
         PaymentLine2: Record "NPR Magento Payment Line";
-        SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
     begin
         case PaymentLine."Document Table No." of
@@ -237,7 +233,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
                     if PaymentLine."Document Type" <> PaymentLine."Document Type"::Order then
                         exit(false);
                     SalesInvHeader.SetRange("Order No.", PaymentLine."Document No.");
-                    if not SalesInvHeader.FindFirst then
+                    if not SalesInvHeader.FindFirst() then
                         exit(false);
                     exit(PaymentLine2.Get(DATABASE::"Sales Invoice Header", 0, SalesInvHeader."No.", PaymentLine."Line No."));
                 end;

@@ -30,7 +30,7 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
             if not Confirm(Text002, true, RecRef.Caption, RecRef.Field(FieldNo).Caption) then
                 exit;
             CopyFromActionToField(ActionCode, RecordID, FieldNo);
-            Commit;
+            Commit();
         end;
 
         EditParams.SetTableView(ParamValue);
@@ -45,24 +45,20 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
         if not RecRef.Get(RecordIDToClear) then
             exit;
 
-        with ParamValue do begin
-            SetRange("Table No.", RecRef.Number);
-            SetRange("Record ID", RecRef.RecordId);
-            if FieldIDToClear > 0 then
-                SetRange(ID, FieldIDToClear);
-            DeleteAll();
-        end;
+        ParamValue.SetRange("Table No.", RecRef.Number);
+        ParamValue.SetRange("Record ID", RecRef.RecordId);
+        if FieldIDToClear > 0 then
+            ParamValue.SetRange(ID, FieldIDToClear);
+        ParamValue.DeleteAll();
     end;
 
     local procedure CopyFromAction(ActionParam: Record "NPR POS Action Parameter"; var ToRec: Record "NPR POS Parameter Value")
     begin
-        with ToRec do begin
-            Name := ActionParam.Name;
-            "Action Code" := ActionParam."POS Action Code";
-            "Data Type" := ActionParam."Data Type";
-            Value := ActionParam."Default Value";
-            Insert;
-        end;
+        ToRec.Name := ActionParam.Name;
+        ToRec."Action Code" := ActionParam."POS Action Code";
+        ToRec."Data Type" := ActionParam."Data Type";
+        ToRec.Value := ActionParam."Default Value";
+        ToRec.Insert();
     end;
 
     procedure CopyFromActionToMenuButton(ActionCode: Code[20]; MenuButton: Record "NPR POS Menu Button")
@@ -75,11 +71,11 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
             exit;
 
         ActionParam.SetRange("POS Action Code", ActionCode);
-        if ActionParam.FindSet then
+        if ActionParam.FindSet() then
             repeat
                 ParamValue.InitForMenuButton(MenuButton);
                 CopyFromAction(ActionParam, ParamValue);
-            until ActionParam.Next = 0;
+            until ActionParam.Next() = 0;
     end;
 
     procedure CopyFromActionToField(ActionCode: Code[20]; RecordID: RecordID; FieldID: Integer)
@@ -92,17 +88,14 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
             exit;
 
         ActionParam.SetRange("POS Action Code", ActionCode);
-        if ActionParam.FindSet then
+        if ActionParam.FindSet() then
             repeat
                 ParamValue.InitForField(RecordID, FieldID);
                 CopyFromAction(ActionParam, ParamValue);
-            until ActionParam.Next = 0;
+            until ActionParam.Next() = 0;
     end;
 
     procedure SplitString(Text: Text; var Parts: List of [Text])
-    var
-        String: DotNet NPRNetString;
-        Char: DotNet NPRNetString;
     begin
         Parts := Text.Split(',');
     end;
@@ -118,7 +111,7 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
 
         // 1st pass: insert new parameters for action and replace existing parameters where data type has changed
         ActionParam.SetRange("POS Action Code", ActionCode);
-        if ActionParam.FindSet then
+        if ActionParam.FindSet() then
             repeat
                 ParamValue."Table No." := RecRef.Number;
                 ParamValue.Code := Code;
@@ -127,8 +120,8 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
                 ParamValue.Name := ActionParam.Name;
 
                 Update := false;
-                if not ParamValue.Find then begin
-                    ParamValue.Insert;
+                if not ParamValue.Find() then begin
+                    ParamValue.Insert();
                     Update := true;
                 end else
                     if ParamValue."Data Type" <> ActionParam."Data Type" then
@@ -138,17 +131,17 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
                     ParamValue."Action Code" := ActionCode;
                     ParamValue."Data Type" := ActionParam."Data Type";
                     ParamValue.Value := ActionParam."Default Value";
-                    ParamValue.Modify;
+                    ParamValue.Modify();
                 end;
-            until ActionParam.Next = 0;
+            until ActionParam.Next() = 0;
 
         // 2nd pass: remove old parameters that are not present in action parameters anymore
         ParamValue.FilterParameters(RecordID, FieldID);
         if ParamValue.FindSet(true) then
             repeat
                 if not ActionParam.Get(ParamValue."Action Code", ParamValue.Name) then
-                    ParamValue.Delete;
-            until ParamValue.Next = 0;
+                    ParamValue.Delete();
+            until ParamValue.Next() = 0;
     end;
 
     procedure RefreshParametersRequired(RecordID: RecordID; "Code": Code[20]; FieldID: Integer; ActionCode: Code[20]): Boolean
@@ -161,15 +154,15 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
 
         // Record defines deprecated parameters
         ParamValue.FilterParameters(RecordID, FieldID);
-        if ParamValue.FindSet then
+        if ParamValue.FindSet() then
             repeat
                 if not ActionParam.Get(ParamValue."Action Code", ParamValue.Name) then
                     exit(true);
-            until ParamValue.Next = 0;
+            until ParamValue.Next() = 0;
 
         // Record does not define actual parameters or defines a parameter with incorrect data type
         ActionParam.SetRange("POS Action Code", ActionCode);
-        if ActionParam.FindSet then
+        if ActionParam.FindSet() then
             repeat
                 ParamValue."Table No." := RecRef.Number;
                 ParamValue.Code := Code;
@@ -178,7 +171,7 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
                 ParamValue.Name := ActionParam.Name;
                 if (not ParamValue.Find) or (ParamValue."Data Type" <> ActionParam."Data Type") then
                     exit(true);
-            until ActionParam.Next = 0;
+            until ActionParam.Next() = 0;
 
         exit(false);
     end;

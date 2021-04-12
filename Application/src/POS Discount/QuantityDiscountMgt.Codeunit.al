@@ -1,4 +1,4 @@
-codeunit 6014432 "NPR Quantity Discount Mgt."
+﻿codeunit 6014432 "NPR Quantity Discount Mgt."
 {
     trigger OnRun()
     begin
@@ -27,22 +27,22 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         GetQuantityDiscounts(TempSaleLinePOS, TempQuantityDiscountHeader, TempQuantityDiscountLine);
         if TempQuantityDiscountHeader.IsEmpty then
             exit;
-        TempQuantityDiscountHeader.FindSet;
+        TempQuantityDiscountHeader.FindSet();
         repeat
             ItemQuantity := 0;
             TempSaleLinePOS.SetRange("No.", TempQuantityDiscountHeader."Item No.");
-            if TempSaleLinePOS.FindSet then
+            if TempSaleLinePOS.FindSet() then
                 repeat
                     ItemQuantity += TempSaleLinePOS.Quantity;
-                until TempSaleLinePOS.Next = 0;
+                until TempSaleLinePOS.Next() = 0;
 
             TempQuantityDiscountLine.SetRange("Main no.", TempQuantityDiscountHeader."Main No.");
             TempQuantityDiscountLine.SetRange("Item No.", TempQuantityDiscountHeader."Item No.");
             TempQuantityDiscountLine.SetFilter(Quantity, '>%1&<=%2', 0, Abs(ItemQuantity));
 
-            if TempQuantityDiscountLine.FindLast then begin
+            if TempQuantityDiscountLine.FindLast() then begin
                 TempSaleLinePOS.SetRange("No.", TempQuantityDiscountLine."Item No.");
-                if TempSaleLinePOS.FindSet then
+                if TempSaleLinePOS.FindSet() then
                     repeat
                         TempQuantityDiscountLine.CalcFields("Price Includes VAT");
                         DiscountPercent := 0;
@@ -67,11 +67,11 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
                         TempSaleLinePOS."FP Anvendt" := true;
 
                         if (DiscountPercent >= 0) then
-                            TempSaleLinePOS.Modify;
+                            TempSaleLinePOS.Modify();
 
-                    until TempSaleLinePOS.Next = 0;
+                    until TempSaleLinePOS.Next() = 0;
             end;
-        until TempQuantityDiscountHeader.Next = 0;
+        until TempQuantityDiscountHeader.Next() = 0;
     end;
 
     procedure GetQuantityDiscounts(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempQuantityDiscountHeader: Record "NPR Quantity Discount Header" temporary; var TempQuantityDiscountLine: Record "NPR Quantity Discount Line")
@@ -79,7 +79,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
     begin
-        if TempSaleLinePOS.FindSet then
+        if TempSaleLinePOS.FindSet() then
             repeat
                 QuantityDiscountHeader.SetCurrentKey("Item No.", Status, "Starting Date", "Closing Date");
                 QuantityDiscountHeader.SetRange("Item No.", TempSaleLinePOS."No.");
@@ -91,27 +91,27 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
                 QuantityDiscountHeader.SetFilter("Global Dimension 1 Code", '=%1|=%2', TempSaleLinePOS."Shortcut Dimension 1 Code", '');
                 QuantityDiscountHeader.SetFilter("Global Dimension 2 Code", '=%1|=%2', TempSaleLinePOS."Shortcut Dimension 2 Code", '');
 
-                if QuantityDiscountHeader.FindSet then begin
+                if QuantityDiscountHeader.FindSet() then begin
                     TempSaleLinePOS."Discount Calculated" := true;
-                    TempSaleLinePOS.Modify;
+                    TempSaleLinePOS.Modify();
                     repeat
                         QuantityDiscountLine.SetRange("Main no.", QuantityDiscountHeader."Main No.");
                         QuantityDiscountLine.SetRange("Item No.", QuantityDiscountHeader."Item No.");
 
-                        TempQuantityDiscountHeader.Init;
+                        TempQuantityDiscountHeader.Init();
                         TempQuantityDiscountHeader.TransferFields(QuantityDiscountHeader);
 
-                        if TempQuantityDiscountHeader.Insert then begin
-                            if QuantityDiscountLine.FindSet then
+                        if TempQuantityDiscountHeader.Insert() then begin
+                            if QuantityDiscountLine.FindSet() then
                                 repeat
-                                    TempQuantityDiscountLine.Init;
+                                    TempQuantityDiscountLine.Init();
                                     TempQuantityDiscountLine.TransferFields(QuantityDiscountLine);
-                                    TempQuantityDiscountLine.Insert;
-                                until QuantityDiscountLine.Next = 0;
+                                    TempQuantityDiscountLine.Insert();
+                                until QuantityDiscountLine.Next() = 0;
                         end;
-                    until QuantityDiscountHeader.Next = 0;
+                    until QuantityDiscountHeader.Next() = 0;
                 end;
-            until TempSaleLinePOS.Next = 0;
+            until TempSaleLinePOS.Next() = 0;
     end;
 
     procedure GetOrInit(var DiscountPriority: Record "NPR Discount Priority")
@@ -119,7 +119,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         if DiscountPriority.Get(DiscSourceTableId()) then
             exit;
 
-        DiscountPriority.Init;
+        DiscountPriority.Init();
         DiscountPriority."Table ID" := DiscSourceTableId();
         DiscountPriority.Priority := 4;
         DiscountPriority.Disabled := false;
@@ -164,7 +164,6 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
     local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     var
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
-        IsActive: Boolean;
         DiscountPriority: Record "NPR Discount Priority";
     begin
         if not DiscountPriority.Get(DiscSourceTableId()) then
@@ -180,9 +179,9 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         QuantityDiscountHeader.SetFilter("Starting Date", '<=%1|=%2', Today, 0D);
         QuantityDiscountHeader.SetFilter("Closing Date", '>=%1|=%2', Today, 0D);
         if not QuantityDiscountHeader.IsEmpty then begin
-            tmpDiscountPriority.Init;
+            tmpDiscountPriority.Init();
             tmpDiscountPriority := DiscountPriority;
-            tmpDiscountPriority.Insert;
+            tmpDiscountPriority.Insert();
         end;
     end;
 
@@ -230,7 +229,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         if QuantityDiscountHeader."Closing Date" = 0D then
             exit(false);
 
-        CurrDate := Today;
+        CurrDate := Today();
         CurrTime := Time;
         if QuantityDiscountHeader."Starting Date" > CurrDate then
             exit(false);

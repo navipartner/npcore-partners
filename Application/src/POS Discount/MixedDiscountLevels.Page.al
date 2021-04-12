@@ -15,28 +15,28 @@ page 6014553 "NPR Mixed Discount Levels"
         {
             repeater(Group)
             {
-                field("Mixed Discount Code"; "Mixed Discount Code")
+                field("Mixed Discount Code"; Rec."Mixed Discount Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Mixed Discount Code field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Multiple Of"; "Multiple Of")
+                field("Multiple Of"; Rec."Multiple Of")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Multiple Of field';
                 }
-                field("Discount Amount"; "Discount Amount")
+                field("Discount Amount"; Rec."Discount Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Amount field';
                 }
-                field("Discount %"; "Discount %")
+                field("Discount %"; Rec."Discount %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount % field';

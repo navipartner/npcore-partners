@@ -48,28 +48,28 @@ table 6151188 "NPR MM Member Communication"
         }
         field(100; "Display Name"; Text[100])
         {
-            CalcFormula = Lookup ("NPR MM Member"."Display Name" WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."Display Name" WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'Display Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(105; "External Member No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'External Member No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(110; "External Membership No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'External Membership No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(120; "Membership Code"; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."Membership Code" WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."Membership Code" WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Membership Code';
             Editable = false;
             FieldClass = FlowField;

@@ -1,12 +1,12 @@
 table 6151386 "NPR CS Rfid Data"
 {
-   
+
     Caption = 'CS Rfid Data';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
-    
+
 
     fields
     {
@@ -21,7 +21,7 @@ table 6151386 "NPR CS Rfid Data"
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
 
-            
+
         }
         field(12; "Cross-Reference Variant Code"; Code[10])
         {
@@ -95,6 +95,6 @@ table 6151386 "NPR CS Rfid Data"
     {
     }
 
-    
+
 }
 

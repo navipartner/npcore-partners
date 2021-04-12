@@ -33,7 +33,7 @@ table 6014458 "NPR E-mail Attachment"
                 RecRef: RecordRef;
             begin
                 CalcFields("Attached File");
-                if "Attached File".HasValue then
+                if "Attached File".HasValue() then
                     if not Confirm(Text001, false) then
                         exit;
 

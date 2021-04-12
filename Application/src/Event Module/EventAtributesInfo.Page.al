@@ -1,4 +1,4 @@
-page 6151588 "NPR Event Atributes Info"
+﻿page 6151588 "NPR Event Atributes Info"
 {
     Caption = 'Event Atributes Info';
     InsertAllowed = false;
@@ -14,14 +14,14 @@ page 6151588 "NPR Event Atributes Info"
             repeater(Control6014403)
             {
                 ShowCaption = false;
-                field("Template Name"; "Template Name")
+                field("Template Name"; Rec."Template Name")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = UseAttributeMatrix;
                     ToolTip = 'Specifies the value of the Template Name field';
                 }
-                field(Promote; Promote)
+                field(Promote; Rec.Promote)
                 {
                     ApplicationArea = All;
                     Style = Attention;
@@ -55,8 +55,8 @@ page 6151588 "NPR Event Atributes Info"
                 var
                     EventAttributeMatrix: Page "NPR Event Attribute Matrix";
                 begin
-                    EventAttributeMatrix.SetJob("Job No.");
-                    EventAttributeMatrix.SetAttrTemplate("Template Name");
+                    EventAttributeMatrix.SetJob(Rec."Job No.");
+                    EventAttributeMatrix.SetAttrTemplate(Rec."Template Name");
                     EventAttributeMatrix.Run
                 end;
             }
@@ -65,19 +65,19 @@ page 6151588 "NPR Event Atributes Info"
 
     trigger OnAfterGetRecord()
     begin
-        EventAttributeTemplate.Get("Template Name");
+        EventAttributeTemplate.Get(Rec."Template Name");
 
-        EventAttributeRowValue.Reset;
+        EventAttributeRowValue.Reset();
         EventAttributeRowValue.SetRange("Template Name", EventAttributeTemplate."Row Template Name");
-        NoOfRows := EventAttributeRowValue.Count;
+        NoOfRows := EventAttributeRowValue.Count();
         EventAttributeRowValue.SetRange(Promote, true);
-        NoOfPromotedRows := EventAttributeRowValue.Count;
+        NoOfPromotedRows := EventAttributeRowValue.Count();
 
-        EventAttributeColValue.Reset;
+        EventAttributeColValue.Reset();
         EventAttributeColValue.SetRange("Template Name", EventAttributeTemplate."Column Template Name");
-        NoOfColumns := EventAttributeColValue.Count;
+        NoOfColumns := EventAttributeColValue.Count();
         EventAttributeColValue.SetRange(Promote, true);
-        NoOfPromotedColumns := EventAttributeColValue.Count;
+        NoOfPromotedColumns := EventAttributeColValue.Count();
 
         UseAttributeMatrix := (MaxNoOfRows < NoOfRows) or (NoOfPromotedRows < NoOfRows) or (MaxNoOfColumns < NoOfColumns) or (NoOfPromotedColumns < NoOfColumns);
     end;

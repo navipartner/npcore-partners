@@ -88,7 +88,6 @@ codeunit 6060133 "NPR Record Field Mgt."
     var
         RecordFieldSetup: Record "NPR Record Field Setup";
         RecordFieldType: Record "NPR Record Field Type";
-        RecRef: RecordRef;
         LookupTableNo: Integer;
     begin
         RecordFieldSetup.Get(TableNo);
@@ -120,7 +119,6 @@ codeunit 6060133 "NPR Record Field Mgt."
         Country: Record "Country/Region";
         Currency: Record Currency;
         Language: Record Language;
-        Salesperson: Record "Salesperson/Purchaser";
     begin
         case LookupTableNo of
             0:

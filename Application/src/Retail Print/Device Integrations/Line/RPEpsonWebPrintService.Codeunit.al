@@ -28,14 +28,14 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
             //-NPR5.20
             WebPrintBuffer.SetAutoCalcFields("Print Data");
             //+NPR5.20
-            if WebPrintBuffer.FindSet then begin
+            if WebPrintBuffer.FindSet() then begin
                 PrintJobs := '<?xml version="1.0" encoding="utf-8"?><PrintRequestInfo Version="2.00">';
                 PrintJobs += GetAllPrintJobs(WebPrintBuffer);
                 PrintJobs += '</PrintRequestInfo>';
             end;
             //Delete expired and currently handled printjobs
             WebPrintBuffer.SetFilter("Time Created", '<=%1', CurrentPrintTime);
-            WebPrintBuffer.DeleteAll;
+            WebPrintBuffer.DeleteAll();
         end;
 
         exit(PrintJobs);
@@ -51,7 +51,7 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
         InnerXML: Text;
     begin
         //Each print job is contained in a XML element : ePOSPrint
-        if WebPrintBuffer."Print Data".HasValue then begin
+        if WebPrintBuffer."Print Data".HasValue() then begin
             WebPrintBuffer.CalcFields("Print Data");
             WebPrintBuffer."Print Data".CreateInStream(InStream);
             InStream.Read(InnerXML);
@@ -75,7 +75,7 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
         //Gathers all escpos for same device in one XML element to avoid ~0,5 sec. printer lag on each new XML element processed.
         //Note for future reference: this erases the 1:1 relation between <printjobid> and WebPrintBuffer."Printjob ID" on printer callback
         repeat
-            if WebPrintBuffer."Print Data".HasValue then begin
+            if WebPrintBuffer."Print Data".HasValue() then begin
                 //-NPR5.20
                 //WebPrintBuffer.CALCFIELDS("Print Data");
                 //+NPR5.20
@@ -86,7 +86,7 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
                 DevID := CopyStr(InnerXML, DevIDStrStart, StrPos(InnerXML, '</devid>') - DevIDStrStart);
 
                 TmpWebPrintBuffer.SetRange("Printer ID", DevID);
-                if TmpWebPrintBuffer.FindFirst and TmpWebPrintBuffer."Print Data".HasValue then begin
+                if TmpWebPrintBuffer.FindFirst() and TmpWebPrintBuffer."Print Data".HasValue() then begin
                     NewCommand := CopyStr(InnerXML, StrPos(InnerXML, '<command>') + 9);
 
                     TmpWebPrintBuffer.CalcFields("Print Data");
@@ -95,26 +95,26 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
 
                     TmpWebPrintBuffer."Print Data".CreateOutStream(OutStream);
                     OutStream.Write(CopyStr(ExistingCommand, 1, StrPos(ExistingCommand, '</command>') - 1) + NewCommand);
-                    TmpWebPrintBuffer.Modify;
+                    TmpWebPrintBuffer.Modify();
                 end else begin
-                    TmpWebPrintBuffer.Init;
+                    TmpWebPrintBuffer.Init();
                     TmpWebPrintBuffer."Printer ID" := DevID;
                     TmpWebPrintBuffer."Print Data".CreateOutStream(OutStream);
                     OutStream.Write(InnerXML);
-                    TmpWebPrintBuffer.Insert;
+                    TmpWebPrintBuffer.Insert();
                 end;
             end;
-        until WebPrintBuffer.Next = 0;
+        until WebPrintBuffer.Next() = 0;
 
-        if TmpWebPrintBuffer.FindSet then
+        if TmpWebPrintBuffer.FindSet() then
             repeat
-                if TmpWebPrintBuffer."Print Data".HasValue then begin
+                if TmpWebPrintBuffer."Print Data".HasValue() then begin
                     TmpWebPrintBuffer.CalcFields("Print Data");
                     TmpWebPrintBuffer."Print Data".CreateInStream(InStream);
                     InStream.Read(InnerXML);
                     TotalInnerXML += InnerXML;
                 end;
-            until TmpWebPrintBuffer.Next = 0;
+            until TmpWebPrintBuffer.Next() = 0;
 
         exit(TotalInnerXML)
     end;

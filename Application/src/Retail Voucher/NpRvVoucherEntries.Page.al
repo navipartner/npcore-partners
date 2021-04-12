@@ -13,82 +13,82 @@ page 6151016 "NPR NpRv Voucher Entries"
         {
             repeater(Group)
             {
-                field("Entry Type"; "Entry Type")
+                field("Entry Type"; Rec."Entry Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Remaining Amount"; "Remaining Amount")
+                field("Remaining Amount"; Rec."Remaining Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Positive field';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Register No. field';
                 }
-                field("Document Type"; "Document Type")
+                field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("External Document No."; "External Document No.")
+                field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Document No. field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Partner Code"; "Partner Code")
+                field("Partner Code"; Rec."Partner Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Partner Code field';
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Closed by Entry No."; "Closed by Entry No.")
+                field("Closed by Entry No."; Rec."Closed by Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closed by Entry No. field';
                 }
-                field("Closed by Partner Code"; "Closed by Partner Code")
+                field("Closed by Partner Code"; Rec."Closed by Partner Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closed by Partner Code field';
                 }
-                field("Partner Clearing"; "Partner Clearing")
+                field("Partner Clearing"; Rec."Partner Clearing")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Partner Clearing field';
@@ -116,8 +116,8 @@ page 6151016 "NPR NpRv Voucher Entries"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
-                    Navigate.Run;
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
+                    Navigate.Run();
                 end;
             }
         }

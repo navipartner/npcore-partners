@@ -8,7 +8,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion();
 
-        M2Authenticate.Import;
+        M2Authenticate.Import();
         M2Authenticate.GetRequest(TmpOneTimePassword);
 
         if (DoAuthenticatePassword(TmpOneTimePassword, TmpContact)) then begin
@@ -27,7 +27,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion;
 
-        M2ResetAccountPassword.Import;
+        M2ResetAccountPassword.Import();
         M2ResetAccountPassword.GetRequest(TmpOneTimePassword);
         if (DoResetPassword(TmpOneTimePassword)) then begin
             M2ResetAccountPassword.SetResponse();
@@ -44,7 +44,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion();
 
-        M2ChangeAccountPassword.Import;
+        M2ChangeAccountPassword.Import();
         M2ChangeAccountPassword.GetRequest(TmpOneTimePassword);
 
         if (DoChangePassword(TmpOneTimePassword, TmpContact)) then begin
@@ -67,7 +67,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion;
 
-        M2GetAccount.Import;
+        M2GetAccount.Import();
         ContactNo := M2GetAccount.GetRequest();
 
         if (DoGetAccount(ContactNo, TmpContact, TmpSellToCustomer, TmpBillToCustomer, TmpShipToAddress)) then begin
@@ -88,7 +88,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion;
 
-        M2UpdateAccount.Import;
+        M2UpdateAccount.Import();
         M2UpdateAccount.GetRequest(TmpContact, TmpCustomer);
 
         if (DoUpdateAccount(TmpContact, TmpCustomer, TmpAccount)) then begin
@@ -109,7 +109,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion;
 
-        M2CreateCorporateAccount.Import;
+        M2CreateCorporateAccount.Import();
         M2CreateCorporateAccount.GetRequest(TmpContact, TmpCustomer);
 
         if (DoCreateAccount(TmpContact, TmpCustomer, TmpAccount)) then begin
@@ -124,13 +124,12 @@ codeunit 6151150 "NPR M2 Account WebService"
     procedure AddPersonAccount(var M2AddAccount: XMLport "NPR M2 Add Account")
     var
         TmpContact: Record Contact temporary;
-        TmpCustomer: Record Customer temporary;
         TmpAccount: Record Contact temporary;
     begin
 
         SelectLatestVersion;
 
-        M2AddAccount.Import;
+        M2AddAccount.Import();
         M2AddAccount.GetRequest(TmpContact);
 
         if (DoAddAccount(TmpContact, TmpAccount)) then begin
@@ -145,15 +144,11 @@ codeunit 6151150 "NPR M2 Account WebService"
     procedure DeleteAccount(var M2DeleteAccount: XMLport "NPR M2 Delete Account")
     var
         ContactNo: Code[20];
-        TmpContact: Record Contact temporary;
-        TmpSellToCustomer: Record Customer temporary;
-        TmpBillToCustomer: Record Customer temporary;
-        TmpShipToAddress: Record "Ship-to Address" temporary;
     begin
 
         SelectLatestVersion;
 
-        M2DeleteAccount.Import;
+        M2DeleteAccount.Import();
         ContactNo := M2DeleteAccount.GetRequest();
 
         if (DoDeleteAccount(ContactNo)) then begin
@@ -174,7 +169,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion;
 
-        M2AddShiptoAddress.Import;
+        M2AddShiptoAddress.Import();
         M2AddShiptoAddress.GetRequest(TmpAccount, TmpShiptoAddressRequest);
 
         if (DoAddShiptoAddress(TmpAccount, TmpShiptoAddressRequest, TmpShiptoAddressResponse)) then begin
@@ -195,7 +190,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         SelectLatestVersion;
 
-        M2UpdateShiptoAddress.Import;
+        M2UpdateShiptoAddress.Import();
         M2UpdateShiptoAddress.GetRequest(TmpAccount, TmpShiptoAddressRequest);
 
         if (DoUpdateShiptoAddress(TmpAccount, TmpShiptoAddressRequest, TmpShiptoAddressResponse)) then begin
@@ -211,12 +206,11 @@ codeunit 6151150 "NPR M2 Account WebService"
     var
         TmpAccount: Record Contact temporary;
         TmpShiptoAddressRequest: Record "Ship-to Address" temporary;
-        TmpShiptoAddressResponse: Record "Ship-to Address" temporary;
     begin
 
         SelectLatestVersion;
 
-        M2DeleteShiptoAddress.Import;
+        M2DeleteShiptoAddress.Import();
         M2DeleteShiptoAddress.GetRequest(TmpAccount, TmpShiptoAddressRequest);
 
         if (DoDeleteShiptoAddress(TmpAccount, TmpShiptoAddressRequest)) then begin
@@ -238,7 +232,7 @@ codeunit 6151150 "NPR M2 Account WebService"
     begin
         SelectLatestVersion;
 
-        GetExtendedAccount.Import;
+        GetExtendedAccount.Import();
         ContactNo := GetExtendedAccount.GetRequest();
 
         if (DoGetAccount(ContactNo, TmpContact, TmpSellToCustomer, TmpBillToCustomer, TmpShipToAddress)) then begin
@@ -290,7 +284,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         EFTShopperRecognition: Codeunit "NPR EFT Shopper Recognition";
     begin
         SelectLatestVersion;
-        ShopperRecognition.Import;
+        ShopperRecognition.Import();
         ShopperRecognition.GetRequest(TmpEFTShopperRecognition);
 
         if (not EFTShopperRecognition.GetShopperReference(TmpEFTShopperRecognition)) then
@@ -503,7 +497,6 @@ codeunit 6151150 "NPR M2 Account WebService"
     var
         M2ResetAccountPassword: XMLport "NPR M2 Reset Account Password";
         TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
-        TmpContact: Record Contact temporary;
         xmltext: Text;
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         iStream: InStream;

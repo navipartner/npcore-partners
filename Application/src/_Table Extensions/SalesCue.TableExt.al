@@ -15,12 +15,12 @@ tableextension 6151252 "NPR Sales Cue" extends "Sales Cue"
         field(6151243; "NPR Sales This Month"; Decimal)
         {
             FieldClass = FlowField;
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = FILTER(Sale), "Posting Date" = FIELD("NPR Date Filter")));
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = FILTER(Sale), "Posting Date" = FIELD("NPR Date Filter")));
         }
         field(6151244; "NPR Sales This Month Lst Year"; Decimal)
         {
             FieldClass = FlowField;
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = FILTER(Sale), "Posting Date" = FIELD("NPR Date Filter Lst Year")));
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = FILTER(Sale), "Posting Date" = FIELD("NPR Date Filter Lst Year")));
         }
     }
 }

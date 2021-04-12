@@ -47,7 +47,7 @@ table 6059898 "NPR Data Log Record"
         }
         field(30; "Field Values"; Integer)
         {
-            CalcFormula = Count ("NPR Data Log Field" WHERE("Table ID" = FIELD("Table ID"),
+            CalcFormula = Count("NPR Data Log Field" WHERE("Table ID" = FIELD("Table ID"),
                                                         "Data Log Record Entry No." = FIELD("Entry No.")));
             Caption = 'Field Values';
             FieldClass = FlowField;
@@ -60,7 +60,7 @@ table 6059898 "NPR Data Log Record"
         }
         field(1000; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             Editable = false;

@@ -344,7 +344,7 @@ report 6014416 "NPR Sale Statistics per Vendor"
 
         trigger OnOpenPage()
         begin
-            InventoryDate := Today;
+            InventoryDate := Today();
         end;
     }
 
@@ -369,7 +369,6 @@ report 6014416 "NPR Sale Statistics per Vendor"
         else
             DateFilterVendor := 'As at ' + Format(InventoryDate);
 
-        PageGroupNo := 1;
         NextPageGroupNo := 1;
     end;
 
@@ -410,7 +409,6 @@ report 6014416 "NPR Sale Statistics per Vendor"
         SpeedVendor: Decimal;
         StartDateInventory: Decimal;
         NextPageGroupNo: Integer;
-        PageGroupNo: Integer;
         Avg_Inventory_Caption_Lbl: Label 'Average Inventory';
         Cost_Caption_Lbl: Label 'COGS (LCY)';
         Creditor_Filter_Caption_Lbl: Label 'Creditor filter';

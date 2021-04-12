@@ -31,7 +31,7 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
             Caption = 'Last Year';
             DataClassification = CustomerContent;
         }
-        field(60; "Difference"; Text[100])
+        field(60; Difference; Text[100])
         {
             Caption = 'Difference';
             DataClassification = CustomerContent;

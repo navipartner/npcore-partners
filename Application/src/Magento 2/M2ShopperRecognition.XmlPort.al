@@ -1,4 +1,4 @@
-xmlport 6184507 "NPR M2 Shopper Recognition"
+﻿xmlport 6184507 "NPR M2 Shopper Recognition"
 {
     Caption = 'M2 Shopper Recognition';
     Encoding = UTF8;
@@ -150,7 +150,7 @@ xmlport 6184507 "NPR M2 Shopper Recognition"
         if (ResponseCode = 'ERROR') then
             exit;
 
-        EFTShopperRecognition.Reset;
+        EFTShopperRecognition.Reset();
         EFTShopperRecognition.FindFirst();
         TmpShopperRecognitionResponse.TransferFields(EFTShopperRecognition, true);
         TmpShopperRecognitionResponse.Insert();

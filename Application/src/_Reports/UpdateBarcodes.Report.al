@@ -44,14 +44,13 @@ report 6014601 "NPR Update Barcodes"
         NoOfBarCodesCreated: Integer;
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
         ItemReference: Record "Item Reference";
-        CrossReferenceNo: Code[50];
 
     local procedure InsertBarcode(ItemNo: Code[20]; VariantCode: Code[10])
     begin
         ItemReference.SetRange("Item No.", ItemNo);
         ItemReference.SetRange("Variant Code", VariantCode);
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-        if ItemReference.FindFirst then
+        if ItemReference.FindFirst() then
             if (CheckBarcodeValidEAN13(ItemReference."Reference No.") or CheckBarcodeValidEAN8(ItemReference."Reference No.")) then
                 exit;
 

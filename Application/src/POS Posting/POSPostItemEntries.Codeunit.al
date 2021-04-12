@@ -1,10 +1,9 @@
-codeunit 6150616 "NPR POS Post Item Entries"
+﻿codeunit 6150616 "NPR POS Post Item Entries"
 {
     TableNo = "NPR POS Entry";
 
     trigger OnRun()
     var
-        POSStore: Record "NPR POS Store";
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         TempItemToAdjust: Record Item temporary;
@@ -16,41 +15,39 @@ codeunit 6150616 "NPR POS Post Item Entries"
         OnBeforePostPOSEntry(Rec);
 
         POSEntry := Rec;
-        with POSEntry do begin
-            if not PostToEntries(POSEntry) then
-                exit;
+        if not PostToEntries(POSEntry) then
+            exit;
 
-            if PostingDateExists and (ReplacePostingDate or ("Posting Date" = 0D)) then begin
-                "Posting Date" := PostingDate;
-                Validate("Currency Code");
-            end;
-
-            if PostingDateExists and (ReplaceDocumentDate or ("Document Date" = 0D)) then
-                Validate("Document Date", PostingDate);
-
-            if GenJnlCheckLine.DateNotAllowed("Posting Date") then
-                FieldError("Posting Date", TextDateNotAllowed);
-            if "Post Item Entry Status" = "Post Entry Status"::Posted then
-                Error(StrSubstNo(TextAllreadyPosted, "Entry No."));
-
-            CheckPostingrestrictions(POSEntry);
-
-            POSSalesLine.Reset;
-            POSSalesLine.SetRange("POS Entry No.", "Entry No.");
-            POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
-            POSSalesLine.SetFilter(Quantity, '<>0');
-            POSSalesLine.SetRange("Exclude from Posting", false);
-            if POSSalesLine.FindSet then
-                repeat
-                    POSSalesLine."Item Entry No." := PostItemJnlLine(POSEntry, POSSalesLine);
-                    POSSalesLine.Modify;
-
-                    CheckAndCreateServiceItemPos(POSEntry, POSSalesLine);
-
-                    if (POSSalesLine."Retail Serial No." <> '') then
-                        HandleRetailSerialNo(POSSalesLine);
-                until POSSalesLine.Next = 0;
+        if PostingDateExists and (ReplacePostingDate or (POSEntry."Posting Date" = 0D)) then begin
+            POSEntry."Posting Date" := PostingDate;
+            POSEntry.Validate("Currency Code");
         end;
+
+        if PostingDateExists and (ReplaceDocumentDate or (POSEntry."Document Date" = 0D)) then
+            POSEntry.Validate("Document Date", PostingDate);
+
+        if GenJnlCheckLine.DateNotAllowed(POSEntry."Posting Date") then
+            POSEntry.FieldError("Posting Date", TextDateNotAllowed);
+        if POSEntry."Post Item Entry Status" = POSEntry."Post Entry Status"::Posted then
+            Error(StrSubstNo(TextAllreadyPosted, POSEntry."Entry No."));
+
+        CheckPostingrestrictions(POSEntry);
+
+        POSSalesLine.Reset();
+        POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+        POSSalesLine.SetFilter(Quantity, '<>0');
+        POSSalesLine.SetRange("Exclude from Posting", false);
+        if POSSalesLine.FindSet() then
+            repeat
+                POSSalesLine."Item Entry No." := PostItemJnlLine(POSEntry, POSSalesLine);
+                POSSalesLine.Modify();
+
+                CheckAndCreateServiceItemPos(POSEntry, POSSalesLine);
+
+                if (POSSalesLine."Retail Serial No." <> '') then
+                    HandleRetailSerialNo(POSSalesLine);
+            until POSSalesLine.Next() = 0;
 
         OnAfterPostPOSEntry(Rec);
     end;
@@ -103,7 +100,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
         POSPeriodRegister.Get(POSEntry."POS Period Register No.");
 
         POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
-        ItemJnlLine.Init;
+        ItemJnlLine.Init();
         ItemJnlLine."Posting Date" := POSEntry."Posting Date";
         ItemJnlLine."Document Date" := POSEntry."Document Date";
         ItemJnlLine."Document No." := POSPeriodRegister."Document No.";
@@ -200,55 +197,53 @@ codeunit 6150616 "NPR POS Post Item Entries"
         ItemTrackingCode: Record "Item Tracking Code";
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        with ItemJournalLine do begin
-            if ("Serial No." = '') and ("Lot No." = '') then
-                exit;
-            Item.Get("Item No.");
-            Item.TestField("Item Tracking Code");
-            ItemTrackingCode.Get(Item."Item Tracking Code");
-            ReservationEntry.Init;
-            ReservationEntry."Entry No." := 0;
-            ReservationEntry.Positive := false;
-            ReservationEntry."Item No." := "Item No.";
-            ReservationEntry."Variant Code" := "Variant Code";
-            ReservationEntry."Location Code" := "Location Code";
-            ReservationEntry."Quantity (Base)" := -Quantity;
-            ReservationEntry."Reservation Status" := ReservationEntry."Reservation Status"::Prospect;
-            if ItemTrackingCode."SN Specific Tracking" then begin
-                if (Quantity <= 0) then begin
-                    //Return Sale
-                    ReservationEntry."Creation Date" := Today;
-                end else begin
-                    //Normal Sale
-                    ItemLedgerEntry.Reset;
-                    ItemLedgerEntry.SetRange(Open, true);
-                    ItemLedgerEntry.SetRange(Positive, true);
-                    ItemLedgerEntry.SetRange("Serial No.", "Serial No.");
-                    ItemLedgerEntry.SetRange("Item No.", "Item No.");
-                    ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
-                    ItemLedgerEntry.FindFirst;
-                    ReservationEntry."Creation Date" := ItemLedgerEntry."Posting Date";
-                end;
+        if (ItemJournalLine."Serial No." = '') and (ItemJournalLine."Lot No." = '') then
+            exit;
+        Item.Get(ItemJournalLine."Item No.");
+        Item.TestField("Item Tracking Code");
+        ItemTrackingCode.Get(Item."Item Tracking Code");
+        ReservationEntry.Init();
+        ReservationEntry."Entry No." := 0;
+        ReservationEntry.Positive := false;
+        ReservationEntry."Item No." := ItemJournalLine."Item No.";
+        ReservationEntry."Variant Code" := ItemJournalLine."Variant Code";
+        ReservationEntry."Location Code" := ItemJournalLine."Location Code";
+        ReservationEntry."Quantity (Base)" := -ItemJournalLine.Quantity;
+        ReservationEntry."Reservation Status" := ReservationEntry."Reservation Status"::Prospect;
+        if ItemTrackingCode."SN Specific Tracking" then begin
+            if (ItemJournalLine.Quantity <= 0) then begin
+                //Return Sale
+                ReservationEntry."Creation Date" := Today();
             end else begin
-                if Quantity <= 0 then begin
-                    ReservationEntry."Creation Date" := Today;
-                end;
+                //Normal Sale
+                ItemLedgerEntry.Reset();
+                ItemLedgerEntry.SetRange(Open, true);
+                ItemLedgerEntry.SetRange(Positive, true);
+                ItemLedgerEntry.SetRange("Serial No.", ItemJournalLine."Serial No.");
+                ItemLedgerEntry.SetRange("Item No.", ItemJournalLine."Item No.");
+                ItemLedgerEntry.SetRange("Variant Code", ItemJournalLine."Variant Code");
+                ItemLedgerEntry.FindFirst();
+                ReservationEntry."Creation Date" := ItemLedgerEntry."Posting Date";
             end;
-            ReservationEntry."Source Type" := DATABASE::"Item Journal Line";
-            ReservationEntry."Source Subtype" := "Entry Type".AsInteger();
-            ReservationEntry."Source ID" := "Journal Template Name";
-            ReservationEntry."Source Batch Name" := "Journal Batch Name";
-            ReservationEntry."Source Ref. No." := "Line No.";
-            ReservationEntry."Expected Receipt Date" := Today;
-            ReservationEntry."Serial No." := "Serial No.";
-            ReservationEntry."Lot No." := "Lot No.";
-            ReservationEntry."Created By" := UserId;
-            ReservationEntry."Qty. per Unit of Measure" := Quantity;
-            ReservationEntry.Quantity := -Quantity;
-            ReservationEntry."Qty. to Handle (Base)" := -Quantity;
-            ReservationEntry."Qty. to Invoice (Base)" := -Quantity;
-            ReservationEntry.Insert;
+        end else begin
+            if ItemJournalLine.Quantity <= 0 then begin
+                ReservationEntry."Creation Date" := Today();
+            end;
         end;
+        ReservationEntry."Source Type" := DATABASE::"Item Journal Line";
+        ReservationEntry."Source Subtype" := ItemJournalLine."Entry Type".AsInteger();
+        ReservationEntry."Source ID" := ItemJournalLine."Journal Template Name";
+        ReservationEntry."Source Batch Name" := ItemJournalLine."Journal Batch Name";
+        ReservationEntry."Source Ref. No." := ItemJournalLine."Line No.";
+        ReservationEntry."Expected Receipt Date" := Today();
+        ReservationEntry."Serial No." := ItemJournalLine."Serial No.";
+        ReservationEntry."Lot No." := ItemJournalLine."Lot No.";
+        ReservationEntry."Created By" := UserId;
+        ReservationEntry."Qty. per Unit of Measure" := ItemJournalLine.Quantity;
+        ReservationEntry.Quantity := -ItemJournalLine.Quantity;
+        ReservationEntry."Qty. to Handle (Base)" := -ItemJournalLine.Quantity;
+        ReservationEntry."Qty. to Invoice (Base)" := -ItemJournalLine.Quantity;
+        ReservationEntry.Insert();
     end;
 
     local procedure PostToEntries(POSEntry: Record "NPR POS Entry"): Boolean
@@ -266,7 +261,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
         Item: Record Item;
         AssemblyHeader: Record "Assembly Header";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
-        AssemblySetup: Record "Assembly Setup";
         AssemblyPost: Codeunit "Assembly-Post";
         CreateAssembly: Boolean;
         CreateAssemblyLink: Boolean;
@@ -302,10 +296,10 @@ codeunit 6150616 "NPR POS Post Item Entries"
         end;
 
         if (CreateAssembly) then begin
-            AssemblyHeader.Init;
+            AssemblyHeader.Init();
             AssemblyHeader.Validate("Document Type", AssemblyHeader."Document Type"::Order);
             AssemblyHeader.Insert(true);
-            Commit;
+            Commit();
 
             AssemblyHeader.Validate("Posting Date", POSEntry."Posting Date");
             AssemblyHeader.Validate("Item No.", POSSalesLine."No.");
@@ -335,7 +329,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
         end;
 
         // Commit the item posting for POS Sale, before attempting to post assembly order - note: there are commits in the AssemblyPost.RUN ();
-        Commit;
+        Commit();
 
         if (AssemblyPost.Run(AssemblyHeader)) then begin
             POSEntrySalesDocLink.Delete();
@@ -343,7 +337,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
             if (AssemblyHeader."Posting No." <> '') then
                 POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."Posting No.";
             if (not POSEntrySalesDocLink.Insert()) then;
-            Commit;
+            Commit();
             exit(true);
         end;
 
@@ -396,11 +390,11 @@ codeunit 6150616 "NPR POS Post Item Entries"
             exit;
 
         if (not ItemTrackingCode.Get(Item."Item Tracking Code")) then
-            ItemTrackingCode.Init;
+            ItemTrackingCode.Init();
 
         // Create service item
-        ServMgtSetup.Get;
-        GLSetup.Get;
+        ServMgtSetup.Get();
+        GLSetup.Get();
         TrackingLinesExist := (POSSalesLine."Serial No." <> '');
 
         for x := 1 to POSSalesLine.Quantity do begin
@@ -414,10 +408,10 @@ codeunit 6150616 "NPR POS Post Item Entries"
             end;
 
             if ((not TrackingLinesExist) or (not ServItemWithSerialNoExist)) then begin
-                ServItem.Init;
+                ServItem.Init();
                 ServMgtSetup.TestField("Service Item Nos.");
                 NoSeriesMgt.InitSeries(ServMgtSetup."Service Item Nos.", ServItem."No. Series", 0D, ServItem."No.", ServItem."No. Series");
-                ServItem.Insert;
+                ServItem.Insert();
             end;
 
             POSEntrySalesDocLink."POS Entry No." := POSEntry."Entry No.";
@@ -481,7 +475,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
               CalcDate(
                 ServMgtSetup."Default Warranty Duration",
                 POSEntry."Posting Date");
-            ServItem.Modify;
+            ServItem.Modify();
 
             ResSkillMgt.AssignServItemResSkills(ServItem);
 
@@ -501,7 +495,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
                             repeat
                                 for y := 1 to Round(BOMComp2."Quantity per", 1) do begin
                                     NextLineNo := NextLineNo + 10000;
-                                    ServItemComponent.Init;
+                                    ServItemComponent.Init();
                                     ServItemComponent.Active := true;
                                     ServItemComponent."Parent Service Item No." := ServItem."No.";
                                     ServItemComponent."Line No." := NextLineNo;
@@ -511,10 +505,10 @@ codeunit 6150616 "NPR POS Post Item Entries"
                                     ServItemComponent.Description := BOMComp2.Description;
                                     ServItemComponent."Serial No." := '';
                                     ServItemComponent."Variant Code" := BOMComp2."Variant Code";
-                                    ServItemComponent.Insert;
+                                    ServItemComponent.Insert();
                                 end;
-                            until BOMComp2.Next = 0;
-                    until BOMComp.Next = 0;
+                            until BOMComp2.Next() = 0;
+                    until BOMComp.Next() = 0;
             end;
             Clear(ServLogMgt);
             ServLogMgt.ServItemAutoCreated(ServItem);
@@ -560,12 +554,12 @@ codeunit 6150616 "NPR POS Post Item Entries"
         if not PostToEntries(POSEntry) then
             exit;
 
-        POSSalesLine.Reset;
+        POSSalesLine.Reset();
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
         POSSalesLine.SetFilter(Quantity, '>%1', 0);
         POSSalesLine.SetRange("Exclude from Posting", false);
-        if POSSalesLine.FindSet then
+        if POSSalesLine.FindSet() then
             repeat
                 // Assembly posting does alot of commits in posting codeunit 900
                 if (not CheckAndCreateAssemblyOrder(FailOnError, POSEntry, POSSalesLine)) then

@@ -3,7 +3,6 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
     Subtype = Upgrade;
 
     var
-        RemoveDefaultPostingProfileLbl: Label 'NPRetailSetup_RemoveDefaultPostingProfile', Locked = true;
         RemoveSourceCodeLbl: Label 'NPRetailSetup_RemoveSourceCodeLbl', Locked = true;
 
     trigger OnUpgradePerCompany()

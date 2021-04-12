@@ -12,22 +12,22 @@ page 6151218 "NPR NpCs Open. Hour Calendar"
         {
             repeater(Group)
             {
-                field("Calendar Date"; "Calendar Date")
+                field("Calendar Date"; Rec."Calendar Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date field';
                 }
-                field("Start Time"; "Start Time")
+                field("Start Time"; Rec."Start Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field("End Time"; "End Time")
+                field("End Time"; Rec."End Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End Time field';
                 }
-                field(Weekday; Weekday)
+                field(Weekday; Rec.Weekday)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Weekday field';

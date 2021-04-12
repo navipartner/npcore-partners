@@ -29,7 +29,7 @@ codeunit 6014551 "NPR RP Aux: Captions"
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := Choice;
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     local procedure "// Event Subscribers"()
@@ -42,9 +42,9 @@ codeunit 6014551 "NPR RP Aux: Captions"
         AllObj: Record AllObj;
     begin
         AllObj.Get(AllObj."Object Type"::Codeunit, CODEUNIT::"NPR RP Aux: Captions");
-        tmpAllObj.Init;
+        tmpAllObj.Init();
         tmpAllObj := AllObj;
-        tmpAllObj.Insert;
+        tmpAllObj.Insert();
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionList', '', false, false)]
@@ -90,53 +90,52 @@ codeunit 6014551 "NPR RP Aux: Captions"
 
         Handled := true;
 
-        with TemplateLine do
-            case FunctionName of
-                'CAPTION_TOTAL':
-                    "Processing Value" := Caption_Total;
-                'CAPTION_VAT':
-                    "Processing Value" := Caption_Vat;
-                'CAPTION_TOTALINCLVAT':
-                    "Processing Value" := Caption_TotalInclVAT;
-                'CAPTION_TOTALEXCLVAT':
-                    "Processing Value" := Caption_TotalExclVAT;
-                'CAPTION_SETTLEMENT':
-                    "Processing Value" := Caption_Settlement;
-                'CAPTION_ROUNDING':
-                    "Processing Value" := Caption_Rounding;
-                'CAPTION_RETURNORDER':
-                    "Processing Value" := Caption_ReturnOrder;
-                'CAPTION_SHIPMENT':
-                    "Processing Value" := Caption_Shipment;
-                'CAPTION_POSTEDINVOICE':
-                    "Processing Value" := Caption_PostedInvoice;
-                'CAPTION_CRMEMOINVOICE':
-                    "Processing Value" := Caption_CrMemoInvoice;
-                'CAPTION_COPY':
-                    "Processing Value" := Caption_COPY;
-                'CAPTION_VALIDYEARS':
-                    "Processing Value" := Caption_ValidYears;
-                'CAPTION_VOUCHERLEGAL':
-                    "Processing Value" := Caption_VoucherLegal;
-                'CAPTION_STAMP_SIGNATURE':
-                    "Processing Value" := Caption_StampSignature;
-                'CAPTION_ADDRESS':
-                    "Processing Value" := Caption_Address;
-                'CAPTION_CUSTOMERSIGNATURE':
-                    "Processing Value" := Caption_CustomerSignature;
-                //-NPR5.36 [289514]
-                'CAPTION_LINEDISCOUNT':
-                    "Processing Value" := Caption_LineDisc;
-                //+NPR5.36 [289514]
-                //-NPR5.38 [294044]
-                'CAPTION_WARRANTYPROOF':
-                    "Processing Value" := Caption_WarrantyProof;
-                //+NPR5.38 [294044]
-                //-NPR5.43 [316833]
-                'CAPTION_TESTENVIRONMENT':
-                    "Processing Value" := Caption_TestEnvironment;
-            //+NPR5.43 [316833]
-            end;
+        case FunctionName of
+            'CAPTION_TOTAL':
+                TemplateLine."Processing Value" := Caption_Total;
+            'CAPTION_VAT':
+                TemplateLine."Processing Value" := Caption_Vat;
+            'CAPTION_TOTALINCLVAT':
+                TemplateLine."Processing Value" := Caption_TotalInclVAT;
+            'CAPTION_TOTALEXCLVAT':
+                TemplateLine."Processing Value" := Caption_TotalExclVAT;
+            'CAPTION_SETTLEMENT':
+                TemplateLine."Processing Value" := Caption_Settlement;
+            'CAPTION_ROUNDING':
+                TemplateLine."Processing Value" := Caption_Rounding;
+            'CAPTION_RETURNORDER':
+                TemplateLine."Processing Value" := Caption_ReturnOrder;
+            'CAPTION_SHIPMENT':
+                TemplateLine."Processing Value" := Caption_Shipment;
+            'CAPTION_POSTEDINVOICE':
+                TemplateLine."Processing Value" := Caption_PostedInvoice;
+            'CAPTION_CRMEMOINVOICE':
+                TemplateLine."Processing Value" := Caption_CrMemoInvoice;
+            'CAPTION_COPY':
+                TemplateLine."Processing Value" := Caption_COPY;
+            'CAPTION_VALIDYEARS':
+                TemplateLine."Processing Value" := Caption_ValidYears;
+            'CAPTION_VOUCHERLEGAL':
+                TemplateLine."Processing Value" := Caption_VoucherLegal;
+            'CAPTION_STAMP_SIGNATURE':
+                TemplateLine."Processing Value" := Caption_StampSignature;
+            'CAPTION_ADDRESS':
+                TemplateLine."Processing Value" := Caption_Address;
+            'CAPTION_CUSTOMERSIGNATURE':
+                TemplateLine."Processing Value" := Caption_CustomerSignature;
+            //-NPR5.36 [289514]
+            'CAPTION_LINEDISCOUNT':
+                TemplateLine."Processing Value" := Caption_LineDisc;
+            //+NPR5.36 [289514]
+            //-NPR5.38 [294044]
+            'CAPTION_WARRANTYPROOF':
+                TemplateLine."Processing Value" := Caption_WarrantyProof;
+            //+NPR5.38 [294044]
+            //-NPR5.43 [316833]
+            'CAPTION_TESTENVIRONMENT':
+                TemplateLine."Processing Value" := Caption_TestEnvironment;
+        //+NPR5.43 [316833]
+        end;
     end;
 }
 

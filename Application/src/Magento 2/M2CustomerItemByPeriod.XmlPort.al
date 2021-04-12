@@ -1,4 +1,4 @@
-xmlport 6151148 "NPR M2 Customer Item By Period"
+﻿xmlport 6151148 "NPR M2 Customer Item By Period"
 {
     Caption = 'Customer Item By Period';
     Encoding = UTF8;
@@ -191,7 +191,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
                                 trigger OnBeforePassVariable()
                                 begin
 
-                                    if (TmpSalesLine.IsEmpty()) then currXMLport.Skip;
+                                    if (TmpSalesLine.IsEmpty()) then currXMLport.Skip();
                                 end;
                             }
                             textelement(Shipped)
@@ -249,7 +249,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    if (TmpItemLedgerEntry.IsEmpty()) then currXMLport.Skip;
+                                    if (TmpItemLedgerEntry.IsEmpty()) then currXMLport.Skip();
                                 end;
                             }
                             textelement(Invoiced)
@@ -303,7 +303,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
                                 trigger OnBeforePassVariable()
                                 begin
 
-                                    if (TmpValueEntry.IsEmpty()) then currXMLport.Skip;
+                                    if (TmpValueEntry.IsEmpty()) then currXMLport.Skip();
                                 end;
                             }
 
@@ -327,7 +327,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
                     begin
 
                         TmpItemResponse.Reset();
-                        if (TmpItemResponse.IsEmpty()) then currXMLport.Break;
+                        if (TmpItemResponse.IsEmpty()) then currXMLport.Break();
                     end;
                 }
             }
@@ -337,11 +337,9 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
     trigger OnInitXmlPort()
     begin
 
-        StartTime := Time
     end;
 
     var
-        StartTime: Time;
         ViewAsOption: Option UNDEFINED,NETCHANGE,BALANCEATDATE;
         InvalidViewByOption: Boolean;
         AmountShippedArray: array[10] of Decimal;
@@ -362,7 +360,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
         if (TmpItemResponse.IsTemporary()) then
             TmpItemResponse.DeleteAll();
 
-        TmpItemRequest.Reset;
+        TmpItemRequest.Reset();
         TmpItemRequest.FindSet();
         repeat
             TmpItemResponse.TransferFields(TmpItemRequest, true);
@@ -485,7 +483,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
         if (SalesLine.FindSet()) then begin
             repeat
                 if (not TmpSalesLine.Get(SalesLine."Document Type", 'BOGUS', 10000)) then begin
-                    TmpSalesLine.Init;
+                    TmpSalesLine.Init();
                     TmpSalesLine."Document Type" := SalesLine."Document Type";
                     TmpSalesLine."Document No." := 'BOGUS';
                     TmpSalesLine."Line No." := 10000;

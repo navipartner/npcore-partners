@@ -1,4 +1,4 @@
-﻿table 6014490 "NPR Sales Price Maint. Groups2"
+table 6014490 "NPR Sales Price Maint. Groups2"
 {
     Caption = 'Sales Price Maintenance Groups';
     DrillDownPageID = "NPR Sales Price Maint. Groups";
@@ -26,8 +26,6 @@
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                Item: Record Item;
             begin
             end;
         }

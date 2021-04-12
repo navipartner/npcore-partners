@@ -14,87 +14,87 @@ page 6151160 "NPR MM Loy. Store Setup Server"
         {
             repeater(Group)
             {
-                field(Setup; Setup)
+                field(Setup; Rec.Setup)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Setup field';
                 }
-                field("Client Company Name"; "Client Company Name")
+                field("Client Company Name"; Rec."Client Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Company Name field';
                 }
-                field("Store Code"; "Store Code")
+                field("Store Code"; Rec."Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Code field';
                 }
-                field("Unit Code"; "Unit Code")
+                field("Unit Code"; Rec."Unit Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Authorization Code"; "Authorization Code")
+                field("Authorization Code"; Rec."Authorization Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Authorization Code field';
                 }
-                field("Accept Client Transactions"; "Accept Client Transactions")
+                field("Accept Client Transactions"; Rec."Accept Client Transactions")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Accept Client Transactions field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Customer Name"; "Customer Name")
+                field("Customer Name"; Rec."Customer Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Name field';
                 }
-                field("Posting Model"; "Posting Model")
+                field("Posting Model"; Rec."Posting Model")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Model field';
                 }
-                field("Loyalty Setup Code"; "Loyalty Setup Code")
+                field("Loyalty Setup Code"; Rec."Loyalty Setup Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Loyalty Setup Code field';
                 }
-                field("Burn Points Currency Code"; "Burn Points Currency Code")
+                field("Burn Points Currency Code"; Rec."Burn Points Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Burn Points LCY Currency Code field';
                 }
-                field("G/L Account No."; "G/L Account No.")
+                field("G/L Account No."; Rec."G/L Account No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the G/L Account No. field';
                 }
-                field("Invoice No. Series"; "Invoice No. Series")
+                field("Invoice No. Series"; Rec."Invoice No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Invoice No. Series field';
                 }
-                field("Reconciliation Period"; "Reconciliation Period")
+                field("Reconciliation Period"; Rec."Reconciliation Period")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reconciliation Period field';
                 }
-                field("Outstanding Earn Points"; "Outstanding Earn Points")
+                field("Outstanding Earn Points"; Rec."Outstanding Earn Points")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Outstanding Earn Points field';
                 }
-                field("Outstanding Burn Points"; "Outstanding Burn Points")
+                field("Outstanding Burn Points"; Rec."Outstanding Burn Points")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Outstanding Burn Points field';
@@ -112,7 +112,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Caption = 'Transaction Entries';
                 Image = EntriesList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Server Trx Log";
@@ -130,7 +130,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Caption = 'Reconcile All Stores';
                 Image = IssueFinanceCharge;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -149,7 +149,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Caption = 'Reconcile Selected Store';
                 Image = IssueFinanceCharge;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

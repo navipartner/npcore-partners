@@ -125,7 +125,6 @@ codeunit 6014465 "NPR String Library"
 
     procedure GetPrefixBySeq(Sequence: Text[10]; n: Integer) Prefix: Text[512]
     var
-        Occurences: Integer;
         Suffix: Text[512];
         Index: Integer;
     begin
@@ -156,7 +155,6 @@ codeunit 6014465 "NPR String Library"
 
     procedure GetSuffixBySeq(Sequence: Text[10]; n: Integer) Suffix: Text[512]
     var
-        Occurences: Integer;
         Prefix: Text[512];
         Index: Integer;
     begin
@@ -347,8 +345,6 @@ codeunit 6014465 "NPR String Library"
     end;
 
     procedure TrimStart(Sequence: Text[10])
-    var
-        Index: Integer;
     begin
         while CopyStr(_String, 1, StrLen(Sequence)) = Sequence do
             _String := CopyStr(_String, 1 + StrLen(Sequence));

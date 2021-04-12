@@ -44,7 +44,7 @@ table 6060123 "NPR TM Det. Ticket AccessEntry"
             Caption = 'Type';
             DataClassification = CustomerContent;
             OptionCaption = 'Initial Entry,Reservation,Admitted,Departed,Consumed,Canceled,Payment,PrePaid,PostPaid,Canceled Reservation';
-            OptionMembers = INITIAL_ENTRY,RESERVATION,ADMITTED,DEPARTED,CONSUMED,CANCELED_ADMISSION,PAYMENT,PREPAID,POSTPAID,CANCELED_RESERVATION ;
+            OptionMembers = INITIAL_ENTRY,RESERVATION,ADMITTED,DEPARTED,CONSUMED,CANCELED_ADMISSION,PAYMENT,PREPAID,POSTPAID,CANCELED_RESERVATION;
         }
         field(11; "External Adm. Sch. Entry No."; Integer)
         {

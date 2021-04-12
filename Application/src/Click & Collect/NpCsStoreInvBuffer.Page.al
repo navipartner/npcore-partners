@@ -14,40 +14,40 @@ page 6151210 "NPR NpCs Store Inv. Buffer"
         {
             repeater(Group)
             {
-                field(Sku; Sku)
+                field(Sku; Rec.Sku)
                 {
                     ApplicationArea = All;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Sku field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 2 field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = All;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Inventory field';
                 }
-                field("In Stock"; "In Stock")
+                field("In Stock"; Rec."In Stock")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the In Stock field';

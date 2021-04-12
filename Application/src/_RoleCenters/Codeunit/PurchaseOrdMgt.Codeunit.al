@@ -7,13 +7,13 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
     procedure OnOpenPage(var TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup")
     begin
         if not TrailingPurchOrdersSetup.Get(UserId) then begin
-            TrailingPurchOrdersSetup.LockTable;
+            TrailingPurchOrdersSetup.LockTable();
             TrailingPurchOrdersSetup."User ID" := UserId;
             TrailingPurchOrdersSetup."Use Work Date as Base" := true;
             TrailingPurchOrdersSetup."Period Length" := TrailingPurchOrdersSetup."Period Length"::Month;
             TrailingPurchOrdersSetup."Value to Calculate" := TrailingPurchOrdersSetup."Value to Calculate"::"No. of Orders";
             TrailingPurchOrdersSetup."Chart Type" := TrailingPurchOrdersSetup."Chart Type"::"Stacked Column";
-            TrailingPurchOrdersSetup.Insert;
+            TrailingPurchOrdersSetup.Insert();
         end;
     end;
 
@@ -114,8 +114,8 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
 
         TrailingSalesOrderQry.SetRange(Status, Status);
         TrailingSalesOrderQry.SetRange(DocumentDate, FromDate, ToDate);
-        TrailingSalesOrderQry.Open;
-        while TrailingSalesOrderQry.Read do begin
+        TrailingSalesOrderQry.Open();
+        while TrailingSalesOrderQry.Read() do begin
             if TrailingSalesOrderQry.CurrencyCode = '' then
                 Amount := TrailingSalesOrderQry.Amount
             else
@@ -134,7 +134,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
             PurchHeader.SetRange("Posting Date");
         PurchHeader.SetRange(Status, Status);
         PurchHeader.SetRange("Document Date", FromDate, ToDate);
-        exit(PurchHeader.Count);
+        exit(PurchHeader.Count());
     end;
 
     procedure CreateMap(var Map: array[4] of Enum "Purchase Document Status")

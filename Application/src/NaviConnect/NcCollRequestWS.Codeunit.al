@@ -9,7 +9,6 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
 
     var
         SETUP_MISSING: Label 'Setup is missing for %1';
-        FileMan: Codeunit "File Management";
 
     procedure Createcollectorrequest(var CollectorRequestWebImport: XMLport "NPR Collector Req. Web Imp.")
     var
@@ -18,19 +17,19 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
         OutStr: OutStream;
     begin
         SelectLatestVersion;
-        CollectorRequestWebImport.Import;
+        CollectorRequestWebImport.Import();
 
         InsertImportEntry('Createcollectorrequest', ImportEntry);
         ImportEntry."Document ID" := CollectorRequestWebImport.GetMessageID();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('CollectorRequest-%1.xml', Format(CurrentDateTime(), 0, 9));
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         CollectorRequestWebImport.SetDestination(OutStr);
-        CollectorRequestWebImport.Export;
+        CollectorRequestWebImport.Export();
         Commit();
 
         ImportEntry.Modify(true);
@@ -54,11 +53,9 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
-    var
-        NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
 
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR Nc Coll.  Request WS", WebserviceFunction);
         if (ImportEntry."Import Type" = '') then begin
@@ -75,7 +72,7 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
         ImportEntry.Insert(true);
     end;
 
-    local procedure GetDocumentSequence(DocumentID: Text[100]) SequenceNo: Integer
+    local procedure GetDocumentSequence(DocumentID: Text[100]): Integer
     var
         ImportEntry: Record "NPR Nc Import Entry";
     begin
@@ -132,7 +129,7 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", '%1', CopyStr(WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));
 
-        if ImportType.FindFirst then
+        if ImportType.FindFirst() then
             exit(ImportType.Code);
 
         exit('');

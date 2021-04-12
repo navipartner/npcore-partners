@@ -250,7 +250,6 @@ page 6059784 "NPR TM Ticket Type"
                 var
                     TempBlob: Codeunit "Temp Blob";
                     FileMgt: Codeunit "File Management";
-                    Path: Text;
                     FileName: Text;
                     RecRef: RecordRef;
                 begin
@@ -277,7 +276,6 @@ page 6059784 "NPR TM Ticket Type"
 
     var
         IMPORT_FILE: Label 'Import File';
-        FileManagement: Codeunit "File Management";
         Webclient: Boolean;
 
     procedure HideTickets()

@@ -65,7 +65,7 @@ codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
         end;
 
         EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Starting trx background session', '');
-        Commit; //Log
+        Commit(); //Log
 
         EFTTransactionRequest.Get(EFTTransactionAsyncRequest."Request Entry No");
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
@@ -76,7 +76,7 @@ codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
         //+NPR5.54 [387990]
 
         LogTrxRequest(EFTTransactionAsyncRequest."Request Entry No", EFTSetup, EFTAdyenCloudProtocol, Success);
-        Commit; //Log
+        Commit(); //Log
 
         //This function takes a LOCK on the request record, which acts a synchronization mechanism between the racing background sessions.
         //It is kept until after writing response record.
@@ -90,7 +90,7 @@ codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
         InsertTrxResponse(EFTTransactionAsyncRequest."Request Entry No", Success, Response, TransactionStarted);
         //+NPR5.54 [387990]
         EFTTrxBackgroundSessionMgt.MarkRequestAsDone(EFTTransactionAsyncRequest."Request Entry No");
-        Commit; //Response
+        Commit(); //Response
         //+NPR5.53 [377533]
     end;
 
@@ -99,22 +99,20 @@ codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
         Success: Boolean;
     begin
         //-NPR5.53 [377533]
-        with EFTTransactionRequest do begin
-            case "Processing Type" of
-                "Processing Type"::PAYMENT:
-                    Success := EFTAdyenCloudProtocol.InvokePayment(EFTTransactionRequest, EFTSetup, Response);
-                "Processing Type"::REFUND:
-                    Success := EFTAdyenCloudProtocol.InvokeRefund(EFTTransactionRequest, EFTSetup, Response);
-                "Processing Type"::AUXILIARY:
-                    case "Auxiliary Operation ID" of
-                        2, 4, 5:
-                            Success := EFTAdyenCloudProtocol.InvokeAcquireCard(EFTTransactionRequest, EFTSetup, Response);
-                        else
-                            Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), "Processing Type");
-                    end;
-                else
-                    Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), "Processing Type");
-            end;
+        case EFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::PAYMENT:
+                Success := EFTAdyenCloudProtocol.InvokePayment(EFTTransactionRequest, EFTSetup, Response);
+            EFTTransactionRequest."Processing Type"::REFUND:
+                Success := EFTAdyenCloudProtocol.InvokeRefund(EFTTransactionRequest, EFTSetup, Response);
+            EFTTransactionRequest."Processing Type"::AUXILIARY:
+                case EFTTransactionRequest."Auxiliary Operation ID" of
+                    2, 4, 5:
+                        Success := EFTAdyenCloudProtocol.InvokeAcquireCard(EFTTransactionRequest, EFTSetup, Response);
+                    else
+                        Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), EFTTransactionRequest."Processing Type");
+                end;
+            else
+                Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), EFTTransactionRequest."Processing Type");
         end;
 
         exit(Success);
@@ -148,7 +146,7 @@ codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
         EFTTransactionAsyncResponse: Record "NPR EFT Trx Async Resp.";
     begin
         //-NPR5.53 [377533]
-        EFTTransactionAsyncResponse.Init;
+        EFTTransactionAsyncResponse.Init();
         EFTTransactionAsyncResponse."Request Entry No" := TrxEntryNo;
 
         if Success then begin
@@ -163,7 +161,7 @@ codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
         EFTTransactionAsyncResponse."Transaction Started" := TransactionStarted;
         //+NPR5.54 [387990]
 
-        EFTTransactionAsyncResponse.Insert;
+        EFTTransactionAsyncResponse.Insert();
         //+NPR5.53 [377533]
     end;
 }

@@ -1,4 +1,4 @@
-codeunit 6150850 "NPR POS Action: CK Payment"
+﻿codeunit 6150850 "NPR POS Action: CK Payment"
 {
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
@@ -49,7 +49,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "NPR POS JSON Management";
-        JSON: Codeunit "NPR POS JSON Management";
         PaymentNo: Code[10];
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
@@ -88,7 +87,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
         Handled := ConfigureCashWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
 
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
@@ -96,10 +95,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     var
         EFTHandled: Boolean;
         PaymentTypeNo: Code[10];
-        ConfirmId: Text;
-        Confirmed: Boolean;
         JSON: Codeunit "NPR POS JSON Management";
-        tmpVariant: Variant;
         AmountToCapture: Decimal;
         NumpadAmount: Decimal;
         CashKeeperTransaction: Record "NPR CashKeeper Transaction";
@@ -127,14 +123,13 @@ codeunit 6150850 "NPR POS Action: CK Payment"
                     NumpadAmount := AmountToCapture;
 
                     JSON.SetContext('TransactionRequest_EntryNo', '');
-                    FrontEnd.SetActionContext(ActionCode, JSON);
+                    FrontEnd.SetActionContext(ActionCode(), JSON);
 
                     EFTHandled := CreateTransaction(POSSession, AmountToCapture, PaymentTypeNo, NumpadAmount);
                 end;
 
             'InvokeDevice':
                 begin
-                    EFTHandled := true;
                     GetTransactionRequest(POSSession, CashKeeperTransaction);
                     FrontEnd.PauseWorkflow();
                     OnInvokeDevice(CashKeeperTransaction);
@@ -142,7 +137,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
             'CheckTransactionResult':
                 begin
-                    EFTHandled := true;
                     GetTransactionRequest(POSSession, CashKeeperTransaction);
                     CheckTransactionResult(POSSession, FrontEnd, CashKeeperTransaction);
                 end;
@@ -155,7 +149,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         POSLine: Record "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         Handled: Boolean;
-        tmpVariant: Variant;
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -179,7 +172,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
             if (NumpadAmount < 0) then
                 Error(NegativeCashBackErr);
 
-            CashKeeperTransaction.Init;
+            CashKeeperTransaction.Init();
             CashKeeperTransaction."Register No." := SaleLinePOS."Register No.";
             CashKeeperTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             CashKeeperTransaction.Amount := NumpadAmount;
@@ -197,7 +190,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
             if (NumpadAmount <> SubTotal) then
                 Error(NoNegativeCashBackErr);
 
-            CashKeeperTransaction.Init;
+            CashKeeperTransaction.Init();
             CashKeeperTransaction."Register No." := SaleLinePOS."Register No.";
             CashKeeperTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             CashKeeperTransaction.Amount := NumpadAmount * -1;
@@ -206,7 +199,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
             CashKeeperTransaction."Value In Cents" := CashKeeperTransaction.Amount * 100;
             CashKeeperTransaction.Action := CashKeeperTransaction.Action::Pay;
             CashKeeperTransaction."Payment Type" := PaymentTypeNo;
-            CashKeeperTransaction.Insert;
+            CashKeeperTransaction.Insert();
 
         end;
 
@@ -222,7 +215,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         PaymentTypeNo: Code[10];
         POSPaymentMethod: Record "NPR POS Payment Method";
         Context: JsonObject;
-        JSON: Codeunit "NPR POS JSON Management";
         Txt001: Label 'CashKeeper error: %1 - %2';
         Txt002: Label 'Payment was cancelled';
     begin
@@ -256,8 +248,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     end;
 
     local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Decimal
-    var
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
         exit(CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod));
     end;
@@ -309,7 +299,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         exit(Round(Amount, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType()));
     end;
 
-    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "NPR CashKeeper Transaction"; POSPaymentMethod: Record "NPR POS Payment Method"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") Handled: Boolean
+    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "NPR CashKeeper Transaction"; POSPaymentMethod: Record "NPR POS Payment Method"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         AlternativTransactionRequest: Record "NPR EFT Transaction Request";
@@ -341,7 +331,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
         POSPaymentLine.InsertPaymentLine(POSLine, 0);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
-        Commit;
+        Commit();
 
         POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, POSPaymentMethod);
 
@@ -357,9 +347,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     local procedure GetTransactionRequest(POSSession: Codeunit "NPR POS Session"; var CashKeeperTransaction: Record "NPR CashKeeper Transaction")
     var
         EntryNo: Integer;
-        Token: Guid;
         TmpVariant: Variant;
-        AlternativTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         POSSession.RetrieveActionState('TransactionRequest_EntryNo', TmpVariant);
         EntryNo := TmpVariant;
@@ -378,7 +366,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         StateEnum: DotNet NPRNetState_Action2;
         CashKeeperSetup: Record "NPR CashKeeper Setup";
         FrontEnd: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
         StepTxt: Text;
     begin
         if CashKeeperTransaction.Amount = 0 then begin
@@ -436,8 +423,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', true, true)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
-    var
-        FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         if (ActionName <> 'CK_PAYMENT') then
             exit;
@@ -455,11 +440,8 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     local procedure CloseForm(Data: Text)
     var
         State: DotNet NPRNetState4;
-        FrontEnd: Codeunit "NPR POS Front End Management";
         CashKeeperTransaction: Record "NPR CashKeeper Transaction";
-        POSSession: Codeunit "NPR POS Session";
         TransactionNo: Integer;
-        PaymentTypeNo: Code[20];
     begin
         State := State.Deserialize(Data);
 
@@ -483,7 +465,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
         CashKeeperTransaction.Modify(true);
 
-        Commit;
+        Commit();
     end;
     #endregion
 

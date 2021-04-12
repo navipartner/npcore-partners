@@ -1,4 +1,4 @@
-xmlport 6151404 "NPR Magento Inv. Set Api"
+﻿xmlport 6151404 "NPR Magento Inv. Set Api"
 {
     Caption = 'Magento Avail. InventoryExport';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/inventory_set';
@@ -22,7 +22,7 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
                     trigger OnAfterAssignVariable()
                     begin
                         RISRetailInventorySet.Get(set_code);
-                        RISRetailInventorySet.SetRecFilter;
+                        RISRetailInventorySet.SetRecFilter();
                     end;
                 }
                 textelement(products)
@@ -42,7 +42,7 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
                                 RISRetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
                                 Position: Integer;
                             begin
-                                TempItemVariant.Init;
+                                TempItemVariant.Init();
                                 TempItemVariant."Item No." := CopyStr(sku, 1, MaxStrLen(TempItemVariant."Item No."));
 
                                 Position := StrPos(sku, '_');
@@ -52,15 +52,15 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
                                 end;
 
                                 RISRetailInventorySetMgt.ProcessInventorySet(RISRetailInventorySet, TempItemVariant."Item No.", TempItemVariant.Code, RetailInventoryBuffer2);
-                                if RetailInventoryBuffer2.FindSet then
+                                if RetailInventoryBuffer2.FindSet() then
                                     repeat
                                         LineNo += 1;
-                                        RetailInventoryBuffer.Init;
+                                        RetailInventoryBuffer.Init();
                                         RetailInventoryBuffer := RetailInventoryBuffer2;
                                         RetailInventoryBuffer."Location Filter" := Format(RetailInventoryBuffer."Line No.");
                                         RetailInventoryBuffer."Line No." := LineNo;
-                                        RetailInventoryBuffer.Insert;
-                                    until RetailInventoryBuffer2.Next = 0;
+                                        RetailInventoryBuffer.Insert();
+                                    until RetailInventoryBuffer2.Next() = 0;
                             end;
                         }
                     }
@@ -68,7 +68,7 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
 
                 trigger OnBeforePassVariable()
                 begin
-                    currXMLport.Skip;
+                    currXMLport.Skip();
                 end;
             }
             tableelement(risretailinventoryset; "NPR RIS Retail Inv. Set")
@@ -125,7 +125,7 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
                                     RetailInventoryBuffer.SetRange("Location Filter", Format(RISRetailInventorySetEntry."Line No."));
                                     RetailInventoryBuffer.SetRange("Item Filter", TempItemVariant2."Item No.");
                                     RetailInventoryBuffer.SetFilter("Variant Filter", '=%1', TempItemVariant2.Code);
-                                    if RetailInventoryBuffer.FindFirst then;
+                                    if RetailInventoryBuffer.FindFirst() then;
                                     inventory := Format(RetailInventoryBuffer.Inventory, 0, 9);
                                 end;
                             }
@@ -140,7 +140,7 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
 
                 trigger OnAfterInitRecord()
                 begin
-                    currXMLport.Skip;
+                    currXMLport.Skip();
                 end;
             }
         }

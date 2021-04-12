@@ -45,7 +45,7 @@ page 6151502 "NPR Nc Task List"
                 group(Filters)
                 {
                     Caption = 'Filters';
-                    field("COUNT"; Count)
+                    field("COUNT"; Rec.Count)
                     {
                         ApplicationArea = All;
                         Caption = 'Quantity';
@@ -100,81 +100,81 @@ page 6151502 "NPR Nc Task List"
             repeater(Control6150622)
             {
                 ShowCaption = false;
-                field("Task Processor Code"; "Task Processor Code")
+                field("Task Processor Code"; Rec."Task Processor Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Processor Code field';
                 }
-                field(Processed; Processed)
+                field(Processed; Rec.Processed)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processed field';
                 }
-                field("Process Error"; "Process Error")
+                field("Process Error"; Rec."Process Error")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Error field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Record Value"; "Record Value")
+                field("Record Value"; Rec."Record Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Record Value field';
                 }
-                field("Record Position"; "Record Position")
+                field("Record Position"; Rec."Record Position")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Record Position field';
                 }
-                field("Log Date"; "Log Date")
+                field("Log Date"; Rec."Log Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Log Date field';
                 }
-                field("Last Checked1"; "Last Processing Started at")
+                field("Last Checked1"; Rec."Last Processing Started at")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Processing Started at field';
                 }
-                field("Last Processing Completed at"; "Last Processing Completed at")
+                field("Last Processing Completed at"; Rec."Last Processing Completed at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Processing Completed at field';
                 }
-                field("Last Processing Duration"; "Last Processing Duration")
+                field("Last Processing Duration"; Rec."Last Processing Duration")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Processing Duration (sec.) field';
                 }
-                field("Process Count"; "Process Count")
+                field("Process Count"; Rec."Process Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Process Count field';
@@ -320,10 +320,8 @@ page 6151502 "NPR Nc Task List"
         ResponseText: Text;
         Text002: Label 'The %1 selected Task(s) will be scheduled for re-export\Continue?';
         ShowProcessed: Boolean;
-        WebClient: Boolean;
         Text003: Label 'Updating: #1#############\Total: #2###############';
         TaskProcessorFilter: Code[20];
-        NaviConnectTaskProcessorCode: Code[20];
 
     local procedure IsWebClient(): Boolean
     var
@@ -336,23 +334,22 @@ page 6151502 "NPR Nc Task List"
 
     local procedure SetPresetFilters()
     var
-        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         CurrentEntryNo: BigInteger;
     begin
         //-NC1.01
-        CurrentEntryNo := "Entry No.";
-        FilterGroup(2);
+        CurrentEntryNo := Rec."Entry No.";
+        Rec.FilterGroup(2);
         //-NC2.01 [252048]
-        SetFilter("Task Processor Code", TaskProcessorFilter);
+        Rec.SetFilter("Task Processor Code", TaskProcessorFilter);
         //+NC2.01 [252048]
 
         //-NC2.00
         //RESET;
         //+NC2.00
         if ShowProcessed then
-            SetRange(Processed)
+            Rec.SetRange(Processed)
         else
-            SetRange(Processed, false);
+            Rec.SetRange(Processed, false);
 
         //-NC2.00
         // IF ItemNo <> '' THEN BEGIN
@@ -364,8 +361,8 @@ page 6151502 "NPR Nc Task List"
         // SETFILTER("Task Processor Code",NaviConnectTaskProcessorCode);
         // //+NC1.22
         //+NC2.00
-        FilterGroup(0);
-        if Get(CurrentEntryNo) then;
+        Rec.FilterGroup(0);
+        if Rec.Get(CurrentEntryNo) then;
         CurrPage.Update(false);
         //+NC1.01
     end;
@@ -373,9 +370,6 @@ page 6151502 "NPR Nc Task List"
     local procedure UpdateResponseText()
     var
         InStream: InStream;
-        Line: Text;
-        LF: Char;
-        CR: Char;
         StreamReader: DotNet NPRNetStreamReader;
     begin
         //-NC2.01 [252048]
@@ -391,9 +385,9 @@ page 6151502 "NPR Nc Task List"
         //  ResponseText += Line;
         // END;
         ResponseText := '';
-        if not Response.HasValue then
+        if not Response.HasValue() then
             exit;
-        CalcFields(Response);
+        Rec.CalcFields(Response);
         Response.CreateInStream(InStream, TEXTENCODING::UTF8);
         StreamReader := StreamReader.StreamReader(InStream);
         ResponseText := StreamReader.ReadToEnd();
@@ -411,9 +405,9 @@ page 6151502 "NPR Nc Task List"
         //-NC1.22
         //IF PAGE.RUNMODAL(PAGE::"Task Worker Group",TaskWorkerGroup) = ACTION::LookupOK THEN
         //  TaskMgt.UpdateTasks(TaskWorkerGroup.Code);
-        if not TaskProcessor.FindSet then begin
+        if not TaskProcessor.FindSet() then begin
             SyncMgt.UpdateTaskProcessor(TaskProcessor);
-            Commit;
+            Commit();
         end;
         if PAGE.RunModal(PAGE::"NPR Nc Task Proces. List", TaskProcessor) <> ACTION::LookupOK then
             exit;
@@ -431,22 +425,20 @@ page 6151502 "NPR Nc Task List"
     begin
         CurrPage.SetSelectionFilter(Task);
         Window.Open(Text003);
-        Window.Update(2, Task.Count);
-        if Task.FindSet then
+        Window.Update(2, Task.Count());
+        if Task.FindSet() then
             repeat
                 Counter += 1;
                 Window.Update(1, Counter);
                 SyncMgt.ProcessTask(Task);
-            until Task.Next = 0;
-        Window.Close;
+            until Task.Next() = 0;
+        Window.Close();
         CurrPage.Update(false);
     end;
 
     local procedure RescheduleForProcessing()
     var
         Task: Record "NPR Nc Task";
-        Counter: Integer;
-        Window: Dialog;
     begin
         CurrPage.SetSelectionFilter(Task);
         if Confirm(StrSubstNo(Text002, Task.Count), true) then begin
@@ -458,18 +450,17 @@ page 6151502 "NPR Nc Task List"
     local procedure ShowOutput()
     var
         NcTaskOutput: Record "NPR Nc Task Output";
-        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;
     begin
-        CalcFields("Data Output");
-        if not "Data Output".HasValue then begin
+        Rec.CalcFields("Data Output");
+        if not "Data Output".HasValue() then begin
             //-NC2.17 [335927]
-            NcTaskOutput.SetRange("Task Entry No.", "Entry No.");
-            if NcTaskOutput.FindLast and NcTaskOutput.Data.HasValue then begin
+            NcTaskOutput.SetRange("Task Entry No.", Rec."Entry No.");
+            if NcTaskOutput.FindLast() and NcTaskOutput.Data.HasValue() then begin
                 NcTaskOutput.CalcFields(Data);
                 NcTaskOutput.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
                 Path := TemporaryPath + NcTaskOutput.Name;
@@ -495,7 +486,7 @@ page 6151502 "NPR Nc Task List"
             //-NC2.01 [252048]
             //TempBlob.Blob := "Data Output";
             //Path := FileMgt.BLOBExport(TempBlob,TEMPORARYPATH + 'Task-' + FORMAT("Entry No.") + '.xml',FALSE);
-            Path := TemporaryPath + 'Task-' + Format("Entry No.") + '.xml';
+            Path := TemporaryPath + 'Task-' + Format(Rec."Entry No.") + '.xml';
             StreamReader := StreamReader.StreamReader(InStr);
             DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.xml', Path);
             //+NC2.01 [252048]

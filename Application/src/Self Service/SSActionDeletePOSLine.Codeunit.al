@@ -2,9 +2,6 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
 {
     var
         ActionDescription: Label 'This built in function deletes sales or payment line from the POS';
-        Title: Label 'Delete Line';
-        Prompt: Label 'Are you sure you want to delete the line %1?';
-        NotAllowed: Label 'This line can''t be deleted.';
 
     local procedure ActionCode(): Text
     begin
@@ -39,7 +36,7 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         Qty: Integer;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         DeletePosLine(POSSession);

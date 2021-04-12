@@ -32,7 +32,7 @@ table 6060154 "NPR Event Att. Row Templ."
     begin
         EventAttrMgt.TemplateHasEntries(0, Name);
         EventAttrRowValue.SetRange("Template Name", Name);
-        EventAttrRowValue.DeleteAll;
+        EventAttrRowValue.DeleteAll();
     end;
 }
 

@@ -13,8 +13,6 @@ table 6014538 "NPR Audit Roll Backup"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                Rapportvalg: Record "NPR Report Selection Retail";
             begin
             end;
         }
@@ -220,8 +218,6 @@ table 6014538 "NPR Audit Roll Backup"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                Valuta2: Record Currency;
             begin
             end;
         }

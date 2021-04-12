@@ -7,7 +7,7 @@ codeunit 6151166 "NPR NpGp POS Sales WS"
         TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary;
         NpGpPOSSalesInitMgt: Codeunit "NPR NpGp POS Sales Init Mgt.";
     begin
-        sales_entries.Import;
+        sales_entries.Import();
         sales_entries.GetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
 
         NpGpPOSSalesInitMgt.InsertPosSalesEntries(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
@@ -25,7 +25,7 @@ codeunit 6151166 "NPR NpGp POS Sales WS"
     begin
         NpGpPOSSalesLine.SetRange("Global Reference", referenceNumber);
         NpGpPOSSalesLine.SetFilter(Quantity, '>0');
-        if not NpGpPOSSalesLine.FindFirst then
+        if not NpGpPOSSalesLine.FindFirst() then
             exit;
 
         NpGpPOSSalesLine.SetRange(Quantity);
@@ -33,36 +33,36 @@ codeunit 6151166 "NPR NpGp POS Sales WS"
         NpGpPOSSalesEntry.SetRange("POS Store Code", NpGpPOSSalesLine."POS Store Code");
         NpGpPOSSalesEntry.SetRange("POS Unit No.", NpGpPOSSalesLine."POS Unit No.");
         NpGpPOSSalesEntry.SetRange("Document No.", NpGpPOSSalesLine."Document No.");
-        if NpGpPOSSalesEntry.FindFirst then begin
+        if NpGpPOSSalesEntry.FindFirst() then begin
             TempNpGpPOSSalesEntry := NpGpPOSSalesEntry;
-            TempNpGpPOSSalesEntry.Insert;
+            TempNpGpPOSSalesEntry.Insert();
 
             if fullSale then
                 NpGpPOSSalesLine.SetRange("Global Reference");
             NpGpPOSSalesLine.SetRange("POS Entry No.", NpGpPOSSalesEntry."Entry No.");
             NpGpPOSSalesLine.SetRange(Type, NpGpPOSSalesLine.Type::Item);
-            NpGpPOSSalesLine.FindSet;
+            NpGpPOSSalesLine.FindSet();
             repeat
                 TempNpGpPOSSalesLine := NpGpPOSSalesLine;
-                TempNpGpPOSSalesLine.Insert;
+                TempNpGpPOSSalesLine.Insert();
 
                 Clear(NpGpPOSSalesLineReturn);
                 NpGpPOSSalesLineReturn.SetRange("Global Reference", NpGpPOSSalesLine."Global Reference");
                 NpGpPOSSalesLineReturn.SetFilter(Quantity, '<0');
-                if NpGpPOSSalesLineReturn.FindSet then
+                if NpGpPOSSalesLineReturn.FindSet() then
                     repeat
                         TempNpGpPOSSalesLine.Quantity += NpGpPOSSalesLineReturn.Quantity;
-                    until NpGpPOSSalesLineReturn.Next = 0;
+                    until NpGpPOSSalesLineReturn.Next() = 0;
 
-                TempNpGpPOSSalesLine.Modify;
-            until NpGpPOSSalesLine.Next = 0;
+                TempNpGpPOSSalesLine.Modify();
+            until NpGpPOSSalesLine.Next() = 0;
 
             NpGpPOSInfoPOSEntry.SetRange("POS Entry No.", NpGpPOSSalesEntry."Entry No.");
-            if NpGpPOSInfoPOSEntry.FindSet then
+            if NpGpPOSInfoPOSEntry.FindSet() then
                 repeat
                     TempNpGpPOSInfoPOSEntry := NpGpPOSInfoPOSEntry;
-                    TempNpGpPOSInfoPOSEntry.Insert;
-                until NpGpPOSInfoPOSEntry.Next = 0;
+                    TempNpGpPOSInfoPOSEntry.Insert();
+                until NpGpPOSInfoPOSEntry.Next() = 0;
         end;
 
         npGpPOSEntries.SetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);

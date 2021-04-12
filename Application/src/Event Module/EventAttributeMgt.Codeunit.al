@@ -1,4 +1,4 @@
-codeunit 6060155 "NPR Event Attribute Mgt."
+﻿codeunit 6060155 "NPR Event Attribute Mgt."
 {
     var
         EventAttributeFound: Label 'You can''t change %1 as it is already part of template (or is a template) which has assigned values. If you wish to change it, create new template and do changes on it.';
@@ -11,35 +11,33 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttributeRowValues: Page "NPR Event Attr. Row Values";
         NewFormula: Text;
     begin
-        with Rec do begin
-            if Type = Type::" " then
-                exit;
-            EventAttributeRowValue.SetRange("Template Name", "Template Name");
-            EventAttributeRowValue.SetRange(Type, EventAttributeRowValue.Type::" ");
-            EventAttributeRowValue.SetFilter("Line No.", '<>%1', "Line No.");
-            EventAttributeRowValues.SetTableView(EventAttributeRowValue);
-            EventAttributeRowValues.SetVisibility();
-            EventAttributeRowValues.LookupMode := true;
-            EventAttributeRowValues.Editable := false;
-            if EventAttributeRowValues.RunModal = ACTION::LookupOK then begin
-                EventAttributeRowValues.SetSelection(EventAttributeRowValue);
-                NewFormula := RowValueConcatenateLineNo(EventAttributeRowValue);
-                if NewFormula <> '' then begin
-                    Validate(Formula, NewFormula);
-                    Modify(true);
-                end;
+        if Rec.Type = Rec.Type::" " then
+            exit;
+        EventAttributeRowValue.SetRange("Template Name", Rec."Template Name");
+        EventAttributeRowValue.SetRange(Type, EventAttributeRowValue.Type::" ");
+        EventAttributeRowValue.SetFilter("Line No.", '<>%1', Rec."Line No.");
+        EventAttributeRowValues.SetTableView(EventAttributeRowValue);
+        EventAttributeRowValues.SetVisibility();
+        EventAttributeRowValues.LookupMode := true;
+        EventAttributeRowValues.Editable := false;
+        if EventAttributeRowValues.RunModal() = ACTION::LookupOK then begin
+            EventAttributeRowValues.SetSelection(EventAttributeRowValue);
+            NewFormula := RowValueConcatenateLineNo(EventAttributeRowValue);
+            if NewFormula <> '' then begin
+                Rec.Validate(Formula, NewFormula);
+                Rec.Modify(true);
             end;
         end;
     end;
 
     local procedure RowValueConcatenateLineNo(var EventAttributeRowValue: Record "NPR Event Attr. Row Value") Lines: Text[250]
     begin
-        if EventAttributeRowValue.FindSet then
+        if EventAttributeRowValue.FindSet() then
             repeat
                 if Lines <> '' then
                     Lines := Lines + ',';
                 Lines := Lines + Format(EventAttributeRowValue."Line No.");
-            until EventAttributeRowValue.Next = 0;
+            until EventAttributeRowValue.Next() = 0;
         exit(Lines);
     end;
 
@@ -70,12 +68,12 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         end;
         if EventAttributeTemplate.IsEmpty then
             exit;
-        EventAttributeTemplate.FindSet;
+        EventAttributeTemplate.FindSet();
         repeat
             EventAttributeEntry.SetRange("Template Name", EventAttributeTemplate.Name);
             if not EventAttributeEntry.IsEmpty then
                 Error(EventAttributeFound, TableCaption);
-        until EventAttributeTemplate.Next = 0;
+        until EventAttributeTemplate.Next() = 0;
     end;
 
     procedure ExcludeRowFromFormula(Rec: Record "NPR Event Attr. Row Value")
@@ -83,33 +81,30 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttributeRowValue: Record "NPR Event Attr. Row Value";
         EventAttributeRowValue2: Record "NPR Event Attr. Row Value";
         TotalNoOfFields: Integer;
-        FormulaValue: Text;
         OptionNo: Integer;
         NewFormulaValue: Text;
         TypeHelper: Codeunit "Type Helper";
     begin
         SetFormulaSearchFilter(Rec."Template Name", Rec."Line No.", EventAttributeRowValue);
-        with EventAttributeRowValue do begin
-            if FindSet then
-                repeat
-                    TotalNoOfFields := TypeHelper.GetNumberOfOptions(Formula);
-                    OptionNo := TypeHelper.GetOptionNo(Format(Rec."Line No."), Formula);
-                    case true of
-                        (OptionNo = 0) and (OptionNo = TotalNoOfFields):
-                            NewFormulaValue := '';
-                        (OptionNo = 0) and (OptionNo < TotalNoOfFields):
-                            NewFormulaValue := CopyStr(Formula, StrLen(Format(Rec."Line No.") + ',') + 1);
-                        (OptionNo > 0) and (OptionNo < TotalNoOfFields):
-                            NewFormulaValue := CopyStr(Formula, 1, StrPos(Formula, Format(Rec."Line No.")) - 1) +
-                                                CopyStr(Formula, StrPos(Formula, Format(Rec."Line No.") + ',') + StrLen(Format(Rec."Line No.") + ','));
-                        (OptionNo = TotalNoOfFields):
-                            NewFormulaValue := CopyStr(Formula, 1, StrPos(Formula, ',' + Format(Rec."Line No.")) - 1);
-                    end;
-                    EventAttributeRowValue2.Get("Template Name", "Line No.");
-                    EventAttributeRowValue2.Formula := NewFormulaValue;
-                    EventAttributeRowValue2.Modify(true);
-                until Next = 0;
-        end;
+        if EventAttributeRowValue.FindSet() then
+            repeat
+                TotalNoOfFields := TypeHelper.GetNumberOfOptions(EventAttributeRowValue.Formula);
+                OptionNo := TypeHelper.GetOptionNo(Format(Rec."Line No."), EventAttributeRowValue.Formula);
+                case true of
+                    (OptionNo = 0) and (OptionNo = TotalNoOfFields):
+                        NewFormulaValue := '';
+                    (OptionNo = 0) and (OptionNo < TotalNoOfFields):
+                        NewFormulaValue := CopyStr(EventAttributeRowValue.Formula, StrLen(Format(Rec."Line No.") + ',') + 1);
+                    (OptionNo > 0) and (OptionNo < TotalNoOfFields):
+                        NewFormulaValue := CopyStr(EventAttributeRowValue.Formula, 1, StrPos(EventAttributeRowValue.Formula, Format(Rec."Line No.")) - 1) +
+                                            CopyStr(EventAttributeRowValue.Formula, StrPos(EventAttributeRowValue.Formula, Format(Rec."Line No.") + ',') + StrLen(Format(Rec."Line No.") + ','));
+                    (OptionNo = TotalNoOfFields):
+                        NewFormulaValue := CopyStr(EventAttributeRowValue.Formula, 1, StrPos(EventAttributeRowValue.Formula, ',' + Format(Rec."Line No.")) - 1);
+                end;
+                EventAttributeRowValue2.Get(EventAttributeRowValue."Template Name", EventAttributeRowValue."Line No.");
+                EventAttributeRowValue2.Formula := NewFormulaValue;
+                EventAttributeRowValue2.Modify(true);
+            until EventAttributeRowValue.Next() = 0;
     end;
 
     local procedure SetEventAttributeEntryFilter(TemplateName: Code[20]; JobNo: Code[20]; RowLineNo: Integer; ColumnLineNo: Integer; var EventAttributeEntry: Record "NPR Event Attribute Entry")
@@ -138,7 +133,7 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttrColValue: Record "NPR Event Attr. Column Value";
         WrongDataType: Label 'Column %1 is of type %2 and only values of that type can be entered.';
     begin
-        if EventAttributeEntry.FindLast then
+        if EventAttributeEntry.FindLast() then
             EntryNo := EventAttributeEntry."Entry No.";
         SetEventAttributeEntryFilter(TemplateName, JobNo, RowLineNo, ColumnLineNo, EventAttributeEntry);
         EventAttributeEntry.SetRange(Filter, FilterMode);
@@ -155,10 +150,10 @@ codeunit 6060155 "NPR Event Attribute Mgt."
                                     Error(WrongDataType, ColumnCaption, EventAttrColValue.Type);
                         end;
                     end;
-                    if EventAttributeEntry.FindFirst then begin
+                    if EventAttributeEntry.FindFirst() then begin
                         EventAttributeEntry."Value Text" := Value;
                         EventAttributeEntry."Value Decimal" := ValueDec;
-                        EventAttributeEntry.Modify;
+                        EventAttributeEntry.Modify();
                     end else begin
                         EventAttributeEntry."Entry No." := EntryNo + 1;
                         EventAttributeEntry."Template Name" := TemplateName;
@@ -169,15 +164,15 @@ codeunit 6060155 "NPR Event Attribute Mgt."
                         EventAttributeEntry."Value Decimal" := ValueDec;
                         EventAttributeEntry.Filter := FilterMode;
                         EventAttributeEntry."Filter Name" := FilterName;
-                        EventAttributeEntry.Insert;
+                        EventAttributeEntry.Insert();
                     end;
                 end;
             ActionHere::Delete:
-                EventAttributeEntry.DeleteAll;
+                EventAttributeEntry.DeleteAll();
             ActionHere::Read:
                 begin
                     Value := '';
-                    if EventAttributeEntry.FindFirst then
+                    if EventAttributeEntry.FindFirst() then
                         Value := EventAttributeEntry."Value Text";
                 end;
         end;
@@ -195,7 +190,7 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         for i := 1 to NoOfLines do begin
             Evaluate(RowLineNo, SelectStr(i, Formula));
             SetEventAttributeEntryFilter(TemplateName, JobNo, RowLineNo, ColumnLineNo, EventAttributeEntry);
-            if EventAttributeEntry.FindFirst then
+            if EventAttributeEntry.FindFirst() then
                 TotalSum += EventAttributeEntry."Value Decimal";
         end;
     end;
@@ -210,7 +205,7 @@ codeunit 6060155 "NPR Event Attribute Mgt."
     begin
         EventAttributeTemplate.Get(TemplateName);
         SetFormulaSearchFilter(EventAttributeTemplate."Row Template Name", RowLineNo, EventAttrRowValue);
-        if EventAttrRowValue.FindSet then
+        if EventAttrRowValue.FindSet() then
             repeat
                 case EventAttrRowValue.Type of
                     EventAttrRowValue.Type::Sum:
@@ -224,7 +219,7 @@ codeunit 6060155 "NPR Event Attribute Mgt."
                             EventAttributeEntryAction(ActionHere, TemplateName, JobNo, EventAttrRowValue."Line No.", ColumnLineNo, ColumnCaption, NewValue, false, '');
                         end;
                 end;
-            until EventAttrRowValue.Next = 0;
+            until EventAttrRowValue.Next() = 0;
     end;
 
     procedure CheckAndUpdate(TemplateName: Code[20]; JobNo: Code[20]; RowLineNo: Integer; ColumnLineNo: Integer; ColumnCaption: Text; AttributeValue: Text; FilterMode: Boolean; FilterName: Code[20])
@@ -269,31 +264,31 @@ codeunit 6060155 "NPR Event Attribute Mgt."
             EventAttributeFrom.SetRange("Job No.", FromEventNo);
             if FromTemplateName <> '' then
                 EventAttributeFrom.SetRange("Template Name", FromTemplateName);
-            if EventAttributeFrom.FindSet then
+            if EventAttributeFrom.FindSet() then
                 repeat
-                    EventAttributeTo.Init;
+                    EventAttributeTo.Init();
                     EventAttributeTo := EventAttributeFrom;
                     EventAttributeTo."Job No." := ToEventNo;
-                    if not EventAttributeTo.Insert then
+                    if not EventAttributeTo.Insert() then
                         Clear(EventAttributeTo);
-                until EventAttributeFrom.Next = 0;
+                until EventAttributeFrom.Next() = 0;
         end;
 
-        if EventAttributeEntryTo.FindLast then
+        if EventAttributeEntryTo.FindLast() then
             NextEntryNo := EventAttributeEntryTo."Entry No.";
 
         if FromTemplateName <> '' then
             EventAttributeEntryFrom.SetRange("Template Name", FromTemplateName);
         EventAttributeEntryFrom.SetRange("Job No.", FromEventNo);
-        if EventAttributeEntryFrom.FindSet then begin
+        if EventAttributeEntryFrom.FindSet() then begin
             repeat
                 NextEntryNo += 1;
-                EventAttributeEntryTo.Init;
+                EventAttributeEntryTo.Init();
                 EventAttributeEntryTo := EventAttributeEntryFrom;
                 EventAttributeEntryTo."Entry No." := NextEntryNo;
                 EventAttributeEntryTo."Job No." := ToEventNo;
-                EventAttributeEntryTo.Insert;
-            until EventAttributeEntryFrom.Next = 0;
+                EventAttributeEntryTo.Insert();
+            until EventAttributeEntryFrom.Next() = 0;
             exit(true);
         end;
         ReturnMsg := NothingToCopyTxt;
@@ -313,7 +308,7 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttributeEntry.SetRange("Template Name", TemplateName);
         EventAttributeEntry.SetRange(Filter, true);
         EventAttributeEntry.SetRange("Filter Name", FilterName);
-        if not EventAttributeEntry.FindSet then
+        if not EventAttributeEntry.FindSet() then
             exit(false);
         repeat
             FilterCount += 1;
@@ -329,33 +324,33 @@ codeunit 6060155 "NPR Event Attribute Mgt."
                 EventAttrColValue.Type::Text:
                     EventAttributeEntryFiltered.SetFilter("Value Text", EventAttributeEntry."Value Text");
             end;
-            if not EventAttributeEntryFiltered.FindSet then
+            if not EventAttributeEntryFiltered.FindSet() then
                 exit(false);
             if FilterCount = 1 then
                 repeat
                     if not TempJob.Get(EventAttributeEntryFiltered."Job No.") then begin
                         TempJob."No." := EventAttributeEntryFiltered."Job No.";
-                        TempJob.Insert;
+                        TempJob.Insert();
                     end;
-                until EventAttributeEntryFiltered.Next = 0
+                until EventAttributeEntryFiltered.Next() = 0
             else begin
-                if TempJob.FindSet then
+                if TempJob.FindSet() then
                     repeat
                         EventAttributeEntryFiltered.SetRange("Job No.", TempJob."No.");
                         if EventAttributeEntryFiltered.IsEmpty then
-                            TempJob.Delete;
-                    until TempJob.Next = 0
+                            TempJob.Delete();
+                    until TempJob.Next() = 0
                 else
                     exit(false);
             end;
             EventAttributeEntryFiltered.SetRange("Value Decimal");
             EventAttributeEntryFiltered.SetRange("Value Text");
-        until EventAttributeEntry.Next = 0;
-        if TempJob.FindSet then
+        until EventAttributeEntry.Next() = 0;
+        if TempJob.FindSet() then
             repeat
                 Job.Get(TempJob."No.");
                 Job.Mark(true);
-            until TempJob.Next = 0;
+            until TempJob.Next() = 0;
         Job.MarkedOnly(true);
         exit(true);
     end;
@@ -368,7 +363,7 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         if not FindEventsInAttributesFilter(TemplateName, FilterName, Job) then
             exit(false);
         EventList.SetTableView(Job);
-        EventList.RunModal;
+        EventList.RunModal();
         exit(true);
     end;
 
@@ -383,20 +378,20 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttributeRowValue.SetRange(Promote, true);
         EventAttrColumnValueOnReport.SetRange("Template Name", EventAttributeTemplateOnReport."Column Template Name");
         EventAttrColumnValueOnReport.SetRange(Promote, true);
-        exit(not EventAttributeRowValue.IsEmpty);
+        exit(not EventAttributeRowValue.IsEmpty());
     end;
 
     procedure EventTemplateReportEventAttributeSetOnAfterGetRecord(EventAttributeRowValue: Record "NPR Event Attr. Row Value"; var AttributeValue: array[5] of Text; var ColumnCaption: array[5] of Text; JobNo: Code[20])
     var
         i: Integer;
     begin
-        if EventAttrColumnValueOnReport.FindSet then
+        if EventAttrColumnValueOnReport.FindSet() then
             repeat
                 i += 1;
                 AttributeValue[i] := '';
                 ColumnCaption[i] := EventAttrColumnValueOnReport.Description;
                 EventAttributeEntryAction(2, EventAttributeTemplateOnReport.Name, JobNo, EventAttributeRowValue."Line No.", EventAttrColumnValueOnReport."Line No.", EventAttrColumnValueOnReport.Description, AttributeValue[i], false, '');
-            until (EventAttrColumnValueOnReport.Next = 0) or (i = ArrayLen(AttributeValue));
+            until (EventAttrColumnValueOnReport.Next() = 0) or (i = ArrayLen(AttributeValue));
     end;
 }
 

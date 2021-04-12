@@ -8,11 +8,11 @@ codeunit 85000 "NPR Library - EFT"
     var
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
     begin
-        EFTSetup.Init;
+        EFTSetup.Init();
         EFTSetup."POS Unit No." := RegisterNo;
         EFTSetup."Payment Type POS" := PaymentType;
         EFTSetup."EFT Integration Type" := EFTTestMockIntegration.IntegrationType();
-        EFTSetup.Insert;
+        EFTSetup.Insert();
     end;
 
 
@@ -35,7 +35,7 @@ codeunit 85000 "NPR Library - EFT"
 
         POSPaymentMethod."EFT Surcharge Service Item No." := SurchargeItem."No.";
         POSPaymentMethod."EFT Tip Service Item No." := TipItem."No.";
-        POSPaymentMethod.Modify;
+        POSPaymentMethod.Modify();
     end;
 
     procedure EFTTransactionCleanup(POSUnitNo: Code[10])
@@ -46,7 +46,7 @@ codeunit 85000 "NPR Library - EFT"
         //Delete all previous transactions, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
         EFTTransactionRequest.SetRange("Register No.", POSUnitNo);
         EFTTransactionRequest.SetRange("Integration Type", EFTTestMockIntegration.IntegrationType());
-        EFTTransactionRequest.DeleteAll;
+        EFTTransactionRequest.DeleteAll();
     end;
 }
 

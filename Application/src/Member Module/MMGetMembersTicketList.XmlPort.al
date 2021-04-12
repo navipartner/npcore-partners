@@ -275,7 +275,6 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
-        TotalCardinality: Integer;
         MembershipRole: Record "NPR MM Membership Role";
         MembershipEntry: Record "NPR MM Membership Entry";
     begin
@@ -360,8 +359,6 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)
-    var
-        totalTicketCardinality: Integer;
     begin
 
         errordescription := ErrorMessage;

@@ -152,7 +152,6 @@ page 6060157 "NPR Event Word Layouts"
 
     trigger OnAfterGetRecord()
     begin
-        CanEdit := IsWindowsClient;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -165,7 +164,6 @@ page 6060157 "NPR Event Word Layouts"
         Rec.FilterGroup := 2;
         Rec.SetRange("Source Record ID", Job.RecordId);
         Rec.FilterGroup := 0;
-        IsWindowsClient := false;
     end;
 
     var
@@ -173,8 +171,6 @@ page 6060157 "NPR Event Word Layouts"
         UpdateSuccesMsg: Label 'Layout has been updated to use the current report design.';
         UpdateNotRequiredMsg: Label 'Layout is up-to-date. No further updates are required.';
         PageCaption: Text;
-        CanEdit: Boolean;
-        IsWindowsClient: Boolean;
 
     procedure SetEvent(JobHere: Record Job)
     begin

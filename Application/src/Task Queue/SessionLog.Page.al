@@ -16,42 +16,42 @@ page 6059908 "NPR Session Log"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Log Type"; "Log Type")
+                field("Log Type"; Rec."Log Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
-                field("Log Time"; "Log Time")
+                field("Log Time"; Rec."Log Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Task Worker Group"; "Task Worker Group")
+                field("Task Worker Group"; Rec."Task Worker Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Worker Group field';
                 }
-                field("Server Instance ID"; "Server Instance ID")
+                field("Server Instance ID"; Rec."Server Instance ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Server Instance ID field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Error Message"; "Error Message")
+                field("Error Message"; Rec."Error Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Message field';

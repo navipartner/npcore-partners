@@ -7,7 +7,7 @@ codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
         TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
         NpDcNonPOSApplicationMgt: Codeunit "NPR NpDc Non-POS App. Mgt.";
     begin
-        coupon_application.Import;
+        coupon_application.Import();
         coupon_application.GetRequest(TempSalePOS, TempSaleLinePOS, TempNpDcExtCouponBuffer);
 
         NpDcNonPOSApplicationMgt.ApplyDiscount(TempSalePOS, TempSaleLinePOS, TempNpDcExtCouponBuffer, NpDcNonPOSApplicationMgt);
@@ -17,11 +17,10 @@ codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
 
     procedure CheckCoupons(var coupons: XMLport "NPR NpDc Ext. Coupon")
     var
-        NpDcCoupon: Record "NPR NpDc Coupon";
         TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
         NpDcNonPOSApplicationMgt: Codeunit "NPR NpDc Non-POS App. Mgt.";
     begin
-        coupons.Import;
+        coupons.Import();
         coupons.GetCoupons(TempNpDcExtCouponBuffer);
 
         NpDcNonPOSApplicationMgt.CheckCoupons(TempNpDcExtCouponBuffer);
@@ -31,11 +30,10 @@ codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
 
     procedure ReserveCoupons(var coupons: XMLport "NPR NpDc Ext. Coupon")
     var
-        NpDcCoupon: Record "NPR NpDc Coupon";
         TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
         NpDcNonPOSApplicationMgt: Codeunit "NPR NpDc Non-POS App. Mgt.";
     begin
-        coupons.Import;
+        coupons.Import();
         coupons.GetCoupons(TempNpDcExtCouponBuffer);
 
         NpDcNonPOSApplicationMgt.ReserveCoupons(TempNpDcExtCouponBuffer);
@@ -45,11 +43,10 @@ codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
 
     procedure CancelCouponReservations(var coupons: XMLport "NPR NpDc Ext. Coupon")
     var
-        NpDcCoupon: Record "NPR NpDc Coupon";
         TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
         NpDcNonPOSApplicationMgt: Codeunit "NPR NpDc Non-POS App. Mgt.";
     begin
-        coupons.Import;
+        coupons.Import();
         coupons.GetCoupons(TempNpDcExtCouponBuffer);
 
         NpDcNonPOSApplicationMgt.CancelCouponReservations(TempNpDcExtCouponBuffer);

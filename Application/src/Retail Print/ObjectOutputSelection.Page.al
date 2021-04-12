@@ -19,37 +19,37 @@ page 6014580 "NPR Object Output Selection"
             repeater(Control6150620)
             {
                 ShowCaption = false;
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Object Type"; "Object Type")
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Type field';
                 }
-                field("Object ID"; "Object ID")
+                field("Object ID"; Rec."Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object ID field';
                 }
-                field("Object Name"; "Object Name")
+                field("Object Name"; Rec."Object Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Name field';
                 }
-                field("Print Template"; "Print Template")
+                field("Print Template"; Rec."Print Template")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Print Template field';
                 }
-                field("Output Type"; "Output Type")
+                field("Output Type"; Rec."Output Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Output Type field';
                 }
-                field("Output Path"; "Output Path")
+                field("Output Path"; Rec."Output Path")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Output Path field';

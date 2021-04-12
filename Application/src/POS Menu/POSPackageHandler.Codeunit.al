@@ -9,12 +9,12 @@ codeunit 6150900 "NPR POS Package Handler"
         FileName: Text;
         POSParameterValue: Record "NPR POS Parameter Value";
     begin
-        if not POSMenu.FindSet then
+        if not POSMenu.FindSet() then
             exit;
 
         repeat
             POSMenu2 := POSMenu;
-            POSMenu2.SetRecFilter;
+            POSMenu2.SetRecFilter();
             POSMenuButton.SetRange("Menu Code", POSMenu2.Code);
             POSParameterValue.SetRange("Table No.", DATABASE::"NPR POS Menu Button");
             POSParameterValue.SetRange(Code, POSMenu2.Code);
@@ -23,7 +23,7 @@ codeunit 6150900 "NPR POS Package Handler"
             ManagedPackageBuilder.AddRecord(POSMenuButton);
             ManagedPackageBuilder.AddRecord(POSParameterValue);
             i += 1;
-        until POSMenu.Next = 0;
+        until POSMenu.Next() = 0;
 
         if i = 1 then
             FileName := StrSubstNo('%1 - %2', 'POS Menu', POSMenu2.Code)

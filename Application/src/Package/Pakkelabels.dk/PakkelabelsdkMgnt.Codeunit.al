@@ -1,8 +1,6 @@
 codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
 {
     trigger OnRun()
-    var
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
     begin
         TQSendPakkeLabel();
     end;
@@ -317,7 +315,6 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
     procedure CreateReturnShipmentOwnCustomerNo(var ShipmentDocument: Record "NPR Pacsoft Shipment Document"; Silent: Boolean)
     var
         CompanyInformation: Record "Company Information";
-        ShippingAgent: Record "Shipping Agent";
         Token: Text;
         ReasonPhrase: Text;
         LabelType: Option Post,Return;
@@ -660,7 +657,6 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostSalesDoc', '', true, false)]
     local procedure C80OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
     var
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         RecRefSalesHeader: RecordRef;
     begin
         if not InitPackageProvider() then
@@ -672,10 +668,7 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', false, false)]
     local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
-        SalesShptHeader: Record "Sales Shipment Header";
-        SalesSetup: Record "Sales & Receivables Setup";
         Args: Record "NPR AF Arguments - Notific.Hub" temporary;
-        RecRefShipment: RecordRef;
         ResponseMessage, LastErrorText : Text;
         IsAssertError: Boolean;
     begin
@@ -882,9 +875,7 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
     var
         CompanyInfo: Record "Company Information";
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-        ShipmentDocument2: Record "NPR Pacsoft Shipment Document";
         ShipmentDocServices: Record "NPR Pacsoft Shipm. Doc. Serv.";
-        CustomsItemRows: Record "NPR Pacsoft Customs Item Rows";
         Customer: Record Customer;
         SalesShipmentHeader: Record "Sales Shipment Header";
         ShipToAddress: Record "Ship-to Address";
@@ -892,8 +883,6 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
         ShippingAgent: Record "Shipping Agent";
         ReturnShippingAgent: Record "Shipping Agent";
         SalesShipmentLine: Record "Sales Shipment Line";
-        CreateShipmentDocument: Page "NPR Pacsoft Shipment Document";
-        TextNotActivated: Label 'The Pacsoft integration is not activated.';
         ShippingAgentServicesCode: Code[10];
         DocFound: Boolean;
     begin
@@ -1015,7 +1004,7 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
 
                             ReturnShippingAgent.SetRange("NPR Return Shipping agent", true);
                             ReturnShippingAgent.SetRange("NPR Shipping Method", ShippingAgent."NPR Shipping Method");
-                            if ReturnShippingAgent.FindFirst then
+                            if ReturnShippingAgent.FindFirst() then
                                 ShipmentDocument."Return Shipping Agent Code" := ReturnShippingAgent.Code;
                         end;
                     end;
@@ -1095,9 +1084,7 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
     [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'NPR PrintShipmentDocument', true, true)]
     local procedure P130OnAfterActionEventCreatePackage(var Rec: Record "Sales Shipment Header")
     var
-        SalesInvHeader: Record "Sales Invoice Header";
         SalesShptHeader: Record "Sales Shipment Header";
-        SalesSetup: Record "Sales & Receivables Setup";
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         RecRefShipment: RecordRef;
         RecRef: RecordRef;

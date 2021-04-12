@@ -1,4 +1,4 @@
-page 6014594 "NPR Sales Stats Subform"
+﻿page 6014594 "NPR Sales Stats Subform"
 {
     Caption = 'Sales Statistics Subform';
     DeleteAllowed = false;
@@ -15,17 +15,17 @@ page 6014594 "NPR Sales Stats Subform"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Sales (Qty)"; "Sales (Qty)")
+                field("Sales (Qty)"; Rec."Sales (Qty)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales (Qty) field';
@@ -35,13 +35,13 @@ page 6014594 "NPR Sales Stats Subform"
                         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
                         ItemLedgerEntryForm: Page "NPR Aux. Item Ledger Entries";
                     begin
-                        SetItemLedgerEntryFilter(AuxItemLedgerEntry, "No.");
+                        SetItemLedgerEntryFilter(AuxItemLedgerEntry, Rec."No.");
                         ItemLedgerEntryForm.SetTableView(AuxItemLedgerEntry);
                         ItemLedgerEntryForm.Editable(false);
-                        ItemLedgerEntryForm.RunModal;
+                        ItemLedgerEntryForm.RunModal();
                     end;
                 }
-                field("Sales (LCY)"; "Sales (LCY)")
+                field("Sales (LCY)"; Rec."Sales (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales (LCY) field';
@@ -51,10 +51,10 @@ page 6014594 "NPR Sales Stats Subform"
                         AuxValueEntry: Record "NPR Aux. Value Entry";
                         AuxValueEntries: Page "NPR Aux. Value Entries";
                     begin
-                        SetValueEntryFilter(AuxValueEntry, "No.");
+                        SetValueEntryFilter(AuxValueEntry, Rec."No.");
                         AuxValueEntries.SetTableView(AuxValueEntry);
                         AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal;
+                        AuxValueEntries.RunModal();
                     end;
                 }
             }
@@ -105,7 +105,7 @@ page 6014594 "NPR Sales Stats Subform"
         Item: Record Item;
         ItemCategory: Record "Item Category";
     begin
-        TempRec.DeleteAll;
+        TempRec.DeleteAll();
         StartDateTime := CreateDateTime(StartDate, StartTime);
         EndDateTime := CreateDateTime(EndDate, EndTime);
         ItemNoFilter := VarItemFilter;
@@ -123,14 +123,14 @@ page 6014594 "NPR Sales Stats Subform"
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Dim_2_Code, Dim2Filter);
-                    ItemQtyQuery.Open;
-                    while ItemQtyQuery.Read do begin
-                        TempRec.Init;
+                    ItemQtyQuery.Open();
+                    while ItemQtyQuery.Read() do begin
+                        TempRec.Init();
                         TempRec."No." := ItemQtyQuery.Item_No;
                         if Item.Get(ItemQtyQuery.Item_No) then
                             TempRec.Description := Item.Description;
                         TempRec."Sales (Qty)" := -ItemQtyQuery.Sum_Quantity;
-                        TempRec.Insert;
+                        TempRec.Insert();
                     end;
 
                     ItemAmtQuery.SetRange(ItemAmtQuery.Filter_Entry_Type, ItemAmtQuery.Filter_Entry_Type::Sale);
@@ -140,11 +140,11 @@ page 6014594 "NPR Sales Stats Subform"
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Dim_2_Code, Dim2Filter);
-                    ItemAmtQuery.Open;
-                    while ItemAmtQuery.Read do begin
+                    ItemAmtQuery.Open();
+                    while ItemAmtQuery.Read() do begin
                         if TempRec.Get(ItemAmtQuery.Item_No) then begin
                             TempRec."Sales (LCY)" := ItemAmtQuery.Sum_Sales_Amount_Actual;
-                            TempRec.Modify;
+                            TempRec.Modify();
                         end;
                     end;
                 end;
@@ -157,14 +157,14 @@ page 6014594 "NPR Sales Stats Subform"
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Dim_2_Code, Dim2Filter);
-                    ItemCatQtyQuery.Open;
-                    while ItemCatQtyQuery.Read do begin
-                        TempRec.Init;
+                    ItemCatQtyQuery.Open();
+                    while ItemCatQtyQuery.Read() do begin
+                        TempRec.Init();
                         TempRec."No." := ItemCatQtyQuery.Item_Category_Code;
                         if ItemCategory.Get(ItemCatQtyQuery.Item_Category_Code) then
                             TempRec.Description := ItemCategory.Description;
                         TempRec."Sales (Qty)" := -ItemCatQtyQuery.Sum_Quantity;
-                        TempRec.Insert;
+                        TempRec.Insert();
                     end;
 
                     ItemCatAmtQuery.SetRange(ItemCatAmtQuery.Filter_Entry_Type, ItemCatAmtQuery.Filter_Entry_Type::Sale);
@@ -173,16 +173,16 @@ page 6014594 "NPR Sales Stats Subform"
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Dim_2_Code, Dim2Filter);
-                    ItemCatAmtQuery.Open;
-                    while ItemCatAmtQuery.Read do begin
+                    ItemCatAmtQuery.Open();
+                    while ItemCatAmtQuery.Read() do begin
                         if TempRec.Get(ItemCatAmtQuery.Item_Category_Code) then begin
                             TempRec."Sales (LCY)" := ItemCatAmtQuery.Sum_Sales_Amount_Actual;
-                            TempRec.Modify;
+                            TempRec.Modify();
                         end
                     end;
                 end;
         end;
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry"; varNo: Code[20])

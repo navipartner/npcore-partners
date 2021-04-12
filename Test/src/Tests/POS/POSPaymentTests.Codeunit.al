@@ -38,7 +38,7 @@ codeunit 85006 "NPR POS Payment Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [When] Paying 4 LCY
@@ -79,7 +79,7 @@ codeunit 85006 "NPR POS Payment Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
 
@@ -133,7 +133,7 @@ codeunit 85006 "NPR POS Payment Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
         // [When] Paying 4 LCY
@@ -186,6 +186,6 @@ codeunit 85006 "NPR POS Payment Tests"
             _Initialized := true;
         end;
 
-        Commit;
+        Commit();
     end;
 }

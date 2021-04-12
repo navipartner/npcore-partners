@@ -41,7 +41,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Unindent';
                 Image = PreviousRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
@@ -58,7 +58,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Indent';
                 Image = NextRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
@@ -75,7 +75,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Test Print';
                 Image = Start;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F8';
@@ -92,15 +92,15 @@ page 6014560 "NPR RP Template Designer"
 
                     DataItem.SetRange(Code, Rec.Code);
                     DataItem.SetRange(Level, 0);
-                    DataItem.FindFirst;
+                    DataItem.FindFirst();
 
                     RecRef.Open(DataItem."Table ID");
                     if RecordView <> '' then begin
                         RecRef.SetView(RecordView);
-                        RecRef.FindSet;
+                        RecRef.FindSet();
                     end else begin
-                        RecRef.FindFirst;
-                        RecRef.SetRecFilter;
+                        RecRef.FindFirst();
+                        RecRef.SetRecFilter();
                     end;
 
                     TemplateMgt.PrintTemplate(Rec.Code, RecRef, 0);
@@ -111,7 +111,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Set Test Print Filter';
                 Image = EditFilter;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
@@ -125,13 +125,13 @@ page 6014560 "NPR RP Template Designer"
                 begin
                     DataItem.SetRange(Code, Rec.Code);
                     DataItem.SetRange(Level, 0);
-                    DataItem.FindFirst;
+                    DataItem.FindFirst();
 
                     FilterPageBuilder.AddTable(DataItem."Data Source", DataItem."Table ID");
                     if (RecordView <> '') and (RecordTableNo = DataItem."Table ID") then
                         FilterPageBuilder.SetView(DataItem."Data Source", RecordView); //Reapply previously set filter
 
-                    if FilterPageBuilder.RunModal then begin
+                    if FilterPageBuilder.RunModal() then begin
                         RecordView := FilterPageBuilder.GetView(DataItem."Data Source", false);
                         RecordTableNo := DataItem."Table ID";
                     end;

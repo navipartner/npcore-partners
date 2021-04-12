@@ -61,7 +61,7 @@ xmlport 6151198 "NPR NpCs Store Inv."
 
                 trigger OnBeforePassVariable()
                 begin
-                    currXMLport.Skip;
+                    currXMLport.Skip();
                 end;
             }
             textelement(collect_response)
@@ -124,7 +124,7 @@ xmlport 6151198 "NPR NpCs Store Inv."
 
                 trigger OnAfterAssignVariable()
                 begin
-                    currXMLport.Skip;
+                    currXMLport.Skip();
                 end;
             }
         }
@@ -136,15 +136,15 @@ xmlport 6151198 "NPR NpCs Store Inv."
 
     local procedure Store2InventoryBuffer()
     begin
-        TempItem.FindSet;
+        TempItem.FindSet();
         repeat
             if not NpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Description 2") then begin
-                NpCsStoreInventoryBuffer.Init;
+                NpCsStoreInventoryBuffer.Init();
                 NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
                 NpCsStoreInventoryBuffer.Sku := tempitem."Description 2";
-                NpCsStoreInventoryBuffer.Insert;
+                NpCsStoreInventoryBuffer.Insert();
             end;
-        until TempItem.Next = 0;
+        until TempItem.Next() = 0;
     end;
 }
 

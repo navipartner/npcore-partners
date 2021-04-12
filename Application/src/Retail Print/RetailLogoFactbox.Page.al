@@ -16,18 +16,18 @@ page 6014567 "NPR Retail Logo Factbox"
     {
         area(content)
         {
-            field(Logo; Logo)
+            field(Logo; Rec.Logo)
             {
                 ApplicationArea = All;
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the Logo field';
             }
-            field(Width; Width)
+            field(Width; Rec.Width)
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Width field';
             }
-            field(Height; Height)
+            field(Height; Rec.Height)
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Height field';

@@ -1,4 +1,4 @@
-page 6014490 "NPR Retail Journal Header"
+﻿page 6014490 "NPR Retail Journal Header"
 {
     Caption = 'Retail Journal';
     PageType = Card;
@@ -16,13 +16,13 @@ page 6014490 "NPR Retail Journal Header"
                 group(Control6150616)
                 {
                     ShowCaption = false;
-                    field("No."; "No.")
+                    field("No."; Rec."No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Code field';
-                       
+
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
@@ -32,17 +32,17 @@ page 6014490 "NPR Retail Journal Header"
                 group(Control6150619)
                 {
                     ShowCaption = false;
-                    field("Date of creation"; "Date of creation")
+                    field("Date of creation"; Rec."Date of creation")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Date field';
                     }
-                    field("Salesperson Code"; "Salesperson Code")
+                    field("Salesperson Code"; Rec."Salesperson Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Salesperson field';
                     }
-                    field("Location Code"; "Location Code")
+                    field("Location Code"; Rec."Location Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Location Code field';
@@ -52,17 +52,17 @@ page 6014490 "NPR Retail Journal Header"
                             CurrPage.Update(true);
                         end;
                     }
-                    field("Register No."; "Register No.")
+                    field("Register No."; Rec."Register No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the POS Unit No. field';
                     }
-                    field("Customer Price Group"; "Customer Price Group")
+                    field("Customer Price Group"; Rec."Customer Price Group")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer Price Group field';
                     }
-                    field("Customer Disc. Group"; "Customer Disc. Group")
+                    field("Customer Disc. Group"; Rec."Customer Disc. Group")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer Disc. Group field';
@@ -75,12 +75,12 @@ page 6014490 "NPR Retail Journal Header"
                 group(Control6150625)
                 {
                     ShowCaption = false;
-                    field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
+                    field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                     }
-                    field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
+                    field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
@@ -301,7 +301,7 @@ page 6014490 "NPR Retail Journal Header"
                     trigger OnAction()
                     begin
                         //-NPR5.46 [294354]
-                        SetPrintQuantityByInventory;
+                        Rec.SetPrintQuantityByInventory;
                         //+NPR5.46 [294354]
                     end;
                 }
@@ -352,7 +352,7 @@ page 6014490 "NPR Retail Journal Header"
                                     "Retail Journal Line".Validate("Description 2", item."Description 2");
                                     "Retail Journal Line".Modify(true);
                                 end;
-                            until "Retail Journal Line".Next = 0;
+                            until "Retail Journal Line".Next() = 0;
                     end;
                 }
             }
@@ -370,8 +370,8 @@ page 6014490 "NPR Retail Journal Header"
                     var
                         RetJnlImportItems: Report "NPR Ret. Jnl. - Import Items";
                     begin
-                        RetJnlImportItems.SetJournal("No.");
-                        RetJnlImportItems.RunModal;
+                        RetJnlImportItems.SetJournal(Rec."No.");
+                        RetJnlImportItems.RunModal();
                     end;
                 }
                 action(ImportFromPeriodDiscount)
@@ -387,11 +387,11 @@ page 6014490 "NPR Retail Journal Header"
                     begin
                         //-NPR5.46 [294354]
                         // RetailJournalHeader := Rec;
-                        // RetailJournalHeader.SETRECFILTER;
+                        // RetailJournalHeader.SetRecFilter();
                         // RetJnlImpPerDisc.SETTABLEVIEW(RetailJournalHeader);
-                        // RetJnlImpPerDisc.RUNMODAL;
+                        // RetJnlImpPerDisc.RunModal();
                         // CLEAR(RetJnlImpPerDisc);
-                        RetailJournalCode.Campaign2RetailJnl('', "No.");
+                        RetailJournalCode.Campaign2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
                         //+NPR5.46 [294354]
                     end;
@@ -409,9 +409,9 @@ page 6014490 "NPR Retail Journal Header"
                     begin
                         //-NPR5.46 [294354]
                         // RetailJournalHeader := Rec;
-                        // RetailJournalHeader.SETRECFILTER;
+                        // RetailJournalHeader.SetRecFilter();
                         // RetJnlImpMixDisc.SETTABLEVIEW(RetailJournalHeader);
-                        // RetJnlImpMixDisc.RUNMODAL;
+                        // RetJnlImpMixDisc.RunModal();
                         // CLEAR(RetJnlImpMixDisc);
                         //+NPR5.46 [294354]
                     end;
@@ -428,7 +428,7 @@ page 6014490 "NPR Retail Journal Header"
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
                         //-NPR5.46 [294354]
-                        RetailJournalCode.TransferOrder2RetailJnl('', "No.");
+                        RetailJournalCode.TransferOrder2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
                         //+NPR5.46 [294354]
                     end;
@@ -445,7 +445,7 @@ page 6014490 "NPR Retail Journal Header"
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
                         //-NPR5.46 [294354]
-                        RetailJournalCode.TransferShipment2RetailJnl('', "No.");
+                        RetailJournalCode.TransferShipment2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
                         //+NPR5.46 [294354]
                     end;
@@ -462,7 +462,7 @@ page 6014490 "NPR Retail Journal Header"
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
                         //-NPR5.46 [294354]
-                        RetailJournalCode.TransferReceipt2RetailJnl('', "No.");
+                        RetailJournalCode.TransferReceipt2RetailJnl('', Rec."No.");
                         CurrPage.Update(true);
                         //+NPR5.46 [294354]
                     end;
@@ -620,11 +620,11 @@ page 6014490 "NPR Retail Journal Header"
                         //CurrForm.SubLine.FORM.GETRECORD("Retail Journal Line");
                         CurrPage.SubLine.PAGE.GetRecord("Retail Journal Line");
                         Clear(ItemCard);
-                        Item.Reset;
+                        Item.Reset();
                         Item.SetRange("No.", "Retail Journal Line"."Item No.");
                         Item.Find('-');
                         ItemCard.SetRecord(Item);
-                        ItemCard.RunModal;
+                        ItemCard.RunModal();
                     end;
                 }
                 action("Validate Lines")
@@ -652,7 +652,7 @@ page 6014490 "NPR Retail Journal Header"
                         i := 0;
 
                         if jnlLines.Find('-') then begin
-                            n := jnlLines.Count;
+                            n := jnlLines.Count();
                             repeat
                                 d.Update(1, Round(i / n * 10000, 1, '>'));
 
@@ -664,9 +664,9 @@ page 6014490 "NPR Retail Journal Header"
                                 jnlLines.Validate("Item No.");
                                 jnlLines.Modify(true);
                                 i += 1;
-                            until jnlLines.Next = 0;
+                            until jnlLines.Next() = 0;
                         end;
-                        d.Close;
+                        d.Close();
                     end;
                 }
                 action("Change Price on Selected Items")
@@ -713,7 +713,6 @@ page 6014490 "NPR Retail Journal Header"
     trigger OnOpenPage()
     begin
         //-NPR5.53 [374290]
-        IsWebClient := not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]);
         //+NPR5.53 [374290]
     end;
 
@@ -725,7 +724,6 @@ page 6014490 "NPR Retail Journal Header"
         ShowUnknown: Option All,"Only existing items","Only unknown items";
         ShowNew: Option All,"Only existing items","Only new items";
         ShowInventory: Option All,"In stock","Not in stock";
-        IsWebClient: Boolean;
 
     procedure UpdateDiscount(RetailJournalHeader: Record "NPR Retail Journal Header")
     var
@@ -734,30 +732,30 @@ page 6014490 "NPR Retail Journal Header"
         MixDiscountLine: Record "NPR Mixed Discount Line";
         MixDiscount: Record "NPR Mixed Discount";
     begin
-        RetailJournalLine.Reset;
+        RetailJournalLine.Reset();
         RetailJournalLine.SetFilter(RetailJournalLine."No.", RetailJournalHeader."No.");
         //-NPR5.31 [262904]
-        //IF RetailJournalLine.FINDFIRST THEN REPEAT
+        //IF RetailJournalLine.FindFirst() THEN REPEAT
         if not RetailJournalLine.IsEmpty then begin
-            RetailJournalLine.FindSet;
+            RetailJournalLine.FindSet();
             repeat
                 //+NPR5.31 [262904]
-                PeriodDiscountLine.Reset;
+                PeriodDiscountLine.Reset();
                 PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '<=%1', RetailJournalHeader."Date of creation");
                 PeriodDiscountLine.SetFilter(PeriodDiscountLine."Ending Date", '>=%1', RetailJournalHeader."Date of creation");
                 PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", RetailJournalLine."Item No.");
 
-                if PeriodDiscountLine.FindFirst then begin
+                if PeriodDiscountLine.FindFirst() then begin
                     RetailJournalLine."Discount Code" := PeriodDiscountLine.Code;
                     RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Campaign;
                 end else begin
-                    MixDiscountLine.Reset;
+                    MixDiscountLine.Reset();
                     MixDiscountLine.SetFilter(MixDiscountLine."No.", RetailJournalLine."Item No.");
                     //-NPR5.31 [262904]
-                    //IF MixDiscountLine.FINDFIRST THEN REPEAT
-                    //  MixDiscount.RESET;
+                    //IF MixDiscountLine.FindFirst() THEN REPEAT
+                    //  MixDiscount.Reset();
                     MixDiscountLine.SetRange("Disc. Grouping Type", MixDiscountLine."Disc. Grouping Type"::Item);
-                    if MixDiscountLine.FindFirst then begin
+                    if MixDiscountLine.FindFirst() then begin
                         //+NPR5.31 [262904]
                         if MixDiscount.Get(MixDiscountLine.Code) and
                             ((MixDiscount."Starting date" <= RetailJournalHeader."Date of creation") and
@@ -765,15 +763,15 @@ page 6014490 "NPR Retail Journal Header"
                             RetailJournalLine."Discount Code" := MixDiscountLine.Code;
                             RetailJournalLine."Discount Type" := RetailJournalLine."Discount Type"::Mix;
                             //-NPR5.31 [262904]
-                            //    MixDiscountLine.FINDLAST;
+                            //    MixDiscountLine.FindLast();
                             //  END;
-                            //UNTIL MixDiscountLine.NEXT = 0;
+                            //UNTIL MixDiscountLine.Next() = 0;
                         end;
                     end;
                     //+NPR5.31 [262904]
                 end;
-                RetailJournalLine.Modify;
-            until RetailJournalLine.Next = 0;
+                RetailJournalLine.Modify();
+            until RetailJournalLine.Next() = 0;
             //-NPR5.31 [262904]
         end;
         //+NPR5.31 [262904]

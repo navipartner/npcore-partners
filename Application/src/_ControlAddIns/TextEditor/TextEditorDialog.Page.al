@@ -1,4 +1,4 @@
-page 6151450 "NPR Text Editor Dialog"
+﻿page 6151450 "NPR Text Editor Dialog"
 {
     Caption = 'Text Editor Dialog';
     PageType = Card;
@@ -22,7 +22,6 @@ page 6151450 "NPR Text Editor Dialog"
                     SendOptionsToTextEditor();
                     SendDataToTextEditor();
                     CurrPage.TextEditor.InitTinyMce();
-                    Initialized := true;
                 end;
 
                 trigger OnAfterInit();
@@ -65,14 +64,13 @@ page 6151450 "NPR Text Editor Dialog"
         OptionValueBuffer: Record "NPR Text Editor Dialog Option" temporary;
         EditorContent: Text;
         OKClicked: Boolean;
-        Initialized: Boolean;
         CanClose: Boolean;
 
     local procedure SendOptionsToTextEditor()
     begin
-        OptionValueBuffer.reset;
+        OptionValueBuffer.Reset();
         OptionValueBuffer.SetAutoCalcFields("Option Value");
-        if OptionValueBuffer.findset then begin
+        if OptionValueBuffer.FindSet() then begin
             repeat
                 OptionValueBuffer.TestField("Option Key");
                 SetOption(OptionValueBuffer."Option Key", OptionValueBuffer.GetOptionValue());
@@ -81,10 +79,6 @@ page 6151450 "NPR Text Editor Dialog"
     end;
 
     local procedure SendDataToTextEditor()
-    var
-        Stream: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        Data: Text;
     begin
         CurrPage.TextEditor.SetContent(EditorContent);
     end;
@@ -124,7 +118,7 @@ page 6151450 "NPR Text Editor Dialog"
 
     procedure InitTextEditorOptionKeyAndValueBuffer()
     begin
-        OptionValueBuffer.reset;
+        OptionValueBuffer.Reset();
         OptionValueBuffer.DeleteAll();
     end;
 

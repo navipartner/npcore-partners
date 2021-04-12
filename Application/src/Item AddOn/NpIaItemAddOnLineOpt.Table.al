@@ -2,7 +2,7 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
 {
     Caption = 'Item AddOn Line Option';
     DataClassification = CustomerContent;
-    
+
     fields
     {
         field(1; "AddOn No."; Code[20])

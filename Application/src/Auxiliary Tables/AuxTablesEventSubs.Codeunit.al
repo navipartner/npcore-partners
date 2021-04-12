@@ -1,4 +1,4 @@
-﻿codeunit 6014460 "NPR Aux. Tables Event Subs."
+codeunit 6014460 "NPR Aux. Tables Event Subs."
 {
 
     #region Aux. Value Entry

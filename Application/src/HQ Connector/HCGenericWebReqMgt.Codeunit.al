@@ -14,7 +14,7 @@ codeunit 6150911 "NPR HC Generic Web Req. Mgt."
             ProcessRequest(TmpHCGenericWebRequest, IsProcessed);
         TmpHCGenericWebRequest."Response Date" := CurrentDateTime;
         TmpHCGenericWebRequest."Response User ID" := UserId;
-        TmpHCGenericWebRequest.Modify;
+        TmpHCGenericWebRequest.Modify();
     end;
 
     local procedure ProcessRequest(var HCGenericWebRequest: Record "NPR HC Generic Web Request"; var IsProcessed: Boolean)
@@ -49,7 +49,7 @@ codeunit 6150911 "NPR HC Generic Web Req. Mgt."
         HCGenericWebRequest."Response 2" := ResponseArray[2];
         HCGenericWebRequest."Response 3" := ResponseArray[3];
         HCGenericWebRequest."Response 4" := ResponseArray[4];
-        HCGenericWebRequest.Modify;
+        HCGenericWebRequest.Modify();
     end;
 
     [IntegrationEvent(FALSE, FALSE)]

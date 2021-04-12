@@ -14,7 +14,7 @@
         if (not TicketWizard(ItemNumberCreated)) then
             exit;
 
-        Commit;
+        Commit();
         TicketBOM.SetFilter("Item No.", '=%1', ItemNumberCreated);
         TicketBOMPage.SetTableView(TicketBOM);
         TicketBOMPage.Run();
@@ -290,7 +290,7 @@
 
         TemplateCode := 'TM-TTYPE';
         if (not ConfigTemplateHeader.Get(TemplateCode)) then begin
-            ConfigTemplateHeader.Init;
+            ConfigTemplateHeader.Init();
             ConfigTemplateHeader.Code := TemplateCode;
             ConfigTemplateHeader.Description := 'Ticket Type Wizard Template';
             ConfigTemplateHeader.Validate("Table ID", DATABASE::"NPR TM Ticket Type");
@@ -325,7 +325,7 @@
 
         TemplateCode := 'TM-ADMSN';
         if (not ConfigTemplateHeader.Get(TemplateCode)) then begin
-            ConfigTemplateHeader.Init;
+            ConfigTemplateHeader.Init();
             ConfigTemplateHeader.Code := TemplateCode;
             ConfigTemplateHeader.Description := 'Admission Wizard Template';
             ConfigTemplateHeader.Validate("Table ID", DATABASE::"NPR TM Admission");
@@ -360,7 +360,7 @@
 
         TemplateCode := 'TM-TCBOM ';
         if (not ConfigTemplateHeader.Get(TemplateCode)) then begin
-            ConfigTemplateHeader.Init;
+            ConfigTemplateHeader.Init();
             ConfigTemplateHeader.Code := TemplateCode;
             ConfigTemplateHeader.Description := 'Ticket BOM Wizard Template';
             ConfigTemplateHeader.Validate("Table ID", DATABASE::"NPR TM Ticket Admission BOM");

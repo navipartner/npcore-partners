@@ -18,22 +18,22 @@ page 6014513 "NPR RP Template Output Log"
             repeater(RepeaterGroup)
             {
                 field("Entry No.";
-                "Entry No.")
+                Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Template Name"; "Template Name")
+                field("Template Name"; Rec."Template Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Name field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Printed At"; "Printed At")
+                field("Printed At"; Rec."Printed At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printed At field';
@@ -50,7 +50,7 @@ page 6014513 "NPR RP Template Output Log"
                 Caption = 'Download Output';
                 Image = Save;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Download Output action';

@@ -1,4 +1,4 @@
-codeunit 6151285 "NPR SS Action - Item AddOn"
+﻿codeunit 6151285 "NPR SS Action - Item AddOn"
 {
 
     var
@@ -41,7 +41,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -372,7 +372,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
         POSInfoTransaction.SetRange("Sale Date", SaleLinePOS.Date);
         if (POSInfoTransaction.FindFirst()) then
-            POSInfoTransaction.DeleteAll;
+            POSInfoTransaction.DeleteAll();
 
         if Comment = '' then
             exit;
@@ -380,7 +380,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         while Comment <> '' do begin
             EntryNo += 1;
 
-            POSInfoTransaction.Init;
+            POSInfoTransaction.Init();
             POSInfoTransaction."Register No." := SaleLinePOS."Register No.";
             POSInfoTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             POSInfoTransaction."Sales Line No." := SaleLinePOS."Line No.";
@@ -408,7 +408,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         SaleLinePOSAddOn.SetRange("AddOn No.", NpIaItemAddOnLine."AddOn No.");
         SaleLinePOSAddOn.SetRange("AddOn Line No.", NpIaItemAddOnLine."Line No.");
         SaleLinePOSAddOn.SetRange("Applies-to Line No.", AppliesToLineNo);
-        if not SaleLinePOSAddOn.FindFirst then
+        if not SaleLinePOSAddOn.FindFirst() then
             exit(false);
 
         exit(SaleLinePOS.Get(SaleLinePOSAddOn."Register No.",
@@ -440,7 +440,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         SaleLinePOSAddOn."Sale Date" := SaleLinePOS.Date;
         SaleLinePOSAddOn."Sale Line No." := SaleLinePOS."Line No.";
 
-        SaleLinePOSAddOn.Init;
+        SaleLinePOSAddOn.Init();
         SaleLinePOSAddOn."Applies-to Line No." := AppliesToLineNo;
         SaleLinePOSAddOn."AddOn No." := NpIaItemAddOnLine."AddOn No.";
         SaleLinePOSAddOn."AddOn Line No." := NpIaItemAddOnLine."Line No.";

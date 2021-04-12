@@ -15,22 +15,22 @@ page 6151093 "NPR Nc RapidConnect Endp. Sub."
         {
             repeater(Group)
             {
-                field("Endpoint Code"; "Endpoint Code")
+                field("Endpoint Code"; Rec."Endpoint Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Endpoint Code field';
                 }
-                field("Endpoint Type"; "Endpoint Type")
+                field("Endpoint Type"; Rec."Endpoint Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Endpoint Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Setup Summary"; "Setup Summary")
+                field("Setup Summary"; Rec."Setup Summary")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Setup Summary field';

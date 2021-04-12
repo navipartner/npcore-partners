@@ -335,7 +335,7 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                                 Line: Text;
                             begin
                                 comment := '';
-                                if TempItem."NPR Magento Description".HasValue then begin
+                                if TempItem."NPR Magento Description".HasValue() then begin
                                     TempItem.CalcFields("NPR Magento Description");
                                     TempItem."NPR Magento Description".CreateInStream(InStream);
                                     while not InStream.EOS do begin
@@ -415,12 +415,12 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                             begin
                                 if TempSalesLine9.Get(TempSalesLine."Document Type", TempSalesLine."Document No.", TempSalesLine."Line No.") then begin
                                     TempSalesLine9."Description 2" := description_2;
-                                    TempSalesLine9.Modify;
+                                    TempSalesLine9.Modify();
                                 end else begin
-                                    TempSalesLine9.Init;
+                                    TempSalesLine9.Init();
                                     TempSalesLine9 := TempSalesLine;
                                     TempSalesLine9."Description 2" := description_2;
-                                    TempSalesLine9.Insert;
+                                    TempSalesLine9.Insert();
                                 end;
                             end;
                         }

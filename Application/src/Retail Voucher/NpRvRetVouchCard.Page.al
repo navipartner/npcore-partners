@@ -10,12 +10,12 @@ page 6151019 "NPR NpRv Ret. Vouch. Card"
         {
             group(General)
             {
-                field("Return Voucher Type"; "Return Voucher Type")
+                field("Return Voucher Type"; Rec."Return Voucher Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Return Voucher Type field';
                 }
-                field("Return Voucher Description"; "Return Voucher Description")
+                field("Return Voucher Description"; Rec."Return Voucher Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Return Voucher Description field';

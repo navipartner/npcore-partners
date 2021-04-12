@@ -131,7 +131,7 @@ table 6151015 "NPR NpRv Sales Line"
                         ContBusinessRelation.SetCurrentKey("Link to Table", "No.");
                         ContBusinessRelation.SetRange("Link to Table", ContBusinessRelation."Link to Table"::Customer);
                         ContBusinessRelation.SetRange("No.", "Customer No.");
-                        if ContBusinessRelation.FindFirst then
+                        if ContBusinessRelation.FindFirst() then
                             Cont.SetRange("Company No.", ContBusinessRelation."Contact No.")
                         else
                             Cont.SetRange("No.", '');
@@ -156,7 +156,7 @@ table 6151015 "NPR NpRv Sales Line"
                     ContBusinessRelation.SetRange("Contact No.", Cont."Company No.");
                     ContBusinessRelation.SetRange("Link to Table", ContBusinessRelation."Link to Table"::Customer);
                     ContBusinessRelation.SetFilter("No.", '<>%1', '');
-                    if ContBusinessRelation.FindFirst and Cust.Get(ContBusinessRelation."No.") then
+                    if ContBusinessRelation.FindFirst() and Cust.Get(ContBusinessRelation."No.") then
                         "Customer No." := Cust."No.";
                 end;
 
@@ -340,19 +340,18 @@ table 6151015 "NPR NpRv Sales Line"
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
     begin
         NpRvSalesLineReference.SetRange("Sales Line Id", Id);
-        if NpRvSalesLineReference.FindFirst then
-            NpRvSalesLineReference.DeleteAll;
+        if NpRvSalesLineReference.FindFirst() then
+            NpRvSalesLineReference.DeleteAll();
     end;
 
     trigger OnInsert()
     begin
         if IsNullGuid(Id) then
-            Id := CreateGuid;
+            Id := CreateGuid();
     end;
 
     local procedure UpdateContactInfo()
     var
-        ContBusinessRelation: Record "Contact Business Relation";
         Cust: Record Customer;
         Cont: Record Contact;
     begin

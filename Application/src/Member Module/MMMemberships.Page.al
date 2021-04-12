@@ -3,7 +3,7 @@ page 6060127 "NPR MM Memberships"
 
     Caption = 'Memberships';
     CardPageID = "NPR MM Membership Card";
-    DataCaptionExpression = "External Membership No.";
+    DataCaptionExpression = Rec."External Membership No.";
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
@@ -18,57 +18,57 @@ page 6060127 "NPR MM Memberships"
         {
             repeater(Group)
             {
-                field("External Membership No."; "External Membership No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Membership No. field';
                 }
-                field("Community Code"; "Community Code")
+                field("Community Code"; Rec."Community Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Community Code field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("Issued Date"; "Issued Date")
+                field("Issued Date"; Rec."Issued Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issued Date field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field("Auto-Renew"; "Auto-Renew")
+                field("Auto-Renew"; Rec."Auto-Renew")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto-Renew field';
                 }
-                field("Auto-Renew Payment Method Code"; "Auto-Renew Payment Method Code")
+                field("Auto-Renew Payment Method Code"; Rec."Auto-Renew Payment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto-Renew Payment Method Code field';
@@ -243,7 +243,7 @@ page 6060127 "NPR MM Memberships"
                 Ellipsis = true;
                 Image = CustomerList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
@@ -267,7 +267,7 @@ page 6060127 "NPR MM Memberships"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -280,7 +280,7 @@ page 6060127 "NPR MM Memberships"
                 Caption = 'Open Coupons';
                 Image = Voucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpDc Coupons";
@@ -297,7 +297,7 @@ page 6060127 "NPR MM Memberships"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -309,9 +309,9 @@ page 6060127 "NPR MM Memberships"
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
 
-                        TestField("Customer No.");
+                        Rec.TestField("Customer No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
-                            RaptorMgt.ShowRaptorData(RaptorAction, "Customer No.");
+                            RaptorMgt.ShowRaptorData(RaptorAction, Rec."Customer No.");
 
                     end;
                 }
@@ -321,7 +321,7 @@ page 6060127 "NPR MM Memberships"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -333,9 +333,9 @@ page 6060127 "NPR MM Memberships"
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
 
-                        TestField("Customer No.");
+                        Rec.TestField("Customer No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
-                            RaptorMgt.ShowRaptorData(RaptorAction, "Customer No.");
+                            RaptorMgt.ShowRaptorData(RaptorAction, Rec."Customer No.");
 
                     end;
                 }
@@ -389,7 +389,7 @@ page 6060127 "NPR MM Memberships"
                 Caption = 'Set Client Attribute Filter';
                 Image = "Filter";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
@@ -404,7 +404,7 @@ page 6060127 "NPR MM Memberships"
                     if (not NPRAttrManagement.SetAttributeFilter(NPRAttributeValueSet)) then
                         exit;
 
-                    SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
+                    Rec.SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
 
                 end;
             }
@@ -414,9 +414,8 @@ page 6060127 "NPR MM Memberships"
     trigger OnAfterGetRecord()
     var
         MembershipRole: Record "NPR MM Membership Role";
-        Member: Record "NPR MM Member";
     begin
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', "Entry No.");
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', Rec."Entry No.");
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MembershipRole.SetFilter("Member Role", '=%1|=%2', MembershipRole."Member Role"::ADMIN, MembershipRole."Member Role"::GUARDIAN);
         DisplayName := '';
@@ -432,7 +431,6 @@ page 6060127 "NPR MM Memberships"
     trigger OnOpenPage()
     var
         RaptorSetup: Record "NPR Raptor Setup";
-        n: Integer;
     begin
 
         Rec.SetFilter(Blocked, '=%1', false);
@@ -450,7 +448,7 @@ page 6060127 "NPR MM Memberships"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
-        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
 
     end;
 
@@ -492,14 +490,14 @@ page 6060127 "NPR MM Memberships"
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
 
-        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
+        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, Rec."Entry No.", NPRAttrTextArray[AttributeNumber]);
 
     end;
 
     local procedure GetMasterDataAttributeValue()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, "Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
 
     end;

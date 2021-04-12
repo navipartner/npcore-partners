@@ -1,4 +1,4 @@
-page 6060066 "NPR Items by Location Overview"
+﻿page 6060066 "NPR Items by Location Overview"
 {
     // NPR5.52/JAKUBV/20191022  CASE 370333 Transport NPR5.52 - 22 October 2019
 
@@ -68,13 +68,13 @@ page 6060066 "NPR Items by Location Overview"
                         Item.SetRange("NPR Blocked on Pos", false);
                         if ItemFilter <> '' then begin
                             Item.SetFilter("No.", ItemFilter);
-                            if Item.FindFirst then;
+                            if Item.FindFirst() then;
                             Item.SetRange("No.");
                         end;
                         ItemList.SetTableView(Item);
                         ItemList.SetRecord(Item);
                         ItemList.LookupMode(true);
-                        if ItemList.RunModal = ACTION::LookupOK then begin
+                        if ItemList.RunModal() = ACTION::LookupOK then begin
                             Text := ItemList.GetSelectionFilter;
                             exit(true);
                         end;
@@ -153,15 +153,13 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
                 ApplicationArea = All;
 
                 trigger OnAction()
-                var
-                    MATRIX_Step: Option Initial,Previous,Same,Next;
                 begin
                     RefreshMatrix(MATRIX_SetWanted::Previous);
                 end;
@@ -171,7 +169,7 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Previous Column';
                 Image = PreviousRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -187,7 +185,7 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Next Column';
                 Image = NextRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
@@ -203,15 +201,13 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
                 ApplicationArea = All;
 
                 trigger OnAction()
-                var
-                    MATRIX_Step: Option Initial,Previous,Same,Next;
                 begin
                     RefreshMatrix(MATRIX_SetWanted::Next);
                 end;
@@ -252,21 +248,21 @@ page 6060066 "NPR Items by Location Overview"
         CurrentMatrixRecordOrdinal: Integer;
     begin
         if SetWanted = SetWanted::Initial then begin
-            MatrixRecordTmp.DeleteAll;
-            MatrixRecord.Reset;
+            MatrixRecordTmp.DeleteAll();
+            MatrixRecord.Reset();
             if LocationFilter <> '' then
                 MatrixRecord.SetFilter(Code, LocationFilter);
             MatrixRecord.SetRange("Use As In-Transit", ShowInTransit);
-            if MatrixRecord.FindSet then
+            if MatrixRecord.FindSet() then
                 repeat
                     MatrixRecordTmp := MatrixRecord;
-                    MatrixRecordTmp.Insert;
-                until MatrixRecord.Next = 0;
+                    MatrixRecordTmp.Insert();
+                until MatrixRecord.Next() = 0;
             if (LocationFilter = '') and not ShowInTransit then begin
-                MatrixRecordTmp.Init;
+                MatrixRecordTmp.Init();
                 MatrixRecordTmp.Code := MatrixSubPage.EmptyCodeValue;
                 MatrixRecordTmp.Name := MatrixSubPage.EmptyCodeValue;
-                MatrixRecordTmp.Insert;
+                MatrixRecordTmp.Insert();
             end;
         end;
 
@@ -288,11 +284,11 @@ page 6060066 "NPR Items by Location Overview"
 
         if MATRIX_CurrSetLength > 0 then begin
             MatrixRecordTmp.SetPosition(MATRIX_PKFirstRecInCurrSet);
-            MatrixRecordTmp.Find;
+            MatrixRecordTmp.Find();
             repeat
                 MatrixRecords[CurrentMatrixRecordOrdinal].Copy(MatrixRecordTmp);
                 CurrentMatrixRecordOrdinal := CurrentMatrixRecordOrdinal + 1;
-            until (CurrentMatrixRecordOrdinal > MATRIX_CurrSetLength) or (MatrixRecordTmp.Next <> 1);
+            until (CurrentMatrixRecordOrdinal > MATRIX_CurrSetLength) or (MatrixRecordTmp.Next() <> 1);
         end;
     end;
 

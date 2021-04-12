@@ -1,4 +1,4 @@
-table 6150716 "NPR POS Menu Filter Line"
+﻿table 6150716 "NPR POS Menu Filter Line"
 {
     Caption = 'POS Menu Filter';
     DataClassification = CustomerContent;
@@ -88,7 +88,7 @@ table 6150716 "NPR POS Menu Filter Line"
                 Field.SetRange(TableNo, DATABASE::"NPR POS Sale");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     Validate("Filter Sale POS Field Id", Field."No.");
                 end;
@@ -114,7 +114,7 @@ table 6150716 "NPR POS Menu Filter Line"
                 Field.SetRange(TableNo, DATABASE::"NPR POS Sale Line");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     Validate("Filter Sale Line POS Field Id", Field."No.");
                 end;
@@ -157,14 +157,14 @@ table 6150716 "NPR POS Menu Filter Line"
         This: Record "NPR POS Menu Filter Line";
     begin
         if Rec."Line No." <> 0 then exit;
-        This.Reset;
+        This.Reset();
         This.SetRange("Object Type", "Object Type");
         This.SetRange("Object Id", "Object Id");
         This.SetRange("Filter Code", "Filter Code");
         if This.IsEmpty then begin
             "Line No." := 10000;
         end else begin
-            This.FindLast;
+            This.FindLast();
             "Line No." := This."Line No." + 10000;
         end;
     end;

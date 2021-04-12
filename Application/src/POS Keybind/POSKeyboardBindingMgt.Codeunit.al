@@ -1,12 +1,10 @@
-codeunit 6150744 "NPR POS Keyboard Binding Mgt."
+﻿codeunit 6150744 "NPR POS Keyboard Binding Mgt."
 {
     var
-        Text000: Label 'Sale was canceled %1';
         SameKeyCodeErr: Label 'Can''t have same %1 for different %2. %1 %3 is already used on %2 %4.';
         RestoreDefaultKeybindConfirm: Label 'This will restore default keybind. Do you want to continue?';
         EmptyKeybindErr: Label '%1 can''t be empty.';
         NoSuchKeyBindErr: Label 'Keybind %1 isn''t supported.';
-        KeyBindFormatErr: Label 'Keybind must begin with a supported key.';
         ProcessNotSupportedErr: Label 'This process is no longer supported.';
         ReadingErr: Label 'reading in %1';
 
@@ -36,50 +34,50 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         OnDiscoveryCheck := POSKeyboardBindingSetup.IsTemporary;
         if OnDiscoveryCheck then begin
             //we need a list that has all the records from discovered keybinds and also those from live setup
-            if POSKeyboardBindingSetup2.FindSet then
+            if POSKeyboardBindingSetup2.FindSet() then
                 repeat
                     if not POSKeyboardBindingSetup.Get(POSKeyboardBindingSetup2."Action Code") then begin
                         POSKeyboardBindingSetup := POSKeyboardBindingSetup2;
                         POSKeyboardBindingSetup.Enabled := false;
-                        POSKeyboardBindingSetup.Insert;
+                        POSKeyboardBindingSetup.Insert();
                     end else begin
                         POSKeyboardBindingSetup."Key Bind" := POSKeyboardBindingSetup2."Key Bind";
                         POSKeyboardBindingSetup.Enabled := POSKeyboardBindingSetup2.Enabled;
-                        POSKeyboardBindingSetup.Modify;
+                        POSKeyboardBindingSetup.Modify();
                     end;
-                until POSKeyboardBindingSetup2.Next = 0;
+                until POSKeyboardBindingSetup2.Next() = 0;
             CheckKeyBind(POSKeyboardBindingSetup, OnDiscoveryCheck);
             POSKeyboardBindingSetupTemp.Copy(POSKeyboardBindingSetup, true);
 
-            if POSKeyboardBindingSetup.FindSet then
+            if POSKeyboardBindingSetup.FindSet() then
                 repeat
                     if POSKeyboardBindingSetup.Enabled then begin
                         POSKeyboardBindingSetupTemp.SetRange("Default Key Bind", POSKeyboardBindingSetup."Default Key Bind");
                         POSKeyboardBindingSetupTemp.SetRange(Enabled, true);
-                        if POSKeyboardBindingSetupTemp.Count > 1 then begin
+                        if POSKeyboardBindingSetupTemp.Count() > 1 then begin
                             POSKeyboardBindingSetup.Enabled := false;
-                            POSKeyboardBindingSetup.Modify;
+                            POSKeyboardBindingSetup.Modify();
                         end;
                         POSKeyboardBindingSetupTemp.SetRange("Default Key Bind");
                         POSKeyboardBindingSetupTemp.SetRange("Key Bind", POSKeyboardBindingSetup."Key Bind");
-                        if POSKeyboardBindingSetupTemp.Count > 1 then begin
-                            POSKeyboardBindingSetupTemp.FindSet;
+                        if POSKeyboardBindingSetupTemp.Count() > 1 then begin
+                            POSKeyboardBindingSetupTemp.FindSet();
                             repeat
                                 if not POSKeyboardBindingSetupTemp2.Get(POSKeyboardBindingSetupTemp."Action Code") then begin
                                     POSKeyboardBindingSetupTemp2 := POSKeyboardBindingSetupTemp;
-                                    POSKeyboardBindingSetupTemp2.Insert;
+                                    POSKeyboardBindingSetupTemp2.Insert();
                                 end;
-                            until POSKeyboardBindingSetupTemp.Next = 0;
+                            until POSKeyboardBindingSetupTemp.Next() = 0;
                         end;
                         POSKeyboardBindingSetupTemp.SetRange("Key Bind");
                         POSKeyboardBindingSetupTemp.SetRange(Enabled);
 
                         if POSKeyboardBindingSetupTemp2.Get(POSKeyboardBindingSetup."Action Code") then begin
                             POSKeyboardBindingSetup.Enabled := false;
-                            POSKeyboardBindingSetup.Modify;
+                            POSKeyboardBindingSetup.Modify();
                         end;
                     end;
-                until POSKeyboardBindingSetup.Next = 0;
+                until POSKeyboardBindingSetup.Next() = 0;
         end else begin
             //need to check if process is still supported
             OnDiscoverKeyboardBindings(POSKeyboardBindingSetupTemp);
@@ -89,7 +87,7 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
             POSKeyboardBindingSetup2.SetRange("Key Bind", POSKeyboardBindingSetup."Key Bind");
             POSKeyboardBindingSetup2.SetRange(Enabled, true);
             POSKeyboardBindingSetup2.SetFilter("Action Code", '<>%1', POSKeyboardBindingSetup."Action Code");
-            if POSKeyboardBindingSetup2.FindFirst then
+            if POSKeyboardBindingSetup2.FindFirst() then
                 Error(SameKeyCodeErr, POSKeyboardBindingSetup2.FieldCaption("Key Bind"), POSKeyboardBindingSetup2.FieldCaption("Action Code"),
                   POSKeyboardBindingSetup2."Key Bind", POSKeyboardBindingSetup2."Action Code");
         end;
@@ -103,29 +101,29 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         POSKeyboardBindingSetup.SetRange("Key Bind", KeyPressed);
         POSKeyboardBindingSetup.SetRange("Default Key Bind", DefaultKeyCode);
         POSKeyboardBindingSetup.SetRange(Enabled, true);
-        exit(not POSKeyboardBindingSetup.IsEmpty);
+        exit(not POSKeyboardBindingSetup.IsEmpty());
     end;
 
     local procedure CreateSetup(var POSKeyboardBindingSetup: Record "NPR POS Keyboard Bind. Setup")
     var
         POSKeyboardBindingSetup2: Record "NPR POS Keyboard Bind. Setup";
     begin
-        if POSKeyboardBindingSetup.FindSet then
+        if POSKeyboardBindingSetup.FindSet() then
             repeat
                 POSKeyboardBindingSetup2 := POSKeyboardBindingSetup;
-                if not POSKeyboardBindingSetup2.Insert then
-                    POSKeyboardBindingSetup2.Modify;
-            until POSKeyboardBindingSetup.Next = 0;
+                if not POSKeyboardBindingSetup2.Insert() then
+                    POSKeyboardBindingSetup2.Modify();
+            until POSKeyboardBindingSetup.Next() = 0;
     end;
 
     local procedure BuildKeyCollection(var KeyboardBindings: List of [Text])
     var
         POSKeyboardBindingSetup: Record "NPR POS Keyboard Bind. Setup";
     begin
-        if POSKeyboardBindingSetup.FindSet then
+        if POSKeyboardBindingSetup.FindSet() then
             repeat
                 KeyboardBindings.Add(POSKeyboardBindingSetup."Key Bind");
-            until POSKeyboardBindingSetup.Next = 0;
+            until POSKeyboardBindingSetup.Next() = 0;
     end;
 
     procedure RestoreDefaultKeyBind(var Rec: Record "NPR POS Keyboard Bind. Setup")
@@ -135,9 +133,9 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         if not Confirm(RestoreDefaultKeybindConfirm) then
             exit;
         POSKeyboardBindingSetup.Copy(Rec);
-        POSKeyboardBindingSetup.SetRecFilter;
+        POSKeyboardBindingSetup.SetRecFilter();
         POSKeyboardBindingSetup.Validate("Key Bind", POSKeyboardBindingSetup."Default Key Bind");
-        POSKeyboardBindingSetup.Modify;
+        POSKeyboardBindingSetup.Modify();
         Rec := POSKeyboardBindingSetup;
     end;
 
@@ -173,39 +171,39 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
             AddKey(AvailablePOSKeybindTemp, EntryNo, ListData, (TextList.IndexOf(ListData) - 1), true);
 
         EntryNo := 0;
-        if AvailablePOSKeybind.FindSet then
+        if AvailablePOSKeybind.FindSet() then
             repeat
                 AvailablePOSKeybindTemp.SetRange("Key Name", AvailablePOSKeybind."Key Name");
-                if AvailablePOSKeybindTemp.FindFirst then begin
+                if AvailablePOSKeybindTemp.FindFirst() then begin
                     AvailablePOSKeybind.Supported := true;
                     AvailablePOSKeybind."Modifier Key Priority" := AvailablePOSKeybindTemp."Modifier Key Priority";
-                    AvailablePOSKeybindTemp.Delete;
+                    AvailablePOSKeybindTemp.Delete();
                 end else
                     AvailablePOSKeybind.Supported := false;
-                AvailablePOSKeybind.Modify;
+                AvailablePOSKeybind.Modify();
                 EntryNo := AvailablePOSKeybind."Entry No.";
-            until AvailablePOSKeybind.Next = 0;
+            until AvailablePOSKeybind.Next() = 0;
 
-        AvailablePOSKeybindTemp.Reset;
-        if AvailablePOSKeybindTemp.FindSet then
+        AvailablePOSKeybindTemp.Reset();
+        if AvailablePOSKeybindTemp.FindSet() then
             repeat
                 EntryNo += 1;
-                AvailablePOSKeybind.Init;
+                AvailablePOSKeybind.Init();
                 AvailablePOSKeybind := AvailablePOSKeybindTemp;
                 AvailablePOSKeybind."Entry No." := EntryNo;
-                AvailablePOSKeybind.Insert;
-            until AvailablePOSKeybindTemp.Next = 0;
+                AvailablePOSKeybind.Insert();
+            until AvailablePOSKeybindTemp.Next() = 0;
     end;
 
     local procedure AddKey(var AvailablePOSKeybind: Record "NPR Available POS Keybind"; var EntryNo: Integer; KeyName: Text[30]; ModifierKeyPriority: Integer; Supported: Boolean)
     begin
         EntryNo += 1;
-        AvailablePOSKeybind.Init;
+        AvailablePOSKeybind.Init();
         AvailablePOSKeybind."Entry No." := EntryNo;
         AvailablePOSKeybind."Key Name" := KeyName;
         AvailablePOSKeybind."Modifier Key Priority" := ModifierKeyPriority;
         AvailablePOSKeybind.Supported := Supported;
-        AvailablePOSKeybind.Insert;
+        AvailablePOSKeybind.Insert();
     end;
 
     procedure CheckKeyBind(var Rec: Record "NPR POS Keyboard Bind. Setup"; OnDiscoveryCheck: Boolean)
@@ -224,13 +222,13 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         KeyBindCaptionArr[2] := Rec.FieldCaption("Default Key Bind");
         if not OnDiscoveryCheck then begin
             IncomingFilters.CopyFilters(Rec);
-            Rec.SetRecFilter;
+            Rec.SetRecFilter();
             IsEnabled := Rec.Enabled;
             KeyBindArr[1] := Rec."Key Bind";
             KeyBindArr[2] := Rec."Default Key Bind";
         end;
 
-        if Rec.FindSet then
+        if Rec.FindSet() then
             repeat
                 if OnDiscoveryCheck then begin
                     IsEnabled := true;
@@ -262,15 +260,15 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
                     ApproveKeybind := ApproveKeybindArr[1]; //only key bind field is valid for enabling record
                     if OnDiscoveryCheck and (not ApproveKeybind) then begin
                         Rec.Enabled := false;
-                        Rec.Modify;
+                        Rec.Modify();
                     end;
                 end;
-            until Rec.Next = 0;
+            until Rec.Next() = 0;
 
         if not OnDiscoveryCheck then begin
             if IsEnabled then
                 CheckNoMultipleKeyCodes(Rec);
-            Rec.Reset;
+            Rec.Reset();
             Rec.CopyFilters(IncomingFilters);
             Rec.Enabled := IsEnabled;
         end;
@@ -306,28 +304,27 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         KeyBind := '';
         AvailablePOSKeybindTemp.SetCurrentKey("Modifier Key Priority");
         AvailablePOSKeybindTemp.SetFilter("Modifier Key Priority", '<>0');
-        if AvailablePOSKeybindTemp.FindSet then
+        if AvailablePOSKeybindTemp.FindSet() then
             repeat
                 if KeyBind <> '' then
                     KeyBind += '+' + AvailablePOSKeybindTemp."Key Name"
                 else
                     KeyBind := AvailablePOSKeybindTemp."Key Name";
-            until AvailablePOSKeybindTemp.Next = 0;
+            until AvailablePOSKeybindTemp.Next() = 0;
         AvailablePOSKeybindTemp.SetRange("Modifier Key Priority", 0);
-        if AvailablePOSKeybindTemp.FindSet then
+        if AvailablePOSKeybindTemp.FindSet() then
             repeat
                 if KeyBind <> '' then
                     KeyBind += '+' + AvailablePOSKeybindTemp."Key Name"
                 else
                     KeyBind := AvailablePOSKeybindTemp."Key Name";
-            until AvailablePOSKeybindTemp.Next = 0;
+            until AvailablePOSKeybindTemp.Next() = 0;
         exit(true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', true, true)]
     local procedure InvokeKeyPressMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        POSKeyboardBindingSetup: Record "NPR POS Keyboard Bind. Setup";
         JSON: Codeunit "NPR POS JSON Management";
         KeyPressed: Text;
     begin

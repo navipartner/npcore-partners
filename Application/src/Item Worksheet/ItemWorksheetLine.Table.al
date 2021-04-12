@@ -890,8 +890,6 @@ table 6060042 "NPR Item Worksheet Line"
             ValidateTableRelation = false;
 
             trigger OnValidate()
-            var
-                VRTCheck: Codeunit "NPR Variety Check";
             begin
                 if "Variety Group" <> xRec."Variety Group" then begin
                     //updateitem
@@ -979,7 +977,7 @@ table 6060042 "NPR Item Worksheet Line"
             trigger OnValidate()
             begin
                 if "Sales Price Currency Code" <> '' then begin
-                    GLSetup.Get;
+                    GLSetup.Get();
                     if "Sales Price Currency Code" = GLSetup."LCY Code" then
                         "Sales Price Currency Code" := '';
                 end;
@@ -995,7 +993,7 @@ table 6060042 "NPR Item Worksheet Line"
             trigger OnValidate()
             begin
                 if "Purchase Price Currency Code" <> '' then begin
-                    GLSetup.Get;
+                    GLSetup.Get();
                     if "Purchase Price Currency Code" = GLSetup."LCY Code" then
                         "Purchase Price Currency Code" := '';
                 end;
@@ -1832,8 +1830,6 @@ table 6060042 "NPR Item Worksheet Line"
     end;
 
     local procedure GetCaptionClass(FieldNumber: Integer): Text[80]
-    var
-        ItemWizBatch: Record "NPR Item Worksheet";
     begin
         if not ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name") then begin
             ItemWorksheet.Init();
@@ -1920,7 +1916,7 @@ table 6060042 "NPR Item Worksheet Line"
             if OurVendorNo <> '' then
                 ItemRef.SetRange("Reference Type No.", OurVendorNo);
             ItemRef.SetRange("Reference No.", ItemRefNo);
-            if ItemRef.FindFirst then begin
+            if ItemRef.FindFirst() then begin
                 OurItemNo := ItemRef."Item No.";
                 OurVariantCode := ItemRef."Variant Code";
                 exit(true);
@@ -2057,7 +2053,7 @@ table 6060042 "NPR Item Worksheet Line"
         if "No. Series" = '' then
             Validate("No. Series", ItemWorksheetTemplate."No. Series");
         if "No. Series" = '' then begin
-            InventorySetup.Get;
+            InventorySetup.Get();
             Validate("No. Series", InventorySetup."Item Nos.");
         end;
 
@@ -2115,7 +2111,7 @@ table 6060042 "NPR Item Worksheet Line"
                     ItemWorksheetVrtValue.Value := VrtValue.Value;
                     ItemWorksheetVrtValue."Sort Order" := VrtValue."Sort Order";
                     ItemWorksheetVrtValue.Description := VrtValue.Description;
-                    if ItemWorksheetVrtValue.Insert then;
+                    if ItemWorksheetVrtValue.Insert() then;
                 until VrtValue.Next() = 0;
         end;
     end;
@@ -2129,7 +2125,6 @@ table 6060042 "NPR Item Worksheet Line"
     procedure RefreshVariants(LinesType: Option "None",Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
     var
         ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
-        NewLevel: Integer;
     begin
         //Remove Lines
         ItemWorksheetVar.SetRange("Worksheet Template Name", "Worksheet Template Name");
@@ -2210,7 +2205,6 @@ table 6060042 "NPR Item Worksheet Line"
 
     local procedure CopyItemVarieties(LinesType: Option "None",Variants,"Varieties Without Variants",All; IncludeHeaders: Boolean)
     var
-        ItemVar: Record "Item Variant";
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarietyValue1: Record "NPR Item Worksh. Variety Value";
         ItemWorksheetVarietyValue2: Record "NPR Item Worksh. Variety Value";
@@ -2220,14 +2214,9 @@ table 6060042 "NPR Item Worksheet Line"
         TempItemWorksheetVarietyValue2: Record "NPR Item Worksh. Variety Value" temporary;
         TempItemWorksheetVarietyValue3: Record "NPR Item Worksh. Variety Value" temporary;
         TempItemWorksheetVarietyValue4: Record "NPR Item Worksh. Variety Value" temporary;
-        UpdateLineNo: Boolean;
         ExistingVariantCode: Code[20];
         LineNo: Integer;
         NewLevel: Integer;
-        VRT1Desc: Text[50];
-        VRT2Desc: Text[50];
-        VRT3Desc: Text[50];
-        VRT4Desc: Text[50];
     begin
         InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue1, "Variety 1", "Variety 1 Table (Base)");
         InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue2, "Variety 2", "Variety 2 Table (Base)");
@@ -2312,7 +2301,6 @@ table 6060042 "NPR Item Worksheet Line"
                                             ((TempItemWorksheetVarietyValue3.Value <> '') or ("Variety 3 Table (Base)" = '')) and
                                             ((TempItemWorksheetVarietyValue2.Value <> '') or ("Variety 2 Table (Base)" = '')))
                                           then begin
-                                            UpdateLineNo := true;
                                             if (LinesType <> LinesType::None) then begin
                                                 ItemWorksheetVariantLine.Init();
                                                 ItemWorksheetVariantLine."Worksheet Template Name" := Rec."Worksheet Template Name";
@@ -2385,7 +2373,6 @@ table 6060042 "NPR Item Worksheet Line"
         AttributeKey: Record "NPR Attribute Key";
         AttributeValueSet: Record "NPR Attribute Value Set";
         AttributeManagement: Codeunit "NPR Attribute Management";
-        WorksheetReference: Integer;
     begin
         AttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
         AttributeKey.SetFilter("Table ID", '=%1', DATABASE::Item);
@@ -2413,23 +2400,21 @@ table 6060042 "NPR Item Worksheet Line"
 
     local procedure InitItemWorksheetVarietyValue(var ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value"; LineType: Code[10]; LineTable: Code[20])
     begin
-        with ItemWorksheetVarietyValue do begin
-            SetCurrentKey("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", Type, Table, "Sort Order");
-            SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
-            SetRange("Worksheet Name", Rec."Worksheet Name");
-            SetRange("Worksheet Line No.", Rec."Line No.");
-            SetRange(Type, LineType);
-            SetRange(Table, LineTable);
-            if IsEmpty then begin
-                Init();
-                "Worksheet Template Name" := Rec."Worksheet Template Name";
-                "Worksheet Name" := Rec."Worksheet Name";
-                "Worksheet Line No." := Rec."Line No.";
-                Type := LineType;
-                Table := LineTable;
-                Value := '';
-                Insert();
-            end;
+        ItemWorksheetVarietyValue.SetCurrentKey("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", Type, Table, "Sort Order");
+        ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+        ItemWorksheetVarietyValue.SetRange("Worksheet Name", Rec."Worksheet Name");
+        ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", Rec."Line No.");
+        ItemWorksheetVarietyValue.SetRange(Type, LineType);
+        ItemWorksheetVarietyValue.SetRange(Table, LineTable);
+        if ItemWorksheetVarietyValue.IsEmpty then begin
+            ItemWorksheetVarietyValue.Init();
+            ItemWorksheetVarietyValue."Worksheet Template Name" := Rec."Worksheet Template Name";
+            ItemWorksheetVarietyValue."Worksheet Name" := Rec."Worksheet Name";
+            ItemWorksheetVarietyValue."Worksheet Line No." := Rec."Line No.";
+            ItemWorksheetVarietyValue.Type := LineType;
+            ItemWorksheetVarietyValue.Table := LineTable;
+            ItemWorksheetVarietyValue.Value := '';
+            ItemWorksheetVarietyValue.Insert();
         end;
     end;
 
@@ -2946,7 +2931,6 @@ table 6060042 "NPR Item Worksheet Line"
     local procedure FillMappedFields()
     var
         LocRecItem: Record Item;
-        ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
         LocRecItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
         if "Existing Item No." = '' then
@@ -2968,12 +2952,10 @@ table 6060042 "NPR Item Worksheet Line"
         ItemWorksheetRecRef: RecordRef;
         ItemFldRef: FieldRef;
         ItemWorksheetFldRef: FieldRef;
-        CountFields: Integer;
     begin
         VarItemWorksheetLine.Get("Worksheet Template Name", "Worksheet Name", "Line No.");
         ItemRecRef.Get(VarItem.RecordId);
         ItemWorksheetRecRef.Get(VarItemWorksheetLine.RecordId);
-        CountFields := 0;
         ItemWorksheetFieldChange.Reset();
         ItemWorksheetFieldChange.SetRange("Worksheet Template Name", VarItemWorksheetLine."Worksheet Template Name");
         ItemWorksheetFieldChange.SetRange("Worksheet Name", VarItemWorksheetLine."Worksheet Name");
@@ -3212,7 +3194,6 @@ table 6060042 "NPR Item Worksheet Line"
 
     procedure CreateQueryItemInformation(OnlyNewAndUpdated: Boolean)
     var
-        EndpointQuery: Record "NPR Endpoint Query";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         EndpointManagement: Codeunit "NPR Endpoint Management";
         QueryName: Text;
@@ -3347,7 +3328,7 @@ table 6060042 "NPR Item Worksheet Line"
                     VarFound := true;
                 if VarFound then begin
                     TempItemWorksheetVarietyValue.TransferFields(ItemWorksheetVarietyValue, true);
-                    TempItemWorksheetVarietyValue.Insert;
+                    TempItemWorksheetVarietyValue.Insert();
                 end;
             until ItemWorksheetVarietyValue.Next() = 0;
     end;

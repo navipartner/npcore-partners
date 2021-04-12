@@ -1,4 +1,4 @@
-page 6150660 "NPR NPRE Waiter Pad"
+﻿page 6150660 "NPR NPRE Waiter Pad"
 {
     Caption = 'Waiter Pad';
     InsertAllowed = false;
@@ -269,11 +269,9 @@ page 6150660 "NPR NPRE Waiter Pad"
                     ToolTip = 'Executes the Merge waiter pad action';
 
                     trigger OnAction()
-                    var
-                        NPHWaiterPad: Page "NPR NPRE Waiter Pad";
                     begin
                         if NPHWaiterPadPOSManagement.MergeWaiterPadUI(Rec) then begin
-                            CurrPage.Close;
+                            CurrPage.Close();
                         end;
                     end;
                 }
@@ -316,12 +314,12 @@ page 6150660 "NPR NPRE Waiter Pad"
         SeatingWaiterPadLinkPage: Page "NPR NPRE Seat.: WaiterPadLink";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", Rec."No.");
 
         Clear(SeatingWaiterPadLinkPage);
         SeatingWaiterPadLinkPage.SetTableView(SeatingWaiterPadLink);
-        SeatingWaiterPadLinkPage.RunModal;
+        SeatingWaiterPadLinkPage.RunModal();
     end;
 
     local procedure ActionAddSeating()
@@ -332,11 +330,11 @@ page 6150660 "NPR NPRE Waiter Pad"
     begin
         //Get a seating to add to waiter pad
         Clear(SeatingList);
-        Seating.Reset;
+        Seating.Reset();
         SeatingList.SetTableView(Seating);
         SeatingList.LookupMode(true);
         SeatingList.Editable(false);
-        if SeatingList.RunModal = ACTION::LookupOK then begin
+        if SeatingList.RunModal() = ACTION::LookupOK then begin
             SeatingList.GetRecord(Seating);
             WaiterPadManagement.LinkSeatingToWaiterPad(Rec."No.", Seating.Code);
         end;

@@ -306,7 +306,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         Customer2: Record Customer;
     begin
         Customer2.Copy(Customer);
-        Customer2.SetRecFilter;
+        Customer2.SetRecFilter();
         REPORT.RunModal(REPORT::"NPR Statement E-Mail", false, false, Customer2);
     end;
 
@@ -319,7 +319,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         NewEmailTemplateCount := 0;
 
         for i := "TemplateType.SalesQuote" to "TemplateType.GiftVoucher" do begin
-            TempField.Init;
+            TempField.Init();
             TempField."No." := i;
             case i of
                 "TemplateType.SalesQuote":
@@ -413,31 +413,31 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                         TempField.Enabled := false;
                     end;
             end;
-            TempField.Insert;
+            TempField.Insert();
         end;
 
         if not EmailRetailMgt.POSEntryExists() then begin
             TempField.Get(0, "TemplateType.POSEntry");
-            TempField.Delete;
+            TempField.Delete();
         end;
         if not EmailRetailMgt.CreditVoucherExists() then begin
             TempField.Get(0, "TemplateType.CreditVoucher");
-            TempField.Delete;
+            TempField.Delete();
         end;
         if not EmailRetailMgt.GiftVoucherExists() then begin
             TempField.Get(0, "TemplateType.GiftVoucher");
-            TempField.Delete;
+            TempField.Delete();
         end;
 
         if PAGE.RunModal(PAGE::"NPR E-mail Templ. Choice List", TempField) <> ACTION::LookupOK then
             exit(0);
 
         TempField.SetRange(Enabled, true);
-        if TempField.FindSet then
+        if TempField.FindSet() then
             repeat
                 if CreateEmailTemplate(TempField."No.") <> '' then
                     NewEmailTemplateCount += 1;
-            until TempField.Next = 0;
+            until TempField.Next() = 0;
         exit(NewEmailTemplateCount);
     end;
 

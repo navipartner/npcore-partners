@@ -2,8 +2,6 @@ codeunit 6150702 "NPR POS UI Management"
 {
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
-        WaterMarkDemo: Label 'DEMO demo DEMO demo';
-        WaterMarkTest: Label 'TEST test TEST test';
 
     procedure Initialize(FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
@@ -22,12 +20,12 @@ codeunit 6150702 "NPR POS UI Management"
 
         Caption.SetFilter("Caption ID", '<>%1', '');
         Caption.SetFilter("Language Code", '%1|%2', '', Language."Abbreviated Name");
-        if Caption.FindSet then
+        if Caption.FindSet() then
             repeat
                 if Captions.Contains(Caption."Caption ID") then
                     Captions.Remove(Caption."Caption ID");
                 Captions.Add(Caption."Caption ID", Caption.Caption);
-            until Caption.Next = 0;
+            until Caption.Next() = 0;
 
         CaptionMgt.Initialize(FrontEnd);
         OnInitializeCaptions(CaptionMgt);
@@ -214,7 +212,7 @@ codeunit 6150702 "NPR POS UI Management"
                 ThemeLine.Add('type', ThemeDep."Dependency Type");
                 ThemeLine.Add('content', DependencyContent);
             end;
-        until ThemeDep.Next = 0;
+        until ThemeDep.Next() = 0;
         FrontEnd.ConfigureTheme(Theme);
     end;
 
@@ -227,27 +225,27 @@ codeunit 6150702 "NPR POS UI Management"
         Template: JsonObject;
     begin
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::All);
-        if AdminTemplateScope.FindSet then
+        if AdminTemplateScope.FindSet() then
             repeat
                 AdminTemplateScopeTmp := AdminTemplateScope;
                 AdminTemplateScopeTmp.Insert();
-            until AdminTemplateScope.Next = 0;
+            until AdminTemplateScope.Next() = 0;
 
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::"POS Unit");
         AdminTemplateScope.SetRange("Applies To Code", POSUnit."No.");
-        if AdminTemplateScope.FindSet then
+        if AdminTemplateScope.FindSet() then
             repeat
                 AdminTemplateScopeTmp := AdminTemplateScope;
                 AdminTemplateScopeTmp.Insert();
-            until AdminTemplateScope.Next = 0;
+            until AdminTemplateScope.Next() = 0;
 
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::User);
         AdminTemplateScope.SetRange("Applies To Code", UserId);
-        if AdminTemplateScope.FindSet then
+        if AdminTemplateScope.FindSet() then
             repeat
                 AdminTemplateScopeTmp := AdminTemplateScope;
                 AdminTemplateScopeTmp.Insert();
-            until AdminTemplateScope.Next = 0;
+            until AdminTemplateScope.Next() = 0;
 
         if AdminTemplateScopeTmp.IsEmpty then
             exit;
@@ -267,7 +265,7 @@ codeunit 6150702 "NPR POS UI Management"
                 end;
             end;
             Templates.Add(Template);
-        until AdminTemplateScopeTmp.Next = 0;
+        until AdminTemplateScopeTmp.Next() = 0;
         FrontEnd.ApplyAdministrativeTemplates(Templates);
     end;
 
@@ -303,11 +301,11 @@ codeunit 6150702 "NPR POS UI Management"
         Font: Codeunit "NPR Web Font";
     begin
         WebFont.SetFilter("Company Name", '%1|%2', '', CompanyName);
-        if WebFont.FindSet then
+        if WebFont.FindSet() then
             repeat
                 WebFont.GetWebFont(Font);
                 FrontEnd.ConfigureFont(Font);
-            until WebFont.Next = 0;
+            until WebFont.Next() = 0;
     end;
 
     local procedure ConfigureCaptions(Captions: JsonObject)
@@ -325,9 +323,7 @@ codeunit 6150702 "NPR POS UI Management"
         CaptionLabelSalesPersonCode: Label 'Salesperson Code';
         CaptionLabelClear: Label 'Erase';
         CaptionLabelPaymentAmount: Label 'Total';
-        CaptionLabelPaymentTotal: Label 'Sale (LCY)';
         CaptionLabelPaymentTotal2: Label 'Sale %1';
-        CaptionLabelTotalPayed: Label 'Payed';
         CaptionLabelSubtotal: Label 'SUBTOTAL %1';
         CaptionLabelTotal: Label 'TOTAL %1';
         CaptionLabelVATAmt: Label 'VAT AMOUNT %1';
@@ -339,8 +335,6 @@ codeunit 6150702 "NPR POS UI Management"
         CaptionGlobalOK: Label 'OK';
         CaptionGlobalYes: Label 'Yes';
         CaptionGlobalNo: Label 'No';
-        CaptionGlobalPrevious: Label 'Previous';
-        CaptionGlobalNext: Label 'Next';
         CaptionGlobalToday: Label 'today';
         CaptionGlobalTomorrow: Label 'tomorrow';
         CaptionGlobalYesterday: Label 'yesterday';
@@ -646,11 +640,11 @@ codeunit 6150702 "NPR POS UI Management"
         POSParameterValue: Record "NPR POS Parameter Value";
     begin
         POSParameterValue.SetRange("Table No.", DATABASE::"NPR POS Menu Button");
-        if POSParameterValue.FindSet then
+        if POSParameterValue.FindSet() then
             repeat
                 tmpPOSParameterValue := POSParameterValue;
-                tmpPOSParameterValue.Insert;
-            until POSParameterValue.Next = 0;
+                tmpPOSParameterValue.Insert();
+            until POSParameterValue.Next() = 0;
     end;
 
     local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer; POSSetupProfileCode: Code[20]; var TmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
@@ -662,11 +656,11 @@ codeunit 6150702 "NPR POS UI Management"
         POSParameterValue.SetRange("Table No.", DATABASE::"NPR POS Setup");
         POSParameterValue.SetRange(ID, FieldNumber);
         POSParameterValue.SetRange("Record ID", POSSetup.RecordId);
-        if POSParameterValue.FindSet then
+        if POSParameterValue.FindSet() then
             repeat
                 TmpPOSParameterValue := POSParameterValue;
-                TmpPOSParameterValue.Insert;
-            until POSParameterValue.Next = 0;
+                TmpPOSParameterValue.Insert();
+            until POSParameterValue.Next() = 0;
         TmpPOSParameterValue.SetParamFilterIndicator();
     end;
 

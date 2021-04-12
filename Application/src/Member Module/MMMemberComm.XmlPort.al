@@ -192,19 +192,18 @@ xmlport 6151188 "NPR MM Member Comm."
         MemberCommunication: Record "NPR MM Member Communication";
     begin
 
-        with MemberCommunication do
-            case MessageType of
-                "Message Type"::WELCOME:
-                    Name := 'Welcome';
-                "Message Type"::RENEW:
-                    Name := 'Renew';
-                "Message Type"::TICKETS:
-                    Name := 'Tickets';
-                "Message Type"::NEWSLETTER:
-                    Name := 'Newsletter';
-                "Message Type"::MEMBERCARD:
-                    Name := 'MemberCard';
-            end;
+        case MessageType of
+            MemberCommunication."Message Type"::WELCOME:
+                Name := 'Welcome';
+            MemberCommunication."Message Type"::RENEW:
+                Name := 'Renew';
+            MemberCommunication."Message Type"::TICKETS:
+                Name := 'Tickets';
+            MemberCommunication."Message Type"::NEWSLETTER:
+                Name := 'Newsletter';
+            MemberCommunication."Message Type"::MEMBERCARD:
+                Name := 'MemberCard';
+        end;
     end;
 
     local procedure MethodOptionToText(Method: Option) Name: Text
@@ -212,19 +211,18 @@ xmlport 6151188 "NPR MM Member Comm."
         MemberCommunication: Record "NPR MM Member Communication";
     begin
 
-        with MemberCommunication do
-            case Method of
-                "Preferred Method"::EMAIL:
-                    Name := 'E-Mail';
-                "Preferred Method"::SMS:
-                    Name := 'SMS';
-                "Preferred Method"::MANUAL:
-                    Name := 'Manual';
-                "Preferred Method"::WALLET_EMAIL:
-                    Name := 'Wallet (E-Mail)';
-                "Preferred Method"::WALLET_SMS:
-                    Name := 'Wallet (SMS)';
-            end;
+        case Method of
+            MemberCommunication."Preferred Method"::EMAIL:
+                Name := 'E-Mail';
+            MemberCommunication."Preferred Method"::SMS:
+                Name := 'SMS';
+            MemberCommunication."Preferred Method"::MANUAL:
+                Name := 'Manual';
+            MemberCommunication."Preferred Method"::WALLET_EMAIL:
+                Name := 'Wallet (E-Mail)';
+            MemberCommunication."Preferred Method"::WALLET_SMS:
+                Name := 'Wallet (SMS)';
+        end;
     end;
 
     local procedure AcceptedOptionToText(Accepted: Option) Name: Text
@@ -232,15 +230,14 @@ xmlport 6151188 "NPR MM Member Comm."
         MemberCommunication: Record "NPR MM Member Communication";
     begin
 
-        with MemberCommunication do
-            case Accepted of
-                "Accepted Communication"::PENDING:
-                    Name := 'Pending';
-                "Accepted Communication"::"OPT-IN":
-                    Name := 'OptIn';
-                "Accepted Communication"::"OPT-OUT":
-                    Name := 'OptOut';
-            end;
+        case Accepted of
+            MemberCommunication."Accepted Communication"::PENDING:
+                Name := 'Pending';
+            MemberCommunication."Accepted Communication"::"OPT-IN":
+                Name := 'OptIn';
+            MemberCommunication."Accepted Communication"::"OPT-OUT":
+                Name := 'OptOut';
+        end;
     end;
 
     local procedure MessageTypeTextToOption(Name: Text) OptionValue: Integer

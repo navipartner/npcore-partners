@@ -267,13 +267,13 @@ page 6014463 "NPR Item ListPart"
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
         if CRMIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
 
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
 
         SetWorkflowManagementEnabledState;
     end;
@@ -294,7 +294,7 @@ page 6014463 "NPR Item ListPart"
                 Rec := TempItemFilteredFromAttributes;
             exit(Found);
         end;
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
@@ -308,7 +308,7 @@ page 6014463 "NPR Item ListPart"
                 Rec := TempItemFilteredFromAttributes;
             exit(ResultSteps);
         end;
-        exit(Next(Steps));
+        exit(Rec.Next(Steps));
     end;
 
     trigger OnOpenPage()
@@ -323,15 +323,9 @@ page 6014463 "NPR Item ListPart"
     end;
 
     var
-        TempFilterItemAttributesBuffer: Record "Filter Item Attributes Buffer" temporary;
         TempItemFilteredFromAttributes: Record Item temporary;
-        TempItemFilteredFromPickItem: Record Item temporary;
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
-        CalculateStdCost: Codeunit "Calculate Standard Cost";
-        ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
-        ClientTypeManagement: Codeunit "Client Type Management";
-        SkilledResourceList: Page "Skilled Resource List";
         IsFoundationEnabled: Boolean;
         CRMIntegrationEnabled: Boolean;
         CRMIsCoupledToRecord: Boolean;
@@ -341,14 +335,12 @@ page 6014463 "NPR Item ListPart"
         IsOnPhone: Boolean;
         RunOnTempRec: Boolean;
         EventFilter: Text;
-        PowerBIVisible: Boolean;
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
         [InDataSet]
         IsNonInventoriable: Boolean;
         [InDataSet]
         IsInventoriable: Boolean;
-        RunOnPickItem: Boolean;
 
     procedure SelectInItemList(var Item: Record Item): Text
     var
@@ -357,7 +349,7 @@ page 6014463 "NPR Item ListPart"
         Item.SetRange(Blocked, false);
         ItemListPage.SetTableView(Item);
         ItemListPage.LookupMode(true);
-        if ItemListPage.RunModal = ACTION::LookupOK then
+        if ItemListPage.RunModal() = ACTION::LookupOK then
             exit(ItemListPage.GetSelectionFilter);
     end;
 

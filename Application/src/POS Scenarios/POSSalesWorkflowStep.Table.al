@@ -59,12 +59,12 @@ table 6150730 "NPR POS Sales Workflow Step"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Subscriber Codeunit ID");
                 if "Subscriber Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Subscriber Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(10; "Subscriber Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Subscriber Codeunit ID")));
             Caption = 'Subscriber Codeunit Name';
             Editable = false;
@@ -105,7 +105,7 @@ table 6150730 "NPR POS Sales Workflow Step"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Subscriber Codeunit ID");
                 if "Subscriber Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Subscriber Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(20; Description; Text[100])

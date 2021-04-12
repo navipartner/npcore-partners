@@ -48,15 +48,15 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
             if (ResponseCode = 0) then begin
 
-                Commit;
+                Commit();
                 AquireTicketParticipant(Token, ExternalMemberNo);
 
-                Commit;
+                Commit();
                 exit(true); // nothing to confirm;
             end;
         end;
 
-        Commit;
+        Commit();
         ResponseCode := -1;
         ResponseMessage := ABORTED;
         if (AquireTicketAdmissionSchedule(Token, SaleLinePOS, UpdateSalesLine, ResponseMessage)) then begin //-+TM1.45 [380754]
@@ -66,10 +66,10 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
 
         if (ResponseCode = 0) then begin
 
-            Commit;
+            Commit();
             AquireTicketParticipant(Token, ExternalMemberNo);
 
-            Commit;
+            Commit();
             exit(true);
         end;
 
@@ -80,8 +80,6 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
     procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         PageAction: Action;
-        Item: Record Item;
-        i: Integer;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketeservationRequest: Page "NPR TM Ticket Make Reserv.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
@@ -103,7 +101,7 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
             if (TicketReservationRequest."Admission Code" <> '') then
                 TicketManagement.GetCurrentScheduleEntry(TicketReservationRequest."Admission Code", true);
         until (TicketReservationRequest.Next() = 0);
-        Commit;
+        Commit();
 
         //-#310947 [310947]
         if (not HaveSalesLine) then begin
@@ -146,13 +144,13 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
             //  IF (DisplayTicketeservationRequest.GetChangedTicketQuantity (NewQuantity)) THEN BEGIN
             //    SaleLinePOS.VALIDATE (Quantity, NewQuantity);
             //    SaleLinePOS.MODIFY ();
-            //    COMMIT;
+            //    Commit();
             //  END;
             DisplayTicketeservationRequest.GetChangedTicketQuantity(NewQuantity);
             SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
             SaleLinePOS.Validate(Quantity, NewQuantity);
             SaleLinePOS.Modify();
-            Commit;
+            Commit();
             //+TM1.41 [353981]
         end;
 

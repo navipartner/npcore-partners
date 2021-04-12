@@ -39,7 +39,6 @@ codeunit 6059901 "NPR Task Queue Manager"
     end;
 
     var
-        CurrentLogEntryNo: Integer;
         ActiveSession: Record "Active Session";
 
     local procedure ExecuteTasks(TaskQueue: Record "NPR Task Queue")
@@ -73,36 +72,34 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskWorker: Record "NPR Task Worker";
         TaskWorkerGroup: Record "NPR Task Worker Group";
     begin
-        with TaskWorker do begin
-            if not Get(ServiceInstanceId, SessionId) then begin
-                //-NPR5.45 [326707]
-                // LOCKTABLE;
-                // IF FINDLAST THEN; //force a read lock
-                //+NPR5.45 [326707]
+        if not TaskWorker.Get(ServiceInstanceId, SessionId) then begin
+            //-NPR5.45 [326707]
+            // LOCKTABLE;
+            // IF FINDLAST THEN; //force a read lock
+            //+NPR5.45 [326707]
 
-                GetMySession;
+            GetMySession;
 
-                TaskWorkerGroup.Get(TaskWorkerGroupCode);
+            TaskWorkerGroup.Get(TaskWorkerGroupCode);
 
-                if TaskWorkerGroup."Language ID" <> 0 then
-                    GlobalLanguage(TaskWorkerGroup."Language ID");
+            if TaskWorkerGroup."Language ID" <> 0 then
+                GlobalLanguage(TaskWorkerGroup."Language ID");
 
-                Init;
-                "Server Instance ID" := ActiveSession."Server Instance ID";
-                "User ID" := ActiveSession."User ID";
-                "Session ID" := ActiveSession."Session ID";
-                "Login Time" := ActiveSession."Login Datetime";
-                "Current Company" := CompanyName;
-                "Host Name" := ActiveSession."Client Computer Name";
-                "Task Worker Group" := TaskWorkerGroupCode;
-                "Current Check Interval" := TaskWorkerGroup."Min Interval Between Check";
-                "Current Language ID" := GlobalLanguage;
-                Active := true;
-                //-TQ1.29 [256917]
-                "Last HeartBeat (When Idle)" := CurrentDateTime;
-                //+TQ1.29 [256917]
-                Insert;
-            end;
+            TaskWorker.Init();
+            TaskWorker."Server Instance ID" := ActiveSession."Server Instance ID";
+            TaskWorker."User ID" := ActiveSession."User ID";
+            TaskWorker."Session ID" := ActiveSession."Session ID";
+            TaskWorker."Login Time" := ActiveSession."Login Datetime";
+            TaskWorker."Current Company" := CompanyName;
+            TaskWorker."Host Name" := ActiveSession."Client Computer Name";
+            TaskWorker."Task Worker Group" := TaskWorkerGroupCode;
+            TaskWorker."Current Check Interval" := TaskWorkerGroup."Min Interval Between Check";
+            TaskWorker."Current Language ID" := GlobalLanguage;
+            TaskWorker.Active := true;
+            //-TQ1.29 [256917]
+            TaskWorker."Last HeartBeat (When Idle)" := CurrentDateTime;
+            //+TQ1.29 [256917]
+            TaskWorker.Insert();
         end;
 
         //-TQ1.28
@@ -112,7 +109,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         //+TQ1.29
         //-TQ1.28
 
-        Commit;
+        Commit();
     end;
 
     procedure LogoutAuto()
@@ -132,12 +129,12 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskWorker: Record "NPR Task Worker";
     begin
         //-TQ1.29
-        TaskWorker.LockTable;
+        TaskWorker.LockTable();
         //+TQ1.29
         if not TaskWorker.Get(ServerInstanceID, SessionID) then
             exit;
 
-        TaskQueue2.LockTable;
+        TaskQueue2.LockTable();
 
         //-NPR5.45 [313269]
         //-TQ1.34 [326930]
@@ -148,9 +145,9 @@ codeunit 6059901 "NPR Task Queue Manager"
 
         TaskQueue2.SetRange("Assigned to Service Inst.ID", ServerInstanceID);
         TaskQueue2.SetRange("Assigned to Session ID", SessionID);
-        if TaskQueue2.FindFirst then begin
+        if TaskQueue2.FindFirst() then begin
             TaskQueue2.Validate(Status, TaskQueue2.Status::Awaiting);
-            TaskQueue2.Modify;
+            TaskQueue2.Modify();
         end;
 
         //-TQ1.29
@@ -160,12 +157,12 @@ codeunit 6059901 "NPR Task Queue Manager"
         //+TQ1.28
         //+TQ1.29
 
-        TaskWorker.Delete;
+        TaskWorker.Delete();
         //-TQ1.29
         //CLEAR(TaskLine);
         //+TQ1.29
 
-        Commit;
+        Commit();
     end;
 
     local procedure GetMySession()
@@ -181,9 +178,9 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskWorker: Record "NPR Task Worker";
     begin
         //-TQ1.28
-        TaskWorker.LockTable;
+        TaskWorker.LockTable();
         //-TQ1.31 [301695]
-        //IF TaskWorker.FINDLAST THEN;
+        //IF TaskWorker.FindLast() THEN;
         //+TQ1.31 [301695]
         //+TQ1.28
         GetMySession;
@@ -193,9 +190,9 @@ codeunit 6059901 "NPR Task Queue Manager"
         //-TQ1.34 [326930]
         TaskWorker."Current Check Interval" := CurrentCheckInterval;
         //+TQ1.34 [326930]
-        TaskWorker.Modify;
+        TaskWorker.Modify();
 
-        Commit;
+        Commit();
     end;
 
     local procedure GetNextTask(TaskWorker: Record "NPR Task Worker"; var TaskQueue: Record "NPR Task Queue"): Boolean
@@ -217,7 +214,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskQueue2.SetRange(Company, TaskWorker."Current Company");
         TaskQueue2.SetRange("Assigned to Service Inst.ID", ServiceInstanceId);
         TaskQueue2.SetRange("Assigned to Session ID", SessionId);
-        if TaskQueue2.FindFirst then begin
+        if TaskQueue2.FindFirst() then begin
             TaskQueue := TaskQueue2;
             exit(true);
         end;

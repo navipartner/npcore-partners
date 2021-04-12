@@ -1,4 +1,4 @@
-page 6150665 "NPR NPRE Seating"
+﻿page 6150665 "NPR NPRE Seating"
 {
     Caption = 'Seating';
     PageType = Card;
@@ -114,12 +114,12 @@ page 6150665 "NPR NPRE Seating"
         SeatingWaiterPadLinkPage: Page "NPR NPRE Seat.: WaiterPadLink";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", Rec.Code);
 
         Clear(SeatingWaiterPadLinkPage);
         SeatingWaiterPadLinkPage.SetTableView(SeatingWaiterPadLink);
-        SeatingWaiterPadLinkPage.RunModal;
+        SeatingWaiterPadLinkPage.RunModal();
     end;
 
     local procedure ActionAddWaiterPad()
@@ -130,11 +130,11 @@ page 6150665 "NPR NPRE Seating"
     begin
         //Get a waiter pad to add to seating
         Clear(WaiterPadList);
-        WaiterPad.Reset;
+        WaiterPad.Reset();
         WaiterPadList.SetTableView(WaiterPad);
         WaiterPadList.LookupMode(true);
         WaiterPadList.Editable(false);
-        if WaiterPadList.RunModal = ACTION::LookupOK then begin
+        if WaiterPadList.RunModal() = ACTION::LookupOK then begin
             WaiterPadList.GetRecord(WaiterPad);
             WaiterPadManagement.LinkSeatingToWaiterPad(WaiterPad."No.", Rec.Code);
         end;

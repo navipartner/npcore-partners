@@ -1,8 +1,8 @@
 report 6014543 "NPR Item - Loss - Top 10"
 {
     RDLCLayout = './src/_Reports/layouts/Item - Loss - Top 10.rdlc';
-    Caption = 'Item Shrinkage - Top 10'; 
-    UsageCategory = ReportsAndAnalysis; 
+    Caption = 'Item Shrinkage - Top 10';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -277,7 +277,7 @@ report 6014543 "NPR Item - Loss - Top 10"
                 ValueEntry.Reset();
                 ValueEntry.SetCurrentKey("Item Ledger Entry No.");
                 ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
-                if ValueEntry.FindFirst then
+                if ValueEntry.FindFirst() then
                     if (SourceCodeFilter = '') or
                        ((SourceCodeFilter <> '') and (SourceCodeFilter = ValueEntry."Source Code"))
                     then begin

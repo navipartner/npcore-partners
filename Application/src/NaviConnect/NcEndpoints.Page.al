@@ -15,32 +15,32 @@ page 6151539 "NPR Nc Endpoints"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Endpoint Type"; "Endpoint Type")
+                field("Endpoint Type"; Rec."Endpoint Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Endpoint Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Setup Summary"; "Setup Summary")
+                field("Setup Summary"; Rec."Setup Summary")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Setup Summary field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field("Linked Endpoints"; "Linked Endpoints")
+                field("Linked Endpoints"; Rec."Linked Endpoints")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Linked Endpoints field';
@@ -58,7 +58,7 @@ page 6151539 "NPR Nc Endpoints"
                 Caption = 'Setup';
                 Image = InteractionTemplateSetup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -66,7 +66,7 @@ page 6151539 "NPR Nc Endpoints"
 
                 trigger OnAction()
                 begin
-                    SetupEndpoint();
+                    Rec.SetupEndpoint();
                 end;
             }
             action("Trigger Links")
@@ -74,7 +74,7 @@ page 6151539 "NPR Nc Endpoints"
                 Caption = 'Trigger Links';
                 Image = Links;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Endpoint Trigger Links";
@@ -89,7 +89,7 @@ page 6151539 "NPR Nc Endpoints"
                 Caption = 'Init Endpoint';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = EndpointHasInit;

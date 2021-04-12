@@ -137,7 +137,7 @@ codeunit 6150895 "NPR Data Row" implements "NPR IJsonSerializable"
         if (Row.Position <> Position) then
             exit(false);
 
-        if (Row.Fields.Keys.Count <> _fields.Keys.Count) then
+        if (Row.Fields.Keys.Count() <> _fields.Keys.Count) then
             exit(false);
 
         foreach FieldName in _fields.Keys do begin

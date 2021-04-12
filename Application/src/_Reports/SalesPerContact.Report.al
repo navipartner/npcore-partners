@@ -1,8 +1,8 @@
 report 6014597 "NPR Sales Per Contact"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Per Contact.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Sales Per Contact.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Sales Per. Contact';
     dataset
@@ -14,7 +14,6 @@ report 6014597 "NPR Sales Per Contact"
             var
                 ValueEntry: Record "Value Entry";
             begin
-                m += 1;
 
                 Clear(SumOfTurnover);
                 Clear(SumOfTurnoverLY);
@@ -56,7 +55,6 @@ report 6014597 "NPR Sales Per Contact"
 
             trigger OnPreDataItem()
             begin
-                m := 0;
 
                 if Contact.GetFilter("Date Filter") <> '' then begin
                     MinDate := Contact.GetRangeMin("Date Filter");
@@ -114,16 +112,13 @@ report 6014597 "NPR Sales Per Contact"
                     if not TurnoverTmp.Find('-') then
                         CurrReport.Break();
                 end else
-                    if (TurnoverTmp.Next = 0) then
+                    if (TurnoverTmp.Next() = 0) then
                         CurrReport.Break();
 
                 if Number > ShowQuantity then
                     CurrReport.Break();
 
-                if (Number / 2) = Round((Number / 2), 1) then
-                    Greyed := false
-                else
-                    Greyed := true;
+
 
                 Contact.Get(TurnoverTmp."Short Code 1");
             end;
@@ -202,17 +197,12 @@ report 6014597 "NPR Sales Per Contact"
         CompanyInformation: Record "Company Information";
         Contact1: Record Contact;
         TurnoverTmp: Record "NPR TEMP Buffer" temporary;
-        Greyed: Boolean;
         MaxDate: Date;
         MaxDateLY: Date;
         MinDate: Date;
         MinDateLY: Date;
         SumOfTurnover: Decimal;
         SumOfTurnoverLY: Decimal;
-        d: Dialog;
-        i: Integer;
-        j: Integer;
-        m: Integer;
         Multiple: Integer;
         ShowQuantity: Integer;
         NoDateFilterLbl: Label 'No date filter entered';

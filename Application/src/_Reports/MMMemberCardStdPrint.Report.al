@@ -59,7 +59,7 @@ report 6060123 "NPR MM Member Card Std Print"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "MM Member".Picture.HasValue then
+                    if "MM Member".Picture.HasValue() then
                         "MM Member".CalcFields(Picture);
 
                     Clear(MemberName);
@@ -75,9 +75,7 @@ report 6060123 "NPR MM Member Card Std Print"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup";
                 MMMembership: Record "NPR MM Membership";
-                MMMembershipRole: Record "NPR MM Membership Role";
                 MMMembershipSetup: Record "NPR MM Membership Setup";
                 BarcodeLib: Codeunit "NPR Barcode Image Library";
                 PointTo: Integer;
@@ -120,7 +118,6 @@ report 6060123 "NPR MM Member Card Std Print"
     var
         CompanyInformation: Record "Company Information";
         MMMembershipEntry: Record "NPR MM Membership Entry";
-        ImageMemoryBuffer: Record "NPR NpXml Custom Val. Buffer" temporary;
         BlobBuffer: Record "NPR BLOB buffer" temporary;
         TmpBarcode: Codeunit "Temp Blob";
         ExpiryDateCaption: Label 'Expiry date: ';

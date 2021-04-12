@@ -14,25 +14,25 @@ page 6151575 "NPR Event Notes"
         {
             repeater(Group)
             {
-                field(URL1; URL1)
+                field(URL1; Rec.URL1)
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     Caption = 'From User';
                     ToolTip = 'Specifies the value of the From User field';
                 }
-                field("To User ID"; "To User ID")
+                field("To User ID"; Rec."To User ID")
                 {
                     ApplicationArea = All;
                     Caption = 'To User';
                     ToolTip = 'Specifies the value of the To User field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Caption = 'Note';
@@ -60,13 +60,13 @@ page 6151575 "NPR Event Notes"
                     Job: Record Job;
                     RecRef: RecordRef;
                 begin
-                    if "Link ID" = 0 then
+                    if Rec."Link ID" = 0 then
                         exit;
-                    RecRef.Get("Record ID");
+                    RecRef.Get(Rec."Record ID");
                     RecRef.SetTable(Job);
-                    Job.SetRecFilter;
+                    Job.SetRecFilter();
                     EventCard.SetTableView(Job);
-                    EventCard.Run;
+                    EventCard.Run();
                 end;
             }
         }
@@ -93,15 +93,15 @@ page 6151575 "NPR Event Notes"
         LinkID: Integer;
     begin
         Job.SetRange("NPR Event", true);
-        Job.SetFilter("Starting Date", '>=%1', WorkDate);
-        if Job.FindSet then
+        Job.SetFilter("Starting Date", '>=%1', WorkDate());
+        if Job.FindSet() then
             repeat
                 JobCount += 1;
                 RecordLink.SetRange("Record ID", Job.RecordId);
                 RecordLink.SetRange(Type, RecordLink.Type::Note);
-                if RecordLink.FindSet then
+                if RecordLink.FindSet() then
                     repeat
-                        if RecordLink.Note.HasValue then begin
+                        if RecordLink.Note.HasValue() then begin
                             Clear(NoteText);
                             Clear(NoteInStream);
                             RecordLink.CalcFields(Note);
@@ -114,17 +114,17 @@ page 6151575 "NPR Event Notes"
                             end;
                             NoteText.AddText(NoteInStreamText);
                             LinkID += 1;
-                            Init;
-                            "Link ID" := LinkID;
-                            URL1 := Job."No.";
-                            "Record ID" := RecordLink."Record ID";
-                            "User ID" := GetUserName(RecordLink."User ID");
-                            "To User ID" := GetUserName(RecordLink."To User ID");
-                            Description := CopyStr(Format(NoteText), 1, MaxStrLen(Description));
-                            Insert;
+                            Rec.Init();
+                            Rec."Link ID" := LinkID;
+                            Rec.URL1 := Job."No.";
+                            Rec."Record ID" := RecordLink."Record ID";
+                            Rec."User ID" := GetUserName(RecordLink."User ID");
+                            Rec."To User ID" := GetUserName(RecordLink."To User ID");
+                            Rec.Description := CopyStr(Format(NoteText), 1, MaxStrLen(Rec.Description));
+                            Rec.Insert();
                         end;
-                    until RecordLink.Next = 0;
-            until (Job.Next = 0) or (JobCount = MaxNoOfEvents);
+                    until RecordLink.Next() = 0;
+            until (Job.Next() = 0) or (JobCount = MaxNoOfEvents);
     end;
 
     local procedure GetUserName(UserID: Text): Text
@@ -133,7 +133,7 @@ page 6151575 "NPR Event Notes"
         EveryoneText: Label 'Everyone';
     begin
         User.SetRange("User Name", UserID);
-        if User.FindFirst and (User."Full Name" <> '') then
+        if User.FindFirst() and (User."Full Name" <> '') then
             exit(User."Full Name");
         if UserID = '' then
             exit(EveryoneText);

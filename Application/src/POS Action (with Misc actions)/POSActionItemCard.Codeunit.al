@@ -6,22 +6,21 @@ codeunit 6150827 "NPR POS Action: Item Card"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
 
-                RegisterWorkflow(false);
-                RegisterBooleanParameter('RefreshLine', true);
-                RegisterBooleanParameter('PageEditable', true);
-                //-NPR5.38 [289390]
-                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-                //+NPR5.38 [289390]
-            end;
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterBooleanParameter('RefreshLine', true);
+            Sender.RegisterBooleanParameter('PageEditable', true);
+            //-NPR5.38 [289390]
+            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+            //+NPR5.38 [289390]
+        end;
     end;
 
     local procedure ActionCode(): Text
@@ -38,11 +37,8 @@ codeunit 6150827 "NPR POS Action: Item Card"
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Confirmed: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         OpenItemPage(Context, POSSession, FrontEnd);
@@ -67,10 +63,10 @@ codeunit 6150827 "NPR POS Action: Item Card"
             POSSaleLine.GetCurrentSaleLine(LinePOS);
             if LinePOS.Type = LinePOS.Type::Item then begin
                 if Item.Get(LinePOS."No.") then begin
-                    Item.SetRecFilter;
+                    Item.SetRecFilter();
                     RetailItemCard.Editable(JSON.GetBooleanParameter('PageEditable'));
                     RetailItemCard.SetRecord(Item);
-                    RetailItemCard.RunModal;
+                    RetailItemCard.RunModal();
                     if JSON.GetBooleanParameter('RefreshLine') then begin
                         LinePOS.Validate("No.");
                         LinePOS.Modify(true);

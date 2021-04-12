@@ -37,7 +37,7 @@ page 6151085 "NPR RIS Retail Inv. Sets"
                 Caption = 'Test Retail Inventory';
                 Image = Intercompany;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

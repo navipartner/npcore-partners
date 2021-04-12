@@ -3,7 +3,7 @@ report 6060044 "NPR Map Excel Item Worksh."
     Caption = 'Map Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")
@@ -58,7 +58,7 @@ report 6060044 "NPR Map Excel Item Worksh."
         begin
             BoolTryMatch := true;
             LocItemWorksheet.CopyFilters("Item Worksheet");
-            if LocItemWorksheet.FindFirst then
+            if LocItemWorksheet.FindFirst() then
                 if LocItemWorksheet."Excel Import from Line No." > 1 then
                     HeaderRow := LocItemWorksheet."Excel Import from Line No." - 1;
         end;
@@ -96,14 +96,11 @@ report 6060044 "NPR Map Excel Item Worksh."
         ExcelBuf: Record "Excel Buffer";
         ExcelBuf2: Record "Excel Buffer";
         BoolTryMatch: Boolean;
-        FirstLine: Integer;
         HeaderRow: Integer;
         ExcelFileExtensionTok: Label '.xlsx', Locked = true;
         ImportExcelLbl: Label 'Import Excel File';
         HeaderRowErr: Label 'Please indicate the Header Row';
         ImportItemWorksheetErr: Label 'Please start this import from the Item Worksheet Page.';
-        ActionIfVariantUnknown: Option Skip,Create;
-        ActionIfVarietyUnknown: Option Skip,Create;
         ServerFileName: Text;
         SheetName: Text[250];
 
@@ -118,7 +115,7 @@ report 6060044 "NPR Map Excel Item Worksh."
         if ExcelBuf.FindFirst() then
             repeat
                 if not ItemWorksheetExcelColumn.Get("Item Worksheet"."Item Template Name", "Item Worksheet".Name, ExcelBuf."Column No.") then begin
-                    ItemWorksheetExcelColumn.Init;
+                    ItemWorksheetExcelColumn.Init();
                     ItemWorksheetExcelColumn.Validate("Worksheet Template Name", "Item Worksheet"."Item Template Name");
                     ItemWorksheetExcelColumn.Validate("Worksheet Name", "Item Worksheet".Name);
                     ItemWorksheetExcelColumn.Validate("Excel Column No.", ExcelBuf."Column No.");
@@ -135,14 +132,14 @@ report 6060044 "NPR Map Excel Item Worksh."
                     RecField.Reset();
                     RecField.SetRange(TableNo, DATABASE::"NPR Item Worksheet Line");
                     RecField.SetFilter(FieldName, '%1', ItemWorksheetExcelColumn."Excel Header Text");
-                    if RecField.FindFirst then begin
+                    if RecField.FindFirst() then begin
                         ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Process as", ItemWorksheetExcelColumn."Process as"::Item);
                         ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Map to Field Number", RecField."No.");
                     end;
                     if ItemWorksheetExcelColumn."Map to Field Number" = 0 then begin
                         RecField.SetRange(FieldName);
                         RecField.SetFilter("Field Caption", '%1', ItemWorksheetExcelColumn."Excel Header Text");
-                        if RecField.FindFirst then begin
+                        if RecField.FindFirst() then begin
                             ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Process as", ItemWorksheetExcelColumn."Process as"::Item);
                             ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Map to Field Number", RecField."No.");
                         end;
@@ -151,7 +148,7 @@ report 6060044 "NPR Map Excel Item Worksh."
                         RecField.SetRange(TableNo, DATABASE::"NPR Item Worksh. Variant Line");
                         RecField.SetFilter(FieldName, '%1', ItemWorksheetExcelColumn."Excel Header Text");
                         RecField.SetRange("Field Caption");
-                        if RecField.FindFirst then begin
+                        if RecField.FindFirst() then begin
                             ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Process as", ItemWorksheetExcelColumn."Process as"::"Item Variant");
                             ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Map to Field Number", RecField."No.");
                         end;
@@ -159,7 +156,7 @@ report 6060044 "NPR Map Excel Item Worksh."
                     if ItemWorksheetExcelColumn."Map to Field Number" = 0 then begin
                         RecField.SetRange(FieldName);
                         RecField.SetFilter("Field Caption", '%1', ItemWorksheetExcelColumn."Excel Header Text");
-                        if RecField.FindFirst then begin
+                        if RecField.FindFirst() then begin
                             ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Process as", ItemWorksheetExcelColumn."Process as"::"Item Variant");
                             ItemWorksheetExcelColumn.Validate(ItemWorksheetExcelColumn."Map to Field Number", RecField."No.");
                         end;

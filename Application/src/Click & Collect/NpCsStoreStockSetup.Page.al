@@ -51,8 +51,8 @@ page 6151225 "NPR NpCs Store Stock Setup"
 
     trigger OnOpenPage()
     begin
-        if not Rec.Get then begin
-            Rec.Init;
+        if not Rec.Get() then begin
+            Rec.Init();
             Rec.Insert(true);
         end;
     end;

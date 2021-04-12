@@ -14,17 +14,17 @@ codeunit 6151453 "NPR Magento NpXml FIK"
         Clear(RecRef);
         RecRef.Open(Rec."Table No.");
         RecRef.SetPosition(Rec."Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
 
         CustomValue := Format(GetFIK('71', RecRef), 0, 9);
-        RecRef.Close;
+        RecRef.Close();
 
         Clear(RecRef);
 
         Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     local procedure GetFIK(FIKType: Code[2]; RecRef: RecordRef) FIKNo: Text
@@ -39,7 +39,7 @@ codeunit 6151453 "NPR Magento NpXml FIK"
         IntBuffer: Integer;
         PmtIDLength: Integer;
     begin
-        CompanyInfo.Get;
+        CompanyInfo.Get();
         CompanyInfo.TestField("Giro No.");
 
         case FIKType of
@@ -65,7 +65,7 @@ codeunit 6151453 "NPR Magento NpXml FIK"
             DATABASE::"Sales Invoice Header":
                 begin
                     RecRef.SetTable(SalesInvHeader);
-                    if not SalesInvHeader.Find then
+                    if not SalesInvHeader.Find() then
                         exit('');
                     PaymentID := PadStr('', PmtIDLength - 2 - StrLen(SalesInvHeader."No."), '0') + SalesInvHeader."No." + '0';
                 end;

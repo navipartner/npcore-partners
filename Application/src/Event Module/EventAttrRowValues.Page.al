@@ -13,25 +13,25 @@ page 6060163 "NPR Event Attr. Row Values"
         {
             repeater(Group)
             {
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = FormulaLookupMode;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Visible = NOT FormulaLookupMode;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field(Formula; Formula)
+                field(Formula; Rec.Formula)
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -40,10 +40,10 @@ page 6060163 "NPR Event Attr. Row Values"
 
                     trigger OnAssistEdit()
                     begin
-                        FormulaAssistEdit();
+                        Rec.FormulaAssistEdit();
                     end;
                 }
-                field(Promote; Promote)
+                field(Promote; Rec.Promote)
                 {
                     ApplicationArea = All;
                     Visible = NOT FormulaLookupMode;

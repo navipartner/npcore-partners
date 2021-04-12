@@ -15,68 +15,68 @@ page 6151505 "NPR Nc Import Types"
             repeater(Control6150621)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Import List Update Handler"; "Import List Update Handler")
+                field("Import List Update Handler"; Rec."Import List Update Handler")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the update handler, which will be used for getting new entries into import list';
                 }
-                field("Keep Import Entries for"; "Keep Import Entries for")
+                field("Keep Import Entries for"; Rec."Keep Import Entries for")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Keep Import Entries for field';
                 }
-                field("Import Codeunit ID"; "Import Codeunit ID")
+                field("Import Codeunit ID"; Rec."Import Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Import Codeunit ID field';
                 }
-                field("Lookup Codeunit ID"; "Lookup Codeunit ID")
+                field("Lookup Codeunit ID"; Rec."Lookup Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Lookup Codeunit ID field';
                 }
-                field("Webservice Enabled"; "Webservice Enabled")
+                field("Webservice Enabled"; Rec."Webservice Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Webservice Enabled field';
                 }
-                field("Webservice Codeunit ID"; "Webservice Codeunit ID")
+                field("Webservice Codeunit ID"; Rec."Webservice Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Webservice Codeunit ID field';
                 }
-                field("Ftp Enabled"; "Ftp Enabled")
+                field("Ftp Enabled"; Rec."Ftp Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ftp Enabled field';
                 }
-                field(Sftp; Sftp)
+                field(Sftp; Rec.Sftp)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sftp field';
                 }
-                field("Ftp Host"; "Ftp Host")
+                field("Ftp Host"; Rec."Ftp Host")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ftp Host field';
                 }
-                field("Server File Enabled"; "Server File Enabled")
+                field("Server File Enabled"; Rec."Server File Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Server File Enabled field';
                 }
-                field("Server File Path"; "Server File Path")
+                field("Server File Path"; Rec."Server File Path")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Server File Path field';
@@ -94,10 +94,10 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Download Ftp';
                 Image = Start;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = "Ftp Enabled";
+                Visible = Rec."Ftp Enabled";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Download Ftp action';
 
@@ -113,10 +113,10 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Download Server File';
                 Image = Save;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = "Server File Enabled";
+                Visible = Rec."Server File Enabled";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Download Server File action';
 
@@ -132,16 +132,15 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Send Test Error E-mail';
                 Image = SendMail;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = ("Send E-mail on Error");
+                Visible = (Rec."Send E-mail on Error");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Send Test Error E-mail action';
 
                 trigger OnAction()
                 var
-                    TempNcImportEntry: Record "NPR Nc Import Entry" temporary;
                     NcImportMgt: Codeunit "NPR Nc Import Mgt.";
                 begin
                     NcImportMgt.SendTestErrorMail(Rec);
@@ -152,7 +151,7 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Show Setup Page';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

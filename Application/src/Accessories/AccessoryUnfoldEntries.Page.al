@@ -15,97 +15,97 @@ page 6014505 "NPR Accessory Unfold Entries"
         {
             repeater(Group)
             {
-                field("Accessory Item No."; "Accessory Item No.")
+                field("Accessory Item No."; Rec."Accessory Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Accessory Item No. field';
                 }
-                field("Item Ledger Entry No."; "Item Ledger Entry No.")
+                field("Item Ledger Entry No."; Rec."Item Ledger Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Ledger Entry No. field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Source Type"; "Source Type")
+                field("Source Type"; Rec."Source Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Type field';
                 }
-                field("Source No."; "Source No.")
+                field("Source No."; Rec."Source No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source No. field';
                 }
-                field("Document Type"; "Document Type")
+                field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Document Line No."; "Document Line No.")
+                field("Document Line No."; Rec."Document Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Line No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Cash Register No."; "Cash Register No.")
+                field("Cash Register No."; Rec."Cash Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Document Time"; "Document Time")
+                field("Document Time"; Rec."Document Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Time field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("Unfold Item Ledger Entry No."; "Unfold Item Ledger Entry No.")
+                field("Unfold Item Ledger Entry No."; Rec."Unfold Item Ledger Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unfold Item Ledger Entry No. field';
@@ -132,14 +132,12 @@ page 6014505 "NPR Accessory Unfold Entries"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
-                    Navigate.Run;
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
+                    Navigate.Run();
                 end;
             }
         }
     }
 
-    var
-        Text000: Label 'Post Accessory Unfold Worksheet?';
 }
 

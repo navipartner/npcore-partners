@@ -84,7 +84,7 @@ page 6014591 "NPR Sales Stats Time Period"
                 Caption = 'Get Data';
                 Image = Calculate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -93,7 +93,7 @@ page 6014591 "NPR Sales Stats Time Period"
                 trigger OnAction()
                 begin
                     CurrPage.SaleStatisticsSubform.PAGE.PopulateTemp(StartDate, EndDate, StartTime, EndTime, StatisticsBy, ItemNoFilter, ItemCategoryCodeFilter, Dim1Filter, Dim2Filter);
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
         }
@@ -107,9 +107,6 @@ page 6014591 "NPR Sales Stats Time Period"
         StartTime: Time;
         EndDate: Date;
         EndTime: Time;
-        QtyQuery: Query "NPR Sales Stat - Item Qty";
-        StartDateTime: DateTime;
-        EndDateTime: DateTime;
         Dim1Filter: Text;
         Dim2Filter: Text;
 }

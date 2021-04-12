@@ -5,7 +5,6 @@ codeunit 6151509 "NPR Nc Import List Processing"
     trigger OnRun()
     var
         NcImportType: Record "NPR Nc Import Type";
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
         FindImportType(Rec, NcImportType);
         UpdateImportList(Rec, NcImportType.Code);
@@ -44,10 +43,10 @@ codeunit 6151509 "NPR Nc Import List Processing"
         NcImportEntry.SetRange(Imported, false);
         NcImportEntry.SetRange("Runtime Error", false);
         NcImportEntry.SetFilter("Earliest Import Datetime", '<=%1', CurrentDateTime);
-        if NcImportEntry.FindSet then
+        if NcImportEntry.FindSet() then
             repeat
                 NcSyncMgt.ProcessImportEntry(NcImportEntry);
-            until NcImportEntry.Next = 0;
+            until NcImportEntry.Next() = 0;
     end;
 
     local procedure FindImportType(JobQueueEntry: Record "Job Queue Entry"; var NcImportType: Record "NPR Nc Import Type")
@@ -122,7 +121,6 @@ codeunit 6151509 "NPR Nc Import List Processing"
     [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
-        NcTaskProcessor: Record "NPR Nc Task Processor";
         ParameterString: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then
@@ -142,7 +140,6 @@ codeunit 6151509 "NPR Nc Import List Processing"
     local procedure OnValidateJobQueueEntryParameterString(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         NcImportType: Record "NPR Nc Import Type";
-        ParameterString: Text;
         Description: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then

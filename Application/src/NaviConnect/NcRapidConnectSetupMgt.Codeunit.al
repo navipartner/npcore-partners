@@ -1,4 +1,4 @@
-codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
+﻿codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
 {
     // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
     // NC2.14/MHA /20180716  CASE 322308 Updated Trigger fields to support Partial Trigger functionality
@@ -24,10 +24,10 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         if NcRapidConnectTrigger.IsEmpty then
             exit;
 
-        NcRapidConnectTrigger.FindSet;
+        NcRapidConnectTrigger.FindSet();
         repeat
             RunInitNcSetup(NcRapidConnectSetup, NcRapidConnectTrigger);
-        until NcRapidConnectTrigger.Next = 0;
+        until NcRapidConnectTrigger.Next() = 0;
     end;
 
     local procedure RunInitImportSetup(var NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup")
@@ -60,7 +60,7 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         PrevRec: Text;
     begin
         if not DataLogSetup.Get(NcRapidConnectTrigger."Table ID") then begin
-            DataLogSetup.Init;
+            DataLogSetup.Init();
             DataLogSetup."Table ID" := NcRapidConnectTrigger."Table ID";
             //-NC2.14 [322308]
             // IF NcRapidConnectTrigger."Insert Trigger" THEN
@@ -100,7 +100,7 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         if DataLogSubscriber.Get(NcRapidConnectSetup."Task Processor Code", NcRapidConnectTrigger."Table ID", '') then
             exit;
 
-        DataLogSubscriber.Init;
+        DataLogSubscriber.Init();
         DataLogSubscriber.Code := NcRapidConnectSetup."Task Processor Code";
         DataLogSubscriber."Table ID" := NcRapidConnectTrigger."Table ID";
         DataLogSubscriber."Company Name" := '';
@@ -114,10 +114,10 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         NcTaskSetup.SetRange("Table No.", NcRapidConnectTrigger."Table ID");
         NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR Nc RapidConn. Exp. Mgt.");
         NcTaskSetup.SetRange("Task Processor Code", NcRapidConnectSetup."Task Processor Code");
-        if NcTaskSetup.FindFirst then
+        if NcTaskSetup.FindFirst() then
             exit;
 
-        NcTaskSetup.Init;
+        NcTaskSetup.Init();
         NcTaskSetup."Entry No." := 0;
         NcTaskSetup."Table No." := NcRapidConnectTrigger."Table ID";
         NcTaskSetup."Codeunit ID" := CODEUNIT::"NPR Nc RapidConn. Exp. Mgt.";
@@ -137,10 +137,10 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         if ConfigPackageTable.IsEmpty then
             exit;
 
-        ConfigPackageTable.FindSet;
+        ConfigPackageTable.FindSet();
         repeat
             if not NcRapidConnectTrigger.Get(NcRapidConnectSetup.Code, ConfigPackageTable."Table ID") then begin
-                NcRapidConnectTrigger.Init;
+                NcRapidConnectTrigger.Init();
                 NcRapidConnectTrigger."Setup Code" := NcRapidConnectSetup.Code;
                 NcRapidConnectTrigger."Table ID" := ConfigPackageTable."Table ID";
                 //-NC2.14 [322308]
@@ -151,7 +151,7 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
                 //+NC2.14 [322308]
                 NcRapidConnectTrigger.Insert(true);
             end;
-        until ConfigPackageTable.Next = 0;
+        until ConfigPackageTable.Next() = 0;
     end;
 
     local procedure InitImportType(var NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup")
@@ -172,7 +172,7 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         end;
 
         if not NcImportType.Get(ImportTypeCode) then begin
-            NcImportType.Init;
+            NcImportType.Init();
             NcImportType.Code := ImportTypeCode;
             NcImportType.Description := NcRapidConnectSetup.Description;
             NcImportType."Import Codeunit ID" := ImportCodeunitId();
@@ -321,14 +321,13 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         SetConfigPackageTableFilter(NcRapidConnectSetup, ConfigPackageTable);
         ConfigPackageTable.FilterGroup(40);
         ConfigPackageTable.SetRange("Table ID", TableID);
-        exit(ConfigPackageTable.FindFirst);
+        exit(ConfigPackageTable.FindFirst());
     end;
 
     procedure LookupTriggerTableID(SetupCode: Code[20]; var ObjectID: Integer): Boolean
     var
         NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup";
         TempAllObjWithCaption: Record AllObjWithCaption temporary;
-        Objects: Page Objects;
     begin
         if not NcRapidConnectSetup.Get(SetupCode) then
             exit(false);
@@ -349,16 +348,16 @@ codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
         NcRapidConnectExportTrigger: Record "NPR Nc RapidConnect Trig.Table";
     begin
         SetConfigPackageTableFilter(NcRapidConnectSetup, ConfigPackageTable);
-        if ConfigPackageTable.FindSet then
+        if ConfigPackageTable.FindSet() then
             repeat
                 if (not NcRapidConnectExportTrigger.Get(NcRapidConnectSetup.Code, ConfigPackageTable."Table ID")) and
                   AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Table, ConfigPackageTable."Table ID")
                 then begin
-                    TempAllObjWithCaption.Init;
+                    TempAllObjWithCaption.Init();
                     TempAllObjWithCaption := AllObjWithCaption;
-                    TempAllObjWithCaption.Insert;
+                    TempAllObjWithCaption.Insert();
                 end;
-            until ConfigPackageTable.Next = 0;
+            until ConfigPackageTable.Next() = 0;
     end;
 
     local procedure "--- Aux"()

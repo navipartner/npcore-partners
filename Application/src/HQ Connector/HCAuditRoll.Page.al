@@ -24,12 +24,12 @@ page 6150900 "NPR HC Audit Roll"
                 trigger OnValidate()
                 begin
                     if Typefilter > Typefilter::" " then begin
-                        SetRange(Type, Typefilter - 1);
+                        Rec.SetRange(Type, Typefilter - 1);
                         boolCancelled := false;
                     end else begin
-                        SetRange(Type);
+                        Rec.SetRange(Type);
                         boolCancelled := true;
-                        SetFilter(Type, '<>%1', Type::Cancelled);
+                        Rec.SetFilter(Type, '<>%1', Rec.Type::Cancelled);
                     end;
 
                     CurrPage.Update(true);
@@ -46,11 +46,11 @@ page 6150900 "NPR HC Audit Roll"
                 trigger OnValidate()
                 begin
                     if CounterNoFilter <> '' then begin
-                        SetCurrentKey("Register No.", "Sales Ticket No.");
-                        SetRange("Register No.", CounterNoFilter)
+                        Rec.SetCurrentKey("Register No.", "Sales Ticket No.");
+                        Rec.SetRange("Register No.", CounterNoFilter)
                     end else begin
-                        SetRange("Register No.");
-                        SetCurrentKey("Sales Ticket No.");
+                        Rec.SetRange("Register No.");
+                        Rec.SetCurrentKey("Sales Ticket No.");
                     end;
 
                     CurrPage.Update(false);
@@ -67,9 +67,9 @@ page 6150900 "NPR HC Audit Roll"
                 trigger OnValidate()
                 begin
                     if SalespersonCodeFilter <> '' then
-                        SetRange("Salesperson Code", SalespersonCodeFilter)
+                        Rec.SetRange("Salesperson Code", SalespersonCodeFilter)
                     else
-                        SetRange("Salesperson Code");
+                        Rec.SetRange("Salesperson Code");
 
                     CurrPage.Update(false);
                 end;
@@ -85,9 +85,9 @@ page 6150900 "NPR HC Audit Roll"
                 begin
 
                     if CustomerNoFilter <> '' then
-                        SetRange("Customer No.", CustomerNoFilter)
+                        Rec.SetRange("Customer No.", CustomerNoFilter)
                     else
-                        SetRange("Customer No.");
+                        Rec.SetRange("Customer No.");
                     CurrPage.Update(true);
                 end;
             }
@@ -101,9 +101,9 @@ page 6150900 "NPR HC Audit Roll"
                 trigger OnValidate()
                 begin
                     if SaleDateFilter <> 0D then begin
-                        SetRange("Sale Date", SaleDateFilter);
+                        Rec.SetRange("Sale Date", SaleDateFilter);
                     end else begin
-                        SetRange("Sale Date");
+                        Rec.SetRange("Sale Date");
                     end;
 
                     CurrPage.Update(true);
@@ -120,9 +120,9 @@ page 6150900 "NPR HC Audit Roll"
                 begin
 
                     if boolCancelled then begin
-                        SetFilter(Type, '<>%1', Type::Cancelled);
+                        Rec.SetFilter(Type, '<>%1', Rec.Type::Cancelled);
                     end else begin
-                        SetRange(Type);
+                        Rec.SetRange(Type);
                     end;
 
                     Typefilter := Typefilter::" ";
@@ -140,13 +140,13 @@ page 6150900 "NPR HC Audit Roll"
                 trigger OnValidate()
                 begin
                     if PostedFilter = PostedFilter::" " then begin
-                        SetRange(Posted);
+                        Rec.SetRange(Posted);
                     end else begin
                         if PostedFilter = PostedFilter::No then begin
-                            SetRange(Posted, false);
+                            Rec.SetRange(Posted, false);
                         end else begin
                             if PostedFilter = PostedFilter::Yes then begin
-                                SetRange(Posted, true);
+                                Rec.SetRange(Posted, true);
                             end;
                         end;
                     end;
@@ -156,13 +156,13 @@ page 6150900 "NPR HC Audit Roll"
             repeater(Control6150622)
             {
                 ShowCaption = false;
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -170,43 +170,43 @@ page 6150900 "NPR HC Audit Roll"
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
-                field("Sale Type"; "Sale Type")
+                field("Sale Type"; Rec."Sale Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sale Type field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Sale Date"; "Sale Date")
+                field("Sale Date"; Rec."Sale Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Sale Date field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Closing Time"; "Closing Time")
+                field("Closing Time"; Rec."Closing Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closing Time field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -214,107 +214,107 @@ page 6150900 "NPR HC Audit Roll"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 2 field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field(Reference; Reference)
+                field(Reference; Rec.Reference)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reference field';
                 }
-                field(Posted; Posted)
+                field(Posted; Rec.Posted)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Posted field';
                 }
-                field("Item Entry Posted"; "Item Entry Posted")
+                field("Item Entry Posted"; Rec."Item Entry Posted")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Item Entry Posted field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Amount Including VAT"; "Amount Including VAT")
+                field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
-                field("Line Discount %"; "Line Discount %")
+                field("Line Discount %"; Rec."Line Discount %")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Line Discount % field';
                 }
-                field("Line Discount Amount"; "Line Discount Amount")
+                field("Line Discount Amount"; Rec."Line Discount Amount")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Line Discount Amount field';
                 }
-                field("VAT %"; "VAT %")
+                field("VAT %"; Rec."VAT %")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the VAT % field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("<Item Entry Posted1>"; "Item Entry Posted")
+                field("<Item Entry Posted1>"; Rec."Item Entry Posted")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Item Entry Posted field';
                 }
-                field(Offline; Offline)
+                field(Offline; Rec.Offline)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
                     ToolTip = 'Specifies the value of the Offline field';
                 }
-                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
-                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
@@ -381,7 +381,7 @@ page 6150900 "NPR HC Audit Roll"
                     Caption = 'Post Sales Ticket';
                     Image = Post;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Shift+F11';
                     ApplicationArea = All;
@@ -424,18 +424,18 @@ page 6150900 "NPR HC Audit Roll"
                         SalesTicketNo: Code[20];
                     begin
 
-                        if "Sales Ticket No." = '' then
+                        if Rec."Sales Ticket No." = '' then
                             Error(Text10600004);
-                        SalesTicketNo := "Sales Ticket No.";
-                        case "Document Type" of
-                            "Document Type"::Faktura:
+                        SalesTicketNo := Rec."Sales Ticket No.";
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Faktura:
                                 begin
                                     SalesInvoiceHeader.FilterGroup := 2;
                                     SalesInvoiceHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
                                     SalesInvoiceHeader.FilterGroup := 0;
                                     PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                                 end;
-                            "Document Type"::Kreditnota:
+                            Rec."Document Type"::Kreditnota:
                                 begin
                                     SalesCrMemoHeader.FilterGroup := 2;
                                     SalesCrMemoHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
@@ -457,8 +457,8 @@ page 6150900 "NPR HC Audit Roll"
                     var
                         Naviger: Page Navigate;
                     begin
-                        Naviger.SetDoc("Sale Date", "Posted Doc. No.");
-                        Naviger.Run;
+                        Naviger.SetDoc(Rec."Sale Date", Rec."Posted Doc. No.");
+                        Naviger.Run();
                     end;
                 }
                 action(ShowDocumentsCustom)
@@ -497,7 +497,7 @@ page 6150900 "NPR HC Audit Roll"
                         if HCAuditRoll.Find('-') then
                             repeat
                                 Sum1 += HCAuditRoll."Amount Including VAT";
-                            until HCAuditRoll.Next = 0;
+                            until HCAuditRoll.Next() = 0;
 
                         Message(Format(Sum1));
 
@@ -514,13 +514,13 @@ page 6150900 "NPR HC Audit Roll"
 
                     trigger OnAction()
                     begin
-                        HCAuditRollGlobal.Reset;
+                        HCAuditRollGlobal.Reset();
                         HCAuditRollGlobal.FilterGroup := 2;
 
-                        HCAuditRollGlobal.SetRange("Register No.", "Register No.");
-                        HCAuditRollGlobal.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                        HCAuditRollGlobal.SetRange("Sale Type", "Sale Type"::Sale);
-                        HCAuditRollGlobal.SetRange("Sale Date", "Sale Date");
+                        HCAuditRollGlobal.SetRange("Register No.", Rec."Register No.");
+                        HCAuditRollGlobal.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+                        HCAuditRollGlobal.SetRange("Sale Type", Rec."Sale Type"::Sale);
+                        HCAuditRollGlobal.SetRange("Sale Date", Rec."Sale Date");
                         HCAuditRollGlobal.FilterGroup := 0;
                         PAGE.RunModal(PAGE::"NPR HC Audit Roll Stats", HCAuditRollGlobal);
                     end;
@@ -546,12 +546,12 @@ page 6150900 "NPR HC Audit Roll"
 
                     trigger OnAction()
                     begin
-                        HCAuditRollGlobal.Reset;
+                        HCAuditRollGlobal.Reset();
                         HCAuditRollGlobal.FilterGroup := 2;
                         HCAuditRollGlobal.SetCurrentKey("Sale Date", "Sale Type");
                         HCAuditRollGlobal.SetRange("Register No.");
                         HCAuditRollGlobal.SetRange("Sales Ticket No.");
-                        HCAuditRollGlobal.SetRange("Sale Type", "Sale Type"::Sale);
+                        HCAuditRollGlobal.SetRange("Sale Type", Rec."Sale Type"::Sale);
                         HCAuditRollGlobal.SetRange("Sale Date", Today);
                         HCAuditRollGlobal.FilterGroup := 0;
                         PAGE.RunModal(PAGE::"NPR HC Audit Roll Stats", HCAuditRollGlobal);
@@ -562,15 +562,12 @@ page 6150900 "NPR HC Audit Roll"
     }
 
     trigger OnAfterGetCurrRecord()
-    var
-        AuditRoll2: Record "NPR HC Audit Roll";
     begin
         TempHCAuditRollArray[2] := TempHCAuditRollArray[1];
         TempHCAuditRollArray[1] := Rec;
 
         SelectedTicketNo := Rec."Sales Ticket No.";
 
-        DoUpdate := true;
 
         if TempHCAuditRollArray[1]."Sales Ticket No." <> TempHCAuditRollArray[2]."Sales Ticket No." then
             CurrPage.PingPong.Ping(1);
@@ -583,9 +580,9 @@ page 6150900 "NPR HC Audit Roll"
 
     trigger OnOpenPage()
     begin
-        SetFilter(Type, '<>%1', Type::Cancelled);
-        if FindFirst then;
-        SelectedTicketNo := "Sales Ticket No.";
+        Rec.SetFilter(Type, '<>%1', Rec.Type::Cancelled);
+        if Rec.FindFirst() then;
+        SelectedTicketNo := Rec."Sales Ticket No.";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -619,7 +616,6 @@ page 6150900 "NPR HC Audit Roll"
         FieldRegisterNo: Boolean;
         SaleDateFilter: Date;
         SelectedTicketNo: Text;
-        DoUpdate: Boolean;
         StyleExpr: Text;
 
     procedure PostReceipt()
@@ -632,10 +628,10 @@ page 6150900 "NPR HC Audit Roll"
     begin
         HCAuditRoll4 := Rec;
         HCAuditRoll4.SetCurrentKey("Register No.", "Sales Ticket No.");
-        HCAuditRoll4.SetRange("Register No.", "Register No.");
-        HCAuditRoll4.SetRange("Sales Ticket No.", "Sales Ticket No.");
+        HCAuditRoll4.SetRange("Register No.", Rec."Register No.");
+        HCAuditRoll4.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
         if Confirm(TX001, true, HCAuditRoll4.GetFilters) then begin
-            HCAuditRollPosting.DeleteAll;
+            HCAuditRollPosting.DeleteAll();
             HCAuditRollPosting.TransferFromRevSilent(HCAuditRoll4, HCAuditRollPosting);
             PostDocNo := HCPostTempAuditRoll.getNewPostingNo(true);
             HCPostTempAuditRoll.setPostingNo(PostDocNo);
@@ -643,7 +639,7 @@ page 6150900 "NPR HC Audit Roll"
             HCAuditRollPosting.UpdateChangesSilent;
 
             /* ITEM LEDGER ENTRIES */
-            HCAuditRollPosting.DeleteAll;
+            HCAuditRollPosting.DeleteAll();
             HCAuditRollPosting.TransferFromRevSilentItemLedg(HCAuditRoll4, HCAuditRollPosting);
             HCPostTempAuditRoll.setPostingNo(PostDocNo);
             HCPostTempAuditRoll.RunPostItemLedger(HCAuditRollPosting);
@@ -654,14 +650,14 @@ page 6150900 "NPR HC Audit Roll"
 
     procedure ModifyAllowed(): Boolean
     begin
-        exit((Type = Type::"G/L")
-             and ("Sale Type" = "Sale Type"::"Out payment")
-             and (not Posted)
+        exit((Rec.Type = Rec.Type::"G/L")
+             and (Rec."Sale Type" = Rec."Sale Type"::"Out payment")
+             and (not Rec.Posted)
              and (Filter[1] = Filter::Payment)
             or
-             (Type = Type::Customer)
-             and ("Sale Type" = "Sale Type"::Deposit)
-             and (not Posted)
+             (Rec.Type = Rec.Type::Customer)
+             and (Rec."Sale Type" = Rec."Sale Type"::Deposit)
+             and (not Rec.Posted)
              and (Filter[2] = Filter::Deposit)
             );
     end;
@@ -678,14 +674,14 @@ page 6150900 "NPR HC Audit Roll"
             Filter::" ":
                 begin
                     Filter[2] := Filter::Payment;
-                    FilterGroup(2);
+                    Rec.FilterGroup(2);
                     TempHCAuditRollArray[1].CopyFilters(Rec);
-                    Reset;
-                    SetRange(Type, Type::"G/L");
-                    SetRange("Sale Type", "Sale Type"::"Out payment");
-                    SetRange(Posted, false);
-                    SetRange("No.", '*');
-                    FilterGroup(0);
+                    Rec.Reset();
+                    Rec.SetRange(Type, Rec.Type::"G/L");
+                    Rec.SetRange("Sale Type", Rec."Sale Type"::"Out payment");
+                    Rec.SetRange(Posted, false);
+                    Rec.SetRange("No.", '*');
+                    Rec.FilterGroup(0);
                     exit(Filter[2]);
                 end;
         end;
@@ -703,14 +699,14 @@ page 6150900 "NPR HC Audit Roll"
             Filter::" ":
                 begin
                     Filter[2] := Filter::Deposit;
-                    FilterGroup(2);
+                    Rec.FilterGroup(2);
                     TempHCAuditRollArray[1].CopyFilters(Rec);
-                    Reset;
-                    SetRange(Type, Type::Customer);
-                    SetRange("Sale Type", "Sale Type"::Deposit);
-                    SetRange(Posted, false);
-                    SetRange("No.", '*');
-                    FilterGroup(0);
+                    Rec.Reset();
+                    Rec.SetRange(Type, Rec.Type::Customer);
+                    Rec.SetRange("Sale Type", Rec."Sale Type"::Deposit);
+                    Rec.SetRange(Posted, false);
+                    Rec.SetRange("No.", '*');
+                    Rec.FilterGroup(0);
                     CurrPage.Update(true);
                     exit(Filter[2]);
                 end;
@@ -719,10 +715,10 @@ page 6150900 "NPR HC Audit Roll"
 
     procedure SetStyleExpression()
     begin
-        if Type = Type::"Open/Close" then
+        if Rec.Type = Rec.Type::"Open/Close" then
             StyleExpr := 'Strong'
         else
-            if ("Sales Ticket No." = SelectedTicketNo) then
+            if (Rec."Sales Ticket No." = SelectedTicketNo) then
                 StyleExpr := 'StrongAccent'
             else
                 StyleExpr := 'None'

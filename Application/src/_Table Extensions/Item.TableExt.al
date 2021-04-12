@@ -518,7 +518,7 @@ tableextension 6014427 "NPR Item" extends Item
             exit;
 
         if not ItemReference.Get(Item."No.", '', Item."Base Unit of Measure", ItemReference."Reference Type"::Vendor, Item."Vendor No.", Item."Vendor Item No.") then begin
-            ItemReference.Init;
+            ItemReference.Init();
             ItemReference."Item No." := Item."No.";
             ItemReference."Variant Code" := '';
             ItemReference."Unit of Measure" := Item."Base Unit of Measure";

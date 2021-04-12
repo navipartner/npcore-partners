@@ -8,7 +8,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         Itt: Integer;
     begin
         ExchangeLabelSetup.Get();
-        CifferCode := ExchangeLabelSetup."Purchace Price Code";
 
         for Itt := 1 to StrLen("Proccesing Value") do begin
             if Evaluate(Index, Format("Proccesing Value"[Itt])) and (Format("Proccesing Value"[Itt]) <> '.') then begin
@@ -66,7 +65,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     procedure FormatNumberNoDecimal(var "Processing Value": Text[30])
     var
         Dec: Decimal;
-        Int: Integer;
     begin
         if Evaluate(Dec, "Processing Value", 9) then
             "Processing Value" := Format(Dec div 1); //always round down
@@ -97,8 +95,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     end;
 
     local procedure NegateDecimal(var ProcessingValue: Text)
-    var
-        Decimal: Decimal;
     begin
         if ProcessingValue <> '' then
             ProcessingValue := Format(ParseAsDecimal(ProcessingValue) * -1);
@@ -118,7 +114,7 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                 begin
                     RecRef := RecordID.GetRecord();
                     RecRef.SetTable(POSEntry);
-                    POSEntry.Find;
+                    POSEntry.Find();
                     POSUnit.Get(POSEntry."POS Unit No.");
                     Utility.GetSalesTicketReceiptText(TicketRcptText, POSUnit);
                 end;
@@ -156,7 +152,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     procedure StringToHex(Text: Text): Text
     var
         Encoding: DotNet NPRNetEncoding;
-        ByteArray: DotNet NPRNetArray;
         BitConverter: DotNet NPRNetBitConverter;
         Regex: DotNet NPRNetRegex;
     begin
@@ -242,7 +237,7 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := Choice;
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     local procedure PadLeft(Value: Text; PadChar: Text; Length: Integer): Text
@@ -264,9 +259,9 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         AllObj: Record AllObj;
     begin
         AllObj.Get(AllObj."Object Type"::Codeunit, CODEUNIT::"NPR RP Aux - Misc. Library");
-        tmpAllObj.Init;
+        tmpAllObj.Init();
         tmpAllObj := AllObj;
-        tmpAllObj.Insert;
+        tmpAllObj.Insert();
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionList', '', false, false)]
@@ -321,78 +316,77 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
 
         Handled := true;
 
-        with TemplateLine do
-            case FunctionName of
-                //Constants
-                'CURRENTDATETIME':
-                    "Processing Value" := Format(CurrentDateTime);
-                'CURRENTDATE':
-                    "Processing Value" := Format(Today);
-                'CURRENTTIME':
-                    "Processing Value" := Format(Time);
-                'CURRENTDAY':
-                    "Processing Value" := PadLeft(Format(Date2DMY(Today, 1)), '0', 2);
-                'CURRENTMONTH':
-                    "Processing Value" := PadLeft(Format(Date2DMY(Today, 2)), '0', 2);
-                'CURRENTYEAR':
-                    "Processing Value" := Format(Date2DMY(Today, 3));
-                'CURRENTYEAR_SHORT':
-                    "Processing Value" := CopyStr(Format(Date2DMY(Today, 3)), 3, 2);
-                'RECEIPT_TEXT':
-                    PrintReceiptText(TemplateLine, RecID);
-                //Date formatting
-                'DATE_DAY':
-                    "Processing Value" := PadLeft(Format(Date2DMY(ParseAsDate("Processing Value"), 1)), '0', 2);
-                'DATE_MONTH':
-                    "Processing Value" := PadLeft(Format(Date2DMY(ParseAsDate("Processing Value"), 2)), '0', 2);
-                'DATE_YEAR':
-                    "Processing Value" := Format(Date2DMY(ParseAsDate("Processing Value"), 3));
-                'DATE_YEAR_SHORT':
-                    "Processing Value" := CopyStr(Format(Date2DMY(ParseAsDate("Processing Value"), 3)), 3, 2);
-                'FORMAT_MONTH_FROM_DATE':
-                    "Processing Value" := FormatMonthFromDate(ParseAsDate("Processing Value"));
-                'FORMAT_MONTH_FROM_DATETIME':
-                    "Processing Value" := FormatMonthFromDatetime(ParseAsDateTime("Processing Value"));
-                'NUMBER_NO_DECIMAL':
-                    FormatNumberNoDecimal("Processing Value");
-                'NUMBER_ONE_DECIMAL':
-                    FormatNumberOneDecimal("Processing Value");
-                'NUMBER_TWO_DECIMAL':
-                    FormatNumberTwoDecimal("Processing Value");
-                'NUMBER_SEPARATOR_TWO_DECIMAL':
-                    FormatNumberSeparator("Processing Value");
-                'NUMBER_SEPARATOR_ROUND':
-                    FormatNumberSeperatorAndRound("Processing Value");
-                'CIFFERCODE':
-                    ApplyCipher("Processing Value", false);
-                'CIPHERCODE_WITHDECIMALS':
-                    ApplyCipher("Processing Value", true);
-                'EXCHANGEDEADLINE':
-                    ApplyExchangeDeadline("Processing Value");
-                'NEGATE_DECIMAL':
-                    NegateDecimal("Processing Value");
-                'INT_TO_HEX':
-                    "Processing Value" := IntToHex(ParseAsBigInteger("Processing Value"));
-                'STRING_TO_HEX':
-                    "Processing Value" := StringToHex("Processing Value");
-                'OBFUSCATE_MI':
-                    "Processing Value" := Format(MultiplicativeInverseEncode(ParseAsBigInteger("Processing Value")), 0, 9);
-                'CALC_DATE':
-                    "Processing Value" := CalculateDate("Processing Value", "Processing Function Parameter");
-                'DECTOINT':
-                    FormatNumberNoDecimal("Processing Value");
-                'ROUNDTO1DECIMAL':
-                    FormatNumberOneDecimal("Processing Value");
-                'FORMAT_THOUSANDSEP':
-                    FormatNumberSeparator("Processing Value");
-                'DECTOINT_WITHSEP':
-                    FormatNumberSeperatorAndRound("Processing Value");
-                else
-                    case true of
-                        CopyStr("Processing Function ID", 1, 7) = 'CONVERT':
-                            ApplyCurrencyConversion("Processing Value", "Processing Function ID");
-                    end;
-            end;
+        case FunctionName of
+            //Constants
+            'CURRENTDATETIME':
+                TemplateLine."Processing Value" := Format(CurrentDateTime);
+            'CURRENTDATE':
+                TemplateLine."Processing Value" := Format(Today);
+            'CURRENTTIME':
+                TemplateLine."Processing Value" := Format(Time);
+            'CURRENTDAY':
+                TemplateLine."Processing Value" := PadLeft(Format(Date2DMY(Today, 1)), '0', 2);
+            'CURRENTMONTH':
+                TemplateLine."Processing Value" := PadLeft(Format(Date2DMY(Today, 2)), '0', 2);
+            'CURRENTYEAR':
+                TemplateLine."Processing Value" := Format(Date2DMY(Today, 3));
+            'CURRENTYEAR_SHORT':
+                TemplateLine."Processing Value" := CopyStr(Format(Date2DMY(Today, 3)), 3, 2);
+            'RECEIPT_TEXT':
+                PrintReceiptText(TemplateLine, RecID);
+            //Date formatting
+            'DATE_DAY':
+                TemplateLine."Processing Value" := PadLeft(Format(Date2DMY(ParseAsDate(TemplateLine."Processing Value"), 1)), '0', 2);
+            'DATE_MONTH':
+                TemplateLine."Processing Value" := PadLeft(Format(Date2DMY(ParseAsDate(TemplateLine."Processing Value"), 2)), '0', 2);
+            'DATE_YEAR':
+                TemplateLine."Processing Value" := Format(Date2DMY(ParseAsDate(TemplateLine."Processing Value"), 3));
+            'DATE_YEAR_SHORT':
+                TemplateLine."Processing Value" := CopyStr(Format(Date2DMY(ParseAsDate(TemplateLine."Processing Value"), 3)), 3, 2);
+            'FORMAT_MONTH_FROM_DATE':
+                TemplateLine."Processing Value" := FormatMonthFromDate(ParseAsDate(TemplateLine."Processing Value"));
+            'FORMAT_MONTH_FROM_DATETIME':
+                TemplateLine."Processing Value" := FormatMonthFromDatetime(ParseAsDateTime(TemplateLine."Processing Value"));
+            'NUMBER_NO_DECIMAL':
+                FormatNumberNoDecimal(TemplateLine."Processing Value");
+            'NUMBER_ONE_DECIMAL':
+                FormatNumberOneDecimal(TemplateLine."Processing Value");
+            'NUMBER_TWO_DECIMAL':
+                FormatNumberTwoDecimal(TemplateLine."Processing Value");
+            'NUMBER_SEPARATOR_TWO_DECIMAL':
+                FormatNumberSeparator(TemplateLine."Processing Value");
+            'NUMBER_SEPARATOR_ROUND':
+                FormatNumberSeperatorAndRound(TemplateLine."Processing Value");
+            'CIFFERCODE':
+                ApplyCipher(TemplateLine."Processing Value", false);
+            'CIPHERCODE_WITHDECIMALS':
+                ApplyCipher(TemplateLine."Processing Value", true);
+            'EXCHANGEDEADLINE':
+                ApplyExchangeDeadline(TemplateLine."Processing Value");
+            'NEGATE_DECIMAL':
+                NegateDecimal(TemplateLine."Processing Value");
+            'INT_TO_HEX':
+                TemplateLine."Processing Value" := IntToHex(ParseAsBigInteger(TemplateLine."Processing Value"));
+            'STRING_TO_HEX':
+                TemplateLine."Processing Value" := StringToHex(TemplateLine."Processing Value");
+            'OBFUSCATE_MI':
+                TemplateLine."Processing Value" := Format(MultiplicativeInverseEncode(ParseAsBigInteger(TemplateLine."Processing Value")), 0, 9);
+            'CALC_DATE':
+                TemplateLine."Processing Value" := CalculateDate(TemplateLine."Processing Value", TemplateLine."Processing Function Parameter");
+            'DECTOINT':
+                FormatNumberNoDecimal(TemplateLine."Processing Value");
+            'ROUNDTO1DECIMAL':
+                FormatNumberOneDecimal(TemplateLine."Processing Value");
+            'FORMAT_THOUSANDSEP':
+                FormatNumberSeparator(TemplateLine."Processing Value");
+            'DECTOINT_WITHSEP':
+                FormatNumberSeperatorAndRound(TemplateLine."Processing Value");
+            else
+                case true of
+                    CopyStr(TemplateLine."Processing Function ID", 1, 7) = 'CONVERT':
+                        ApplyCurrencyConversion(TemplateLine."Processing Value", TemplateLine."Processing Function ID");
+                end;
+        end;
     end;
 }
 

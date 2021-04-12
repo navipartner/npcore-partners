@@ -10,7 +10,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
 
         Capture(PaymentLine);
 
-        PaymentLine."Date Captured" := Today;
+        PaymentLine."Date Captured" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -35,7 +35,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
 
         Refund(PaymentLine);
 
-        PaymentLine."Date Refunded" := Today;
+        PaymentLine."Date Refunded" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -75,13 +75,11 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         SalesInvHeader: Record "Sales Invoice Header";
         SalesInvLine: Record "Sales Invoice Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         JToken: JsonToken;
         HttpWebRequest: HttpRequestMessage;
         Url: Text;
         Request: Text;
         OrderId: Text;
-        ErrorMessage: Text;
         Response: Text;
         ResponseJson: Text;
         ItemArray: Text;
@@ -100,14 +98,14 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
                     SalesLine.SetRange("Document No.", SalesHeader."No.");
                     SalesLine.SetRange(Type, SalesLine.Type::Item);
                     SalesLine.SetFilter("Outstanding Quantity", '>%1', 0);
-                    if SalesLine.FindSet then begin
+                    if SalesLine.FindSet() then begin
                         ItemArray :=
                           '{' +
                             '"order_item_sku": "' + ItemNo2Sku(SalesLine."No.", SalesLine."Variant Code") + '",' +
                             '"qty": ' + Format(SalesLine."Outstanding Quantity", 0, 9) +
                           '}';
 
-                        while SalesLine.Next <> 0 do begin
+                        while SalesLine.Next() <> 0 do begin
                             ItemArray +=
                               ',{' +
                                 '"order_item_sku": "' + ItemNo2Sku(SalesLine."No.", SalesLine."Variant Code") + '",' +
@@ -124,14 +122,14 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
                     SalesInvLine.SetRange("Document No.", SalesInvHeader."No.");
                     SalesInvLine.SetRange(Type, SalesInvLine.Type::Item);
                     SalesInvLine.SetFilter(Quantity, '>%1', 0);
-                    if SalesInvLine.FindSet then begin
+                    if SalesInvLine.FindSet() then begin
                         ItemArray :=
                           '{' +
                             '"order_item_sku": "' + ItemNo2Sku(SalesInvLine."No.", SalesInvLine."Variant Code") + '",' +
                             '"qty": ' + Format(SalesInvLine.Quantity, 0, 9) +
                           '}';
 
-                        while SalesInvLine.Next <> 0 do begin
+                        while SalesInvLine.Next() <> 0 do begin
                             ItemArray +=
                               ',{' +
                                 '"order_item_sku": "' + ItemNo2Sku(SalesInvLine."No.", SalesInvLine."Variant Code") + '",' +
@@ -173,12 +171,10 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
     var
         MagentoOrderStatus: Record "NPR Magento Order Status";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         JToken: JsonToken;
         HttpWebRequest: HttpRequestMessage;
         Url: Text;
         Request: Text;
-        ErrorMessage: Text;
         Response: Text;
         ResponseJson: Text;
     begin
@@ -221,13 +217,11 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         JToken: JsonToken;
         HttpWebRequest: HttpRequestMessage;
         Url: Text;
         Request: Text;
         OrderId: Text;
-        ErrorMessage: Text;
         Response: Text;
         ResponseJson: Text;
         ItemArray: Text;
@@ -246,14 +240,14 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
                     SalesLine.SetRange("Document No.", SalesHeader."No.");
                     SalesLine.SetRange(Type, SalesLine.Type::Item);
                     SalesLine.SetFilter("Outstanding Quantity", '>%1', 0);
-                    if SalesLine.FindSet then begin
+                    if SalesLine.FindSet() then begin
                         ItemArray :=
                           '{' +
                             '"order_item_sku": "' + ItemNo2Sku(SalesLine."No.", SalesLine."Variant Code") + '",' +
                             '"qty": ' + Format(SalesLine."Outstanding Quantity", 0, 9) +
                           '}';
 
-                        while SalesLine.Next <> 0 do begin
+                        while SalesLine.Next() <> 0 do begin
                             ItemArray +=
                               ',{' +
                                 '"order_item_sku": "' + ItemNo2Sku(SalesLine."No.", SalesLine."Variant Code") + '",' +
@@ -270,14 +264,14 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
                     SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
                     SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
                     SalesCrMemoLine.SetFilter(Quantity, '>%1', 0);
-                    if SalesCrMemoLine.FindSet then begin
+                    if SalesCrMemoLine.FindSet() then begin
                         ItemArray :=
                           '{' +
                             '"order_item_sku": "' + ItemNo2Sku(SalesCrMemoLine."No.", SalesCrMemoLine."Variant Code") + '",' +
                             '"qty": ' + Format(SalesCrMemoLine.Quantity, 0, 9) +
                           '}';
 
-                        while SalesCrMemoLine.Next <> 0 do begin
+                        while SalesCrMemoLine.Next() <> 0 do begin
                             ItemArray +=
                               ',{' +
                                 '"order_item_sku": "' + ItemNo2Sku(SalesCrMemoLine."No.", SalesCrMemoLine."Variant Code") + '",' +
@@ -327,7 +321,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit;
 
         if MagentoPaymentGateway."Api Url" = '' then

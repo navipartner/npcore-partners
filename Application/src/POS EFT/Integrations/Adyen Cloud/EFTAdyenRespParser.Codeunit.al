@@ -51,7 +51,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
                 Error(ERROR_RESPONSE_TYPE, ResponseType);
         end;
 
-        EFTTransactionRequest.Modify;
+        EFTTransactionRequest.Modify();
     end;
 
     procedure SetResponseData(ResponseTypeIn: Text; DataIn: Text; EntryNo: Integer)
@@ -255,7 +255,6 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
     local procedure ParsePaymentResponse(JObject: DotNet NPRNetJObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         JToken: DotNet NPRNetJObject;
-        TransactionDateTime: DateTime;
         EFTAdyenCloudSignDialog: Codeunit "NPR EFT Adyen Cloud Sign Dia.";
         CultureInfo: DotNet NPRNetCultureInfo;
         JValue: DotNet NPRNetJValue;
@@ -440,10 +439,10 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
     var
         i: Integer;
     begin
-        if JObject.Count = 0 then
+        if JObject.Count() = 0 then
             exit;
 
-        for i := 0 to JObject.Count - 1 do begin
+        for i := 0 to JObject.Count() - 1 do begin
             case JObject.Item(i).ToString() of
                 'SignatureCapture':
                     begin
@@ -461,17 +460,13 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         OutStream: OutStream;
         DocumentQualifier: Text;
         JToken: DotNet NPRNetJObject;
-        OutputFormat: Text;
         j: Integer;
-        Line: Text;
         NameValueCollection: DotNet NPRNetNameValueCollection;
         "Key": Text;
         Name: Text;
         Value: Text;
         ParsePrint: Boolean;
-        TotalLength: Integer;
         RequiredSignature: Boolean;
-        CreditCardTransaction: Record "NPR EFT Receipt";
     begin
         if JObject.Count() < 1 then
             exit;
@@ -687,8 +682,8 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         Name := SubstituteCurrencyChars(Name);
         Value := SubstituteCurrencyChars(Value);
 
-        CreditCardTransaction.Init;
-        CreditCardTransaction.Date := Today;
+        CreditCardTransaction.Init();
+        CreditCardTransaction.Date := Today();
         CreditCardTransaction."Transaction Time" := Time;
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
         CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
@@ -702,7 +697,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
             CreditCardTransaction.Text := Name + ' ' + Value;
 
         CreditCardTransaction."Entry No." := EntryNo;
-        CreditCardTransaction.Insert;
+        CreditCardTransaction.Insert();
         //+NPR5.54 [387990]
     end;
 
@@ -714,7 +709,6 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         JsonTextReader: DotNet NPRNetJsonTextReader;
         DateParseHandling: DotNet NPRNetDateParseHandling;
         FloatParseHandling: DotNet NPRNetFloatParseHandling;
-        FloatFormatHandling: DotNet NPRNetFloatFormatHandling;
     begin
         MemStream := MemStream.MemoryStream(Encoding.UTF8.GetBytes(JSON));
         StreamReader := StreamReader.StreamReader(MemStream, Encoding.UTF8);

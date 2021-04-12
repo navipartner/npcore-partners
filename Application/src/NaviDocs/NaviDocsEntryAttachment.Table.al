@@ -67,7 +67,7 @@ table 6059944 "NPR NaviDocs Entry Attachment"
             exit;
 
         CalcFields(Data);
-        if not Data.HasValue then begin
+        if not Data.HasValue() then begin
             Message(NoDataText);
             exit;
         end;

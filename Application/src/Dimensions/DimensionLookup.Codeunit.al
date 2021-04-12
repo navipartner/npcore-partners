@@ -29,7 +29,7 @@ codeunit 6014606 "NPR Dimension Lookup"
 
         DimMgt.GetDimensionSet(DimSetEntryTmp, Sale."Dimension Set ID");
         DimSetEntryTmp.SetRange("Dimension Code", Dim.Code);
-        if DimSetEntryTmp.FindFirst then begin
+        if DimSetEntryTmp.FindFirst() then begin
             DimVal."Dimension Code" := Dim.Code;
             DimVal.Code := DimSetEntryTmp."Dimension Value Code";
             DimVal.Find();
@@ -38,7 +38,7 @@ codeunit 6014606 "NPR Dimension Lookup"
         DimValues.SetRecord(DimVal);
         DimValues.SetTableView(DimVal);
         DimValues.LookupMode := true;
-        if DimValues.RunModal = ACTION::LookupOK then begin
+        if DimValues.RunModal() = ACTION::LookupOK then begin
             DimValues.GetRecord(DimVal);
             DimSetEntryTmp."Dimension Code" := Dim.Code;
             DimSetEntryTmp."Dimension Value Code" := DimVal.Code;

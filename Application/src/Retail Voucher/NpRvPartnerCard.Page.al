@@ -15,13 +15,13 @@ page 6151027 "NPR NpRv Partner Card"
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Code field';
                     }
-                    field(Name; Name)
+                    field(Name; Rec.Name)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Name field';
@@ -30,19 +30,19 @@ page 6151027 "NPR NpRv Partner Card"
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Service Url"; "Service Url")
+                    field("Service Url"; Rec."Service Url")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Service Url field';
                     }
-                    field("Service Username"; "Service Username")
+                    field("Service Username"; Rec."Service Username")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Service Username field';
                     }
-                    field("Service Password"; "Service Password")
+                    field("Service Password"; Rec."Service Password")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
@@ -62,7 +62,7 @@ page 6151027 "NPR NpRv Partner Card"
                 Caption = 'Validate Partner Setup';
                 Image = Approve;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

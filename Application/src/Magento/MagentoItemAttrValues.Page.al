@@ -29,12 +29,12 @@ page 6151437 "NPR Magento Item Attr. Values"
                             if MagentoAttribute.Type in [MagentoAttribute.Type::Single, MagentoAttribute.Type::"Text Area (single)"] then begin
                                 Rec.ModifyAll(Selected, false);
                                 CurrPage.Update(false);
-                                Rec.Find;
+                                Rec.Find();
                                 Rec.Selected := true;
                                 Rec.Modify(true);
                             end;
                         end;
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 field(Value; Rec.Value)

@@ -1,4 +1,4 @@
-codeunit 6060063 "NPR Catalog Nonstock Mgt."
+﻿codeunit 6060063 "NPR Catalog Nonstock Mgt."
 {
     local procedure CopyNonstockAttributesToItem(var NonstockItem: Record "Nonstock Item")
     var
@@ -7,14 +7,14 @@ codeunit 6060063 "NPR Catalog Nonstock Mgt."
     begin
         NPRAttributeKey.SetRange("Table ID", DATABASE::"Nonstock Item");
         NPRAttributeKey.SetRange("MDR Code PK", NonstockItem."Entry No.");
-        if NPRAttributeKey.FindSet then
+        if NPRAttributeKey.FindSet() then
             repeat
                 NPRAttributeValueSet.SetRange("Attribute Set ID", NPRAttributeKey."Attribute Set ID");
-                if NPRAttributeValueSet.FindFirst then
+                if NPRAttributeValueSet.FindFirst() then
                     repeat
                         UpdateItemAttribute(0, NonstockItem."Item No.", NPRAttributeValueSet."Attribute Code", NPRAttributeValueSet."Text Value");
-                    until NPRAttributeValueSet.Next = 0;
-            until NPRAttributeKey.Next = 0;
+                    until NPRAttributeValueSet.Next() = 0;
+            until NPRAttributeKey.Next() = 0;
     end;
 
     procedure UpdateItemAttribute(Type: Option Item,Nonstocktem; ItemNo: Code[20]; AttributeCode: Code[20]; AttributeValue: Text)
@@ -31,8 +31,8 @@ codeunit 6060063 "NPR Catalog Nonstock Mgt."
                 NPRAttributeKey.SetRange("Table ID", DATABASE::"Nonstock Item");
         end;
         NPRAttributeKey.SetRange("MDR Code PK", ItemNo);
-        if not NPRAttributeKey.FindLast then begin
-            NPRAttributeKey.Init;
+        if not NPRAttributeKey.FindLast() then begin
+            NPRAttributeKey.Init();
             NPRAttributeKey."Attribute Set ID" := 0;
             case Type of
                 Type::Item:
@@ -41,16 +41,16 @@ codeunit 6060063 "NPR Catalog Nonstock Mgt."
                     NPRAttributeKey."Table ID" := DATABASE::"Nonstock Item";
             end;
             NPRAttributeKey."MDR Code PK" := ItemNo;
-            NPRAttributeKey.Insert;
+            NPRAttributeKey.Insert();
         end;
 
         NPRAttributeValueSet.SetRange("Attribute Set ID", NPRAttributeKey."Attribute Set ID");
         NPRAttributeValueSet.SetRange("Attribute Code", AttributeCode);
-        if not NPRAttributeValueSet.FindFirst then begin
-            NPRAttributeValueSet.Init;
+        if not NPRAttributeValueSet.FindFirst() then begin
+            NPRAttributeValueSet.Init();
             NPRAttributeValueSet."Attribute Set ID" := NPRAttributeKey."Attribute Set ID";
             NPRAttributeValueSet."Attribute Code" := AttributeCode;
-            NPRAttributeValueSet.Insert;
+            NPRAttributeValueSet.Insert();
         end;
 
         NPRAttributeValueSet."Text Value" := AttributeValue;

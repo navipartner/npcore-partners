@@ -1,4 +1,4 @@
-codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
+﻿codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
 {
     var
         TempNpCsOpenHourCalendarEntry: Record "NPR NpCs Open. Hour Cal. Entry" temporary;
@@ -9,8 +9,6 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
     procedure CalcNextClosingDTDaysQty(SetCode: Code[20]; StartDT: DateTime; DaysQty: Integer) ClosingDT: DateTime
     var
         EndDT: DateTime;
-        PrevStartDT: DateTime;
-        OpeningDuration: Duration;
     begin
         if StartDT = 0DT then
             exit(0DT);
@@ -114,10 +112,10 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
 
         TempNpCsOpenHourCalendarEntry.SetFilter("Start Time", '<=%1', CheckTime);
         TempNpCsOpenHourCalendarEntry.SetFilter("End Time", '>=%1|=%2', CheckTime, 0T);
-        exit(TempNpCsOpenHourCalendarEntry.FindFirst);
+        exit(TempNpCsOpenHourCalendarEntry.FindFirst());
     end;
 
-    local procedure FindNextOpeningHours(SetCode: Code[20]; CheckDT: DateTime) OpeningHours: DateTime
+    local procedure FindNextOpeningHours(SetCode: Code[20]; CheckDT: DateTime): DateTime
     var
         CheckDate: Date;
         CheckTime: Time;
@@ -131,24 +129,24 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
 
         TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date", CheckDate);
         TempNpCsOpenHourCalendarEntry.SetFilter("End Time", '>%1|=%2', CheckTime, 0T);
-        if TempNpCsOpenHourCalendarEntry.FindSet then begin
+        if TempNpCsOpenHourCalendarEntry.FindSet() then begin
             repeat
                 if TempNpCsOpenHourCalendarEntry."Start Time" <= CheckTime then
                     exit(CheckDT);
 
                 exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date", TempNpCsOpenHourCalendarEntry."Start Time"));
-            until TempNpCsOpenHourCalendarEntry.Next = 0;
+            until TempNpCsOpenHourCalendarEntry.Next() = 0;
         end;
 
         Clear(TempNpCsOpenHourCalendarEntry);
         TempNpCsOpenHourCalendarEntry.SetFilter("Calendar Date", '>%1', CheckDate);
-        if TempNpCsOpenHourCalendarEntry.FindFirst then
+        if TempNpCsOpenHourCalendarEntry.FindFirst() then
             exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date", TempNpCsOpenHourCalendarEntry."Start Time"));
 
         exit(0DT);
     end;
 
-    local procedure FindNextClosingHours(SetCode: Code[20]; CheckDT: DateTime) ClosingHours: DateTime
+    local procedure FindNextClosingHours(SetCode: Code[20]; CheckDT: DateTime): DateTime
     var
         CheckDate: Date;
         CheckTime: Time;
@@ -162,18 +160,18 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
 
         TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date", CheckDate);
         TempNpCsOpenHourCalendarEntry.SetFilter("End Time", '>=%1|=%2', CheckTime, 0T);
-        if TempNpCsOpenHourCalendarEntry.FindSet then begin
+        if TempNpCsOpenHourCalendarEntry.FindSet() then begin
             repeat
                 if TempNpCsOpenHourCalendarEntry."End Time" = 0T then
                     exit(CreateDateTime(CalcDate('<1D>', TempNpCsOpenHourCalendarEntry."Calendar Date"), TempNpCsOpenHourCalendarEntry."End Time"));
 
                 exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date", TempNpCsOpenHourCalendarEntry."End Time"));
-            until TempNpCsOpenHourCalendarEntry.Next = 0;
+            until TempNpCsOpenHourCalendarEntry.Next() = 0;
         end;
 
         Clear(TempNpCsOpenHourCalendarEntry);
         TempNpCsOpenHourCalendarEntry.SetFilter("Calendar Date", '>%1', CheckDate);
-        if not TempNpCsOpenHourCalendarEntry.FindFirst then
+        if not TempNpCsOpenHourCalendarEntry.FindFirst() then
             exit(0DT);
 
         exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date", TempNpCsOpenHourCalendarEntry."End Time"));
@@ -191,24 +189,24 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
         NpCsOpenHourEntry: Record "NPR NpCs Open. Hour Entry";
     begin
         if SetCode = '' then begin
-            if not NpCsOpenHourSet.FindFirst then
+            if not NpCsOpenHourSet.FindFirst() then
                 exit;
             SetCode := NpCsOpenHourSet.Code;
         end;
 
         if StartDate = 0D then
-            StartDate := Today;
+            StartDate := Today();
         if EndDate = 0D then
             EndDate := CalcDate('<5Y>', Today);
 
         NpCsOpenHourEntry.SetRange("Set Code", SetCode);
-        if not NpCsOpenHourEntry.FindSet then
+        if not NpCsOpenHourEntry.FindSet() then
             exit;
 
         repeat
             ApplyOpeningHourEntry(NpCsOpenHourEntry);
             Clear(TempNpCsOpenHourCalendarEntry);
-        until NpCsOpenHourEntry.Next = 0;
+        until NpCsOpenHourEntry.Next() = 0;
     end;
 
     local procedure ApplyOpeningHourEntry(NpCsOpenHourEntry: Record "NPR NpCs Open. Hour Entry")
@@ -239,27 +237,27 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
     begin
         Date.SetRange("Period Type", Date."Period Type"::Date);
         Date.SetFilter("Period Start", '%1..%2', StartDate, EndDate);
-        if Date.FindSet then
+        if Date.FindSet() then
             repeat
                 case NpCsOpenHourEntry."Entry Type" of
                     NpCsOpenHourEntry."Entry Type"::"Store Closed":
                         begin
                             TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date", Date."Period Start");
-                            if TempNpCsOpenHourCalendarEntry.FindFirst then
-                                TempNpCsOpenHourCalendarEntry.DeleteAll;
+                            if TempNpCsOpenHourCalendarEntry.FindFirst() then
+                                TempNpCsOpenHourCalendarEntry.DeleteAll();
                         end;
                     NpCsOpenHourEntry."Entry Type"::"Store Open":
                         begin
                             if not TempNpCsOpenHourCalendarEntry.Get(Date."Period Start", NpCsOpenHourEntry."Start Time", NpCsOpenHourEntry."End Time") then begin
-                                TempNpCsOpenHourCalendarEntry.Init;
+                                TempNpCsOpenHourCalendarEntry.Init();
                                 TempNpCsOpenHourCalendarEntry."Calendar Date" := Date."Period Start";
                                 TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
                                 TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
-                                TempNpCsOpenHourCalendarEntry.Insert;
+                                TempNpCsOpenHourCalendarEntry.Insert();
                             end;
                         end;
                 end;
-            until Date.Next = 0;
+            until Date.Next() = 0;
     end;
 
     local procedure ApplyOpeningHourEntryWeekly(NpCsOpenHourEntry: Record "NPR NpCs Open. Hour Entry")
@@ -269,27 +267,27 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
         Date.SetRange("Period Type", Date."Period Type"::Date);
         Date.SetFilter("Period Start", '%1..%2', StartDate, EndDate);
         Date.SetFilter("Period No.", GetPeriodNoFilter(NpCsOpenHourEntry));
-        if Date.FindSet then
+        if Date.FindSet() then
             repeat
                 case NpCsOpenHourEntry."Entry Type" of
                     NpCsOpenHourEntry."Entry Type"::"Store Closed":
                         begin
                             TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date", Date."Period Start");
-                            if TempNpCsOpenHourCalendarEntry.FindFirst then
-                                TempNpCsOpenHourCalendarEntry.DeleteAll;
+                            if TempNpCsOpenHourCalendarEntry.FindFirst() then
+                                TempNpCsOpenHourCalendarEntry.DeleteAll();
                         end;
                     NpCsOpenHourEntry."Entry Type"::"Store Open":
                         begin
                             if not TempNpCsOpenHourCalendarEntry.Get(Date."Period Start", NpCsOpenHourEntry."Start Time", NpCsOpenHourEntry."End Time") then begin
-                                TempNpCsOpenHourCalendarEntry.Init;
+                                TempNpCsOpenHourCalendarEntry.Init();
                                 TempNpCsOpenHourCalendarEntry."Calendar Date" := Date."Period Start";
                                 TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
                                 TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
-                                TempNpCsOpenHourCalendarEntry.Insert;
+                                TempNpCsOpenHourCalendarEntry.Insert();
                             end;
                         end;
                 end;
-            until Date.Next = 0;
+            until Date.Next() = 0;
     end;
 
     local procedure ApplyOpeningHourEntryYearly(NpCsOpenHourEntry: Record "NPR NpCs Open. Hour Entry")
@@ -322,17 +320,17 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
                     NpCsOpenHourEntry."Entry Type"::"Store Closed":
                         begin
                             TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date", CalendarDate);
-                            if TempNpCsOpenHourCalendarEntry.FindFirst then
-                                TempNpCsOpenHourCalendarEntry.DeleteAll;
+                            if TempNpCsOpenHourCalendarEntry.FindFirst() then
+                                TempNpCsOpenHourCalendarEntry.DeleteAll();
                         end;
                     NpCsOpenHourEntry."Entry Type"::"Store Open":
                         begin
                             if not TempNpCsOpenHourCalendarEntry.Get(CalendarDate, NpCsOpenHourEntry."Start Time", NpCsOpenHourEntry."End Time") then begin
-                                TempNpCsOpenHourCalendarEntry.Init;
+                                TempNpCsOpenHourCalendarEntry.Init();
                                 TempNpCsOpenHourCalendarEntry."Calendar Date" := CalendarDate;
                                 TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
                                 TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
-                                TempNpCsOpenHourCalendarEntry.Insert;
+                                TempNpCsOpenHourCalendarEntry.Insert();
                             end;
                         end;
                 end;
@@ -352,17 +350,17 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
             NpCsOpenHourEntry."Entry Type"::"Store Closed":
                 begin
                     TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date", NpCsOpenHourEntry."Entry Date");
-                    if TempNpCsOpenHourCalendarEntry.FindFirst then
-                        TempNpCsOpenHourCalendarEntry.DeleteAll;
+                    if TempNpCsOpenHourCalendarEntry.FindFirst() then
+                        TempNpCsOpenHourCalendarEntry.DeleteAll();
                 end;
             NpCsOpenHourEntry."Entry Type"::"Store Open":
                 begin
                     if not TempNpCsOpenHourCalendarEntry.Get(NpCsOpenHourEntry."Entry Date", NpCsOpenHourEntry."Start Time", NpCsOpenHourEntry."End Time") then begin
-                        TempNpCsOpenHourCalendarEntry.Init;
+                        TempNpCsOpenHourCalendarEntry.Init();
                         TempNpCsOpenHourCalendarEntry."Calendar Date" := NpCsOpenHourEntry."Entry Date";
                         TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
                         TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
-                        TempNpCsOpenHourCalendarEntry.Insert;
+                        TempNpCsOpenHourCalendarEntry.Insert();
                     end;
                 end;
         end;
@@ -406,7 +404,7 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
             exit;
 
         Clear(TempNpCsOpenHourCalendarEntry);
-        TempNpCsOpenHourCalendarEntry.DeleteAll;
+        TempNpCsOpenHourCalendarEntry.DeleteAll();
         Initialized := true;
         StartDate := NewStartDate;
         EndDate := NewEndDate;

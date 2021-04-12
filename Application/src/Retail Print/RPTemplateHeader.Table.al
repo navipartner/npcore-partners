@@ -42,7 +42,7 @@ table 6014446 "NPR RP Template Header"
                         Error('');
 
                     TemplateModified();
-                    DeviceSettings.DeleteAll;
+                    DeviceSettings.DeleteAll();
                 end;
             end;
         }
@@ -185,7 +185,7 @@ table 6014446 "NPR RP Template Header"
         }
         field(1000; "Table ID"; Integer)
         {
-            CalcFormula = Lookup ("NPR RP Data Items"."Table ID" WHERE(Code = FIELD(Code),
+            CalcFormula = Lookup("NPR RP Data Items"."Table ID" WHERE(Code = FIELD(Code),
                                                                    Level = CONST(0)));
             Caption = 'Table ID';
             Description = 'NPR5.34';
@@ -222,25 +222,25 @@ table 6014446 "NPR RP Template Header"
             exit;
 
         TemplateLine.SetRange("Template Code", Code);
-        TemplateLine.DeleteAll;
+        TemplateLine.DeleteAll();
 
         DataItem.SetRange(Code, Code);
-        DataItem.DeleteAll;
+        DataItem.DeleteAll();
 
         DataItemLinks.SetRange("Data Item Code", Code);
-        DataItemLinks.DeleteAll;
+        DataItemLinks.DeleteAll();
 
         DataItemConstraint.SetRange("Data Item Code", Code);
-        DataItemConstraint.DeleteAll;
+        DataItemConstraint.DeleteAll();
 
         DataItemConstraintLinks.SetRange("Data Item Code", Code);
-        DataItemConstraintLinks.DeleteAll;
+        DataItemConstraintLinks.DeleteAll();
 
         DeviceSettings.SetRange(Template, Code);
-        DeviceSettings.DeleteAll;
+        DeviceSettings.DeleteAll();
 
         MediaInfo.SetRange(Template, Code);
-        MediaInfo.DeleteAll;
+        MediaInfo.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -304,13 +304,13 @@ table 6014446 "NPR RP Template Header"
         if StrLen(Version) = 0 then
             Version := PrintTemplateMgt.GetNextVersionNumber(Rec);
 
-        Modify;
+        Modify();
 
         TemplateHeader.Copy(Rec);
         TemplateHeader.SetRecFilter();
         PackageHandler.ExportPackageToBlob(TemplateHeader, TempBlob);
 
-        TemplateArchive.Init;
+        TemplateArchive.Init();
         TemplateArchive.Code := TemplateHeader.Code;
         TemplateArchive.Version := TemplateHeader.Version;
         TemplateArchive."Archived at" := CreateDateTime(Today, Time);
@@ -321,7 +321,7 @@ table 6014446 "NPR RP Template Header"
         TempBlob.ToRecordRef(RecRef, TemplateArchive.FieldNo(Template));
         RecRef.SetTable(TemplateArchive);
 
-        TemplateArchive.Insert;
+        TemplateArchive.Insert();
     end;
 
     procedure LookupDevice()

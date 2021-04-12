@@ -174,20 +174,20 @@ table 6151590 "NPR NpDc Coupon Type"
         NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv.";
     begin
         Coupon.SetRange("Coupon Type", Code);
-        Coupon.DeleteAll;
+        Coupon.DeleteAll();
 
         CouponEntry.SetRange("Coupon Type", Code);
-        CouponEntry.DeleteAll;
+        CouponEntry.DeleteAll();
 
         CouponItem.SetRange("Coupon Type", Code);
-        CouponItem.DeleteAll;
+        CouponItem.DeleteAll();
 
         SaleLinePOSCoupon.SetRange("Coupon Type", Code);
-        SaleLinePOSCoupon.DeleteAll;
+        SaleLinePOSCoupon.DeleteAll();
 
         NpDcExtCouponSalesLine.SetRange("Coupon Type", Code);
-        if NpDcExtCouponSalesLine.FindFirst then
-            NpDcExtCouponSalesLine.DeleteAll;
+        if NpDcExtCouponSalesLine.FindFirst() then
+            NpDcExtCouponSalesLine.DeleteAll();
     end;
 
     trigger OnInsert()

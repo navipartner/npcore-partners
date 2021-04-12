@@ -199,7 +199,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                     TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
 
-                    TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, WorkDate);
+                    TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, WorkDate());
                 end;
             }
             action("Calculate Schedule Entries (Force)")
@@ -217,7 +217,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                     TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
                     if (Confirm(FORCE_GENERATE, false)) then
-                        TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", true, WorkDate);
+                        TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", true, WorkDate());
                 end;
             }
 

@@ -12,22 +12,22 @@ page 6060160 "NPR Event Attribute Templ."
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Row Template Name"; "Row Template Name")
+                field("Row Template Name"; Rec."Row Template Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Row Template Name field';
                 }
-                field("Column Template Name"; "Column Template Name")
+                field("Column Template Name"; Rec."Column Template Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Column Template Name field';
@@ -45,7 +45,7 @@ page 6060160 "NPR Event Attribute Templ."
                 Caption = 'Default Values';
                 Image = BulletList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -56,7 +56,7 @@ page 6060160 "NPR Event Attribute Templ."
                     EventAttributeMatrix: Page "NPR Event Attribute Matrix";
                 begin
                     EventAttributeMatrix.SetAttrTemplate(Rec.Name);
-                    EventAttributeMatrix.Run;
+                    EventAttributeMatrix.Run();
                 end;
             }
             action(TemplateFilters)
@@ -64,7 +64,7 @@ page 6060160 "NPR Event Attribute Templ."
                 Caption = 'Template Filters';
                 Image = "Filter";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Temp. Filters";

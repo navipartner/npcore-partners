@@ -13,67 +13,67 @@ page 6060132 "NPR MM Member Community"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("External No. Search Order"; "External No. Search Order")
+                field("External No. Search Order"; Rec."External No. Search Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External No. Search Order field';
                 }
-                field("External Membership No. Series"; "External Membership No. Series")
+                field("External Membership No. Series"; Rec."External Membership No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Membership No. Series field';
                 }
-                field("External Member No. Series"; "External Member No. Series")
+                field("External Member No. Series"; Rec."External Member No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Member No. Series field';
                 }
-                field("Customer No. Series"; "Customer No. Series")
+                field("Customer No. Series"; Rec."Customer No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. Series field';
                 }
-                field("Member Unique Identity"; "Member Unique Identity")
+                field("Member Unique Identity"; Rec."Member Unique Identity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Unique Identity field';
                 }
-                field("Create Member UI Violation"; "Create Member UI Violation")
+                field("Create Member UI Violation"; Rec."Create Member UI Violation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Member UI Violation field';
                 }
-                field("Member Logon Credentials"; "Member Logon Credentials")
+                field("Member Logon Credentials"; Rec."Member Logon Credentials")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Logon Credentials field';
                 }
-                field("Membership to Cust. Rel."; "Membership to Cust. Rel.")
+                field("Membership to Cust. Rel."; Rec."Membership to Cust. Rel.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership to Cust. Rel. field';
                 }
-                field("Create Renewal Notifications"; "Create Renewal Notifications")
+                field("Create Renewal Notifications"; Rec."Create Renewal Notifications")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Renewal Notifications field';
                 }
-                field("Activate Loyalty Program"; "Activate Loyalty Program")
+                field("Activate Loyalty Program"; Rec."Activate Loyalty Program")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Activate Loyalty Program field';
                 }
-                field("Foreign Membership"; "Foreign Membership")
+                field("Foreign Membership"; Rec."Foreign Membership")
                 {
                     ApplicationArea = All;
                     Editable = false;

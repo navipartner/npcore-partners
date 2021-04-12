@@ -28,7 +28,7 @@ codeunit 6060101 "NPR Data Cleanup GCVI"
                 end;
                 DataCleanupCVI2.Retries := DataCleanupCVI2.Retries + 1;
                 DataCleanupCVI2.Modify(true);
-                Commit;
+                Commit();
             until DataCleanupCVI.Next() = 0;
 
         DataCleanupCVI.SetCurrentKey("Cleanup Action", "Approve Rename", IsError, IsRenamed, Retries);
@@ -52,7 +52,7 @@ codeunit 6060101 "NPR Data Cleanup GCVI"
                 end;
                 DataCleanupCVI2.Retries := DataCleanupCVI2.Retries + 1;
                 DataCleanupCVI2.Modify(true);
-                Commit;
+                Commit();
             until DataCleanupCVI.Next() = 0;
         Message(DoneMsg);
     end;

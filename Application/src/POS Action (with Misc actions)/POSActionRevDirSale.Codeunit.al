@@ -7,8 +7,6 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         Title: Label 'Reverse Sale';
         ReceiptPrompt: Label 'Receipt Number';
         ReasonPrompt: Label 'Return Reason';
-        ResellablePrompt: Label 'Are the returned items resellable?';
-        NotAllowed: Label '%1 does not have the rights to return sales ticket. Make a return sale instead.';
         ReasonRequired: Label 'You must choose a return reason.';
         NotFound: Label 'Return receipt reference number %1 not found.';
         NOTHING_TO_RETURN: Label 'All items sold on ticket %1  has already been returned. ';
@@ -16,7 +14,6 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         COPIED_RECEIPT: Label 'This sales is copied from %1 and new return items can''t be added to the return sales.';
         QTY_ADJUSTED: Label 'Quantity was adjusted due to previous return sales.';
         POSEntryMgt: Codeunit "NPR POS Entry Management";
-        DimsNotCopied: Label 'Dimension copy is only supported, when Advanced Posting is activated.\Dimensions were not copied from the original sale.';
         Text00001: Label 'There already exists lines in the sales. Please delete the lines to fetch and customize the return sale.';
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
@@ -34,23 +31,22 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('receipt', 'input(labels.title, labels.receiptprompt).respond().cancel(abort);');
-                RegisterWorkflowStep('reason', 'context.PromptForReason && respond();');
-                RegisterWorkflowStep('handle', 'respond();');
-                RegisterWorkflow(true);
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('receipt', 'input(labels.title, labels.receiptprompt).respond().cancel(abort);');
+            Sender.RegisterWorkflowStep('reason', 'context.PromptForReason && respond();');
+            Sender.RegisterWorkflowStep('handle', 'respond();');
+            Sender.RegisterWorkflow(true);
 
-                RegisterOptionParameter('ItemCondition', 'Mint,Used,Not Suitable for Resale', 'Used');
-                RegisterOptionParameter('ObfucationMethod', 'None,MI', 'None');
-                RegisterBooleanParameter('CopyHeaderDimensions', false);
-            end;
+            Sender.RegisterOptionParameter('ItemCondition', 'Mint,Used,Not Suitable for Resale', 'Used');
+            Sender.RegisterOptionParameter('ObfucationMethod', 'None,MI', 'None');
+            Sender.RegisterBooleanParameter('CopyHeaderDimensions', false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
@@ -59,14 +55,14 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         Setup: Codeunit "NPR POS Setup";
         Context: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         POSSession.GetSetup(Setup);
 
         Context.SetContext('PromptForReason', true);
 
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
         Handled := true;
     end;
 
@@ -76,7 +72,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         JSON: Codeunit "NPR POS JSON Management";
         ReturnReasonCode: Code[20];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -89,7 +85,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
                 begin
                     ReturnReasonCode := SelectReturnReason(Context, POSSession, FrontEnd);
                     JSON.SetContext('ReturnReasonCode', ReturnReasonCode);
-                    FrontEnd.SetActionContext(ActionCode, JSON);
+                    FrontEnd.SetActionContext(ActionCode(), JSON);
                 end;
             'handle':
                 begin
@@ -106,9 +102,9 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'receiptprompt', ReceiptPrompt);
-        Captions.AddActionCaption(ActionCode, 'reasonprompt', ReasonPrompt);
+        Captions.AddActionCaption(ActionCode(), 'title', Title);
+        Captions.AddActionCaption(ActionCode(), 'receiptprompt', ReceiptPrompt);
+        Captions.AddActionCaption(ActionCode(), 'reasonprompt', ReasonPrompt);
     end;
 
     local procedure VerifyReceiptForReversal(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -204,12 +200,12 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 
         SaleLinePOS2.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS2.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS2.FindFirst then
+        if SaleLinePOS2.FindFirst() then
             Error(Text00001);
 
         if POSSalesLine.FindSet(false, false) then
             repeat
-                SaleLinePOS.Init;
+                SaleLinePOS.Init();
                 SaleLinePOS."Register No." := SalePOS."Register No.";
                 SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
                 SaleLinePOS.Date := SalePOS.Date;
@@ -222,14 +218,11 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
                     SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
                 SaleLinePOS.Modify(true);
-            until POSSalesLine.Next = 0;
+            until POSSalesLine.Next() = 0;
     end;
 
     procedure ReverseAuditInfoToSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; POSSalesLine: Record "NPR POS Entry Sales Line")
     var
-        NPRDimMgt: Codeunit "NPR Dimension Mgt.";
-        FromNPRLineDim: Record "NPR Line Dimension";
-        ToNPRLineDim: Record "NPR Line Dimension";
         POSEntry: Record "NPR POS Entry";
     begin
         POSEntry.Get(POSSalesLine."POS Entry No.");
@@ -394,14 +387,14 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 
         POSEntry.SetCurrentKey("Document No.");
         POSEntry.SetRange("Document No.", OriginalSalesTicketNo);
-        if POSEntry.FindLast then
+        if POSEntry.FindLast() then
             if CurrentSalePOS."Dimension Set ID" <> POSEntry."Dimension Set ID" then begin
                 OldDimSetID := CurrentSalePOS."Dimension Set ID";
 
                 CurrentSalePOS."Dimension Set ID" := POSEntry."Dimension Set ID";
                 CurrentSalePOS."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
                 CurrentSalePOS."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
-                CurrentSalePOS.Modify;
+                CurrentSalePOS.Modify();
 
                 if CurrentSalePOS.SalesLinesExist then
                     CurrentSalePOS.UpdateAllLineDim(CurrentSalePOS."Dimension Set ID", OldDimSetID);

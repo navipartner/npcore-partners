@@ -16,22 +16,22 @@ page 6184491 "NPR Pepper Config. List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field(Mode; Mode)
+                field(Mode; Rec.Mode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mode field';
@@ -70,7 +70,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        UploadFile(0);
+                        Rec.UploadFile(0);
                     end;
                 }
                 action(ImportAdditionalParameters)
@@ -82,7 +82,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        UploadFile(1);
+                        Rec.UploadFile(1);
                     end;
                 }
             }
@@ -98,7 +98,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ShowFile(0);
+                        Rec.ShowFile(0);
                     end;
                 }
                 action(ShowConfigXML)
@@ -110,7 +110,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ShowFile(1);
+                        Rec.ShowFile(1);
                     end;
                 }
                 action(ShowAdditionalParameters)
@@ -122,7 +122,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ShowFile(2);
+                        Rec.ShowFile(2);
                     end;
                 }
             }
@@ -138,7 +138,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ClearFile(0);
+                        Rec.ClearFile(0);
                     end;
                 }
                 action("DeleteAdditional Parameters")
@@ -150,7 +150,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ClearFile(1);
+                        Rec.ClearFile(1);
                     end;
                 }
             }
@@ -166,7 +166,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ExportFile(0);
+                        Rec.ExportFile(0);
                     end;
                 }
                 action(ExportConfig)
@@ -178,7 +178,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ExportFile(1);
+                        Rec.ExportFile(1);
                     end;
                 }
                 action(ExportAddtionalParameters)
@@ -190,7 +190,7 @@ page 6184491 "NPR Pepper Config. List"
 
                     trigger OnAction()
                     begin
-                        ExportFile(2);
+                        Rec.ExportFile(2);
                     end;
                 }
             }

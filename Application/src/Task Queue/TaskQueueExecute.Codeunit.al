@@ -17,7 +17,6 @@ codeunit 6059903 "NPR Task Queue Execute"
         CurrentFilePath: Text[250];
         TaskOutputLog: Record "NPR Task Output Log";
         Printer: Record Printer;
-        TaskTemplate: Record "NPR Task Template";
         CurrLangID: Integer;
         RunOnRecRef: Boolean;
         RecRef: RecordRef;
@@ -108,14 +107,14 @@ codeunit 6059903 "NPR Task Queue Execute"
                 begin
                     if "Call Object With Task Record" then begin
                         RecRef.GetTable(Rec);
-                        RecRef.SetRecFilter;
+                        RecRef.SetRecFilter();
                         RunOnRecRef := true;
                     end;
 
                     if TaskGenerateOutput then begin
                         TaskOutputLog.InitRecord(Rec);
                         TaskOutputLog.File.CreateOutStream(OutStr);
-                        TaskOutputLog.Insert;
+                        TaskOutputLog.Insert();
                     end;
 
                     case "Type Of Output" of
@@ -189,7 +188,7 @@ codeunit 6059903 "NPR Task Queue Execute"
         if TaskGenerateOutput then begin
             CalcFields("Report Name");
             TaskOutputLog."File Name" := DelChr("Report Name", '=', '\/:*?"<>|') + Suffix(Rec);
-            TaskOutputLog.Modify;
+            TaskOutputLog.Modify();
         end;
         //+TQ1.29 [242044]
 
@@ -203,7 +202,6 @@ codeunit 6059903 "NPR Task Queue Execute"
     procedure GetFileName(TaskLine: Record "NPR Task Line"): Text[1024]
     var
         NewFileName: Text[1024];
-        NewFilePath: Text[1024];
     begin
         //input eg c:\{DATE,0,1}
         //whatever is in the {} should be as the normal "format" property of the corresponding datatype
@@ -216,7 +214,6 @@ codeunit 6059903 "NPR Task Queue Execute"
 
     procedure GetFilePath(TaskLine: Record "NPR Task Line"): Text[1024]
     var
-        NewFileName: Text[1024];
         NewFilePath: Text[1024];
     begin
         //input eg c:\{DATE,0,1}
@@ -231,7 +228,6 @@ codeunit 6059903 "NPR Task Queue Execute"
     procedure FormatFileNameText(TextIn: Text[1024]): Text[1024]
     var
         NewFilePath: Text[1024];
-        TempText: Text[100];
         FieldValue: Text[100];
         FormatStr: Text[100];
         FormatLenghtTxt: Text[100];

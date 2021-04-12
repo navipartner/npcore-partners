@@ -23,20 +23,18 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('ShowDoc', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('ShowDoc', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('SelectType', 'List,SelectedLine', 'List');
-                RegisterTextParameter('SalesOrderViewString', '');
-                RegisterBooleanParameter('SelectCustomer', true);
-            end;
+            Sender.RegisterOptionParameter('SelectType', 'List,SelectedLine', 'List');
+            Sender.RegisterTextParameter('SalesOrderViewString', '');
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
         end;
     end;
 
@@ -53,7 +51,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
         SalesOrderViewString: Text;
         SelectCustomer: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -114,14 +112,14 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
-        Commit;
+        Commit();
         exit(true);
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -137,7 +135,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -153,7 +151,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -168,7 +166,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
         SalesHeader: Record "Sales Header";
         FilterPageBuilder: FilterPageBuilder;
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -179,7 +177,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
                         SalesHeader.SetView(POSParameterValue.Value);
                         FilterPageBuilder.SetView(SalesHeader.TableCaption, SalesHeader.GetView(false));
                     end;
-                    if FilterPageBuilder.RunModal then
+                    if FilterPageBuilder.RunModal() then
                         POSParameterValue.Value := FilterPageBuilder.GetView(SalesHeader.TableCaption, false);
                 end;
         end;
@@ -190,7 +188,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
     var
         SalesHeader: Record "Sales Header";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

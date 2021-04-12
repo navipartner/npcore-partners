@@ -1,4 +1,4 @@
-xmlport 6060109 "NPR TM Offline Ticket Valid."
+﻿xmlport 6060109 "NPR TM Offline Ticket Valid."
 {
     // TM1.22/NPKNAV/20170612  CASE 274464 Transport T0007 - 12 June 2017
 
@@ -113,7 +113,7 @@ xmlport 6060109 "NPR TM Offline Ticket Valid."
         if (OfflineTicketValidation.FindLast()) then;
         ImportRefNo := OfflineTicketValidation."Import Reference No." + 1;
 
-        OfflineTicketValidation.Reset;
+        OfflineTicketValidation.Reset();
 
         repeat
             Clear(OfflineTicketValidation);
@@ -122,10 +122,10 @@ xmlport 6060109 "NPR TM Offline Ticket Valid."
             OfflineTicketValidation."Import Reference No." := ImportRefNo;
             OfflineTicketValidation.Insert();
         until (TmpTicketOfflineValidation.Next() = 0);
-        Commit;
+        Commit();
 
         OfflineTicketValidationMgr.ProcessImportBatch(ImportRefNo);
-        Commit;
+        Commit();
 
         OfflineTicketValidation.Reset();
         OfflineTicketValidation.SetCurrentKey("Import Reference No.");

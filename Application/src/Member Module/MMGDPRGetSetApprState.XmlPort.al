@@ -196,8 +196,6 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
         }
     }
 
-    var
-        NOT_FOUND: Label 'Filter combination removed all results.';
 
     procedure ClearResponse()
     begin
@@ -210,7 +208,6 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
-        MemberCard: Record "NPR MM Member Card";
         GDPRConsentLog: Record "NPR GDPR Consent Log";
         GDPRAgreementVersion: Record "NPR GDPR Agreement Version";
     begin
@@ -260,7 +257,7 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
         // MembershipRole.RESET ();
         // MembershipRole.SetFilter ("Membership Entry No.", '<>%1', MembershipEntryNo);
         // MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
-        // IF (MembershipRole.FindSet ()) THEN BEGIN
+        // IF (MembershipRole.FindSet() ()) THEN BEGIN
         //  IF (MembershipRole."Member Role" = MembershipRole."Member Role"::GUARDIAN) THEN BEGIN
         //    TmpGuardians.TransferFields (MembershipRole, TRUE);
         //    //IF (TmpGuardians.Insert ()) THEN ;

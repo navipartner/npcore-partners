@@ -26,20 +26,19 @@ codeunit 6150875 "NPR POS Action: Raptor"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction20(
-                ActionCode,
-                ActionDescription,
-                ActionVersion)
-            then begin
-                //RegisterWorkflow20('await workflow.respond();');  //NPR5.54 [400510]-revoked
-                //-NPR5.54 [400510]
-                RegisterWorkflow20(
-                  'await workflow.respond(); ' +
-                  'if ($context.ActionFailed) {if ($context.ActionFailReasonMsg.length > 0) {await popup.message($context.ActionFailReasonMsg);};}');
-                //+NPR5.54 [400510]
-                RegisterTextParameter('RaptorActionCode', '');
-            end;
+        if Sender.DiscoverAction20(
+    ActionCode,
+    ActionDescription,
+    ActionVersion)
+then begin
+            //RegisterWorkflow20('await workflow.respond();');  //NPR5.54 [400510]-revoked
+            //-NPR5.54 [400510]
+            Sender.RegisterWorkflow20(
+              'await workflow.respond(); ' +
+              'if ($context.ActionFailed) {if ($context.ActionFailReasonMsg.length > 0) {await popup.message($context.ActionFailReasonMsg);};}');
+            //+NPR5.54 [400510]
+            Sender.RegisterTextParameter('RaptorActionCode', '');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
@@ -51,7 +50,7 @@ codeunit 6150875 "NPR POS Action: Raptor"
         RaptorMgt: Codeunit "NPR Raptor Management";
         RaptorActionCode: Code[20];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -141,7 +140,7 @@ codeunit 6150875 "NPR POS Action: Raptor"
                     if POSParameterValue.Value = '' then
                         exit;
                     RaptorAction.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(RaptorAction.Code));
-                    RaptorAction.Find;
+                    RaptorAction.Find();
                 end;
         end;
         //+NPR5.54 [399189]

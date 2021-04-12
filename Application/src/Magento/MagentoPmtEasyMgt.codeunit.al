@@ -46,7 +46,6 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         Content: HttpContent;
         FormattedAmount: Text;
         Response: JsonToken;
-        ChargedId: text;
     begin
 
 
@@ -83,7 +82,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
 
         Response.ReadFrom(ResponseText);
         paymentline."Charge ID" := GetJsonText(Response, 'chargeId', 0);
-        PaymentLine."Date Captured" := today;
+        PaymentLine."Date Captured" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -97,7 +96,6 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         Content: HttpContent;
         FormattedAmount: Text;
         Response: JsonToken;
-        ChargedId: text;
     begin
 
 
@@ -133,7 +131,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         SendHttpRequest(RequestMessage, ResponseText);
 
         Response.ReadFrom(ResponseText);
-        PaymentLine."Date Refunded" := today;
+        PaymentLine."Date Refunded" := Today();
         PaymentLine.Modify(true);
 
     end;
@@ -148,7 +146,6 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         Content: HttpContent;
         FormattedAmount: Text;
         Response: JsonToken;
-        ChargedId: text;
     begin
 
 

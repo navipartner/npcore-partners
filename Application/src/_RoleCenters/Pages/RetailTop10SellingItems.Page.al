@@ -52,11 +52,11 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
                         trigger OnDrillDown()
                         begin
-                            Item.Get("No.");
+                            Item.Get(Rec."No.");
                             PAGE.Run(PAGE::"Item Card", Item);
                         end;
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
@@ -87,12 +87,12 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Day action';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Week)
@@ -105,7 +105,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Week;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Month)
@@ -118,7 +118,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Month;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Quarter)
@@ -131,7 +131,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Quarter;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Year)
@@ -144,7 +144,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Year;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
             }
@@ -154,8 +154,8 @@ page 6151256 "NPR Retail Top10 Selling Items"
     trigger OnOpenPage()
     begin
         PeriodType := PeriodType::Year;
-        CurrDate := Today;
-        UpdateList;
+        CurrDate := Today();
+        UpdateList();
     end;
 
     var
@@ -163,10 +163,8 @@ page 6151256 "NPR Retail Top10 Selling Items"
         Item: Record Item;
         StartDate: Date;
         Enddate: Date;
-        Err000: Label 'End Date should be after Start Date';
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         CurrDate: Date;
-        SalesQty: Text[30];
 
     local procedure UpdateList()
     begin
@@ -176,27 +174,25 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
     local procedure ExecuteQuery()
     begin
-        Rec.DeleteAll;
+        Rec.DeleteAll();
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
-        Query1.Open;
-        while Query1.Read do begin
+        Query1.Open();
+        while Query1.Read() do begin
             if Item.Get(Query1.Item_No) then begin
                 Rec.TransferFields(Item);
-                if Rec.Insert then
+                if Rec.Insert() then
                     Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
                 Rec.CalcFields("Sales (Qty.)");
                 Rec."Low-Level Code" := Round(Rec."Sales (Qty.)", 0.01) * 100;
-                Rec.Modify;
+                Rec.Modify();
             end;
 
         end;
-        Query1.Close;
+        Query1.Close();
     end;
 
     local procedure Setdate()
-    var
-        DatePeriod: Record Date;
     begin
         case PeriodType of
             PeriodType::Day:

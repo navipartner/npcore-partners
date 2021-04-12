@@ -179,7 +179,7 @@ table 6060101 "NPR Data Cleanup GCVI"
 
     trigger OnInsert()
     begin
-        "Date Created" := Today;
+        "Date Created" := Today();
         "Time Created" := Time;
         "User Created" := UserId;
 
@@ -188,7 +188,7 @@ table 6060101 "NPR Data Cleanup GCVI"
 
     trigger OnModify()
     begin
-        "Date Modified" := Today;
+        "Date Modified" := Today();
         "Time Modified" := Time;
         "User Modified" := UserId;
 

@@ -78,7 +78,6 @@ codeunit 6151510 "NPR Nc Cleanup Processing"
     [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
-        NcTaskProcessor: Record "NPR Nc Task Processor";
         ParameterString: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then
@@ -95,8 +94,6 @@ codeunit 6151510 "NPR Nc Cleanup Processing"
     [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Parameter String', true, true)]
     local procedure OnValidateJobQueueEntryParameterString(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
-        NcImportType: Record "NPR Nc Import Type";
-        ParameterString: Text;
         Description: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then

@@ -14,17 +14,17 @@ page 6150718 "NPR POS Menu Filter"
             group(General)
             {
                 Caption = 'General';
-                field("Filter Code"; "Filter Code")
+                field("Filter Code"; Rec."Filter Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -34,33 +34,33 @@ page 6150718 "NPR POS Menu Filter"
             group("Run object")
             {
                 Caption = 'Run object';
-                field("Object Type"; "Object Type")
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Type field';
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
-                field("Object Id"; "Object Id")
+                field("Object Id"; Rec."Object Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Id field';
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
-                field("Object Name"; "Object Name")
+                field("Object Name"; Rec."Object Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Object Name field';
                 }
-                field("Run Modal"; "Run Modal")
+                field("Run Modal"; Rec."Run Modal")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Run Modal field';
@@ -69,37 +69,37 @@ page 6150718 "NPR POS Menu Filter"
             group("Filter record")
             {
                 Caption = 'Filter record';
-                field("Send Sale POS"; "Send Sale POS")
+                field("Send Sale POS"; Rec."Send Sale POS")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send Sale POS field';
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
-                field("Send Sale Line POS"; "Send Sale Line POS")
+                field("Send Sale Line POS"; Rec."Send Sale Line POS")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send Sale Line POS field';
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -108,7 +108,7 @@ page 6150718 "NPR POS Menu Filter"
                 group("Implied Filters")
                 {
                     Caption = 'Implied Filters';
-                    field("Current POS Register / Unit"; "Current POS Register / Unit")
+                    field("Current POS Register / Unit"; Rec."Current POS Register / Unit")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Current POS Register / Unit field';
@@ -127,7 +127,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Test & Activate';
                 Image = ApprovalSetup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -143,7 +143,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Deactivate';
                 Image = Cancel;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -159,7 +159,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Table Filter';
                 Image = EditFilter;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = false;
@@ -176,7 +176,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Generic Filter';
                 Image = EditFilter;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

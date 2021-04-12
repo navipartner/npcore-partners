@@ -55,7 +55,7 @@ table 6151105 "NPR NpRi Party"
 
                 if "No." <> '' then begin
                     FieldRef.SetFilter('%1', "No.");
-                    if RecRef.FindFirst then;
+                    if RecRef.FindFirst() then;
                     FieldRef.SetRange();
                 end;
 
@@ -88,7 +88,7 @@ table 6151105 "NPR NpRi Party"
 
                 if "No." <> '' then begin
                     FieldRef.SetFilter('%1', "No.");
-                    if RecRef.FindFirst then;
+                    if RecRef.FindFirst() then;
                     FieldRef.SetRange();
                 end;
 
@@ -139,12 +139,12 @@ table 6151105 "NPR NpRi Party"
         NpRiReimbursementEntry.SetCurrentKey("Party Type", "Party No.", "Template Code", "Entry Type", Open, "Posting Date");
         NpRiReimbursementEntry.SetRange("Party Type", "Party Type");
         NpRiReimbursementEntry.SetRange("Party No.", "No.");
-        if NpRiReimbursement.FindFirst or NpRiReimbursementEntry.FindFirst then begin
+        if NpRiReimbursement.FindFirst() or NpRiReimbursementEntry.FindFirst() then begin
             if not Confirm(Text000, false) then
                 Error(Text001);
 
-            NpRiReimbursementEntry.DeleteAll;
-            NpRiReimbursement.DeleteAll;
+            NpRiReimbursementEntry.DeleteAll();
+            NpRiReimbursement.DeleteAll();
         end;
     end;
 

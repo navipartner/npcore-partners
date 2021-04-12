@@ -37,35 +37,31 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('DownpaymentPrompt', 'param.PromptDownpayment && numpad(labels.DownpaymentPctTitle, labels.DownpaymentPctLead, param.DownpaymentPercent).cancel (abort);');
-                RegisterWorkflowStep('CreateLayaway', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('DownpaymentPrompt', 'param.PromptDownpayment && numpad(labels.DownpaymentPctTitle, labels.DownpaymentPctLead, param.DownpaymentPercent).cancel (abort);');
+            Sender.RegisterWorkflowStep('CreateLayaway', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterBooleanParameter('PromptDownpayment', false);
-                RegisterDecimalParameter('DownpaymentPercent', 0);
-                RegisterTextParameter('CreationFeeItemNo', '');
-                RegisterBooleanParameter('ReserveItems', true);
-                RegisterIntegerParameter('Instalments', 0);
-                RegisterTextParameter('OrderPaymentTerms', '');
-                RegisterTextParameter('PrepaymentPaymentTerms', '');
-            end;
+            Sender.RegisterBooleanParameter('PromptDownpayment', false);
+            Sender.RegisterDecimalParameter('DownpaymentPercent', 0);
+            Sender.RegisterTextParameter('CreationFeeItemNo', '');
+            Sender.RegisterBooleanParameter('ReserveItems', true);
+            Sender.RegisterIntegerParameter('Instalments', 0);
+            Sender.RegisterTextParameter('OrderPaymentTerms', '');
+            Sender.RegisterTextParameter('PrepaymentPaymentTerms', '');
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'DownpaymentPctTitle', TextDownpaymentPctTitle);
-        Captions.AddActionCaption(ActionCode, 'DownpaymentPctLead', TextDownpaymentPctLead);
+        Captions.AddActionCaption(ActionCode(), 'DownpaymentPctTitle', TextDownpaymentPctTitle);
+        Captions.AddActionCaption(ActionCode(), 'DownpaymentPctLead', TextDownpaymentPctLead);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -86,7 +82,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         PrepaymentPaymentTerms: Text;
         ReserveItems: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -123,7 +119,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         InsertCreationFeeItem(POSSession, CreationFeeItemNo);
         ExportToOrderAndEndSale(SalesHeader, POSSession, ReserveItems, OrderPaymentTerms);
 
-        Commit;
+        Commit();
         ClearLastError();
         Clear(POSLayawayMgt);
         POSLayawayMgt.SetRunCreateAndPostDownpmtAndLayawayInvoices(DownpaymentPct, PrepaymentPaymentTerms, Instalments);
@@ -214,7 +210,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         DummySalesHdr: Record "Sales Header";
         POSLayawayMgt: Codeunit "NPR POS Layaway Mgt.";
     begin
-        Commit;
+        Commit();
         ClearLastError();
         Clear(POSLayawayMgt);
         POSLayawayMgt.SetRunHandleDownpayment(POSSession, DownpaymentInvoiceNo);
@@ -241,7 +237,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         SalePOS.Modify(true);
         Customer.Get(SalePOS."Customer No.");
         Customer.TestField("Application Method", Customer."Application Method"::Manual);
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -265,7 +261,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -289,7 +285,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -313,7 +309,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -326,7 +322,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         Item: Record Item;
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -355,7 +351,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         Item: Record Item;
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

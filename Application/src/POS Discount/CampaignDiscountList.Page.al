@@ -24,61 +24,61 @@ page 6014455 "NPR Campaign Discount List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Ending Date"; "Ending Date")
+                field("Ending Date"; Rec."Ending Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Closing Date field';
                 }
-                field("Period Type"; "Period Type")
+                field("Period Type"; Rec."Period Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Period Type field';
                 }
-                field("Period Description"; "Period Description")
+                field("Period Description"; Rec."Period Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Period Description field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Comment field';
                 }
-                field("Created Date"; "Created Date")
+                field("Created Date"; Rec."Created Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created Date field';
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -108,14 +108,14 @@ page 6014455 "NPR Campaign Discount List"
 
     local procedure CodeOnActivate()
     begin
-        SetCurrentKey(Code);
-        CurrPage.Update;
+        Rec.SetCurrentKey(Code);
+        CurrPage.Update();
     end;
 
     local procedure DescriptionOnActivate()
     begin
-        SetCurrentKey(Description);
-        CurrPage.Update;
+        Rec.SetCurrentKey(Description);
+        CurrPage.Update();
     end;
 }
 

@@ -14,18 +14,18 @@ page 6014628 "NPR RP Device Settings"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Data Type field';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value field';

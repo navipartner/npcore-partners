@@ -4,7 +4,6 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
         ActionDescription: Label 'This built-in action splits waiter pads (bills) from Restaurant View';
         IncludeAllWPadsQ: Label 'There are multiple waiter pads assigned to the seating %1. Do you want them all to be included in the scope?';
         PopupCaption: Label 'Please, configure your bills';
-        WPadIsOpenedInPOSSale: Label 'The waiter pad is opened in a POS sale at the moment and might have unsaved changes. Are you sure you want to continue on running the action?';
 
     local procedure ActionCode(): Text;
     begin
@@ -40,14 +39,8 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
     local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        SeatingCode: Code[20];
-        WaiterPadCode: Code[20];
-        IncludeAllWPads: Option No,Yes,Ask;
-        ReturnToDefaultView: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -118,16 +111,16 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
         BillContent: JsonObject;
         WPadLineCollection: JsonArray;
     begin
-        if SeatingWPadLink.FindSet then begin
+        if SeatingWPadLink.FindSet() then begin
             repeat
                 GetWaiterPadLines(WPadLineCollection, SeatingWPadLink."Waiter Pad No.");
-                if WPadLineCollection.Count > 0 then begin
+                if WPadLineCollection.Count() > 0 then begin
                     Clear(BillContent);
                     BillContent.Add('id', SeatingWPadLink."Waiter Pad No.");
                     BillContent.Add('items', WPadLineCollection);
                     BillCollection.Add(BillContent);
                 end;
-            until SeatingWPadLink.Next = 0;
+            until SeatingWPadLink.Next() = 0;
 
             Context.GetContextObject().Add('bills', BillCollection);
         end;
@@ -141,7 +134,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
         Clear(WPadLineCollection);
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadCode);
         WaiterPadLine.SetRange(Type, WaiterPadLine.Type::Item);
-        if WaiterPadLine.FindSet then
+        if WaiterPadLine.FindSet() then
             repeat
                 if WaiterPadLine.Quantity - WaiterPadLine."Billed Quantity" > 0 then begin
                     Clear(WPadLineContent);
@@ -153,7 +146,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
 
                     WPadLineCollection.Add(WPadLineContent);
                 end;
-            until WaiterPadLine.Next = 0;
+            until WaiterPadLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
@@ -164,7 +157,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
         CaptionSeatingCode: Label 'Seating Code';
         CaptionWaiterPadCode: Label 'Waiter Pad Code';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         CASE POSParameterValue.Name OF
@@ -187,7 +180,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
         DescSeatingCode: Label 'Defines seating number the action is to be run upon. The parameter is set automatically by the system on the runtime';
         DescWaiterPadCode: Label 'Defines waiter pad number the action is to be run upon. The parameter is set automatically by the system on the runtime';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         CASE POSParameterValue.Name OF
@@ -207,7 +200,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
     var
         OptionIncludeAllWPads: Label 'No,Yes,Ask';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         CASE POSParameterValue.Name OF

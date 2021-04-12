@@ -28,7 +28,7 @@ page 6184478 "NPR EFT Type Pay. Gen. Param."
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -38,20 +38,20 @@ page 6184478 "NPR EFT Type Pay. Gen. Param."
                 {
                     ApplicationArea = All;
                     Caption = 'Value';
-                    Editable = "User Configurable";
+                    Editable = Rec."User Configurable";
                     ToolTip = 'Specifies the value of the Value field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupValue();
-                        Modify;
+                        Rec.LookupValue();
+                        Rec.Modify();
                         SetParameterValue();
                     end;
 
                     trigger OnValidate()
                     begin
-                        Validate(Value, ParameterValue);
-                        Modify;
+                        Rec.Validate(Value, ParameterValue);
+                        Rec.Modify();
                         SetParameterValue();
                     end;
                 }
@@ -78,15 +78,15 @@ page 6184478 "NPR EFT Type Pay. Gen. Param."
     local procedure SetParameterName()
     begin
         Clear(ParameterName);
-        OnGetParameterNameCaption(Rec, ParameterName);
+        Rec.OnGetParameterNameCaption(Rec, ParameterName);
         if (ParameterName = '') then
-            ParameterName := Name;
+            ParameterName := Rec.Name;
     end;
 
     local procedure SetParameterDescription()
     begin
         Clear(ParameterDescription);
-        OnGetParameterDescriptionCaption(Rec, ParameterDescription);
+        Rec.OnGetParameterDescriptionCaption(Rec, ParameterDescription);
     end;
 
     local procedure SetParameterValue()
@@ -95,26 +95,25 @@ page 6184478 "NPR EFT Type Pay. Gen. Param."
     begin
         Clear(ParameterOptionString);
         Clear(ParameterValue);
-        OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
+        Rec.OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
         if ParameterOptionString = '' then
-            ParameterOptionString := OptionString;
-        if (ParameterOptionString = '') or ("Data Type" <> "Data Type"::Option) then
-            ParameterValue := Value
+            ParameterOptionString := Rec.OptionString;
+        if (ParameterOptionString = '') or (Rec."Data Type" <> Rec."Data Type"::Option) then
+            ParameterValue := Rec.Value
         else
             ParameterValue := GetOptionStringCaption(ParameterOptionString)
     end;
 
     local procedure GetOptionStringCaption(ParameterOptionStringCaption: Text): Text
     var
-        TypeHelper: Codeunit "Type Helper";
         OptionCaption: Text;
         Option: Integer;
     begin
         Evaluate(Option, Rec.Value);
-        if TrySelectStr(Option, ParameterOptionStringCaption, OptionCaption) then
+        if Rec.TrySelectStr(Option, ParameterOptionStringCaption, OptionCaption) then
             exit(OptionCaption)
         else
-            exit(Value);
+            exit(Rec.Value);
     end;
 
     [TryFunction]

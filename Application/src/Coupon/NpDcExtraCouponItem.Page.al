@@ -16,12 +16,12 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Item No."; "Item No.")
+                    field("Item No."; Rec."Item No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Item No. field';
                     }
-                    field("Discount Type"; "Discount Type")
+                    field("Discount Type"; Rec."Discount Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Discount Type field';
@@ -29,8 +29,8 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                     group(Control6014411)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 0);
-                        field("Discount Amount"; "Discount Amount")
+                        Visible = (Rec."Discount Type" = 0);
+                        field("Discount Amount"; Rec."Discount Amount")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
@@ -40,14 +40,14 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                     group(Control6014409)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 1);
-                        field("Discount %"; "Discount %")
+                        Visible = (Rec."Discount Type" = 1);
+                        field("Discount %"; Rec."Discount %")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the Discount % field';
                         }
-                        field("Max. Discount Amount"; "Max. Discount Amount")
+                        field("Max. Discount Amount"; Rec."Max. Discount Amount")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Max. Discount Amount per Sale';
@@ -57,17 +57,17 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                 group(Control6014406)
                 {
                     ShowCaption = false;
-                    field("Item Description"; "Item Description")
+                    field("Item Description"; Rec."Item Description")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Item Description field';
                     }
-                    field("Unit Price"; "Unit Price")
+                    field("Unit Price"; Rec."Unit Price")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Unit Price field';
                     }
-                    field("Profit %"; "Profit %")
+                    field("Profit %"; Rec."Profit %")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Profit % field';

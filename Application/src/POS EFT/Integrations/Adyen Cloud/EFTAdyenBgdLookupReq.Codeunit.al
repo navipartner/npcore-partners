@@ -18,7 +18,6 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
     end;
 
     var
-        ERR_UNSUPPORTED_TYPE: Label 'Unsupported %1: %2';
         CodeunitExecutionMode: Option INIT_SESSION,START_TRX;
 
     procedure SetExecutionMode(CodeunitExecutionModeIn: Integer)
@@ -48,21 +47,19 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
         LookupEftTrxRequest: Record "NPR EFT Transaction Request";
         LookupAttempt: Integer;
         ConclusiveResponse: Boolean;
-        StartTime: DateTime;
         EFTAdyenResponseParser: Codeunit "NPR EFT Adyen Resp. Parser";
         InnerResponse: Text;
     begin
         EFTTransactionAsyncRequest.TestField("Request Entry No");
 
         EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Starting lookup background session', '');
-        Commit; //Log
+        Commit(); //Log
 
         EFTTransactionRequest.Get(EFTTransactionAsyncRequest."Request Entry No");
         if not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]) then
             EFTTransactionRequest.FieldError("Processing Type");
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        StartTime := CurrentDateTime;
         while (not ConclusiveResponse) do begin
             Clear(Response);
             LookupAttempt += 1;
@@ -70,7 +67,7 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
             if LookupAttempt = 1 then begin
                 Sleep(1000 * 10);
                 EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Lookup buffer period passed, starting to loop lookup requests', '');
-                Commit;
+                Commit();
                 //-NPR5.54 [364340]
             end else
                 if LookupAttempt > 60 then begin
@@ -91,7 +88,7 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
                     EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Stopping lookup background session. (Marked as done)', '');
                     exit;
                 end;
-                Commit; //Release lock
+                Commit(); //Release lock
             end;
 
             LookupEftTrxRequest := EFTTransactionRequest; //Is not actually inserted in DB to prevent data spam. Reference no. is increased on top of auto increment.
@@ -105,7 +102,7 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
         end;
 
         LogTrxRequest(EFTTransactionAsyncRequest."Request Entry No", EFTSetup, EFTAdyenCloudProtocol, ConclusiveResponse);
-        Commit; //Log
+        Commit(); //Log
 
         //This function takes a LOCK on the request record, which acts a synchronization mechanism between the racing background sessions.
         //It is kept until after writing response record.
@@ -116,7 +113,7 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
 
         InsertTrxResponse(EFTTransactionAsyncRequest."Request Entry No", ConclusiveResponse, InnerResponse);
         EFTTrxBackgroundSessionMgt.MarkRequestAsDone(EFTTransactionAsyncRequest."Request Entry No");
-        Commit; //Response
+        Commit(); //Response
     end;
 
     local procedure LogTrxRequest(TrxEntryNo: Integer; EFTSetup: Record "NPR EFT Setup"; EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot."; Success: Boolean)
@@ -141,7 +138,7 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
         OutStream: OutStream;
         EFTTransactionAsyncResponse: Record "NPR EFT Trx Async Resp.";
     begin
-        EFTTransactionAsyncResponse.Init;
+        EFTTransactionAsyncResponse.Init();
         EFTTransactionAsyncResponse."Request Entry No" := TrxEntryNo;
 
         if Success then begin
@@ -155,7 +152,7 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
         EFTTransactionAsyncResponse."Transaction Started" := true;
         //+NPR5.54 [387990]
 
-        EFTTransactionAsyncResponse.Insert;
+        EFTTransactionAsyncResponse.Insert();
     end;
 }
 

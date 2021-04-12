@@ -34,12 +34,12 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
             SaleLinePOSCoupon.SetRange("Coupon No.", Coupon."No.");
             SaleLinePOSCoupon.SetRange("Register No.", SalePOS."Register No.");
             SaleLinePOSCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            CurrSaleCouponCount := SaleLinePOSCoupon.Count;
+            CurrSaleCouponCount := SaleLinePOSCoupon.Count();
 
         end else begin
             NpDcExtCouponSalesLine.SetRange("External Document No.", SalePOS."Sales Ticket No.");
             NpDcExtCouponSalesLine.SetRange("Coupon No.", Coupon."No.");
-            CurrSaleCouponCount := NpDcExtCouponSalesLine.Count;
+            CurrSaleCouponCount := NpDcExtCouponSalesLine.Count();
         end;
 
         if Coupon."Max Use per Sale" < 1 then
@@ -54,7 +54,7 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
         if CouponModule.Get(CouponModule.Type::"Validate Coupon", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Validate Coupon";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := Text004;

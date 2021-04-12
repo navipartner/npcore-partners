@@ -45,13 +45,13 @@ page 6151436 "NPR Magento Item Attr."
         MagentoItemAttributeValue.SetRange("Item No.", Rec."Item No.");
         MagentoItemAttributeValue.SetRange("Variant Code", Rec."Variant Code");
         MagentoItemAttributeValue.SetRange(Selected, true);
-        if MagentoItemAttributeValue.FindSet then
+        if MagentoItemAttributeValue.FindSet() then
             repeat
                 MagentoItemAttributeValue.CalcFields(Value);
                 if Value <> '' then
                     Value += ',';
                 Value += MagentoItemAttributeValue.Value;
-            until MagentoItemAttributeValue.Next = 0;
+            until MagentoItemAttributeValue.Next() = 0;
 
         exit(Value);
     end;

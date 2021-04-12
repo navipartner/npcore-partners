@@ -1,4 +1,4 @@
-table 6060043 "NPR Item Worksh. Variant Line"
+﻿table 6060043 "NPR Item Worksh. Variant Line"
 {
     Caption = 'Item Worksheet Variant Line';
     DataClassification = CustomerContent;
@@ -49,7 +49,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
                     SetPropagationFilter;
-                    if ItemWorksheetVariantLine2.FindSet then
+                    if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate(Action, Action);
                             ItemWorksheetVariantLine2.Modify();
@@ -139,7 +139,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
                     SetPropagationFilter;
-                    if ItemWorksheetVariantLine2.FindSet then
+                    if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate("Internal Bar Code", "Internal Bar Code");
                             ItemWorksheetVariantLine2.Modify();
@@ -160,7 +160,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
                     SetPropagationFilter;
-                    if ItemWorksheetVariantLine2.FindSet then
+                    if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate("Sales Price", "Sales Price");
                             ItemWorksheetVariantLine2.Modify();
@@ -181,7 +181,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
                     SetPropagationFilter;
-                    if ItemWorksheetVariantLine2.FindSet then
+                    if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate("Direct Unit Cost", "Direct Unit Cost");
                             ItemWorksheetVariantLine2.Modify();
@@ -226,7 +226,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
                     SetPropagationFilter;
-                    if ItemWorksheetVariantLine2.FindSet then
+                    if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Blocked := Blocked;
                             ItemWorksheetVariantLine2.Modify();
@@ -280,7 +280,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                     SetPropagationFilter();
                     ItemWorksheetVariantLine2.SetCurrentKey("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Line No.");
                     ItemWorksheetVariantLine2.SetRange("Variety 1 Value", xRec."Variety 1 Value");
-                    if ItemWorksheetVariantLine2.FindSet then
+                    if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate("Variety 1 Value", "Variety 1 Value");
                             ItemWorksheetVariantLine2.Modify();
@@ -467,7 +467,6 @@ table 6060043 "NPR Item Worksh. Variant Line"
         ItemWorksheetVariantLine2: Record "NPR Item Worksh. Variant Line";
         ItemWorksheet: Record "NPR Item Worksheet";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        VarietySetup: Record "NPR Variety Setup";
         DimMgt: Codeunit DimensionManagement;
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
         UpdateFromWorksheetLine: Boolean;
@@ -519,7 +518,6 @@ table 6060043 "NPR Item Worksh. Variant Line"
     var
         ItemLedgEntry: Record "Item Ledger Entry";
         PurchLine: Record "Purchase Line";
-        SalesLine: Record "Sales Line";
     begin
         //Variant is not created yet. Delete is ok
         if "Variant Code" = '' then
@@ -571,7 +569,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         SalesPrice.SetRange("Item No.", "Existing Item No.");
         SalesPrice.SetRange("Variant Code", "Existing Variant Code");
         SalesPrice.SetRange("Sales Type", SalesPrice."Sales Type"::"All Customers");
-        if SalesPrice.FindFirst then
+        if SalesPrice.FindFirst() then
             exit(SalesPrice."Unit Price")
         else
             exit(0);
@@ -584,7 +582,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         PurchasePrice.SetRange("Item No.", "Existing Item No.");
         PurchasePrice.SetRange("Variant Code", "Existing Variant Code");
         PurchasePrice.SetRange("Vendor No.", ItemWorksheetLine."Vendor No.");
-        if PurchasePrice.FindFirst then
+        if PurchasePrice.FindFirst() then
             exit(PurchasePrice."Direct Unit Cost")
         else
             exit(0);
@@ -599,11 +597,8 @@ table 6060043 "NPR Item Worksh. Variant Line"
     var
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarValue: Record "NPR Item Worksh. Variety Value";
-        VarietyGroup: Record "NPR Variety Group";
         VarietyValue: Record "NPR Variety Value";
         NewVarExists: Boolean;
-        NewCode: Code[20];
-        CopySetup: Integer;
         I: Integer;
         AddCommentText: Text;
     begin
@@ -647,7 +642,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                                             ItemWorksheetVariantLine.SetRange(ItemWorksheetVariantLine."Variety 4 Value", OldVrtValue);
                                         end;
                                 end;
-                                if ItemWorksheetVariantLine.FindFirst then
+                                if ItemWorksheetVariantLine.FindFirst() then
                                     repeat
                                         case I of
                                             1:
@@ -677,7 +672,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                             ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                             ItemWorksheetVariantLine.SetRange("Worksheet Name", "Worksheet Name");
                             ItemWorksheetVariantLine.SetFilter("Worksheet Line No.", '<>%1', ItemWorksheetVarValue."Worksheet Line No.");
-                            if ItemWorksheetVariantLine.FindSet then
+                            if ItemWorksheetVariantLine.FindSet() then
                                 repeat
                                     if ItemWorksheetVariantLine.ApplyVarietyMapping then
                                         ItemWorksheetVariantLine.Modify(true);
@@ -687,7 +682,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                 end else begin
                     if not NewVarExists then begin
                         //Insert in the new value in Worksheet Value table
-                        ItemWorksheetVarValue.Init;
+                        ItemWorksheetVarValue.Init();
                         ItemWorksheetVarValue.Validate("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
                         ItemWorksheetVarValue.Validate("Worksheet Name", ItemWorksheetLine."Worksheet Name");
                         ItemWorksheetVarValue.Validate("Worksheet Line No.", ItemWorksheetLine."Line No.");
@@ -727,8 +722,6 @@ table 6060043 "NPR Item Worksh. Variant Line"
     end;
 
     procedure CalcLevel(): Integer
-    var
-        Lvl: Integer;
     begin
         ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");
         case ItemWorksheet."Show Variety Level" of
@@ -781,11 +774,11 @@ table 6060043 "NPR Item Worksh. Variant Line"
             ItemVar.SetRange("NPR Variety 3 Value", "Variety 3 Value");
             ItemVar.SetRange("NPR Variety 4 Value", "Variety 4 Value");
             ItemVar.SetRange("NPR Blocked", false);
-            if ItemVar.FindFirst then begin
+            if ItemVar.FindFirst() then begin
                 exit(ItemVar.Code);
             end else begin
                 ItemVar.SetRange("NPR Blocked", true);
-                if ItemVar.FindFirst then
+                if ItemVar.FindFirst() then
                     exit(ItemVar.Code);
             end;
         end;
@@ -845,7 +838,6 @@ table 6060043 "NPR Item Worksh. Variant Line"
     local procedure CreateVarietyMapping(VrtType: Code[10]; VrtTable: Code[40]; WorksheetTemplate: Code[10]; WorksheetName: Code[10]; VendorNo: Code[20]; OldVrtValue: Code[50]; NewValue: Code[50])
     var
         ItemWorksheetVarietyMapping: Record "NPR Item Worksh. Vrty Mapping";
-        ItemWorksheetVarietyMapping2: Record "NPR Item Worksh. Vrty Mapping";
     begin
         if (VrtType = '') or (VrtTable = '') then
             exit;
@@ -857,7 +849,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         ItemWorksheetVarietyMapping.SetRange("Vendor No.", VendorNo);
         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", NewValue);
         //Check whether the New value is mapped iteself
-        if ItemWorksheetVarietyMapping.FindFirst then
+        if ItemWorksheetVarietyMapping.FindFirst() then
             if Confirm(StrSubstNo(RemoveMappingQst, NewValue, ItemWorksheetVarietyMapping."Variety Value")) then
                 ItemWorksheetVarietyMapping.Delete(true)
             else
@@ -865,8 +857,8 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
         //Update or New insert Mapping
         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", OldVrtValue);
-        if not ItemWorksheetVarietyMapping.FindFirst then begin
-            ItemWorksheetVarietyMapping.Init;
+        if not ItemWorksheetVarietyMapping.FindFirst() then begin
+            ItemWorksheetVarietyMapping.Init();
             ItemWorksheetVarietyMapping.Validate(Variety, VrtType);
             ItemWorksheetVarietyMapping.Validate("Variety Table", VrtTable);
             ItemWorksheetVarietyMapping.Validate("Worksheet Template Name", WorksheetTemplate);
@@ -881,7 +873,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         //Update any mapping that results in the Old value
         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value");
         ItemWorksheetVarietyMapping.SetRange("Variety Value", OldVrtValue);
-        if ItemWorksheetVarietyMapping.FindSet then
+        if ItemWorksheetVarietyMapping.FindSet() then
             repeat
                 ItemWorksheetVarietyMapping."Variety Value" := NewValue;
                 ItemWorksheetVarietyMapping.Modify();
@@ -910,7 +902,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
                         SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
-                        if ItemWorksheetVarietyMapping.FindFirst then begin
+                        if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 1 Value" := ItemWorksheetVarietyMapping."Variety Value";
                             VariantModified := true;
                         end;
@@ -923,7 +915,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
                         SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
-                        if ItemWorksheetVarietyMapping.FindFirst then begin
+                        if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 2 Value" := ItemWorksheetVarietyMapping."Variety Value";
                             VariantModified := true;
                         end;
@@ -935,7 +927,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", "Variety 3 Value");
                         SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
-                        if ItemWorksheetVarietyMapping.FindFirst then begin
+                        if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 3 Value" := ItemWorksheetVarietyMapping."Variety Value";
                             VariantModified := true;
                         end;
@@ -947,7 +939,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", "Variety 4 Value");
                         SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
-                        if ItemWorksheetVarietyMapping.FindFirst then begin
+                        if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 4 Value" := ItemWorksheetVarietyMapping."Variety Value";
                             VariantModified := true;
                         end;
@@ -974,7 +966,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
     begin
         ItemWorksheetVarietyMapping2.CopyFilters(ItemWorksheetVarietyMapping);
         ItemWorksheetVarietyMapping2.SetFilter("Item Wksh. Maping Field", '>%1', 0);
-        if ItemWorksheetVarietyMapping2.FindSet then begin
+        if ItemWorksheetVarietyMapping2.FindSet() then begin
             repeat
                 RecRef.GetTable(ItemWorksheetLine);
                 FldRef := RecRef.Field(1);
@@ -985,7 +977,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                 FldRef.SetFilter('%1', ItemWorksheetLine."Line No.");
                 FldRef := RecRef.Field(ItemWorksheetVarietyMapping2."Item Wksh. Maping Field");
                 FldRef.SetFilter('%1', ItemWorksheetVarietyMapping2."Item Wksh. Maping Field Value");
-                if RecRef.FindFirst then begin
+                if RecRef.FindFirst() then begin
                     ItemWorksheetVarietyMapping.SetRange("Item Wksh. Maping Field", ItemWorksheetVarietyMapping2."Item Wksh. Maping Field");
                     ItemWorksheetVarietyMapping.SetRange("Item Wksh. Maping Field Value", ItemWorksheetVarietyMapping2."Item Wksh. Maping Field Value");
                 end;

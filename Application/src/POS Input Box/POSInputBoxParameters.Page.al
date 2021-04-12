@@ -15,53 +15,53 @@ page 6060099 "NPR POS Input Box Parameters"
         {
             repeater(Group)
             {
-                field("Event Code"; "Event Code")
+                field("Event Code"; Rec."Event Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Event Code field';
                 }
-                field("Action Code"; "Action Code")
+                field("Action Code"; Rec."Action Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Action Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     Style = Subordinate;
-                    StyleExpr = "Non Editable";
+                    StyleExpr = Rec."Non Editable";
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Ean Box Value"; "Ean Box Value")
+                field("Ean Box Value"; Rec."Ean Box Value")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Ean Box Value field';
                 }
-                field("Non Editable"; "Non Editable")
+                field("Non Editable"; Rec."Non Editable")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Non Editable field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Type field';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
-                    Enabled = (NOT "Ean Box Value") AND (NOT "Non Editable");
-                    HideValue = "Ean Box Value";
+                    Enabled = (NOT Rec."Ean Box Value") AND (NOT Rec."Non Editable");
+                    HideValue = Rec."Ean Box Value";
                     Style = Subordinate;
-                    StyleExpr = "Non Editable";
+                    StyleExpr = Rec."Non Editable";
                     ToolTip = 'Specifies the value of the Value field';
                 }
-                field(OptionValueInteger; OptionValueInteger)
+                field(OptionValueInteger; Rec.OptionValueInteger)
                 {
                     ApplicationArea = All;
                     Visible = false;

@@ -1,4 +1,4 @@
-table 6014422 "NPR Retail Journal Line"
+﻿table 6014422 "NPR Retail Journal Line"
 {
     Caption = 'Retail Journal Line';
     DataClassification = CustomerContent;
@@ -20,14 +20,10 @@ table 6014422 "NPR Retail Journal Line"
             trigger OnValidate()
             var
                 Item: Record Item;
-                Vendor: Record Vendor;
-                BarcodeLibrary: Codeunit "NPR Barcode Image Library";
-                BarcodeValue: Text;
-                ResolvingTable: Integer;
             begin
 
                 if "Item No." = '' then begin
-                    Init;
+                    Init();
                     exit;
                 end;
 
@@ -76,7 +72,7 @@ table 6014422 "NPR Retail Journal Line"
                 Vendor: Record Vendor;
             begin
                 if not Vendor.Get("Vendor No.") then
-                    Vendor.Init;
+                    Vendor.Init();
 
                 "Vendor Name" := Vendor.Name;
                 "Vendor Search Description" := Vendor."Search Name";
@@ -461,11 +457,10 @@ table 6014422 "NPR Retail Journal Line"
             var
                 ExchangeLabel: Record "NPR Exchange Label";
                 RetailJournalLine: Record "NPR Retail Journal Line";
-                RetailJournalLine2: Record "NPR Retail Journal Line";
                 MultipleLines: Boolean;
             begin
                 ExchangeLabel.SetRange(Barcode, "Exchange Label");
-                ExchangeLabel.FindFirst;
+                ExchangeLabel.FindFirst();
 
                 if ExchangeLabel."Packaged Batch" then begin
                     ExchangeLabel.SetRange(Barcode);
@@ -473,7 +468,7 @@ table 6014422 "NPR Retail Journal Line"
                     ExchangeLabel.SetRange("Batch No.", ExchangeLabel."Batch No.");
                     ExchangeLabel.SetRange("Register No.", ExchangeLabel."Register No.");
                     ExchangeLabel.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
-                    ExchangeLabel.FindSet;
+                    ExchangeLabel.FindSet();
                 end;
 
                 repeat
@@ -495,7 +490,7 @@ table 6014422 "NPR Retail Journal Line"
                         Rec := RetailJournalLine;
 
                     MultipleLines := true;
-                until (ExchangeLabel.Next = 0) or (not ExchangeLabel."Packaged Batch");
+                until (ExchangeLabel.Next() = 0) or (not ExchangeLabel."Packaged Batch");
             end;
         }
         field(6059970; "Is Master"; Boolean)
@@ -569,7 +564,7 @@ table 6014422 "NPR Retail Journal Line"
             TempSalePOS."Register No." := POSUnit.GetCurrentPOSUnit();
 
         if not POSUnit.Get(TempSalePOS."Register No.") then
-            POSUnit.Init;
+            POSUnit.Init();
 
         if not POSUnit.Get(TempSalePOS."Register No.") then
             POSUnit.Init();
@@ -601,13 +596,13 @@ table 6014422 "NPR Retail Journal Line"
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
         POSSalesDiscountCalcMgt.InitDiscountPriority(TMPDiscountPriority);
         TempSaleLinePOS2 := TempSaleLinePOS;
-        TempSaleLinePOS2.Insert;
+        TempSaleLinePOS2.Insert();
         TMPDiscountPriority.SetCurrentKey(Priority);
-        if TMPDiscountPriority.FindSet then
+        if TMPDiscountPriority.FindSet() then
             repeat
                 POSSalesDiscountCalcMgt.ApplyDiscount(TMPDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
                 TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
-            until (TMPDiscountPriority.Next = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
+            until (TMPDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
         "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
         "VAT %" := TempSaleLinePOS2."VAT %";
         "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
@@ -621,7 +616,6 @@ table 6014422 "NPR Retail Journal Line"
     var
         tItem: Record Item temporary;
         Item1: Record Item;
-        d: Dialog;
     begin
         if ("Discount Price Incl. Vat" = 0) then
             exit;
@@ -637,7 +631,7 @@ table 6014422 "NPR Retail Journal Line"
             end;
         end else begin
             if "Item No." <> '' then begin
-                tItem.Init;
+                tItem.Init();
                 tItem."No." := "Item No.";
                 tItem.Validate("Item Category Code", "Item group");
                 tItem."Unit Cost" := "Last Direct Cost";
@@ -653,14 +647,14 @@ table 6014422 "NPR Retail Journal Line"
         POSUnit: Record "NPR POS Unit";
     begin
         if not RetailJournalHeader.Get(RetailJournalCode) then begin
-            RetailJournalHeader.Init;
+            RetailJournalHeader.Init();
             RetailJournalHeader."No." := RetailJournalCode;
             RetailJournalHeader."Register No." := POSUnit.GetCurrentPOSUnit();
         end;
         RetailJournalHeader.TestField("No.");
 
         RetailJnlLine.SetRange("No.", RetailJournalHeader."No.");
-        if RetailJnlLine.FindLast then
+        if RetailJnlLine.FindLast() then
             LineNo := RetailJnlLine."Line No." + 10000
         else
             LineNo := 10000;
@@ -683,7 +677,6 @@ table 6014422 "NPR Retail Journal Line"
 
     procedure InitLine()
     var
-        RetailJnlLine: Record "NPR Retail Journal Line";
         POSUnit: Record "NPR POS Unit";
     begin
         RetailJournalHeader.TestField("No.");
@@ -692,7 +685,7 @@ table 6014422 "NPR Retail Journal Line"
         if ShowDialog then
             Dia.Update(1, Round(RecNo / TotalRecNo * 10000, 1));
 
-        Init;
+        Init();
         "No." := RetailJournalHeader."No.";
         "Line No." := LineNo;
         LineNo += 10000;
@@ -732,7 +725,7 @@ table 6014422 "NPR Retail Journal Line"
         if not ShowDialog then
             exit;
 
-        Dia.Close;
+        Dia.Close();
         ShowDialog := false;
     end;
 
@@ -761,13 +754,12 @@ table 6014422 "NPR Retail Journal Line"
     procedure SetupNewLine(var LastRetailJnlLine: Record "NPR Retail Journal Line")
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
-        i: Integer;
         POSUnit: Record "NPR POS Unit";
     begin
         LastRetailJnlLine.FilterGroup(4);
         if not RetailJnlHeader.Get(LastRetailJnlLine.GetFilter("No.")) then begin
-            RetailJnlHeader.Init;
-            RetailJnlHeader."Date of creation" := Today;
+            RetailJnlHeader.Init();
+            RetailJnlHeader."Date of creation" := Today();
         end;
         LastRetailJnlLine.FilterGroup(0);
         if RetailJnlHeader."Register No." = '' then

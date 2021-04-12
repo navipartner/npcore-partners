@@ -14,7 +14,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
         {
             repeater(Group)
             {
-                field("E-Mail"; "E-Mail")
+                field("E-Mail"; Rec."E-Mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail field';
@@ -26,22 +26,22 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Password Set field';
                 }
-                field("Default Organizer E-Mail"; "Default Organizer E-Mail")
+                field("Default Organizer E-Mail"; Rec."Default Organizer E-Mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default Organizer E-Mail field';
                 }
-                field("Time Zone No."; "Time Zone No.")
+                field("Time Zone No."; Rec."Time Zone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Time Zone No. field';
                 }
-                field("Time Zone Display Name"; "Time Zone Display Name")
+                field("Time Zone Display Name"; Rec."Time Zone Display Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Time Zone Display Name field';
                 }
-                field("Time Zone Custom Offset (Min)"; "Time Zone Custom Offset (Min)")
+                field("Time Zone Custom Offset (Min)"; Rec."Time Zone Custom Offset (Min)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Time Zone Custom Offset (Min) field';
@@ -60,7 +60,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 Ellipsis = true;
                 Image = EncryptionKeys;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -68,7 +68,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
 
                 trigger OnAction()
                 begin
-                    SetPassword();
+                    Rec.SetPassword();
                 end;
             }
             action("Test Server Connection")
@@ -76,7 +76,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 Caption = 'Test Server Connection';
                 Image = Link;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -84,7 +84,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
 
                 trigger OnAction()
                 begin
-                    TestServerConnection();
+                    Rec.TestServerConnection();
                 end;
             }
         }

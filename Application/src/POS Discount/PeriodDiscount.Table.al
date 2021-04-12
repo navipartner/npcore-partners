@@ -1,4 +1,4 @@
-table 6014413 "NPR Period Discount"
+﻿table 6014413 "NPR Period Discount"
 {
     Caption = 'Period Discount';
     LookupPageID = "NPR Campaign Discount List";
@@ -59,7 +59,7 @@ table 6014413 "NPR Period Discount"
                 TestField("Ending Date");
                 if Status <> xRec.Status then
                     if Status = Status::Active then begin
-                        PeriodDiscountLine2.Reset;
+                        PeriodDiscountLine2.Reset();
                         PeriodDiscountLine2.SetRange(Status, Status::Active);
                         PeriodDiscountLine2.SetFilter("Starting Date", '<=%1', "Ending Date");
                         PeriodDiscountLine2.SetFilter("Ending Date", '>=%1', "Starting Date");
@@ -67,7 +67,7 @@ table 6014413 "NPR Period Discount"
                         PeriodDiscountLine2.SetFilter("Starting Time", '<=%1', "Ending Time");
                         PeriodDiscountLine2.SetFilter("Ending Time", '>=%1', "Starting Time");
                         //+NPR5.29 [257922]
-                        PeriodDiscountLine.Reset;
+                        PeriodDiscountLine.Reset();
                         PeriodDiscountLine.SetRange(Code, Code);
                         if PeriodDiscountLine2.Find('-') then
                             repeat
@@ -79,7 +79,7 @@ table 6014413 "NPR Period Discount"
                                                                     PeriodDiscountLine2.Code,
                                                                     PeriodDiscountLine."Campaign Unit Price",
                                                                     PeriodDiscountLine2."Campaign Unit Price");
-                            until PeriodDiscountLine2.Next = 0;
+                            until PeriodDiscountLine2.Next() = 0;
                     end;
             end;
         }
@@ -342,11 +342,11 @@ table 6014413 "NPR Period Discount"
 
         CommentLine.SetRange("Table Name", CommentLine."Table Name"::"Nonstock Item");
         CommentLine.SetRange("No.", Code);
-        CommentLine.DeleteAll;
+        CommentLine.DeleteAll();
 
         RetailComment.SetRange("Table ID", 6014414);
         RetailComment.SetRange("No.", Code);
-        RetailComment.DeleteAll;
+        RetailComment.DeleteAll();
 
         DimMgt.DeleteDefaultDim(DATABASE::"NPR Period Discount", Code);
     end;
@@ -355,13 +355,13 @@ table 6014413 "NPR Period Discount"
     var
         Date: Record Date;
     begin
-        "Created Date" := Today;
+        "Created Date" := Today();
 
         if Code = '' then
             NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Series", 0D, Code, "No. Series");
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
-        "Starting Date" := Today;
+        "Starting Date" := Today();
         if Date.Find('+') then
             "Ending Date" := Date."Period Start";
 
@@ -374,7 +374,7 @@ table 6014413 "NPR Period Discount"
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
         UpdateLines();
     end;
 
@@ -383,12 +383,12 @@ table 6014413 "NPR Period Discount"
         RetailComment: Record "NPR Retail Comment";
         RetailComment2: Record "NPR Retail Comment";
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
         PeriodDiscountLine.SetRange(Code, Code);
         if PeriodDiscountLine.Find('-') then
             repeat
                 PeriodDiscountLine.Code := Code;
-            until PeriodDiscountLine.Next = 0;
+            until PeriodDiscountLine.Next() = 0;
 
         RetailComment.SetRange("Table ID", 6014414);
         RetailComment.SetRange("No.", xRec.Code);
@@ -398,8 +398,8 @@ table 6014413 "NPR Period Discount"
                 RetailComment2.Validate("No.", Code);
                 if not RetailComment2.Insert(true) then
                     RetailComment2.Modify(true);
-            until RetailComment.Next = 0;
-        RetailComment.DeleteAll;
+            until RetailComment.Next() = 0;
+        RetailComment.DeleteAll();
     end;
 
     var
@@ -409,7 +409,6 @@ table 6014413 "NPR Period Discount"
         Text1060007: Label 'Period price: %3 <> %4';
         PeriodDiscountLine: Record "NPR Period Discount Line";
         PeriodDiscountLine2: Record "NPR Period Discount Line";
-        MixedDiscount: Record "NPR Mixed Discount";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         PeriodDiscount: Record "NPR Period Discount";
         DimMgt: Codeunit DimensionManagement;
@@ -438,7 +437,7 @@ table 6014413 "NPR Period Discount"
         //DimMgt.SaveDefaultDim(DATABASE::Customer,Code,FieldNumber,ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR Period Discount", Code, FieldNumber, ShortcutDimCode);
         //+NPR5.29 [261710]
-        Modify;
+        Modify();
     end;
 
     local procedure UpdateLines()
@@ -450,15 +449,15 @@ table 6014413 "NPR Period Discount"
             exit;
 
         PeriodDiscountLines.SetRange(Code, Code);
-        if PeriodDiscountLines.FindSet then
+        if PeriodDiscountLines.FindSet() then
             repeat
                 PeriodDiscountLines."Starting Date" := "Starting Date";
                 PeriodDiscountLines."Ending Date" := "Ending Date";
                 PeriodDiscountLines."Starting Time" := "Starting Time";
                 PeriodDiscountLines."Ending Time" := "Ending Time";
                 PeriodDiscountLines.Status := Status;
-                PeriodDiscountLines.Modify;
-            until PeriodDiscountLines.Next = 0;
+                PeriodDiscountLines.Modify();
+            until PeriodDiscountLines.Next() = 0;
         //+NPR5.40 [294655]
     end;
 

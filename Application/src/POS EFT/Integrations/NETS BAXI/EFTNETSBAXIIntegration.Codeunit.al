@@ -1,4 +1,4 @@
-codeunit 6184540 "NPR EFT NETS BAXI Integration"
+﻿codeunit 6184540 "NPR EFT NETS BAXI Integration"
 {
     // NPR5.54/MMV /20200129 CASE 364340 Created object
 
@@ -9,7 +9,6 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
 
     var
         Description: Label 'NETS BAXI .NET';
-        CANCEL_ACTION: Label 'Cancel Action';
         BALANCE_ENQUIRY: Label 'Balance Enquiry';
         DOWNLOAD_DATASET: Label 'Download Dataset';
         DOWNLOAD_SOFTWARE: Label 'Download Software';
@@ -35,52 +34,51 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
-        tmpEFTIntegrationType.Init;
+        tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT NETS BAXI Integration";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
         tmpEFTAuxOperation.Description := BALANCE_ENQUIRY;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
         tmpEFTAuxOperation.Description := DOWNLOAD_DATASET;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 3;
         tmpEFTAuxOperation.Description := DOWNLOAD_SOFTWARE;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 4;
         tmpEFTAuxOperation.Description := RECONCILIATION;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
     var
         EFTNETSBAXIPaymentSetup: Record "NPR EFT NETS BAXI Paym. Setup";
-        EFTNETSBAXIPaymentSetupPage: Page "NPR EFT NETS BAXI Paym. Setup";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
 
         GetPaymentTypeParameters(EFTSetup, EFTNETSBAXIPaymentSetup);
-        Commit;
+        Commit();
         PAGE.RunModal(PAGE::"NPR EFT NETS BAXI Paym. Setup", EFTNETSBAXIPaymentSetup);
     end;
 
@@ -217,16 +215,15 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     var
         EFTSetup: Record "NPR EFT Setup";
         POSSetup: Codeunit "NPR POS Setup";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTNETSBAXIPaymentSetup: Record "NPR EFT NETS BAXI Paym. Setup";
     begin
         POSSession.GetSetup(POSSetup);
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
-        if not EFTSetup.FindFirst then begin
+        if not EFTSetup.FindFirst() then begin
             EFTSetup.SetRange("POS Unit No.", '');
-            if not EFTSetup.FindFirst then
+            if not EFTSetup.FindFirst() then
                 exit;
         end;
 
@@ -235,7 +232,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
             exit;
 
         tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert;
+        tmpEFTSetup.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
@@ -277,7 +274,6 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     procedure HandleProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
-        EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
     begin
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::PAYMENT,
@@ -326,7 +322,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
             EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
         end;
         EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
-        EftTransactionRequest.Modify;
+        EftTransactionRequest.Modify();
     end;
 
     local procedure HandleVoidResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
@@ -341,7 +337,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
                 EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
             end;
             EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end else begin
             Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         end;
@@ -351,7 +347,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     begin
         if EftTransactionRequest.Successful then begin
             Message(RECONCILE_SUCCESS);
-            Commit;
+            Commit();
             if not CODEUNIT.Run(CODEUNIT::"NPR EFT Try Print Receipt", EftTransactionRequest) then
                 Message(GetLastErrorText);
         end else begin
@@ -391,7 +387,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
             Message(TRX_ERROR, EFTTransactionRequest."Integration Type", Format(EFTTransactionRequest."Processing Type"), EFTTransactionRequest."Result Display Text", EFTTransactionRequest."NST Error");
 
         if EFTTransactionRequest.Successful then begin
-            Commit;
+            Commit();
             if not CODEUNIT.Run(CODEUNIT::"NPR EFT Try Print Receipt", EFTTransactionRequest) then
                 Message(GetLastErrorText);
         end
@@ -406,9 +402,9 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
         EFTSetup.TestField("Payment Type POS");
 
         if not EFTNETSBAXIPaymentSetup.Get(EFTSetup."Payment Type POS") then begin
-            EFTNETSBAXIPaymentSetup.Init;
+            EFTNETSBAXIPaymentSetup.Init();
             EFTNETSBAXIPaymentSetup."Payment Type POS" := EFTSetup."Payment Type POS";
-            EFTNETSBAXIPaymentSetup.Insert;
+            EFTNETSBAXIPaymentSetup.Insert();
         end;
     end;
 
@@ -437,7 +433,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, EFTSetup, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Entry No.", false);
-        Commit;
+        Commit();
         EFTFrameworkMgt.SendRequest(VoidEFTTransactionRequest);
     end;
 
@@ -483,7 +479,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
               EFTTransactionRequest."Processing Type"::REFUND,
               EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD);
         end;
-        if (EFTTransactionRequest.FindLast) then
+        if (EFTTransactionRequest.FindLast()) then
             if (EFTTransactionRequest."Entry No." = EFTTransactionRequestIn."Processed Entry No.") then
                 exit;
 

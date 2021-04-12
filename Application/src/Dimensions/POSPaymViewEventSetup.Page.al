@@ -95,9 +95,9 @@ page 6151054 "NPR POS Paym. View Event Setup"
 
     trigger OnInit()
     begin
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

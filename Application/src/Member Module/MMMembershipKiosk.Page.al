@@ -27,7 +27,6 @@ page 6060078 "NPR MM Membership Kiosk"
 
                 trigger OnInvokeMethod(method: Text; eventContent: JsonObject)
                 var
-                    NextPage: Integer;
                     Content: Text;
                 begin
                     eventContent.WriteTo(Content);
@@ -58,7 +57,6 @@ page 6060078 "NPR MM Membership Kiosk"
 
     procedure GotoPage(CurrentPageId: Integer; DestinationPageId: Integer; EventContents: Text): Integer
     var
-        JToken: JsonToken;
         JObject: JsonObject;
         ScanCode: Text;
         TicketWebService: Codeunit "NPR TM Ticket WebService";
@@ -300,8 +298,6 @@ page 6060078 "NPR MM Membership Kiosk"
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
-        ReasonText: Text;
     begin
 
         MemberInfoCapture."First Name" := GetStringValue(JObject, 'FirstName');
@@ -311,7 +307,7 @@ page 6060078 "NPR MM Membership Kiosk"
         MemberInfoCapture."Phone No." := GetStringValue(JObject, 'PhoneNumber');
 
         MemberInfoCapture."Item No." := GetStringValue(JObject, 'MembershipItemNumber');
-        MemberInfoCapture."Document Date" := Today;
+        MemberInfoCapture."Document Date" := Today();
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         MemberInfoCapture.Insert();
 

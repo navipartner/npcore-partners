@@ -15,22 +15,22 @@ page 6151562 "NPR NpXml Templ. Arch. List"
         {
             repeater(Group)
             {
-                field("Template Version No."; "Template Version No.")
+                field("Template Version No."; Rec."Template Version No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Version No. field';
                 }
-                field("Version Description"; "Version Description")
+                field("Version Description"; Rec."Version Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version Description field';
                 }
-                field("Archived by"; "Archived by")
+                field("Archived by"; Rec."Archived by")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Archived by field';
                 }
-                field("Archived at"; "Archived at")
+                field("Archived at"; Rec."Archived at")
                 {
                     ApplicationArea = All;
                     Caption = 'Archived At';
@@ -49,7 +49,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 Caption = 'Restore Template Version';
                 Image = Restore;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -63,11 +63,11 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                         exit;
 
                     Clear(NpXmlTemplateMgt);
-                    if not NpXmlTemplateMgt.RestoreArchivedNpXmlTemplate(Code, "Template Version No.") then
+                    if not NpXmlTemplateMgt.RestoreArchivedNpXmlTemplate(Rec.Code, Rec."Template Version No.") then
                         Message(Text200)
                     else
-                        Message(StrSubstNo(Text100, "Template Version No."));
-                    CurrPage.Close;
+                        Message(StrSubstNo(Text100, Rec."Template Version No."));
+                    CurrPage.Close();
                 end;
             }
             action("Export Template Version")
@@ -75,7 +75,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 Caption = 'Export Template Version';
                 Image = Export;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

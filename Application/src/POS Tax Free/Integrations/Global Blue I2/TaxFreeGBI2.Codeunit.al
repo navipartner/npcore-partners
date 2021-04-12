@@ -1,4 +1,4 @@
-codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface"
+﻿codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface"
 {
     // Consumes Global Blue I2 solution, GRIPS MX API v16.06
     // 
@@ -26,14 +26,11 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         Caption_InvalidIdentifier: Label 'Invalid identifier: %1. Global Blue card number must be at least 10 characters.';
         Error_InvalidResponse: Label 'Invalid response received from tax free server for:\Handler: %1\Request: %2';
         Error_MissingPrintSetup: Label 'Missing object output setup';
-        Error_MissingParameters: Label 'Missing parameters for handler %1 on tax free unit %2';
         Caption_MobileNo: Label 'Mobile Phone No.';
         Error_NotSupported: Label 'Operation is not supported by tax free handler %1';
         Error_UserCancel: Label 'Operation was cancelled by user.';
         Caption_Passport: Label 'Passport Information';
-        Caption_PassportDetected: Label 'Passport no. detected. Please select Passport Country.';
         Caption_IdentifierType: Label 'Please select a Global Blue identifier type:';
-        Caption_PrefillCaptureWithNAVCustomer: Label 'Pre-fill tax free customer data with NAV customer data?';
         Error_PrintFail: Label 'Printing of tax free voucher %1 failed with error "%2".\NOTE: The voucher is correctly issued and active. Please attempt using ''Reprint Last'' or reissuing the voucher if the print error persists.';
         Error_Ineligible: Label 'Sale is not eligible. VAT or issue date is outside the allowed range.';
         Error_Unknown: Label 'Unknown handler error. Could not retrieve error message from response.';
@@ -64,7 +61,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         end;
 
         GlobalBlueServices.SetRange("Tax Free Unit", TaxFreeRequest."POS Unit No.");
-        GlobalBlueServices.FindSet;
+        GlobalBlueServices.FindSet();
     end;
 
     #region Actions
@@ -98,7 +95,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         Evaluate(GlobalBlueParameters."Shop Country Code", Value, 9);
 
         Services := XMLDoc.GetDescendantElements('Service');
-        ServiceCount := Services.Count;
+        ServiceCount := Services.Count();
         if not (ServiceCount > 0) then
             Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
 
@@ -110,7 +107,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
             Evaluate(ServiceID, Value, 9);
 
             if not GlobalBlueServices.Get(GlobalTaxFreeUnit."POS Unit No.", ServiceID) then begin
-                GlobalBlueServices.Init;
+                GlobalBlueServices.Init();
                 GlobalBlueServices."Tax Free Unit" := GlobalTaxFreeUnit."POS Unit No.";
                 GlobalBlueServices."Service ID" := ServiceID;
                 GlobalBlueServices.Insert(true);
@@ -132,19 +129,19 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         end;
 
         //Delete any old services that was not part of the latest auto configuration response
-        GlobalBlueServices.Reset;
+        GlobalBlueServices.Reset();
         GlobalBlueServices.SetRange("Tax Free Unit", GlobalTaxFreeUnit."POS Unit No.");
         GlobalBlueServices.SetFilter("Service ID", ServiceIDFilterString);
         GlobalBlueServices.DeleteAll();
 
 
-        GlobalBlueParameters."Date Last Auto Configured" := Today;
+        GlobalBlueParameters."Date Last Auto Configured" := Today();
         GlobalBlueParameters.Modify(true);
-        Commit;
+        Commit();
 
-        GlobalBlueServices.Reset;
+        GlobalBlueServices.Reset();
         GlobalBlueServices.SetRange("Tax Free Unit", GlobalTaxFreeUnit."POS Unit No.");
-        GlobalBlueServices.FindSet;
+        GlobalBlueServices.FindSet();
     end;
 
     procedure DownloadCountries(var TaxFreeRequest: Record "NPR Tax Free Request")
@@ -172,7 +169,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         for i := 1 to (CountryCount) do begin
             Countries.Get(i, Country);
 
-            GlobalBlueCountries.Init;
+            GlobalBlueCountries.Init();
             TryGetItemInnerText(Country, 'CountryCode', Value);
             Evaluate(GlobalBlueCountries."Country Code", Value);
 
@@ -185,10 +182,10 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
                 Evaluate(GlobalBlueCountries."Passport Code", Value, 9);
             if GlobalBlueCountries.Insert(false) then;
         end;
-        Commit;
+        Commit();
 
         TaxFreeRequest.Success := true;
-        TaxFreeRequest."Date End" := Today;
+        TaxFreeRequest."Date End" := Today();
         TaxFreeRequest."Time End" := Time;
     end;
 
@@ -214,19 +211,19 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
 
         GlobalBlueBlockedCountries.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueBlockedCountries.DeleteAll(false);
-        GlobalBlueBlockedCountries.Reset;
+        GlobalBlueBlockedCountries.Reset();
         for i := 1 to (CountryCount) do begin
             Countries.Get(i, Country);
 
-            GlobalBlueBlockedCountries.Init;
+            GlobalBlueBlockedCountries.Init();
             GlobalBlueBlockedCountries."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
             Evaluate(GlobalBlueBlockedCountries."Country Code", Country.AsXmlElement().InnerText, 9);
             if GlobalBlueBlockedCountries.Insert(false) then;
         end;
-        Commit;
+        Commit();
 
         TaxFreeRequest.Success := true;
-        TaxFreeRequest."Date End" := Today;
+        TaxFreeRequest."Date End" := Today();
         TaxFreeRequest."Time End" := Time;
     end;
 
@@ -253,11 +250,11 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
 
         GlobalBlueIINBlacklist.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueIINBlacklist.DeleteAll(false);
-        GlobalBlueIINBlacklist.Reset;
+        GlobalBlueIINBlacklist.Reset();
         for i := 1 to (RangeCount) do begin
             Ranges.Get(1, Range);
 
-            GlobalBlueIINBlacklist.Init;
+            GlobalBlueIINBlacklist.Init();
             GlobalBlueIINBlacklist."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
             TryGetItemInnerText(Range, 'PrefixFrom', Value);
             Evaluate(GlobalBlueIINBlacklist."Range Inclusive Start", Value, 9);
@@ -266,10 +263,10 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
 
             if GlobalBlueIINBlacklist.Insert(false) then;
         end;
-        Commit;
+        Commit();
 
         TaxFreeRequest.Success := true;
-        TaxFreeRequest."Date End" := Today;
+        TaxFreeRequest."Date End" := Today();
         TaxFreeRequest."Time End" := Time;
     end;
 
@@ -279,7 +276,6 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         CustomerXML: Text;
         PaymentXML: Text;
         PurchaseXML: Text;
-        ServiceID: Text;
         Handeled: Boolean;
     begin
         //tmpTaxFreeConsolidation carries the sales receipts/documents to be consolidated into one tax free voucher.
@@ -465,7 +461,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         GlobalBlueIINBlacklist.SetFilter("Range Inclusive Start", '<=%1', IINInteger);
         GlobalBlueIINBlacklist.SetFilter("Range Exclusive End", '>%1', IINInteger);
 
-        exit(GlobalBlueIINBlacklist.IsEmpty);
+        exit(GlobalBlueIINBlacklist.IsEmpty());
     end;
 
     [TryFunction]
@@ -473,16 +469,15 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
     var
         TaxFreeRequest: Record "NPR Tax Free Request";
         IsError: Boolean;
-        DateTime: DateTime;
         Value: Text;
         XMLDoc: XmlDocument;
     begin
-        TaxFreeRequest.Init;
+        TaxFreeRequest.Init();
         TaxFreeRequest."Request Type" := 'LOOKUP_TRAVELLER';
         TaxFreeRequest.Mode := GlobalTaxFreeUnit.Mode;
         TaxFreeRequest."Timeout (ms)" := GlobalTaxFreeUnit."Request Timeout (ms)";
         TaxFreeRequest."Time Start" := Time;
-        TaxFreeRequest."Date Start" := Today;
+        TaxFreeRequest."Date Start" := Today();
 
         GetTraveller(TaxFreeRequest, tmpCustomerInfoCapture);
         HandleResponse(TaxFreeRequest, 'GetTraveller', XMLDoc, IsError);
@@ -548,7 +543,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
             Evaluate(tmpCustomerInfoCapture."Date Of Birth", CopyStr(Value, 1, StrPos(Value, 'T') - 1), 9);
 
         TaxFreeRequest.Success := true;
-        TaxFreeRequest."Date End" := Today;
+        TaxFreeRequest."Date End" := Today();
         TaxFreeRequest."Time End" := Time;
     end;
 
@@ -595,14 +590,10 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Line: Text)
     var
-        Barcode: Boolean;
         Bold: Boolean;
         Center: Boolean;
         HFont: Boolean;
-        Img: Boolean;
         Inverse: Boolean;
-        ShopCopy: Boolean;
-        TearOff: Boolean;
         String: Text;
         StringUpper: Text;
         Value: Text;
@@ -1032,7 +1023,6 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         HttpResponseMessage: HttpResponseMessage;
         HttpRequestMessage: HttpRequestMessage;
         OutStream: OutStream;
-        BaseAddress: Text;
         Result: Text;
         HttpHeaders: HttpHeaders;
     begin
@@ -1074,10 +1064,8 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
 
     local procedure HandleResponse(var TaxFreeRequest: Record "NPR Tax Free Request"; ExpectedOperation: Text; var XMLDoc: XmlDocument; var IsError: Boolean)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XMLDOMMtg: Codeunit "XML DOM Management";
         InStream: InStream;
-        OutStream: OutStream;
         Value: Text;
         XMLMessage: Text;
     begin
@@ -1157,12 +1145,6 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
     local procedure TrySelectSingleNodeText(var XMLDoc: XmlDocument; XPath: Text; var Value: Text)
     var
         XMLNode: XmlNode;
-        XMLNodeLst: XmlNodeList;
-        XmlAttributeColl: XmlAttributeCollection;
-        XMLNamesp: XmlProcessingInstruction;
-        XMLDom: Codeunit "XML DOM Management";
-        XMLMessage: Text;
-        XMLDocNoNamespace: XmlDocument;
 
     begin
         XMLDoc.SelectSingleNode(XPath, XMLNode);
@@ -1200,9 +1182,9 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
         LookupCompleted: Boolean;
     begin
-        tmpCustomerInfoCapture.Init;
+        tmpCustomerInfoCapture.Init();
         tmpCustomerInfoCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-        tmpCustomerInfoCapture.Insert;
+        tmpCustomerInfoCapture.Insert();
 
         if Confirm(Caption_UseID) then begin
             if not ScanCustomerID(tmpCustomerInfoCapture) then
@@ -1257,17 +1239,17 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         tmpMobilePhoneNoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
         tmpMobilePhoneRequiredParam: Record "NPR Tax Free GB I2 Param." temporary;
     begin
-        tmpMobilePhoneRequiredParam.Init;
+        tmpMobilePhoneRequiredParam.Init();
         tmpMobilePhoneRequiredParam."(Dialog) Mobile No." := tmpMobilePhoneRequiredParam."(Dialog) Mobile No."::Required;
-        tmpMobilePhoneRequiredParam.Insert;
-        tmpMobilePhoneNoCapture.Init;
+        tmpMobilePhoneRequiredParam.Insert();
+        tmpMobilePhoneNoCapture.Init();
         tmpMobilePhoneNoCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-        tmpMobilePhoneNoCapture.Insert;
+        tmpMobilePhoneNoCapture.Insert();
 
         TravellerInfoCapture.SetModes(tmpMobilePhoneRequiredParam);
         TravellerInfoCapture.SetRec(tmpMobilePhoneNoCapture);
         TravellerInfoCapture.LookupMode(true);
-        if TravellerInfoCapture.RunModal <> ACTION::LookupOK then
+        if TravellerInfoCapture.RunModal() <> ACTION::LookupOK then
             exit(false); //Restart capture flow
 
         TravellerInfoCapture.GetRec(tmpMobilePhoneNoCapture);
@@ -1296,18 +1278,18 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         tmpPassportCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
         tmpPassportRequiredParam: Record "NPR Tax Free GB I2 Param." temporary;
     begin
-        tmpPassportRequiredParam.Init;
+        tmpPassportRequiredParam.Init();
         tmpPassportRequiredParam."(Dialog) Passport Number" := tmpPassportRequiredParam."(Dialog) Passport Number"::Required;
         tmpPassportRequiredParam."(Dialog) Passport Country Code" := tmpPassportRequiredParam."(Dialog) Passport Country Code"::Required;
-        tmpPassportRequiredParam.Insert;
-        tmpPassportCapture.Init;
+        tmpPassportRequiredParam.Insert();
+        tmpPassportCapture.Init();
         tmpPassportCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-        tmpPassportCapture.Insert;
+        tmpPassportCapture.Insert();
 
         TravellerInfoCapture.SetModes(tmpPassportRequiredParam);
         TravellerInfoCapture.SetRec(tmpPassportCapture);
         TravellerInfoCapture.LookupMode(true);
-        if TravellerInfoCapture.RunModal <> ACTION::LookupOK then
+        if TravellerInfoCapture.RunModal() <> ACTION::LookupOK then
             exit(false); //Restart capture flow
 
         TravellerInfoCapture.GetRec(tmpPassportCapture);
@@ -1334,7 +1316,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
     begin
         InputDialog.LookupMode(true);
         InputDialog.SetInput(1, Input, Caption_GlobalBlueIdentifier);
-        ScanAction := InputDialog.RunModal;
+        ScanAction := InputDialog.RunModal();
         if (ScanAction <> ACTION::LookupOK) or (InputDialog.InputText(1, Input) <> 1) then
             exit(false);
 
@@ -1360,7 +1342,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         TravellerInfoCapture.SetModes(GlobalBlueParameters);
         TravellerInfoCapture.SetRec(tmpCustomerInfoCapture); //Will set filled out data as read-only.
         TravellerInfoCapture.LookupMode(true);
-        if TravellerInfoCapture.RunModal = ACTION::LookupOK then begin
+        if TravellerInfoCapture.RunModal() = ACTION::LookupOK then begin
             TravellerInfoCapture.GetRec(tmpCustomerInfoCapture);
             exit(true);
         end;
@@ -1435,7 +1417,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         if not GlobalBlueParameters."Consolidation Allowed" then
             exit(false);
 
-        if not tmpTaxFreeConsolidation.FindSet then
+        if not tmpTaxFreeConsolidation.FindSet() then
             exit(false);
 
         if GlobalBlueParameters."Consolidation Separate Limits" then
@@ -1458,12 +1440,12 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
             Eligible := IsStoredSaleEligible(tmpTaxFreeConsolidation."Sales Ticket No.", tmpEligibleServices);
 
             if Eligible then begin
-                tmpEligibleServices.FindSet;
+                tmpEligibleServices.FindSet();
                 repeat
                     if First then begin
-                        tmpSharedEligibleServices.Init;
+                        tmpSharedEligibleServices.Init();
                         tmpSharedEligibleServices.TransferFields(tmpEligibleServices);
-                        tmpSharedEligibleServices.Insert;
+                        tmpSharedEligibleServices.Insert();
                     end else begin
                         if not tmpSharedEligibleServices.Get(tmpEligibleServices."Tax Free Unit", tmpEligibleServices."Service ID") then begin
                             if FilterString <> '' then
@@ -1471,22 +1453,22 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
                             FilterString += '<>' + Format(tmpEligibleServices."Service ID");
                         end;
                     end;
-                until tmpEligibleServices.Next = 0;
+                until tmpEligibleServices.Next() = 0;
 
                 if FilterString <> '' then begin
                     //Delete every non-shared service
                     tmpSharedEligibleServices.SetFilter("Service ID", FilterString);
-                    tmpSharedEligibleServices.DeleteAll;
+                    tmpSharedEligibleServices.DeleteAll();
                     tmpSharedEligibleServices.SetRange("Service ID");
                 end;
             end;
 
             First := false;
-            tmpEligibleServices.DeleteAll;
+            tmpEligibleServices.DeleteAll();
             Clear(tmpEligibleServices);
             Clear(FilterString);
-            Eligible := Eligible and (not tmpSharedEligibleServices.IsEmpty);
-        until (tmpTaxFreeConsolidation.Next = 0) or (not Eligible);
+            Eligible := Eligible and (not tmpSharedEligibleServices.IsEmpty());
+        until (tmpTaxFreeConsolidation.Next() = 0) or (not Eligible);
 
         if Eligible then
             tmpEligibleServices.Copy(tmpSharedEligibleServices, true);
@@ -1502,7 +1484,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         POSEntry: Record "NPR POS Entry";
     begin
         repeat
-            POSSalesLine.Reset;
+            POSSalesLine.Reset();
             Clear(POSSalesLine);
 
             POSSalesLine.SetCurrentKey("Document No.", "Line No.");
@@ -1511,7 +1493,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
             POSSalesLine.SetFilter(Quantity, '>0');
             POSSalesLine.SetFilter("VAT %", '>0');
 
-            if not POSSalesLine.FindSet then
+            if not POSSalesLine.FindSet() then
                 exit(false);
 
             POSEntry.Get(POSSalesLine."POS Entry No.");
@@ -1534,12 +1516,12 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
                     Item.Get(POSSalesLine."No.");
                     if Item.Type = Item.Type::Inventory then
                         SalesAmount += POSSalesLine."Amount Incl. VAT";
-                until POSSalesLine.Next = 0;
+                until POSSalesLine.Next() = 0;
             end;
-        until tmpTaxFreeConsolidation.Next = 0;
+        until tmpTaxFreeConsolidation.Next() = 0;
 
         GetEligibleServices(SalesAmount, tmpEligibleServices);
-        exit(not tmpEligibleServices.IsEmpty);
+        exit(not tmpEligibleServices.IsEmpty());
     end;
 
     local procedure IsStoredSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
@@ -1578,11 +1560,11 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
                 Item.Get(POSSalesLine."No.");
                 if Item.Type = Item.Type::Inventory then
                     SaleAmount += POSSalesLine."Amount Incl. VAT";
-            until POSSalesLine.Next = 0;
+            until POSSalesLine.Next() = 0;
         end;
 
         GetEligibleServices(SaleAmount, tmpEligibleServices);
-        exit(not tmpEligibleServices.IsEmpty);
+        exit(not tmpEligibleServices.IsEmpty());
     end;
 
     local procedure IsActiveSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
@@ -1598,7 +1580,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         SaleLinePOS.SetFilter(Quantity, '>0');
         SaleLinePOS.SetFilter("VAT %", '>0');
 
-        if not SaleLinePOS.FindSet then
+        if not SaleLinePOS.FindSet() then
             exit(false);
 
         SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
@@ -1616,46 +1598,46 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
                 Item.Get(SaleLinePOS."No.");
                 if Item.Type = Item.Type::Inventory then
                     SaleAmount += SaleLinePOS."Amount Including VAT";
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
         end;
 
         GetEligibleServices(SaleAmount, tmpEligibleServices);
-        exit(not tmpEligibleServices.IsEmpty);
+        exit(not tmpEligibleServices.IsEmpty());
     end;
 
     local procedure GetEligibleServices(SaleAmount: Decimal; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary)
     begin
-        if GlobalBlueServices.FindSet then
+        if GlobalBlueServices.FindSet() then
             repeat
                 if (GlobalBlueServices."Minimum Purchase Amount" <> 0) and (GlobalBlueServices."Maximum Purchase Amount" <> 0) then begin //Both upper and lower bound
                     if (GlobalBlueServices."Minimum Purchase Amount" <= SaleAmount) and (SaleAmount <= GlobalBlueServices."Maximum Purchase Amount") then begin
-                        tmpEligibleServices.Init;
+                        tmpEligibleServices.Init();
                         tmpEligibleServices.TransferFields(GlobalBlueServices);
-                        tmpEligibleServices.Insert;
+                        tmpEligibleServices.Insert();
                     end;
                 end else
                     if (GlobalBlueServices."Maximum Purchase Amount" = 0) then begin //Only lower bound
                         if (GlobalBlueServices."Minimum Purchase Amount" <= SaleAmount) then begin
-                            tmpEligibleServices.Init;
+                            tmpEligibleServices.Init();
                             tmpEligibleServices.TransferFields(GlobalBlueServices);
-                            tmpEligibleServices.Insert;
+                            tmpEligibleServices.Insert();
                         end;
                     end else begin //Only upper bound
                         if (SaleAmount <= GlobalBlueServices."Maximum Purchase Amount") then begin
-                            tmpEligibleServices.Init;
+                            tmpEligibleServices.Init();
                             tmpEligibleServices.TransferFields(GlobalBlueServices);
-                            tmpEligibleServices.Insert;
+                            tmpEligibleServices.Insert();
                         end;
                     end;
-            until GlobalBlueServices.Next = 0;
+            until GlobalBlueServices.Next() = 0;
     end;
 
     local procedure SelectService(var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Integer
     begin
-        if tmpEligibleServices.Count = 1 then
+        if tmpEligibleServices.Count() = 1 then
             exit(tmpEligibleServices."Service ID");
 
-        tmpEligibleServices.FindSet;
+        tmpEligibleServices.FindSet();
         if PAGE.RunModal(PAGE::"NPR Tax Free GB I2 Serv. Sel.", tmpEligibleServices) <> ACTION::LookupOK then begin
             if Confirm(Caption_CancelOperation) then
                 Error(Error_UserCancel)
@@ -1675,14 +1657,14 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         XML: Text;
     begin
         XML := '<PurchaseDetails>';
-        tmpTaxFreeConsolidation.FindSet;
+        tmpTaxFreeConsolidation.FindSet();
         repeat
-            PosSalesLine.Reset;
+            PosSalesLine.Reset();
             Clear(PosSalesLine);
             PosSalesLine.SetRange("Document No.", tmpTaxFreeConsolidation."Sales Ticket No.");
             PosSalesLine.SetRange(Type, PosSalesLine.Type::Item);
             PosSalesLine.SetFilter(Quantity, '>0');
-            PosSalesLine.FindSet;
+            PosSalesLine.FindSet();
             POSSalesLine.CalcFields("Entry Date", "Ending Time");
 
             XML += '<Receipt>';
@@ -1701,10 +1683,10 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
                       '<Quantity>' + Format(Round(PosSalesLine.Quantity, 1, '>')) + '</Quantity>' + //Round up - They only accept integer quantity
                       '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(PosSalesLine.Description), 1, 50)) + '</GoodDescription>' +
                     '</PurchaseItem>';
-            until PosSalesLine.Next = 0;
+            until PosSalesLine.Next() = 0;
             XML += '</PurchaseItems>';
             XML += '</Receipt>';
-        until tmpTaxFreeConsolidation.Next = 0;
+        until tmpTaxFreeConsolidation.Next() = 0;
         XML += '</PurchaseDetails>';
 
         exit(XML);
@@ -1812,10 +1794,10 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         Handled := true;
 
         if not GlobalBlueParameters.Get(TaxFreeUnit."POS Unit No.") then begin
-            GlobalBlueParameters.Init;
+            GlobalBlueParameters.Init();
             GlobalBlueParameters."Tax Free Unit" := TaxFreeUnit."POS Unit No.";
-            GlobalBlueParameters.Insert;
-            Commit;
+            GlobalBlueParameters.Insert();
+            Commit();
         end;
 
         GlobalBlueParameterPage.SetRecord(GlobalBlueParameters);
@@ -1862,9 +1844,9 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         if tmpEligibleServices.IsEmpty then
             Error(Error_Ineligible);
 
-        tmpTaxFreeConsolidation.Init;
+        tmpTaxFreeConsolidation.Init();
         tmpTaxFreeConsolidation."Sales Ticket No." := SalesReceiptNo;
-        tmpTaxFreeConsolidation.Insert;
+        tmpTaxFreeConsolidation.Insert();
 
         IssueVoucher(TaxFreeRequest, tmpTaxFreeConsolidation, tmpEligibleServices);
     end;

@@ -1,4 +1,4 @@
-codeunit 6151212 "NPR NpCs Run Workflow Step"
+﻿codeunit 6151212 "NPR NpCs Run Workflow Step"
 {
     TableNo = "NPR NpCs Document";
 
@@ -50,7 +50,7 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
         LogMessage: Text;
         SOReleasedLbl: Label 'Sales Order %1 Released ';
     begin
-        NpCsDocument.Find;
+        NpCsDocument.Find();
         NpCsDocument.TestField(Type, NpCsDocument.Type::"Send to Store");
         NpCsDocument.CalcFields("Send Order Module");
         if NpCsDocument."Send Order Module" = '' then
@@ -62,13 +62,13 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
             LogMessage := StrSubstNo(SOReleasedLbl, SalesHeader."No.");
             ReleaseSalesDoc.PerformManualRelease(SalesHeader);
             NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
-            Commit;
+            Commit();
         end;
 
         NpCsDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step"::"Order Status";
         NpCsDocument.Modify(true);
         NpCsWorkflowMgt.SendOrder(NpCsDocument, LogMessage);
-        Commit;
+        Commit();
 
         if LogMessage <> '' then
             NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
@@ -90,7 +90,7 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
         if IsComplete(NpCsDocument) then begin
             NpCsDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step"::"Post Processing";
             NpCsDocument.Modify(true);
-            Commit;
+            Commit();
         end;
 
         if LogMessage <> '' then
@@ -150,7 +150,7 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
 
     local procedure FindNextWorkflowModule(NpCsDocument: Record "NPR NpCs Document"; NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
     begin
-        NpCsWorkflowModule.Init;
+        NpCsWorkflowModule.Init();
         case NpCsDocument."Next Workflow Step" of
             NpCsDocument."Next Workflow Step"::"Send Order":
                 begin
@@ -169,7 +169,7 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
                 end;
         end;
 
-        if NpCsWorkflowModule.Find then;
+        if NpCsWorkflowModule.Find() then;
     end;
 
     local procedure NotifyStoreEmail(NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text): Boolean
@@ -228,7 +228,7 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
         if EmailTemplateHeader.Code = '' then
             exit(false);
         EmailTemplateHeader.TestField("Table No.", DATABASE::"NPR NpCs Document");
-        EmailTemplateHeader.SetRecFilter;
+        EmailTemplateHeader.SetRecFilter();
 
         RecRef.GetTable(NpCsDocument);
         if EmailTemplateHeader."Report ID" = 0 then
@@ -309,10 +309,10 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
         LogMessage: Text;
     begin
         NpCsDocument.CalcFields("Order Status Module");
-        NpCsWorkflowModule.Init;
+        NpCsWorkflowModule.Init();
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
         NpCsWorkflowModule.Code := NpCsDocument."Order Status Module";
-        if NpCsWorkflowModule.Find then;
+        if NpCsWorkflowModule.Find() then;
 
         case NotificationType of
             NotificationType::" ":
@@ -373,10 +373,10 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
                 exit(false);
         end;
         EmailTemplateHeader.TestField("Table No.", DATABASE::"NPR NpCs Document");
-        EmailTemplateHeader.SetRecFilter;
+        EmailTemplateHeader.SetRecFilter();
 
         RecRef.GetTable(NpCsDocument);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
 
         if EmailTemplateHeader."Report ID" = 0 then
             ErrorText := EmailMgt.SendEmailTemplate(RecRef, EmailTemplateHeader, NpCsDocument."Customer E-mail", true)
@@ -458,7 +458,7 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
                 exit(NpCsStore."Contact Phone No.");
         end;
 
-        if CompanyInfo.Get and (CompanyInfo."Phone No." <> '') then
+        if CompanyInfo.Get() and (CompanyInfo."Phone No." <> '') then
             exit(CompanyInfo."Phone No.");
 
         if NpCsStore.Get(NpCsDocument."From Store Code") then begin

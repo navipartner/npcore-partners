@@ -1,4 +1,4 @@
-codeunit 6184516 "NPR EFT Flexiiterm Prot."
+﻿codeunit 6184516 "NPR EFT Flexiiterm Prot."
 {
     SingleInstance = true;
 
@@ -22,7 +22,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     var
         State: DotNet NPRNetState6;
         GatewayRequest: DotNet NPRNetPaymentGatewayProcessRequest0;
-        EFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param.";
         EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
         EFTSetup: Record "NPR EFT Setup";
         POSSession: Codeunit "NPR POS Session";
@@ -91,13 +90,10 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
-        PaymentNo: Code[10];
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
         State: DotNet NPRNetState6;
-        ConfirmFee: Boolean;
-        EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
         EFTSetup: Record "NPR EFT Setup";
     begin
 
@@ -127,9 +123,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     end;
 
     local procedure GetGiftVoucherBalance(GiftVoucherNo: Text; var ReturnData: Text)
-    var
-        GiftVoucherBalance: Decimal;
-        ExpiryDate: Text;
     begin
         ReturnData := SerializeJson(0);
     end;
@@ -153,7 +146,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
-        CreditCardTransaction: Record "NPR EFT Receipt";
         State: DotNet NPRNetState6;
     begin
 
@@ -164,7 +156,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         EFTTransactionRequest.Successful := true;
         EFTTransactionRequest."Result Display Text" := 'Approved';
         EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan(State.CardPan);
-        EFTTransactionRequest."Transaction Date" := Today;
+        EFTTransactionRequest."Transaction Date" := Today();
         EFTTransactionRequest."Transaction Time" := Time;
         EFTTransactionRequest."External Result Known" := true;
         EFTTransactionRequest.Modify();
@@ -173,7 +165,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     local procedure RejectTransactionIfFound(Data: Text)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        CreditCardTransaction: Record "NPR EFT Receipt";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
         State: DotNet NPRNetState6;
     begin
@@ -185,7 +176,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         EFTTransactionRequest.Successful := false;
         EFTTransactionRequest."Result Display Text" := 'Declined';
         EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan(State.CardPan);
-        EFTTransactionRequest."Transaction Date" := Today;
+        EFTTransactionRequest."Transaction Date" := Today();
         EFTTransactionRequest."Transaction Time" := Time;
         EFTTransactionRequest."External Result Known" := true;
         EFTTransactionRequest.Modify();
@@ -196,7 +187,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         Lines: DotNet NPRNetArray;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         OStream: OutStream;
-        Util: Codeunit "NPR Receipt Footer Mgt.";
         ReceiptLine: Text;
         CreditCardTransaction: Record "NPR EFT Receipt";
         EntryNo: Integer;
@@ -219,8 +209,8 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
             ReceiptNo := CreditCardTransaction."Receipt No." + 1
         end;
 
-        CreditCardTransaction.Init;
-        CreditCardTransaction.Date := Today;
+        CreditCardTransaction.Init();
+        CreditCardTransaction.Date := Today();
         CreditCardTransaction."Transaction Time" := Time;
         CreditCardTransaction.Type := 0;
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
@@ -233,14 +223,14 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
 
             CreditCardTransaction."Entry No." := EntryNo;
             CreditCardTransaction.Text := ReceiptLine;
-            CreditCardTransaction.Insert;
+            CreditCardTransaction.Insert();
             EntryNo += 1;
         end;
 
         EFTTransactionRequest.Modify();
-        Commit; //Prevent receipt data rollback in case of print error below - printing immediately inside the EFT transaction is unfortunately necessary since signature approval transactions depend on it.
+        Commit(); //Prevent receipt data rollback in case of print error below - printing immediately inside the EFT transaction is unfortunately necessary since signature approval transactions depend on it.
 
-        CreditCardTransaction.Reset;
+        CreditCardTransaction.Reset();
         CreditCardTransaction.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
         CreditCardTransaction.SetRange("Receipt No.", ReceiptNo);
         CreditCardTransaction.PrintTerminalReceipt();
@@ -255,9 +245,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
-    var
-        PaymentRequest: Integer;
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
 
         if (ActionName <> 'Flexiiterm_EftTrx') then

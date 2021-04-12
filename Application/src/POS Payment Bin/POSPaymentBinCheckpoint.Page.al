@@ -1,4 +1,4 @@
-page 6150628 "NPR POS Payment Bin Checkpoint"
+﻿page 6150628 "NPR POS Payment Bin Checkpoint"
 {
     Caption = 'POS Payment Bin Checkpoint';
     DeleteAllowed = false;
@@ -212,13 +212,13 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                     field("Bank Deposit Bin Code"; Rec."Bank Deposit Bin Code")
                     {
                         ApplicationArea = All;
-                        ShowMandatory = "Bank Deposit Amount" <> 0;
+                        ShowMandatory = Rec."Bank Deposit Amount" <> 0;
                         ToolTip = 'Specifies the value of the Bank Deposit Bin Code field';
                     }
                     field("Bank Deposit Reference"; Rec."Bank Deposit Reference")
                     {
                         ApplicationArea = All;
-                        ShowMandatory = "Bank Deposit Amount" <> 0;
+                        ShowMandatory = Rec."Bank Deposit Amount" <> 0;
                         ToolTip = 'Specifies the value of the Bank Deposit Reference field';
                     }
                     field("Move to Bin Amount"; Rec."Move to Bin Amount")
@@ -350,20 +350,20 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
         POSCountingDenomination: Record "NPR POS Counting Denomination";
     begin
 
-        PaymentTypeDetailed.SetFilter("Payment No.", '=%1', "Payment Type No.");
+        PaymentTypeDetailed.SetFilter("Payment No.", '=%1', Rec."Payment Type No.");
         PaymentTypeDetailed.SetFilter("Register No.", '=%1', GetRegisterNo());
         if (PaymentTypeDetailed.IsEmpty()) then begin
-            POSCountingDenomination.SetFilter("Payment Type", '=%1', "Payment Type No.");
+            POSCountingDenomination.SetFilter("Payment Type", '=%1', Rec."Payment Type No.");
             if POSCountingDenomination.FindSet() then begin
                 repeat
-                    PaymentTypeDetailed.Init;
-                    PaymentTypeDetailed."Payment No." := "Payment Type No.";
+                    PaymentTypeDetailed.Init();
+                    PaymentTypeDetailed."Payment No." := Rec."Payment Type No.";
                     PaymentTypeDetailed."Register No." := GetRegisterNo();
                     PaymentTypeDetailed.Weight := POSCountingDenomination.Weight;
                     PaymentTypeDetailed.Insert();
 
                 until (POSCountingDenomination.Next() = 0);
-                Commit;
+                Commit();
             end;
         end;
 
@@ -389,7 +389,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
         CurrPage.Update(true);
     end;
 
-    local procedure GetRegisterNo() RegisterNo: Code[10]
+    local procedure GetRegisterNo(): Code[10]
     var
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
@@ -500,13 +500,13 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
             exit;
         end;
 
-        Rec."Bank Deposit Reference" := StrSubstNo('%1 %2', "Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
+        Rec."Bank Deposit Reference" := StrSubstNo('%1 %2', Rec."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
 
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
         if POSPaymentBin.IsEmpty() then
             exit;
 
-        POSPaymentBin.Reset;
+        POSPaymentBin.Reset();
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
         POSPaymentBin.SetFilter("POS Store Code", '=%1', GetStoreCode());
         if (POSPaymentBin.Count() = 1) then begin
@@ -515,7 +515,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
             exit;
         end;
 
-        POSPaymentBin.Reset;
+        POSPaymentBin.Reset();
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
         POSPaymentBin.SetFilter("Attached to POS Unit No.", '=%1', GetPosUnitNo());
         if (POSPaymentBin.Count() = 1) then begin
@@ -524,7 +524,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
             exit;
         end;
 
-        POSPaymentBin.Reset;
+        POSPaymentBin.Reset();
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
         if (POSPaymentBin.Count() = 1) then begin
             POSPaymentBin.FindFirst();
@@ -541,13 +541,13 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
             Rec."Move to Bin Code" := '';
             exit;
         end;
-        Rec."Move to Bin Reference" := StrSubstNo('%1 %2', "Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
+        Rec."Move to Bin Reference" := StrSubstNo('%1 %2', Rec."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
 
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
         if POSPaymentBin.IsEmpty() then
             exit;
 
-        POSPaymentBin.Reset;
+        POSPaymentBin.Reset();
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
         POSPaymentBin.SetFilter("POS Store Code", '=%1', GetStoreCode());
         if (POSPaymentBin.Count() = 1) then begin
@@ -556,7 +556,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
             exit;
         end;
 
-        POSPaymentBin.Reset;
+        POSPaymentBin.Reset();
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
         POSPaymentBin.SetFilter("Attached to POS Unit No.", '=%1', GetPosUnitNo());
         if (POSPaymentBin.Count() = 1) then begin
@@ -565,7 +565,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
             exit;
         end;
 
-        POSPaymentBin.Reset;
+        POSPaymentBin.Reset();
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
         if (POSPaymentBin.Count() = 1) then begin
             POSPaymentBin.FindFirst();
@@ -609,7 +609,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
 
                     POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
                     POSPaymentBinCheckpoint.Validate("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
-                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
+                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
                     POSPaymentBinCheckpoint."New Float Amount" := 0;
                     POSPaymentBinCheckpoint.Comment := AutoCount;
                     POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;

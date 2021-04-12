@@ -1,4 +1,4 @@
-codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
+﻿codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
 {
     TableNo = "NPR Data Log Record";
 
@@ -11,10 +11,10 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
         if not FindSKUs(Rec, TempStockkeepingUnit) then
             exit;
 
-        if TempStockkeepingUnit.FindSet then
+        if TempStockkeepingUnit.FindSet() then
             repeat
                 RegisterStoreStocks(TempStockkeepingUnit);
-            until TempStockkeepingUnit.Next = 0;
+            until TempStockkeepingUnit.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6151222, 'OnAfterModifyEvent', '', true, true)]
@@ -40,11 +40,10 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
         Company: Record Company;
         NpCsStore: Record "NPR NpCs Store";
         WebService: Record "Web Service";
-        Url: Text;
         PrevRec: Text;
     begin
         if (GetStoreStockItemUrl(CompanyName) = '') and not WebService.Get(WebService."Object Type"::Page, 'collect_store_stock_items') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Page;
             WebService."Object ID" := PAGE::"NPR NpCs Store Stock Items";
             WebService."Service Name" := 'collect_store_stock_items';
@@ -53,7 +52,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
         end;
 
         if (GetStoreStockStatusUrl(CompanyName) = '') and not WebService.Get(WebService."Object Type"::Query, 'collect_store_stock_status') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Query;
             WebService."Object ID" := QUERY::"NPR NpCs Store Stock Status";
             WebService."Service Name" := 'collect_store_stock_status';
@@ -61,7 +60,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
             WebService.Insert(true);
         end;
 
-        if NpCsStore.FindSet then
+        if NpCsStore.FindSet() then
             repeat
                 if Company.Get(NpCsStore."Company Name") then begin
                     PrevRec := Format(NpCsStore);
@@ -72,7 +71,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
                     if PrevRec <> Format(NpCsStore) then
                         NpCsStore.Modify(true);
                 end;
-            until NpCsStore.Next = 0;
+            until NpCsStore.Next() = 0;
     end;
 
     local procedure InitDataLogSetup()
@@ -93,7 +92,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
             exit;
 
         if not DataLogSetup.Get(TableMetadata.ID) then begin
-            DataLogSetup.Init;
+            DataLogSetup.Init();
             DataLogSetup."Table ID" := TableMetadata.ID;
             if InsertTrigger then
                 DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
@@ -119,7 +118,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
 
         SubscriberCode := 'STORE_STOCK';
         if not DataLogSubscriber.Get(SubscriberCode, TableMetadata.ID, '') then begin
-            DataLogSubscriber.Init;
+            DataLogSubscriber.Init();
             DataLogSubscriber.Code := SubscriberCode;
             DataLogSubscriber."Table ID" := TableMetadata.ID;
             DataLogSubscriber."Company Name" := '';
@@ -151,7 +150,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
         if not TempStockkeepingUnit.IsTemporary then
             exit(false);
         Clear(TempStockkeepingUnit);
-        TempStockkeepingUnit.DeleteAll;
+        TempStockkeepingUnit.DeleteAll();
 
         if not DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogRecord."Entry No.", false, RecRef) then
             exit(false);
@@ -160,11 +159,11 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
             DATABASE::"Item Ledger Entry":
                 begin
                     RecRef.SetTable(ItemLedgEntry);
-                    TempStockkeepingUnit.Init;
+                    TempStockkeepingUnit.Init();
                     TempStockkeepingUnit."Item No." := ItemLedgEntry."Item No.";
                     TempStockkeepingUnit."Variant Code" := ItemLedgEntry."Variant Code";
                     TempStockkeepingUnit."Location Code" := ItemLedgEntry."Location Code";
-                    TempStockkeepingUnit.Insert;
+                    TempStockkeepingUnit.Insert();
                     exit(true);
                 end;
             DATABASE::"Sales Line":
@@ -177,22 +176,22 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
                     if SalesLine."No." = '' then
                         exit(false);
 
-                    TempStockkeepingUnit.Init;
+                    TempStockkeepingUnit.Init();
                     TempStockkeepingUnit."Item No." := SalesLine."No.";
                     TempStockkeepingUnit."Variant Code" := SalesLine."Variant Code";
                     TempStockkeepingUnit."Location Code" := SalesLine."Location Code";
-                    TempStockkeepingUnit.Insert;
+                    TempStockkeepingUnit.Insert();
 
                     DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogRecord."Entry No.", true, RecRef);
                     RecRef.SetTable(SalesLine);
                     if (SalesLine.Type = SalesLine.Type::Item) and (SalesLine."No." <> '') and
                       not TempStockkeepingUnit.Get(SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code")
                     then begin
-                        TempStockkeepingUnit.Init;
+                        TempStockkeepingUnit.Init();
                         TempStockkeepingUnit."Item No." := SalesLine."No.";
                         TempStockkeepingUnit."Variant Code" := SalesLine."Variant Code";
                         TempStockkeepingUnit."Location Code" := SalesLine."Location Code";
-                        TempStockkeepingUnit.Insert;
+                        TempStockkeepingUnit.Insert();
                     end;
                     exit(true);
                 end;
@@ -209,7 +208,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
         if TempStockkeepingUnit."Variant Code" = '' then begin
             ItemVariant.SetRange("Item No.", TempStockkeepingUnit."Item No.");
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst then
+            if ItemVariant.FindFirst() then
                 exit;
         end;
 
@@ -218,10 +217,10 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
         if NpCsStore.IsEmpty then
             exit;
 
-        NpCsStore.FindSet;
+        NpCsStore.FindSet();
         repeat
             RegisterStoreStock(NpCsStore, TempStockkeepingUnit);
-        until NpCsStore.Next = 0;
+        until NpCsStore.Next() = 0;
     end;
 
     local procedure RegisterStoreStock(NpCsStore: Record "NPR NpCs Store"; TempStockkeepingUnit: Record "Stockkeeping Unit" temporary)
@@ -239,9 +238,9 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
         Item.CalcFields(Inventory, "Qty. on Sales Order");
         StockQty := Item.Inventory - Item."Qty. on Sales Order";
 
-        NpCsStoreStockItem.LockTable;
+        NpCsStoreStockItem.LockTable();
         if not NpCsStoreStockItem.Get(NpCsStore.Code, TempStockkeepingUnit."Item No.", TempStockkeepingUnit."Variant Code") then begin
-            NpCsStoreStockItem.Init;
+            NpCsStoreStockItem.Init();
             NpCsStoreStockItem."Store Code" := NpCsStore.Code;
             NpCsStoreStockItem."Item No." := TempStockkeepingUnit."Item No.";
             NpCsStoreStockItem."Variant Code" := TempStockkeepingUnit."Variant Code";
@@ -252,7 +251,7 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
                 NpCsStoreStockItem."Stock Qty." := StockQty;
                 NpCsStoreStockItem.Modify(true);
             end;
-        Commit;
+        Commit();
     end;
 
     procedure InitStoreStockItems()
@@ -265,61 +264,60 @@ codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
             exit;
 
         NpCsStore.SetRange("Local Store", true);
-        if not NpCsStore.FindSet then
+        if not NpCsStore.FindSet() then
             exit;
         repeat
-            TempNpCsStore.Init;
+            TempNpCsStore.Init();
             TempNpCsStore := NpCsStore;
-            TempNpCsStore.Insert;
-        until NpCsStore.Next = 0;
+            TempNpCsStore.Insert();
+        until NpCsStore.Next() = 0;
 
-        if not Item.FindSet then
+        if not Item.FindSet() then
             exit;
 
         repeat
             InitStoreStockItem(TempNpCsStore, Item);
-        until Item.Next = 0;
+        until Item.Next() = 0;
     end;
 
     local procedure InitStoreStockItem(var TempNpCsStore: Record "NPR NpCs Store" temporary; Item: Record Item)
     var
         ItemVariant: Record "Item Variant";
         TempStockkeepingUnit: Record "Stockkeeping Unit" temporary;
-        NpCsStoreStockDataMgt: Codeunit "NPR NpCs Store Stock Data Mgt.";
     begin
         ItemVariant.SetRange("Item No.", Item."No.");
         ItemVariant.SetRange("NPR Blocked", false);
         if ItemVariant.IsEmpty then begin
-            TempNpCsStore.FindSet;
+            TempNpCsStore.FindSet();
             repeat
-                TempStockkeepingUnit.Init;
+                TempStockkeepingUnit.Init();
                 TempStockkeepingUnit."Item No." := Item."No.";
                 TempStockkeepingUnit."Variant Code" := '';
                 TempStockkeepingUnit."Location Code" := TempNpCsStore."Location Code";
                 RegisterStoreStock(TempNpCsStore, TempStockkeepingUnit);
-            until TempNpCsStore.Next = 0;
+            until TempNpCsStore.Next() = 0;
 
             exit;
         end;
 
-        ItemVariant.FindSet;
+        ItemVariant.FindSet();
         repeat
-            TempNpCsStore.FindSet;
+            TempNpCsStore.FindSet();
             repeat
-                TempStockkeepingUnit.Init;
+                TempStockkeepingUnit.Init();
                 TempStockkeepingUnit."Item No." := Item."No.";
                 TempStockkeepingUnit."Variant Code" := ItemVariant.Code;
                 TempStockkeepingUnit."Location Code" := TempNpCsStore."Location Code";
                 RegisterStoreStock(TempNpCsStore, TempStockkeepingUnit);
-            until TempNpCsStore.Next = 0;
-        until ItemVariant.Next = 0;
+            until TempNpCsStore.Next() = 0;
+        until ItemVariant.Next() = 0;
     end;
 
     local procedure StoreStockEnabled(): Boolean
     var
         NpCsStoreStockSetup: Record "NPR NpCs Store Stock Setup";
     begin
-        if not NpCsStoreStockSetup.Get then
+        if not NpCsStoreStockSetup.Get() then
             exit;
 
         exit(NpCsStoreStockSetup."Store Stock Enabled");

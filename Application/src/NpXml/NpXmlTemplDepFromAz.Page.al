@@ -24,7 +24,6 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
                     package: Text;
                     BaseUri: Text;
                     Secret: Text;
-                    test: text;
                 begin
                     BaseUri := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl');
                     Secret := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataSecret');
@@ -47,12 +46,12 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
                     SelectedValues := '';
                     RetailListPage.GetSelectionFilter(tmpRetailList);
                     tmpRetailList.MarkedOnly(true);
-                    if tmpRetailList.FindSet then
+                    if tmpRetailList.FindSet() then
                         repeat
                             if StrLen(SelectedValues) > 0 then
                                 SelectedValues += ',';
                             SelectedValues += tmpRetailList.Value;
-                        until tmpRetailList.Next = 0;
+                        until tmpRetailList.Next() = 0;
 
                     exit(true);
                 end;
@@ -70,7 +69,7 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
-                Image = Action; 
+                Image = Action;
 
                 trigger OnAction()
                 var

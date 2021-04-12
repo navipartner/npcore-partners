@@ -87,7 +87,6 @@ table 6151051 "NPR Item Hierarchy Level"
 
             trigger OnValidate()
             var
-                "Object": Record "Object";
                 AllObj: Record AllObjWithCaption;
             begin
                 if "Table No." <> 0 then begin

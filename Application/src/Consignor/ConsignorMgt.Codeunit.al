@@ -29,7 +29,7 @@ codeunit 6184601 "NPR Consignor Mgt."
         NpXmlTemplate.SetRange("Table No.", DATABASE::"NPR Consignor Entry");
         NpXmlTemplate.SetRange("Transaction Task", true);
         NpXmlTemplate.SetFilter("Task Processor Code", '<>%1', '');
-        if not NpXmlTemplate.FindFirst then
+        if not NpXmlTemplate.FindFirst() then
             exit;
 
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
@@ -38,10 +38,10 @@ codeunit 6184601 "NPR Consignor Mgt."
         if JobQueueEntry.IsEmpty then
             exit;
 
-        JobQueueEntry.FindSet;
+        JobQueueEntry.FindSet();
         repeat
             ScheduleJobQueueEntry(JobQueueEntry);
-        until JobQueueEntry.Next = 0;
+        until JobQueueEntry.Next() = 0;
     end;
 
     local procedure ScheduleJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")

@@ -15,32 +15,32 @@ page 6150729 "NPR POS Scenarios"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Publisher Codeunit ID"; "Publisher Codeunit ID")
+                field("Publisher Codeunit ID"; Rec."Publisher Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Publisher Codeunit ID field';
                 }
-                field("Publisher Codeunit Name"; "Publisher Codeunit Name")
+                field("Publisher Codeunit Name"; Rec."Publisher Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Publisher Codeunit Name field';
                 }
-                field("Publisher Function"; "Publisher Function")
+                field("Publisher Function"; Rec."Publisher Function")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Publisher Function field';
                 }
-                field(Control6014410; "Workflow Steps")
+                field(Control6014410; Rec."Workflow Steps")
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
@@ -59,7 +59,7 @@ page 6150729 "NPR POS Scenarios"
                 Caption = 'POS Scenario Steps';
                 Image = List;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Scenarios Steps";
@@ -74,7 +74,7 @@ page 6150729 "NPR POS Scenarios"
                 Ellipsis = true;
                 Image = AddAction;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -85,10 +85,10 @@ page 6150729 "NPR POS Scenarios"
                     StepsInitiated: Integer;
                 begin
                     CurrPage.SetSelectionFilter(POSSalesWorkflow);
-                    if POSSalesWorkflow.FindSet then
+                    if POSSalesWorkflow.FindSet() then
                         repeat
                             StepsInitiated += POSSalesWorkflow.InitPOSSalesWorkflowSteps();
-                        until POSSalesWorkflow.Next = 0;
+                        until POSSalesWorkflow.Next() = 0;
 
                     Message(Text000, StepsInitiated);
                 end;
@@ -98,7 +98,7 @@ page 6150729 "NPR POS Scenarios"
 
     trigger OnOpenPage()
     begin
-        OnDiscoverPOSSalesWorkflows();
+        Rec.OnDiscoverPOSSalesWorkflows();
     end;
 
     var

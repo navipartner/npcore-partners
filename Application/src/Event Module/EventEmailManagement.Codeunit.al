@@ -21,7 +21,7 @@ codeunit 6060153 "NPR Event Email Management"
             exit;
 
         Rec."NPR Mail Item Status" := Rec."NPR Mail Item Status"::" ";
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
@@ -52,7 +52,7 @@ codeunit 6060153 "NPR Event Email Management"
             exit;
 
         Rec."NPR Mail Item Status" := Rec."NPR Mail Item Status"::" ";
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     procedure SendEMail(var Job: Record Job; MailFor: Option Customer,Team; CalledFromFieldNo: Integer)
@@ -96,14 +96,13 @@ codeunit 6060153 "NPR Event Email Management"
             Job."NPR Mail Item Status" := Job."NPR Mail Item Status"::Error;
 
         if CalledFromFieldNo = 0 then
-            Job.Modify;
+            Job.Modify();
     end;
 
     procedure SendEmailFromLine(var JobPlanningLine: Record "Job Planning Line")
     var
         RecRef: RecordRef;
         Job: Record Job;
-        IncludeAttachment: Boolean;
     begin
         if not Confirm(ConfirmSendMail) then
             exit;
@@ -126,7 +125,7 @@ codeunit 6060153 "NPR Event Email Management"
         else
             JobPlanningLine."NPR Mail Item Status" := JobPlanningLine."NPR Mail Item Status"::Error;
 
-        JobPlanningLine.Modify;
+        JobPlanningLine.Modify();
     end;
 
     procedure ProcessMailItemWithLog(var RecRef: RecordRef; MailFor: Option Customer,Team): Boolean
@@ -154,9 +153,7 @@ codeunit 6060153 "NPR Event Email Management"
         BodyText: Text;
         MessageBody: DotNet NPRNetMessageBody;
         BodyType: DotNet NPRNetBodyType;
-        MailSubjectText: Label '%1 for event %2';
         FileName: Text;
-        MailBodyAddText: Label 'Attached you can find more details about the event.';
         ResourceGroup: Record "Resource Group";
         FileMgt: Codeunit "File Management";
         EMailTemplateHeader: Record "NPR E-mail Template Header";
@@ -175,7 +172,7 @@ codeunit 6060153 "NPR Event Email Management"
             DATABASE::"Job Planning Line":
                 begin
                     RecRef.SetTable(JobPlanningLine);
-                    JobPlanningLine.SetRecFilter;
+                    JobPlanningLine.SetRecFilter();
                     Job.Get(JobPlanningLine."Job No.");
                 end;
         end;
@@ -188,7 +185,7 @@ codeunit 6060153 "NPR Event Email Management"
             MailFor::Customer:
                 AddEMailRecipient(EmailMessage, 0, Job."NPR Bill-to E-Mail");
             MailFor::Team:
-                if JobPlanningLine.FindSet then
+                if JobPlanningLine.FindSet() then
                     repeat
                         AddEMailRecipient(EmailMessage, 0, JobPlanningLine."NPR Resource E-Mail");
                         if JobPlanningLine."Resource Group No." <> '' then begin
@@ -196,14 +193,14 @@ codeunit 6060153 "NPR Event Email Management"
                             if ResourceGroup."NPR E-Mail" <> '' then
                                 AddEMailRecipient(EmailMessage, 1, ResourceGroup."NPR E-Mail");
                         end;
-                    until JobPlanningLine.Next = 0;
+                    until JobPlanningLine.Next() = 0;
         end;
 
         if UseTemplate and (EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code")) then begin
             RecRef2.GetTable(Job);
             EmailMessage.Subject := EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject);
             EMailTemplateLine.SetRange("E-mail Template Code", EMailTemplateHeader.Code);
-            if EMailTemplateLine.FindSet then begin
+            if EMailTemplateLine.FindSet() then begin
                 BodyText := '<font face="Calibri">';
                 repeat
                     JobPlanningLineTickets.SetRange("Job No.", Job."No.");
@@ -215,16 +212,16 @@ codeunit 6060153 "NPR Event Email Management"
                         ParsedSuffix := CopyStr(ParsedLine, StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") + StrLen(EventExchIntTemplate."Ticket URL Placeholder(E-Mail)"));
                         ParsedLine := CopyStr(ParsedLine, 1, StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") - 1);
                         CollectedURLs := '';
-                        JobPlanningLineTickets.FindSet;
+                        JobPlanningLineTickets.FindSet();
                         repeat
                             if CollectedURLs <> '' then
                                 CollectedURLs += ', ';
                             CollectedURLs += '<a href="' + EventTicketMgt.GetTicketURL(JobPlanningLineTickets) + '">' + JobPlanningLineTickets.Description + '</a>';
-                        until JobPlanningLineTickets.Next = 0;
+                        until JobPlanningLineTickets.Next() = 0;
                         BodyText += ParsedLine + CollectedURLs + ParsedSuffix;
                     end else
                         BodyText += ParsedLine;
-                until EMailTemplateLine.Next = 0;
+                until EMailTemplateLine.Next() = 0;
                 BodyText += '</br></font>';
                 EmailMessage.Body := MessageBody.MessageBody(BodyType.HTML, BodyText);
             end;

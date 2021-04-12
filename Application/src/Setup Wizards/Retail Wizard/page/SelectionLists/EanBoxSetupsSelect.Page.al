@@ -13,17 +13,17 @@ page 6014699 "NPR Ean Box Setups Select"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("POS View"; "POS View")
+                field("POS View"; Rec."POS View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View field';

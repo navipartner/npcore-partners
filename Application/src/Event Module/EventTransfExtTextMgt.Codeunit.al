@@ -1,4 +1,4 @@
-codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
+﻿codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
 {
     var
         GLAcc: Record "G/L Account";
@@ -89,7 +89,7 @@ codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
         if JobPlanningLine2.Find('>') then begin
             repeat
                 JobPlanningLine2.Delete(true);
-            until JobPlanningLine2.Next = 0;
+            until JobPlanningLine2.Next() = 0;
             exit(true);
         end;
     end;
@@ -126,11 +126,11 @@ codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
         ExtTextLine.SetRange("Language Code", ExtTextHeader."Language Code");
         ExtTextLine.SetRange("Text No.", ExtTextHeader."Text No.");
         if ExtTextLine.Find('-') then begin
-            TmpExtTextLine.DeleteAll;
+            TmpExtTextLine.DeleteAll();
             repeat
                 TmpExtTextLine := ExtTextLine;
-                TmpExtTextLine.Insert;
-            until ExtTextLine.Next = 0;
+                TmpExtTextLine.Insert();
+            until ExtTextLine.Next() = 0;
             exit(true);
         end;
     end;
@@ -139,14 +139,14 @@ codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
     var
         ToJobPlanningLine: Record "Job Planning Line";
     begin
-        ToJobPlanningLine.Reset;
+        ToJobPlanningLine.Reset();
         ToJobPlanningLine.SetRange("Job No.", JobPlanningLine."Job No.");
         ToJobPlanningLine.SetRange("Job Task No.", JobPlanningLine."Job Task No.");
         ToJobPlanningLine := JobPlanningLine;
         if ToJobPlanningLine.Find('>') then begin
             LineSpacing :=
               (ToJobPlanningLine."Line No." - JobPlanningLine."Line No.") div
-              (1 + TmpExtTextLine.Count);
+              (1 + TmpExtTextLine.Count());
             if LineSpacing = 0 then
                 Error(Text000);
         end else
@@ -154,10 +154,10 @@ codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
 
         NextLineNo := JobPlanningLine."Line No." + LineSpacing;
 
-        TmpExtTextLine.Reset;
+        TmpExtTextLine.Reset();
         if TmpExtTextLine.Find('-') then begin
             repeat
-                ToJobPlanningLine.Init;
+                ToJobPlanningLine.Init();
                 ToJobPlanningLine."Job No." := JobPlanningLine."Job No.";
                 ToJobPlanningLine."Job Task No." := JobPlanningLine."Job Task No.";
                 ToJobPlanningLine."Line No." := NextLineNo;
@@ -167,11 +167,11 @@ codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
                 ToJobPlanningLine."NPR Att. to Line No." := JobPlanningLine."Line No.";
                 ToJobPlanningLine."Line Type" := JobPlanningLine."Line Type";
                 ToJobPlanningLine."Planning Date" := JobPlanningLine."Planning Date";
-                ToJobPlanningLine.Insert;
-            until TmpExtTextLine.Next = 0;
+                ToJobPlanningLine.Insert();
+            until TmpExtTextLine.Next() = 0;
             MakeUpdateRequired := true;
         end;
-        TmpExtTextLine.DeleteAll;
+        TmpExtTextLine.DeleteAll();
     end;
 
     local procedure IsDeleteAttachedLines(LineNo: Integer; No: Code[20]; AttachedToLineNo: Integer): Boolean

@@ -31,13 +31,13 @@ table 6151121 "NPR GDPR Agreement"
         }
         field(1000; "Latest Version"; Integer)
         {
-            CalcFormula = Max ("NPR GDPR Agreement Version".Version WHERE("No." = FIELD("No.")));
+            CalcFormula = Max("NPR GDPR Agreement Version".Version WHERE("No." = FIELD("No.")));
             Caption = 'Latest Version';
             FieldClass = FlowField;
         }
         field(1001; "Current Version"; Integer)
         {
-            CalcFormula = Max ("NPR GDPR Agreement Version".Version WHERE("No." = FIELD("No."),
+            CalcFormula = Max("NPR GDPR Agreement Version".Version WHERE("No." = FIELD("No."),
                                                                       "Activation Date" = FIELD(UPPERLIMIT("Date Filter"))));
             Caption = 'Current Version';
             FieldClass = FlowField;
@@ -76,11 +76,11 @@ table 6151121 "NPR GDPR Agreement"
         if (Format("Anonymize After") = '') then
             Evaluate("Anonymize After", '<+0D>');
 
-        GDPRAgreementVersion.Init;
+        GDPRAgreementVersion.Init();
         GDPRAgreementVersion."No." := "No.";
         GDPRAgreementVersion.Version := 1;
         GDPRAgreementVersion.Description := Description;
-        GDPRAgreementVersion."Activation Date" := Today;
+        GDPRAgreementVersion."Activation Date" := Today();
         GDPRAgreementVersion."Anonymize After" := "Anonymize After";
         GDPRAgreementVersion.Insert();
     end;

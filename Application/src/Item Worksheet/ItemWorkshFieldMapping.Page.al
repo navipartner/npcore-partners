@@ -5,7 +5,7 @@ page 6060057 "NPR Item Worksh. Field Mapping"
     PopulateAllFields = true;
     SourceTable = "NPR Item Worksh. Field Mapping";
     UsageCategory = Lists;
-    ApplicationArea = All; 
+    ApplicationArea = All;
 
     layout
     {

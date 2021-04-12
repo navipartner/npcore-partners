@@ -1,4 +1,4 @@
-﻿page 6014418 "NPR Aux. Value Entries"
+page 6014418 "NPR Aux. Value Entries"
 {
     Caption = 'Value Entries';
     PageType = List;

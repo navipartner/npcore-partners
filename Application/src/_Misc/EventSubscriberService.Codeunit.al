@@ -50,9 +50,9 @@ codeunit 6014457 "NPR Event Subscriber (Service)"
         HostName: Text;
     begin
         HostName := '';
-        if not DependencyMagtSetup.Get then begin
-            DependencyMagtSetup.Init;
-            DependencyMagtSetup.Insert;
+        if not DependencyMagtSetup.Get() then begin
+            DependencyMagtSetup.Init();
+            DependencyMagtSetup.Insert();
         end;
         ServiceConnection.InsertServiceConnection(
             ServiceConnection, DependencyMagtSetup.RecordId, ServiceNameDepMgtLbl,

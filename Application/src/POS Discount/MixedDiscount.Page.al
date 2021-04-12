@@ -1,4 +1,4 @@
-page 6014450 "NPR Mixed Discount"
+﻿page 6014450 "NPR Mixed Discount"
 {
     Caption = 'Mix Discount';
     PageType = Card;
@@ -30,7 +30,7 @@ page 6014450 "NPR Mixed Discount"
                                 trigger OnAssistEdit()
                                 begin
                                     if Rec.Assistedit(xRec) then
-                                        CurrPage.Update;
+                                        CurrPage.Update();
                                 end;
                             }
                             field(Description; Rec.Description)
@@ -207,7 +207,7 @@ page 6014450 "NPR Mixed Discount"
 
                                         trigger OnValidate()
                                         begin
-                                            CurrPage.Update;
+                                            CurrPage.Update();
                                         end;
                                     }
                                 }
@@ -424,8 +424,8 @@ page 6014450 "NPR Mixed Discount"
                         begin
                             Clear(ItemList);
                             ItemList.LookupMode := true;
-                            if (ItemList.RunModal = ACTION::LookupOK) then begin
-                                Item.Reset;
+                            if (ItemList.RunModal() = ACTION::LookupOK) then begin
+                                Item.Reset();
                                 ItemList.GetRecord(Item);
                                 Item.SetRange("No.", Item."No.");
                                 TransferToMix();
@@ -446,8 +446,8 @@ page 6014450 "NPR Mixed Discount"
                         begin
                             Clear(ItemCategories);
                             ItemCategories.LookupMode := true;
-                            if (ItemCategories.RunModal = ACTION::LookupOK) then begin
-                                Item.Reset;
+                            if (ItemCategories.RunModal() = ACTION::LookupOK) then begin
+                                Item.Reset();
                                 ItemCategories.GetRecord(ItemCategory);
                                 Item.SetRange("Item Category Code", ItemCategory.Code);
                                 TransferToMix();
@@ -468,9 +468,9 @@ page 6014450 "NPR Mixed Discount"
                         begin
                             Clear(KreditorForm);
                             KreditorForm.LookupMode := true;
-                            if (KreditorForm.RunModal = ACTION::LookupOK) then begin
+                            if (KreditorForm.RunModal() = ACTION::LookupOK) then begin
                                 KreditorForm.GetRecord(Kreditor);
-                                Item.Reset;
+                                Item.Reset();
                                 Item.SetRange("Vendor No.", Kreditor."No.");
                                 TransferToMix();
                             end;
@@ -487,7 +487,7 @@ page 6014450 "NPR Mixed Discount"
                         var
                             MsgOkCancel: Label 'Transfer all items to this mix?';
                         begin
-                            Item.Reset;
+                            Item.Reset();
                             if DIALOG.Confirm(MsgOkCancel, false) then
                                 TransferToMix();
                         end;
@@ -520,7 +520,7 @@ page 6014450 "NPR Mixed Discount"
                     var
                         RetailJournalMgt: Codeunit "NPR Retail Journal Code";
                     begin
-                        RetailJournalMgt.Mix2RetailJnl(Code, '');
+                        RetailJournalMgt.Mix2RetailJnl(Rec.Code, '');
                     end;
                 }
                 action("Copy campaign to Department Code")
@@ -617,8 +617,8 @@ page 6014450 "NPR Mixed Discount"
             exit;
 
         Clear(ItemDiscGrpRec);
-        ItemDiscGrpRec.Init;
-        ItemDiscGrpRec.Code := Code;
+        ItemDiscGrpRec.Init();
+        ItemDiscGrpRec.Code := Rec.Code;
         ItemDiscGrpRec.Description := CopyStr(TxtCompressItems, 1, MaxStrLen(ItemDiscGrpRec.Description));
         if ItemDiscGrpRec.Insert(true) then;
 
@@ -628,7 +628,7 @@ page 6014450 "NPR Mixed Discount"
         if MixedDiscountLine.Find('-') then
             repeat
                 if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::Item then begin
-                    Item.Reset;
+                    Item.Reset();
                     if Item.Get(MixedDiscountLine."No.") then
                         if not Item."NPR Group sale" then begin
                             Item."Item Disc. Group" := Rec.Code;
@@ -643,7 +643,7 @@ page 6014450 "NPR Mixed Discount"
 
         MixedDiscountLine.ClearMarks;
         Clear(MixedDiscountLine);
-        MixedDiscountLine.Init;
+        MixedDiscountLine.Init();
         MixedDiscountLine.Validate(Code, Rec.Code);
         MixedDiscountLine."Disc. Grouping Type" := MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group";
         MixedDiscountLine."No." := Rec.Code;
@@ -667,7 +667,6 @@ page 6014450 "NPR Mixed Discount"
     var
         FieldRef: FieldRef;
         KeyRef: KeyRef;
-        i: Integer;
     begin
         KeyRef := RecRef.KeyIndex(1);
         FieldRef := KeyRef.FieldIndex(KeyRef.FieldCount);
@@ -690,7 +689,6 @@ page 6014450 "NPR Mixed Discount"
 
     local procedure RunDynamicRequestPage(Caption: Text; var RecRef: RecordRef): Boolean
     var
-        TableMetadata: Record "Table Metadata";
         TempBlob: Codeunit "Temp Blob";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
@@ -703,12 +701,12 @@ page 6014450 "NPR Mixed Discount"
             exit(false);
         FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView);
         FilterPageBuilder.PageCaption := Caption;
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number);
 
-        RecRef.Reset;
+        RecRef.Reset();
         if ReturnFilters <> '' then begin
             Clear(TempBlob);
             TempBlob.CreateOutStream(OutStream);
@@ -738,8 +736,6 @@ page 6014450 "NPR Mixed Discount"
 
     local procedure UpdateFiltersOnCurrRec(FilterFieldNo: Integer; RecRef: RecordRef)
     var
-        CustomerDiscountGroup: Record "Customer Discount Group";
-        DimensionValue: Record "Dimension Value";
         CurrRecRef: RecordRef;
         CurrFieldRef: FieldRef;
         PrimaryKeyFilter: Text;
@@ -753,9 +749,9 @@ page 6014450 "NPR Mixed Discount"
             exit;
         end;
 
-        RecRef.FindSet;
+        RecRef.FindSet();
         PrimaryKeyFilter := GetPrimaryKeyValue(RecRef);
-        while RecRef.Next <> 0 do
+        while RecRef.Next() <> 0 do
             PrimaryKeyFilter += '|' + GetPrimaryKeyValue(RecRef);
 
         CurrFieldRef.Value := CopyStr(PrimaryKeyFilter, 1, CurrFieldRef.Length);

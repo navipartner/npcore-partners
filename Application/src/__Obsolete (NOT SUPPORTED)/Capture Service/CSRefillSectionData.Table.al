@@ -2,9 +2,9 @@ table 6151365 "NPR CS Refill Section Data"
 {
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
-   
+
 
 
     fields

@@ -34,7 +34,7 @@ xmlport 6151189 "NPR MM Loyalty Delete Coupont"
                     trigger OnBeforeInsertRecord()
                     begin
 
-                        tmpMemberInfoCapture."Document Date" := Today;
+                        tmpMemberInfoCapture."Document Date" := Today();
                     end;
                 }
 
@@ -73,11 +73,6 @@ xmlport 6151189 "NPR MM Loyalty Delete Coupont"
     end;
 
     procedure AddResponse(ResponseMessageIn: Text);
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        Member: Record "NPR MM Member";
-        MembershipRole: Record "NPR MM Membership Role";
     begin
         responsemessage := ResponseMessageIn;
         responsecode := 'OK';

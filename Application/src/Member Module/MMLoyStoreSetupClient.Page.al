@@ -14,42 +14,42 @@ page 6151162 "NPR MM Loy. Store Setup Client"
         {
             repeater(Group)
             {
-                field("Store Code"; "Store Code")
+                field("Store Code"; Rec."Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Code field';
                 }
-                field("Unit Code"; "Unit Code")
+                field("Unit Code"; Rec."Unit Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Code field';
                 }
-                field(Setup; Setup)
+                field(Setup; Rec.Setup)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Setup field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Authorization Code"; "Authorization Code")
+                field("Authorization Code"; Rec."Authorization Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Authorization Code field';
                 }
-                field("Accept Client Transactions"; "Accept Client Transactions")
+                field("Accept Client Transactions"; Rec."Accept Client Transactions")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Accept Client Transactions field';
                 }
-                field("POS Payment Method Code"; "POS Payment Method Code")
+                field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Method Code field';
                 }
-                field("Store Endpoint Code"; "Store Endpoint Code")
+                field("Store Endpoint Code"; Rec."Store Endpoint Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Endpoint Code field';

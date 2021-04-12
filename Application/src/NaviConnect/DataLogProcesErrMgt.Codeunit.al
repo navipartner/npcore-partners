@@ -19,13 +19,13 @@ codeunit 6059897 "NPR Data Log Proces. Err. Mgt."
         if LastErrorText = '' then
             exit;
 
-        DataLogProcessingEntry.Find;
+        DataLogProcessingEntry.Find();
         Clear(DataLogProcessingEntry."Error Message");
         DataLogProcessingEntry."Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
         OutStr.WriteText(LastErrorText);
         DataLogProcessingEntry."Processing Completed at" := CurrentDateTime;
         DataLogProcessingEntry.Modify(true);
-        Commit;
+        Commit();
     end;
 
     local procedure RunFailureCodeunit(var DataLogProcessingEntry: Record "NPR Data Log Processing Entry")
@@ -42,7 +42,7 @@ codeunit 6059897 "NPR Data Log Proces. Err. Mgt."
         if not DataLogRecord.Get(DataLogProcessingEntry."Data Log Entry No.") then
             exit;
 
-        Commit;
+        Commit();
         CODEUNIT.Run(DataLogSubscriber."Failure Codeunit ID", DataLogRecord);
     end;
 }

@@ -18,7 +18,7 @@ page 6150674 "NPR POS Prepaym. Invoices"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
@@ -27,16 +27,16 @@ page 6150674 "NPR POS Prepaym. Invoices"
                     var
                         SalesInvoiceHeader: Record "Sales Invoice Header";
                     begin
-                        SalesInvoiceHeader.Get("No.");
+                        SalesInvoiceHeader.Get(Rec."No.");
                         PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                     end;
                 }
-                field("Due Date"; "Due Date")
+                field("Due Date"; Rec."Due Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Due Date field';
                 }
-                field("Amount Including VAT"; "Amount Including VAT")
+                field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
@@ -75,13 +75,13 @@ page 6150674 "NPR POS Prepaym. Invoices"
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         FullyPaid := false;
-        RemainingAmount := "Amount Including VAT";
+        RemainingAmount := Rec."Amount Including VAT";
 
         CustLedgerEntry.SetAutoCalcFields("Remaining Amt. (LCY)");
-        CustLedgerEntry.SetRange("Customer No.", "Bill-to Customer No.");
-        CustLedgerEntry.SetRange("Document No.", "No.");
+        CustLedgerEntry.SetRange("Customer No.", Rec."Bill-to Customer No.");
+        CustLedgerEntry.SetRange("Document No.", Rec."No.");
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
-        if not CustLedgerEntry.FindFirst then
+        if not CustLedgerEntry.FindFirst() then
             exit;
 
         RemainingAmount := CustLedgerEntry."Remaining Amt. (LCY)";

@@ -17,18 +17,18 @@ page 6059797 "NPR E-mail Attachments"
             repeater(Group)
             {
                 Caption = 'Files';
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Attached File"; "Attached File")
+                field("Attached File"; Rec."Attached File")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attached data field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

@@ -1,4 +1,4 @@
-page 6060117 "NPR TM Ticket Acs. Stat.Lines"
+﻿page 6060117 "NPR TM Ticket Acs. Stat.Lines"
 {
     Caption = 'Ticket Access Stat. Lines';
     Editable = false;
@@ -181,8 +181,6 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
     }
 
     trigger OnAfterGetRecord()
-    var
-        MATRIX_CurrentColumnOrdinal: Integer;
     begin
 
         LINE_Total := DisplayCellValue(0, 0, false);
@@ -191,7 +189,6 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
     trigger OnFindRecord(Which: Text): Boolean
     var
         Found: Boolean;
-        MATRIX_CurrentColumnOrdinal: Integer;
     begin
         Found := TicketAdmissionStatisticsMgr.FindRec(LineFactOption, Rec, Which, TicketFactLineFilter, PeriodType, PeriodFilter, PeriodInitialized, InternalDateFilter);
         if (Found) then
@@ -203,7 +200,6 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
     trigger OnNextRecord(Steps: Integer): Integer
     var
         Step: Integer;
-        MATRIX_CurrentColumnOrdinal: Integer;
     begin
         repeat
             Step := TicketAdmissionStatisticsMgr.NextRec(LineFactOption, Rec, Steps, TicketFactLineFilter, PeriodType, PeriodFilter);
@@ -222,7 +218,6 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         MATRIX_MaxNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[12] of Text[80];
         MATRIX_CaptionSet: array[32] of Text[80];
-        MATRIX_Step: Option Initial,Previous,Same,Next;
         LINE_Total: Text[80];
         TicketAdmissionStatisticsMgr: Codeunit "NPR TM Ticket Access Stats";
         TicketStatisticsFilter: Record "NPR TM Ticket Access Stats";
@@ -298,7 +293,7 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         PeriodType := pPeriodType;
         AdmissionDefinition := pAdmissionDefinition;
 
-        TicketFactLineFilter.Reset;
+        TicketFactLineFilter.Reset();
         case LineFactOption of
             LineFactOption::ITEM:
                 TicketFactLineFilter.SetFilter("Fact Code", ItemFactFilter);

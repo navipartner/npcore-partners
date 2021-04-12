@@ -8,7 +8,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     var
         XRootElement: XmlElement;
         XNodeParent: XmlNode;
-        XNode: XmlNode;
     begin
         XmlDoc.GetRoot(XRootElement);
         if XRootElement.IsEmpty then
@@ -27,7 +26,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
         XDataElement := XmlElement.Create(Name);
         XRootElement.Add(XDataElement);
-        exit(not XDataElement.IsEmpty);
+        exit(not XDataElement.IsEmpty());
     end;
 
     procedure AddContainer(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250])
@@ -85,8 +84,8 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         MagentoNpXmlSetupMgt: Codeunit "NPR Magento NpXml Setup Mgt";
         RecRef: RecordRef;
     begin
-        MagentoSetup.Get;
-        if MagentoSetup."Generic Setup".HasValue then
+        MagentoSetup.Get();
+        if MagentoSetup."Generic Setup".HasValue() then
             MagentoSetup.CalcFields("Generic Setup");
 
         TempBlob.FromRecord(MagentoSetup, MagentoSetup.FieldNo("Generic Setup"));
@@ -97,7 +96,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         TempBlob.ToRecordRef(RecRef, MagentoSetup.FieldNo("Generic Setup"));
         RecRef.SetTable(MagentoSetup);
 
-        MagentoSetup.Modify;
+        MagentoSetup.Modify();
     end;
 
     local procedure InitGenericSetup(var TempBlob: Codeunit "Temp Blob")
@@ -105,7 +104,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XmlDoc: XmlDocument;
         OutStream: OutStream;
     begin
-        if TempBlob.HasValue then
+        if TempBlob.HasValue() then
             exit;
 
         XmlDocument.ReadFrom('<?xml version="1.0" encoding="UTF-8"?>' +
@@ -122,10 +121,9 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XElement2: XmlElement;
         XNodeList: XmlNodeList;
         XNode: XmlNode;
-        i: Integer;
     begin
         LineNo += 10000;
-        TempGenericSetupBuffer.Init;
+        TempGenericSetupBuffer.Init();
         TempGenericSetupBuffer."Line No." := LineNo;
         TempGenericSetupBuffer.Name := XmlElement.Name;
         TempGenericSetupBuffer."Node Path" := TempGenericSetupBuffer.Name;
@@ -138,7 +136,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         end;
 
         TempGenericSetupBuffer.Level := Level;
-        TempGenericSetupBuffer.Insert;
+        TempGenericSetupBuffer.Insert();
 
         ParentNodePath := TempGenericSetupBuffer."Node Path";
         if TempGenericSetupBuffer.Container then begin
@@ -159,12 +157,10 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XNode: XmlNode;
         XNodeList: XmlNodeList;
         XElement: XmlElement;
-        InStream: InStream;
         OutStream: OutStream;
         LineNo: Integer;
-        i: Integer;
     begin
-        TempGenericSetupBuffer.DeleteAll;
+        TempGenericSetupBuffer.DeleteAll();
         if not LoadGenericSetup(TempBlob, XmlDoc) then
             exit;
 
@@ -183,11 +179,11 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         PAGE.RunModal(PAGE::"NPR Magento Gen. Setup Buffer", TempGenericSetupBuffer);
 
         TempGenericSetupBuffer.SetRange(Container, false);
-        if TempGenericSetupBuffer.FindSet then
+        if TempGenericSetupBuffer.FindSet() then
             repeat
                 XNodeRoot.SelectSingleNode(TempGenericSetupBuffer."Node Path", XNode); //xPath must be used.
                 XNode.AsXmlElement().Add(TempGenericSetupBuffer.Value);
-            until TempGenericSetupBuffer.Next = 0;
+            until TempGenericSetupBuffer.Next() = 0;
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
         XmlDoc.WriteTo(OutStream);
@@ -200,7 +196,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         RecRef: RecordRef;
     begin
         InitGenericMagentoSetup(MagentoSetup);
-        Commit;
+        Commit();
         TempBlob.FromRecord(MagentoSetup, MagentoSetup.FieldNo("Generic Setup"));
         EditGenericSetup(TempBlob, NodePath);
 
@@ -215,7 +211,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     procedure LookupGenericSetup(var TempBlob: Codeunit "Temp Blob"; RootNodePath: Text): Text
     var
         TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary;
-        GenericSetupBuffer: Page "NPR Magento Gen. Setup Buffer";
     begin
         LoadGenericSetupBuffer(TempBlob, RootNodePath, TempGenericSetupBuffer);
         if PAGE.RunModal(PAGE::"NPR Magento Gen. Setup Buffer", TempGenericSetupBuffer) <> ACTION::LookupOK then
@@ -275,7 +270,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     var
         InStream: InStream;
     begin
-        if not TempBlob.HasValue then
+        if not TempBlob.HasValue() then
             exit(false);
 
         TempBlob.CreateInStream(InStream);
@@ -290,10 +285,9 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XNode: XmlNode;
         XNodeList: XmlNodeList;
         XElement: XmlElement;
-        i: Integer;
         LineNo: Integer;
     begin
-        TempGenericSetupBuffer.DeleteAll;
+        TempGenericSetupBuffer.DeleteAll();
         InitGenericSetup(TempBlob);
         if not LoadGenericSetup(TempBlob, XmlDoc) then
             exit;
@@ -390,7 +384,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     var
         XElement: XmlElement;
         XNodeList: XmlNodeList;
-        i: Integer;
     begin
         if not XNode.SelectNodes('child::*', XNodeList) then
             exit(true);
@@ -411,7 +404,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XmlDoc: XmlDocument;
         OutStream: OutStream;
     begin
-        if not (MagentoSetup.Get and (MagentoSetup."Variant System" in [MagentoSetup."Variant System"::Variety])) then
+        if not (MagentoSetup.Get() and (MagentoSetup."Variant System" in [MagentoSetup."Variant System"::Variety])) then
             exit('');
 
         SetupDimensionBuffer(XmlDoc);
@@ -450,7 +443,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         if not OpenRecRef(VarietyTableNo, RecRef) then
             exit(false);
 
-        if not RecRef.FindSet then
+        if not RecRef.FindSet() then
             exit(false);
 
         VarietyDescriptionFieldNo := 10;
@@ -459,7 +452,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
             if OpenFieldRef(RecRef, VarietyDescriptionFieldNo, FieldRef) and OpenFieldRef(RecRef, VarietyCodeFieldNo, FieldRef2) then
                 if (Format(FieldRef.Value) <> '') and (Format(FieldRef2.Value) <> '') then
                     AddFieldText(XmlDoc, "ElementName.VariantDimension", Format(FieldRef.Value), Format(FieldRef2.Value));
-        until RecRef.Next = 0;
+        until RecRef.Next() = 0;
 
         exit(true);
     end;

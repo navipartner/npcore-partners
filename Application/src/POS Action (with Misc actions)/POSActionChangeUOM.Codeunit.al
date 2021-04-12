@@ -41,7 +41,7 @@ codeunit 6151140 "NPR POS Action: Change UOM"
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -68,7 +68,7 @@ codeunit 6151140 "NPR POS Action: Change UOM"
         UnitsofMeasure.Editable(false);
         UnitsofMeasure.LookupMode(true);
         UnitsofMeasure.SetTableView(UnitofMeasure);
-        if UnitsofMeasure.RunModal <> ACTION::LookupOK then
+        if UnitsofMeasure.RunModal() <> ACTION::LookupOK then
             exit;
 
         UnitsofMeasure.GetRecord(UnitofMeasure);
@@ -88,10 +88,10 @@ codeunit 6151140 "NPR POS Action: Change UOM"
     begin
         ItemUnitofMeasure.SetRange("Item No.", ItemNo);
 
-        if ItemUnitofMeasure.FindSet then
+        if ItemUnitofMeasure.FindSet() then
             repeat
                 Codes += '|' + ItemUnitofMeasure.Code;
-            until ItemUnitofMeasure.Next = 0;
+            until ItemUnitofMeasure.Next() = 0;
 
         Codes := CopyStr(Codes, 2);
     end;

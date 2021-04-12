@@ -86,7 +86,7 @@ table 6014493 "NPR Arch. NpRv SL POS Ref."
             exit;
 
         Voucher.SetRange("Reference No.", "Reference No.");
-        if Voucher.FindFirst then
+        if Voucher.FindFirst() then
             Error(Text000, "Reference No.");
     end;
 }

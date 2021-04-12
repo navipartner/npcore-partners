@@ -1,4 +1,4 @@
-codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
+﻿codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
 {
     TableNo = "Sales Header";
 
@@ -29,57 +29,52 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
     var
         SalesSetup: Record "Sales & Receivables Setup";
         DocSendProfile: Record "Document Sending Profile";
-        CustomerVar: Record Customer;
         SalesPostViaJobQueue: Codeunit "Sales Post via Job Queue";
         SendReportAsEmail: Boolean;
     begin
-        with SalesHeader do begin
-            case "Document Type" of
-                "Document Type"::Order:
-                    begin
-                        Selection := StrMenu(Text000, 3);
-                        if Selection = 0 then
-                            exit;
-                        Ship := Selection in [1, 3];
-                        Invoice := Selection in [2, 3];
-                    end;
-                "Document Type"::"Return Order":
-                    begin
-                        Selection := StrMenu(Text002, 3);
-                        if Selection = 0 then
-                            exit;
-                        Receive := Selection in [1, 3];
-                        Invoice := Selection in [2, 3];
-                    end
-                else
-                    if not Confirm(ConfirmationMessage, false, "Document Type") then
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                begin
+                    Selection := StrMenu(Text000, 3);
+                    if Selection = 0 then
                         exit;
-            end;
-
-            "Print Posted Documents" := true;
-
-            DocSendProfile.GetDefaultForCustomer("Bill-to Customer No.", DocSendProfile);
-            SendReportAsEmail := DocSendProfile."E-Mail" <> DocSendProfile."E-Mail"::No;
-
-            SalesSetup.Get;
-            if SalesSetup."Post & Print with Job Queue" and not SendReportAsEmail then
-                SalesPostViaJobQueue.EnqueueSalesDoc(SalesHeader)
-            else begin
-                CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
-                Mode := Mode::Standard;
-                GetReport(SalesHeader);
-            end;
-            Commit;
+                    SalesHeader.Ship := Selection in [1, 3];
+                    SalesHeader.Invoice := Selection in [2, 3];
+                end;
+            SalesHeader."Document Type"::"Return Order":
+                begin
+                    Selection := StrMenu(Text002, 3);
+                    if Selection = 0 then
+                        exit;
+                    SalesHeader.Receive := Selection in [1, 3];
+                    SalesHeader.Invoice := Selection in [2, 3];
+                end
+            else
+                if not Confirm(ConfirmationMessage, false, SalesHeader."Document Type") then
+                    exit;
         end;
+
+        SalesHeader."Print Posted Documents" := true;
+
+        DocSendProfile.GetDefaultForCustomer(SalesHeader."Bill-to Customer No.", DocSendProfile);
+        SendReportAsEmail := DocSendProfile."E-Mail" <> DocSendProfile."E-Mail"::No;
+
+        SalesSetup.Get();
+        if SalesSetup."Post & Print with Job Queue" and not SendReportAsEmail then
+            SalesPostViaJobQueue.EnqueueSalesDoc(SalesHeader)
+        else begin
+            CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
+            Mode := Mode::Standard;
+            GetReport(SalesHeader);
+        end;
+        Commit();
     end;
 
     procedure GetReport(var SalesHeader2: Record "Sales Header")
     var
-        CustomReportSelection: Record "Custom Report Selection";
-        CustomReportID: Integer;
         OrderPrinted: Boolean;
     begin
-        Commit;
+        Commit();
 
         SalesHeader.Copy(SalesHeader2);
 
@@ -87,73 +82,72 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
             Mode::PrepaymentInvoice:
                 begin
                     SalesInvHeader."No." := SalesHeader."Last Prepayment No.";
-                    SalesInvHeader.SetRecFilter;
+                    SalesInvHeader.SetRecFilter();
                     HandleReport(ReportSelection.Usage::"S.Invoice");
                 end;
             Mode::PrepaymentCreditMemo:
                 begin
                     SalesCrMemoHeader."No." := SalesHeader."Last Prepmt. Cr. Memo No.";
-                    SalesCrMemoHeader.SetRecFilter;
+                    SalesCrMemoHeader.SetRecFilter();
                     HandleReport(ReportSelection.Usage::"S.Cr.Memo");
                 end;
             Mode::Standard:
                 begin
-                    with SalesHeader do
-                        case "Document Type" of
-                            "Document Type"::Order:
-                                begin
-                                    if Ship then begin
-                                        SalesShptHeader."No." := "Last Shipping No.";
-                                        SalesShptHeader.SetRecFilter;
-                                        OrderPrinted := HandleReport(ReportSelection.Usage::"S.Shipment");
-                                    end;
-                                    if IsPrintingBothDocumentsForNonWindowsClient(Ship and Invoice and OrderPrinted) then
-                                        if not Confirm(DownloadInvoiceAlsoQst, true) then
-                                            exit;
-                                    if Invoice then begin
-                                        SalesInvHeader."No." := "Last Posting No.";
-                                        SalesInvHeader.SetRecFilter;
-                                        HandleReport(ReportSelection.Usage::"S.Invoice");
-                                    end;
+                    case SalesHeader."Document Type" of
+                        SalesHeader."Document Type"::Order:
+                            begin
+                                if SalesHeader.Ship then begin
+                                    SalesShptHeader."No." := SalesHeader."Last Shipping No.";
+                                    SalesShptHeader.SetRecFilter();
+                                    OrderPrinted := HandleReport(ReportSelection.Usage::"S.Shipment");
                                 end;
-                            "Document Type"::Invoice:
-                                begin
-                                    if "Last Posting No." = '' then
-                                        SalesInvHeader."No." := "No."
-                                    else
-                                        SalesInvHeader."No." := "Last Posting No.";
-                                    SalesInvHeader.SetRecFilter;
-
+                                if IsPrintingBothDocumentsForNonWindowsClient(SalesHeader.Ship and SalesHeader.Invoice and OrderPrinted) then
+                                    if not Confirm(DownloadInvoiceAlsoQst, true) then
+                                        exit;
+                                if SalesHeader.Invoice then begin
+                                    SalesInvHeader."No." := SalesHeader."Last Posting No.";
+                                    SalesInvHeader.SetRecFilter();
                                     HandleReport(ReportSelection.Usage::"S.Invoice");
                                 end;
-                            "Document Type"::"Return Order":
-                                begin
-                                    if Receive then begin
-                                        ReturnRcptHeader."No." := "Last Return Receipt No.";
-                                        ReturnRcptHeader.SetRecFilter;
-                                        OrderPrinted := HandleReport(ReportSelection.Usage::"S.Ret.Rcpt.");
-                                    end;
-                                    if IsPrintingBothDocumentsForNonWindowsClient(Ship and Invoice and OrderPrinted) then
-                                        if not Confirm(DownloadCrMemoAlsoQst, true) then
-                                            exit;
-                                    if Invoice then begin
-                                        SalesCrMemoHeader."No." := "Last Posting No.";
-                                        SalesCrMemoHeader.SetRecFilter;
+                            end;
+                        SalesHeader."Document Type"::Invoice:
+                            begin
+                                if SalesHeader."Last Posting No." = '' then
+                                    SalesInvHeader."No." := SalesHeader."No."
+                                else
+                                    SalesInvHeader."No." := SalesHeader."Last Posting No.";
+                                SalesInvHeader.SetRecFilter();
 
-                                        HandleReport(ReportSelection.Usage::"S.Cr.Memo");
-                                    end;
+                                HandleReport(ReportSelection.Usage::"S.Invoice");
+                            end;
+                        SalesHeader."Document Type"::"Return Order":
+                            begin
+                                if SalesHeader.Receive then begin
+                                    ReturnRcptHeader."No." := SalesHeader."Last Return Receipt No.";
+                                    ReturnRcptHeader.SetRecFilter();
+                                    OrderPrinted := HandleReport(ReportSelection.Usage::"S.Ret.Rcpt.");
                                 end;
-                            "Document Type"::"Credit Memo":
-                                begin
-                                    if "Last Posting No." = '' then
-                                        SalesCrMemoHeader."No." := "No."
-                                    else
-                                        SalesCrMemoHeader."No." := "Last Posting No.";
-                                    SalesCrMemoHeader.SetRecFilter;
+                                if IsPrintingBothDocumentsForNonWindowsClient(SalesHeader.Ship and SalesHeader.Invoice and OrderPrinted) then
+                                    if not Confirm(DownloadCrMemoAlsoQst, true) then
+                                        exit;
+                                if SalesHeader.Invoice then begin
+                                    SalesCrMemoHeader."No." := SalesHeader."Last Posting No.";
+                                    SalesCrMemoHeader.SetRecFilter();
 
                                     HandleReport(ReportSelection.Usage::"S.Cr.Memo");
                                 end;
-                        end;
+                            end;
+                        SalesHeader."Document Type"::"Credit Memo":
+                            begin
+                                if SalesHeader."Last Posting No." = '' then
+                                    SalesCrMemoHeader."No." := SalesHeader."No."
+                                else
+                                    SalesCrMemoHeader."No." := SalesHeader."Last Posting No.";
+                                SalesCrMemoHeader.SetRecFilter();
+
+                                HandleReport(ReportSelection.Usage::"S.Cr.Memo");
+                            end;
+                    end;
                 end;
         end;
     end;
@@ -182,8 +176,8 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
             DoPrint := true;
 
         if (not DoPrint) then begin
-            if not SalesPostandPdf2NavSetup.Get then
-                SalesPostandPdf2NavSetup.Init;
+            if not SalesPostandPdf2NavSetup.Get() then
+                SalesPostandPdf2NavSetup.Init();
             if (ReportUsage = ReportSelection.Usage::"S.Shipment") and SalesPostandPdf2NavSetup."Always Print Ship" then
                 DoPrint := true;
             if (ReportUsage = ReportSelection.Usage::"S.Ret.Rcpt.") and SalesPostandPdf2NavSetup."Always Print Receive" then
@@ -203,9 +197,9 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         if SkipPrintHandling then
             exit(false);
 
-        ReportSelection.Reset;
+        ReportSelection.Reset();
         ReportSelection.SetRange(Usage, ReportUsage);
-        ReportSelection.FindSet;
+        ReportSelection.FindSet();
         repeat
             ReportSelection.TestField("Report ID");
             case ReportUsage of
@@ -223,14 +217,14 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
                     REPORT.Run(ReportSelection."Report ID", false, false, ReturnRcptHeader);
             end;
             Printed := true;
-        until ReportSelection.Next = 0;
+        until ReportSelection.Next() = 0;
     end;
 
     local procedure EmailReport(ReportUsage: Enum "Report Selection Usage")
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        Commit;
+        Commit();
         case ReportUsage of
             ReportSelection.Usage::"S.Cr.Memo":
                 begin

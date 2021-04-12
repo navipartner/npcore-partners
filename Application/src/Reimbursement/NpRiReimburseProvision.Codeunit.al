@@ -1,4 +1,4 @@
-codeunit 6151105 "NPR NpRi Reimburse Provision"
+﻿codeunit 6151105 "NPR NpRi Reimburse Provision"
 {
     var
         Text000: Label 'Post percentage of Data Collection Amount to G/L';
@@ -11,7 +11,7 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         if NpRiModule.Get(ProvisionCode()) then
             exit;
 
-        NpRiModule.Init;
+        NpRiModule.Init();
         NpRiModule.Code := ProvisionCode();
         NpRiModule.Description := Text000;
         NpRiModule.Type := NpRiModule.Type::Reimbursement;
@@ -56,10 +56,10 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
             exit;
 
         if not NpRiProvisionSetup.Get(NpRiReimbursementTemplate.Code) then begin
-            NpRiProvisionSetup.Init;
+            NpRiProvisionSetup.Init();
             NpRiProvisionSetup."Template Code" := NpRiReimbursementTemplate.Code;
             NpRiProvisionSetup.Insert(true);
-            Commit;
+            Commit();
         end;
 
         NpRiProvisionSetup.FilterGroup(2);
@@ -68,7 +68,7 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
 
         PAGE.RunModal(PAGE::"NPR NpRi Provision Setup", NpRiProvisionSetup);
 
-        if NpRiProvisionSetup.Find then;
+        if NpRiProvisionSetup.Find() then;
         NpRiProvisionSetup.SetRange("Provision %", NpRiProvisionSetup."Provision %");
         NpRiProvisionSetup.SetRange("Account No.", NpRiProvisionSetup."Account No.");
         NpRiProvisionSetup.SetRange("Bal. Account No.", NpRiProvisionSetup."Bal. Account No.");
@@ -104,7 +104,7 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         PostProvision(ReimbursementAmount, NpRiReimbursementEntryApply, TempGenJnlLine);
     end;
 
-    local procedure CreateGenJnl(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry"; var TempGenJnlLine: Record "Gen. Journal Line" temporary) ReimbursementAmount: Decimal
+    local procedure CreateGenJnl(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry"; var TempGenJnlLine: Record "Gen. Journal Line" temporary): Decimal
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         NpRiProvisionSetup: Record "NPR NpRi Provision Setup";
@@ -122,12 +122,12 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         NpRiProvisionSetup.TestField("Account No.");
         NpRiProvisionSetup.TestField("Bal. Account No.");
 
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
         AmountExclVat := Round(NpRiReimbursementEntryApply.Amount * NpRiProvisionSetup."Provision %" / 100, GeneralLedgerSetup."Amount Rounding Precision");
         if AmountExclVat = 0 then
             exit(0);
 
-        TempGenJnlLine.Init;
+        TempGenJnlLine.Init();
         TempGenJnlLine."Posting Date" := NpRiReimbursement."Posting Date";
         TempGenJnlLine."Document No." := NpRiReimbursementEntryApply."Document No.";
         TempGenJnlLine."Document Date" := NpRiReimbursement."Posting Date";
@@ -177,7 +177,7 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         if NpRiProvisionSetup."Source Code" <> '' then
             TempGenJnlLine."Source Code" := NpRiProvisionSetup."Source Code";
         TempGenJnlLine."Allow Zero-Amount Posting" := true;
-        TempGenJnlLine.Insert;
+        TempGenJnlLine.Insert();
 
         exit(AmountExclVat);
     end;
@@ -196,8 +196,8 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
     local procedure LockGLEntry(var GLEntry: Record "G/L Entry")
     begin
         Clear(GLEntry);
-        GLEntry.LockTable;
-        if GLEntry.FindLast then;
+        GLEntry.LockTable();
+        if GLEntry.FindLast() then;
         GLEntry."Entry No." += 1;
     end;
 

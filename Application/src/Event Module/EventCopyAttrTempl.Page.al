@@ -32,9 +32,6 @@ page 6060156 "NPR Event Copy Attr./Templ."
     }
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
-    var
-        JobFrom: Record Job;
-        JobTo: Record Job;
     begin
         if CloseAction in [ACTION::OK, ACTION::LookupOK] then begin
             ValidateUserInput();

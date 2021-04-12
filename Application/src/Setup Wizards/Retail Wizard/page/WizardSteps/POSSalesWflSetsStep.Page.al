@@ -12,20 +12,18 @@ page 6014657 "NPR POS Sales Wfl. Sets Step"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnValidate()
-                    var
-                        TempPOSViewProfile: Record "NPR POS View Profile" temporary;
                     begin
-                        CheckIfNoAvailableInPOSSalesWorkflowSet(ExistingPOSSalesWorkflowSet, Code);
+                        CheckIfNoAvailableInPOSSalesWorkflowSet(ExistingPOSSalesWorkflowSet, Rec.Code);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

@@ -1,4 +1,4 @@
-codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
+﻿codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
 {
     // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
 
@@ -17,7 +17,6 @@ codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
         AbortRequested: Boolean;
         ModelAmount: Decimal;
         TXT_FORCE_ABORT: Label 'Force Abort';
-        TransactionStartTime: DateTime;
         FirstAbortRequestedTime: DateTime;
         CONFIRM_FORCE_ABORT: Label 'WARNING:\Force abort will close the transaction dialog without receiving transaction result. This should only be used if the terminal has frozen or is unresponsive. Use lookup afterwards to recover any approved transactions!\Continue with force abort?';
 
@@ -28,7 +27,6 @@ codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
         Clear(AbortRequested);
         TransactionEntryNo := EFTTransactionRequest."Entry No.";
         ModelAmount := GetAmount(EFTTransactionRequest);
-        TransactionStartTime := EFTTransactionRequest.Started;
 
         ConstructTransactionDialog(EFTTransactionRequest);
         ActiveModelID := POSFrontEnd.ShowModel(Model);
@@ -44,9 +42,6 @@ codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', false, false)]
     local procedure OnTransactionDialogResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
-    var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
     begin
         if ModelID <> ActiveModelID then
             exit;
@@ -67,10 +62,7 @@ codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
 
     local procedure CheckResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        EFTNETSCloudIntegration: Codeunit "NPR EFT NETSCloud Integrat.";
-        EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        ContinueOnTransactionEntryNo: Integer;
         EFTNETSCloudBgResp: Codeunit "NPR EFT NETSCloud Bg. Resp.";
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
     begin
@@ -85,7 +77,7 @@ codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
         //Response was found with a lock, i.e. no dirty read. Process it and close dialog regardless of success status.
         //Display any uncaught errors (extremely critical as payment might have been processed. Will need to be handled via trx lookup, assuming error was transient or missing config).
 
-        EFTTransactionRequest.Reset;
+        EFTTransactionRequest.Reset();
         EFTTransactionRequest."Entry No." := TransactionEntryNo;
         EFTNETSCloudBgResp.SetRunMode(1);
         if not EFTNETSCloudBgResp.Run(EFTTransactionRequest) then begin
@@ -283,15 +275,11 @@ codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
     end;
 
     local procedure GetCaption(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
-    var
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         exit(Format(EFTTransactionRequest."Processing Type"));
     end;
 
     local procedure GetAmount(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Decimal
-    var
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         exit(EFTTransactionRequest."Amount Input");
     end;

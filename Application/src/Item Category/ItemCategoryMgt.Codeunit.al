@@ -1,4 +1,4 @@
-﻿codeunit 6014456 "NPR Item Category Mgt."
+codeunit 6014456 "NPR Item Category Mgt."
 {
     #region Item Category creation and modification management
 
@@ -185,7 +185,7 @@
         if TempItem.Type <> TempItem.Type::Service then
             ItemCategory.TestField("NPR Inventory Posting Group");
 
-        if Item.Type <> TempItem.Type then 
+        if Item.Type <> TempItem.Type then
             Item.Validate(Item.Type, TempItem.Type);
 
         Item.Validate(Item."Gen. Prod. Posting Group", ItemCategory."NPR Gen. Prod. Posting Group");
@@ -364,7 +364,7 @@
         FR := RR.Field(FieldId);
     end;
 
-    local procedure GetNextItemTemplateCode()TemplateCode: Code[10]
+    local procedure GetNextItemTemplateCode() TemplateCode: Code[10]
     var
         TempText: Text;
         TemplatePrefixTok: Label 'ICT', Locked = true;
@@ -406,7 +406,7 @@
             if DeleteDimension then begin
                 if DefaultDimension2.Get(DATABASE::"Item Category", ChildItemCategory.Code, DefaultDimension."Dimension Code") then
                     DefaultDimension2.Delete(true);
-            end else 
+            end else
                 if not DefaultDimension2.Get(DATABASE::"Item Category", ChildItemCategory.Code, DefaultDimension."Dimension Code") then begin
                     DefaultDimension2.Init();
                     DefaultDimension2 := DefaultDimension;

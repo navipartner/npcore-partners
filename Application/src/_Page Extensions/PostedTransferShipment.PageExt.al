@@ -10,7 +10,7 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
                 Ellipsis = true;
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Print action';
@@ -20,7 +20,7 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
                 Caption = 'Price Label';
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -29,6 +29,4 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
         }
     }
 
-    var
-        LabelLibrarySubMgt: Codeunit "NPR Label Library Sub. Mgt.";
 }

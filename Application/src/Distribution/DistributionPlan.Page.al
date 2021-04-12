@@ -15,22 +15,22 @@ page 6151060 "NPR Distribution Plan"
         {
             group(General)
             {
-                field("Distribution Group"; "Distribution Group")
+                field("Distribution Group"; Rec."Distribution Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Group field';
                 }
-                field("Item Hiearachy"; "Item Hiearachy")
+                field("Item Hiearachy"; Rec."Item Hiearachy")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Hiearachy field';
                 }
-                field("Distribution Type"; "Distribution Type")
+                field("Distribution Type"; Rec."Distribution Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -42,7 +42,7 @@ page 6151060 "NPR Distribution Plan"
                     Visible = false;
                     ToolTip = 'Specifies the value of the View field';
                 }
-                field("Required Date"; "Required Date")
+                field("Required Date"; Rec."Required Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Required Date field';
@@ -65,7 +65,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Create Distribution';
                 Image = CalculateInventory;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Distribution action';
 
@@ -75,9 +75,9 @@ page 6151060 "NPR Distribution Plan"
                     ItemHierarchy: Record "NPR Item Hierarchy";
                     DistributionGroups: Record "NPR Distrib. Group";
                 begin
-                    ItemHierarchy.Get("Item Hiearachy");
-                    DistributionGroups.Get("Distribution Group");
-                    DistributionMgmt.CreateDistributionItem("Distribution Id", ItemHierarchy, DistributionGroups);
+                    ItemHierarchy.Get(Rec."Item Hiearachy");
+                    DistributionGroups.Get(Rec."Distribution Group");
+                    DistributionMgmt.CreateDistributionItem(Rec."Distribution Id", ItemHierarchy, DistributionGroups);
                 end;
             }
             action("Create Distribution Orders")
@@ -85,7 +85,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Create Distribution Orders';
                 Image = CreateDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Distribution Orders action';
 
@@ -96,8 +96,8 @@ page 6151060 "NPR Distribution Plan"
                     DistributionGroups: Record "NPR Distrib. Group";
                     CompletedText: Label 'Documents Created!';
                 begin
-                    ItemHierarchy.Get("Item Hiearachy");
-                    DistributionGroups.Get("Distribution Group");
+                    ItemHierarchy.Get(Rec."Item Hiearachy");
+                    DistributionGroups.Get(Rec."Distribution Group");
                     DistributionMgmt.CreateDistributionDocuments(Rec);
                     Message(CompletedText);
                 end;
@@ -107,7 +107,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'View Documents';
                 Image = CreateDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 RunObject = Page "NPR Distribution Orders";
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id"),
                               "Distribution Item" = CONST('<>'''),
@@ -120,7 +120,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Import Demands';
                 Image = ImportDatabase;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 Visible = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import Demands action';
@@ -140,7 +140,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Previous Set';
                     Image = PreviousSet;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
@@ -165,7 +165,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Previous Column';
                     Image = PreviousRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
@@ -190,7 +190,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Next Column';
                     Image = NextRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
@@ -217,7 +217,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Next Set';
                     Image = NextSet;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
@@ -255,6 +255,5 @@ page 6151060 "NPR Distribution Plan"
 
     var
         View: Option Distributions,Demands,Inventory;
-        FirstColumn: Integer;
 }
 

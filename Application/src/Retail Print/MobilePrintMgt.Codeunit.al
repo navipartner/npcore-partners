@@ -21,14 +21,12 @@ codeunit 6014584 "NPR Mobile Print Mgt."
 
     local procedure PrintJobHTTPInternal(Address: Text; Endpoint: Text; Base64: Text)
     var
-        JSBridge: Page "NPR JS Bridge";
         JSON: Text;
         Model: DotNet NPRNetModel;
         JSString: Text;
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         ActiveModelID: Guid;
-        FullUrl: Text;
     begin
         if not (CurrentClientType in [CLIENTTYPE::Web, CLIENTTYPE::Phone, CLIENTTYPE::Tablet]) then
             Error(Err_InvalidClientType, Format(CurrentClientType));
@@ -67,7 +65,6 @@ codeunit 6014584 "NPR Mobile Print Mgt."
 
     local procedure PrintJobBluetoothInternal(DeviceName: Text; Base64: Text)
     var
-        JSBridge: Page "NPR JS Bridge";
         JSON: Text;
         Model: DotNet NPRNetModel;
         JSString: Text;

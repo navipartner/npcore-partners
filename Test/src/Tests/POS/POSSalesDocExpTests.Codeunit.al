@@ -42,7 +42,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] Customer applied to sale
@@ -103,7 +103,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] Customer applied to sale
@@ -161,6 +161,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
             _Initialized := true;
         end;
 
-        Commit;
+        Commit();
     end;
 }

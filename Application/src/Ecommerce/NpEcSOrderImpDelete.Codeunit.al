@@ -30,7 +30,6 @@ codeunit 6151305 "NPR NpEc S.Order Imp. Delete"
     local procedure ImportSalesOrder(Element: XmlElement)
     var
         SalesHeader: Record "Sales Header";
-        ReleaseSalesDoc: Codeunit "Release Sales Document";
         NpEcSalesDocImportMgt: Codeunit "NPR NpEc Sales Doc. Imp. Mgt.";
     begin
         if not NpEcSalesDocImportMgt.FindOrder(Element, SalesHeader) then

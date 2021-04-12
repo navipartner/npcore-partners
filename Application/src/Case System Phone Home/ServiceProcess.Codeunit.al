@@ -21,7 +21,7 @@ codeunit 6014483 "NPR Service Process"
         SMSSetup: Record "NPR SMS Setup";
         ServiceLibraryNamespaceUri: Label 'urn:microsoft-dynamics-schemas/codeunit/ServiceLibrary', Locked = true;
 
-    local procedure IsUserSubscribed(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]) Result: Boolean
+    local procedure IsUserSubscribed(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]): Boolean
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
@@ -32,7 +32,7 @@ codeunit 6014483 "NPR Service Process"
 
     end;
 
-    local procedure IsCustomerSubscribed(CustomerNo: Code[20]; ServiceId: Code[20]) Result: Boolean
+    local procedure IsCustomerSubscribed(CustomerNo: Code[20]; ServiceId: Code[20]): Boolean
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
@@ -42,7 +42,7 @@ codeunit 6014483 "NPR Service Process"
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
-    local procedure CreateUserAccount(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]) Result: Boolean
+    local procedure CreateUserAccount(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]): Boolean
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
@@ -52,7 +52,7 @@ codeunit 6014483 "NPR Service Process"
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
-    local procedure CreateTransactionLogEntry(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]) Result: Boolean
+    local procedure CreateTransactionLogEntry(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]): Boolean
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
@@ -62,7 +62,7 @@ codeunit 6014483 "NPR Service Process"
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
-    local procedure CreateTransactionLogEntryAmt(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]; Quantity: Decimal; Description: Text[50]; Amount: Decimal) Result: Boolean
+    local procedure CreateTransactionLogEntryAmt(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]; Quantity: Decimal; Description: Text[50]; Amount: Decimal): Boolean
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
@@ -101,7 +101,7 @@ codeunit 6014483 "NPR Service Process"
         exit(ServiceUsed);
     end;
 
-    local procedure ProcessServiceAmount(ServiceId: Code[20]; AmountUsed: Decimal) Result: Boolean
+    local procedure ProcessServiceAmount(ServiceId: Code[20]; AmountUsed: Decimal): Boolean
     var
         UserSubscribed: Boolean;
         CustomerSubscribed: Boolean;
@@ -112,7 +112,7 @@ codeunit 6014483 "NPR Service Process"
         QtyUsed: Decimal;
         LogDescription: Text[50];
     begin
-        if SMSSetup.Get then begin
+        if SMSSetup.Get() then begin
             SubscriptionUserId := ''; //Unknown in webclient
             CustomerNo := SMSSetup."Customer No.";
             UserSubscribed := IsUserSubscribed(SubscriptionUserId, CustomerNo, ServiceId);
@@ -133,7 +133,7 @@ codeunit 6014483 "NPR Service Process"
         exit(ServiceUsed);
     end;
 
-    local procedure GetReturnValue(ResponseMessage: HttpResponseMessage; NamespaceUri: Text) ResponseText: Text
+    local procedure GetReturnValue(ResponseMessage: HttpResponseMessage; NamespaceUri: Text): Text
     var
         Document: XmlDocument;
         Element: XmlElement;

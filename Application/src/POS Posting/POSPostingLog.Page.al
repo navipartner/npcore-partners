@@ -13,42 +13,42 @@ page 6150658 "NPR POS Posting Log"
         {
             repeater(Group)
             {
-                field("Posting Timestamp"; "Posting Timestamp")
+                field("Posting Timestamp"; Rec."Posting Timestamp")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Timestamp field';
                 }
-                field("Posting Duration"; "Posting Duration")
+                field("Posting Duration"; Rec."Posting Duration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Duration field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("With Error"; "With Error")
+                field("With Error"; Rec."With Error")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the With Error field';
                 }
-                field("Error Description"; "Error Description")
+                field("Error Description"; Rec."Error Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Description field';
                 }
-                field("POS Entry View"; "POS Entry View")
+                field("POS Entry View"; Rec."POS Entry View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Entry View field';
                 }
-                field("Last POS Entry No. at Posting"; "Last POS Entry No. at Posting")
+                field("Last POS Entry No. at Posting"; Rec."Last POS Entry No. at Posting")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last POS Entry No. at Posting field';
                 }
-                field("No. of POS Entries"; "No. of POS Entries")
+                field("No. of POS Entries"; Rec."No. of POS Entries")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. of POS Entries field';
@@ -74,7 +74,7 @@ page 6150658 "NPR POS Posting Log"
                 Caption = 'Repost';
                 Image = PostBatch;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Repost action';
@@ -95,7 +95,7 @@ page 6150658 "NPR POS Posting Log"
                 Caption = 'POS Entries';
                 Image = LedgerEntries;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";

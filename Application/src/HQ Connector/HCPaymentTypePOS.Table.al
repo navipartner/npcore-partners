@@ -176,11 +176,11 @@ table 6150905 "NPR HC Payment Type POS"
                 ErrCustomer: Label 'A deptor must be chosen for this accounttype';
                 CustomerList: Page "Customer List";
             begin
-                RetailSetup.Get;
+                RetailSetup.Get();
                 if "Account Type" = "Account Type"::Customer then begin
                     Clear(CustomerList);
                     CustomerList.LookupMode(true);
-                    if CustomerList.RunModal <> ACTION::LookupOK then
+                    if CustomerList.RunModal() <> ACTION::LookupOK then
                         Error(ErrCustomer);
 
                     CustomerList.GetRecord(Cust);
@@ -805,7 +805,7 @@ table 6150905 "NPR HC Payment Type POS"
     var
         ErrorNo1: Label 'All sales tickets in the audit roll concerning this payment type must be posted to rename payment type.';
     begin
-        AuditRoll.Reset;
+        AuditRoll.Reset();
         AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
         AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
         AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
@@ -826,7 +826,7 @@ table 6150905 "NPR HC Payment Type POS"
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR HC Payment Type POS", "No.", FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 }
 

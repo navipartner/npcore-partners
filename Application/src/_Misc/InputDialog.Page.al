@@ -138,7 +138,6 @@ page 6014449 "NPR Input Dialog"
         ControlCount: Integer;
         Captions: array[10] of Text;
         TextInputs: array[10] of Text;
-        Text: Text[100];
         Vars: array[10] of Variant;
 
     procedure SetInput(ControlID: Integer; Variable: Variant; Description: Text[250])
@@ -175,8 +174,6 @@ page 6014449 "NPR Input Dialog"
     end;
 
     procedure InputText(ControlID: Integer; var OutVar: Text): Integer
-    var
-        Text2: Text;
     begin
         if Evaluate(OutVar, Format(Vars[ControlID])) then exit(ControlID);
     end;
@@ -250,7 +247,7 @@ page 6014449 "NPR Input Dialog"
         Value := Format(Vars[ControlID]);
 
         if (ControlID = ControlCount) and AutoCloseOnValidate then
-            CurrPage.Close;
+            CurrPage.Close();
     end;
 
     procedure SetAutoCloseOnValidate(ParAutoCloseOnValidate: Boolean)

@@ -42,8 +42,8 @@ codeunit 6150858 "NPR POS Action: Start POS"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'balancenow', BalanceNow);
+        Captions.AddActionCaption(ActionCode(), 'title', Title);
+        Captions.AddActionCaption(ActionCode(), 'balancenow', BalanceNow);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
@@ -58,7 +58,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
         POSUnit: Record "NPR POS Unit";
         BinContentsHTML: Text;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -81,7 +81,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
                     BinContentsHTML := StrSubstNo('<b>%1</b>', WorkshiftWasClosed);
                     Context.SetContext('ConfirmBin', true);
                     Context.SetContext('BinContents', BinContentsHTML);
-                    FrontEnd.SetActionContext(ActionCode, Context);
+                    FrontEnd.SetActionContext(ActionCode(), Context);
                     exit;
                 end;
 
@@ -116,7 +116,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
         end;
 
         Context.SetContext('BinContents', BinContentsHTML);
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -130,14 +130,13 @@ codeunit 6150858 "NPR POS Action: Start POS"
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         JSON: Codeunit "NPR POS JSON Management";
         Setup: Codeunit "NPR POS Setup";
-        POSSale: Codeunit "NPR POS Sale";
         POSOpenPOSUnit: Codeunit "NPR POS Manage POS Unit";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         EoDActionName: Text;
         OpeningEntryNo: Integer;
         BinContentsConfirmed: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -166,7 +165,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
                         // The Magical Confirm!
                         // This is a hack and workaround. The confirm is modal in C/AL, but not to the control-addin.
                         // It will allow the current workflow step to finish in frontend, before the InvokeWorkflow executes.
-                        // (Note: PAGE.RUNMODAL will also work)
+                        // (Note: PAGE.RunModal() will also work)
                         // *****
                         if (Confirm(BalanceNow, true)) then begin
                             EoDActionName := 'BALANCE_V3';
@@ -193,7 +192,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
                         OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", Setup.Salesperson());
                         POSOpenPOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
 
-                        Commit;
+                        Commit();
                         PrintBeginWorkshift(POSUnit."No.");
 
                         // Start Sale

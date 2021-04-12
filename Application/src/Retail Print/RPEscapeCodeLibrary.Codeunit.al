@@ -54,7 +54,6 @@ codeunit 6014540 "NPR RP Escape Code Library"
 
     var
         Initialized: Boolean;
-        "-- Chars": Integer;
         cNUL: Char;
         c01: Char;
         c02: Char;
@@ -101,7 +100,7 @@ codeunit 6014540 "NPR RP Escape Code Library"
         Token: Text[30];
         Itt: Integer;
     begin
-        TestInitialize;
+        TestInitialize();
         String.Construct(Sequence);
         for Itt := 1 to String.CountOccurences(' ') + 1 do begin
             Token := String.SelectStringSep(Itt, ' ');
@@ -189,71 +188,71 @@ codeunit 6014540 "NPR RP Escape Code Library"
             Token := String.SelectStringSep(Itt, ' ');
             case Token of
                 'NUL':
-                    ReturnSequence += NUL;
+                    ReturnSequence += NUL();
                 '01':
-                    ReturnSequence += "01";
+                    ReturnSequence += "01"();
                 '02':
-                    ReturnSequence += "02";
+                    ReturnSequence += "02"();
                 '03':
-                    ReturnSequence += "03";
+                    ReturnSequence += "03"();
                 'EOT':
-                    ReturnSequence += EOT;
+                    ReturnSequence += EOT();
                 'ENQ':
-                    ReturnSequence += ENQ;
+                    ReturnSequence += ENQ();
                 'ACK':
-                    ReturnSequence += ACK;
+                    ReturnSequence += ACK();
                 '07':
-                    ReturnSequence += "07";
+                    ReturnSequence += "07"();
                 '08':
-                    ReturnSequence += "08";
+                    ReturnSequence += "08"();
                 'HT':
-                    ReturnSequence += HT;
+                    ReturnSequence += HT();
                 'LF':
-                    ReturnSequence += LF;
+                    ReturnSequence += LF();
                 '11':
-                    ReturnSequence += "11";
+                    ReturnSequence += "11"();
                 'FF':
-                    ReturnSequence += FF;
+                    ReturnSequence += FF();
                 'CR':
-                    ReturnSequence += CR;
+                    ReturnSequence += CR();
                 '14':
-                    ReturnSequence += "14";
+                    ReturnSequence += "14"();
                 '15':
-                    ReturnSequence += "15";
+                    ReturnSequence += "15"();
                 '16':
-                    ReturnSequence += "16";
+                    ReturnSequence += "16"();
                 'DLE':
-                    ReturnSequence += DLE;
+                    ReturnSequence += DLE();
                 'XON':
-                    ReturnSequence += XON;
+                    ReturnSequence += XON();
                 'XOFF':
-                    ReturnSequence += XOFF;
+                    ReturnSequence += XOFF();
                 'DC4':
-                    ReturnSequence += DC4;
+                    ReturnSequence += DC4();
                 'NAK':
-                    ReturnSequence += NAK;
+                    ReturnSequence += NAK();
                 '22':
-                    ReturnSequence += "22";
+                    ReturnSequence += "22"();
                 '23':
-                    ReturnSequence += "23";
+                    ReturnSequence += "23"();
                 'CAN':
-                    ReturnSequence += CAN;
+                    ReturnSequence += CAN();
                 '25':
-                    ReturnSequence += "25";
+                    ReturnSequence += "25"();
                 '26':
-                    ReturnSequence += "26";
+                    ReturnSequence += "26"();
                 'ESC':
-                    ReturnSequence += ESC;
+                    ReturnSequence += ESC();
                 'FS':
-                    ReturnSequence += FS;
+                    ReturnSequence += FS();
                 'GS':
-                    ReturnSequence += GS;
+                    ReturnSequence += GS();
                 'RS':
-                    ReturnSequence += RS;
+                    ReturnSequence += RS();
                 '31':
-                    ReturnSequence += "31";
+                    ReturnSequence += "31"();
                 'SP':
-                    ReturnSequence += SP;
+                    ReturnSequence += SP();
                 else
                     ReturnSequence += Token;
             end;
@@ -261,10 +260,6 @@ codeunit 6014540 "NPR RP Escape Code Library"
     end;
 
     procedure C2ESC(var Char: Char) ReturnESCCode: Text[30]
-    var
-        String: Codeunit "NPR String Library";
-        Token: Text[100];
-        Itt: Integer;
     begin
         case Char of
             cNUL:
@@ -436,199 +431,199 @@ codeunit 6014540 "NPR RP Escape Code Library"
 
     procedure NUL(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cNUL));
     end;
 
     procedure "01"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c01));
     end;
 
     procedure "02"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c02));
     end;
 
     procedure "03"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c03));
     end;
 
     procedure EOT(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cEOT));
     end;
 
     procedure ENQ(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cEOT));
     end;
 
     procedure ACK(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cACK));
     end;
 
     procedure "07"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c07));
     end;
 
     procedure "08"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c08));
     end;
 
     procedure HT(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cHT));
     end;
 
     procedure LF(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cLF));
     end;
 
     procedure "11"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c11));
     end;
 
     procedure FF(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cFF));
     end;
 
     procedure CR(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cCR));
     end;
 
     procedure "14"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c14));
     end;
 
     procedure "15"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c15));
     end;
 
     procedure "16"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c16));
     end;
 
     procedure DLE(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cDLE));
     end;
 
     procedure XON(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cXON));
     end;
 
     procedure XOFF(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cXOFF));
     end;
 
     procedure DC4(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cDC4));
     end;
 
     procedure NAK(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cNAK));
     end;
 
     procedure "22"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c22));
     end;
 
     procedure "23"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c23));
     end;
 
     procedure CAN(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cCAN));
     end;
 
     procedure "25"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c25));
     end;
 
     procedure "26"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c26));
     end;
 
     procedure ESC(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cESC));
     end;
 
     procedure FS(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cFS));
     end;
 
     procedure GS(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cGS));
     end;
 
     procedure RS(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cRS));
     end;
 
     procedure "31"(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(c31));
     end;
 
     procedure SP(): Text[1]
     begin
-        TestInitialize;
+        TestInitialize();
         exit(Format(cSP));
     end;
 

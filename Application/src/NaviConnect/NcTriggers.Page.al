@@ -16,47 +16,47 @@ page 6151520 "NPR Nc Triggers"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Split Trigger and Endpoint"; "Split Trigger and Endpoint")
+                field("Split Trigger and Endpoint"; Rec."Split Trigger and Endpoint")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Split Trigger and Endpoint field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field("Error on Empty Output"; "Error on Empty Output")
+                field("Error on Empty Output"; Rec."Error on Empty Output")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error on Empty Output field';
                 }
-                field("Task Processor"; "Task Processor")
+                field("Task Processor"; Rec."Task Processor")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Processor field';
                 }
-                field("Linked Endpoints"; "Linked Endpoints")
+                field("Linked Endpoints"; Rec."Linked Endpoints")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Linked Endpoints field';
                 }
-                field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
+                field("Subscriber Codeunit ID"; Rec."Subscriber Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Subscriber Codeunit ID field';
                 }
-                field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
+                field("Subscriber Codeunit Name"; Rec."Subscriber Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Subscriber Codeunit Name field';
@@ -97,7 +97,7 @@ page 6151520 "NPR Nc Triggers"
                 Caption = 'Task List';
                 Image = TaskList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Task List";
@@ -127,7 +127,7 @@ page 6151520 "NPR Nc Triggers"
     begin
         if NcTriggerScheduler.FindTaskLine(Rec, TaskLine, TaskLineParameters) then begin
             TaskCard.SetRecord(TaskLine);
-            TaskCard.RunModal;
+            TaskCard.RunModal();
             Clear(TaskCard);
         end;
     end;

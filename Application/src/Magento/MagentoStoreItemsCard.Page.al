@@ -15,24 +15,24 @@ page 6014425 "NPR Magento Store Items Card"
         {
             group(General)
             {
-                field(Webshop; Webshop)
+                field(Webshop; Rec.Webshop)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Webshop field';
                 }
-                field("Store Code"; "Store Code")
+                field("Store Code"; Rec."Store Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Store Code field';
                 }
-                field("Website Code"; "Website Code")
+                field("Website Code"; Rec."Website Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Website Code field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
@@ -42,7 +42,7 @@ page 6014425 "NPR Magento Store Items Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field(GetEnabledFieldsCaption; GetEnabledFieldsCaption)
+                field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption)
                 {
                     ApplicationArea = All;
                     Caption = 'Fields Enabled';
@@ -57,12 +57,12 @@ page 6014425 "NPR Magento Store Items Card"
 
                 grid(UnitPriceGrid)
                 {
-                    field("Unit Price"; "Unit Price")
+                    field("Unit Price"; Rec."Unit Price")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Unit Price field';
                     }
-                    field("Unit Price Enabled"; "Unit Price Enabled")
+                    field("Unit Price Enabled"; Rec."Unit Price Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -74,12 +74,12 @@ page 6014425 "NPR Magento Store Items Card"
                     Caption = 'Product New';
                     grid(ProductNewFromGrid)
                     {
-                        field("Product New From"; "Product New From")
+                        field("Product New From"; Rec."Product New From")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Product New From field';
                         }
-                        field("Product New From Enabled"; "Product New From Enabled")
+                        field("Product New From Enabled"; Rec."Product New From Enabled")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
@@ -88,12 +88,12 @@ page 6014425 "NPR Magento Store Items Card"
                     }
                     grid(ProductNewToGrid)
                     {
-                        field("Product New To"; "Product New To")
+                        field("Product New To"; Rec."Product New To")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Product New To field';
                         }
-                        field("Product New To Enabled"; "Product New To Enabled")
+                        field("Product New To Enabled"; Rec."Product New To Enabled")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
@@ -107,12 +107,12 @@ page 6014425 "NPR Magento Store Items Card"
 
                     grid(SpecialPriceGrid)
                     {
-                        field("Special Price"; "Special Price")
+                        field("Special Price"; Rec."Special Price")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Special Price field';
                         }
-                        field("Special Price Enabled"; "Special Price Enabled")
+                        field("Special Price Enabled"; Rec."Special Price Enabled")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
@@ -121,12 +121,12 @@ page 6014425 "NPR Magento Store Items Card"
                     }
                     grid(SpecialPriceFromGrid)
                     {
-                        field("Special Price From"; "Special Price From")
+                        field("Special Price From"; Rec."Special Price From")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Special Price From field';
                         }
-                        field("Special Price From Enabled"; "Special Price From Enabled")
+                        field("Special Price From Enabled"; Rec."Special Price From Enabled")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
@@ -135,12 +135,12 @@ page 6014425 "NPR Magento Store Items Card"
                     }
                     grid(SpecialPriceToGrid)
                     {
-                        field("Special Price To"; "Special Price To")
+                        field("Special Price To"; Rec."Special Price To")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Special Price To field';
                         }
-                        field("Special Price To Enabled"; "Special Price To Enabled")
+                        field("Special Price To Enabled"; Rec."Special Price To Enabled")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
@@ -155,13 +155,13 @@ page 6014425 "NPR Magento Store Items Card"
 
                 grid(WebshopNameGrid)
                 {
-                    field("Webshop Name"; "Webshop Name")
+                    field("Webshop Name"; Rec."Webshop Name")
                     {
                         ApplicationArea = All;
                         Caption = 'Name';
                         ToolTip = 'Specifies the value of the Name field';
                     }
-                    field("Webshop Name Enabled"; "Webshop Name Enabled")
+                    field("Webshop Name Enabled"; Rec."Webshop Name Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -183,15 +183,15 @@ page 6014425 "NPR Magento Store Items Card"
                             MagentoFunctions: Codeunit "NPR Magento Functions";
                         begin
                             RecRef.GetTable(Rec);
-                            FieldRef := RecRef.Field(FieldNo("Webshop Description"));
+                            FieldRef := RecRef.Field(Rec.FieldNo("Webshop Description"));
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                                 RecRef.SetTable(Rec);
-                                Modify(true);
+                                Rec.Modify(true);
                             end;
                         end;
                     }
 
-                    field("Webshop Description Enabled"; "Webshop Description Enabled")
+                    field("Webshop Description Enabled"; Rec."Webshop Description Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -214,33 +214,33 @@ page 6014425 "NPR Magento Store Items Card"
                             MagentoFunctions: Codeunit "NPR Magento Functions";
                         begin
                             RecRef.GetTable(Rec);
-                            FieldRef := RecRef.Field(FieldNo("Webshop Short Desc."));
+                            FieldRef := RecRef.Field(Rec.FieldNo("Webshop Short Desc."));
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                                 RecRef.SetTable(Rec);
-                                Modify(true);
+                                Rec.Modify(true);
                             end;
                         end;
                     }
-                    field("Webshop Short Desc. Enabled"; "Webshop Short Desc. Enabled")
+                    field("Webshop Short Desc. Enabled"; Rec."Webshop Short Desc. Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Webshop Short Description Enabled field';
                     }
                 }
-                field(Visibility; Visibility)
+                field(Visibility; Rec.Visibility)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Visibility field';
                 }
                 grid(DisplayOnlyGrid)
                 {
-                    field("Display Only"; "Display Only")
+                    field("Display Only"; Rec."Display Only")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Display Only field';
                     }
-                    field("Display Only Enabled"; "Display Only Enabled")
+                    field("Display Only Enabled"; Rec."Display Only Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -249,12 +249,12 @@ page 6014425 "NPR Magento Store Items Card"
                 }
                 grid(SeoLinkGrid)
                 {
-                    field("Seo Link"; "Seo Link")
+                    field("Seo Link"; Rec."Seo Link")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Seo Link field';
                     }
-                    field("Seo Link Enabled"; "Seo Link Enabled")
+                    field("Seo Link Enabled"; Rec."Seo Link Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -263,12 +263,12 @@ page 6014425 "NPR Magento Store Items Card"
                 }
                 grid(MetaTitleGrid)
                 {
-                    field("Meta Title"; "Meta Title")
+                    field("Meta Title"; Rec."Meta Title")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Meta Title field';
                     }
-                    field("Meta Title Enabled"; "Meta Title Enabled")
+                    field("Meta Title Enabled"; Rec."Meta Title Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -277,12 +277,12 @@ page 6014425 "NPR Magento Store Items Card"
                 }
                 grid(MetaDescriptionGrid)
                 {
-                    field("Meta Description"; "Meta Description")
+                    field("Meta Description"; Rec."Meta Description")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Meta Description field';
                     }
-                    field("Meta Description Enabled"; "Meta Description Enabled")
+                    field("Meta Description Enabled"; Rec."Meta Description Enabled")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;

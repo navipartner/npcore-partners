@@ -54,21 +54,21 @@ page 6059770 "NPR NaviDocs Comment Subpage"
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
         ActivityLog: Record "Activity Log";
     begin
-        if not Rec.IsTemporary then
+        if not Rec.IsTemporary() then
             exit;
-        Rec.DeleteAll;
+        Rec.DeleteAll();
         if UseActivityLog then begin
             ActivityLog.SetRange("Record ID", NaviDocsEntry.RecordId);
-            if ActivityLog.FindSet then
+            if ActivityLog.FindSet() then
                 repeat
                     Rec := ActivityLog;
-                    Rec.Insert;
-                until ActivityLog.Next = 0;
+                    Rec.Insert();
+                until ActivityLog.Next() = 0;
         end else begin
             NaviDocsEntryComment.SetRange("Entry No.", NaviDocsEntry."Entry No.");
-            if NaviDocsEntryComment.FindSet then
+            if NaviDocsEntryComment.FindSet() then
                 repeat
-                    Rec.Init;
+                    Rec.Init();
                     Rec.ID := NaviDocsEntryComment."Line No.";
                     Rec."Record ID" := NaviDocsEntry.RecordId;
                     Rec."Activity Date" := CreateDateTime(NaviDocsEntryComment."Insert Date", NaviDocsEntryComment."Insert Time");
@@ -79,7 +79,7 @@ page 6059770 "NPR NaviDocs Comment Subpage"
                         Rec.Status := Rec.Status::Success;
                     Rec."Activity Message" := NaviDocsEntryComment.Description;
                     Rec.Insert(true);
-                until NaviDocsEntryComment.Next = 0;
+                until NaviDocsEntryComment.Next() = 0;
         end;
         CurrPage.Update(false);
     end;

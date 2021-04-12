@@ -124,7 +124,7 @@ table 6014580 "NPR Object Output Selection"
 
         AllObj.SetRange("Object ID", "Object ID");
 
-        if AllObj.FindFirst then
+        if AllObj.FindFirst() then
             "Object Name" := AllObj."Object Name";
     end;
 }

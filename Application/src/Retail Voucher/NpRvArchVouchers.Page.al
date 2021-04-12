@@ -14,92 +14,92 @@ page 6151022 "NPR NpRv Arch. Vouchers"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Voucher Type"; "Voucher Type")
+                field("Voucher Type"; Rec."Voucher Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Issue Date"; "Issue Date")
+                field("Issue Date"; Rec."Issue Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issue Date field';
                 }
-                field("Initial Amount"; "Initial Amount")
+                field("Initial Amount"; Rec."Initial Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Initial Amount field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Ending Date"; "Ending Date")
+                field("Ending Date"; Rec."Ending Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Date field';
                 }
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Issue Register No."; "Issue Register No.")
+                field("Issue Register No."; Rec."Issue Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issue Register No. field';
                 }
-                field("Issue Document Type"; "Issue Document Type")
+                field("Issue Document Type"; Rec."Issue Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issue Document Type field';
                 }
-                field("Issue Document No."; "Issue Document No.")
+                field("Issue Document No."; Rec."Issue Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issue Document No. field';
                 }
-                field("Issue External Document No."; "Issue External Document No.")
+                field("Issue External Document No."; Rec."Issue External Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issue External Document No. field';
                 }
-                field("Issue User ID"; "Issue User ID")
+                field("Issue User ID"; Rec."Issue User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issue User ID field';
                 }
-                field("Issue Partner Code"; "Issue Partner Code")
+                field("Issue Partner Code"; Rec."Issue Partner Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issue Partner Code field';
                 }
-                field("Partner Clearing"; "Partner Clearing")
+                field("Partner Clearing"; Rec."Partner Clearing")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Partner Clearing field';
                 }
-                field("No. Send"; "No. Send")
+                field("No. Send"; Rec."No. Send")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -122,7 +122,7 @@ page 6151022 "NPR NpRv Arch. Vouchers"
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Archived Voucher Entries action';

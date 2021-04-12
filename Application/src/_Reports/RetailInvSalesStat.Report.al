@@ -1,8 +1,8 @@
 report 6014662 "NPR Retail Inv.: Sales Stat."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Inventory - Sales Statistics';
     dataset
@@ -141,18 +141,16 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
         ItemFilter := Item.GetFilters;
         PeriodText := Item.GetFilter("Date Filter");
 
-        with ItemStatisticsBuf do begin
-            if Item.GetFilter("Date Filter") <> '' then
-                SetFilter("Date Filter", PeriodText);
-            if Item.GetFilter("Location Filter") <> '' then
-                SetFilter("Location Filter", Item.GetFilter("Location Filter"));
-            if Item.GetFilter("Variant Filter") <> '' then
-                SetFilter("Variant Filter", Item.GetFilter("Variant Filter"));
-            if Item.GetFilter("Global Dimension 1 Filter") <> '' then
-                SetFilter("Global Dimension 1 Filter", Item.GetFilter("Global Dimension 1 Filter"));
-            if Item.GetFilter("Global Dimension 2 Filter") <> '' then
-                SetFilter("Global Dimension 2 Filter", Item.GetFilter("Global Dimension 2 Filter"));
-        end;
+        if Item.GetFilter("Date Filter") <> '' then
+            ItemStatisticsBuf.SetFilter("Date Filter", PeriodText);
+        if Item.GetFilter("Location Filter") <> '' then
+            ItemStatisticsBuf.SetFilter("Location Filter", Item.GetFilter("Location Filter"));
+        if Item.GetFilter("Variant Filter") <> '' then
+            ItemStatisticsBuf.SetFilter("Variant Filter", Item.GetFilter("Variant Filter"));
+        if Item.GetFilter("Global Dimension 1 Filter") <> '' then
+            ItemStatisticsBuf.SetFilter("Global Dimension 1 Filter", Item.GetFilter("Global Dimension 1 Filter"));
+        if Item.GetFilter("Global Dimension 2 Filter") <> '' then
+            ItemStatisticsBuf.SetFilter("Global Dimension 2 Filter", Item.GetFilter("Global Dimension 2 Filter"));
     end;
 
     var

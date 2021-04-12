@@ -32,7 +32,7 @@ table 6060155 "NPR Event Attr. Col. Template"
     begin
         EventAttrMgt.TemplateHasEntries(1, Name);
         EventAttrColValue.SetRange("Template Name", Name);
-        EventAttrColValue.DeleteAll;
+        EventAttrColValue.DeleteAll();
     end;
 }
 

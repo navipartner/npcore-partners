@@ -42,7 +42,7 @@ table 6014679 "NPR Endpoint Query Filter"
         }
         field(35; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
@@ -67,12 +67,8 @@ table 6014679 "NPR Endpoint Query Filter"
     }
 
     trigger OnInsert()
-    var
-        Endpoint: Record "NPR Endpoint";
     begin
     end;
 
-    var
-        TxtSpecifyTableInEndPoint: Label 'Please specifiy the table in the Endpoint before adding filters.';
 }
 

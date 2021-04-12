@@ -93,20 +93,11 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     EventSubscriberInstance = Manual;
 
     trigger OnRun()
-    var
-        Itt: Integer;
-        J: Integer;
-        cNUL: Char;
-        ff: File;
-        kc1: Char;
-        kc2: Char;
     begin
         //PrintMethodMgt.PrintBytesLocal('Boca (redirected 28)','<SP200,60><RC600,280><RL><F8><HW1,1>ab æÆ bc ¢¥ cd åÅ - $£<p>','ibm850');
     end;
 
     var
-        TempPattern: Text[50];
-        ESC: Codeunit "NPR RP Escape Code Library";
         SETTING_MEDIAWIDTH: Label 'Width of media.';
         MediaWidth: Option "80mm","58mm";
         SETTING_ENCODING: Label 'Text encoding.';
@@ -115,10 +106,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         Encoding: Option ibm850;
         PrintBuffer: Codeunit "Temp Blob";
         PrintBufferOutStream: OutStream;
-        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        "---": Integer;
-        tmpWidth: Integer;
-        tmpHeight: Integer;
         FontHeight: Integer;
         FontWidth: Integer;
         HeightModifier: Integer;
@@ -127,7 +114,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         DotSize: Decimal;
         DPI: Option "200","300","600";
         PrintMargin: Integer;
-        xCoord: Integer;
         yCoord: Integer;
         ySpace: Integer;
 
@@ -161,8 +147,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
-        with POSPrintBuffer do
-            PrintData(Text, Font, Bold, Underline, DoubleStrike, Align, Width, Height, "Column No.");
+        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Bold, POSPrintBuffer.Underline, POSPrintBuffer.DoubleStrike, POSPrintBuffer.Align, POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer."Column No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnEndJob', '', false, false)]
@@ -219,7 +204,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         tmpRetailList.Number += 1;
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     procedure "// ShortHandFunctions"()
@@ -236,7 +221,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         Clear(Encoding);
         Clear(DPI);
 
-        if DeviceSettings.FindSet then
+        if DeviceSettings.FindSet() then
             repeat
                 case DeviceSettings.Name of
                     'MEDIA_WIDTH':
@@ -260,7 +245,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
                     else
                         Error(Error_InvalidDeviceSetting, DeviceSettings.Value);
                 end;
-            until DeviceSettings.Next = 0;
+            until DeviceSettings.Next() = 0;
 
         //InitializePrinter;
         case DPI of
@@ -288,7 +273,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
 
     procedure PrintData(Data: Text[100]; FontType: Text[30]; Bold: Boolean; UnderLine: Boolean; DoubleStrike: Boolean; Align: Integer; Width: Integer; Height: Integer; Column: Integer)
     var
-        BarcodeNo: Integer;
         StringLib: Codeunit "NPR String Library";
     begin
         if UpperCase(FontType) = 'COMMAND' then
@@ -338,8 +322,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
 
     procedure PrintBarcode(BarcodeType: Text[30]; Text: Text; Width: Integer; Height: Integer; Alignment: Integer)
     var
-        Int: Integer;
-        Code128: Text;
         StringLib: Codeunit "NPR String Library";
         BarcodeXCoord: Integer;
     begin
@@ -443,11 +425,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     end;
 
     procedure SetFontStretch(Height: Integer; Width: Integer)
-    var
-        Int: Integer;
-        n: Char;
-        nByte: Text;
-        Convert: DotNet NPRNetConvert;
     begin
         if Height > 16 then
             Height := 16;
@@ -460,9 +437,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     end;
 
     procedure SetFontFace(FontFace: Text[30])
-    var
-        FontType: Char;
-        StringLib: Codeunit "NPR String Library";
     begin
     end;
 
@@ -475,8 +449,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     procedure GetPrintBytes(): Text
     var
         PrintBufferInStream: InStream;
-        BufferText: Text;
-        Result: Text;
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
         Encoding: DotNet NPRNetEncoding;
@@ -508,7 +480,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
 
         if RetailLogoMgt.GetRetailLogo(Keyword, RegisterNo, RetailLogo) then
             repeat
-                if RetailLogo.OneBitLogo.HasValue then begin
+                if RetailLogo.OneBitLogo.HasValue() then begin
                     RetailLogo.OneBitLogo.CreateInStream(InStream);
                     MemoryStream := InStream;
                     MemoryStream.Position := 0;
@@ -518,7 +490,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
                     AddTextToBuffer(StrSubstNo('<SP%1,%2><RL><bmp><G%3>%4', (PageWidth div 1.077), yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future
                     yCoord += RetailLogo.Height + 30; // Might need to make this dynamic in the future
                 end;
-            until RetailLogo.Next = 0;
+            until RetailLogo.Next() = 0;
         //+NPR5.55 [404276]
     end;
 
@@ -531,7 +503,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         StringLib: Codeunit "NPR String Library";
         TextModifierW: Integer;
         TextModifierH: Integer;
-        SpaceCount: Integer;
     begin
         // Set default font modifier
         SetFontStretch(1, 1);
@@ -633,7 +604,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         RetailList.SetShowValue(true);
         RetailList.SetRec(tmpRetailList);
         RetailList.LookupMode(true);
-        if RetailList.RunModal = ACTION::LookupOK then begin
+        if RetailList.RunModal() = ACTION::LookupOK then begin
             RetailList.GetRec(tmpRetailList);
             tmpDeviceSetting.Name := tmpRetailList.Value;
             case tmpDeviceSetting.Name of
@@ -708,19 +679,19 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         RetailList.Number += 1;
         RetailList.Choice := Choice;
         RetailList.Value := Value;
-        RetailList.Insert;
+        RetailList.Insert();
     end;
 
     local procedure "// Unit Conversions"()
     begin
     end;
 
-    local procedure Mm2In(mm: Decimal) inches: Decimal
+    local procedure Mm2In(mm: Decimal): Decimal
     begin
         exit(mm * 0.03937007874);
     end;
 
-    local procedure In2Mm(inches: Decimal) mm: Decimal
+    local procedure In2Mm(inches: Decimal): Decimal
     begin
         exit(inches / 0.03937007874);
     end;

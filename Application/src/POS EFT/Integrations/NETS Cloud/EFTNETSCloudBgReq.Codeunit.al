@@ -47,8 +47,6 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         LookupResult: Boolean;
         LookupAttempt: Integer;
         ErrorText: Text;
-        EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
-        TokenText: Text;
         TransactionStarted: Boolean;
     begin
         if (EFTTrxBackgroundSessionMgt.IsRequestAbortAttempted(EFTTransactionAsyncRequest."Request Entry No", true)) then begin
@@ -57,7 +55,7 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         end;
 
         EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Starting trx background session', '');
-        Commit; //Log
+        Commit(); //Log
 
         EFTTransactionRequest.Get(EFTTransactionAsyncRequest."Request Entry No");
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
@@ -65,7 +63,7 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         TrxResult := SendRequest(EFTTransactionRequest, EFTSetup, TrxResponse, EFTNETSCloudProtocol);
         TransactionStarted := TrxResult or (EFTNETSCloudProtocol.GetResponseStatusCodeBuffer in [0, 200, 201, 400]);
         LogTrxRequest(EFTTransactionAsyncRequest."Request Entry No", EFTSetup, EFTNETSCloudProtocol, TrxResult);
-        Commit; //Log
+        Commit(); //Log
 
         if not TrxResult then begin
             ErrorText := GetLastErrorText;
@@ -83,7 +81,7 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
                         EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Stopping auto lookup. (Marked as done)', '');
                         exit;
                     end;
-                    Commit;
+                    Commit();
                 end;
 
                 LookupResult := LookupTrx(LookupAttempt, EFTTransactionRequest, EFTSetup, EFTNETSCloudProtocol, 1000 * 5, LookupResponse);
@@ -108,29 +106,27 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
 
         InsertTrxResponse(EFTTransactionAsyncRequest."Request Entry No", TrxResult, TrxResponse, ErrorText);
         EFTTrxBackgroundSessionMgt.MarkRequestAsDone(EFTTransactionAsyncRequest."Request Entry No");
-        Commit; //Response
+        Commit(); //Response
     end;
 
     local procedure SendRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text; var EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol"): Boolean
     var
         Success: Boolean;
     begin
-        with EFTTransactionRequest do begin
-            case "Processing Type" of
-                "Processing Type"::PAYMENT:
-                    Success := EFTNETSCloudProtocol.InvokePayment(EFTTransactionRequest, EFTSetup, Response);
-                "Processing Type"::REFUND:
-                    Success := EFTNETSCloudProtocol.InvokeRefund(EFTTransactionRequest, EFTSetup, Response);
-                "Processing Type"::AUXILIARY:
-                    case "Auxiliary Operation ID" of
-                        1:
-                            ;
-                        else
-                            Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), "Processing Type");
-                    end;
-                else
-                    Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), "Processing Type");
-            end;
+        case EFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::PAYMENT:
+                Success := EFTNETSCloudProtocol.InvokePayment(EFTTransactionRequest, EFTSetup, Response);
+            EFTTransactionRequest."Processing Type"::REFUND:
+                Success := EFTNETSCloudProtocol.InvokeRefund(EFTTransactionRequest, EFTSetup, Response);
+            EFTTransactionRequest."Processing Type"::AUXILIARY:
+                case EFTTransactionRequest."Auxiliary Operation ID" of
+                    1:
+                        ;
+                    else
+                        Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), EFTTransactionRequest."Processing Type");
+                end;
+            else
+                Error(ERR_UNSUPPORTED_TYPE, EFTTransactionRequest.FieldCaption("Processing Type"), EFTTransactionRequest."Processing Type");
         end;
 
         exit(Success);
@@ -160,7 +156,7 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         OutStream: OutStream;
         EFTTransactionAsyncResponse: Record "NPR EFT Trx Async Resp.";
     begin
-        EFTTransactionAsyncResponse.Init;
+        EFTTransactionAsyncResponse.Init();
         EFTTransactionAsyncResponse."Request Entry No" := TrxEntryNo;
 
         if Success then begin
@@ -171,7 +167,7 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
             EFTTransactionAsyncResponse."Error Text" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionAsyncResponse."Error Text"));
         end;
 
-        EFTTransactionAsyncResponse.Insert;
+        EFTTransactionAsyncResponse.Insert();
     end;
 
     local procedure LookupTrx(LookupAttempt: Integer; EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol"; TimeoutMs: Integer; var LookupResponse: Text): Boolean

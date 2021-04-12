@@ -1,4 +1,4 @@
-codeunit 6151420 "NPR Magento Imp. Ret. Order"
+﻿codeunit 6151420 "NPR Magento Imp. Ret. Order"
 {
     TableNo = "NPR Nc Import Entry";
 
@@ -24,7 +24,6 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
     var
         XmlNodeVar: XmlNode;
         XmlNodeList: XmlNodeList;
-        i: Integer;
     begin
         Initialize();
         if not XmlDoc.SelectNodes('.//*[local-name()="sales_return_order"]', XmlNodeList) then
@@ -35,7 +34,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         end;
     end;
 
-    local procedure ImportSalesReturnOrder(XmlElement: XmlElement) Imported: Boolean
+    local procedure ImportSalesReturnOrder(XmlElement: XmlElement): Boolean
     var
         SalesHeader: Record "Sales Header";
         ReleaseSalesDoc: Codeunit "Release Sales Document";
@@ -87,7 +86,6 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
     var
         Node: XmlNode;
         XmlNodeList: XmlNodeList;
-        i: Integer;
     begin
         XmlElement.SelectNodes('.//*[local-name()="comment_line"]', XmlNodeList);
         foreach Node in XmlNodeList do begin
@@ -121,7 +119,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         if NewCust then begin
             VATBusPostingGroup := MagentoMgt.GetVATBusPostingGroup(TaxClass);
 
-            Customer.Init;
+            Customer.Init();
             Customer."No." := '';
             Customer."NPR External Customer No." := ExternalCustomerNo;
             Customer.Insert(true);
@@ -192,9 +190,9 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         PaymentMapping.SetRange("External Payment Method Code", CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'code', true), 1, MaxStrLen(PaymentMapping."External Payment Method Code")));
 
         PaymentMapping.SetRange("External Payment Type", NpXmlDomMgt.GetXmlText(XmlElement, 'payment_type', MaxStrLen(PaymentMapping."External Payment Type"), false));
-        if not PaymentMapping.FindFirst then begin
+        if not PaymentMapping.FindFirst() then begin
             PaymentMapping.SetRange("External Payment Type");
-            PaymentMapping.FindFirst;
+            PaymentMapping.FindFirst();
         end;
 
         PaymentMapping.TestField("Payment Method Code");
@@ -224,7 +222,6 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         Node: XmlNode;
         XmlNodeList: XmlNodeList;
         LineNo: Integer;
-        i: Integer;
     begin
         if not XmlElement.SelectNodes('.//*[local-name()="payment_refund"]', XmlNodeList) then
             exit;
@@ -254,7 +251,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         if not XmlElement.SelectSingleNode('.//*[local-name()="sell_to_customer"]', Node) then
             Error(Error001);
         InsertCustomer(Node.AsXmlElement(), MagentoSetup."Customers Enabled", Customer);
-        SalesHeader.Init;
+        SalesHeader.Init();
         SalesHeader."Document Type" := SalesHeader."Document Type"::"Return Order";
         SalesHeader."No." := '';
         SalesHeader."NPR External Order No." := CopyStr(OrderNo, 1, MaxStrLen(SalesHeader."NPR External Order No."));
@@ -282,7 +279,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
 
         if XmlElement.SelectSingleNode('.//*[local-name()="shipment"]', Node) then begin
             ShipmentMapping.SetRange("External Shipment Method Code", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'shipment_method', MaxStrLen(ShipmentMapping."External Shipment Method Code"), true));
-            ShipmentMapping.FindFirst;
+            ShipmentMapping.FindFirst();
             SalesHeader.Validate("Shipment Method Code", ShipmentMapping."Shipment Method Code");
             SalesHeader.Validate("Shipping Agent Code", ShipmentMapping."Shipping Agent Code");
             SalesHeader.Validate("Shipping Agent Service Code", ShipmentMapping."Shipping Agent Service Code");
@@ -299,9 +296,9 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
                   CopyStr(NpXmlDomMgt.GetXmlAttributeText(Node, 'code', true), 1, MaxStrLen(PaymentMapping."External Payment Method Code")));
                 PaymentMapping.SetRange("External Payment Type",
                   NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'payment_type', MaxStrLen(PaymentMapping."External Payment Type"), false));
-                if not PaymentMapping.FindFirst then begin
+                if not PaymentMapping.FindFirst() then begin
                     PaymentMapping.SetRange("External Payment Type");
-                    PaymentMapping.FindFirst;
+                    PaymentMapping.FindFirst();
                 end;
                 SalesHeader.Validate("Payment Method Code", PaymentMapping."Payment Method Code");
 
@@ -366,9 +363,6 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         UnitPrice: Decimal;
         UnitPrice2: Decimal;
         VatPct: Decimal;
-        DiscountAmount: Decimal;
-        DiscountPct: Decimal;
-        i: Integer;
         Position: Integer;
         TableId: Integer;
     begin
@@ -377,7 +371,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
             'comment':
                 begin
                     LineNo += 10000;
-                    SalesLine.Init;
+                    SalesLine.Init();
                     SalesLine."Document Type" := SalesHeader."Document Type";
                     SalesLine."Document No." := SalesHeader."No.";
                     SalesLine."Line No." := LineNo;
@@ -409,7 +403,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
                     Evaluate(LineAmount, NpXmlDomMgt.GetXmlText(XmlElement, 'line_amount_incl_vat', 0, true), 9);
                     Evaluate(UnitofMeasure, NpXmlDomMgt.GetXmlText(XmlElement, 'unit_of_measure', MaxStrLen(SalesLine."Unit of Measure Code"), false));
                     LineNo += 10000;
-                    SalesLine.Init;
+                    SalesLine.Init();
                     SalesLine."Document Type" := SalesHeader."Document Type";
                     SalesLine."Document No." := SalesHeader."No.";
                     SalesLine."Line No." := LineNo;
@@ -439,23 +433,23 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
                     Evaluate(LineAmountIncVat, NpXmlDomMgt.GetXmlText(XmlElement, 'line_amount_incl_vat', 0, true), 9);
                     if (Quantity2 = 0) and (LineAmountIncVat = 0) then begin
                         LineNo += 10000;
-                        SalesCommentLine.Init;
+                        SalesCommentLine.Init();
                         SalesCommentLine."Document Type" := SalesHeader."Document Type";
                         SalesCommentLine."No." := SalesHeader."No.";
                         SalesCommentLine."Document Line No." := 0;
                         SalesCommentLine."Line No." := LineNo;
-                        SalesCommentLine.Date := Today;
+                        SalesCommentLine.Date := Today();
                         SalesCommentLine.Comment := NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true);
                         SalesCommentLine.Insert(true);
                     end else begin
                         LineNo += 10000;
-                        SalesLine.Init;
+                        SalesLine.Init();
                         SalesLine."Document Type" := SalesHeader."Document Type";
                         SalesLine."Document No." := SalesHeader."No.";
                         SalesLine."Line No." := LineNo;
                         SalesLine.Insert(true);
                         ShipmentMapping.SetRange("External Shipment Method Code", NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_no', false));
-                        ShipmentMapping.FindFirst;
+                        ShipmentMapping.FindFirst();
                         SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
                         SalesLine.Validate("No.", ShipmentMapping."Shipment Fee No.");
                         if Quantity2 <> 0 then
@@ -482,7 +476,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         MagentoSetup.TestField("Payment Fee Account No.");
 
         LineNo += 10000;
-        SalesLine.Init;
+        SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
@@ -505,11 +499,11 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
             exit;
 
         ShipmentMapping.SetRange("External Shipment Method Code", NpXmlDomMgt.GetXmlText(XmlElement, 'shipment_method', MaxStrLen(ShipmentMapping."External Shipment Method Code"), true));
-        ShipmentMapping.FindFirst;
+        ShipmentMapping.FindFirst();
         ShipmentMapping.TestField("Shipment Fee No.");
 
         LineNo += 10000;
-        SalesLine.Init;
+        SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
@@ -536,7 +530,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         ContBusRel.SetRange("Contact No.", Contact."Company No.");
         ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
         ContBusRel.SetFilter("No.", '<>%1', '');
-        if not ContBusRel.FindFirst then
+        if not ContBusRel.FindFirst() then
             exit(false);
 
         exit(Customer.Get(ContBusRel."No."));
@@ -547,7 +541,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         Initialize;
         Clear(Customer);
         Customer.SetRange("E-Mail", NpXmlDomMgt.GetXmlText(XmlElement, 'email', MaxStrLen(Customer."E-Mail"), false));
-        exit(Customer.FindFirst and (Customer."E-Mail" <> ''));
+        exit(Customer.FindFirst() and (Customer."E-Mail" <> ''));
     end;
 
     local procedure GetCurrencyCode(CurrencyCode: Code[10]): Code[10]
@@ -559,7 +553,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         if not MagentoSetup."Use Blank Code for LCY" then
             exit(CurrencyCode);
 
-        GLSetup.Get;
+        GLSetup.Get();
         if GLSetup."LCY Code" = CurrencyCode then
             exit('');
 
@@ -578,11 +572,11 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
 
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
         SalesHeader.SetRange("NPR External Order No.", CopyStr(OrderNo, 1, MaxStrLen(SalesHeader."NPR External Order No.")));
-        if SalesHeader.FindFirst then
+        if SalesHeader.FindFirst() then
             exit(true);
 
         SalesCrMemoHeader.SetRange("NPR External Order No.", CopyStr(OrderNo, 1, MaxStrLen(SalesCrMemoHeader."NPR External Order No.")));
-        if SalesCrMemoHeader.FindFirst then
+        if SalesCrMemoHeader.FindFirst() then
             exit(true);
 
         exit(false);
@@ -603,19 +597,15 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
     procedure Initialize()
     begin
         if not Initialized then begin
-            MagentoSetup.Get;
+            MagentoSetup.Get();
             Initialized := true;
         end;
     end;
 
-    local procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean
+    local procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer): Boolean
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        ItemVariant: Record "Item Variant";
-        GenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
     begin
         ResolvingTable := 0;
         ItemNo := '';

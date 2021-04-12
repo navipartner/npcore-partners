@@ -78,8 +78,6 @@ table 6151553 "NPR NpXml Filter"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                "Field": Record "Field";
             begin
             end;
         }
@@ -129,8 +127,6 @@ table 6151553 "NPR NpXml Filter"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                "Field": Record "Field";
             begin
             end;
         }
@@ -149,8 +145,6 @@ table 6151553 "NPR NpXml Filter"
             Description = 'NC1.08';
 
             trigger OnLookup()
-            var
-                NewFilterValue: Text;
             begin
                 NpXmlTemplateMgt.LookupFieldValue("Table No.", "Field No.", "Filter Value");
             end;

@@ -19,51 +19,51 @@ page 6014561 "NPR RP Data Items"
             repeater(Group)
             {
                 FreezeColumn = Name;
-                IndentationColumn = Level;
+                IndentationColumn = Rec.Level;
                 IndentationControls = "Data Source";
-                field("Data Source"; "Data Source")
+                field("Data Source"; Rec."Data Source")
                 {
                     ApplicationArea = All;
                     Style = Strong;
-                    StyleExpr = Level = 0;
+                    StyleExpr = Rec.Level = 0;
                     ToolTip = 'Specifies the value of the Data Source field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Iteration Type"; "Iteration Type")
+                field("Iteration Type"; Rec."Iteration Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Iteration Type field';
                 }
-                field("Key ID"; "Key ID")
+                field("Key ID"; Rec."Key ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Key ID field';
                 }
-                field("Sort Order"; "Sort Order")
+                field("Sort Order"; Rec."Sort Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sort Order field';
                 }
-                field("Total Fields"; "Total Fields")
+                field("Total Fields"; Rec."Total Fields")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Total Fields field';
                 }
-                field("Field ID"; "Field ID")
+                field("Field ID"; Rec."Field ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field ID field';
                 }
-                field("Skip Template If Empty"; "Skip Template If Empty")
+                field("Skip Template If Empty"; Rec."Skip Template If Empty")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Skip Template If Empty field';
                 }
-                field("Skip Template If Not Empty"; "Skip Template If Not Empty")
+                field("Skip Template If Not Empty"; Rec."Skip Template If Not Empty")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Skip Template If Not Empty field';
@@ -91,7 +91,7 @@ page 6014561 "NPR RP Data Items"
                 Caption = 'Unindent';
                 Image = PreviousRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -107,7 +107,7 @@ page 6014561 "NPR RP Data Items"
                 Caption = 'Indent';
                 Image = NextRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -123,7 +123,7 @@ page 6014561 "NPR RP Data Items"
                 Caption = 'Constraints';
                 Image = FilterLines;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Data Item Constr.";
@@ -145,11 +145,11 @@ page 6014561 "NPR RP Data Items"
         // MODIFY(TRUE);
 
         CurrPage.SetSelectionFilter(DataItem);
-        if DataItem.FindSet then
+        if DataItem.FindSet() then
             repeat
                 DataItem.Validate(Level, DataItem.Level + 1);
                 DataItem.Modify(true);
-            until DataItem.Next = 0;
+            until DataItem.Next() = 0;
         //+NPR5.34 [284505]
     end;
 
@@ -164,13 +164,13 @@ page 6014561 "NPR RP Data Items"
         // MODIFY(TRUE);
 
         CurrPage.SetSelectionFilter(DataItem);
-        if DataItem.FindSet then
+        if DataItem.FindSet() then
             repeat
                 if DataItem.Level > 0 then begin
                     DataItem.Validate(Level, DataItem.Level - 1);
                     DataItem.Modify(true);
                 end;
-            until DataItem.Next = 0;
+            until DataItem.Next() = 0;
         //+NPR5.34 [284505]
     end;
 
@@ -179,13 +179,13 @@ page 6014561 "NPR RP Data Items"
         DataItemLinks: Page "NPR RP Data Item Links";
         DataItemLink: Record "NPR RP Data Item Links";
     begin
-        DataItemLink.SetRange("Data Item Code", Code);
-        DataItemLink.SetRange("Child Line No.", "Line No.");
-        DataItemLink.SetRange("Parent Line No.", "Parent Line No.");
-        DataItemLink.SetRange("Parent Table ID", "Parent Table ID");
-        DataItemLink.SetRange("Table ID", "Table ID");
+        DataItemLink.SetRange("Data Item Code", Rec.Code);
+        DataItemLink.SetRange("Child Line No.", Rec."Line No.");
+        DataItemLink.SetRange("Parent Line No.", Rec."Parent Line No.");
+        DataItemLink.SetRange("Parent Table ID", Rec."Parent Table ID");
+        DataItemLink.SetRange("Table ID", Rec."Table ID");
         DataItemLinks.SetTableView(DataItemLink);
-        DataItemLinks.RunModal;
+        DataItemLinks.RunModal();
     end;
 }
 

@@ -102,14 +102,14 @@ table 6014474 "NPR Item Repl. by Store"
         }
         field(50; "Item Description"; Text[30])
         {
-            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(60; "Variant Description"; Text[30])
         {
-            CalcFormula = Lookup ("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
+            CalcFormula = Lookup("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
                                                                    "Item No." = FIELD("Item No.")));
             Caption = 'Variant Description';
             Editable = false;

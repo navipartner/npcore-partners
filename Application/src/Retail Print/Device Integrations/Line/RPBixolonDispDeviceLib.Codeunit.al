@@ -37,13 +37,6 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
     EventSubscriberInstance = Manual;
 
     trigger OnRun()
-    var
-        Itt: Integer;
-        J: Integer;
-        cNUL: Char;
-        ff: File;
-        kc1: Char;
-        kc2: Char;
     begin
     end;
 
@@ -69,14 +62,13 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnInitJob', '', false, false)]
     local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
-        Init;
+        Init();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
-        with POSPrintBuffer do
-            PrintText(Text);
+        PrintText(POSPrintBuffer.Text);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetPageWidth', '', false, false)]
@@ -109,7 +101,7 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
         tmpRetailList.Number += 1;
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     local procedure "// ShortHandFunctions"()
@@ -123,8 +115,6 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
     end;
 
     procedure PrintText(Text: Text)
-    var
-        BarcodeNo: Integer;
     begin
         AddTextToBuffer(Text);
     end;

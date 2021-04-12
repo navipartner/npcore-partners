@@ -1,4 +1,4 @@
-codeunit 6014403 "NPR Barcode Lookup Mgt."
+﻿codeunit 6014403 "NPR Barcode Lookup Mgt."
 {
     var
         ItemWithItemRefNoNotFoundErr: Label 'There are no items with reference: %1', Comment = '%1=TempItemRefNo';
@@ -43,15 +43,13 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
             end;
         end;
 
-        with Item do begin
-            if (StrLen(Barcode) <= MaxStrLen("Vendor Item No.")) then begin
-                SetCurrentKey("Vendor Item No.", "Vendor No.");
-                SetRange("Vendor Item No.", Barcode);
-                if FindFirst() then begin
-                    ResolvingTable := DATABASE::Item;
-                    ItemNo := "No.";
-                    exit(true);
-                end;
+        if (StrLen(Barcode) <= MaxStrLen(Item."Vendor Item No.")) then begin
+            Item.SetCurrentKey("Vendor Item No.", "Vendor No.");
+            Item.SetRange("Vendor Item No.", Barcode);
+            if Item.FindFirst() then begin
+                ResolvingTable := DATABASE::Item;
+                ItemNo := Item."No.";
+                exit(true);
             end;
         end;
 
@@ -93,49 +91,45 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     var
         ReturnedItemRef: Record "Item Reference";
     begin
-        with Rec do begin
-            GetTransferHeader(Rec);
-            ReturnedItemRef.Init;
-            if "NPR Cross-Reference No." <> '' then begin
-                ICRLookupTransferItem(Rec, ReturnedItemRef);
-                Validate("Item No.", ReturnedItemRef."Item No.");
-                if ReturnedItemRef."Variant Code" <> '' then
-                    Validate("Variant Code", ReturnedItemRef."Variant Code");
-                if ReturnedItemRef."Unit of Measure" <> '' then
-                    Validate("Unit of Measure Code", ReturnedItemRef."Unit of Measure");
-            end;
-            "NPR Cross-Reference No." := ReturnedItemRef."Reference No.";
-            if ReturnedItemRef.Description <> '' then
-                Description := ReturnedItemRef.Description;
+        GetTransferHeader(Rec);
+        ReturnedItemRef.Init();
+        if Rec."NPR Cross-Reference No." <> '' then begin
+            ICRLookupTransferItem(Rec, ReturnedItemRef);
+            Rec.Validate("Item No.", ReturnedItemRef."Item No.");
+            if ReturnedItemRef."Variant Code" <> '' then
+                Rec.Validate("Variant Code", ReturnedItemRef."Variant Code");
+            if ReturnedItemRef."Unit of Measure" <> '' then
+                Rec.Validate("Unit of Measure Code", ReturnedItemRef."Unit of Measure");
         end;
+        Rec."NPR Cross-Reference No." := ReturnedItemRef."Reference No.";
+        if ReturnedItemRef.Description <> '' then
+            Rec.Description := ReturnedItemRef.Description;
     end;
 
     local procedure GetTransferHeader(var TransferLine2: Record "Transfer Line")
     var
         TransHeader: Record "Transfer Header";
     begin
-        with TransferLine2 do begin
-            TestField("Document No.");
-            if "Document No." <> TransHeader."No." then
-                TransHeader.Get("Document No.");
+        TransferLine2.TestField("Document No.");
+        if TransferLine2."Document No." <> TransHeader."No." then
+            TransHeader.Get(TransferLine2."Document No.");
 
-            TransHeader.TestField("Shipment Date");
-            TransHeader.TestField("Receipt Date");
-            TransHeader.TestField("Transfer-from Code");
-            TransHeader.TestField("Transfer-to Code");
-            TransHeader.TestField("In-Transit Code");
-            "In-Transit Code" := TransHeader."In-Transit Code";
-            "Transfer-from Code" := TransHeader."Transfer-from Code";
-            "Transfer-to Code" := TransHeader."Transfer-to Code";
-            "Shipment Date" := TransHeader."Shipment Date";
-            "Receipt Date" := TransHeader."Receipt Date";
-            "Shipping Agent Code" := TransHeader."Shipping Agent Code";
-            "Shipping Agent Service Code" := TransHeader."Shipping Agent Service Code";
-            "Shipping Time" := TransHeader."Shipping Time";
-            "Outbound Whse. Handling Time" := TransHeader."Outbound Whse. Handling Time";
-            "Inbound Whse. Handling Time" := TransHeader."Inbound Whse. Handling Time";
-            Status := TransHeader.Status;
-        end;
+        TransHeader.TestField("Shipment Date");
+        TransHeader.TestField("Receipt Date");
+        TransHeader.TestField("Transfer-from Code");
+        TransHeader.TestField("Transfer-to Code");
+        TransHeader.TestField("In-Transit Code");
+        TransferLine2."In-Transit Code" := TransHeader."In-Transit Code";
+        TransferLine2."Transfer-from Code" := TransHeader."Transfer-from Code";
+        TransferLine2."Transfer-to Code" := TransHeader."Transfer-to Code";
+        TransferLine2."Shipment Date" := TransHeader."Shipment Date";
+        TransferLine2."Receipt Date" := TransHeader."Receipt Date";
+        TransferLine2."Shipping Agent Code" := TransHeader."Shipping Agent Code";
+        TransferLine2."Shipping Agent Service Code" := TransHeader."Shipping Agent Service Code";
+        TransferLine2."Shipping Time" := TransHeader."Shipping Time";
+        TransferLine2."Outbound Whse. Handling Time" := TransHeader."Outbound Whse. Handling Time";
+        TransferLine2."Inbound Whse. Handling Time" := TransHeader."Inbound Whse. Handling Time";
+        TransferLine2.Status := TransHeader.Status;
     end;
 
     procedure EnterTransferItemCrossRef(var TransferLine: Record "Transfer Line")
@@ -177,8 +171,6 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     procedure ICRLookupTransferItem(var TransferLine2: Record "Transfer Line"; var ReturnedItemRef: Record "Item Reference")
     var
         ItemReference: Record "Item Reference";
-        ItemVariant: Record "Item Variant";
-        Item: Record Item;
         TempItemRefNo: Text;
         TransferLine: Record "Transfer Line";
     begin
@@ -197,7 +189,7 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
             if not ItemReference.Find('-') then begin
                 Error(ItemWithItemRefNoNotFoundErr, TempItemRefNo)
             end;
-            if ItemReference.Next <> 0 then begin
+            if ItemReference.Next() <> 0 then begin
                 ItemReference.SetRange("Reference Type No.", '');
                 if ItemReference.Find('-') then
                     if ItemReference.Next() <> 0 then begin
@@ -228,15 +220,13 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     var
         ItemReference3: Record "Item Reference";
     begin
-        with TransferLine3 do begin
-            GetTransferHeader(TransferLine3);
-            ItemReference3.Reset;
-            ItemReference3.SetCurrentKey("Reference Type", "Reference Type No.");
-            ItemReference3.SetFilter("Reference Type", '%1', ItemReference3."Reference Type"::" ");
-            ItemReference3.SetFilter("Reference Type No.", '%1', '');
-            if PAGE.RunModal(PAGE::"Item Reference List", ItemReference3) = ACTION::LookupOK then
-                Validate("NPR Cross-Reference No.", ItemReference3."Reference No.");
-        end;
+        GetTransferHeader(TransferLine3);
+        ItemReference3.Reset();
+        ItemReference3.SetCurrentKey("Reference Type", "Reference Type No.");
+        ItemReference3.SetFilter("Reference Type", '%1', ItemReference3."Reference Type"::" ");
+        ItemReference3.SetFilter("Reference Type No.", '%1', '');
+        if PAGE.RunModal(PAGE::"Item Reference List", ItemReference3) = ACTION::LookupOK then
+            TransferLine3.Validate("NPR Cross-Reference No.", ItemReference3."Reference No.");
     end;
 
     local procedure GetMixedDiscountHeader(var MixedDiscountLine: Record "NPR Mixed Discount Line")
@@ -259,18 +249,16 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     var
         ItemReference2: Record "Item Reference";
     begin
-        with MixedDiscountLine do begin
-            if "Disc. Grouping Type" <> "Disc. Grouping Type"::Item then
-                exit;
-            GetMixedDiscountHeader(MixedDiscountLine);
-            ItemReference2.Reset;
-            ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
-            ItemReference2.SetFilter("Reference Type", '%1', ItemReference2."Reference Type"::"Bar Code");
-            ItemReference2.SetFilter("Reference Type No.", '%1', '');
-            if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
-                "No." := ItemReference2."Item No.";
-                Validate("Cross-Reference No.", ItemReference2."Reference No.");
-            end;
+        if MixedDiscountLine."Disc. Grouping Type" <> MixedDiscountLine."Disc. Grouping Type"::Item then
+            exit;
+        GetMixedDiscountHeader(MixedDiscountLine);
+        ItemReference2.Reset();
+        ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
+        ItemReference2.SetFilter("Reference Type", '%1', ItemReference2."Reference Type"::"Bar Code");
+        ItemReference2.SetFilter("Reference Type No.", '%1', '');
+        if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
+            MixedDiscountLine."No." := ItemReference2."Item No.";
+            MixedDiscountLine.Validate("Cross-Reference No.", ItemReference2."Reference No.");
         end;
     end;
 
@@ -279,7 +267,7 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     var
         ReturnedItemRef: Record "Item Reference";
     begin
-        ReturnedItemRef.Init;
+        ReturnedItemRef.Init();
         if Rec."Cross-Reference No." <> '' then begin
             ICRLookupMixedDiscount(Rec, ReturnedItemRef);
             Rec.Validate("No.", ReturnedItemRef."Item No.");
@@ -295,7 +283,6 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         ItemReference: Record "Item Reference";
-        ItemVariant: Record "Item Variant";
         TempItemRefNo: Text;
     begin
         MixedDiscountLine.Copy(MixedDiscountLine2);
@@ -313,10 +300,10 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
                 if not ItemReference.Find('-') then begin
                     Error(ItemWithItemRefNoNotFoundErr, TempItemRefNo)
                 end;
-                if ItemReference.Next <> 0 then begin
+                if ItemReference.Next() <> 0 then begin
                     ItemReference.SetRange("Reference Type No.", '');
                     if ItemReference.Find('-') then
-                        if ItemReference.Next <> 0 then begin
+                        if ItemReference.Next() <> 0 then begin
                             ItemReference.SetRange("Reference Type No.");
                             if PAGE.RunModal(PAGE::"Item Reference List", ItemReference) <> ACTION::LookupOK
                             then
@@ -347,16 +334,14 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     var
         ItemReference2: Record "Item Reference";
     begin
-        with PeriodDiscountLine do begin
-            GetPeriodicDiscountHeader(PeriodDiscountLine);
-            ItemReference2.Reset;
-            ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
-            ItemReference2.SetFilter("Reference Type", '%1', ItemReference2."Reference Type"::"Bar Code");
-            ItemReference2.SetFilter("Reference Type No.", '%1', '');
-            if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
-                "Item No." := ItemReference2."Item No.";
-                Validate("Cross-Reference No.", ItemReference2."Reference No.");
-            end;
+        GetPeriodicDiscountHeader(PeriodDiscountLine);
+        ItemReference2.Reset();
+        ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
+        ItemReference2.SetFilter("Reference Type", '%1', ItemReference2."Reference Type"::"Bar Code");
+        ItemReference2.SetFilter("Reference Type No.", '%1', '');
+        if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
+            PeriodDiscountLine."Item No." := ItemReference2."Item No.";
+            PeriodDiscountLine.Validate("Cross-Reference No.", ItemReference2."Reference No.");
         end;
     end;
 
@@ -365,25 +350,22 @@ codeunit 6014403 "NPR Barcode Lookup Mgt."
     var
         ReturnedItemRef: Record "Item Reference";
     begin
-        with Rec do begin
-            ReturnedItemRef.Init;
-            if "Cross-Reference No." <> '' then begin
-                ICRLookupPeriodicDiscount(Rec, ReturnedItemRef);
-                Validate("Item No.", ReturnedItemRef."Item No.");
-                if ReturnedItemRef."Variant Code" <> '' then
-                    Validate("Variant Code", ReturnedItemRef."Variant Code");
-            end;
-            "Cross-Reference No." := ReturnedItemRef."Reference No.";
-            if ReturnedItemRef.Description <> '' then
-                Description := ReturnedItemRef.Description;
+        ReturnedItemRef.Init();
+        if Rec."Cross-Reference No." <> '' then begin
+            ICRLookupPeriodicDiscount(Rec, ReturnedItemRef);
+            Rec.Validate("Item No.", ReturnedItemRef."Item No.");
+            if ReturnedItemRef."Variant Code" <> '' then
+                Rec.Validate("Variant Code", ReturnedItemRef."Variant Code");
         end;
+        Rec."Cross-Reference No." := ReturnedItemRef."Reference No.";
+        if ReturnedItemRef.Description <> '' then
+            Rec.Description := ReturnedItemRef.Description;
     end;
 
     procedure ICRLookupPeriodicDiscount(var PeriodDiscountLine2: Record "NPR Period Discount Line"; var ReturnedItemRef: Record "Item Reference")
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
         ItemReference: Record "Item Reference";
-        ItemVariant: Record "Item Variant";
         TempItemRefNo: Text;
     begin
         PeriodDiscountLine.Copy(PeriodDiscountLine2);

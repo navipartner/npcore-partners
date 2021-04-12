@@ -13,12 +13,12 @@ page 6151566 "NPR NpXml Api Headers"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value field';

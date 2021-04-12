@@ -1,4 +1,4 @@
-table 6151523 "NPR Nc Endpoint E-mail"
+﻿table 6151523 "NPR Nc Endpoint E-mail"
 {
     // NC2.01/BR /20160818  CASE 248630 NaviConnect
 
@@ -131,11 +131,11 @@ table 6151523 "NPR Nc Endpoint E-mail"
         NcEndpointTriggerLinks: Page "NPR Nc Endpoint Trigger Links";
     begin
         Clear(NcEndpointTriggerLinks);
-        NcEndpointTriggerLink.Reset;
+        NcEndpointTriggerLink.Reset();
         //NcEndpointTriggerLink.SETRANGE("Endpoint Type Code",GetEndpointTypeCode);
         NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
         NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
-        NcEndpointTriggerLinks.RunModal;
+        NcEndpointTriggerLinks.RunModal();
     end;
 
     local procedure UpdateNcEndpoint()
@@ -146,10 +146,10 @@ table 6151523 "NPR Nc Endpoint E-mail"
     begin
         ToBeUpdated := false;
         if not NcEndpoint.Get(Code) then begin
-            NcEndpoint.Init;
+            NcEndpoint.Init();
             NcEndpoint.Validate(Code, Code);
             NcEndpoint.Validate("Endpoint Type", GetEndpointTypeCode);
-            NcEndpoint.Insert;
+            NcEndpoint.Insert();
         end;
         if Description <> NcEndpoint.Description then begin
             NcEndpoint.Description := Description;

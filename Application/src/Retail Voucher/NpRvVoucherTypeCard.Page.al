@@ -15,13 +15,13 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 group(Control6014420)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Code field';
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
@@ -30,17 +30,17 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 group(Control6014424)
                 {
                     ShowCaption = false;
-                    field("Voucher Qty. (Open)"; "Voucher Qty. (Open)")
+                    field("Voucher Qty. (Open)"; Rec."Voucher Qty. (Open)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Voucher Qty. (Open) field';
                     }
-                    field("Voucher Qty. (Closed)"; "Voucher Qty. (Closed)")
+                    field("Voucher Qty. (Closed)"; Rec."Voucher Qty. (Closed)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Voucher Qty. (Closed) field';
                     }
-                    field("Arch. Voucher Qty."; "Arch. Voucher Qty.")
+                    field("Arch. Voucher Qty."; Rec."Arch. Voucher Qty.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Archived Voucher Qty. field';
@@ -53,28 +53,28 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 group(Control6014425)
                 {
                     ShowCaption = false;
-                    field("Send Voucher Module"; "Send Voucher Module")
+                    field("Send Voucher Module"; Rec."Send Voucher Module")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Send Voucher Module field';
                     }
-                    field("Account No."; "Account No.")
+                    field("Account No."; Rec."Account No.")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Account No. field';
                     }
-                    field("Partner Code"; "Partner Code")
+                    field("Partner Code"; Rec."Partner Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Partner Code field';
                     }
-                    field("Allow Top-up"; "Allow Top-up")
+                    field("Allow Top-up"; Rec."Allow Top-up")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Allow Top-up field';
                     }
-                    field("Minimum Amount Issue"; "Minimum Amount Issue")
+                    field("Minimum Amount Issue"; Rec."Minimum Amount Issue")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Minimum Amount Issue field';
@@ -83,18 +83,18 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("No. Series"; "No. Series")
+                    field("No. Series"; Rec."No. Series")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the No. Series field';
                     }
-                    field("Arch. No. Series"; "Arch. No. Series")
+                    field("Arch. No. Series"; Rec."Arch. No. Series")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Archivation No. Series field';
                     }
-                    field("Reference No. Type"; "Reference No. Type")
+                    field("Reference No. Type"; Rec."Reference No. Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Reference No. Type field';
@@ -102,8 +102,8 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     group(Control6014407)
                     {
                         ShowCaption = false;
-                        Visible = ("Reference No. Type" = 0);
-                        field("Reference No. Pattern"; "Reference No. Pattern")
+                        Visible = (Rec."Reference No. Type" = 0);
+                        field("Reference No. Pattern"; Rec."Reference No. Pattern")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
@@ -113,35 +113,35 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     group(Control6014405)
                     {
                         ShowCaption = false;
-                        Visible = ("Reference No. Type" = 1);
-                        field(EAN13ReferenceNoPattern; "Reference No. Pattern")
+                        Visible = (Rec."Reference No. Type" = 1);
+                        field(EAN13ReferenceNoPattern; Rec."Reference No. Pattern")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
                             ToolTip = '[S] ~ Voucher No. || [N] ~ Random Number || [N*3] ~ 3 Random Numbers';
                         }
                     }
-                    field("Print Template Code"; "Print Template Code")
+                    field("Print Template Code"; Rec."Print Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Template Code field';
                     }
-                    field("E-mail Template Code"; "E-mail Template Code")
+                    field("E-mail Template Code"; Rec."E-mail Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the E-mail Template Code field';
                     }
-                    field("SMS Template Code"; "SMS Template Code")
+                    field("SMS Template Code"; Rec."SMS Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the SMS Template Code field';
                     }
-                    field("Send Method via POS"; "Send Method via POS")
+                    field("Send Method via POS"; Rec."Send Method via POS")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Send Method via POS field';
                     }
-                    field("Voucher Message"; "Voucher Message")
+                    field("Voucher Message"; Rec."Voucher Message")
                     {
                         ApplicationArea = All;
                         MultiLine = true;
@@ -155,7 +155,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 group(Control6014427)
                 {
                     ShowCaption = false;
-                    field("Validate Voucher Module"; "Validate Voucher Module")
+                    field("Validate Voucher Module"; Rec."Validate Voucher Module")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Validate Voucher Module field';
@@ -164,7 +164,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 group(Control6014428)
                 {
                     ShowCaption = false;
-                    field("Valid Period"; "Valid Period")
+                    field("Valid Period"; Rec."Valid Period")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
@@ -175,12 +175,12 @@ page 6151012 "NPR NpRv Voucher Type Card"
             group("Apply Payment")
             {
                 Caption = 'Apply Payment';
-                field("Apply Payment Module"; "Apply Payment Module")
+                field("Apply Payment Module"; Rec."Apply Payment Module")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Apply Payment Module field';
                 }
-                field("Payment Type"; "Payment Type")
+                field("Payment Type"; Rec."Payment Type")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
@@ -201,7 +201,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     Caption = 'Setup Send Voucher';
                     Image = VoucherGroup;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasIssueVoucherSetup;
@@ -220,7 +220,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     Caption = 'Setup Validate Voucher';
                     Image = RefreshVoucher;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasValidateVoucherSetup;
@@ -239,7 +239,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     Caption = 'Setup Apply Payment';
                     Image = Voucher;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasApplyPaymentSetup;
@@ -273,7 +273,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                 Image = UserSetup;
                 RunObject = Page "NPR NpRv Partner Card";
                 RunPageLink = Code = FIELD("Partner Code");
-                Visible = "Partner Code" <> '';
+                Visible = Rec."Partner Code" <> '';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Partner Card action';
             }

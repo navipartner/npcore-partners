@@ -87,7 +87,7 @@ table 6151030 "NPR NpRv Sending Log"
         BufferText: Text;
     begin
         FullLogMessage := '';
-        if not "Error Message".HasValue then
+        if not "Error Message".HasValue() then
             exit('');
 
         CalcFields("Error Message");

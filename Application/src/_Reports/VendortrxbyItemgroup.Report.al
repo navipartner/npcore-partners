@@ -99,7 +99,7 @@ report 6014449 "NPR Vendor trx by Item group"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if (ItemCategory.GetFilter("NPR Vendor Filter") = '') and ("NPR Sales (LCY)" = 0) then CurrReport.Skip;
+                    if (ItemCategory.GetFilter("NPR Vendor Filter") = '') and ("NPR Sales (LCY)" = 0) then CurrReport.Skip();
 
                     Clear(dg);
                     if "NPR Sales (LCY)" <> 0 then
@@ -107,7 +107,6 @@ report 6014449 "NPR Vendor trx by Item group"
 
                     AuxItemLedgerEntry.SetRange("Vendor No.", "No.");
                     AuxItemLedgerEntry.CalcSums(Quantity);
-                    negatedQuantity := AuxItemLedgerEntry.Quantity * -1;
                     vgvendor.SetFilter("NPR Vendor Filter", "No.");
                     vgvendor.CalcFields("NPR Purchases (LCY)", "NPR Purchases (Qty.)", "NPR Sales (LCY)", "NPR Sales (Qty.)");
                 end;
@@ -143,7 +142,7 @@ report 6014449 "NPR Vendor trx by Item group"
                 end;
 
                 if not visudensalg then begin
-                    if not ("NPR Sales (Qty.)" <> 0) then CurrReport.Skip;
+                    if not ("NPR Sales (Qty.)" <> 0) then CurrReport.Skip();
                 end;
 
                 Clear(dgItemGrp);
@@ -274,7 +273,6 @@ report 6014449 "NPR Vendor trx by Item group"
         startdato: Date;
         dg: Decimal;
         dgItemGrp: Decimal;
-        negatedQuantity: Decimal;
         pcttot: Decimal;
         pctvaresalgfjor: Decimal;
         TotalConsumptionAmt: Decimal;

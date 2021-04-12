@@ -1,4 +1,4 @@
-codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
+﻿codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
 {
 
     Permissions = TableData "Vendor Ledger Entry" = rm;
@@ -16,7 +16,7 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         if NpRiModule.Get(PurchDocDiscCode()) then
             exit;
 
-        NpRiModule.Init;
+        NpRiModule.Init();
         NpRiModule.Code := PurchDocDiscCode();
         NpRiModule.Description := CopyStr(Text000, 1, MaxStrLen(NpRiModule.Description));
         NpRiModule.Type := NpRiModule.Type::Reimbursement;
@@ -62,10 +62,10 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
             exit;
 
         if not NpRiPurchDocDiscSetup.Get(NpRiReimbursementTemplate.Code) then begin
-            NpRiPurchDocDiscSetup.Init;
+            NpRiPurchDocDiscSetup.Init();
             NpRiPurchDocDiscSetup."Template Code" := NpRiReimbursementTemplate.Code;
             NpRiPurchDocDiscSetup.Insert(true);
-            Commit;
+            Commit();
         end;
 
         NpRiPurchDocDiscSetup.FilterGroup(2);
@@ -74,7 +74,7 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
 
         PAGE.RunModal(PAGE::"NPR NpRi Purch.Doc.Disc. Setup", NpRiPurchDocDiscSetup);
 
-        if NpRiPurchDocDiscSetup.Find then;
+        if NpRiPurchDocDiscSetup.Find() then;
         NpRiPurchDocDiscSetup.SetRange("Discount %", NpRiPurchDocDiscSetup."Discount %");
         NpRiPurchDocDiscSetup.SetRange("Bal. Account No.", NpRiPurchDocDiscSetup."Bal. Account No.");
         NpRiPurchDocDiscSetup.SetRange("Bal. Gen. Prod. Posting Group", NpRiPurchDocDiscSetup."Bal. Gen. Prod. Posting Group");
@@ -104,7 +104,7 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         Vendor: Record Vendor;
         ReimbursementAmount: Decimal;
     begin
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
         GetVendor(NpRiReimbursement, Vendor);
 
         CreateGenJnl(NpRiReimbursement, Vendor, NpRiReimbursementEntryApply, TempGenJnlLine);
@@ -139,9 +139,9 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         NpRiPurchDocDiscSetup.TestField("Discount %");
         NpRiPurchDocDiscSetup.TestField("Bal. Account No.");
 
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
 
-        TempGenJnlLine.Init;
+        TempGenJnlLine.Init();
         TempGenJnlLine."Posting Date" := NpRiReimbursement."Posting Date";
         TempGenJnlLine."Document No." := NpRiReimbursementEntryApply."Document No.";
         TempGenJnlLine."Document Date" := NpRiReimbursement."Posting Date";
@@ -165,7 +165,7 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         TempGenJnlLine."Applies-to Doc. No." := '';
         TempGenJnlLine."Applies-to ID" := TempGenJnlLine."Document No.";
         TempGenJnlLine."Allow Zero-Amount Posting" := true;
-        TempGenJnlLine.Insert;
+        TempGenJnlLine.Insert();
     end;
 
     local procedure SetVendLedgEntryAppIds(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry"; var TempGenJnlLine: Record "Gen. Journal Line" temporary) ReimbursementAmount: Decimal
@@ -175,25 +175,24 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
     begin
         NpRiReimbursementEntry.SetRange("Closed by Entry No.", NpRiReimbursementEntryApply."Entry No.");
         NpRiReimbursementEntry.SetFilter("Source Table No.", '<>%1', DATABASE::"Vendor Ledger Entry");
-        if NpRiReimbursementEntry.FindFirst then
+        if NpRiReimbursementEntry.FindFirst() then
             Error(Text001);
 
         NpRiPurchDocDiscSetup.Get(NpRiReimbursement."Template Code");
 
-        NpRiReimbursementEntry.Reset;
+        NpRiReimbursementEntry.Reset();
         NpRiReimbursementEntry.SetRange("Closed by Entry No.", NpRiReimbursementEntryApply."Entry No.");
-        if NpRiReimbursementEntry.FindSet then
+        if NpRiReimbursementEntry.FindSet() then
             repeat
                 ReimbursementAmount += SetVendLedgEntryAppId(NpRiPurchDocDiscSetup, TempGenJnlLine, NpRiReimbursementEntry);
-            until NpRiReimbursementEntry.Next = 0;
+            until NpRiReimbursementEntry.Next() = 0;
 
         exit(ReimbursementAmount);
     end;
 
-    local procedure SetVendLedgEntryAppId(NpRiPurchDocDiscSetup: Record "NPR NpRi Purch.Doc.Disc. Setup"; var TempGenJnlLine: Record "Gen. Journal Line" temporary; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry") ReimbursementAmount: Decimal
+    local procedure SetVendLedgEntryAppId(NpRiPurchDocDiscSetup: Record "NPR NpRi Purch.Doc.Disc. Setup"; var TempGenJnlLine: Record "Gen. Journal Line" temporary; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"): Decimal
     var
         VendLedgEntry: Record "Vendor Ledger Entry";
-        VendEntrySetApplID: Codeunit "Vend. Entry-SetAppl.ID";
         AmountToApply: Decimal;
     begin
         VendLedgEntry.Get(NpRiReimbursementEntry."Source Entry No.");
@@ -208,10 +207,10 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
 
         VendLedgEntry."Applies-to ID" := TempGenJnlLine."Document No.";
         VendLedgEntry."Amount to Apply" := AmountToApply;
-        VendLedgEntry.Modify;
+        VendLedgEntry.Modify();
 
         NpRiReimbursementEntry."Reimbursement Amount" := VendLedgEntry."Amount to Apply";
-        NpRiReimbursementEntry.Modify;
+        NpRiReimbursementEntry.Modify();
 
         exit(NpRiReimbursementEntry."Reimbursement Amount");
     end;
@@ -231,15 +230,15 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
 
         VendLedgEntry.SetRange("Posting Date", TempGenJnlLine2."Posting Date");
         VendLedgEntry.SetRange("Document No.", TempGenJnlLine2."Document No.");
-        VendLedgEntry.FindLast;
+        VendLedgEntry.FindLast();
         UpdateApplicationEntry2(VendLedgEntry, NpRiReimbursementEntryApply);
     end;
 
     local procedure LockGLEntry(var GLEntry: Record "G/L Entry")
     begin
         Clear(GLEntry);
-        GLEntry.LockTable;
-        if GLEntry.FindLast then;
+        GLEntry.LockTable();
+        if GLEntry.FindLast() then;
         GLEntry."Entry No." += 1;
     end;
 

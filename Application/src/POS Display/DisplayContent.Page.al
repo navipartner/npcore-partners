@@ -15,17 +15,17 @@ page 6059951 "NPR Display Content"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Content Lines"; "Content Lines")
+                field("Content Lines"; Rec."Content Lines")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Content Lines field';

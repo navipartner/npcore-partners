@@ -1,6 +1,6 @@
 report 6014408 "NPR Item Group Overview"
 {
-DefaultLayout = RDLC;
+    DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Overview.rdlc';
     Caption = 'Item Group Overview';
     UsageCategory = ReportsAndAnalysis;
@@ -72,6 +72,7 @@ DefaultLayout = RDLC;
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
     end;
+
     var
         CompanyInformation: Record "Company Information";
         DescriptionCaptionLbl: Label 'Description';

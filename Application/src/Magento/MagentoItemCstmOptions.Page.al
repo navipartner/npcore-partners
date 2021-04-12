@@ -1,4 +1,4 @@
-page 6151428 "NPR Magento Item Cstm Options"
+﻿page 6151428 "NPR Magento Item Cstm Options"
 {
     Caption = 'Magento Item Custom Options';
     DeleteAllowed = false;
@@ -100,8 +100,6 @@ page 6151428 "NPR Magento Item Cstm Options"
 
     var
         ItemNo: Code[20];
-        EnabledForeColor: Integer;
-        PriceForeColor: Integer;
 
     local procedure OnModifyTrigger()
     var
@@ -119,7 +117,7 @@ page 6151428 "NPR Magento Item Cstm Options"
             exit;
         end;
 
-        ItemCustomOption.Init;
+        ItemCustomOption.Init();
         ItemCustomOption := Rec;
         ItemCustomOption.Insert(true);
     end;
@@ -147,19 +145,19 @@ page 6151428 "NPR Magento Item Cstm Options"
         RecRef.GetTable(Rec);
         if not RecRef.IsTemporary then
             exit;
-        RecRef.Close;
+        RecRef.Close();
 
-        Rec.DeleteAll;
+        Rec.DeleteAll();
 
         if not Item.Get(ItemNo) then
             exit;
 
-        if not CustomOption.FindSet then
+        if not CustomOption.FindSet() then
             exit;
 
 
         repeat
-            Rec.Init;
+            Rec.Init();
             if ItemCustomOption.Get(ItemNo, CustomOption."No.") then
                 Rec := ItemCustomOption
             else begin
@@ -167,26 +165,21 @@ page 6151428 "NPR Magento Item Cstm Options"
                 Rec."Custom Option No." := CustomOption."No.";
                 Rec.Enabled := false;
             end;
-            Rec.Insert;
-        until CustomOption.Next = 0;
+            Rec.Insert();
+        until CustomOption.Next() = 0;
 
-        Rec.FindFirst;
+        Rec.FindFirst();
 
         CurrPage.Update(false);
     end;
 
     local procedure UpdateForeColors()
     begin
-        EnabledForeColor := 0;
-        PriceForeColor := 0;
 
         if not (Rec.Type in [Rec.Type::SelectDropDown, Rec.Type::SelectRadioButtons, Rec.Type::SelectCheckbox, Rec.Type::SelectMultiple]) then
             exit;
 
         Rec.CalcFields("Enabled Option Values");
 
-        PriceForeColor := 10061943; //Light Slate Gray 119-136-153
-        if Rec.Enabled and (Rec."Enabled Option Values" <= 0) then
-            EnabledForeColor := 17919;  //Orange Red 255-69-0
     end;
 }

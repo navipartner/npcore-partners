@@ -1,4 +1,4 @@
-codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
+﻿codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 {
     var
         Text003: Label 'Document Archived';
@@ -22,18 +22,18 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
         NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, Text003, not Success, GetLastErrorText);
-        Commit;
+        Commit();
         if not Success then
             exit(false);
 
         InsertArchCollectDocument(NpCsDocument, NpCsArchDocument);
 
         NpCsDocumentLogEntry.SetRange("Document Entry No.", NpCsDocument."Entry No.");
-        if NpCsDocumentLogEntry.FindSet then
+        if NpCsDocumentLogEntry.FindSet() then
             repeat
                 InsertArchCollectDocumentLogEntry(NpCsDocumentLogEntry, NpCsArchDocument, NpCsArchDocumentLogEntry);
-                NpCsDocumentLogEntry.Delete;
-            until NpCsDocumentLogEntry.Next = 0;
+                NpCsDocumentLogEntry.Delete();
+            until NpCsDocumentLogEntry.Next() = 0;
 
         NpCsDocument.Delete(true);
         NpCsDocument := PrevNpCsDocument;
@@ -42,7 +42,7 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 
     local procedure InsertArchCollectDocument(NpCsDocument: Record "NPR NpCs Document"; var NpCsArchDocument: Record "NPR NpCs Arch. Document")
     begin
-        NpCsArchDocument.Init;
+        NpCsArchDocument.Init();
         NpCsArchDocument."Entry No." := 0;
         NpCsArchDocument.Type := NpCsDocument.Type;
         NpCsArchDocument."Document Type" := NpCsDocument."Document Type";
@@ -55,7 +55,7 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
         NpCsArchDocument."From Document Type" := NpCsDocument."From Document Type";
         NpCsArchDocument."From Document No." := NpCsDocument."From Document No.";
         NpCsArchDocument."From Store Code" := NpCsDocument."From Store Code";
-        if NpCsDocument."Callback Data".HasValue then
+        if NpCsDocument."Callback Data".HasValue() then
             NpCsDocument.CalcFields("Callback Data");
         NpCsArchDocument."Callback Data" := NpCsDocument."Callback Data";
         NpCsArchDocument."To Document Type" := NpCsDocument."To Document Type";
@@ -105,13 +105,13 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 
     local procedure InsertArchCollectDocumentLogEntry(NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry"; NpCsArchDocument: Record "NPR NpCs Arch. Document"; var NpCsArchDocumentLogEntry: Record "NPR NpCs Arch. Doc. Log Entry")
     begin
-        NpCsArchDocumentLogEntry.Init;
+        NpCsArchDocumentLogEntry.Init();
         NpCsArchDocumentLogEntry."Entry No." := 0;
         NpCsArchDocumentLogEntry."Log Date" := NpCsDocumentLogEntry."Log Date";
         NpCsArchDocumentLogEntry."Workflow Type" := NpCsDocumentLogEntry."Workflow Type";
         NpCsArchDocumentLogEntry."Workflow Module" := NpCsDocumentLogEntry."Workflow Module";
         NpCsArchDocumentLogEntry."Log Message" := NpCsDocumentLogEntry."Log Message";
-        if NpCsDocumentLogEntry."Error Message".HasValue then
+        if NpCsDocumentLogEntry."Error Message".HasValue() then
             NpCsDocumentLogEntry.CalcFields("Error Message");
         NpCsArchDocumentLogEntry."Error Message" := NpCsDocumentLogEntry."Error Message";
         NpCsArchDocumentLogEntry."Error Entry" := NpCsDocumentLogEntry."Error Entry";

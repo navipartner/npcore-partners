@@ -1,4 +1,4 @@
-codeunit 6151491 "NPR Raptor Management"
+﻿codeunit 6151491 "NPR Raptor Management"
 {
     trigger OnRun()
     begin
@@ -79,8 +79,8 @@ codeunit 6151491 "NPR Raptor Management"
         Handled: Boolean;
         InvalidRespErr: Label 'Invalid response, expected a JSON array as root object.\Actual response: %1';
     begin
-        RaptorDataBuffer.Reset;
-        RaptorDataBuffer.DeleteAll;
+        RaptorDataBuffer.Reset();
+        RaptorDataBuffer.DeleteAll();
 
         Result := SendRaptorGetDataRequst(RaptorAction, UserIdentifier, ErrorMsg);
         if ErrorMsg <> '' then
@@ -95,21 +95,21 @@ codeunit 6151491 "NPR Raptor Management"
                 case RaptorAction."Raptor Module Code" of
                     RaptorModule_GetUserIdHistory:
                         begin
-                            RaptorDataBuffer.Init;
+                            RaptorDataBuffer.Init();
                             RaptorDataBuffer."Entry No." += 1;
                             RaptorDataBuffer."Date-Time Created" := GetJsonToken(JObject, 'CreateDate').AsValue().AsDateTime();
                             RaptorDataBuffer.Priority := GetJsonToken(JObject, 'Priority').AsValue().AsInteger();
                             ParseItemNo(GetJsonToken(JObject, 'RecommendedId').AsValue().AsText(), RaptorDataBuffer);
-                            RaptorDataBuffer.Insert;
+                            RaptorDataBuffer.Insert();
                         end;
 
                     RaptorModule_GetUserRecommendations:
                         begin
-                            RaptorDataBuffer.Init;
+                            RaptorDataBuffer.Init();
                             RaptorDataBuffer."Entry No." += 1;
                             RaptorDataBuffer.Priority := GetJsonToken(JObject, 'Priority').AsValue().AsInteger();
                             ParseItemNo(GetJsonToken(JObject, 'RecommendedId').AsValue().AsText(), RaptorDataBuffer);
-                            RaptorDataBuffer.Insert;
+                            RaptorDataBuffer.Insert();
                         end;
 
                     else
@@ -135,12 +135,12 @@ codeunit 6151491 "NPR Raptor Management"
                 RaptorModule_GetUserIdHistory:
                     begin
                         RaptorDataBuffer.SetCurrentKey(Priority, "Date-Time Created");
-                        RaptorDataBuffer.FindFirst;
+                        RaptorDataBuffer.FindFirst();
                     end;
                 RaptorModule_GetUserRecommendations:
                     begin
                         RaptorDataBuffer.SetCurrentKey(Priority);
-                        RaptorDataBuffer.FindFirst;
+                        RaptorDataBuffer.FindFirst();
                     end;
             end;
 
@@ -148,18 +148,18 @@ codeunit 6151491 "NPR Raptor Management"
         RaptorDataBufferEntries.SetTableView(RaptorDataBuffer);
         RaptorDataBufferEntries.SetRaptorAction(RaptorAction);
         RaptorDataBufferEntries.SetRecordSet(RaptorDataBuffer);
-        RaptorDataBufferEntries.Run;
+        RaptorDataBufferEntries.Run();
     end;
 
     procedure SelectRaptorAction(RaptorModuleCode: Text[50]; UseFirst: Boolean; var RaptorAction: Record "NPR Raptor Action"): Boolean
     var
         RaptorAction2: Record "NPR Raptor Action";
     begin
-        RaptorAction.Reset;
+        RaptorAction.Reset();
         if RaptorModuleCode <> '' then
             RaptorAction2.SetRange("Raptor Module Code", RaptorModuleCode);
         if UseFirst then begin
-            RaptorAction2.FindFirst;
+            RaptorAction2.FindFirst();
             RaptorAction := RaptorAction2;
             exit(true);
         end else
@@ -175,19 +175,17 @@ codeunit 6151491 "NPR Raptor Management"
         Item: Record Item;
         Position: Integer;
     begin
-        with RaptorDataBuffer do begin
-            Position := StrPos(RaptorItemNo, '_');
-            if Position > 0 then begin
-                "Item No." := CopyStr(CopyStr(RaptorItemNo, 1, Position - 1), 1, MaxStrLen("Item No."));
-                "Variant Code" := CopyStr(RaptorItemNo, Position + 1, MaxStrLen("Variant Code"));
-            end else begin
-                "Item No." := CopyStr(RaptorItemNo, 1, MaxStrLen("Item No."));
-                "Variant Code" := '';
-            end;
-            if not Item.Get("Item No.") then
-                Item.Init;
-            "Item Description" := Item.Description;
+        Position := StrPos(RaptorItemNo, '_');
+        if Position > 0 then begin
+            RaptorDataBuffer."Item No." := CopyStr(CopyStr(RaptorItemNo, 1, Position - 1), 1, MaxStrLen(RaptorDataBuffer."Item No."));
+            RaptorDataBuffer."Variant Code" := CopyStr(RaptorItemNo, Position + 1, MaxStrLen(RaptorDataBuffer."Variant Code"));
+        end else begin
+            RaptorDataBuffer."Item No." := CopyStr(RaptorItemNo, 1, MaxStrLen(RaptorDataBuffer."Item No."));
+            RaptorDataBuffer."Variant Code" := '';
         end;
+        if not Item.Get(RaptorDataBuffer."Item No.") then
+            Item.Init();
+        RaptorDataBuffer."Item Description" := Item.Description;
     end;
 
     local procedure GenerateUrlQueryString(var Parameters: Record "Name/Value Buffer") QueryString: Text
@@ -196,7 +194,7 @@ codeunit 6151491 "NPR Raptor Management"
     begin
         Parameters.SetFilter(Name, '<>%1', '_*');
         Parameters.SetFilter(Value, '<>%1', '');
-        if Parameters.FindSet then
+        if Parameters.FindSet() then
             repeat
                 if QueryString <> '' then
                     QueryString := QueryString + '&'
@@ -204,7 +202,7 @@ codeunit 6151491 "NPR Raptor Management"
                     QueryString := '?';
                 QueryString := QueryString +
                     StrSubstNo('%1=%2', TypeHelper.UrlEncode(Parameters.Name), TypeHelper.UrlEncode(Parameters.Value));
-            until Parameters.Next = 0;
+            until Parameters.Next() = 0;
     end;
 
     local procedure IsEnabled(DataFlowType: Option GetData,SendData): Boolean
@@ -238,7 +236,7 @@ codeunit 6151491 "NPR Raptor Management"
         if not (Force or RaptorAction.IsEmpty) then
             exit;
 
-        RaptorAction.Init;
+        RaptorAction.Init();
         RaptorAction.Code := 'USER_BROWS_HIST';
         RaptorAction."Raptor Module Code" := RaptorModule_GetUserIdHistory;
         RaptorAction."Data Type Description" := ActionDescrLbl_GetUserIDHistory;
@@ -248,7 +246,7 @@ codeunit 6151491 "NPR Raptor Management"
         RaptorAction."Show Priority" := true;
         AddAction(RaptorAction, Silent);
 
-        RaptorAction.Init;
+        RaptorAction.Init();
         RaptorAction.Code := 'USER_RECOMM';
         RaptorAction."Raptor Module Code" := RaptorModule_GetUserRecommendations;
         RaptorAction."Data Type Description" := ActionDescrLbl_GetUserRecomm;
@@ -265,15 +263,15 @@ codeunit 6151491 "NPR Raptor Management"
         RaptorAction2: Record "NPR Raptor Action";
     begin
         RaptorAction2 := RaptorAction;
-        if RaptorAction2.Find then begin
+        if RaptorAction2.Find() then begin
             if not Silent then
                 if not Confirm(ConfirmOverwrite, false, RaptorAction2.TableCaption, RaptorAction2.Code) then
                     exit;
-            RaptorAction2.Delete;
+            RaptorAction2.Delete();
             RaptorAction2 := RaptorAction;
         end;
-        RaptorAction2.Insert;
-        Commit;
+        RaptorAction2.Insert();
+        Commit();
     end;
 
     procedure SetupJobQueue(Enabled: Boolean)
@@ -290,8 +288,8 @@ codeunit 6151491 "NPR Raptor Management"
             JobQueueEntry."Starting Time" := 070000T;
             JobQueueEntry."Ending Time" := 230000T;
             JobQueueEntry."No. of Minutes between Runs" := 10;
-            JobQueueEntry.Modify;
-            Commit;
+            JobQueueEntry.Modify();
+            Commit();
 
             if Confirm(DailyUpdateQst) then
                 PAGE.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
@@ -306,7 +304,7 @@ codeunit 6151491 "NPR Raptor Management"
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Raptor Send Data");
-        if JobQueueEntry.FindFirst then
+        if JobQueueEntry.FindFirst() then
             PAGE.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
     end;
 
@@ -380,14 +378,14 @@ codeunit 6151491 "NPR Raptor Management"
         if not ListOfTrackingServiceTypes.IsTemporary then
             Error(IncorrectFunctionCallErr);
 
-        ListOfTrackingServiceTypes.Reset;
-        ListOfTrackingServiceTypes.DeleteAll;
+        ListOfTrackingServiceTypes.Reset();
+        ListOfTrackingServiceTypes.DeleteAll();
 
-        ListOfTrackingServiceTypes.Init;
+        ListOfTrackingServiceTypes.Init();
         ListOfTrackingServiceTypes.ID += 1;
         ListOfTrackingServiceTypes.Name := CopyStr(TrackServDescr_rsa, 1, MaxStrLen(ListOfTrackingServiceTypes.Name));
         ListOfTrackingServiceTypes.Value := RaptorTrackService_rsa;
-        ListOfTrackingServiceTypes.Insert;
+        ListOfTrackingServiceTypes.Insert();
 
         OnGetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
     end;
@@ -423,10 +421,10 @@ codeunit 6151491 "NPR Raptor Management"
 
         if SalespersonFilter <> '' then begin
             SalespersonTmp.SetFilter(Code, SalespersonFilter);
-            if SalespersonTmp.FindSet then
+            if SalespersonTmp.FindSet() then
                 repeat
                     SalespersonTmp.Mark := true;
-                until SalespersonTmp.Next = 0;
+                until SalespersonTmp.Next() = 0;
             SalespersonTmp.SetRange(Code);
         end;
 
@@ -434,18 +432,18 @@ codeunit 6151491 "NPR Raptor Management"
         SalespersonList.SetDataset(SalespersonTmp);
         SalespersonList.SetMultiSelectionMode(true);
         SalespersonList.LookupMode(true);
-        if SalespersonList.RunModal <> ACTION::LookupOK then
+        if SalespersonList.RunModal() <> ACTION::LookupOK then
             exit;
         SalespersonList.GetDataset(SalespersonTmp);
         SalespersonTmp.MarkedOnly(true);
 
         SalespersonFilter := '';
-        if SalespersonTmp.FindSet then
+        if SalespersonTmp.FindSet() then
             repeat
                 if SalespersonFilter <> '' then
                     SalespersonFilter := SalespersonFilter + '|';
                 SalespersonFilter := SalespersonFilter + StrSubstNo(InQuotes, SalespersonTmp.Code);
-            until SalespersonTmp.Next = 0;
+            until SalespersonTmp.Next() = 0;
     end;
 
     procedure GetJsonToken(JObject: JsonObject; TokenKey: Text) JToken: JsonToken

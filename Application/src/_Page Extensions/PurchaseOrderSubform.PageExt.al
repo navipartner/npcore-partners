@@ -56,7 +56,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                             ExchangeLabelMultiple.SetFilter("No.", '<>%1', ExchangeLabel."No.");
                             ExchangeLabelMultiple.SetRange("Store ID", ExchangeLabel."Store ID");
                             ExchangeLabelMultiple.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
-                            if ExchangeLabelMultiple.Count > 0 then begin
+                            if ExchangeLabelMultiple.Count() > 0 then begin
                                 if ExchangeLabelMultiple.FindSet() then
                                     repeat
                                         PurchaseLineCheck.Reset();
@@ -66,8 +66,8 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
 
                                         PurchaseLineInsrt.Reset();
                                         PurchaseLineInsrt.Init();
-                                        PurchaseLineInsrt.Validate("Document Type", "Document Type");
-                                        PurchaseLineInsrt.Validate("Document No.", "Document No.");
+                                        PurchaseLineInsrt.Validate("Document Type", Rec."Document Type");
+                                        PurchaseLineInsrt.Validate("Document No.", Rec."Document No.");
                                         PurchaseLineInsrt."Line No." := PurchaseLineCheck."Line No." + 10000;
                                         PurchaseLineInsrt.Validate(Type, PurchaseLineInsrt.Type::Item);
                                         PurchaseLineInsrt.Validate("Buy-from Vendor No.", Rec."Buy-from Vendor No.");

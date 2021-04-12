@@ -18,7 +18,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         if Sender.DiscoverAction(
             ActionCode(),
             ActionDescription,
-            ActionVersion,
+            ActionVersion(),
             Sender.Type::Generic,
             Sender."Subscriber Instances Allowed"::Multiple)
         then begin
@@ -52,7 +52,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         ReturnToDefaultView: Boolean;
         WPadNotSelectedErr: Label 'Please select a waiter pad first.';
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -70,7 +70,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
                 Error(WPadNotSelectedErr);
             WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
             WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false);
-            Commit;
+            Commit();
 
             case WPadAction of
                 WPadAction::"Print Pre-Receipt":
@@ -103,7 +103,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
                         if not WaiterPadPOSMgt.SelectWaiterPadToMergeTo(WaiterPad, WaiterPad2) then
                             Error('');
                         POSSession.GetSaleLine(POSSaleLine);
-                        POSSaleLine.DeleteAll;
+                        POSSaleLine.DeleteAll();
                         WaiterPadMgt.MergeWaiterPad(WaiterPad, WaiterPad2);
                         WaiterPad := WaiterPad2;
                     end;
@@ -115,10 +115,10 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         then begin
             if WPadAction <> WPadAction::"Merge Waiter Pad" then begin
                 POSSession.GetSaleLine(POSSaleLine);
-                POSSaleLine.DeleteAll;
+                POSSaleLine.DeleteAll();
             end;
 
-            SalePOS.Find;
+            SalePOS.Find();
             WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, false);
             POSSale.Refresh(SalePOS);
             POSSale.Modify(true, false);
@@ -166,10 +166,10 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
                         exit;
                     FlowStatus."Status Object" := FlowStatus."Status Object"::WaiterPadLineMealFlow;
                     FlowStatus.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(FlowStatus.Code));
-                    if not FlowStatus.Find then begin
+                    if not FlowStatus.Find() then begin
                         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);
                         FlowStatus.SetFilter(Code, CopyStr(StrSubstNo('@%1*', POSParameterValue.Value), 1, MaxStrLen(FlowStatus.Code)));
-                        FlowStatus.FindFirst;
+                        FlowStatus.FindFirst();
                     end;
                     POSParameterValue.Value := FlowStatus.Code;
                 end;
@@ -185,7 +185,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         CaptionServingStep: Label 'Serving Step to Request';
         CaptionWaiterPadAction: Label 'Waiter Pad Action';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -211,7 +211,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         DescServingStep: Label 'Defines which serving step is to be requested, if ''Request Specific Serving'' is selected as Waiter Pad Action';
         DescWaiterPadAction: Label 'Defines which waiter pad action is to be run by the POS action';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -234,7 +234,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         OptionLinesToSend: Label 'New/Updated,All';
         OptionWaiterPadAction: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Close w/out Saving';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

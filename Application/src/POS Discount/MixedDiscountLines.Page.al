@@ -32,7 +32,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
-                    Enabled = ("Disc. Grouping Type" = "Disc. Grouping Type"::Item);
+                    Enabled = (Rec."Disc. Grouping Type" = Rec."Disc. Grouping Type"::Item);
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(Description; Rec.Description)
@@ -153,7 +153,7 @@ page 6014451 "NPR Mixed Discount Lines"
                 var
                     MixedDiscount: Record "NPR Mixed Discount";
                 begin
-                    MixedDiscount.Init;
+                    MixedDiscount.Init();
                     MixedDiscount.Code := '';
                     MixedDiscount."Mix Type" := MixedDiscount."Mix Type"::"Combination Part";
                     MixedDiscount.Insert(true);
@@ -194,7 +194,7 @@ page 6014451 "NPR Mixed Discount Lines"
         MixType: Integer;
         TotalAmount: Decimal;
 
-    local procedure CalcExpectedAmount(FindMaxDisc: Boolean) ExpectedDiscAmount: Decimal
+    local procedure CalcExpectedAmount(FindMaxDisc: Boolean): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
         TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary;

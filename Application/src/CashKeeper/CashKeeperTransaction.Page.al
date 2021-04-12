@@ -16,77 +16,77 @@ page 6059946 "NPR CashKeeper Transaction"
         {
             repeater(Group)
             {
-                field("Transaction No."; "Transaction No.")
+                field("Transaction No."; Rec."Transaction No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction No. field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Sales Line No."; "Sales Line No.")
+                field("Sales Line No."; Rec."Sales Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Line No. field';
                 }
-                field("CK Error Code"; "CK Error Code")
+                field("CK Error Code"; Rec."CK Error Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the CK Error Code field';
                 }
-                field("CK Error Description"; "CK Error Description")
+                field("CK Error Description"; Rec."CK Error Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the CK Error Description field';
                 }
-                field("Order ID"; "Order ID")
+                field("Order ID"; Rec."Order ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Order ID field';
                 }
-                field("Payment Type"; "Payment Type")
+                field("Payment Type"; Rec."Payment Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Type field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action field';
                 }
-                field("Value In Cents"; "Value In Cents")
+                field("Value In Cents"; Rec."Value In Cents")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value In Cents field';
                 }
-                field("Paid In Value"; "Paid In Value")
+                field("Paid In Value"; Rec."Paid In Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Paid In Value field';
                 }
-                field("Paid Out Value"; "Paid Out Value")
+                field("Paid Out Value"; Rec."Paid Out Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Paid Out Value field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reversed field';

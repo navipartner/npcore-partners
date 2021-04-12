@@ -64,7 +64,7 @@ codeunit 6014488 "NPR Membership Attempt Create"
                         MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
                         MemberInfoCapture.Modify();
 
-                        while (MemberInfoCapture.Next <> 0) do begin
+                        while (MemberInfoCapture.Next() <> 0) do begin
                             MemberManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
                             MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
                             MemberInfoCapture.Modify();
@@ -128,7 +128,6 @@ codeunit 6014488 "NPR Membership Attempt Create"
         MemberManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
-        MembershipEntryNo: Integer;
         ResponseMessage: Text;
         MSG_1101: Label 'Quantity must be 1, when selling memberships.';
     begin

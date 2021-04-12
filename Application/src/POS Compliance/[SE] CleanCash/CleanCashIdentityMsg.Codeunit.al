@@ -29,9 +29,7 @@ codeunit 6014454 "NPR CleanCash Identity Msg." implements "NPR CleanCash XCCSP I
     procedure GetRequestXml(CleanCashTransactionRequest: Record "NPR CleanCash Trans. Request"; var XmlDoc: XmlDocument) Success: Boolean;
     var
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
-        DebugText: Text;
         XmlNs: Text;
-        Declaration: XmlDeclaration;
         Data: XmlElement;
         Envelope: XmlElement;
         StatusRequest: XmlElement;
@@ -63,13 +61,11 @@ codeunit 6014454 "NPR CleanCash Identity Msg." implements "NPR CleanCash XCCSP I
     var
         CleanCashResponse: Record "NPR CleanCash Trans. Response";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
-        DebugText: Text;
         EnumAsText: Text;
         DataElement: XmlElement;
         Element: XmlElement;
         NamespaceManager: XmlNamespaceManager;
         Node: XmlNode;
-        UnitMainStatus: Enum "NPR CleanCash Unit Main Status";
     begin
 
         CleanCashResponse.SetFilter("Request Entry No.", '=%1', CleanCashTransactionRequest."Entry No.");

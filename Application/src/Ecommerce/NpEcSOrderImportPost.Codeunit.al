@@ -73,13 +73,12 @@ codeunit 6151304 "NPR NpEc S.Order Import (Post)"
     var
         SalesInvHeader: Record "Sales Invoice Header";
         DocSendProfile: Record "Document Sending Profile";
-        CustomerVar: Record Customer;
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
         DocSendProfile.GetDefaultForCustomer(SalesHeader."Bill-to Customer No.", DocSendProfile);
         if DocSendProfile."E-Mail" <> DocSendProfile."E-Mail"::No then begin
             SalesInvHeader.Get(SalesHeader."Last Posting No.");
-            SalesInvHeader.SetRecFilter;
+            SalesInvHeader.SetRecFilter();
             EmailDocMgt.SendReport(SalesInvHeader, true);
         end;
     end;

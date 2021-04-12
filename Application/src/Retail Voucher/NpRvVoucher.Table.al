@@ -218,7 +218,7 @@ table 6151013 "NPR NpRv Voucher"
                         ContBusinessRelation.SetCurrentKey("Link to Table", "No.");
                         ContBusinessRelation.SetRange("Link to Table", ContBusinessRelation."Link to Table"::Customer);
                         ContBusinessRelation.SetRange("No.", "Customer No.");
-                        if ContBusinessRelation.FindFirst then
+                        if ContBusinessRelation.FindFirst() then
                             Cont.SetRange("Company No.", ContBusinessRelation."Contact No.")
                         else
                             Cont.SetRange("No.", '');
@@ -243,7 +243,7 @@ table 6151013 "NPR NpRv Voucher"
                     ContBusinessRelation.SetRange("Contact No.", Cont."Company No.");
                     ContBusinessRelation.SetRange("Link to Table", ContBusinessRelation."Link to Table"::Customer);
                     ContBusinessRelation.SetFilter("No.", '<>%1', '');
-                    if ContBusinessRelation.FindFirst and Cust.Get(ContBusinessRelation."No.") then
+                    if ContBusinessRelation.FindFirst() and Cust.Get(ContBusinessRelation."No.") then
                         "Customer No." := Cust."No.";
                 end;
 
@@ -455,8 +455,8 @@ table 6151013 "NPR NpRv Voucher"
         TestField(Open, false);
 
         NpRvVoucherEntry.SetRange("Voucher No.", "No.");
-        if NpRvVoucherEntry.FindFirst then
-            NpRvVoucherEntry.DeleteAll;
+        if NpRvVoucherEntry.FindFirst() then
+            NpRvVoucherEntry.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -501,13 +501,12 @@ table 6151013 "NPR NpRv Voucher"
 
         Voucher.SetFilter("No.", '<>%1', "No.");
         Voucher.SetRange("Reference No.", "Reference No.");
-        if Voucher.FindFirst then
+        if Voucher.FindFirst() then
             Error(Text000, "Reference No.");
     end;
 
     local procedure UpdateContactInfo()
     var
-        ContBusinessRelation: Record "Contact Business Relation";
         Cust: Record Customer;
         Cont: Record Contact;
     begin

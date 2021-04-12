@@ -123,7 +123,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 Caption = 'Run Data Collection';
                 Image = ExecuteBatch;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -136,7 +136,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 begin
                     CurrPage.SetSelectionFilter(NpRiReimbursement);
                     NpRiDataCollectionMgt.RunDataCollections(NpRiReimbursement);
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
             action("Run Reimbursement")
@@ -144,7 +144,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 Caption = 'Run Reimbursement';
                 Image = ExecuteAndPostBatch;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -157,7 +157,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 begin
                     CurrPage.SetSelectionFilter(NpRiReimbursement);
                     NpRiReimbursementMgt.RunReimbursements(NpRiReimbursement);
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
         }

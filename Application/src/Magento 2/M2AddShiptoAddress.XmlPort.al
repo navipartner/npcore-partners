@@ -104,8 +104,6 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
                             XmlName = 'Editable';
 
                             trigger OnBeforePassVariable()
-                            var
-                                MagentoContactShiptoAdrs: Record "NPR Magento Contact ShipToAdr.";
                             begin
                                 ShipToEditable := 'true';
                             end;

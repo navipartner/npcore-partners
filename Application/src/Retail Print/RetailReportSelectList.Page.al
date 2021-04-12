@@ -13,71 +13,71 @@ page 6014481 "NPR Retail Report Select. List"
         {
             repeater(Group)
             {
-                field("Report Type"; "Report Type")
+                field("Report Type"; Rec."Report Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report Type field';
                 }
-                field(Sequence; Sequence)
+                field(Sequence; Rec.Sequence)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sequence field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report ID field';
                 }
-                field("Report Name"; "Report Name")
+                field("Report Name"; Rec."Report Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report Name field';
                 }
-                field("XML Port ID"; "XML Port ID")
+                field("XML Port ID"; Rec."XML Port ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the XML Port ID field';
                 }
-                field("XML Port Name"; "XML Port Name")
+                field("XML Port Name"; Rec."XML Port Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the XML Port Name field';
                 }
-                field("Codeunit ID"; "Codeunit ID")
+                field("Codeunit ID"; Rec."Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
-                field("Codeunit Name"; "Codeunit Name")
+                field("Codeunit Name"; Rec."Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit Name field';
                 }
-                field("Print Template"; "Print Template")
+                field("Print Template"; Rec."Print Template")
                 {
                     ApplicationArea = All;
                     Width = 20;
                     ToolTip = 'Specifies the value of the Print Template field';
                 }
-                field("Filter Object ID"; "Filter Object ID")
+                field("Filter Object ID"; Rec."Filter Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Object ID field';
                 }
-                field("Record Filter"; "Record Filter")
+                field("Record Filter"; Rec."Record Filter")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
                     ToolTip = 'Specifies the value of the Record Filter field';
                 }
-                field(Optional; Optional)
+                field(Optional; Rec.Optional)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Optional field';

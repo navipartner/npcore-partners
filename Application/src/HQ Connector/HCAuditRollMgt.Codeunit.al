@@ -46,7 +46,7 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
             AppendDocumentNoFilter(DocumentNo, DocumentNoFilter);
         end;
 
-        Commit;
+        Commit();
         if DocumentNoFilter = '' then
             exit;
         if not Evaluate(DirectPost, NpXmlDomMgt.GetXmlAttributeText(Element, 'direct_posting', false), 9) then
@@ -56,10 +56,9 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
             PostAuditRoll(DocumentNoFilter);
     end;
 
-    local procedure UpdateAuditRollLine(ItemXmlElement: XmlElement) DocumentNo: Text
+    local procedure UpdateAuditRollLine(ItemXmlElement: XmlElement): Text
     var
         HCAuditRoll: Record "NPR HC Audit Roll";
-        ChildNode: XmlNode;
     begin
         if ItemXmlElement.IsEmpty then
             exit('');
@@ -71,26 +70,24 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
 
     local procedure PreprocessAuditRollLine(var HCAuditRoll: Record "NPR HC Audit Roll")
     begin
-        with HCAuditRoll do begin
-            Posted := false;
-            "Item Entry Posted" := false;
-            "Dimension Set ID" := 0;
-            "Shortcut Dimension 1 Code" := '';
-            "Shortcut Dimension 2 Code" := '';
+        HCAuditRoll.Posted := false;
+        HCAuditRoll."Item Entry Posted" := false;
+        HCAuditRoll."Dimension Set ID" := 0;
+        HCAuditRoll."Shortcut Dimension 1 Code" := '';
+        HCAuditRoll."Shortcut Dimension 2 Code" := '';
 
-            //Mark lines as posted under certain conditions
-            if Type = Type::Cancelled then
-                Posted := true;
-            if Type = Type::Comment then
-                Posted := true;
-            if (Type = Type::"Open/Close") and ("Sale Type" = "Sale Type"::Comment) then
-                if "No." = '' then
-                    Posted := true;
-            if ("Allocated No." <> '') then
-                Posted := true;
-            if Offline then
-                Posted := true;
-        end;
+        //Mark lines as posted under certain conditions
+        if HCAuditRoll.Type = HCAuditRoll.Type::Cancelled then
+            HCAuditRoll.Posted := true;
+        if HCAuditRoll.Type = HCAuditRoll.Type::Comment then
+            HCAuditRoll.Posted := true;
+        if (HCAuditRoll.Type = HCAuditRoll.Type::"Open/Close") and (HCAuditRoll."Sale Type" = HCAuditRoll."Sale Type"::Comment) then
+            if HCAuditRoll."No." = '' then
+                HCAuditRoll.Posted := true;
+        if (HCAuditRoll."Allocated No." <> '') then
+            HCAuditRoll.Posted := true;
+        if HCAuditRoll.Offline then
+            HCAuditRoll.Posted := true;
     end;
 
     local procedure AppendDocumentNoFilter(DocumentNo: Text; var DocumentNoFilter: Text)
@@ -119,7 +116,6 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
     local procedure InsertAuditRollLine(Element: XmlElement; var HCAuditRoll: Record "NPR HC Audit Roll")
     var
         TempHCAuditRoll: Record "NPR HC Audit Roll" temporary;
-        OStream: OutStream;
     begin
         Evaluate(TempHCAuditRoll."Register No.", NpXmlDomMgt.GetXmlText(Element, 'registerno', 0, false), 9);
         Evaluate(TempHCAuditRoll."Sales Ticket No.", NpXmlDomMgt.GetXmlText(Element, 'salesticketno', 0, false), 9);
@@ -216,9 +212,9 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
 
         //Record insert
         if not HCAuditRoll.Get(TempHCAuditRoll."Register No.", TempHCAuditRoll."Sales Ticket No.", TempHCAuditRoll."Sale Type", TempHCAuditRoll."Line No.", TempHCAuditRoll."No.", TempHCAuditRoll."Sale Date") then begin
-            HCAuditRoll.Init;
+            HCAuditRoll.Init();
             HCAuditRoll := TempHCAuditRoll;
-            HCAuditRoll.Insert;
+            HCAuditRoll.Insert();
         end;
     end;
 }

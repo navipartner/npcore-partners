@@ -13,17 +13,17 @@ page 6059798 "NPR E-mail Templ. Reports"
         {
             repeater(Group)
             {
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report ID field';
                 }
-                field(Filename; Filename)
+                field(Filename; Rec.Filename)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filename field';
                 }
-                field("Report Name"; "Report Name")
+                field("Report Name"; Rec."Report Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report Name field';

@@ -14,18 +14,18 @@ page 6014531 "NPR Payment Mapping WP"
         {
             repeater(Group)
             {
-                field("External Payment Method Code"; "External Payment Method Code")
+                field("External Payment Method Code"; Rec."External Payment Method Code")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the External Payment Method Code field';
                 }
-                field("External Payment Type"; "External Payment Type")
+                field("External Payment Type"; Rec."External Payment Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Payment Type field';
                 }
-                field("Payment Method Code"; "Payment Method Code")
+                field("Payment Method Code"; Rec."Payment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Method Code field';
@@ -36,22 +36,22 @@ page 6014531 "NPR Payment Mapping WP"
                     begin
                         PaymentMethods.LookupMode := true;
 
-                        if "Payment Method Code" <> '' then
-                            if PaymentMethod.Get("Payment Method Code") then
+                        if Rec."Payment Method Code" <> '' then
+                            if PaymentMethod.Get(Rec."Payment Method Code") then
                                 PaymentMethods.SetRecord(PaymentMethod);
 
                         if PaymentMethods.RunModal() = Action::LookupOK then begin
                             PaymentMethods.GetRecord(PaymentMethod);
-                            "Payment Method Code" := PaymentMethod.Code;
+                            Rec."Payment Method Code" := PaymentMethod.Code;
                         end;
                     end;
                 }
-                field("Allow Adjust Payment Amount"; "Allow Adjust Payment Amount")
+                field("Allow Adjust Payment Amount"; Rec."Allow Adjust Payment Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow Adjust Payment Amount field';
                 }
-                field("Payment Gateway Code"; "Payment Gateway Code")
+                field("Payment Gateway Code"; Rec."Payment Gateway Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Gateway Code field';
@@ -64,17 +64,17 @@ page 6014531 "NPR Payment Mapping WP"
 
                         PaymentGateways.SetRec(TempAllMagentoPaymentGateway);
 
-                        IF "Payment Gateway Code" <> '' then
-                            if TempAllMagentoPaymentGateway.Get("Payment Gateway Code") then
+                        IF Rec."Payment Gateway Code" <> '' then
+                            if TempAllMagentoPaymentGateway.Get(Rec."Payment Gateway Code") then
                                 PaymentGateways.SetRecord(TempAllMagentoPaymentGateway);
 
                         if PaymentGateways.RunModal() = Action::LookupOK then begin
                             PaymentGateways.GetRecord(TempAllMagentoPaymentGateway);
-                            "Payment Gateway Code" := TempAllMagentoPaymentGateway.Code;
+                            Rec."Payment Gateway Code" := TempAllMagentoPaymentGateway.Code;
                         end;
                     end;
                 }
-                field("Captured Externally"; "Captured Externally")
+                field("Captured Externally"; Rec."Captured Externally")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Captured Externally field';

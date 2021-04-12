@@ -165,7 +165,6 @@ xmlport 6060114 "NPR TM Ticket Reservation"
     var
         ExternalIdCount: Integer;
         QtySum: Integer;
-        n: Integer;
 
     procedure GetToken(): Text[100]
     begin
@@ -221,7 +220,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         tmpTicketReservationResponse.Insert();
 
         tmpTicketReservationResponse.Reset();
-        Commit;
+        Commit();
     end;
 
     procedure SetErrorResult(DocumentID: Text[100]; ReasonText: Text)

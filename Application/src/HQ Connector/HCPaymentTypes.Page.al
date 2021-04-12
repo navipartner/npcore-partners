@@ -12,47 +12,47 @@ page 6150904 "NPR HC Payment Types"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Account Type"; "Account Type")
+                field("Account Type"; Rec."Account Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account Type field';
                 }
-                field("G/L Account No."; "G/L Account No.")
+                field("G/L Account No."; Rec."G/L Account No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the G/L Account field';
                 }
-                field("Bank Acc. No."; "Bank Acc. No.")
+                field("Bank Acc. No."; Rec."Bank Acc. No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bank field';
                 }
-                field("HQ Processing"; "HQ Processing")
+                field("HQ Processing"; Rec."HQ Processing")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the HQ Processing field';
                 }
-                field("HQ Post Sales Document"; "HQ Post Sales Document")
+                field("HQ Post Sales Document"; Rec."HQ Post Sales Document")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the HQ Post Sales Document field';
                 }
-                field("HQ Post Payment"; "HQ Post Payment")
+                field("HQ Post Payment"; Rec."HQ Post Payment")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the HQ Post Payment field';
                 }
-                field("Payment Method Code"; "Payment Method Code")
+                field("Payment Method Code"; Rec."Payment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Method Code field';

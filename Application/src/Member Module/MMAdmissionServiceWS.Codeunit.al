@@ -1,4 +1,4 @@
-codeunit 6060093 "NPR MM Admission Service WS"
+﻿codeunit 6060093 "NPR MM Admission Service WS"
 {
 
     trigger OnRun()
@@ -8,7 +8,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         Clear(WebService);
 
         if not WebService.Get(WebService."Object Type"::Codeunit, 'admission_service') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Service Name" := 'admission_service';
             WebService."Object ID" := 6060093;
@@ -23,7 +23,6 @@ codeunit 6060093 "NPR MM Admission Service WS"
         ErrorInvalidGuest: Label 'Invalid Guest';
         ErrorNoIsBlank: Label 'No Is Blank';
         ErrorTokenIsBlank: Label 'Token Is Blank';
-        ErrorNoOrTokenNotValid: Label 'No Or Token Is Not Valid';
         ErrorAdmissionTypeIsBlank: Label 'Admission Type Is Blank';
         ErrorTooManyLogins: Label 'TooManyLogins';
         TicketDisplayName: Label 'Ticket';
@@ -41,7 +40,6 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
         MessageText: Text[250];
         TMTicket: Record "NPR TM Ticket";
-        TMTicketType: Record "NPR TM Ticket Type";
         MMMembership: Record "NPR MM Membership";
         Item: Record Item;
         MMMembershipSetup: Record "NPR MM Membership Setup";
@@ -51,7 +49,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         SelectLatestVersion;
 
-        MMAdmissionServiceLog.Init;
+        MMAdmissionServiceLog.Init();
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
         MMAdmissionServiceLog."Request Barcode" := Barcode;
         MMAdmissionServiceLog."Scanner Station Id" := ScannerStationId;
@@ -59,9 +57,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog."Created Date" := CurrentDateTime;
         MMAdmissionServiceLog.Insert(true);
 
-        MMAdmissionServiceSetup.Get;
+        MMAdmissionServiceSetup.Get();
 
-        MMAdmissionServiceEntry.Init;
+        MMAdmissionServiceEntry.Init();
         MMAdmissionServiceEntry."Created Date" := MMAdmissionServiceLog."Created Date";
         MMAdmissionServiceEntry.Insert(true);
 
@@ -96,7 +94,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
                 if MMMemberWebService.MemberCardNumberValidation(Barcode, ScannerStationId) then begin
                     MemberCard.SetCurrentKey("External Card No.");
                     MemberCard.SetRange("External Card No.", Barcode);
-                    if MemberCard.FindLast then begin
+                    if MemberCard.FindLast() then begin
                         if Member.Get(MemberCard."Member Entry No.") then begin
                             MMAdmissionServiceLog."Response No" := Member."External Member No.";
                             MMAdmissionServiceLog."Response Token" := CreateToken();
@@ -136,7 +134,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
                     TMTicket.SetCurrentKey("External Ticket No.");
                     TMTicket.SetFilter("External Ticket No.", '=%1', CopyStr(Barcode, 1, MaxStrLen(TMTicket."External Ticket No.")));
-                    TMTicket.FindFirst;
+                    TMTicket.FindFirst();
 
                     MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
                     MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
@@ -161,7 +159,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
                     MemberCard.SetCurrentKey("External Card No.");
                     MemberCard.SetRange("External Card No.", MMAdmissionServiceEntry."External Card No.");
-                    if MemberCard.FindLast then begin
+                    if MemberCard.FindLast() then begin
                         if Member.Get(MemberCard."Member Entry No.") then begin
                             MMAdmissionServiceEntry."Card Entry No." := MemberCard."Entry No.";
                             MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";
@@ -227,9 +225,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
     begin
         SelectLatestVersion;
 
-        MMAdmissionServiceSetup.Get;
+        MMAdmissionServiceSetup.Get();
 
-        MMAdmissionServiceLog.Init;
+        MMAdmissionServiceLog.Init();
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Arrival";
         MMAdmissionServiceLog.Token := Token;
         MMAdmissionServiceLog.Key := No;
@@ -271,7 +269,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceEntry.SetRange(Token, MMAdmissionServiceLog.Token);
         MMAdmissionServiceEntry.SetRange("Admission Is Valid", true);
         MMAdmissionServiceEntry.SetRange(Arrived, false);
-        if MMAdmissionServiceEntry.FindSet then begin
+        if MMAdmissionServiceEntry.FindSet() then begin
 
             Transaktion := Format(MMAdmissionServiceEntry."Entry No.");
             Name := MMAdmissionServiceEntry."Display Name";
@@ -341,9 +339,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
     begin
         SelectLatestVersion;
 
-        MMAdmissionServiceSetup.Get;
+        MMAdmissionServiceSetup.Get();
 
-        MMAdmissionServiceLog.Init;
+        MMAdmissionServiceLog.Init();
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Arrival";
         MMAdmissionServiceLog.Token := Token;
         MMAdmissionServiceLog.Key := No;
@@ -385,7 +383,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceEntry.SetRange(Token, MMAdmissionServiceLog.Token);
         MMAdmissionServiceEntry.SetRange("Admission Is Valid", true);
         MMAdmissionServiceEntry.SetRange(Arrived, false);
-        if MMAdmissionServiceEntry.FindSet then begin
+        if MMAdmissionServiceEntry.FindSet() then begin
 
             Transaktion := Format(MMAdmissionServiceEntry."Entry No.");
             Name := MMAdmissionServiceEntry."Display Name";
@@ -473,7 +471,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
                 if TenantMedia.Get(MMAdmissionScannerStations."Default Turnstile Image".MediaId()) then
                     TenantMedia.CalcFields(Content);
-                if TenantMedia.Content.HasValue then begin
+                if TenantMedia.Content.HasValue() then begin
                     TenantMedia.Content.CreateInStream(InStrDefault);
                     GetImageContentAndExtension(InStrDefault, TenantMedia."Mime Type", PictureBase64Error, PictureExtensionDefault);
 
@@ -483,7 +481,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
                 Clear(TenantMedia);
                 if TenantMedia.Get(MMAdmissionScannerStations."Error Image of Turnstile".MediaId()) then
                     TenantMedia.CalcFields(Content);
-                if TenantMedia.Content.HasValue then begin
+                if TenantMedia.Content.HasValue() then begin
                     TenantMedia.Content.CreateInStream(InStrError);
                     GetImageContentAndExtension(InStrError, TenantMedia."Mime Type", PictureBase64Error, PictureExtensionError);
                     Clear(InStrError);
@@ -495,7 +493,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         Clear(TenantMedia);
         if TenantMedia.Get(MMAdmissionServiceSetup."Default Turnstile Image".MediaId()) then
             TenantMedia.CalcFields(Content);
-        if TenantMedia.Content.HasValue and (PictureBase64Default = '') then begin
+        if TenantMedia.Content.HasValue() and (PictureBase64Default = '') then begin
             TenantMedia.Content.CreateInStream(InStrDefault);
             GetImageContentAndExtension(InStrDefault, TenantMedia."Mime Type", PictureBase64Default, PictureExtensionDefault);
             Clear(InStrDefault);
@@ -504,7 +502,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         Clear(TenantMedia);
         if TenantMedia.Get(MMAdmissionServiceSetup."Error Image of Turnstile".MediaId()) then
             TenantMedia.CalcFields(Content);
-        if TenantMedia.Content.HasValue and (PictureBase64Error = '') then begin
+        if TenantMedia.Content.HasValue() and (PictureBase64Error = '') then begin
             TenantMedia.Content.CreateInStream(InStrError);
             GetImageContentAndExtension(InStrError, TenantMedia."Mime Type", PictureBase64Error, PictureExtensionError);
             Clear(InStrError);
@@ -523,25 +521,23 @@ codeunit 6060093 "NPR MM Admission Service WS"
         exit(Token);
     end;
 
-    local procedure GetAvatarImage(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text) Success: Boolean
+    local procedure GetAvatarImage(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text): Boolean
     var
-        Member: Record "NPR MM Member";
         TenantMedia: Record "Tenant Media";
         Base64Convert: Codeunit "Base64 Convert";
         InStr: InStream;
     begin
         if TenantMedia.Get(MMAdmissionServiceSetup."Guest Avatar Image".MediaId()) then
             TenantMedia.CalcFields(Content);
-        if TenantMedia.Content.HasValue then begin
+        if TenantMedia.Content.HasValue() then begin
             TenantMedia.Content.CreateInStream(InStr);
             Base64StringImage := Base64Convert.ToBase64(InStr);
             exit(true);
         end;
     end;
 
-    local procedure GetAvatarImageV2(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text; ScannerStationId: Code[10]) Success: Boolean
+    local procedure GetAvatarImageV2(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text; ScannerStationId: Code[10]): Boolean
     var
-        Member: Record "NPR MM Member";
         TenantMedia: Record "Tenant Media";
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
         Base64Convert: Codeunit "Base64 Convert";
@@ -551,7 +547,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
             if MMAdmissionScannerStations.Activated then begin
                 if TenantMedia.Get(MMAdmissionScannerStations."Guest Avatar Image".MediaId()) then
                     TenantMedia.CalcFields(Content);
-                if TenantMedia.Content.HasValue then begin
+                if TenantMedia.Content.HasValue() then begin
                     TenantMedia.Content.CreateInStream(InStr);
                     Base64StringImage := Base64Convert.ToBase64(InStr);
                     exit(true);
@@ -562,7 +558,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         Clear(TenantMedia);
         if TenantMedia.Get(MMAdmissionServiceSetup."Guest Avatar Image".MediaId()) then
             TenantMedia.CalcFields(Content);
-        if TenantMedia.Content.HasValue then begin
+        if TenantMedia.Content.HasValue() then begin
             TenantMedia.Content.CreateInStream(InStr);
             Base64StringImage := Base64Convert.ToBase64(InStr);
             exit(true);
@@ -593,7 +589,6 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
         MessageText: Text[250];
         TMTicket: Record "NPR TM Ticket";
-        TMTicketType: Record "NPR TM Ticket Type";
         MMMembership: Record "NPR MM Membership";
         Item: Record Item;
         MMMembershipSetup: Record "NPR MM Membership Setup";
@@ -603,7 +598,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         SelectLatestVersion;
 
-        MMAdmissionServiceLog.Init;
+        MMAdmissionServiceLog.Init();
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
         MMAdmissionServiceLog."Request Barcode" := Barcode;
         MMAdmissionServiceLog."Scanner Station Id" := ScannerStationId;
@@ -611,9 +606,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog."Created Date" := CurrentDateTime;
         MMAdmissionServiceLog.Insert(true);
 
-        MMAdmissionServiceSetup.Get;
+        MMAdmissionServiceSetup.Get();
 
-        MMAdmissionServiceEntry.Init;
+        MMAdmissionServiceEntry.Init();
         MMAdmissionServiceEntry."Created Date" := MMAdmissionServiceLog."Created Date";
         MMAdmissionServiceEntry.Insert(true);
 
@@ -650,7 +645,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
                 if MMMemberWebService.MemberCardNumberValidation(Barcode, ScannerStationId) then begin
                     MemberCard.SetCurrentKey("External Card No.");
                     MemberCard.SetRange("External Card No.", Barcode);
-                    if MemberCard.FindLast then begin
+                    if MemberCard.FindLast() then begin
                         if Member.Get(MemberCard."Member Entry No.") then begin
                             MMAdmissionServiceLog."Response No" := Member."External Member No.";
                             MMAdmissionServiceLog."Response Token" := CreateToken();
@@ -692,7 +687,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
                     TMTicket.SetCurrentKey("External Ticket No.");
                     TMTicket.SetFilter("External Ticket No.", '=%1', CopyStr(Barcode, 1, MaxStrLen(TMTicket."External Ticket No.")));
-                    TMTicket.FindFirst;
+                    TMTicket.FindFirst();
 
                     MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
                     MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
@@ -717,7 +712,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
                     MemberCard.SetCurrentKey("External Card No.");
                     MemberCard.SetRange("External Card No.", MMAdmissionServiceEntry."External Card No.");
-                    if MemberCard.FindLast then begin
+                    if MemberCard.FindLast() then begin
                         if Member.Get(MemberCard."Member Entry No.") then begin
                             MMAdmissionServiceEntry."Card Entry No." := MemberCard."Entry No.";
                             MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";

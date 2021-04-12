@@ -53,7 +53,7 @@ table 6150635 "NPR POS Posting Log"
         }
         field(90; "No. of POS Entries"; Integer)
         {
-            CalcFormula = Count ("NPR POS Entry" WHERE("POS Posting Log Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR POS Entry" WHERE("POS Posting Log Entry No." = FIELD("Entry No.")));
             Caption = 'No. of POS Entries';
             Editable = false;
             FieldClass = FlowField;

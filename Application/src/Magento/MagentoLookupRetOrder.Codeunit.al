@@ -1,4 +1,4 @@
-codeunit 6151421 "NPR Magento Lookup Ret.Order"
+﻿codeunit 6151421 "NPR Magento Lookup Ret.Order"
 {
     TableNo = "NPR Nc Import Entry";
 
@@ -20,14 +20,12 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
     var
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         RecRef: RecordRef;
         XmlDoc: XmlDocument;
         Node: XmlNode;
         ReturnOrderNoAttribute: XmlAttribute;
         XmlNodeList: XmlNodeList;
         ReturnOrderNo: Code[20];
-        i: Integer;
     begin
         RecRef.GetTable(TempSalesHeader);
         if not RecRef.IsTemporary then
@@ -37,8 +35,8 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
         if not RecRef.IsTemporary then
             exit(false);
 
-        TempSalesHeader.DeleteAll;
-        TempSalesCrMemoHeader.DeleteAll;
+        TempSalesHeader.DeleteAll();
+        TempSalesCrMemoHeader.DeleteAll();
 
         if not ImportEntry.LoadXmlDoc(XmlDoc) then
             exit(false);
@@ -52,39 +50,39 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
             if (ReturnOrderNo <> '') and (StrLen(ReturnOrderNo) <= MaxStrLen(SalesHeader."NPR External Order No.")) then begin
                 SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
                 SalesHeader.SetRange("NPR External Order No.", ReturnOrderNo);
-                if SalesHeader.FindSet then
+                if SalesHeader.FindSet() then
                     repeat
                         if not TempSalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin
-                            TempSalesHeader.Init;
+                            TempSalesHeader.Init();
                             TempSalesHeader := SalesHeader;
-                            TempSalesHeader.Insert;
+                            TempSalesHeader.Insert();
                         end;
-                    until SalesHeader.Next = 0;
+                    until SalesHeader.Next() = 0;
                 SalesCrMemoHeader.SetRange("NPR External Order No.", ReturnOrderNo);
-                if SalesCrMemoHeader.FindSet then
+                if SalesCrMemoHeader.FindSet() then
                     repeat
                         if not TempSalesCrMemoHeader.Get(SalesCrMemoHeader."No.") then begin
-                            TempSalesCrMemoHeader.Init;
+                            TempSalesCrMemoHeader.Init();
                             TempSalesCrMemoHeader := SalesCrMemoHeader;
-                            TempSalesCrMemoHeader.Insert;
+                            TempSalesCrMemoHeader.Insert();
                         end;
-                    until SalesCrMemoHeader.Next = 0;
+                    until SalesCrMemoHeader.Next() = 0;
             end;
         end;
 
-        exit(TempSalesHeader.FindSet or TempSalesCrMemoHeader.FindSet);
+        exit(TempSalesHeader.FindSet() or TempSalesCrMemoHeader.FindSet);
     end;
 
     procedure RunPageReturnOrder(var TempSalesHeader: Record "Sales Header" temporary): Boolean
     var
         SalesHeader: Record "Sales Header";
     begin
-        case TempSalesHeader.Count of
+        case TempSalesHeader.Count() of
             0:
                 exit(false);
             1:
                 begin
-                    TempSalesHeader.FindFirst;
+                    TempSalesHeader.FindFirst();
                     SalesHeader.Get(TempSalesHeader."Document Type", TempSalesHeader."No.");
                     PAGE.Run(PAGE::"Sales Return Order", SalesHeader);
                 end;
@@ -99,12 +97,12 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
     var
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
     begin
-        case TempSalesCrMemoHeader.Count of
+        case TempSalesCrMemoHeader.Count() of
             0:
                 exit(false);
             1:
                 begin
-                    TempSalesCrMemoHeader.FindFirst;
+                    TempSalesCrMemoHeader.FindFirst();
                     SalesCrMemoHeader.Get(TempSalesCrMemoHeader."No.");
                     PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
                 end;

@@ -80,7 +80,7 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa."
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -108,7 +108,6 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa."
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
-        ConfirmString: Text;
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

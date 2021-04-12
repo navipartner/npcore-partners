@@ -18,37 +18,37 @@ page 6184494 "NPR Pepper Terminal List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Terminal Type Code"; "Terminal Type Code")
+                field("Terminal Type Code"; Rec."Terminal Type Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Terminal Type Code field';
                 }
-                field("Instance ID"; "Instance ID")
+                field("Instance ID"; Rec."Instance ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Instance ID field';
                 }
-                field("Configuration Code"; "Configuration Code")
+                field("Configuration Code"; Rec."Configuration Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Configuration Code field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("License ID"; "License ID")
+                field("License ID"; Rec."License ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the License ID field';
@@ -73,7 +73,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        UploadFile(0);
+                        Rec.UploadFile(0);
                     end;
                 }
                 action(ImportAdditionalParameters)
@@ -85,7 +85,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        UploadFile(1);
+                        Rec.UploadFile(1);
                     end;
                 }
             }
@@ -101,7 +101,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        ShowFile(0);
+                        Rec.ShowFile(0);
                     end;
                 }
                 action(ShowAdditionalParameters)
@@ -113,7 +113,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        ShowFile(1);
+                        Rec.ShowFile(1);
                     end;
                 }
             }
@@ -129,7 +129,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        ClearFile(0);
+                        Rec.ClearFile(0);
                     end;
                 }
                 action("DeleteAdditional Parameters")
@@ -141,7 +141,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        ClearFile(1);
+                        Rec.ClearFile(1);
                     end;
                 }
             }
@@ -157,7 +157,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        ExportFile(0);
+                        Rec.ExportFile(0);
                     end;
                 }
                 action(ExportAddtionalParameters)
@@ -169,7 +169,7 @@ page 6184494 "NPR Pepper Terminal List"
 
                     trigger OnAction()
                     begin
-                        ExportFile(1);
+                        Rec.ExportFile(1);
                     end;
                 }
             }

@@ -152,13 +152,13 @@ table 6014462 "NPR E-mail Template Header"
         EmailTemplateLine: Record "NPR E-mail Templ. Line";
     begin
         EmailTemplateFilter.SetRange("E-mail Template Code", Code);
-        EmailTemplateFilter.DeleteAll;
+        EmailTemplateFilter.DeleteAll();
 
         EmailTemplateLine.SetRange("E-mail Template Code", Code);
-        EmailTemplateLine.DeleteAll;
+        EmailTemplateLine.DeleteAll();
 
         EmailAttachment.SetRange("Primary Key", GetPosition(false));
-        EmailAttachment.DeleteAll;
+        EmailAttachment.DeleteAll();
     end;
 }
 

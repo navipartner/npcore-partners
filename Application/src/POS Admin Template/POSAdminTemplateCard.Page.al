@@ -16,13 +16,13 @@ page 6150740 "NPR POS Admin. Template Card"
         {
             group(General)
             {
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Id field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
@@ -32,17 +32,17 @@ page 6150740 "NPR POS Admin. Template Card"
                         CurrPage.Update();
                     end;
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Persist on Client"; "Persist on Client")
+                field("Persist on Client"; Rec."Persist on Client")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Persist on Client field';
@@ -51,7 +51,7 @@ page 6150740 "NPR POS Admin. Template Card"
             group(MainMenu)
             {
                 Caption = 'Main Menu';
-                field("Role Center"; "Role Center")
+                field("Role Center"; Rec."Role Center")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Role Center field';
@@ -61,13 +61,13 @@ page 6150740 "NPR POS Admin. Template Card"
                         SetControlStatuses();
                     end;
                 }
-                field("Role Center Password"; "Role Center Password")
+                field("Role Center Password"; Rec."Role Center Password")
                 {
                     ApplicationArea = All;
                     Editable = RoleCenterPasswordEditable;
                     ToolTip = 'Specifies the value of the Role Center Password field';
                 }
-                field(Configuration; Configuration)
+                field(Configuration; Rec.Configuration)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Configuration field';
@@ -77,7 +77,7 @@ page 6150740 "NPR POS Admin. Template Card"
                         SetControlStatuses();
                     end;
                 }
-                field("Configuration Password"; "Configuration Password")
+                field("Configuration Password"; Rec."Configuration Password")
                 {
                     ApplicationArea = All;
                     Editable = ConfigurationPasswordEditable;
@@ -96,7 +96,7 @@ page 6150740 "NPR POS Admin. Template Card"
                 Caption = 'Scopes';
                 Image = UserInterface;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Admin. Template Scopes";
@@ -119,16 +119,16 @@ page 6150740 "NPR POS Admin. Template Card"
 
     local procedure GetName(): Text
     begin
-        if Name <> '' then
-            exit(Name)
+        if Rec.Name <> '' then
+            exit(Rec.Name)
         else
-            exit(StrSubstNo(Text001, Id));
+            exit(StrSubstNo(Text001, Rec.Id));
     end;
 
     local procedure SetControlStatuses()
     begin
-        RoleCenterPasswordEditable := "Role Center" = "Role Center"::Password;
-        ConfigurationPasswordEditable := Configuration = Configuration::Password;
+        RoleCenterPasswordEditable := Rec."Role Center" = Rec."Role Center"::Password;
+        ConfigurationPasswordEditable := Rec.Configuration = Rec.Configuration::Password;
     end;
 }
 

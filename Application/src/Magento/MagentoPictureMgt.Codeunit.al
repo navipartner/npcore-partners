@@ -19,7 +19,7 @@ codeunit 6151419 "NPR Magento Picture Mgt."
         MagentoMgt: Codeunit "NPR Magento Mgt.";
         XmlDoc: XmlDocument;
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         MagentoSetup.TestField("Magento Url");
         Clear(XmlDoc);
 

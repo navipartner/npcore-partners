@@ -10,7 +10,7 @@ page 6060047 "NPR Regist. Item Worksh. Page"
     SaveValues = true;
     SourceTable = "NPR Regist. Item Worksh Line";
     UsageCategory = Administration;
-    ApplicationArea = All; 
+    ApplicationArea = All;
 
     layout
     {
@@ -268,7 +268,7 @@ page 6060047 "NPR Regist. Item Worksh. Page"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Create Copy of Variety 1 Table field';
                 }
-                field("Variety 2"; "Variety 2")
+                field("Variety 2"; Rec."Variety 2")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -431,40 +431,25 @@ page 6060047 "NPR Regist. Item Worksh. Page"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if not RegItemWorksheet.Get("Registered Worksheet No.") then
-            RegItemWorksheet.Init;
+        if not RegItemWorksheet.Get(Rec."Registered Worksheet No.") then
+            RegItemWorksheet.Init();
         SetVisibleFields;
     end;
 
     var
-        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         RegItemWorksheet: Record "NPR Registered Item Works.";
-        SuggestItemWorksheetLines: Report "NPR Suggest Item Worksh. Lines";
-        ItemWorksheetMgt: Codeunit "NPR Item Worksheet Mgt.";
-        ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
-        [InDataSet]
-        FieldsEditable: Boolean;
         [InDataSet]
         FieldsVisible: Boolean;
-        OpenedFromWorksheet: Boolean;
         ShowAllInfo: Boolean;
-        [InDataSet]
-        VendorItemNoEditable: Boolean;
-        WorksheetSelected: Boolean;
         CurrentWorksheetName: Code[10];
-        InvoiceNo: Code[20];
-        InvoiceDate: Date;
-        Freight: Decimal;
-        ShowExpanded: Option "Variety 1","Variety 1+2","Variety 1+2+3","Variety 1+2+3+4";
 
     procedure SetFieldEditable()
     begin
-        FieldsEditable := (Rec."Existing Item No." = '');
     end;
 
     procedure GetCurrentWorksheet()
     begin
-        RegItemWorksheet.Get(GetRangeMax("Registered Worksheet No."), CurrentWorksheetName);
+        RegItemWorksheet.Get(Rec.GetRangeMax("Registered Worksheet No."), CurrentWorksheetName);
     end;
 
     procedure SetVisibleFields()

@@ -37,8 +37,6 @@ codeunit 6150880 "NPR Workflow" implements "NPR IJsonSerializable"
     end;
 
     procedure GetJson() Json: JsonObject;
-    var
-        Steps: JsonArray;
     begin
         Json.Add('Name', _name);
         Json.Add('RequestContext', _requestContext);
@@ -56,7 +54,6 @@ codeunit 6150880 "NPR Workflow" implements "NPR IJsonSerializable"
     local procedure DeserializeFromJsonObject(Json: JsonObject);
     var
         Token: JsonToken;
-        Steps: JsonArray;
     begin
         ClearPrivateState();
 

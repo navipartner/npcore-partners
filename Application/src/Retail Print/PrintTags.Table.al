@@ -24,11 +24,11 @@ table 6014499 "NPR Print Tags"
                 if StrPos("Print Tag", ',') > 0 then
                     Error(Err0002);
 
-                if PrintTags.FindSet then
+                if PrintTags.FindSet() then
                     repeat
                         if (StrPos("Print Tag", PrintTags."Print Tag") > 0) or (StrPos(PrintTags."Print Tag", "Print Tag") > 0) then
                             Error(Err0001, PrintTags."Print Tag");
-                    until PrintTags.Next = 0;
+                    until PrintTags.Next() = 0;
             end;
         }
     }

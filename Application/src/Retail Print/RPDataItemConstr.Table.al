@@ -36,7 +36,7 @@ table 6014563 "NPR RP Data Item Constr."
         }
         field(6; "Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             FieldClass = FlowField;
@@ -65,7 +65,7 @@ table 6014563 "NPR RP Data Item Constr."
 
         DataItemConstraintLinks.SetRange("Data Item Code", "Data Item Code");
         DataItemConstraintLinks.SetRange("Constraint Line No.", "Line No.");
-        DataItemConstraintLinks.DeleteAll;
+        DataItemConstraintLinks.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -100,7 +100,7 @@ table 6014563 "NPR RP Data Item Constr."
     begin
         DataItemConstraint.SetCurrentKey("Data Item Code", "Line No.");
         DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
-        if DataItemConstraint.FindLast then;
+        if DataItemConstraint.FindLast() then;
         "Line No." := DataItemConstraint."Line No." + 10000;
     end;
 }

@@ -1,8 +1,8 @@
 report 6014515 "NPR Delete EFT Receipt"
 {
     Caption = 'Delete EFT Receipt';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -71,7 +71,7 @@ report 6014515 "NPR Delete EFT Receipt"
         RecRef.CurrentKeyIndex(GetBestKey(RecRef));
         RecRef.SetTable(EFTReceipt);
 
-        NoOfEntries := EFTReceipt.Count;
+        NoOfEntries := EFTReceipt.Count();
         NoOfRowsToDeleteAllowed := 0;
         OriginalMaxSizeToDelete := MaxSizeToDelete;
         Counter := 0;
@@ -79,11 +79,11 @@ report 6014515 "NPR Delete EFT Receipt"
         if (OriginalMaxSizeToDelete <> 0) then begin
             if (NoOfRowsToDeleteAllowed <> 0) then begin
                 NoOfEntries := NoOfRowsToDeleteAllowed;
-                if EFTReceipt.FindSet then
+                if EFTReceipt.FindSet() then
                     repeat
-                        EFTReceipt.Delete;
+                        EFTReceipt.Delete();
                         Counter += 1;
-                        EFTReceipt.Next;
+                        EFTReceipt.Next();
                     until Counter = NoOfRowsToDeleteAllowed;
             end;
         end else
@@ -160,7 +160,7 @@ report 6014515 "NPR Delete EFT Receipt"
         if MaxSizeToDelete > 0 then begin
             TableInformation.SetRange(TableInformation."Company Name", CompanyToDelete);
             TableInformation.SetRange(TableInformation."Table No.", Table);
-            if TableInformation.FindFirst then begin
+            if TableInformation.FindFirst() then begin
                 ActualRecordSizeToDelete := Round((OriginalRowCount * TableInformation."Record Size") / 1000, 1, '=');
                 if MaxSizeToDelete > ActualRecordSizeToDelete then begin
                     MaxSizeToDelete := MaxSizeToDelete - ActualRecordSizeToDelete;

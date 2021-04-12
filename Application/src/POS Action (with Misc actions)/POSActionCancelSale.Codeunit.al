@@ -22,39 +22,34 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         Title: Label 'Cancel Sale';
         Prompt: Label 'Are you sure you want to cancel this sales? All lines will be deleted.';
         PartlyPaid: Label 'This sales can''t be deleted. It has been partly paid. You must first void the payment.';
-        CustomerInvoice: Label 'This sales can''t be deleted. It has a customer invoice attached. ';
         CANCEL_SALE: Label 'Sale was canceled %1';
         AltSaleCancelDescription: Text;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
 
-                RegisterWorkflowStep('', 'confirm(labels.title, labels.prompt).respond();');
-                RegisterDataBinding();
-                //-NPR5.42 [313914]
-                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-                //+NPR5.42 [313914]
-                RegisterWorkflow(true);
-            end;
+            Sender.RegisterWorkflowStep('', 'confirm(labels.title, labels.prompt).respond();');
+            Sender.RegisterDataBinding();
+            //-NPR5.42 [313914]
+            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+            //+NPR5.42 [313914]
+            Sender.RegisterWorkflow(true);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Confirmed: Boolean;
     begin
 
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         //CancelSale (Context, POSSession, FrontEnd);  //NPR5.54 [364658]-revoked
@@ -65,8 +60,8 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'prompt', Prompt);
+        Captions.AddActionCaption(ActionCode(), 'title', Title);
+        Captions.AddActionCaption(ActionCode(), 'prompt', Prompt);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
@@ -75,7 +70,7 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         Context: Codeunit "NPR POS JSON Management";
     begin
 
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         //-NPR5.54 [364658]-revoked
@@ -88,7 +83,7 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         //+NPR5.54 [364658]-revoked
         CheckSaleBeforeCancel(POSSession);  //NPR5.54 [364658]
 
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
         Handled := true;
 
     end;
@@ -122,8 +117,6 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
 
     procedure CancelSaleAndStartNew(POSSession: Codeunit "NPR POS Session"): Boolean
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         Line: Record "NPR POS Sale Line";
     begin
@@ -147,17 +140,15 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
 
-        with Line do begin
-            Type := Type::Comment;
-            //-NPR5.55 [391678]
-            if AltSaleCancelDescription <> '' then begin
-                Description := CopyStr(AltSaleCancelDescription, 1, MaxStrLen(Description));
-                "Description 2" := CopyStr(AltSaleCancelDescription, MaxStrLen(Description) + 1, MaxStrLen("Description 2"));
-            end else
-                //+NPR5.55 [391678]
-                Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
-            "Sale Type" := "Sale Type"::Cancelled;
-        end;
+        Line.Type := Line.Type::Comment;
+        //-NPR5.55 [391678]
+        if AltSaleCancelDescription <> '' then begin
+            Line.Description := CopyStr(AltSaleCancelDescription, 1, MaxStrLen(Line.Description));
+            Line."Description 2" := CopyStr(AltSaleCancelDescription, MaxStrLen(Line.Description) + 1, MaxStrLen(Line."Description 2"));
+        end else
+            //+NPR5.55 [391678]
+            Line.Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
+        Line."Sale Type" := Line."Sale Type"::Cancelled;
         POSSaleLine.InsertLine(Line);
 
         POSSession.GetSale(POSSale);

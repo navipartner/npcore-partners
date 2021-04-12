@@ -15,18 +15,18 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
         Clear(RecRef);
         RecRef.Open(Rec."Table No.");
         RecRef.SetPosition(Rec."Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
 
         SetRecRefCalcFieldFilter(NpXmlElement, RecRef, RecRef2);
         CustomValue := Format(GetFirstname(RecRef, NpXmlElement."Field No."), 0, 9);
-        RecRef.Close;
+        RecRef.Close();
 
         Clear(RecRef);
 
         Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     procedure GetFirstname(RecRef: RecordRef; FieldNo: Integer) Firstname: Text
@@ -67,11 +67,11 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
     begin
         Clear(RecRef2);
         RecRef2.Open(RecRef.Number);
-        RecRef2 := RecRef.Duplicate;
+        RecRef2 := RecRef.Duplicate();
 
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        if NpXmlFilter.FindSet then
+        if NpXmlFilter.FindSet() then
             repeat
                 FieldRef2 := RecRef2.Field(NpXmlFilter."Field No.");
                 case NpXmlFilter."Filter Type" of
@@ -101,18 +101,18 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
                             FieldRef2.SetFilter(NpXmlFilter."Filter Value");
                         end;
                 end;
-            until NpXmlFilter.Next = 0;
+            until NpXmlFilter.Next() = 0;
 
         case NpXmlElement."Iteration Type" of
             NpXmlElement."Iteration Type"::First:
                 begin
-                    if RecRef2.FindFirst then
-                        RecRef2.SetRecFilter;
+                    if RecRef2.FindFirst() then
+                        RecRef2.SetRecFilter();
                 end;
             NpXmlElement."Iteration Type"::Last:
                 begin
-                    if RecRef2.FindLast then
-                        RecRef2.SetRecFilter;
+                    if RecRef2.FindLast() then
+                        RecRef2.SetRecFilter();
                 end;
         end;
     end;

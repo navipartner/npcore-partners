@@ -1,4 +1,4 @@
-codeunit 6151103 "NPR NpRi Coll. Vendor Ledgers"
+﻿codeunit 6151103 "NPR NpRi Coll. Vendor Ledgers"
 {
     var
         Text000: Label 'Vendor Ledger Entries (Invoice and Credit Memo)';
@@ -12,7 +12,7 @@ codeunit 6151103 "NPR NpRi Coll. Vendor Ledgers"
         if NpRiModule.Get(VendorLedgerCode()) then
             exit;
 
-        NpRiModule.Init;
+        NpRiModule.Init();
         NpRiModule.Code := VendorLedgerCode();
         NpRiModule.Description := Text000;
         NpRiModule.Type := NpRiModule.Type::"Data Collection";
@@ -65,9 +65,9 @@ codeunit 6151103 "NPR NpRi Coll. Vendor Ledgers"
 
         TableMetadata.Get(DATABASE::Vendor);
 
-        TempTableMetadata.Init;
+        TempTableMetadata.Init();
         TempTableMetadata := TableMetadata;
-        TempTableMetadata.Insert;
+        TempTableMetadata.Insert();
     end;
 
     //Data Collect
@@ -94,17 +94,17 @@ codeunit 6151103 "NPR NpRi Coll. Vendor Ledgers"
         if not FindVendLedgEntries(NpRiReimbursement, VendLedgEntry) then
             exit;
 
-        Total := VendLedgEntry.Count;
+        Total := VendLedgEntry.Count();
         NpRiDataCollectionMgt.OpenWindow(Text001);
 
-        VendLedgEntry.FindSet;
+        VendLedgEntry.FindSet();
         repeat
             Counter += 1;
             NpRiDataCollectionMgt.UpdateWindow(1, Round((Counter / Total) * 10000, 1));
 
             if NpRiDataCollectionMgt.InsertEntry(NpRiReimbursement, VendLedgEntry."Purchase (LCY)", VendLedgEntry, NpRiReimbursementEntry) then
                 UpdateEntry(VendLedgEntry, NpRiReimbursementEntry);
-        until VendLedgEntry.Next = 0;
+        until VendLedgEntry.Next() = 0;
 
         NpRiDataCollectionMgt.CloseWindow();
     end;
@@ -154,7 +154,7 @@ codeunit 6151103 "NPR NpRi Coll. Vendor Ledgers"
         end;
         VendLedgEntry.FilterGroup(0);
 
-        exit(VendLedgEntry.FindFirst);
+        exit(VendLedgEntry.FindFirst());
     end;
 
     local procedure UpdateEntry(VendLedgEntry: Record "Vendor Ledger Entry"; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry")

@@ -4,7 +4,7 @@ page 6060053 "NPR Item Works. Excel Column"
     PageType = List;
     SourceTable = "NPR Item Worksh. Excel Column";
     UsageCategory = Lists;
-    ApplicationArea = All; 
+    ApplicationArea = All;
     layout
     {
         area(content)
@@ -63,7 +63,7 @@ page 6060053 "NPR Item Works. Excel Column"
                 Caption = 'Select Excel to Map';
                 Image = ImportExcel;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Select Excel to Map action.';
@@ -98,7 +98,7 @@ page 6060053 "NPR Item Works. Excel Column"
 
     procedure GetCurrentWorksheet()
     begin
-        ItemWorksheet.Get(GetRangeMax("Worksheet Template Name"), GetRangeMax("Worksheet Name"));
+        ItemWorksheet.Get(Rec.GetRangeMax("Worksheet Template Name"), Rec.GetRangeMax("Worksheet Name"));
     end;
 }
 

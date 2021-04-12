@@ -49,7 +49,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         EFTTransactionRequest."Amount Input" := AmountToCapture;
         EFTTransactionRequest."Currency Code" := CurrencyCode;
         if EFTTransactionRequest."Currency Code" = '' then begin
-            GLSetup.Get;
+            GLSetup.Get();
             EFTTransactionRequest."Currency Code" := GLSetup."LCY Code";
         end;
         EFTTransactionRequest."Cashback Amount" := CalculateCashback(EFTTransactionRequest);
@@ -95,7 +95,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         EFTTransactionRequest."Amount Input" := AmountToRefund * -1;
         EFTTransactionRequest."Currency Code" := CurrencyCode;
         if EFTTransactionRequest."Currency Code" = '' then begin
-            GLSetup.Get;
+            GLSetup.Get();
             EFTTransactionRequest."Currency Code" := GLSetup."LCY Code";
         end;
 
@@ -185,7 +185,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         EFTInterface.OnDiscoverAuxiliaryOperations(tmpEFTAuxOperation);
         tmpEFTAuxOperation.SetRange("Integration Type", EFTTransactionRequest."Integration Type");
         tmpEFTAuxOperation.SetRange("Auxiliary ID", AuxFunction);
-        tmpEFTAuxOperation.FindFirst;
+        tmpEFTAuxOperation.FindFirst();
 
         EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
         EFTTransactionRequest."Auxiliary Operation ID" := AuxFunction;
@@ -209,7 +209,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         EFTTransactionRequest."Amount Input" := AmountToLoad * -1;
         EFTTransactionRequest."Currency Code" := CurrencyCode;
         if EFTTransactionRequest."Currency Code" = '' then begin
-            GLSetup.Get;
+            GLSetup.Get();
             EFTTransactionRequest."Currency Code" := GLSetup."LCY Code";
         end;
 
@@ -242,7 +242,6 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     procedure ConfirmAfterPayment(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Annul: Boolean)
     var
         EFTInterface: Codeunit "NPR EFT Interface";
-        Handled: Boolean;
     begin
         EFTInterface.OnAfterPaymentConfirm(EFTTransactionRequest, Annul);
     end;
@@ -255,24 +254,22 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     begin
         EndGenericRequest(EftTransactionRequest);
 
-        with EftTransactionRequest do begin
-            if ("Processing Type" in ["Processing Type"::VOID, "Processing Type"::LOOK_UP]) then begin
-                OriginalEFTTransactionRequest.Get("Processed Entry No.");
-                if (OriginalEFTTransactionRequest."Processing Type" = "Processing Type"::VOID) then
-                    OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Processed Entry No.");
-                ProcessingType := OriginalEFTTransactionRequest."Processing Type";
-            end else begin
-                ProcessingType := EftTransactionRequest."Processing Type";
-            end;
+        if (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::VOID, EftTransactionRequest."Processing Type"::LOOK_UP]) then begin
+            OriginalEFTTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+            if (OriginalEFTTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::VOID) then
+                OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Processed Entry No.");
+            ProcessingType := OriginalEFTTransactionRequest."Processing Type";
+        end else begin
+            ProcessingType := EftTransactionRequest."Processing Type";
+        end;
 
-            case ProcessingType of
-                "Processing Type"::GIFTCARD_LOAD,
-              "Processing Type"::PAYMENT,
-              "Processing Type"::REFUND:
-                    EFTPaymentMgt.HandleIntegrationResponse(EftTransactionRequest);
-                else
-                    HandleOtherIntegrationResponse(EftTransactionRequest);
-            end;
+        case ProcessingType of
+            EftTransactionRequest."Processing Type"::GIFTCARD_LOAD,
+          EftTransactionRequest."Processing Type"::PAYMENT,
+          EftTransactionRequest."Processing Type"::REFUND:
+                EFTPaymentMgt.HandleIntegrationResponse(EftTransactionRequest);
+            else
+                HandleOtherIntegrationResponse(EftTransactionRequest);
         end;
 
         OnAfterEftIntegrationResponseReceived(EftTransactionRequest);
@@ -282,13 +279,9 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
-        EFTInterface: Codeunit "NPR EFT Interface";
-        Skip: Boolean;
     begin
-        with EftTransactionRequest do begin
-            if not ("Processing Type" in ["Processing Type"::AUXILIARY, "Processing Type"::OPEN, "Processing Type"::CLOSE, "Processing Type"::OTHER, "Processing Type"::SETUP]) then
-                FieldError("Processing Type");
-        end;
+        if not (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::AUXILIARY, EftTransactionRequest."Processing Type"::OPEN, EftTransactionRequest."Processing Type"::CLOSE, EftTransactionRequest."Processing Type"::OTHER, EftTransactionRequest."Processing Type"::SETUP]) then
+            EftTransactionRequest.FieldError("Processing Type");
 
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
@@ -383,7 +376,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         InStream: InStream;
         FileName: Text;
     begin
-        if not EFTTransactionRequest.Logs.HasValue then
+        if not EFTTransactionRequest.Logs.HasValue() then
             exit;
         EFTTransactionRequest.CalcFields(Logs);
         EFTTransactionRequest.Logs.CreateInStream(InStream);
@@ -407,14 +400,14 @@ codeunit 6184499 "NPR EFT Framework Mgt."
             1:
                 begin
                     EFTTransactionRequest.CalcFields("Receipt 1");
-                    if not EFTTransactionRequest."Receipt 1".HasValue then
+                    if not EFTTransactionRequest."Receipt 1".HasValue() then
                         exit;
                     EFTTransactionRequest."Receipt 1".CreateInStream(StreamIn);
                 end;
             2:
                 begin
                     EFTTransactionRequest.CalcFields("Receipt 2");
-                    if not EFTTransactionRequest."Receipt 2".HasValue then
+                    if not EFTTransactionRequest."Receipt 2".HasValue() then
                         exit;
                     EFTTransactionRequest."Receipt 2".CreateInStream(StreamIn);
                 end;
@@ -457,13 +450,13 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     begin
         EFTTransactionRequest.Finished := CurrentDateTime;
         EFTTransactionRequest."Result Processed" := true; //If this value is false later, we never acted on the result in the POS.
-        EFTTransactionRequest.Modify;
+        EFTTransactionRequest.Modify();
     end;
 
     local procedure CheckHandled(IntegrationType: Text; EFTTransactionRequest: Record "NPR EFT Transaction Request"; OperationType: Text; Handled: Boolean)
     begin
         if Handled then
-            if EFTTransactionRequest.Find then
+            if EFTTransactionRequest.Find() then
                 exit;
 
         Error(ERROR_REQUEST_HANDLE, IntegrationType, OperationType);
@@ -510,30 +503,28 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
     begin
-        with EFTTransactionRequest do begin
-            if "Sales Ticket No." = '' then
-                exit(false);
-            if "Register No." = '' then
-                exit(false);
+        if EFTTransactionRequest."Sales Ticket No." = '' then
+            exit(false);
+        if EFTTransactionRequest."Register No." = '' then
+            exit(false);
 
-            SalePOS.SetRange("Register No.", "Register No.");
-            SalePOS.SetRange(Date, DT2Date(Started));
-            SalePOS.SetFilter("Start Time", '>%1', DT2Time(Started));
-            if not SalePOS.IsEmpty then
-                exit(false);
+        SalePOS.SetRange("Register No.", EFTTransactionRequest."Register No.");
+        SalePOS.SetRange(Date, DT2Date(EFTTransactionRequest.Started));
+        SalePOS.SetFilter("Start Time", '>%1', DT2Time(EFTTransactionRequest.Started));
+        if not SalePOS.IsEmpty then
+            exit(false);
 
-            POSEntry.SetRange("POS Unit No.", "Register No.");
-            POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
-            if not POSEntry.FindLast then
-                exit(true);
-
-            if POSEntry."Document Date" > DT2Date(Started) then
-                exit(false);
-            if (POSEntry."Document Date" = DT2Date(Started)) and (POSEntry."Starting Time" > DT2Time(Started)) then
-                exit(false);
-
+        POSEntry.SetRange("POS Unit No.", EFTTransactionRequest."Register No.");
+        POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
+        if not POSEntry.FindLast() then
             exit(true);
-        end;
+
+        if POSEntry."Document Date" > DT2Date(EFTTransactionRequest.Started) then
+            exit(false);
+        if (POSEntry."Document Date" = DT2Date(EFTTransactionRequest.Started)) and (POSEntry."Starting Time" > DT2Time(EFTTransactionRequest.Started)) then
+            exit(false);
+
+        exit(true);
     end;
 
     procedure PauseFrontEndBeforeEFTRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management")

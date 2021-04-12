@@ -1,4 +1,4 @@
-page 6059812 "NPR Retail Activities"
+﻿page 6059812 "NPR Retail Activities"
 {
     Caption = 'Retail Activities';
     PageType = CardPart;
@@ -133,11 +133,11 @@ page 6059812 "NPR Retail Activities"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
-        Rec.SetFilter("Date Filter", '=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '=%1', WorkDate());
     end;
 }

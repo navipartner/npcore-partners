@@ -70,11 +70,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
 
     trigger OnRun()
-    var
-        RetailJournalLine: Record "NPR Retail Journal Line";
-        RetailJournalLine2: Record "NPR Retail Journal Line";
-        RecordRef: RecordRef;
-        "Table": Variant;
     begin
     end;
 
@@ -203,13 +198,13 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     procedure ProcessBufferForCodeunit(CodeunitID: Integer; NoOfPrints: Integer)
     begin
         PrintBuffer('', CodeunitID, 0, NoOfPrints);
-        GlobalBuffer.DeleteAll;
+        GlobalBuffer.DeleteAll();
     end;
 
     procedure ProcessBufferForReport(ReportID: Integer; NoOfPrints: Integer)
     begin
         PrintBuffer('', 0, ReportID, NoOfPrints);
-        GlobalBuffer.DeleteAll;
+        GlobalBuffer.DeleteAll();
     end;
 
     procedure SetPrintIterationFieldNo(FieldNo: Integer)
@@ -245,7 +240,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         i: Integer;
         "Integer": Integer;
         Itt: Integer;
-        PrinterName: Text;
         CurrentRecNo: Integer;
         Next: Boolean;
         UpperBound: Integer;
@@ -264,7 +258,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
             exit;
 
         repeat
-            GlobalBuffer.DeleteAll;
+            GlobalBuffer.DeleteAll();
 
             //-NPR5.51 [359771]
             UpperBound := DataJoinBuffer.FindSubset(CurrentRecNo, 0);
@@ -275,10 +269,10 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
             TemplateLine.SetRange("Template Code", TemplateHeader.Code);
             TemplateLine.SetRange(Type, TemplateLine.Type::Data);
             TemplateLine.SetRange(Level, 0);
-            if TemplateLine.FindSet then
+            if TemplateLine.FindSet() then
                 repeat
                     MergeField(TemplateLine, DataJoinBuffer);
-                until TemplateLine.Next = 0;
+                until TemplateLine.Next() = 0;
 
             Itt := 1;
             if PrintIterationFieldNo > 0 then begin
@@ -294,10 +288,10 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
             for i := 1 to Itt do begin
                 MatrixPrinter.OnInitJob(DeviceSettings);
-                if GlobalBuffer.FindSet then
+                if GlobalBuffer.FindSet() then
                     repeat
                         MatrixPrinter.OnPrintData(GlobalBuffer);
-                    until GlobalBuffer.Next = 0;
+                    until GlobalBuffer.Next() = 0;
                 MatrixPrinter.OnEndJob();
             end;
             //+NPR5.51 [360975]
@@ -330,12 +324,12 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         DataItems: Record "NPR RP Data Items";
         DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt.";
     begin
-        GlobalBuffer.DeleteAll;
+        GlobalBuffer.DeleteAll();
         SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
 
         DataItems.SetRange(Code, TemplateHeader.Code);
         DataItems.SetRange(Level, 0);
-        DataItems.FindFirst;
+        DataItems.FindFirst();
         DataJoinBuffer.AddFieldToMap(DataItems.Name, PrintIterationFieldNo);
         DataJoinBuffer.SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
         DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code);
@@ -345,14 +339,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; NoOfPrints: Integer)
     var
         MatrixPrinter: Codeunit "NPR RP Matrix Printer Interf.";
-        PrintBytes: Text;
         DeviceType: Text;
-        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        TargetEncoding: Text;
-        HTTPEndpoint: Text;
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        i: Integer;
-        Supported: Boolean;
         DeviceSettings: Record "NPR RP Device Settings";
     begin
         DeviceType := GetDeviceType(TemplateCode, CodeunitId, ReportId);
@@ -361,10 +348,10 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         MatrixPrinter.Construct(DeviceType);
         MatrixPrinter.OnInitJob(DeviceSettings);
 
-        if GlobalBuffer.FindSet then
+        if GlobalBuffer.FindSet() then
             repeat
                 MatrixPrinter.OnPrintData(GlobalBuffer);
-            until GlobalBuffer.Next = 0;
+            until GlobalBuffer.Next() = 0;
 
         MatrixPrinter.OnEndJob();
         OnSendPrintJob(TemplateCode, CodeunitId, ReportId, MatrixPrinter, NoOfPrints);
@@ -424,7 +411,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
     local procedure MergeField(var TemplateLine: Record "NPR RP Template Line"; var DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt.")
     var
-        Font: Text[30];
         RecID: RecordID;
         Handled: Boolean;
         Skip: Boolean;
@@ -534,8 +520,8 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         GlobalBuffer.Rotation := Rotation;
         GlobalBuffer.Align := Align;
 
-        if not GlobalBuffer.Insert then
-            GlobalBuffer.Modify;
+        if not GlobalBuffer.Insert() then
+            GlobalBuffer.Modify();
 
         CurrentLineNo += 1;
     end;
@@ -582,7 +568,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         //-NPR5.46 [314067]
         AttributeID.SetRange(AttributeID."Table ID", TemplateLine."Data Item Table");
         AttributeID.SetRange(AttributeID."Attribute Code", TemplateLine.Attribute);
-        if not AttributeID.FindSet then
+        if not AttributeID.FindSet() then
             exit('');
 
         RecRef.Open(TemplateLine."Data Item Table");

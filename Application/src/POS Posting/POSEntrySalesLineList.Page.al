@@ -14,113 +14,113 @@ page 6150655 "NPR POS Entry Sales Line List"
         {
             repeater(Group)
             {
-                field("Entry Date"; "Entry Date")
+                field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Date field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Ending Time"; "Ending Time")
+                field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Time field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("POS Period Register No."; "POS Period Register No.")
+                field("POS Period Register No."; Rec."POS Period Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Period Register No. field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Line Discount %"; "Line Discount %")
+                field("Line Discount %"; Rec."Line Discount %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Discount % field';
                 }
-                field("Amount Excl. VAT"; "Amount Excl. VAT")
+                field("Amount Excl. VAT"; Rec."Amount Excl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Excl. VAT field';
                 }
-                field("Amount Incl. VAT"; "Amount Incl. VAT")
+                field("Amount Incl. VAT"; Rec."Amount Incl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Incl. VAT field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Withhold Item"; "Withhold Item")
+                field("Withhold Item"; Rec."Withhold Item")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Withhold Item field';
                 }
-                field("Discount Authorised by"; "Discount Authorised by")
+                field("Discount Authorised by"; Rec."Discount Authorised by")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount Authorised by field';
                 }
-                field("POS Entry No."; "POS Entry No.")
+                field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Entry No. field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line No. field';
@@ -141,7 +141,7 @@ page 6150655 "NPR POS Entry Sales Line List"
                     Caption = 'POS Entry Card';
                     Image = List;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");

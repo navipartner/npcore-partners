@@ -95,7 +95,7 @@ codeunit 6150935 "NPR UPG Rcpt. Profile"
         Field.SetFilter(ObsoleteState, '%1|%2', Field.ObsoleteState::Removed, Field.ObsoleteState::Pending);
         Field.SetRange(FieldName, FieldNameTxt);
 
-        if not Field.FindFirst then
+        if not Field.FindFirst() then
             exit(false);
 
         FieldRef := RecordRef.Field(Field."No.");

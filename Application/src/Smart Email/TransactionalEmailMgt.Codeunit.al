@@ -95,14 +95,14 @@ codeunit 6059820 "NPR Transactional Email Mgt."
                     if (FromName <> '') and (FromName <> FromEmail) then
                         FromEmail := StrSubstNo('%1 %2', FromName, FromEmail);
                     CampaignMonitorMgt.SendClasicMail(
-                        Recipient, Cc, Bcc, Subject, BodyHtml, BodyText, 
-                        FromEmail, ReplyTo, TrackOpen, TrackClick, Group, 
+                        Recipient, Cc, Bcc, Subject, BodyHtml, BodyText,
+                        FromEmail, ReplyTo, TrackOpen, TrackClick, Group,
                         AddRecipientsToListID, Attachment, Silent);
                 end;
             TransactionalEmailSetup.Provider::Mailchimp:
                 MandrillTransEmailMgt.SendClassicMail(
-                    Recipient, Cc, Bcc, Subject, BodyHtml, BodyText, 
-                    FromEmail, FromName, ReplyTo, TrackOpen, TrackClick, Group, 
+                    Recipient, Cc, Bcc, Subject, BodyHtml, BodyText,
+                    FromEmail, FromName, ReplyTo, TrackOpen, TrackClick, Group,
                     AddRecipientsToListID, Attachment, Silent);
         end;
     end;

@@ -58,29 +58,21 @@ table 6184481 "NPR EFTType Paym. BLOB Param."
     }
 
     procedure GetParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; UserConfigurable: Boolean; var TempBlobOut: Codeunit "Temp Blob")
-    var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
     begin
         SetAutoCalcFields(Value);
         if not Get(IntegrationType, PaymentTypePOS, NameIn) then begin
-            Init;
+            Init();
             "Integration Type" := IntegrationType;
             "Payment Type POS" := PaymentTypePOS;
             Name := NameIn;
             "User Configurable" := UserConfigurable;
-            Insert;
+            Insert();
         end;
 
         TempBlobOut.FromRecord(Rec, FieldNo(Value));
     end;
 
     procedure LookupValue()
-    var
-        tmpRetailList: Record "NPR Retail List" temporary;
-        Parts: DotNet NPRNetArray;
-        "Part": DotNet NPRNetString;
-        OptionStringCaption: Text;
-        Handled: Boolean;
     begin
         OnLookupParameterValue(Rec);
     end;
@@ -103,7 +95,7 @@ table 6184481 "NPR EFTType Paym. BLOB Param."
         RecRef.SetTable(Rec);
 
         //+NPR5.48 [334105]
-        Modify;
+        Modify();
     end;
 
     [IntegrationEvent(false, false)]

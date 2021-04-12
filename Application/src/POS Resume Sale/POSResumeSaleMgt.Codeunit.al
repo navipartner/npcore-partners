@@ -67,7 +67,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         if SalePOS.IsEmpty then
             exit(false);
 
-        SalePOS.FindFirst;
+        SalePOS.FindFirst();
         if not SalePOS.SalesLinesExist then
             ActionOption := ActionOption::CancelAndNew;  //Silently cancel any unfinished sale with no lines
         ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
@@ -138,14 +138,14 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
             POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
 
         if not CancelFailed then begin
-            Commit;
+            Commit();
             AltSaleCancelDescription := StrSubstNo(SaleWasParkedTxt, CurrentDateTime);
             CancelFailed := not TryCancelSale(SalePOS, POSSession);
             AltSaleCancelDescription := '';
         end;
         if CancelFailed then
             SalePOS.Delete(true);
-        Commit;
+        Commit();
 
         if not SkipDialog then
             if CancelErrorText <> '' then
@@ -197,7 +197,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     begin
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
             WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, true);
-            Commit;
+            Commit();
         end;
 
         Clear(POSTryCancelSale);

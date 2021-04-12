@@ -172,8 +172,6 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Description = 'CASE220397';
 
             trigger OnLookup()
-            var
-                VarValue: Code[20];
             begin
             end;
         }
@@ -202,8 +200,6 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Description = 'CASE220397';
 
             trigger OnLookup()
-            var
-                VarValue: Code[20];
             begin
             end;
         }

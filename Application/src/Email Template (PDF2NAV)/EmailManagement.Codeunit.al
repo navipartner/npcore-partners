@@ -1,4 +1,4 @@
-codeunit 6014450 "NPR E-mail Management"
+﻿codeunit 6014450 "NPR E-mail Management"
 {
     var
 
@@ -7,9 +7,7 @@ codeunit 6014450 "NPR E-mail Management"
         Text003: Label 'The email may not be empty.';
         Text004: Label 'There is not entered any sender email address in the setup.';
         Text006: Label 'The functionality to save report %1 as PDF, returned an error.\\%2';
-        Text007: Label 'Shortcut not found.';
         ReqParamStoreDict: Dictionary of [Integer, Text];
-        Initialized: Boolean;
         Text008: Label 'Smtp Mail Setup is not completed';
         Text010: Label 'Would you like to resend the e-mail?';
         Text011: Label 'E-mail Template was not found';
@@ -23,7 +21,6 @@ codeunit 6014450 "NPR E-mail Management"
         TransactionalEmailRecipient: Text;
         AttachmentNoData: Label 'No data in %1';
         NoOutputFromReport: Label 'No output from report.';
-        NoMatchingEnd: Label 'No End-Tag found for Start-Tag at position %1 in %2.';
 
     procedure SendEmail(var RecRef: RecordRef; RecipientEmail: Text; Silent: Boolean) ErrorMessage: Text
     var
@@ -52,18 +49,12 @@ codeunit 6014450 "NPR E-mail Management"
     procedure SendReport(ReportID: Integer; var RecRef: RecordRef; RecipientEmail: Text[250]; Silent: Boolean): Text
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
-        FileManagement: Codeunit "File Management";
-        Filepath: Text;
-        Filename: Text;
-        ErrorMessage: Text;
     begin
         exit(SendReportTemplate(ReportID, RecRef, EmailTemplateHeader, RecipientEmail, Silent));
     end;
 
     procedure SendReportTemplate(ReportID: Integer; var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean): Text
     var
-        FileManagement: Codeunit "File Management";
-        InStream: InStream;
         Filename: Text;
         ErrorMessage: Text;
     begin
@@ -83,7 +74,7 @@ codeunit 6014450 "NPR E-mail Management"
 
         if ErrorMessage = '' then begin
             Filename := GetFilename(EmailTemplateHeader, RecRef);
-            RecRef.SetRecFilter;
+            RecRef.SetRecFilter();
             if not PrintPDF(ReportID, RecRef, Filename) then
                 ErrorMessage := StrSubstNo(Text006, ReportID, GetLastErrorText);
         end;
@@ -108,9 +99,9 @@ codeunit 6014450 "NPR E-mail Management"
         EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
         Filename: Text[250];
     begin
-        EmailTemplateReport.Reset;
+        EmailTemplateReport.Reset();
         EmailTemplateReport.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
-        if EmailTemplateReport.FindSet then
+        if EmailTemplateReport.FindSet() then
             repeat
                 Filename := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateReport.Filename, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
                 if StrPos(Filename, '.pdf') = 0 then
@@ -119,7 +110,7 @@ codeunit 6014450 "NPR E-mail Management"
 
                 if not PrintPDF(EmailTemplateReport."Report ID", RecRef, Filename) then
                     ErrorMessage := StrSubstNo(Text006, EmailTemplateReport."Report ID", GetLastErrorText);
-            until (EmailTemplateReport.Next = 0) or (ErrorMessage <> '');
+            until (EmailTemplateReport.Next() = 0) or (ErrorMessage <> '');
 
         exit(ErrorMessage);
     end;
@@ -132,13 +123,13 @@ codeunit 6014450 "NPR E-mail Management"
         RecRef.GetTable(EmailTemplateHeader);
         EmailAttachment.SetRange("Table No.", RecRef.Number);
         EmailAttachment.SetRange("Primary Key", RecRef.GetPosition(false));
-        if EmailAttachment.FindSet then
+        if EmailAttachment.FindSet() then
             repeat
                 if EmailAttachment.Description <> '' then begin
                     EmailAttachment.CalcFields("Attached File");
                     AddAttachmentToBuffer(EmailAttachment);
                 end;
-            until EmailAttachment.Next = 0;
+            until EmailAttachment.Next() = 0;
     end;
 
     procedure AddFileToSmtpMessage(Filename: Text[250]) FileAttached: Boolean
@@ -154,7 +145,7 @@ codeunit 6014450 "NPR E-mail Management"
 
         AttachmentFile.Open(Filename);
         AttachmentFile.CreateInStream(InStream);
-        EmailAttachmentTemp.Init;
+        EmailAttachmentTemp.Init();
         EmailAttachmentTemp."Attached File".CreateOutStream(OutStream);
         CopyStream(OutStream, InStream);
         Pos := StrPos(Filename, '\');
@@ -163,9 +154,9 @@ codeunit 6014450 "NPR E-mail Management"
             Pos := StrPos(Filename, '\');
         end;
         EmailAttachmentTemp.Description := ReplaceSpecialChar(Filename);
-        EmailAttachmentTemp.Insert;
+        EmailAttachmentTemp.Insert();
         AddAttachmentToBuffer(EmailAttachmentTemp);
-        AttachmentFile.Close;
+        AttachmentFile.Close();
         exit(true);
     end;
 
@@ -179,12 +170,12 @@ codeunit 6014450 "NPR E-mail Management"
         NextAttachmentLineNo: Integer;
     begin
         EmailAttachment.CalcFields("Attached File");
-        if not EmailAttachment."Attached File".HasValue then begin
+        if not EmailAttachment."Attached File".HasValue() then begin
             if SetLastErrorMessage(StrSubstNo(AttachmentNoData, EmailAttachment.Description)) then;
             exit(false);
         end;
-        AttachmentBuffer.Reset;
-        if AttachmentBuffer.FindLast then
+        AttachmentBuffer.Reset();
+        if AttachmentBuffer.FindLast() then
             NextAttachmentLineNo := AttachmentBuffer."Line No." + 1
         else
             NextAttachmentLineNo := 1;
@@ -192,7 +183,7 @@ codeunit 6014450 "NPR E-mail Management"
         AttachmentBuffer."Table No." := 0;
         AttachmentBuffer."Primary Key" := '';
         AttachmentBuffer."Line No." := NextAttachmentLineNo;
-        AttachmentBuffer.Insert;
+        AttachmentBuffer.Insert();
         exit(true);
     end;
 
@@ -200,14 +191,8 @@ codeunit 6014450 "NPR E-mail Management"
     var
         EmailTemplateLine: Record "NPR E-mail Templ. Line";
         EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
-        FileManagement: Codeunit "File Management";
-        Email: Text;
-        EmailString: Text;
-        Filepath: Text;
-        Filename: Text;
         HtmlLine: Text;
         InStream: InStream;
-        i: Integer;
         Separators: List of [Text];
     begin
         if not SmtpMail.IsEnabled() then
@@ -242,14 +227,14 @@ codeunit 6014450 "NPR E-mail Management"
             SmtpMail.AddSubject(HtmlLine);
             if not EmailTemplateHeader."Use HTML Template" then begin
                 EmailTemplateLine.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
-                if EmailTemplateLine.FindSet then
+                if EmailTemplateLine.FindSet() then
                     repeat
                         HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateLine."Mail Body Line", EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
                         SmtpMail.AppendBody(HtmlLine);
-                    until EmailTemplateLine.Next = 0;
+                    until EmailTemplateLine.Next() = 0;
             end else begin
                 EmailTemplateHeader.CalcFields("HTML Template");
-                if EmailTemplateHeader."HTML Template".HasValue then begin
+                if EmailTemplateHeader."HTML Template".HasValue() then begin
                     EmailTemplateHeader."HTML Template".CreateInStream(InStream, TEXTENCODING::UTF8);
                     while not InStream.EOS do begin
                         HtmlLine := '';
@@ -262,7 +247,7 @@ codeunit 6014450 "NPR E-mail Management"
             end;
         end;
 
-        AttachmentBuffer.DeleteAll;
+        AttachmentBuffer.DeleteAll();
 
         exit('');
     end;
@@ -309,25 +294,25 @@ codeunit 6014450 "NPR E-mail Management"
                     exit(Text008);
                 Error(Text008);
             end;
-            AttachmentBuffer.Reset;
-            if AttachmentBuffer.FindSet then
+            AttachmentBuffer.Reset();
+            if AttachmentBuffer.FindSet() then
                 repeat
                     if AttachmentBuffer.Description <> '' then begin
                         AttachmentBuffer.CalcFields("Attached File");
                         Clear(IStream);
-                        if AttachmentBuffer."Attached File".HasValue then begin
+                        if AttachmentBuffer."Attached File".HasValue() then begin
                             AttachmentBuffer."Attached File".CreateInStream(IStream);
                         end;
                         if SmtpMail.AddAttachmentStream(IStream, AttachmentBuffer.Description) then
                             Clear(IStream);
                     end;
-                until AttachmentBuffer.Next = 0;
+                until AttachmentBuffer.Next() = 0;
             PrepareEmailLogEntry(EmailLog, RecRef);
             EmailLogPrepared := true;
             SmtpMail.Send();
             ErrorMessage := SmtpMail.GetLastSendMailErrorText();
         end;
-        AttachmentBuffer.DeleteAll;
+        AttachmentBuffer.DeleteAll();
 
         if ErrorMessage = '' then begin
             AddEmailLogEntry(EmailLog, RecRef, EmailLogPrepared);
@@ -396,12 +381,12 @@ codeunit 6014450 "NPR E-mail Management"
         Parameters := GetReqParametersFromStore(ReportID);
         Result := REPORT.SaveAs(ReportID, Parameters, REPORTFORMAT::Pdf, OStream, RecVariant);
         ClearRequestParameters(ReportID);
-        if not EmailAttachmentTemp."Attached File".HasValue then begin
+        if not EmailAttachmentTemp."Attached File".HasValue() then begin
             Result := false;
             if SetLastErrorMessage(NoOutputFromReport) then;
         end;
         if Result then begin
-            EmailAttachmentTemp.Insert;
+            EmailAttachmentTemp.Insert();
             Result := AddAttachmentToBuffer(EmailAttachmentTemp);
         end;
 
@@ -411,7 +396,7 @@ codeunit 6014450 "NPR E-mail Management"
 
     //--- Get ---
 
-    local procedure GetEmailFromAddress(EmailTemplateHeader: Record "NPR E-mail Template Header") NewEmailFromAddress: Text[250]
+    local procedure GetEmailFromAddress(EmailTemplateHeader: Record "NPR E-mail Template Header"): Text[250]
     var
         EmailSetup: Record "NPR E-mail Setup";
 
@@ -422,7 +407,7 @@ codeunit 6014450 "NPR E-mail Management"
         exit(EmailSetup."From E-mail Address");
     end;
 
-    local procedure GetEmailFromName(EmailTemplateHeader: Record "NPR E-mail Template Header") NewEmailFromAddress: Text[250]
+    local procedure GetEmailFromName(EmailTemplateHeader: Record "NPR E-mail Template Header"): Text[250]
     var
         EmailSetup: Record "NPR E-mail Setup";
     begin
@@ -448,8 +433,6 @@ codeunit 6014450 "NPR E-mail Management"
     var
         EmailTemplateFilter: Record "NPR E-mail Template Filter";
         FieldRef: FieldRef;
-        ValueInt: Integer;
-        Value: Text[250];
         Stop: Boolean;
     begin
         if EmailTemplateHeader.GetFilters = '' then
@@ -465,14 +448,14 @@ codeunit 6014450 "NPR E-mail Management"
                         RecordExists := false;
                         FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
                         FieldRef.SetFilter(EmailTemplateFilter.Value);
-                        if RecRef.Find then
+                        if RecRef.Find() then
                             RecordExists := true;
                         FieldRef.SetRange();
-                    until not RecordExists or (EmailTemplateFilter.Next = 0);
+                    until not RecordExists or (EmailTemplateFilter.Next() = 0);
                 if RecordExists then
                     Stop := true
                 else
-                    Stop := EmailTemplateHeader.Next = 0;
+                    Stop := EmailTemplateHeader.Next() = 0;
             until Stop;
 
         if not RecordExists then begin
@@ -486,14 +469,14 @@ codeunit 6014450 "NPR E-mail Management"
                             RecordExists := false;
                             FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
                             FieldRef.SetFilter(EmailTemplateFilter.Value);
-                            if RecRef.Find then
+                            if RecRef.Find() then
                                 RecordExists := true;
                             FieldRef.SetRange();
-                        until not RecordExists or (EmailTemplateFilter.Next = 0);
+                        until not RecordExists or (EmailTemplateFilter.Next() = 0);
                     if RecordExists then
                         Stop := true
                     else
-                        Stop := EmailTemplateHeader.Next = 0;
+                        Stop := EmailTemplateHeader.Next() = 0;
                 until Stop;
         end;
 
@@ -529,7 +512,6 @@ codeunit 6014450 "NPR E-mail Management"
         ReportSelections: Record "Report Selections";
         SalesHeader: Record "Sales Header";
         ServHeader: Record "Service Header";
-        CustomReportSelection: Record "Custom Report Selection";
     begin
         ReportID := 0;
 
@@ -569,13 +551,13 @@ codeunit 6014450 "NPR E-mail Management"
             DATABASE::"Issued Reminder Header":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::Reminder);
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
             DATABASE::"Issued Fin. Charge Memo Header":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"Fin.Charge");
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
             DATABASE::"Sales Cr.Memo Header":
@@ -583,7 +565,7 @@ codeunit 6014450 "NPR E-mail Management"
                     ReportID := GetCustomReportSelection(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Cr.Memo");
                     if ReportID = 0 then begin
                         ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Cr.Memo");
-                        if ReportSelections.FindFirst then
+                        if ReportSelections.FindFirst() then
                             ReportID := ReportSelections."Report ID";
                     end;
                 end;
@@ -596,7 +578,7 @@ codeunit 6014450 "NPR E-mail Management"
                                 ReportID := GetCustomReportSelection(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Quote");
                                 if ReportID = 0 then begin
                                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Quote");
-                                    if ReportSelections.FindFirst then
+                                    if ReportSelections.FindFirst() then
                                         ReportID := ReportSelections."Report ID";
                                 end;
                             end;
@@ -605,7 +587,7 @@ codeunit 6014450 "NPR E-mail Management"
                                 ReportID := GetCustomReportSelection(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Order");
                                 if ReportID = 0 then begin
                                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Order");
-                                    if ReportSelections.FindFirst then
+                                    if ReportSelections.FindFirst() then
                                         ReportID := ReportSelections."Report ID";
                                 end;
                             end;
@@ -614,7 +596,7 @@ codeunit 6014450 "NPR E-mail Management"
                                 ReportID := GetCustomReportSelection(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Return");
                                 if ReportID = 0 then begin
                                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Return");
-                                    if ReportSelections.FindFirst then
+                                    if ReportSelections.FindFirst() then
                                         ReportID := ReportSelections."Report ID";
                                 end;
                             end;
@@ -625,20 +607,20 @@ codeunit 6014450 "NPR E-mail Management"
                     ReportID := GetCustomReportSelection(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Invoice");
                     if ReportID = 0 then begin
                         ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
-                        if ReportSelections.FindFirst then
+                        if ReportSelections.FindFirst() then
                             ReportID := ReportSelections."Report ID";
                     end;
                 end;
             DATABASE::"Sales Shipment Header":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Shipment");
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
             DATABASE::"Purch. Cr. Memo Hdr.":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Cr.Memo");
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
             DATABASE::"Purchase Header":
@@ -648,19 +630,19 @@ codeunit 6014450 "NPR E-mail Management"
                         PurchHeader."Document Type"::Quote:
                             begin
                                 ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Quote");
-                                if ReportSelections.FindFirst then
+                                if ReportSelections.FindFirst() then
                                     ReportID := ReportSelections."Report ID";
                             end;
                         PurchHeader."Document Type"::Order:
                             begin
                                 ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Order");
-                                if ReportSelections.FindFirst then
+                                if ReportSelections.FindFirst() then
                                     ReportID := ReportSelections."Report ID";
                             end;
                         PurchHeader."Document Type"::"Return Order":
                             begin
                                 ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Return");
-                                if ReportSelections.FindFirst then
+                                if ReportSelections.FindFirst() then
                                     ReportID := ReportSelections."Report ID";
                             end;
                     end;
@@ -668,13 +650,13 @@ codeunit 6014450 "NPR E-mail Management"
             DATABASE::"Purch. Inv. Header":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Invoice");
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
             DATABASE::"Purch. Rcpt. Header":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"P.Receipt");
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
             DATABASE::"Service Header":
@@ -684,13 +666,13 @@ codeunit 6014450 "NPR E-mail Management"
                         ServHeader."Document Type"::Quote:
                             begin
                                 ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Quote");
-                                if ReportSelections.FindFirst then
+                                if ReportSelections.FindFirst() then
                                     ReportID := ReportSelections."Report ID";
                             end;
                         ServHeader."Document Type"::Order:
                             begin
                                 ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Order");
-                                if ReportSelections.FindFirst then
+                                if ReportSelections.FindFirst() then
                                     ReportID := ReportSelections."Report ID";
                             end;
                     end;
@@ -698,13 +680,13 @@ codeunit 6014450 "NPR E-mail Management"
             DATABASE::"Service Shipment Header":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Shipment");
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
             DATABASE::"Service Invoice Header":
                 begin
                     ReportSelections.SetRange(Usage, ReportSelections.Usage::"SM.Invoice");
-                    if ReportSelections.FindFirst then
+                    if ReportSelections.FindFirst() then
                         ReportID := ReportSelections."Report ID";
                 end;
         end;
@@ -774,7 +756,7 @@ codeunit 6014450 "NPR E-mail Management"
         CustomReportSelection.SetRange("Source No.", BillToCustomer);
         CustomReportSelection.SetRange(Usage, NewUsage);
         ReportID := 0;
-        if CustomReportSelection.FindFirst then begin
+        if CustomReportSelection.FindFirst() then begin
             ReportID := CustomReportSelection."Report ID";
             if EmailNaviDocsMgtWrapper.HasCustomReportLayout(CustomReportSelection) or
                 (CustomReportSelection."Send To Email" <> '') then begin
@@ -788,7 +770,6 @@ codeunit 6014450 "NPR E-mail Management"
     local procedure GetCustomEmailForReportID(SourceType: Integer; BillToCustomer: Code[20]; NewUsage: Enum "Report Selection Usage"; ReportID: Integer)
     var
         CustomReportSelection: Record "Custom Report Selection";
-        EmailNaviDocsMgtWrapper: Codeunit "NPR E-mail NaviDocs Mgt.Wrap.";
     begin
         if UseCustomReportSelection then
             exit;
@@ -796,9 +777,9 @@ codeunit 6014450 "NPR E-mail Management"
         CustomReportSelection.SetRange("Source No.", BillToCustomer);
         CustomReportSelection.SetRange(Usage, NewUsage);
         CustomReportSelection.SetRange("Report ID", ReportID);
-        if not CustomReportSelection.FindFirst then begin
+        if not CustomReportSelection.FindFirst() then begin
             CustomReportSelection.SetRange("Report ID", 0);
-            if not CustomReportSelection.FindFirst then
+            if not CustomReportSelection.FindFirst() then
                 exit;
         end;
         if CustomReportSelection."Send To Email" <> '' then begin
@@ -849,9 +830,6 @@ codeunit 6014450 "NPR E-mail Management"
     end;
 
     local procedure GetReqParametersFromStore(ReportID: Integer): Text
-    var
-        InStr: InStream;
-        Parameters: Text;
     begin
         if ReqParamStoreDict.ContainsKey(ReportID) then
             exit(ReqParamStoreDict.Get(ReportID));
@@ -869,16 +847,15 @@ codeunit 6014450 "NPR E-mail Management"
     local procedure PrepareEmailLogEntry(var EmailLog: Record "NPR E-mail Log"; RecRef: RecordRef)
     var
         Chr: array[2] of Char;
-        i: Integer;
         MailAddresses: List of [Text];
     begin
         Chr[1] := 13;
         Chr[2] := 10;
-        EmailLog.Init;
+        EmailLog.Init();
         EmailLog."Table No." := RecRef.Number;
         EmailLog."Primary Key" := RecRef.GetPosition(false);
         EmailLog."Sent Time" := Time;
-        EmailLog."Sent Date" := Today;
+        EmailLog."Sent Date" := Today();
         EmailLog."Sent Username" := UserId;
         SmtpMail.GetRecipients(MailAddresses);
         EmailLog."Recipient E-mail" := CopyStr(List2Text(MailAddresses), 1, MaxStrLen(EmailLog."Recipient E-mail"));
@@ -901,7 +878,7 @@ codeunit 6014450 "NPR E-mail Management"
         Clear(EmailLog);
         EmailLog.SetRange("Table No.", RecRef.Number);
         EmailLog.SetRange("Primary Key", RecRef.GetPosition(false));
-        exit(not EmailLog.IsEmpty);
+        exit(not EmailLog.IsEmpty());
     end;
 
     local procedure ReplaceSpecialChar(Input: Text) Output: Text
@@ -978,7 +955,7 @@ codeunit 6014450 "NPR E-mail Management"
         Clear(InputDialog);
         InputDialog.SetInput(1, RecipientEmail, Text001);
         InputDialog.LookupMode(true);
-        if InputDialog.RunModal <> ACTION::LookupOK then
+        if InputDialog.RunModal() <> ACTION::LookupOK then
             exit('');
 
         InputDialog.InputText(1, NewRecipientEmail);

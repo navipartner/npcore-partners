@@ -35,12 +35,9 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
-        MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MembershipRole: Record "NPR MM Membership Role";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
-        MemberNotification: Codeunit "NPR MM Member Notification";
         MembershipEntryNo: Integer;
         TotalEarnAmount: Decimal;
         TotalBurnAmount: Decimal;
@@ -62,7 +59,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyStoreLedger.TransferFields(TmpAuthorizationIn, false);
         LoyaltyStoreLedger."Entry No." := 0;
         LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RECEIPT;
-        LoyaltyStoreLedger."Authorization Code" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        LoyaltyStoreLedger."Authorization Code" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         // Store the details in the points entry ledgers
         TmpSaleLinesIn.Reset();
@@ -101,11 +98,9 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
     procedure ReservePoints(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpReserveLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
-        MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
-        MembershipRole: Record "NPR MM Membership Role";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         MembershipEntryNo: Integer;
     begin
@@ -126,7 +121,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyStoreLedger.TransferFields(TmpAuthorizationIn, false);
         LoyaltyStoreLedger."Entry No." := 0;
         LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RESERVE;
-        LoyaltyStoreLedger."Authorization Code" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        LoyaltyStoreLedger."Authorization Code" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         // Store the details in the points entry ledger
         TmpReserveLinesIn.Reset();
@@ -219,7 +214,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
             exit(true);
 
         if ((BasicCheck) and (TmpAuthorizationIn."Transaction Date" = 0D)) then
-            TmpAuthorizationIn."Transaction Date" := Today;
+            TmpAuthorizationIn."Transaction Date" := Today();
 
         //IF ((TmpAuthorizationIn."Transaction Date" = 0D) OR (TmpAuthorizationIn."Transaction Date" > TODAY)) THEN BEGIN
         if (TmpAuthorizationIn."Transaction Date" = 0D) then begin
@@ -301,10 +296,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyServerStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         GeneralLedgerSetup: Record "General Ledger Setup";
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
-        TotalSalesAmount: Decimal;
-        TotalSalesPoints: InStream;
-        TotalPaymentAmount: Decimal;
-        TotalPaymentPoints: Decimal;
         EarnedPoints: Integer;
         BurnedPoints: Integer;
         EarnedAmount: Decimal;
@@ -447,42 +438,37 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
     local procedure ValidateReservePoints(var TmpReserveLines: Record "NPR MM Reg. Sales Buffer" temporary; MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
-        LoyaltyServerStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
-        TotalReserveAmount: Decimal;
         TotalReservePoints: Decimal;
     begin
 
         Membership.Get(MembershipEntryNo);
         Membership.CalcFields("Remaining Points");
 
-        with TmpReserveLines do begin
+        TmpReserveLines.Reset();
+        if (TmpReserveLines.FindSet()) then begin
+            repeat
+                if (TmpReserveLines."Total Points" <> 0) then begin
+                    TotalReservePoints += TmpReserveLines."Total Points";
 
-            Reset();
-            if (FindSet()) then begin
-                repeat
-                    if ("Total Points" <> 0) then begin
-                        TotalReservePoints += "Total Points";
-
-                        if (not (Type in [Type::PAYMENT, Type::REFUND])) then begin
-                            ResponseMessage := RESERVE_4;
-                            ResponseMessageId := '-1202';
-                        end;
-
-                        if (TmpReserveLines."Total Points" < 0) and (TmpReserveLines.Type = TmpReserveLines.Type::PAYMENT) then begin
-                            ResponseMessage := RESERVE_2;
-                            ResponseMessageId := '-1200';
-                            exit(false);
-                        end;
-
-                        if (TmpReserveLines."Total Points" > 0) and (TmpReserveLines.Type = TmpReserveLines.Type::REFUND) then begin
-                            ResponseMessage := RESERVE_3;
-                            ResponseMessageId := '-1201';
-                            exit(false);
-                        end;
-
+                    if (not (TmpReserveLines.Type in [TmpReserveLines.Type::PAYMENT, TmpReserveLines.Type::REFUND])) then begin
+                        ResponseMessage := RESERVE_4;
+                        ResponseMessageId := '-1202';
                     end;
-                until (Next() = 0);
-            end;
+
+                    if (TmpReserveLines."Total Points" < 0) and (TmpReserveLines.Type = TmpReserveLines.Type::PAYMENT) then begin
+                        ResponseMessage := RESERVE_2;
+                        ResponseMessageId := '-1200';
+                        exit(false);
+                    end;
+
+                    if (TmpReserveLines."Total Points" > 0) and (TmpReserveLines.Type = TmpReserveLines.Type::REFUND) then begin
+                        ResponseMessage := RESERVE_3;
+                        ResponseMessageId := '-1201';
+                        exit(false);
+                    end;
+
+                end;
+            until (TmpReserveLines.Next() = 0);
         end;
 
         if (TotalReservePoints > 0) then begin
@@ -507,54 +493,50 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin
 
-        with MembershipPointsEntry do begin
+        MembershipPointsEntry.Init();
 
-            Init();
+        MembershipPointsEntry."Entry No." := 0;
+        MembershipPointsEntry."Posting Date" := LoyaltyStoreLedger."Transaction Date";
 
-            "Entry No." := 0;
-            "Posting Date" := LoyaltyStoreLedger."Transaction Date";
+        MembershipPointsEntry."Membership Entry No." := Membership."Entry No.";
+        MembershipPointsEntry."Customer No." := Membership."Customer No.";
 
-            "Membership Entry No." := Membership."Entry No.";
-            "Customer No." := Membership."Customer No.";
+        MembershipPointsEntry."POS Store Code" := LoyaltyStoreLedger."POS Store Code";
+        MembershipPointsEntry."POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
+        MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
+        MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
+        MembershipPointsEntry."Authorization Code" := LoyaltyStoreLedger."Authorization Code";
 
-            "POS Store Code" := LoyaltyStoreLedger."POS Store Code";
-            "POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
-            "Document No." := LoyaltyStoreLedger."Reference Number";
-            "Loyalty Code" := LoyaltySetup.Code;
-            "Authorization Code" := LoyaltyStoreLedger."Authorization Code";
+        MembershipPointsEntry."Item No." := TmpBuffer."Item No.";
+        MembershipPointsEntry."Variant Code" := TmpBuffer."Variant Code";
 
-            "Item No." := TmpBuffer."Item No.";
-            "Variant Code" := TmpBuffer."Variant Code";
+        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
-            LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, "Posting Date", "Period Start", "Period End");
-
-            case TmpBuffer.Type of
-                TmpBuffer.Type::SALES:
-                    begin
-                        "Entry Type" := "Entry Type"::SALE;
-                        Points := Abs(TmpBuffer."Total Points");
-                        "Amount (LCY)" := Abs(TmpBuffer."Total Amount");
-                    end;
-                TmpBuffer.Type::RETURN:
-                    begin
-                        "Entry Type" := "Entry Type"::REFUND;
-                        Points := Abs(TmpBuffer."Total Points") * -1;
-                        "Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
-                    end;
-            end;
-
-            "Awarded Points" := Points;
-            "Awarded Amount (LCY)" := "Amount (LCY)";
-
-            Quantity := TmpBuffer.Quantity;
-            Description := TmpBuffer.Description;
-
-            Insert();
-
-            LoyaltyStoreLedger."Earned Points" += Points;
-            TotalEarnAmount += "Amount (LCY)";
-
+        case TmpBuffer.Type of
+            TmpBuffer.Type::SALES:
+                begin
+                    MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::SALE;
+                    MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points");
+                    MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount");
+                end;
+            TmpBuffer.Type::RETURN:
+                begin
+                    MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::REFUND;
+                    MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points") * -1;
+                    MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
+                end;
         end;
+
+        MembershipPointsEntry."Awarded Points" := MembershipPointsEntry.Points;
+        MembershipPointsEntry."Awarded Amount (LCY)" := MembershipPointsEntry."Amount (LCY)";
+
+        MembershipPointsEntry.Quantity := TmpBuffer.Quantity;
+        MembershipPointsEntry.Description := TmpBuffer.Description;
+
+        MembershipPointsEntry.Insert();
+
+        LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
+        TotalEarnAmount += MembershipPointsEntry."Amount (LCY)";
     end;
 
     local procedure CreateCaptureEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TotalBurnAmount: Decimal)
@@ -563,52 +545,48 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin
 
-        with MembershipPointsEntry do begin
+        MembershipPointsEntry.Init();
+        MembershipPointsEntry."Entry No." := 0;
+        MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::CAPTURE;
 
-            Init();
-            "Entry No." := 0;
-            "Entry Type" := MembershipPointsEntry."Entry Type"::CAPTURE;
+        MembershipPointsEntry."Posting Date" := LoyaltyStoreLedger."Transaction Date";
 
-            "Posting Date" := LoyaltyStoreLedger."Transaction Date";
+        MembershipPointsEntry."Membership Entry No." := Membership."Entry No.";
+        MembershipPointsEntry."Customer No." := Membership."Customer No.";
 
-            "Membership Entry No." := Membership."Entry No.";
-            "Customer No." := Membership."Customer No.";
+        MembershipPointsEntry."POS Store Code" := LoyaltyStoreLedger."POS Store Code";
+        MembershipPointsEntry."POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
+        MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
+        MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
+        MembershipPointsEntry."Authorization Code" := TmpBuffer."Authorization Code";
 
-            "POS Store Code" := LoyaltyStoreLedger."POS Store Code";
-            "POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
-            "Document No." := LoyaltyStoreLedger."Reference Number";
-            "Loyalty Code" := LoyaltySetup.Code;
-            "Authorization Code" := TmpBuffer."Authorization Code";
+        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
-            LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, "Posting Date", "Period Start", "Period End");
-
-            Points := 0;
-            case TmpBuffer.Type of
-                TmpBuffer.Type::PAYMENT:
-                    begin
-                        Points := Abs(TmpBuffer."Total Points") * -1;
-                        "Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
-                    end;
-                TmpBuffer.Type::REFUND:
-                    begin
-                        Points := Abs(TmpBuffer."Total Points");
-                        "Amount (LCY)" := Abs(TmpBuffer."Total Amount");
-                    end;
-            end;
-
-            "Redeemed Points" := Points;
-            "Awarded Amount (LCY)" := "Amount (LCY)";
-
-            Quantity := 1;
-            Description := TmpBuffer.Description;
-
-            Insert();
-
-            // Payment points are negative
-            LoyaltyStoreLedger."Burned Points" += Points;
-            TotalBurnAmount += "Amount (LCY)";
-
+        MembershipPointsEntry.Points := 0;
+        case TmpBuffer.Type of
+            TmpBuffer.Type::PAYMENT:
+                begin
+                    MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points") * -1;
+                    MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
+                end;
+            TmpBuffer.Type::REFUND:
+                begin
+                    MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points");
+                    MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount");
+                end;
         end;
+
+        MembershipPointsEntry."Redeemed Points" := MembershipPointsEntry.Points;
+        MembershipPointsEntry."Awarded Amount (LCY)" := MembershipPointsEntry."Amount (LCY)";
+
+        MembershipPointsEntry.Quantity := 1;
+        MembershipPointsEntry.Description := TmpBuffer.Description;
+
+        MembershipPointsEntry.Insert();
+
+        // Payment points are negative
+        LoyaltyStoreLedger."Burned Points" += MembershipPointsEntry.Points;
+        TotalBurnAmount += MembershipPointsEntry."Amount (LCY)";
     end;
 
     local procedure CreateReserveEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
@@ -617,44 +595,41 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin
 
-        with MembershipPointsEntry do begin
+        MembershipPointsEntry.Init();
+        MembershipPointsEntry."Entry No." := 0;
+        MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::RESERVE;
+        MembershipPointsEntry."Posting Date" := LoyaltyStoreLedger."Transaction Date";
 
-            Init();
-            "Entry No." := 0;
-            "Entry Type" := MembershipPointsEntry."Entry Type"::RESERVE;
-            "Posting Date" := LoyaltyStoreLedger."Transaction Date";
+        MembershipPointsEntry."Membership Entry No." := Membership."Entry No.";
+        MembershipPointsEntry."Customer No." := Membership."Customer No.";
 
-            "Membership Entry No." := Membership."Entry No.";
-            "Customer No." := Membership."Customer No.";
+        MembershipPointsEntry."POS Store Code" := LoyaltyStoreLedger."POS Store Code";
+        MembershipPointsEntry."POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
+        MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
+        MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
+        MembershipPointsEntry."Authorization Code" := LoyaltyStoreLedger."Authorization Code";
 
-            "POS Store Code" := LoyaltyStoreLedger."POS Store Code";
-            "POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
-            "Document No." := LoyaltyStoreLedger."Reference Number";
-            "Loyalty Code" := LoyaltySetup.Code;
-            "Authorization Code" := LoyaltyStoreLedger."Authorization Code";
+        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
-            LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, "Posting Date", "Period Start", "Period End");
-
-            case TmpBuffer.Type of
-                TmpBuffer.Type::PAYMENT:
-                    begin
-                        Points := Abs(TmpBuffer."Total Points") * -1;
-                        "Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
-                    end;
-                TmpBuffer.Type::REFUND:
-                    begin
-                        Points := Abs(TmpBuffer."Total Points");
-                        "Amount (LCY)" := Abs(TmpBuffer."Total Amount");
-                    end;
-            end;
-
-            LoyaltyStoreLedger."Burned Points" += Points;
-            "Awarded Points" := 0;
-            "Awarded Amount (LCY)" := 0;
-            Description := TmpBuffer.Description;
-            Quantity := 1;
-            Insert();
+        case TmpBuffer.Type of
+            TmpBuffer.Type::PAYMENT:
+                begin
+                    MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points") * -1;
+                    MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
+                end;
+            TmpBuffer.Type::REFUND:
+                begin
+                    MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points");
+                    MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount");
+                end;
         end;
+
+        LoyaltyStoreLedger."Burned Points" += MembershipPointsEntry.Points;
+        MembershipPointsEntry."Awarded Points" := 0;
+        MembershipPointsEntry."Awarded Amount (LCY)" := 0;
+        MembershipPointsEntry.Description := TmpBuffer.Description;
+        MembershipPointsEntry.Quantity := 1;
+        MembershipPointsEntry.Insert();
     end;
 
     local procedure CreateNotEligibleEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TotalEarnAmount: Decimal; TotalBurnAmount: Decimal)
@@ -664,43 +639,39 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         EarnRatio: Decimal;
     begin
 
-        with MembershipPointsEntry do begin
+        MembershipPointsEntry.Init();
+        MembershipPointsEntry."Entry No." := 0;
+        MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::CAPTURE;
 
-            Init();
-            "Entry No." := 0;
-            "Entry Type" := MembershipPointsEntry."Entry Type"::CAPTURE;
+        MembershipPointsEntry."Posting Date" := LoyaltyStoreLedger."Transaction Date";
 
-            "Posting Date" := LoyaltyStoreLedger."Transaction Date";
+        MembershipPointsEntry."Membership Entry No." := Membership."Entry No.";
+        MembershipPointsEntry."Customer No." := Membership."Customer No.";
 
-            "Membership Entry No." := Membership."Entry No.";
-            "Customer No." := Membership."Customer No.";
+        MembershipPointsEntry."POS Store Code" := LoyaltyStoreLedger."POS Store Code";
+        MembershipPointsEntry."POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
+        MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
+        MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
 
-            "POS Store Code" := LoyaltyStoreLedger."POS Store Code";
-            "POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
-            "Document No." := LoyaltyStoreLedger."Reference Number";
-            "Loyalty Code" := LoyaltySetup.Code;
+        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
-            LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, "Posting Date", "Period Start", "Period End");
+        EarnRatio := LoyaltyStoreLedger."Earned Points" / TotalEarnAmount;
 
-            EarnRatio := LoyaltyStoreLedger."Earned Points" / TotalEarnAmount;
+        MembershipPointsEntry."Amount (LCY)" := TotalBurnAmount;
+        MembershipPointsEntry.Points := Round(MembershipPointsEntry."Amount (LCY)" * EarnRatio, 1);
 
-            "Amount (LCY)" := TotalBurnAmount;
-            Points := Round("Amount (LCY)" * EarnRatio, 1);
+        if (LoyaltyStoreLedger."Earned Points" + MembershipPointsEntry.Points < 0) then
+            MembershipPointsEntry.Points := LoyaltyStoreLedger."Earned Points" * -1;
 
-            if (LoyaltyStoreLedger."Earned Points" + Points < 0) then
-                Points := LoyaltyStoreLedger."Earned Points" * -1;
+        MembershipPointsEntry."Awarded Points" := MembershipPointsEntry.Points;
+        MembershipPointsEntry."Awarded Amount (LCY)" := MembershipPointsEntry."Amount (LCY)";
 
-            "Awarded Points" := Points;
-            "Awarded Amount (LCY)" := "Amount (LCY)";
+        MembershipPointsEntry.Quantity := 1;
+        MembershipPointsEntry.Description := 'Amount not eligible for points';
 
-            Quantity := 1;
-            Description := 'Amount not eligible for points';
+        MembershipPointsEntry.Insert();
 
-            Insert();
-
-            LoyaltyStoreLedger."Earned Points" += Points;
-
-        end;
+        LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
     end;
 
     local procedure "---"()
@@ -741,12 +712,12 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         // GenJournalLine.DeleteALL ();
         //
         // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
-        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WORKDATE);
-        //  COMMIT;
+        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate());
+        //  Commit();
         // END;
 
         if (GenJournalBatch."No. Series" <> '') then
-            DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate);
+            DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate());
 
         GenJournalLine.SetFilter("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
         GenJournalLine.SetFilter("Journal Batch Name", '=%1', GenJournalBatch.Name);
@@ -800,12 +771,12 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         // GenJournalLine.DeleteALL ();
         //
         // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
-        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WORKDATE);
-        //  COMMIT;
+        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate());
+        //  Commit();
         // END;
 
         if (GenJournalBatch."No. Series" <> '') then
-            DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate);
+            DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate());
 
         GenJournalLine.SetFilter("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
         GenJournalLine.SetFilter("Journal Batch Name", '=%1', GenJournalBatch.Name);
@@ -834,7 +805,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         BurnPoints: Integer;
         PostingBurnCurrencyCode: Code[10];
         PostingBurnAmount: Decimal;
-        PostingEarnCurrencyCode: Code[10];
         PostingEarnAmount: Decimal;
         InvoiceNo: Code[20];
         DocType: Enum "Gen. Journal Document Type";
@@ -844,7 +814,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
             LoyaltyStoreSetup."Reconciliation Period"::PREVIOUS_MONTH:
                 UntilDate := CalcDate('<-CM-1D>', Today);
             LoyaltyStoreSetup."Reconciliation Period"::TODAY:
-                UntilDate := Today;
+                UntilDate := Today();
         end;
 
         case LoyaltyStoreSetup."Posting Model" of
@@ -935,7 +905,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
     begin
 
         GenJournalLine."Line No." += 10000;
-        GenJournalLine.Init;
+        GenJournalLine.Init();
 
         GenJournalLine.Validate("Posting Date", PostingDate);
         if (DocumentNo = '') then

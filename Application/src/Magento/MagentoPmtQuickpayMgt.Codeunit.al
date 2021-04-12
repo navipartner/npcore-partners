@@ -1,4 +1,4 @@
-codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
+﻿codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
 {
     var
         Text000: Label 'Quickpay error:\%1';
@@ -13,7 +13,7 @@ codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
 
         Capture(PaymentLine);
 
-        PaymentLine."Date Captured" := Today;
+        PaymentLine."Date Captured" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -27,7 +27,7 @@ codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
 
         Refund(PaymentLine);
 
-        PaymentLine."Date Refunded" := Today;
+        PaymentLine."Date Refunded" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -193,13 +193,13 @@ codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
     var
         PaymentLine: Record "NPR Magento Payment Line";
     begin
-        PaymentLine.Reset;
+        PaymentLine.Reset();
         PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetFilter("Account No.", '<>%1', '');
         PaymentLine.SetFilter(Amount, '<>%1', 0);
-        exit(PaymentLine.FindFirst);
+        exit(PaymentLine.FindFirst());
     end;
 
     procedure CaptureSalesInvHeader(SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
@@ -209,21 +209,21 @@ codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
         if SalesInvoiceHeader."Order No." = '' then
             exit(false);
 
-        PaymentLine.Reset;
+        PaymentLine.Reset();
         PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Invoice Header");
         PaymentLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
         PaymentLine.SetFilter("Account No.", '<>%1', '');
         PaymentLine.SetFilter(Amount, '<>%1', 0);
         PaymentLine.SetRange("Date Captured", 0D);
-        if PaymentLine.FindSet then
+        if PaymentLine.FindSet() then
             repeat
-                Commit;
+                Commit();
                 Capture(PaymentLine);
-                PaymentLine."Date Captured" := Today;
-                PaymentLine.Modify;
-                Commit;
-            until PaymentLine.Next = 0;
+                PaymentLine."Date Captured" := Today();
+                PaymentLine.Modify();
+                Commit();
+            until PaymentLine.Next() = 0;
         exit(true);
     end;
 }

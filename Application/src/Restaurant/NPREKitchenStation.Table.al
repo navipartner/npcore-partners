@@ -61,6 +61,6 @@ table 6150682 "NPR NPRE Kitchen Station"
         Clear(KitchenRequests);
         KitchenRequests.SetViewMode(1);
         KitchenRequests.SetTableView(KitchenRequest);
-        KitchenRequests.Run;
+        KitchenRequests.Run();
     end;
 }

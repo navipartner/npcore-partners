@@ -2,7 +2,7 @@ codeunit 85017 "NPR Library - Tax Free"
 {
     procedure CreateTaxFreePosUnit(PosUnitNo: Code[10]; var TaxFreePosUnit: Record "NPR Tax Free POS Unit");
     begin
-        TaxFreePosUnit.Init;
+        TaxFreePosUnit.Init();
         TaxFreePosUnit.Validate(
           "Pos Unit No.", PosUnitNo);
         TaxFreePosUnit.Validate(Mode, TaxFreePosUnit.Mode::Test);
@@ -30,7 +30,7 @@ codeunit 85017 "NPR Library - Tax Free"
         TaxFreePosUnitPrm.Validate("Desk ID", GenerateRandomCode(TaxFreePosUnitPrm.FieldNo("Desk ID"), DATABASE::"NPR Tax Free GB I2 Param."));
         TaxFreePosUnitPrm.Validate("UserName", GenerateRandomCode(TaxFreePosUnitPrm.FieldNo("UserName"), DATABASE::"NPR Tax Free GB I2 Param."));
         TaxFreePosUnitPrm.Validate("Password", GenerateRandomCode(TaxFreePosUnitPrm.FieldNo("Password"), DATABASE::"NPR Tax Free GB I2 Param."));
-        TaxFreePosUnitPrm."Date Last Auto Configured" := Today;
+        TaxFreePosUnitPrm."Date Last Auto Configured" := Today();
         if TaxFreePosUnitPrm.Insert() then;
         DeleteOldCreateNewTaxFreeService(TaxFreePosUnit, TaxFreeService);
     end;

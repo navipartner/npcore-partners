@@ -14,27 +14,27 @@ page 6151026 "NPR NpRv Partners"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Service Url"; "Service Url")
+                field("Service Url"; Rec."Service Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Service Url field';
                 }
-                field("Service Username"; "Service Username")
+                field("Service Username"; Rec."Service Username")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Service Username field';
                 }
-                field("Service Password"; "Service Password")
+                field("Service Password"; Rec."Service Password")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Service Password field';

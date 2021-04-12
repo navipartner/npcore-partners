@@ -227,7 +227,6 @@ xmlport 6060120 "NPR TM Ticket Details"
         ReservationID: Text[100];
         ExternalIdCount: Integer;
         QtySum: Integer;
-        n: Integer;
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
 
     procedure GetToken(): Text[100]
@@ -248,7 +247,6 @@ xmlport 6060120 "NPR TM Ticket Details"
 
     procedure CreateResponse()
     var
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";

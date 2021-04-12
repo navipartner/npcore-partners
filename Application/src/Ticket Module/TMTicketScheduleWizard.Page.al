@@ -1,4 +1,4 @@
-page 6151134 "NPR TM Ticket Schedule Wizard"
+﻿page 6151134 "NPR TM Ticket Schedule Wizard"
 {
     Caption = 'Schedule';
     DelayedInsert = true;
@@ -118,7 +118,7 @@ page 6151134 "NPR TM Ticket Schedule Wizard"
     procedure GetSchedules(var AdmissionSchedule: Record "NPR TM Admis. Schedule" temporary)
     begin
 
-        Rec.Reset;
+        Rec.Reset();
         if (Rec.FindSet()) then begin
             repeat
                 AdmissionSchedule.TransferFields(Rec, true);

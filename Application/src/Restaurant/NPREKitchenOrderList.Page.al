@@ -65,7 +65,7 @@ page 6150688 "NPR NPRE Kitchen Order List"
                 Caption = 'Show Requests';
                 Image = ExpandDepositLine;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Kitchen Req.";

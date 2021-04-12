@@ -17,42 +17,42 @@ page 6184489 "NPR Pepper EFT Result Codes"
         {
             repeater(Group)
             {
-                field("Integration Type"; "Integration Type")
+                field("Integration Type"; Rec."Integration Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Integration Type field';
                 }
-                field("Transaction Type Code"; "Transaction Type Code")
+                field("Transaction Type Code"; Rec."Transaction Type Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Code field';
                 }
-                field("Transaction Subtype Code"; "Transaction Subtype Code")
+                field("Transaction Subtype Code"; Rec."Transaction Subtype Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Subtype Code field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Successful; Successful)
+                field(Successful; Rec.Successful)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Successful field';
                 }
-                field("Long Description"; "Long Description")
+                field("Long Description"; Rec."Long Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Long Description field';
                 }
-                field("Open Terminal and Retry"; "Open Terminal and Retry")
+                field("Open Terminal and Retry"; Rec."Open Terminal and Retry")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open Terminal and Retry field';

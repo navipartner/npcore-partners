@@ -1,8 +1,8 @@
 report 6014617 "NPR Purchase Order"
 {
     RDLCLayout = './src/_Reports/layouts/NP Purchase Order.rdlc';
-    WordLayout = './src/_Reports/layouts/NP Purchase Order.docx'; 
-    UsageCategory = ReportsAndAnalysis; 
+    WordLayout = './src/_Reports/layouts/NP Purchase Order.docx';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'NP Purchase Order';
     DefaultLayout = Word;
@@ -277,7 +277,7 @@ report 6014617 "NPR Purchase Order"
                         trigger OnAfterGetRecord()
                         begin
                             if Number = 1 then begin
-                                if not DimSetEntry1.FindSet then
+                                if not DimSetEntry1.FindSet() then
                                     CurrReport.Break();
                             end else
                                 if not Continue then
@@ -299,7 +299,7 @@ report 6014617 "NPR Purchase Order"
                                     Continue := true;
                                     exit;
                                 end;
-                            until DimSetEntry1.Next = 0;
+                            until DimSetEntry1.Next() = 0;
                         end;
 
                         trigger OnPreDataItem()
@@ -483,7 +483,7 @@ report 6014617 "NPR Purchase Order"
                             trigger OnAfterGetRecord()
                             begin
                                 if Number = 1 then begin
-                                    if not DimSetEntry2.FindSet then
+                                    if not DimSetEntry2.FindSet() then
                                         CurrReport.Break();
                                 end else
                                     if not Continue then
@@ -505,7 +505,7 @@ report 6014617 "NPR Purchase Order"
                                         Continue := true;
                                         exit;
                                     end;
-                                until DimSetEntry2.Next = 0;
+                                until DimSetEntry2.Next() = 0;
                             end;
 
                             trigger OnPreDataItem()
@@ -522,7 +522,7 @@ report 6014617 "NPR Purchase Order"
                             if Number = 1 then
                                 PurchLine.Find('-')
                             else
-                                PurchLine.Next;
+                                PurchLine.Next();
                             "Purchase Line" := PurchLine;
 
                             if not "Purchase Header"."Prices Including VAT" and
@@ -548,8 +548,6 @@ report 6014617 "NPR Purchase Order"
                             if ("Purchase Line"."VAT %" <> 0) or ("Purchase Line".Amount <> "Purchase Line"."Amount Including VAT") then
                                 VATAmountLine.InsertLine();
 
-                            TransHeaderAmount += PrevLineAmount;
-                            PrevLineAmount := "Purchase Line"."Line Amount";
                             TotalSubTotal += "Purchase Line"."Line Amount";
                             TotalInvDiscAmount -= "Purchase Line"."Inv. Discount Amount";
                             TotalAmount += "Purchase Line".Amount;
@@ -573,7 +571,7 @@ report 6014617 "NPR Purchase Order"
                             if not MoreLines then
                                 CurrReport.Break();
                             PurchLine.SetRange("Line No.", 0, PurchLine."Line No.");
-                            SetRange(Number, 1, PurchLine.Count);
+                            SetRange(Number, 1, PurchLine.Count());
                         end;
                     }
                     dataitem(Totals; "Integer")
@@ -668,7 +666,7 @@ report 6014617 "NPR Purchase Order"
                         begin
                             if VATAmount = 0 then
                                 CurrReport.Break();
-                            SetRange(Number, 1, VATAmountLine.Count);
+                            SetRange(Number, 1, VATAmountLine.Count());
                         end;
                     }
                     dataitem(VATCounterLCY; "Integer")
@@ -708,7 +706,7 @@ report 6014617 "NPR Purchase Order"
                             then
                                 CurrReport.Break();
 
-                            SetRange(Number, 1, VATAmountLine.Count);
+                            SetRange(Number, 1, VATAmountLine.Count());
 
                             if GLSetup."LCY Code" = '' then
                                 VALSpecLCYHeader := Text007 + Text008
@@ -864,7 +862,7 @@ report 6014617 "NPR Purchase Order"
                             trigger OnAfterGetRecord()
                             begin
                                 if Number = 1 then begin
-                                    if not PrepmtDimSetEntry.FindSet then
+                                    if not PrepmtDimSetEntry.FindSet() then
                                         CurrReport.Break();
                                 end else
                                     if not Continue then
@@ -896,7 +894,7 @@ report 6014617 "NPR Purchase Order"
                                 if not PrepmtInvBuf.Find('-') then
                                     CurrReport.Break();
                             end else
-                                if PrepmtInvBuf.Next = 0 then
+                                if PrepmtInvBuf.Next() = 0 then
                                     CurrReport.Break();
 
                             if ShowInternalInfo then
@@ -944,7 +942,7 @@ report 6014617 "NPR Purchase Order"
 
                         trigger OnPreDataItem()
                         begin
-                            SetRange(Number, 1, PrepmtVATAmountLine.Count);
+                            SetRange(Number, 1, PrepmtVATAmountLine.Count());
                         end;
                     }
                 }
@@ -1177,7 +1175,6 @@ report 6014617 "NPR Purchase Order"
         PrepmtVATAmountLine: Record "VAT Amount Line" temporary;
         PrePmtVATAmountLineDeduct: Record "VAT Amount Line" temporary;
         VATAmountLine: Record "VAT Amount Line" temporary;
-        Supplier: Record Vendor;
         ArchiveManagement: Codeunit ArchiveManagement;
         FormatAddr: Codeunit "Format Address";
         Language: Codeunit Language;
@@ -1198,7 +1195,6 @@ report 6014617 "NPR Purchase Order"
         PrepmtTotalAmountInclVAT: Decimal;
         PrepmtVATAmount: Decimal;
         PrepmtVATBaseAmount: Decimal;
-        PrevLineAmount: Decimal;
         TotalAmount: Decimal;
         TotalAmountInclVAT: Decimal;
         TotalAmountVAT: Decimal;
@@ -1206,7 +1202,6 @@ report 6014617 "NPR Purchase Order"
         TotalInvoiceDiscountAmount: Decimal;
         TotalPaymentDiscOnVAT: Decimal;
         TotalSubTotal: Decimal;
-        TransHeaderAmount: Decimal;
         VALVATAmountLCY: Decimal;
         VALVATBaseLCY: Decimal;
         VATAmount: Decimal;
@@ -1244,7 +1239,6 @@ report 6014617 "NPR Purchase Order"
         Text004: Label 'Order%1';
         OrderNoCaptionLbl: Label 'Order No.';
         PageCaptionLbl: Label 'Page';
-        Text005: Label 'Page';
         PaymentDetailsCaptionLbl: Label 'Payment Details';
         VATDiscountAmountCaptionLbl: Label 'Payment Discount on VAT';
         PaymentTermsDescCaptionLbl: Label 'Payment Terms';

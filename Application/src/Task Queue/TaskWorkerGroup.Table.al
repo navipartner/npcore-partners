@@ -34,7 +34,7 @@ table 6059906 "NPR Task Worker Group"
         }
         field(21; "Abbreviated Name"; Text[3])
         {
-            CalcFormula = Lookup ("Windows Language"."Abbreviated Name" WHERE("Language ID" = FIELD("Language ID")));
+            CalcFormula = Lookup("Windows Language"."Abbreviated Name" WHERE("Language ID" = FIELD("Language ID")));
             Caption = 'Abbreviated Name';
             FieldClass = FlowField;
         }
@@ -84,7 +84,7 @@ table 6059906 "NPR Task Worker Group"
         }
         field(51; "No. of Active Threads"; Integer)
         {
-            CalcFormula = Count ("NPR Task Worker" WHERE("Task Worker Group" = FIELD(Code)));
+            CalcFormula = Count("NPR Task Worker" WHERE("Task Worker Group" = FIELD(Code)));
             Caption = 'No. of Active Threads';
             FieldClass = FlowField;
             TableRelation = "NPR Task Worker" WHERE("Task Worker Group" = FIELD(Code));
@@ -111,7 +111,7 @@ table 6059906 "NPR Task Worker Group"
         if Get(NASGroupID) then
             exit;
 
-        Init;
+        Init();
         Code := NASGroupID;
         Description := Desc;
         "Language ID" := GlobalLanguage;
@@ -125,7 +125,7 @@ table 6059906 "NPR Task Worker Group"
             //+TQ1.28
             "Max. Concurrent Threads" := 1;
         //+TQ1.16
-        Insert;
+        Insert();
     end;
 
     procedure InsertDefault()

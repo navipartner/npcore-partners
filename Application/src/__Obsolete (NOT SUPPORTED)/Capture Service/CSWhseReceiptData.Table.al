@@ -1,10 +1,10 @@
 table 6151395 "NPR CS Whse. Receipt Data"
 {
-    
+
     Caption = 'CS Whse. Receipt Data';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -23,7 +23,7 @@ table 6151395 "NPR CS Whse. Receipt Data"
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
-           
+
         }
         field(11; "Variant Code"; Code[10])
         {
@@ -36,7 +36,7 @@ table 6151395 "NPR CS Whse. Receipt Data"
             Caption = 'Item Group Code';
             DataClassification = CustomerContent;
         }
-     
+
         field(16; Created; DateTime)
         {
             Caption = 'Created';
@@ -86,6 +86,6 @@ table 6151395 "NPR CS Whse. Receipt Data"
     fieldgroups
     {
     }
-    
+
 }
 

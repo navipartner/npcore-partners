@@ -1,4 +1,4 @@
-table 6150660 "NPR NPRE Waiter Pad"
+﻿table 6150660 "NPR NPRE Waiter Pad"
 {
     Caption = 'Waiter Pad';
     DataClassification = CustomerContent;
@@ -174,8 +174,6 @@ table 6150660 "NPR NPRE Waiter Pad"
     end;
 
     trigger OnInsert()
-    var
-        WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
         UpdateCurrentSeatingDescription;
     end;
@@ -207,19 +205,19 @@ table 6150660 "NPR NPRE Waiter Pad"
         if WaiterPad."No." = '' then
             exit;
 
-        WaiterPadLine.Reset;
+        WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         if not WaiterPadLine.IsEmpty then
             WaiterPadLine.DeleteAll(true);
 
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
         if not SeatingWaiterPadLink.IsEmpty then
-            SeatingWaiterPadLink.DeleteAll;
+            SeatingWaiterPadLink.DeleteAll();
 
         POSInfoWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
         if not POSInfoWaiterPadLink.IsEmpty then
-            POSInfoWaiterPadLink.DeleteAll;
+            POSInfoWaiterPadLink.DeleteAll();
     end;
 
     procedure CloseWaiterPad()

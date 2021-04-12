@@ -1,4 +1,4 @@
-page 6151260 "NPR POS Entry Cue"
+﻿page 6151260 "NPR POS Entry Cue"
 {
     PageType = CardPart;
     SourceTable = "NPR POS Entry Cue.";
@@ -60,10 +60,10 @@ page 6151260 "NPR POS Entry Cue"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

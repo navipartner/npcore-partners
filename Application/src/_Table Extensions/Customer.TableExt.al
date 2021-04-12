@@ -241,6 +241,4 @@ tableextension 6014423 "NPR Customer" extends Customer
             Error(DeleteCustActiveCashErr, Rec."No.");
     end;
 
-    var
-        SalesSetup: Record "Sales & Receivables Setup";
 }

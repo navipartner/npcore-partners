@@ -1,4 +1,4 @@
-table 6151533 "NPR Nc Endpoint"
+﻿table 6151533 "NPR Nc Endpoint"
 {
     // NC2.01\BR\20160921  CASE 248630 Object created
 
@@ -38,7 +38,7 @@ table 6151533 "NPR Nc Endpoint"
         }
         field(60; "Linked Endpoints"; Integer)
         {
-            CalcFormula = Count ("NPR Nc Endpoint Trigger Link" WHERE("Endpoint Code" = FIELD(Code)));
+            CalcFormula = Count("NPR Nc Endpoint Trigger Link" WHERE("Endpoint Code" = FIELD(Code)));
             Caption = 'Linked Endpoints';
             Editable = false;
             FieldClass = FlowField;
@@ -80,7 +80,7 @@ table 6151533 "NPR Nc Endpoint"
     var
         NcEndpointType: Record "NPR Nc Endpoint Type";
     begin
-        NcEndpointType.Reset;
+        NcEndpointType.Reset();
         if PAGE.RunModal(PAGE::"NPR Nc Endpoint Types", NcEndpointType) = ACTION::LookupOK then begin
             Validate("Endpoint Type", NcEndpointType.Code);
             exit(true);

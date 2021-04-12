@@ -13,82 +13,82 @@ page 6060142 "NPR MM Member Notific. Setup"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Days Before"; "Days Before")
+                field("Days Before"; Rec."Days Before")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Days Before field';
                 }
-                field("Days Past"; "Days Past")
+                field("Days Past"; Rec."Days Past")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Days Past field';
                 }
-                field("Cancel Overdue Notif. (Days)"; "Cancel Overdue Notif. (Days)")
+                field("Cancel Overdue Notif. (Days)"; Rec."Cancel Overdue Notif. (Days)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cancel Overdue Notif. (Days) field';
                 }
-                field("Processing Method"; "Processing Method")
+                field("Processing Method"; Rec."Processing Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Method field';
                 }
-                field("Template Filter Value"; "Template Filter Value")
+                field("Template Filter Value"; Rec."Template Filter Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Filter Value field';
                 }
-                field("Community Code"; "Community Code")
+                field("Community Code"; Rec."Community Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Community Code field';
                 }
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("Next Notification Code"; "Next Notification Code")
+                field("Next Notification Code"; Rec."Next Notification Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Next Notification Code field';
                 }
-                field("Target Member Role"; "Target Member Role")
+                field("Target Member Role"; Rec."Target Member Role")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Target Member Role field';
                 }
-                field("Include NP Pass"; "Include NP Pass")
+                field("Include NP Pass"; Rec."Include NP Pass")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Include NP Pass field';
                 }
-                field("NP Pass Server Base URL"; "NP Pass Server Base URL")
+                field("NP Pass Server Base URL"; Rec."NP Pass Server Base URL")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NP Pass Server Base URL field';
                 }
-                field("Pass Notification Method"; "Pass Notification Method")
+                field("Pass Notification Method"; Rec."Pass Notification Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pass Notification Method field';
                 }
-                field("Passes API"; "Passes API")
+                field("Passes API"; Rec."Passes API")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Passes API field';
@@ -100,22 +100,22 @@ page 6060142 "NPR MM Member Notific. Setup"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Have Template field';
                 }
-                field("Pass Token"; "Pass Token")
+                field("Pass Token"; Rec."Pass Token")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pass Token field';
                 }
-                field("Pass Type Code"; "Pass Type Code")
+                field("Pass Type Code"; Rec."Pass Type Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pass Type Code field';
                 }
-                field("Generate Magento PW URL"; "Generate Magento PW URL")
+                field("Generate Magento PW URL"; Rec."Generate Magento PW URL")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Generate Magento PW URL field';
                 }
-                field("Fallback Magento PW URL"; "Fallback Magento PW URL")
+                field("Fallback Magento PW URL"; Rec."Fallback Magento PW URL")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Fallback Magento PW URL field';
@@ -134,7 +134,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'E-Mail Templates';
                 Image = InteractionTemplate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060139));
@@ -146,7 +146,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'SMS Template';
                 Image = InteractionTemplate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060139));
@@ -160,7 +160,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Ellipsis = true;
                 Image = Note;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Notification Trigger" = CONST(RENEWAL);
@@ -187,19 +187,19 @@ page 6060142 "NPR MM Member Notific. Setup"
                     PassData: Text;
                     TemplateOutStream: outstream;
                 begin
-                    CalcFields("PUT Passes Template");
+                    Rec.CalcFields("PUT Passes Template");
                     if (not "PUT Passes Template".HasValue()) then begin
                         PassData := MemberNotification.GetDefaultWalletTemplate();
                         "PUT Passes Template".CreateOutStream(TemplateOutStream);
                         TemplateOutStream.Write(PassData);
-                        Modify();
-                        CalcFields("PUT Passes Template");
+                        Rec.Modify();
+                        Rec.CalcFields("PUT Passes Template");
                     end;
 
-                    TempBlob.FromRecord(Rec, FieldNo("PUT Passes Template"));
+                    TempBlob.FromRecord(Rec, Rec.FieldNo("PUT Passes Template"));
                     if (not TempBlob.HasValue()) then
                         exit;
-                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo('%1 - %2.json', Code, Description), true);
+                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo('%1 - %2.json', Rec.Code, Rec.Description), true);
 
                 end;
             }
@@ -215,7 +215,6 @@ page 6060142 "NPR MM Member Notific. Setup"
                 var
                     TempBlob: Codeunit "Temp Blob";
                     FileMgt: Codeunit "File Management";
-                    Path: Text;
                     FileName: Text;
                     RecRef: RecordRef;
                 begin
@@ -228,7 +227,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                     TempBlob.ToRecordRef(RecRef, Rec.FieldNo("PUT Passes Template"));
                     RecRef.SetTable(Rec);
 
-                    Modify(true);
+                    Rec.Modify(true);
                     Clear(TempBlob);
 
                 end;
@@ -238,7 +237,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'Refresh Renew Notification';
                 Image = Recalculate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Refresh Renew Notification action';
@@ -249,16 +248,16 @@ page 6060142 "NPR MM Member Notific. Setup"
                     MembershipSetup: Record "NPR MM Membership Setup";
                 begin
 
-                    TestField(Type, Type::RENEWAL);
-                    if ("Membership Code" <> '') then begin
-                        if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Membership Code"), "Membership Code")) then
+                    Rec.TestField(Type, Rec.Type::RENEWAL);
+                    if (Rec."Membership Code" <> '') then begin
+                        if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Membership Code"), Rec."Membership Code")) then
                             Error('');
 
                         MemberNotification.RefreshAllMembershipRenewalNotifications(Rec."Membership Code");
 
                     end else
-                        if ("Community Code" <> '') then begin
-                            if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Community Code"), "Community Code")) then
+                        if (Rec."Community Code" <> '') then begin
+                            if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Community Code"), Rec."Community Code")) then
                                 Error('');
 
                             MembershipSetup.SetFilter("Community Code", '=%1', Rec."Community Code");
@@ -274,7 +273,6 @@ page 6060142 "NPR MM Member Notific. Setup"
     }
 
     var
-        FileManagement: Codeunit "File Management";
         REFRESH_ALL_RENEW: Label 'Refresh all renew notifications for %1 %2.';
         IMPORT_FILE: Label 'Import File';
 

@@ -150,7 +150,7 @@ table 6014551 "NPR Package Label Numbers"
 
     trigger OnInsert()
     begin
-        "Print Date" := Today;
+        "Print Date" := Today();
     end;
 }
 

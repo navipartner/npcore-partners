@@ -7,7 +7,6 @@ codeunit 6151221 "NPR PrintNode Mgt."
 
     var
         NaviDocsHandlingProfileTxt: Label 'PrintNode printing';
-        RemovedTxt: Label 'Printer Removed';
         NoDefaultPrinterErr: Label 'No default Printer found.';
         RecordNotFoundErr: Label 'Document %1 not found.';
         NoOutputErr: Label 'No output from Report %1.';
@@ -72,7 +71,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
             exit;
         if not SelectToken(JToken.AsObject(), JToken, 'capabilities', false) then
             exit;
-        if PrintNodePrinter.Settings.HasValue then begin
+        if PrintNodePrinter.Settings.HasValue() then begin
             PrintNodePrinter.CalcFields(Settings);
             PrintNodePrinter.Settings.CreateInStream(IStream, TextEncoding::UTF8);
             IStream.Read(SettingsJson);
@@ -102,7 +101,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
         if not PrintNodePrinter.Get(PrinterId, ObjectType, ObjectId) then
             if not PrintNodePrinter.Get(PrinterId, ObjectType, 0) then
                 exit('');
-        if not PrintNodePrinter.Settings.HasValue then
+        if not PrintNodePrinter.Settings.HasValue() then
             exit('');
         PrintNodePrinter.Settings.CreateInStream(IStream, TextEncoding::UTF8);
         IStream.Read(SettingsJson);
@@ -200,7 +199,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
                 ErrorMessage := StrSubstNo(RecordNotFoundErr, NaviDocsEntry."Record ID");
 
         if ErrorMessage = '' then begin
-            RecRef.SetRecFilter;
+            RecRef.SetRecFilter();
             SetCustomReportLayout(RecRef, ReportID);
             TempBlob.CreateOutStream(OStream);
             if not Report.SaveAs(ReportID, '', REPORTFORMAT::Pdf, OStream, RecRef) then
@@ -231,7 +230,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
             else
                 CustomReportSelection.SetRange("Source No.", Format(RecRef.Field(4).Value));
             CustomReportSelection.SetRange("Report ID", ReportID);
-            if CustomReportSelection.FindFirst then begin
+            if CustomReportSelection.FindFirst() then begin
                 EmailNaviDocsMgtWrapper.GetCustomReportLayoutVariant(CustomReportSelection, CustomReportLayoutVariant);
                 if CustomReportLayout.Get(CustomReportLayoutVariant) then
                     ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutVariant);

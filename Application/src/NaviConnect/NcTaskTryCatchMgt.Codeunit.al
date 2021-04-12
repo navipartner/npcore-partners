@@ -24,7 +24,7 @@ codeunit 6151534 "NPR Nc Try Catch Mgt."
         NcTriggerTaskMgt: Codeunit "NPR Nc Trigger Task Mgt.";
         OutStr: OutStream;
         NcTriggerCode: Code[20];
-        Output, FileName, Subject, Body, NcTaskRecId : Text;
+        Output, FileName, Subject, Body : Text;
     begin
         ReadArgsForManualTransferOutputNcTriggerTaskMgt(JObject, NcTriggerCode, NcTask, Output, FileName, Subject, Body);
 
@@ -57,12 +57,9 @@ codeunit 6151534 "NPR Nc Try Catch Mgt."
     local procedure ReadArgsForManualTransferOutputNcTriggerTaskMgt(JObject: JsonObject; NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var FileName: text; var Subject: Text; var Body: Text)
     var
         DataTypeManagement: Codeunit "Data Type Management";
-        JToken: JsonToken;
-        JValue: JsonValue;
         RecRef: RecordRef;
         RecId: RecordId;
-        InStr: InStream;
-        NcTaskRecId, Args : Text;
+        NcTaskRecId: Text;
     begin
         GetJValueFromArg(JObject, 'NcTaskRecId', NcTaskRecId);
         if Evaluate(RecId, NcTaskRecId) then

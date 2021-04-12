@@ -89,7 +89,7 @@ table 6150733 "NPR POS Admin. Template"
     trigger OnInsert()
     begin
         if IsNullGuid(Id) then
-            Id := CreateGuid;
+            Id := CreateGuid();
     end;
 }
 

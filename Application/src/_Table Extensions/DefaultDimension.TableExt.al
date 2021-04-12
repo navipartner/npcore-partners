@@ -1,4 +1,4 @@
-﻿tableextension 6014417 "NPR Default Dimension" extends "Default Dimension"
+tableextension 6014417 "NPR Default Dimension" extends "Default Dimension"
 {
     trigger OnAfterInsert()
     begin

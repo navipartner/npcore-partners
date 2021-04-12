@@ -17,9 +17,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
     var
         FunctionOptionString: Text;
-        JSArr: Text;
-        N: Integer;
-        OptionsNameArray: Text;
         ACTION_DESCRIPTION: Label 'This action handles member management functions for workflow 2.0.';
     begin
 
@@ -94,10 +91,10 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MEMBERSHIPNUMBER_PROMPT: Label 'Enter Membership Number';
         DIALOG_TITLE: Label '%1 - Membership Management.';
     begin
-        Captions.AddActionCaption(ActionCode, 'MemberCardPrompt', MEMBERCARD_PROMPT);
-        Captions.AddActionCaption(ActionCode, 'MemberNumberPrompt', MEMBERNUMBER_PROMPT);
-        Captions.AddActionCaption(ActionCode, 'MembershipNumberPrompt', MEMBERSHIPNUMBER_PROMPT);
-        Captions.AddActionCaption(ActionCode, 'DialogTitle', DIALOG_TITLE);
+        Captions.AddActionCaption(ActionCode(), 'MemberCardPrompt', MEMBERCARD_PROMPT);
+        Captions.AddActionCaption(ActionCode(), 'MemberNumberPrompt', MEMBERNUMBER_PROMPT);
+        Captions.AddActionCaption(ActionCode(), 'MembershipNumberPrompt', MEMBERSHIPNUMBER_PROMPT);
+        Captions.AddActionCaption(ActionCode(), 'DialogTitle', DIALOG_TITLE);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
@@ -226,7 +223,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         SalePOS: Record "NPR POS Sale";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         POSSale: Codeunit "NPR POS Sale";
-        ItemNo: Code[20];
         FrontEndInputMethod: Option;
         ExternalMemberCardNo: Text;
     begin
@@ -252,16 +248,9 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     local procedure GetMembershipEntryLookupJson(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
     var
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
-        TmpRetailList: Record "NPR Retail List" temporary;
-        LookupRecRef: RecordRef;
-        MembershipEntryNo: Integer;
-        ReasonNotFound: Text;
-        LineNo: Integer;
         FrontEndInputMethod: Option;
         ExternalMemberCardNo: Text;
         LookupProperties: JsonObject;
@@ -417,7 +406,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         FunctionId: Integer;
         LookupProperties: JsonObject;
         EXTEND_OPTION: Label 'Extend options...';
@@ -496,7 +484,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Membership: Record "NPR MM Membership";
         POSSalesInfo: Record "NPR MM POS Sales Info";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -681,8 +668,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
 
     procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
-    var
-        MemberCard: Record "NPR MM Member Card";
     begin
         exit(SelectMemberCardViaMemberUI(ExtMemberCardNo));
     end;
@@ -796,7 +781,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     local procedure DeleteMemberInfoCapture(SaleLinePOS: Record "NPR POS Sale Line")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
     begin
 
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");

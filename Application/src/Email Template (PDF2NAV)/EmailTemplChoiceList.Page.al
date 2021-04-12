@@ -13,13 +13,13 @@ page 6059799 "NPR E-mail Templ. Choice List"
         {
             repeater(Group)
             {
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     Caption = 'Selected';
                     ToolTip = 'Specifies the value of the Selected field';
                 }
-                field("Field Caption"; "Field Caption")
+                field("Field Caption"; Rec."Field Caption")
                 {
                     ApplicationArea = All;
                     Caption = 'E-mail Template';

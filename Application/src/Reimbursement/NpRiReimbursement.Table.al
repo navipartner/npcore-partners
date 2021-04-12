@@ -148,11 +148,11 @@ table 6151102 "NPR NpRi Reimbursement"
         NpRiReimbursementEntry.SetRange("Party Type", "Party Type");
         NpRiReimbursementEntry.SetRange("Party No.", "Party No.");
         NpRiReimbursementEntry.SetRange("Template Code", "Template Code");
-        if NpRiReimbursementEntry.FindFirst then begin
+        if NpRiReimbursementEntry.FindFirst() then begin
             if not Confirm(Text000, false) then
                 Error(Text001);
 
-            NpRiReimbursementEntry.DeleteAll;
+            NpRiReimbursementEntry.DeleteAll();
         end;
     end;
 
@@ -163,7 +163,7 @@ table 6151102 "NPR NpRi Reimbursement"
         NpRiReimbursementEntry.SetRange("Party Type", xRec."Party Type");
         NpRiReimbursementEntry.SetRange("Party No.", xRec."Party No.");
         NpRiReimbursementEntry.SetRange("Template Code", xRec."Template Code");
-        if NpRiReimbursementEntry.FindFirst then
+        if NpRiReimbursementEntry.FindFirst() then
             Error(Text002);
     end;
 

@@ -77,14 +77,14 @@ page 6059978 "NPR Variety Matrix Bool"
             {
                 FreezeColumn = "Variety 4 Value";
                 ShowCaption = false;
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Variety 1 Value"; "Variety 1 Value")
+                field("Variety 1 Value"; Rec."Variety 1 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + Item."NPR Variety 1";
@@ -93,7 +93,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     Visible = showvariety1;
                     ToolTip = 'Specifies the value of the Variety 1 Value field';
                 }
-                field("Variety 2 Value"; "Variety 2 Value")
+                field("Variety 2 Value"; Rec."Variety 2 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + Item."NPR Variety 2";
@@ -102,7 +102,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     Visible = showvariety2;
                     ToolTip = 'Specifies the value of the Variety 2 Value field';
                 }
-                field("Variety 3 Value"; "Variety 3 Value")
+                field("Variety 3 Value"; Rec."Variety 3 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + Item."NPR Variety 3";
@@ -111,7 +111,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     Visible = showvariety3;
                     ToolTip = 'Specifies the value of the Variety 3 Value field';
                 }
-                field("Variety 4 Value"; "Variety 4 Value")
+                field("Variety 4 Value"; Rec."Variety 4 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + Item."NPR Variety 4";
@@ -1571,7 +1571,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Create Table Copy';
                 Image = CopyFixedAssets;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = New;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -1590,7 +1590,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -1609,7 +1609,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
@@ -1628,7 +1628,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Select All';
                 Image = "Table";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -1647,7 +1647,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Select Active Row';
                 Image = Line;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -1917,7 +1917,7 @@ page 6059978 "NPR Variety Matrix Bool"
         if Initialized then
             exit;
 
-        VarietySetup.Get;
+        VarietySetup.Get();
         VarietySetup.TestField("Variety Enabled", true);
 
         HideInactive := false;
@@ -1960,11 +1960,6 @@ page 6059978 "NPR Variety Matrix Bool"
     end;
 
     procedure UpdateMatrix(ReloadMatrixData: Boolean)
-    var
-        ItemVariant: Record "Item Variant";
-        ItemVariant2: Record "Item Variant";
-        ItemVariant3: Record "Item Variant";
-        ItemVariant4: Record "Item Variant";
     begin
         Clear(Rec);
         //-NPR5.31 [271133]
@@ -1974,7 +1969,7 @@ page 6059978 "NPR Variety Matrix Bool"
         Load(MATRIX_CaptionSet, MATRIX_MatrixRecords, MATRIX_CurrentNoOfColumns);
         //-NPR5.36 [285733]
         //LoadMatrixRecords(Rec, Item."No.", ShowAsCrossVRT);
-        LoadMatrixRows(Rec, Item, ShowAsCrossVRT, HideInactive);
+        Rec.LoadMatrixRows(Rec, Item, ShowAsCrossVRT, HideInactive);
         if ReloadMatrixData then
             VRTMatrixMgt.LoadMatrixData(Item."No.", HideInactive);
         //+NPR5.36 [285733]
@@ -1999,9 +1994,9 @@ page 6059978 "NPR Variety Matrix Bool"
         ShowVariety4 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety4) and (Item."NPR Variety 4" <> ''));
 
         //-NPR5.36 [285733]
-        //Rec.FINDFIRST;
+        //Rec.FindFirst();
         // IF HideInactive THEN BEGIN
-        //  IF FINDSET THEN
+        //  IF FindSet() then
         //    REPEAT
         //      ItemVariant.SETRANGE("Item No.",Item."No.");
         //      ItemVariant.SETRANGE("Variety 1 Value","Variety 1 Value");
@@ -2021,7 +2016,7 @@ page 6059978 "NPR Variety Matrix Bool"
         //
         //      MARK(((NOT ShowVariety1) OR ItemVariant.FINDFIRST) AND ((NOT ShowVariety2) OR ItemVariant2.FINDFIRST) AND
         //           ((NOT ShowVariety3) OR ItemVariant3.FINDFIRST) AND ((NOT ShowVariety4) OR ItemVariant4.FINDFIRST));
-        //    UNTIL NEXT = 0;
+        //    UNTIL Next() = 0;
         //  MARKEDONLY(TRUE);
         // END;
         // IF FINDFIRST THEN;
@@ -2041,7 +2036,7 @@ page 6059978 "NPR Variety Matrix Bool"
         CurrVRTField.SetRange("Table No.", RecRef.Number);
 
         //-NPR5.32 [274170]
-        if CurrVRTField.FindSet then
+        if CurrVRTField.FindSet() then
             repeat
                 if CurrVRTField.Type = CurrVRTField.Type::Field then begin
                     CurrVRTField.CalcFields("Field Type Name");
@@ -2049,7 +2044,7 @@ page 6059978 "NPR Variety Matrix Bool"
                         CurrVRTField.Mark(true);
                 end else
                     CurrVRTField.Mark(true);
-            until CurrVRTField.Next = 0;
+            until CurrVRTField.Next() = 0;
         CurrVRTField.MarkedOnly(true);
         //+NPR5.32 [274170]
 
@@ -2058,10 +2053,10 @@ page 6059978 "NPR Variety Matrix Bool"
         else
             CurrVRTField.SetRange("Is Table Default", true);
 
-        if not CurrVRTField.FindFirst then begin
+        if not CurrVRTField.FindFirst() then begin
             CurrVRTField.SetRange("Field No.");
             CurrVRTField.SetRange("Is Table Default");
-            CurrVRTField.FindFirst;
+            CurrVRTField.FindFirst();
         end;
         CurrVRTField.SetRange("Field No.");
         CurrVRTField.SetRange("Is Table Default");
@@ -2074,10 +2069,10 @@ page 6059978 "NPR Variety Matrix Bool"
         VRT3Value: Code[50];
         VRT4Value: Code[50];
     begin
-        VRT1Value := "Variety 1 Value";
-        VRT2Value := "Variety 2 Value";
-        VRT3Value := "Variety 3 Value";
-        VRT4Value := "Variety 4 Value";
+        VRT1Value := Rec."Variety 1 Value";
+        VRT2Value := Rec."Variety 2 Value";
+        VRT3Value := Rec."Variety 3 Value";
+        VRT4Value := Rec."Variety 4 Value";
         case ShowAsCrossVRT of
             ShowAsCrossVRT::Variety1:
                 VRT1Value := MATRIX_CaptionSet[FieldNo];

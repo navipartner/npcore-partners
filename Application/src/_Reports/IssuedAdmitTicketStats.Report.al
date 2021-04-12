@@ -1,4 +1,4 @@
-report 6014422 "NPR Issued/Admit. Ticket Stats"
+﻿report 6014422 "NPR Issued/Admit. Ticket Stats"
 {
     RDLCLayout = './src/_Reports/layouts/IssuedAdmitted Ticket Stats.rdlc';
     Caption = 'Issued/Admitted Ticket Statistics';
@@ -108,7 +108,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
 
                         if SkipLineWithZero then
                             if (IssuedTicket = 0) and (AdmittedTicket = 0) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                         TicketTypeAvailable := true;
 
                         TotalIssuedTicketType += TotalIssuedTicketPerItem;
@@ -172,7 +172,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
 
                         if SkipLineWithZero then
                             if (IssuedTicket = 0) and (AdmittedTicket = 0) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                         TicketTypeAvailable := true;
                     end;
 
@@ -204,7 +204,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
                 ItemCheck: Record Item;
             begin
                 ItemCheck.SetRange("NPR Ticket Type", Code);
-                if not ItemCheck.FindFirst then
+                if not ItemCheck.FindFirst() then
                     CurrReport.Skip();
 
                 Clear(TicketTypeAvailable);
@@ -290,8 +290,8 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
 
         trigger OnOpenPage()
         begin
-            StartDate := Today;
-            EndDate := Today;
+            StartDate := Today();
+            EndDate := Today();
         end;
     }
 
@@ -329,8 +329,6 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
 
     var
         Itemvariant: Record "Item Variant";
-        TMTicketAccessStatistics: Record "NPR TM Ticket Access Stats";
-        TMTicketAccessStatistics2: Record "NPR TM Ticket Access Stats";
         ShowVariantLine: Boolean;
         SkipLineWithZero: Boolean;
         TicketTypeAvailable: Boolean;
@@ -342,11 +340,9 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
         StartDate: Date;
         TotalAdmittedTicketPerItem: Decimal;
         TotalAdmittedTicketPerVariant: Decimal;
-        TotalAdmittedTicketTypePerVariant: Decimal;
         TotalIssuedTicketPerItem: Decimal;
         TotalIssuedTicketPervariant: Decimal;
         TotalIssuedTicketType: Decimal;
-        TotalIssuedTicketTypePerVariant: Decimal;
         TotalAdmittedTicketType: Integer;
         AdmissionCodeLbl: Label 'Admission Code: ';
         CustomerCaption: Label 'Customer Filter: %1';
@@ -396,7 +392,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
                 if (TicketTypeFactCode = '') then
                     TicketTypeFactCode := '<BLANK>';
                 Evaluate(AdmissionHour, Format(TMTicketAccessEntry."Access Time", 0, '<Hours24>'));
-                TMTicketAccessStatistics.Reset;
+                TMTicketAccessStatistics.Reset();
                 TMTicketAccessStatistics.SetFilter("Item No.", '=%1', ItemFactCode);
                 TMTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TicketTypeFactCode);
                 TMTicketAccessStatistics.SetFilter("Admission Code", '=%1', TMTicketAccessEntry."Admission Code");
@@ -442,7 +438,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
                 if (TicketTypeFactCode = '') then
                     TicketTypeFactCode := '<BLANK>';
                 Evaluate(AdmissionHour, Format(TMTicketAccessEntry."Access Time", 0, '<Hours24>'));
-                TMTicketAccessStatistics.Reset;
+                TMTicketAccessStatistics.Reset();
                 TMTicketAccessStatistics.SetFilter("Item No.", '=%1', ItemFactCode);
                 TMTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TicketTypeFactCode);
                 TMTicketAccessStatistics.SetFilter("Admission Code", '=%1', TMTicketAccessEntry."Admission Code");

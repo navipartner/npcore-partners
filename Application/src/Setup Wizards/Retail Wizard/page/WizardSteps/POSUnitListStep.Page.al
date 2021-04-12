@@ -95,24 +95,24 @@ page 6014683 "NPR POS Unit List Step"
             }
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("Global Dimen 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimen 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
@@ -132,20 +132,20 @@ page 6014683 "NPR POS Unit List Step"
                         if DimValue.FindFirst() then;
                         DimValueList.SetTableView(DimValue);
 
-                        if "Global Dimension 1 Code" <> '' then begin
-                            DimValue.SetRange(Code, "Global Dimension 1 Code");
+                        if Rec."Global Dimension 1 Code" <> '' then begin
+                            DimValue.SetRange(Code, Rec."Global Dimension 1 Code");
                             if DimValue.FindFirst() then
                                 DimValueList.SetRecord(DimValue);
                         end;
 
                         if DimValueList.RunModal() = Action::LookupOK then begin
                             DimValueList.GetRecord(DimValue);
-                            "Global Dimension 1 Code" := DimValue.Code;
+                            Rec."Global Dimension 1 Code" := DimValue.Code;
                             Rec.Modify(false);
                         end;
                     end;
                 }
-                field("Global Dime 2 Code"; "Global Dimension 2 Code")
+                field("Global Dime 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
@@ -165,26 +165,26 @@ page 6014683 "NPR POS Unit List Step"
                         if DimValue.FindFirst() then;
                         DimValueList.SetTableView(DimValue);
 
-                        if "Global Dimension 2 Code" <> '' then begin
-                            DimValue.SetRange(Code, "Global Dimension 2 Code");
+                        if Rec."Global Dimension 2 Code" <> '' then begin
+                            DimValue.SetRange(Code, Rec."Global Dimension 2 Code");
                             if DimValue.FindFirst() then
                                 DimValueList.SetRecord(DimValue);
                         end;
 
                         if DimValueList.RunModal() = Action::LookupOK then begin
                             DimValueList.GetRecord(DimValue);
-                            "Global Dimension 2 Code" := DimValue.Code;
+                            Rec."Global Dimension 2 Code" := DimValue.Code;
                             Rec.Modify(false);
                         end;
                     end;
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("POS Audit Profile"; "POS Audit Profile")
+                field("POS Audit Profile"; Rec."POS Audit Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Audit Profile field';
@@ -197,17 +197,17 @@ page 6014683 "NPR POS Unit List Step"
                         TempAllPOSAuditProfileList.Editable := false;
                         TempAllPOSAuditProfileList.SetRec(TempAllPOSAuditProfile);
 
-                        if "POS Audit Profile" <> '' then
-                            if TempAllPOSAuditProfile.Get("POS Audit Profile") then
+                        if Rec."POS Audit Profile" <> '' then
+                            if TempAllPOSAuditProfile.Get(Rec."POS Audit Profile") then
                                 TempAllPOSAuditProfileList.SetRecord(TempAllPOSAuditProfile);
 
                         if TempAllPOSAuditProfileList.RunModal() = Action::LookupOK then begin
                             TempAllPOSAuditProfileList.GetRecord(TempAllPOSAuditProfile);
-                            "POS Audit Profile" := TempAllPOSAuditProfile.Code;
+                            Rec."POS Audit Profile" := TempAllPOSAuditProfile.Code;
                         end;
                     end;
                 }
-                field("POS View Profile"; "POS View Profile")
+                field("POS View Profile"; Rec."POS View Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View Profile field';
@@ -220,17 +220,17 @@ page 6014683 "NPR POS Unit List Step"
                         TempAllPOSViewProfileList.Editable := false;
                         TempAllPOSViewProfileList.SetRec(TempAllPOSViewProfile);
 
-                        if "POS View Profile" <> '' then
-                            if TempAllPOSViewProfile.Get("POS View Profile") then
+                        if Rec."POS View Profile" <> '' then
+                            if TempAllPOSViewProfile.Get(Rec."POS View Profile") then
                                 TempAllPOSViewProfileList.SetRecord(TempAllPOSViewProfile);
 
                         if TempAllPOSViewProfileList.RunModal() = Action::LookupOK then begin
                             TempAllPOSViewProfileList.GetRecord(TempAllPOSViewProfile);
-                            "POS View Profile" := TempAllPOSViewProfile.Code;
+                            Rec."POS View Profile" := TempAllPOSViewProfile.Code;
                         end;
                     end;
                 }
-                field("POS End of Day Profile"; "POS End of Day Profile")
+                field("POS End of Day Profile"; Rec."POS End of Day Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS End of Day Profile field';
@@ -243,17 +243,17 @@ page 6014683 "NPR POS Unit List Step"
                         TempAllPOSEndOfDayProfileList.Editable := false;
                         TempAllPOSEndOfDayProfileList.SetRec(TempAllPOSEndOfDayProfile);
 
-                        if "POS End of Day Profile" <> '' then
-                            if TempAllPOSEndOfDayProfile.Get("POS End of Day Profile") then
+                        if Rec."POS End of Day Profile" <> '' then
+                            if TempAllPOSEndOfDayProfile.Get(Rec."POS End of Day Profile") then
                                 TempAllPOSEndOfDayProfileList.SetRecord(TempAllPOSEndOfDayProfile);
 
                         if TempAllPOSEndOfDayProfileList.RunModal() = Action::LookupOK then begin
                             TempAllPOSEndOfDayProfileList.GetRecord(TempAllPOSEndOfDayProfile);
-                            "POS End of Day Profile" := TempAllPOSEndOfDayProfile.Code;
+                            Rec."POS End of Day Profile" := TempAllPOSEndOfDayProfile.Code;
                         end;
                     end;
                 }
-                field("Ean Box Sales Setup"; "Ean Box Sales Setup")
+                field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
@@ -266,17 +266,17 @@ page 6014683 "NPR POS Unit List Step"
                         TempAllEanBoxSetupList.Editable := false;
                         TempAllEanBoxSetupList.SetRec(TempAllEanBoxSetup);
 
-                        if "Ean Box Sales Setup" <> '' then
-                            if TempAllEanBoxSetup.Get("Ean Box Sales Setup") then
+                        if Rec."Ean Box Sales Setup" <> '' then
+                            if TempAllEanBoxSetup.Get(Rec."Ean Box Sales Setup") then
                                 TempAllEanBoxSetupList.SetRecord(TempAllEanBoxSetup);
 
                         if TempAllEanBoxSetupList.RunModal() = Action::LookupOK then begin
                             TempAllEanBoxSetupList.GetRecord(TempAllEanBoxSetup);
-                            "Ean Box Sales Setup" := TempAllEanBoxSetup.Code;
+                            Rec."Ean Box Sales Setup" := TempAllEanBoxSetup.Code;
                         end;
                     end;
                 }
-                field("POS Sales Workflow Set"; "POS Sales Workflow Set")
+                field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Sales Workflow Set field';
@@ -289,17 +289,17 @@ page 6014683 "NPR POS Unit List Step"
                         TempAllPOSSalesWorkflowSetList.Editable := false;
                         TempAllPOSSalesWorkflowSetList.SetRec(TempAllPOSSalesWorkflowSet);
 
-                        if "POS Sales Workflow Set" <> '' then
-                            if TempAllPOSSalesWorkflowSet.Get("POS Sales Workflow Set") then
+                        if Rec."POS Sales Workflow Set" <> '' then
+                            if TempAllPOSSalesWorkflowSet.Get(Rec."POS Sales Workflow Set") then
                                 TempAllPOSSalesWorkflowSetList.SetRecord(TempAllPOSSalesWorkflowSet);
 
                         if TempAllPOSSalesWorkflowSetList.RunModal() = Action::LookupOK then begin
                             TempAllPOSSalesWorkflowSetList.GetRecord(TempAllPOSSalesWorkflowSet);
-                            "POS Sales Workflow Set" := TempAllPOSSalesWorkflowSet.Code;
+                            Rec."POS Sales Workflow Set" := TempAllPOSSalesWorkflowSet.Code;
                         end;
                     end;
                 }
-                field("Global POS Sales Setup"; "Global POS Sales Setup")
+                field("Global POS Sales Setup"; Rec."Global POS Sales Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global POS Sales Setup field';
@@ -312,13 +312,13 @@ page 6014683 "NPR POS Unit List Step"
                         TempAllGlobalPOSSalesSetupList.Editable := false;
                         TempAllGlobalPOSSalesSetupList.SetRec(TempAllGlobalPOSSalesSetup);
 
-                        if "Global POS Sales Setup" <> '' then
-                            if TempAllGlobalPOSSalesSetup.Get("Global POS Sales Setup") then
+                        if Rec."Global POS Sales Setup" <> '' then
+                            if TempAllGlobalPOSSalesSetup.Get(Rec."Global POS Sales Setup") then
                                 TempAllGlobalPOSSalesSetupList.SetRecord(TempAllGlobalPOSSalesSetup);
 
                         if TempAllGlobalPOSSalesSetupList.RunModal() = Action::LookupOK then begin
                             TempAllGlobalPOSSalesSetupList.GetRecord(TempAllGlobalPOSSalesSetup);
-                            "Global POS Sales Setup" := TempAllGlobalPOSSalesSetup.Code;
+                            Rec."Global POS Sales Setup" := TempAllGlobalPOSSalesSetup.Code;
                         end;
                     end;
                 }

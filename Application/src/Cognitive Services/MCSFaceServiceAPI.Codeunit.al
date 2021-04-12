@@ -1,4 +1,4 @@
-codeunit 6059955 "NPR MCS Face Service API"
+﻿codeunit 6059955 "NPR MCS Face Service API"
 {
     var
         PersonGroupURI: label '/persongroups/', Locked = true;
@@ -37,16 +37,16 @@ codeunit 6059955 "NPR MCS Face Service API"
         JsonArr.ReadFrom(JsonResponse);
 
         Counter := 10000;
-        PersonGroups.DeleteAll;
+        PersonGroups.DeleteAll();
         foreach JsonTok in JsonArr do begin
             JsonObj := JsonTok.AsObject();
             JsonObj.Get('personGroupId', JsonTokValue);
-            PersonGroups.Init;
+            PersonGroups.Init();
             PersonGroups.Id := Counter;
             PersonGroups.PersonGroupId := JsonTokValue.AsValue().AsText();
             JsonObj.Get('name', JsonTokValue);
             PersonGroups.Name := JsonTokValue.AsValue().AsText();
-            PersonGroups.Insert;
+            PersonGroups.Insert();
             Counter += 10000;
         end;
     end;
@@ -59,8 +59,6 @@ codeunit 6059955 "NPR MCS Face Service API"
         HttpRespMessage: HttpResponseMessage;
         Uri: Text;
         BaseUrl: Text;
-        JsonObj: JsonObject;
-        JsonArr: JsonArray;
         HttpCont: HttpContent;
     begin
         if not RunTrigger then
@@ -145,10 +143,10 @@ codeunit 6059955 "NPR MCS Face Service API"
             SendHttpRequest(HttpRespMessage, HttpCont, Uri, 'DELETE');
         end;
 
-        MCSFaces.Reset;
+        MCSFaces.Reset();
         MCSFaces.SetRange(PersonId, Rec.PersonId);
         MCSFaces.DeleteAll(true);
-        MCSPersonBusinessEntities.Reset;
+        MCSPersonBusinessEntities.Reset();
         MCSPersonBusinessEntities.SetCurrentKey(Key);
         MCSPersonBusinessEntities.SetRange(Key, Rec.RecordId);
         MCSPersonBusinessEntities.DeleteAll(true);
@@ -160,18 +158,18 @@ codeunit 6059955 "NPR MCS Face Service API"
         RecRef: RecordRef;
         MCSPersonBusinessEntities: Record "NPR MCS Person Bus. Entit.";
     begin
-        MCSPersonBusinessEntities.Reset;
+        MCSPersonBusinessEntities.Reset();
         MCSPersonBusinessEntities.SetCurrentKey(Key);
         MCSPersonBusinessEntities.SetRange(Key, NewRecordID);
-        if MCSPersonBusinessEntities.FindSet then
+        if MCSPersonBusinessEntities.FindSet() then
             exit;
 
-        MCSPersonBusinessEntities.Reset;
+        MCSPersonBusinessEntities.Reset();
         MCSPersonBusinessEntities.SetCurrentKey(Key);
         MCSPersonBusinessEntities.SetRange(Key, Origin);
-        if MCSPersonBusinessEntities.FindSet then begin
+        if MCSPersonBusinessEntities.FindSet() then begin
             RecRef.Get(NewRecordID);
-            NewMCSPersonBusinessEntities.Init;
+            NewMCSPersonBusinessEntities.Init();
             NewMCSPersonBusinessEntities.PersonId := MCSPersonBusinessEntities.PersonId;
             NewMCSPersonBusinessEntities."Table Id" := RecRef.Number;
             NewMCSPersonBusinessEntities.Key := NewRecordID;
@@ -222,7 +220,6 @@ codeunit 6059955 "NPR MCS Face Service API"
         UserData: Text;
         PersonId: Text;
         PersonIdentified: Boolean;
-        RecRefBlob: RecordRef;
         BaseUrl: Text;
         JsonFacesArr: JsonArray;
         JsonIdArr: JsonArray;
@@ -272,13 +269,13 @@ codeunit 6059955 "NPR MCS Face Service API"
             MCSFaces.Insert(true);
 
             if not MCSPerson.Get(MCSFaces.PersonId) then begin
-                MCSPerson.Init;
+                MCSPerson.Init();
                 MCSPerson.PersonId := MCSFaces.PersonId;
                 MCSPerson.PersonGroupId := PersonGroups.PersonGroupId;
                 MCSPerson.Name := PersonName;
                 MCSPerson.UserData := UserData;
                 if MCSPerson.Insert(true) then begin
-                    MCSPersonBusinessEntities.Init;
+                    MCSPersonBusinessEntities.Init();
                     MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
                     MCSPersonBusinessEntities."Table Id" := RecRef.Number;
                     MCSPersonBusinessEntities.Key := RecRef.RecordId;
@@ -286,7 +283,7 @@ codeunit 6059955 "NPR MCS Face Service API"
                 end;
             end else begin
                 if not MCSPersonBusinessEntities.Get(MCSPerson.PersonId, RecRef.Number) then begin
-                    MCSPersonBusinessEntities.Init;
+                    MCSPersonBusinessEntities.Init();
                     MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
                     MCSPersonBusinessEntities."Table Id" := RecRef.Number;
                     MCSPersonBusinessEntities.Key := RecRef.RecordId;
@@ -301,7 +298,7 @@ codeunit 6059955 "NPR MCS Face Service API"
     var
         JsonTokValue: JsonToken;
     begin
-        MCSFaces.Init;
+        MCSFaces.Init();
         MCSFaces.FaceId := FaceID;
         MCSFaces.PersonId := PersonId;
 
@@ -463,7 +460,7 @@ codeunit 6059955 "NPR MCS Face Service API"
         SendHttpRequest(HttpRespMessage, HttpCont, Uri, 'POST');
     end;
 
-    local procedure CheckTrainGroup(GroupID: Text) SkipIdentify: Boolean
+    local procedure CheckTrainGroup(GroupID: Text): Boolean
     var
         MCSAPISetup: Record "NPR MCS API Setup";
         Uri: Text;
@@ -560,7 +557,6 @@ codeunit 6059955 "NPR MCS Face Service API"
         BaseUrl: Text;
         HttpCont: HttpContent;
         HttpRespMessage: HttpResponseMessage;
-        PostParameters: Text;
         JsonResponse: Text;
         JsonObj: JsonObject;
         JsonTok: JsonToken;
@@ -649,7 +645,7 @@ codeunit 6059955 "NPR MCS Face Service API"
         BaseUriMissingErr: Label '%1 is missing for %2 %3 setup';
     begin
         MCSAPISetup.Get(MCSAPISetup.API::Face);
-        if not MCSAPISetup.BaseURL.HasValue then
+        if not MCSAPISetup.BaseURL.HasValue() then
             Error(BaseUriMissingErr, MCSAPISetup.FieldCaption(BaseURL), MCSAPISetup.TableCaption, MCSAPISetup.API);
         MCSAPISetup.TestField("Key 1");
     end;

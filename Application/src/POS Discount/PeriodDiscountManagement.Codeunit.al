@@ -1,4 +1,4 @@
-codeunit 6014415 "NPR Period Discount Management"
+﻿codeunit 6014415 "NPR Period Discount Management"
 {
     trigger OnRun()
     begin
@@ -16,10 +16,10 @@ codeunit 6014415 "NPR Period Discount Management"
             TempSaleLinePOS.SetRange(Date, Rec.Date);
             TempSaleLinePOS.SetRange("Sale Type", Rec."Sale Type");
             TempSaleLinePOS.SetFilter("Discount Type", '=%1|=%2', TempSaleLinePOS."Discount Type"::" ", TempSaleLinePOS."Discount Type"::Customer);
-            if TempSaleLinePOS.FindSet then
+            if TempSaleLinePOS.FindSet() then
                 repeat
                     ApplyDiscountOnLine(TempSaleLinePOS, SalePOS);
-                until TempSaleLinePOS.Next = 0;
+                until TempSaleLinePOS.Next() = 0;
         end else
             if TempSaleLinePOS.Get(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") then
                 ApplyDiscountOnLine(TempSaleLinePOS, SalePOS);
@@ -31,7 +31,7 @@ codeunit 6014415 "NPR Period Discount Management"
     begin
         if TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::" " then begin
             ApplyPeriodDiscountOnLine(TempSaleLinePOS, TempSalePOS);
-            TempSaleLinePOS.Modify;
+            TempSaleLinePOS.Modify();
         end;
 
         if TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::Customer then begin
@@ -40,7 +40,7 @@ codeunit 6014415 "NPR Period Discount Management"
 
             if TempSaleLinePOS2."Discount %" <= TempSaleLinePOS."Discount %" then
                 exit;
-            TempSaleLinePOS2.Modify;
+            TempSaleLinePOS2.Modify();
         end;
     end;
 
@@ -60,76 +60,74 @@ codeunit 6014415 "NPR Period Discount Management"
         Handled: Boolean;
     begin
         //SetPeriodeRabat()
-        with TempSaleLinePOS do begin
-            if "No." = '' then
-                exit;
-            Item.Get("No.");
-            PeriodDiscountLine.Reset;
-            PeriodDiscountLine.SetCurrentKey("Item No.");
-            PeriodDiscountLine.SetRange(Status, PeriodDiscountLine.Status::Active);
-            PeriodDiscountLine.SetFilter("Starting Date", '<=%1', Today);
-            PeriodDiscountLine.SetFilter("Ending Date", '>=%1', Today);
-            PeriodDiscountLine.SetRange("Item No.", "No.");
-            PeriodDiscountLine.SetFilter("Variant Code", '=%1|=%2', "Variant Code", '');
-            if not PeriodDiscountLine.FindFirst then
-                exit;
+        if TempSaleLinePOS."No." = '' then
+            exit;
+        Item.Get(TempSaleLinePOS."No.");
+        PeriodDiscountLine.Reset();
+        PeriodDiscountLine.SetCurrentKey("Item No.");
+        PeriodDiscountLine.SetRange(Status, PeriodDiscountLine.Status::Active);
+        PeriodDiscountLine.SetFilter("Starting Date", '<=%1', Today);
+        PeriodDiscountLine.SetFilter("Ending Date", '>=%1', Today);
+        PeriodDiscountLine.SetRange("Item No.", TempSaleLinePOS."No.");
+        PeriodDiscountLine.SetFilter("Variant Code", '=%1|=%2', TempSaleLinePOS."Variant Code", '');
+        if not PeriodDiscountLine.FindFirst() then
+            exit;
 
-            TempSaleLinePOS.SetPOSHeader(TempSalePOS);
+        TempSaleLinePOS.SetPOSHeader(TempSalePOS);
 
-            UnitPrice := TempSaleLinePOS.FindItemSalesPrice();
-            "Discount Amount" := 0;
-            "Discount %" := 0;
-            Price := 999999999999.99;
+        UnitPrice := TempSaleLinePOS.FindItemSalesPrice();
+        TempSaleLinePOS."Discount Amount" := 0;
+        TempSaleLinePOS."Discount %" := 0;
+        Price := 999999999999.99;
 
-            if PeriodDiscountLine.FindSet then
-                repeat
-                    if PeriodDiscountLineIsValid(PeriodDiscountLine, TempSaleLinePOS, TempSalePOS) then begin
-                        PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
-                        if PeriodDiscountLine."Unit Price Incl. VAT" then
-                            PeriodDiscountLine."Unit Price" := PeriodDiscountLine."Unit Price" / (100 + "VAT %") * 100;
-                        if PeriodDiscountLine."Campaign Unit Price" < Price then begin
-                            Price := PeriodDiscountLine."Campaign Unit Price";
-                            BestCode := PeriodDiscountLine.Code;
-                            BestVariant := PeriodDiscountLine."Variant Code";
-                        end;
-                    end;
-                until PeriodDiscountLine.Next = 0;
-
-            if PeriodDiscountLine.Get(BestCode, "No.", BestVariant) then begin
-                PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
-                if Customer.Get(TempSalePOS."Customer No.") and PeriodDiscountLine."Unit Price Incl. VAT" then begin
-                    if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-                        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
-                    if VATPostingSetup2.Get(Customer."VAT Bus. Posting Group", "VAT Prod. Posting Group") then
-                        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup2, Handled);
-                    PeriodDiscountLine."Campaign Unit Price" :=
-                        PeriodDiscountLine."Campaign Unit Price" / (100 + VATPostingSetup."VAT %") * (100 + VATPostingSetup2."VAT %");
-                end;
-
-                if "Price Includes VAT" then begin
-                    if not PeriodDiscountLine."Unit Price Incl. VAT" then
-                        PeriodDiscountLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price" * (100 + "VAT %") / 100;
-                end else begin
+        if PeriodDiscountLine.FindSet() then
+            repeat
+                if PeriodDiscountLineIsValid(PeriodDiscountLine, TempSaleLinePOS, TempSalePOS) then begin
+                    PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
                     if PeriodDiscountLine."Unit Price Incl. VAT" then
-                        PeriodDiscountLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price" / (100 + "VAT %") * 100;
+                        PeriodDiscountLine."Unit Price" := PeriodDiscountLine."Unit Price" / (100 + TempSaleLinePOS."VAT %") * 100;
+                    if PeriodDiscountLine."Campaign Unit Price" < Price then begin
+                        Price := PeriodDiscountLine."Campaign Unit Price";
+                        BestCode := PeriodDiscountLine.Code;
+                        BestVariant := PeriodDiscountLine."Variant Code";
+                    end;
                 end;
+            until PeriodDiscountLine.Next() = 0;
 
-                if PeriodDiscountLine."Campaign Unit Price" <= UnitPrice then begin
-                    "Discount %" := 100 - PeriodDiscountLine."Campaign Unit Price" / UnitPrice * 100;
-                    "Discount Type" := "Discount Type"::Campaign;
-                    "Discount Code" := PeriodDiscountLine.Code;
-                    "Period Discount code" := PeriodDiscountLine.Code;
-                    PeriodDiscount.Get(PeriodDiscountLine.Code);
-                    "Custom Disc Blocked" := PeriodDiscount."Block Custom Disc.";
-                end;
-
-                //Apply unit cost for the period if specified
-                if PeriodDiscountLine."Campaign Unit Cost" <> 0 then
-                    "Unit Cost" := PeriodDiscountLine."Campaign Unit Cost";
+        if PeriodDiscountLine.Get(BestCode, TempSaleLinePOS."No.", BestVariant) then begin
+            PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
+            if Customer.Get(TempSalePOS."Customer No.") and PeriodDiscountLine."Unit Price Incl. VAT" then begin
+                if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
+                    POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                if VATPostingSetup2.Get(Customer."VAT Bus. Posting Group", TempSaleLinePOS."VAT Prod. Posting Group") then
+                    POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup2, Handled);
+                PeriodDiscountLine."Campaign Unit Price" :=
+                    PeriodDiscountLine."Campaign Unit Price" / (100 + VATPostingSetup."VAT %") * (100 + VATPostingSetup2."VAT %");
             end;
 
-            "Discount Calculated" := true;
+            if TempSaleLinePOS."Price Includes VAT" then begin
+                if not PeriodDiscountLine."Unit Price Incl. VAT" then
+                    PeriodDiscountLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price" * (100 + TempSaleLinePOS."VAT %") / 100;
+            end else begin
+                if PeriodDiscountLine."Unit Price Incl. VAT" then
+                    PeriodDiscountLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price" / (100 + TempSaleLinePOS."VAT %") * 100;
+            end;
+
+            if PeriodDiscountLine."Campaign Unit Price" <= UnitPrice then begin
+                TempSaleLinePOS."Discount %" := 100 - PeriodDiscountLine."Campaign Unit Price" / UnitPrice * 100;
+                TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Campaign;
+                TempSaleLinePOS."Discount Code" := PeriodDiscountLine.Code;
+                TempSaleLinePOS."Period Discount code" := PeriodDiscountLine.Code;
+                PeriodDiscount.Get(PeriodDiscountLine.Code);
+                TempSaleLinePOS."Custom Disc Blocked" := PeriodDiscount."Block Custom Disc.";
+            end;
+
+            //Apply unit cost for the period if specified
+            if PeriodDiscountLine."Campaign Unit Cost" <> 0 then
+                TempSaleLinePOS."Unit Cost" := PeriodDiscountLine."Campaign Unit Cost";
         end;
+
+        TempSaleLinePOS."Discount Calculated" := true;
     end;
 
     procedure "-- Aux"()
@@ -213,7 +211,7 @@ codeunit 6014415 "NPR Period Discount Management"
         if DiscountPriority.Get(DiscSourceTableId()) then
             exit;
 
-        DiscountPriority.Init;
+        DiscountPriority.Init();
         DiscountPriority."Table ID" := DiscSourceTableId();
         DiscountPriority.Priority := 3;
         DiscountPriority.Disabled := false;
@@ -273,9 +271,9 @@ codeunit 6014415 "NPR Period Discount Management"
         PeriodDiscountLine.SetFilter("Starting Date", '<=%1|=%2', Today, 0D);
         PeriodDiscountLine.SetFilter("Ending Date", '>=%1|=%2', Today, 0D);
         if not PeriodDiscountLine.IsEmpty then begin
-            tmpDiscountPriority.Init;
+            tmpDiscountPriority.Init();
             tmpDiscountPriority := DiscountPriority;
-            tmpDiscountPriority.Insert;
+            tmpDiscountPriority.Insert();
         end;
     end;
 

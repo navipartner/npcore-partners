@@ -19,48 +19,48 @@ page 6059896 "NPR Data Log Subscribers"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Table ID"; "Table ID")
+                field("Table ID"; Rec."Table ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table ID field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Last Log Entry No."; "Last Log Entry No.")
+                field("Last Log Entry No."; Rec."Last Log Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Log Entry No. field';
                 }
-                field("Direct Data Processing"; "Direct Data Processing")
+                field("Direct Data Processing"; Rec."Direct Data Processing")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Direct Data Processing field';
                 }
-                field("Data Processing Codeunit ID"; "Data Processing Codeunit ID")
+                field("Data Processing Codeunit ID"; Rec."Data Processing Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Processing Codeunit ID field';
                 }
-                field("Data Processing Codeunit Name"; "Data Processing Codeunit Name")
+                field("Data Processing Codeunit Name"; Rec."Data Processing Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Processing Codeunit Name field';
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Date Modified field';

@@ -1,4 +1,4 @@
-xmlport 6151147 "NPR M2 Item Availab. By Period"
+﻿xmlport 6151147 "NPR M2 Item Availab. By Period"
 {
     Caption = 'Item Availability By Period';
     Encoding = UTF8;
@@ -266,9 +266,6 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                                     }
 
                                     trigger OnAfterGetRecord()
-                                    var
-                                        Customer: Record Customer;
-                                        Item: Record Item;
                                     begin
 
                                         ItemByPeriod.SetFilter("No.", '=%1', TmpItemResponse."Item No.");
@@ -443,8 +440,6 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                                     }
 
                                     trigger OnAfterGetRecord()
-                                    var
-                                        Customer: Record Customer;
                                     begin
 
                                         ItemByPeriod.SetFilter("No.", '=%1', TmpItemResponse."Item No.");
@@ -537,7 +532,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                     if (LocationCodeIn = '') then
                         LocationCodeIn := Customer."Location Code";
 
-        TmpItemRequest.Reset;
+        TmpItemRequest.Reset();
         TmpItemRequest.FindSet();
         repeat
             TmpItemResponse.TransferFields(TmpItemRequest, true);

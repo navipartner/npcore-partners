@@ -1,4 +1,4 @@
-codeunit 6184544 "NPR SS Action - Adyen Unatt."
+﻿codeunit 6184544 "NPR SS Action - Adyen Unatt."
 {
     var
         ActionDescription: Label 'Adyen Cloud Unattended Transaction';
@@ -59,7 +59,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -100,10 +100,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
 
     local procedure CheckResponse(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        ContinueOnTransactionEntryNo: Integer;
         EFTAdyenCloudBackgndResp: Codeunit "NPR EFT Adyen Backgnd. Resp.";
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
         EftEntryNo: Integer;
@@ -120,7 +117,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
         //Response was found with a lock, i.e. no dirty read. Process it and close dialog regardless of success status.
         //Display any uncaught errors (extremely critical as payment might have been processed. Will need to be handled via trx lookup, assuming error was transient or missing config).
 
-        EFTTransactionRequest.Reset;
+        EFTTransactionRequest.Reset();
         EFTTransactionRequest."Entry No." := EftEntryNo;
         EFTAdyenCloudBackgndResp.SetRunMode(1);
         EFTAdyenCloudBackgndResp.Run(EFTTransactionRequest);

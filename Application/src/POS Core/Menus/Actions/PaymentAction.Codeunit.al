@@ -2,8 +2,6 @@ codeunit 6150885 "NPR Payment Action" implements "NPR IAction", "NPR IJsonSerial
 {
     var
         _code: Text;
-        _state: JsonObject;
-        _type: Enum "NPR Action Type";
         _base: Codeunit "NPR Base Action";
 
     procedure Code(): Text;

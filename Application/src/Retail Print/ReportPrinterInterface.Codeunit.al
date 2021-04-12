@@ -9,7 +9,6 @@ codeunit 6014583 "NPR Report Printer Interface"
         LastErrorText: Text;
         Err_ReportPrint: Label 'Error when printing report %1 %2';
         RecordSpecified: Boolean;
-        Err_InvalidRecRef: Label 'The first data item in report "%1" does not use table %2';
 
     procedure RunReport(Number: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
     var
@@ -117,7 +116,6 @@ codeunit 6014583 "NPR Report Printer Interface"
     var
         ObjectOutputSelection: Record "NPR Object Output Selection";
         PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        OutErrorMessage: Text;
     begin
         case OutputType of
             ObjectOutputSelection."Output Type"::"E-mail":

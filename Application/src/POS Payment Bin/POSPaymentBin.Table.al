@@ -68,7 +68,7 @@ table 6150617 "NPR POS Payment Bin"
                 //-NPR5.40 [300600]
                 if (Rec."Eject Method" <> xRec."Eject Method") and (xRec."Eject Method" <> '') then begin
                     POSPaymentBinInvokeParameter.SetRange("Bin No.", "No.");
-                    POSPaymentBinInvokeParameter.DeleteAll;
+                    POSPaymentBinInvokeParameter.DeleteAll();
                 end;
                 //+NPR5.40 [300600]
             end;

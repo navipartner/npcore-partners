@@ -42,15 +42,10 @@ codeunit 6060110 "NPR TM Statistics WebService"
         FromDate: Date;
         UntilDate: Date;
         TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
-        TicketAccessStatistics: Codeunit "NPR TM Ticket Access Stats";
-        Tmp2DimStatisics: Record "NPR TM Ticket Access Stats";
         TmpLineFacts: Record "NPR TM Ticket Access Fact" temporary;
         TmpColumnFacts: Record "NPR TM Ticket Access Fact" temporary;
         Columns: Record "NPR TM Ticket Access Fact" temporary;
         Lines: Record "NPR TM Ticket Access Fact" temporary;
-        AdmissionHour: Integer;
-        AdmissionDate: Date;
-        EntryNumber: Integer;
         Dim1: Text;
         Dim2: Text;
         ReasonText: Text;
@@ -105,8 +100,6 @@ codeunit 6060110 "NPR TM Statistics WebService"
     var
         TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
         TicketAccessStatistics: Codeunit "NPR TM Ticket Access Stats";
-        Columns: Record "NPR TM Ticket Access Fact" temporary;
-        Lines: Record "NPR TM Ticket Access Fact" temporary;
         AdmissionHour: Integer;
         AdmissionDate: Date;
         EntryNumber: Integer;
@@ -137,49 +130,47 @@ codeunit 6060110 "NPR TM Statistics WebService"
                 if (TmpColumnFacts.FindSet()) then
                     repeat
 
-                        with TmpLineFacts do
-                            case "Fact Name" of
-                                "Fact Name"::ADMISSION_CODE:
-                                    TmpTicketAccessStatistics.SetFilter("Admission Code", '=%1', "Fact Code");
-                                "Fact Name"::ADMISSION_HOUR:
-                                    begin
-                                        Evaluate(AdmissionHour, "Fact Code");
-                                        TmpTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
-                                    end;
-                                "Fact Name"::ITEM:
-                                    TmpTicketAccessStatistics.SetFilter("Item No.", '=%1', "Fact Code");
-                                "Fact Name"::TICKET_TYPE:
-                                    TmpTicketAccessStatistics.SetFilter("Ticket Type", '=%1', "Fact Code");
-                                "Fact Name"::VARIANT_CODE:
-                                    TmpTicketAccessStatistics.SetFilter("Variant Code", '=%1', "Fact Code");
-                                "Fact Name"::ADMISSION_DATE:
-                                    begin
-                                        Evaluate(AdmissionDate, "Fact Code", 9);
-                                        TmpTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
-                                    end;
-                            end;
+                        case TmpLineFacts."Fact Name" of
+                            TmpLineFacts."Fact Name"::ADMISSION_CODE:
+                                TmpTicketAccessStatistics.SetFilter("Admission Code", '=%1', TmpLineFacts."Fact Code");
+                            TmpLineFacts."Fact Name"::ADMISSION_HOUR:
+                                begin
+                                    Evaluate(AdmissionHour, TmpLineFacts."Fact Code");
+                                    TmpTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
+                                end;
+                            TmpLineFacts."Fact Name"::ITEM:
+                                TmpTicketAccessStatistics.SetFilter("Item No.", '=%1', TmpLineFacts."Fact Code");
+                            TmpLineFacts."Fact Name"::TICKET_TYPE:
+                                TmpTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TmpLineFacts."Fact Code");
+                            TmpLineFacts."Fact Name"::VARIANT_CODE:
+                                TmpTicketAccessStatistics.SetFilter("Variant Code", '=%1', TmpLineFacts."Fact Code");
+                            TmpLineFacts."Fact Name"::ADMISSION_DATE:
+                                begin
+                                    Evaluate(AdmissionDate, TmpLineFacts."Fact Code", 9);
+                                    TmpTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
+                                end;
+                        end;
 
-                        with TmpColumnFacts do
-                            case "Fact Name" of
-                                "Fact Name"::ADMISSION_CODE:
-                                    TmpTicketAccessStatistics.SetFilter("Admission Code", '=%1', "Fact Code");
-                                "Fact Name"::ADMISSION_HOUR:
-                                    begin
-                                        Evaluate(AdmissionHour, "Fact Code");
-                                        TmpTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
-                                    end;
-                                "Fact Name"::ITEM:
-                                    TmpTicketAccessStatistics.SetFilter("Item No.", '=%1', "Fact Code");
-                                "Fact Name"::TICKET_TYPE:
-                                    TmpTicketAccessStatistics.SetFilter("Ticket Type", '=%1', "Fact Code");
-                                "Fact Name"::VARIANT_CODE:
-                                    TmpTicketAccessStatistics.SetFilter("Variant Code", '=%1', "Fact Code");
-                                "Fact Name"::ADMISSION_DATE:
-                                    begin
-                                        Evaluate(AdmissionDate, "Fact Code", 9);
-                                        TmpTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
-                                    end;
-                            end;
+                        case TmpColumnFacts."Fact Name" of
+                            TmpColumnFacts."Fact Name"::ADMISSION_CODE:
+                                TmpTicketAccessStatistics.SetFilter("Admission Code", '=%1', TmpColumnFacts."Fact Code");
+                            TmpColumnFacts."Fact Name"::ADMISSION_HOUR:
+                                begin
+                                    Evaluate(AdmissionHour, TmpColumnFacts."Fact Code");
+                                    TmpTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
+                                end;
+                            TmpColumnFacts."Fact Name"::ITEM:
+                                TmpTicketAccessStatistics.SetFilter("Item No.", '=%1', TmpColumnFacts."Fact Code");
+                            TmpColumnFacts."Fact Name"::TICKET_TYPE:
+                                TmpTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TmpColumnFacts."Fact Code");
+                            TmpColumnFacts."Fact Name"::VARIANT_CODE:
+                                TmpTicketAccessStatistics.SetFilter("Variant Code", '=%1', TmpColumnFacts."Fact Code");
+                            TmpColumnFacts."Fact Name"::ADMISSION_DATE:
+                                begin
+                                    Evaluate(AdmissionDate, TmpColumnFacts."Fact Code", 9);
+                                    TmpTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
+                                end;
+                        end;
 
                         // hi-jack "item no." for lines and "admission code" for columns
                         if (TmpTicketAccessStatistics.FindSet()) then begin
@@ -229,7 +220,6 @@ codeunit 6060110 "NPR TM Statistics WebService"
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;
         FactCode: Code[20];
-        Ticket: Record "NPR TM Ticket";
         Admission: Record "NPR TM Admission";
         Variant: Record "Item Variant";
     begin
@@ -240,63 +230,60 @@ codeunit 6060110 "NPR TM Statistics WebService"
 
         repeat
 
-            with TmpTicketAccessFact do begin
+            if (not TmpTicketAccessFact.Get(TmpTicketAccessFact."Fact Name"::TICKET_TYPE, TmpTicketAccessStatistics."Ticket Type")) then begin
+                TmpTicketAccessFact.Init();
+                TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::TICKET_TYPE;
+                TmpTicketAccessFact."Fact Code" := TmpTicketAccessStatistics."Ticket Type";
+                if (TicketType.Get(TmpTicketAccessFact."Fact Code")) then
+                    TmpTicketAccessFact.Description := TicketType.Description;
+                TmpTicketAccessFact.Insert();
+            end;
 
-                if (not Get("Fact Name"::TICKET_TYPE, TmpTicketAccessStatistics."Ticket Type")) then begin
-                    Init();
-                    "Fact Name" := "Fact Name"::TICKET_TYPE;
-                    "Fact Code" := TmpTicketAccessStatistics."Ticket Type";
-                    if (TicketType.Get("Fact Code")) then
-                        Description := TicketType.Description;
-                    Insert();
-                end;
+            if (not TmpTicketAccessFact.Get(TmpTicketAccessFact."Fact Name"::ADMISSION_CODE, TmpTicketAccessStatistics."Admission Code")) then begin
+                TmpTicketAccessFact.Init();
+                TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::ADMISSION_CODE;
+                TmpTicketAccessFact."Fact Code" := TmpTicketAccessStatistics."Admission Code";
+                if (Admission.Get(TmpTicketAccessFact."Fact Code")) then
+                    TmpTicketAccessFact.Description := Admission.Description;
+                TmpTicketAccessFact.Insert();
+            end;
 
-                if (not Get("Fact Name"::ADMISSION_CODE, TmpTicketAccessStatistics."Admission Code")) then begin
-                    Init();
-                    "Fact Name" := "Fact Name"::ADMISSION_CODE;
-                    "Fact Code" := TmpTicketAccessStatistics."Admission Code";
-                    if (Admission.Get("Fact Code")) then
-                        Description := Admission.Description;
-                    Insert();
-                end;
+            if (not TmpTicketAccessFact.Get(TmpTicketAccessFact."Fact Name"::ITEM, TmpTicketAccessStatistics."Item No.")) then begin
+                TmpTicketAccessFact.Init();
+                TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::ITEM;
+                TmpTicketAccessFact."Fact Code" := TmpTicketAccessStatistics."Item No.";
+                if (Item.Get(TmpTicketAccessFact."Fact Code")) then
+                    TmpTicketAccessFact.Description := CopyStr(Item.Description, 1, MaxStrLen(TmpTicketAccessFact.Description));
+                TmpTicketAccessFact.Insert();
+            end;
 
-                if (not Get("Fact Name"::ITEM, TmpTicketAccessStatistics."Item No.")) then begin
-                    Init();
-                    "Fact Name" := "Fact Name"::ITEM;
-                    "Fact Code" := TmpTicketAccessStatistics."Item No.";
-                    if (Item.Get("Fact Code")) then
-                        Description := CopyStr(Item.Description, 1, MaxStrLen(Description));
-                    Insert();
-                end;
+            if (not TmpTicketAccessFact.Get(TmpTicketAccessFact."Fact Name"::VARIANT_CODE, TmpTicketAccessStatistics."Variant Code")) then begin
+                TmpTicketAccessFact.Init();
+                TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::VARIANT_CODE;
+                TmpTicketAccessFact."Fact Code" := TmpTicketAccessStatistics."Variant Code";
+                if (Variant.Get(TmpTicketAccessStatistics."Item No.", TmpTicketAccessStatistics."Variant Code")) then
+                    TmpTicketAccessFact.Description := CopyStr(Variant.Description, 1, MaxStrLen(TmpTicketAccessFact.Description));
+                TmpTicketAccessFact.Insert();
+            end;
 
-                if (not Get("Fact Name"::VARIANT_CODE, TmpTicketAccessStatistics."Variant Code")) then begin
-                    Init();
-                    "Fact Name" := "Fact Name"::VARIANT_CODE;
-                    "Fact Code" := TmpTicketAccessStatistics."Variant Code";
-                    if (Variant.Get(TmpTicketAccessStatistics."Item No.", TmpTicketAccessStatistics."Variant Code")) then
-                        Description := CopyStr(Variant.Description, 1, MaxStrLen(Description));
-                    Insert();
-                end;
+            FactCode := Format(TmpTicketAccessStatistics."Admission Date", 0, 9);
+            if (not TmpTicketAccessFact.Get(TmpTicketAccessFact."Fact Name"::ADMISSION_DATE, FactCode)) then begin
+                TmpTicketAccessFact.Init();
+                TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::ADMISSION_DATE;
+                TmpTicketAccessFact."Fact Code" := FactCode;
+                TmpTicketAccessFact.Description := Format(TmpTicketAccessStatistics."Admission Date");
+                TmpTicketAccessFact.Insert();
+            end;
 
-                FactCode := Format(TmpTicketAccessStatistics."Admission Date", 0, 9);
-                if (not Get("Fact Name"::ADMISSION_DATE, FactCode)) then begin
-                    Init();
-                    "Fact Name" := "Fact Name"::ADMISSION_DATE;
-                    "Fact Code" := FactCode;
-                    Description := Format(TmpTicketAccessStatistics."Admission Date");
-                    Insert();
-                end;
-
-                FactCode := Format(TmpTicketAccessStatistics."Admission Hour");
-                if (StrLen(FactCode) = 1) then
-                    FactCode := StrSubstNo('0%1', FactCode);
-                if (not Get("Fact Name"::ADMISSION_HOUR, FactCode)) then begin
-                    Init();
-                    "Fact Name" := "Fact Name"::ADMISSION_HOUR;
-                    "Fact Code" := FactCode;
-                    Description := StrSubstNo('%1:00 - %1:59', FactCode);
-                    Insert();
-                end;
+            FactCode := Format(TmpTicketAccessStatistics."Admission Hour");
+            if (StrLen(FactCode) = 1) then
+                FactCode := StrSubstNo('0%1', FactCode);
+            if (not TmpTicketAccessFact.Get(TmpTicketAccessFact."Fact Name"::ADMISSION_HOUR, FactCode)) then begin
+                TmpTicketAccessFact.Init();
+                TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::ADMISSION_HOUR;
+                TmpTicketAccessFact."Fact Code" := FactCode;
+                TmpTicketAccessFact.Description := StrSubstNo('%1:00 - %1:59', FactCode);
+                TmpTicketAccessFact.Insert();
             end;
         until (TmpTicketAccessStatistics.Next() = 0);
     end;

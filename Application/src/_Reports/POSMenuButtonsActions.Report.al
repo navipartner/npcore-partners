@@ -70,7 +70,7 @@ report 6014421 "NPR POS Menu Buttons/Actions"
                     trigger OnAfterGetRecord()
                     begin
                         if "Action Code" = '' then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end;
                 }
 

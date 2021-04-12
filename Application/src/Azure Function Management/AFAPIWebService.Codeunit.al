@@ -7,12 +7,12 @@ codeunit 6151572 "NPR AF API WebService"
         Clear(WebService);
 
         if not WebService.Get(WebService."Object Type"::Codeunit, 'azurefunction_service') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Service Name" := 'azurefunction_service';
             WebService."Object ID" := Codeunit::"NPR AF API WebService";
             WebService.Published := true;
-            WebService.Insert;
+            WebService.Insert();
         end;
     end;
 
@@ -166,7 +166,6 @@ codeunit 6151572 "NPR AF API WebService"
     var
         AFNotificationHub: Record "NPR AF Notification Hub";
         KeyInt: Integer;
-        JSON: Text;
     begin
         if Key = '' then
             exit;
@@ -228,7 +227,7 @@ codeunit 6151572 "NPR AF API WebService"
             JsonObjChld.Add('Variety4', ItemVariant."NPR Variety 4");
             JsonObjChld.Add('Variety4Value', ItemVariant."NPR Variety 4 Value");
             JsonArr.Add(JsonObjChld);
-        until ItemVariant.Next = 0;
+        until ItemVariant.Next() = 0;
 
         JsonObj.Add('Base64Image', Base64String);
         JsonObj.Add('ImageName', PictureFilename);
@@ -247,10 +246,6 @@ codeunit 6151572 "NPR AF API WebService"
         JsonObjChld: JsonObject;
         JsonArr: JsonArray;
         JsonText: Text;
-        CodeCommaString: Text;
-        Variant1CommaString: Text;
-        Variant2CommaString: Text;
-        Variant3CommaString: Text;
         AFHelperFunctions: Codeunit "NPR AF Helper Functions";
         BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
         ItemNo: Code[20];
@@ -291,7 +286,7 @@ codeunit 6151572 "NPR AF API WebService"
             JsonObjChld.Add('Variety4', ItemVariant."NPR Variety 4");
             JsonObjChld.Add('Variety4Value', ItemVariant."NPR Variety 4 Value");
             JsonArr.Add(JsonObjChld);
-        until ItemVariant.Next = 0;
+        until ItemVariant.Next() = 0;
 
         JsonObj.Add('Base64Image', Base64String);
         JsonObj.Add('ImageName', PictureFilename);
@@ -360,7 +355,7 @@ codeunit 6151572 "NPR AF API WebService"
             exit;
 
         RecRef := RecID.GetRecord;
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         VarRecRef := RecRef;
 
         TempBlob.CreateInStream(Istream);

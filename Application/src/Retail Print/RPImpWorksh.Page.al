@@ -19,7 +19,7 @@ page 6014632 "NPR RP Imp. Worksh."
         {
             repeater(Group)
             {
-                field(Template; Template)
+                field(Template; Rec.Template)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -27,53 +27,53 @@ page 6014632 "NPR RP Imp. Worksh."
                     Width = 80;
                     ToolTip = 'Specifies the value of the Template field';
                 }
-                field("New Template"; "New Template")
+                field("New Template"; Rec."New Template")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Template field';
                 }
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action field';
 
                     trigger OnValidate()
                     begin
-                        Style := SetStyle();
+                        Style := Rec.SetStyle();
                     end;
                 }
-                field("Existing Version"; "Existing Version")
+                field("Existing Version"; Rec."Existing Version")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Existing Version field';
                 }
-                field("Existing Description"; "Existing Description")
+                field("Existing Description"; Rec."Existing Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Existing Description field';
                 }
-                field("Existing Last Modified At"; "Existing Last Modified At")
+                field("Existing Last Modified At"; Rec."Existing Last Modified At")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Existing Last Modified At field';
                 }
-                field("New Version"; "New Version")
+                field("New Version"; Rec."New Version")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Version field';
                 }
-                field("New Description"; "New Description")
+                field("New Description"; Rec."New Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Description field';
                 }
-                field("New Last Modified At"; "New Last Modified At")
+                field("New Last Modified At"; Rec."New Last Modified At")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -89,7 +89,7 @@ page 6014632 "NPR RP Imp. Worksh."
 
     trigger OnAfterGetRecord()
     begin
-        Style := SetStyle();
+        Style := Rec.SetStyle();
     end;
 
     var

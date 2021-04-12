@@ -1,4 +1,4 @@
-codeunit 6150906 "NPR HC Sales Doc. Mgt."
+﻿codeunit 6150906 "NPR HC Sales Doc. Mgt."
 {
     TableNo = "NPR Nc Import Entry";
 
@@ -40,7 +40,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
 
     end;
 
-    local procedure UpdateSalesHeader(ItemXmlElement: XmlElement) Imported: Boolean
+    local procedure UpdateSalesHeader(ItemXmlElement: XmlElement): Boolean
     var
         SalesHeader: Record "Sales Header";
         NodeList: XmlNodeList;
@@ -55,7 +55,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         foreach Node in NodeList do
             UpdateSalesLine(Node.AsXmlElement(), SalesHeader);
 
-        Commit;
+        Commit();
 
         OnAfterUpdateSalesHeader(SalesHeader);
 
@@ -68,7 +68,6 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         SalesLine: Record "Sales Line";
         NodeList: XmlNodeList;
         Node: XmlNode;
-        i: Integer;
         XPath: Text;
     begin
         if ItemXmlElement.IsEmpty then
@@ -204,8 +203,8 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         //Record insert
         if not Handeld then begin
             SalesHeader.SetRange("External Document No.", TempSalesHeader."External Document No.");
-            if not SalesHeader.FindFirst then begin
-                SalesHeader.Init;
+            if not SalesHeader.FindFirst() then begin
+                SalesHeader.Init();
                 SalesHeader.Validate("Document Type", TempSalesHeader."Document Type");
                 SalesHeader."No." := '';
                 SalesHeader.Insert(true);
@@ -251,7 +250,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
                     SalesHeader.Validate("Ship-to Address 2", TempSalesHeader."Ship-to Address 2");
                 SalesHeader.Modify(true);
             end;
-            SalesHeader.Reset;
+            SalesHeader.Reset();
         end;
 
         OnAfterInsertSalesHeader(TempSalesHeader, SalesHeader);
@@ -416,7 +415,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
 
         if not Handeld then begin
             if not SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", TempSalesLine."Line No.") then begin
-                SalesLine.Init;
+                SalesLine.Init();
                 SalesLine."Document Type" := SalesHeader."Document Type";
                 SalesLine."Document No." := SalesHeader."No.";
                 SalesLine."Line No." := TempSalesLine."Line No.";
@@ -509,7 +508,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         ReservationEntry := TempReservationEntry;
         ReservationEntry.SetPointerFilter;
         ReservationEntry.SetTrackingFilterFromReservEntry(ReservationEntry);
-        if not ReservationEntry.FindFirst then
+        if not ReservationEntry.FindFirst() then
             CreateReservationEntry(TempReservationEntry, CurrentEntryStatus)
         else begin
             ReservationMgt.SetItemTrackingHandling(1);

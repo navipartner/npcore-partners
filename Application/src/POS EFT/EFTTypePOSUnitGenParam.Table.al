@@ -75,8 +75,6 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
         FieldErrorOption: Label 'does not contain a valid option (%1)';
 
     procedure GetTextParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Text; UserConfigurable: Boolean): Text
-    var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
     begin
         FindOrCreateRecord(IntegrationType, POSUnitNo, NameIn, "Data Type"::Text, DefaultValue, '', UserConfigurable);
         exit(Value);
@@ -84,7 +82,6 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
 
     procedure GetIntegerParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Integer; UserConfigurable: Boolean): Integer
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         "Integer": Integer;
     begin
         FindOrCreateRecord(IntegrationType, POSUnitNo, NameIn, "Data Type"::Integer, DefaultValue, '', UserConfigurable);
@@ -94,7 +91,6 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
 
     procedure GetBooleanParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Boolean; UserConfigurable: Boolean): Boolean
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         Boolean: Boolean;
     begin
         FindOrCreateRecord(IntegrationType, POSUnitNo, NameIn, "Data Type"::Boolean, DefaultValue, '', UserConfigurable);
@@ -104,7 +100,6 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
 
     procedure GetOptionParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Integer; OptionStringIn: Text; UserConfigurable: Boolean): Integer
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         "Integer": Integer;
     begin
         FindOrCreateRecord(IntegrationType, POSUnitNo, NameIn, "Data Type"::Option, DefaultValue, OptionStringIn, UserConfigurable);
@@ -114,7 +109,6 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
 
     procedure GetDecimalParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Decimal; UserConfigurable: Boolean): Decimal
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         Decimal: Decimal;
     begin
         FindOrCreateRecord(IntegrationType, POSUnitNo, NameIn, "Data Type"::Decimal, DefaultValue, '', UserConfigurable);
@@ -124,7 +118,6 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
 
     procedure GetDateParameterValue(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DefaultValue: Date; UserConfigurable: Boolean): Date
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         Date: Date;
     begin
         FindOrCreateRecord(IntegrationType, POSUnitNo, NameIn, "Data Type"::Date, DefaultValue, '', UserConfigurable);
@@ -135,7 +128,7 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
     procedure FindOrCreateRecord(IntegrationType: Text; POSUnitNo: Text; NameIn: Text; DataType: Integer; DefaultValue: Variant; OptionStringIn: Text; UserConfigurable: Boolean)
     begin
         if not Get(IntegrationType, POSUnitNo, NameIn) then begin
-            Init;
+            Init();
             "Integration Type" := IntegrationType;
             "POS Unit No." := POSUnitNo;
             Name := NameIn;
@@ -143,7 +136,7 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
             OptionString := OptionStringIn;
             "User Configurable" := UserConfigurable;
             Validate(Value, DefaultValue);
-            Insert;
+            Insert();
         end;
     end;
 
@@ -151,7 +144,7 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
     begin
         Get(IntegrationType, POSUnitNo, NameIn);
         Validate(Value, ValueIn);
-        Modify;
+        Modify();
     end;
 
     procedure LookupValue()
@@ -181,7 +174,7 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
         foreach Part in Parts do begin
             tmpRetailList.Number += 1;
             tmpRetailList.Choice := Part;
-            tmpRetailList.Insert;
+            tmpRetailList.Insert();
         end;
 
         if tmpRetailList.IsEmpty then

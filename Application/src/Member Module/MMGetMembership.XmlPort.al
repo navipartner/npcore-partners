@@ -237,8 +237,6 @@ xmlport 6060129 "NPR MM Get Membership"
         }
     }
 
-    var
-        TotalCount: Integer;
 
     procedure ClearResponse()
     begin
@@ -250,8 +248,6 @@ xmlport 6060129 "NPR MM Get Membership"
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        Member: Record "NPR MM Member";
-        MembershipRole: Record "NPR MM Membership Role";
         MembershipEntry: Record "NPR MM Membership Entry";
         NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
@@ -289,7 +285,7 @@ xmlport 6060129 "NPR MM Get Membership"
 
         // MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         // MembershipRole.SetFilter (Blocked, '=%1', FALSE);
-        // MemberCount := FORMAT (MembershipRole.COUNT ());
+        // MemberCount := FORMAT (MembershipRole.Count() ());
 
         MembershipManagement.GetMemberCount(MembershipEntryNo, AdminMemberCount, NamedMemberCount, AnonMemberCount);
         NamedMemberCountText := Format(AdminMemberCount + NamedMemberCount, 0, 9);

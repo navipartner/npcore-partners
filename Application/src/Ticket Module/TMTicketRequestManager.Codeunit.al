@@ -1,4 +1,4 @@
-codeunit 6060119 "NPR TM Ticket Request Manager"
+﻿codeunit 6060119 "NPR TM Ticket Request Manager"
 {
 
     trigger OnRun()
@@ -6,14 +6,9 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     end;
 
     var
-        ITEM_NOT_FOUND: Label 'The sales item specified in external_id %1, was not found.';
         CHANGE_NOT_ALLOWED: Label 'Confirmed tickets can''t be changed.';
         TOKEN_NOT_FOUND: Label 'The ticket-token %1 was not found, or has incorrect state.';
         TOKEN_EXPIRED: Label 'The ticket-token %1 has expired. Use PreConfirm to re-reserve tickets.';
-        TOKEN_INCORRECT_STATE: Label 'The ticket-token %1 can''t be changed when in the %1 state.';
-        MISSING_CASE: Label 'No handler for %1 [%2].';
-        MISSING_SCHEDULE_ENTRY: Label 'Admission Code %1 requires a valid schedule entry.';
-        "XREF-NOT-FOUND": Label 'The Item and Variant %1 %2 requires a valid item reference or alternative no.';
         EXTERNAL_ITEM_CHANGE: Label 'Changing the sales item when there is an active ticket reservation, is not supported. Please delete the POS line and start over.';
         REVOKE_UNUSED_ERROR: Label 'Ticket %1 has been used for entry to %2 at %3 and can''t be revoked due to the revoke policy set on item %4 for admission %5.';
         TICKET_CANCELLED: Label 'Ticket %1 has already been revoked at %2 and can''t be revoked again.';
@@ -32,7 +27,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         SALES_NOT_STARTED_1200: Label 'Ticket sales does not start until %1 for %2 using ticket item %3 %4.';
         SALES_STOPPED_1201: Label 'Ticket sales ended at %1 for %2 using ticket item %3 %4.';
         WAITINGLIST_REQUIRED_1202: Label 'Waitinglist reference code is required to book a ticket for this time schedule.';
-        WAITINGLIST_FAULT_1203: Label 'A problem redeeming the waiting list reference code.';
 
         INVALID_TICKET_PIN: Label 'The combination of ticket number and pin code is not valid.';
         NOT_CONFIRMED: Label 'The ticket request must be confirmed prior to change.';
@@ -40,11 +34,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
     procedure LockResources()
     var
-        TMTicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TMTicket: Record "NPR TM Ticket";
-        TMTicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        TMDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        TMTicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
 
         TMTicket.LockTable(true);
@@ -55,7 +45,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
     procedure GetNewToken() Token: Code[40]
     begin
-        exit(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')));
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
     end;
 
     procedure TokenRequestExists(Token: Text[100]): Boolean
@@ -101,7 +91,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
                             DetailedTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                             if (not DetailedTicketAccessEntry.IsEmpty()) then
                                 DetailedTicketAccessEntry.DeleteAll();
-                        until (Ticket.Next = 0);
+                        until (Ticket.Next() = 0);
                     end;
 
                     SeatingReservationEntry.SetCurrentKey("Ticket Token");
@@ -120,10 +110,10 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
                 if (RemoveRequest) then begin
                     TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
                     TicketReservationResponse.DeleteAll();
-                    TicketReservationRequest.Delete;
+                    TicketReservationRequest.Delete();
                 end;
 
-            until (TicketReservationRequest.Next = 0);
+            until (TicketReservationRequest.Next() = 0);
 
         end;
     end;
@@ -155,35 +145,28 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
-        TicketBOM: Record "NPR TM Ticket Admission BOM";
         AdmissionUnitPrice: Decimal;
-        AdmissionCount: Decimal;
     begin
 
         TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
         if (TicketReservationRequest."Admission Created") then
             exit;
 
-        with TicketReservationRequest do begin
+        if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then
+            _IssueNewTickets(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest.Quantity, TicketReservationRequest."Entry No.", AdmissionUnitPrice);
 
-            if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then
-                _IssueNewTickets("Item No.", "Variant Code", Quantity, "Entry No.", AdmissionUnitPrice);
+        if ((TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) and
+            (not TicketReservationRequest."Admission Created")) then begin
 
-            if ((TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) and
-                (not TicketReservationRequest."Admission Created")) then begin
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            if (Ticket.FindSet()) then begin
+                repeat
+                    _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionUnitPrice);
 
-                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-                if (Ticket.FindSet()) then begin
-                    AdmissionCount := 0;
-                    repeat
-                        AdmissionCount += 1;
-                        _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionUnitPrice);
+                until (Ticket.Next() = 0);
 
-                    until (Ticket.Next() = 0);
+                if (AdmissionUnitPrice > 0) then begin
 
-                    if (AdmissionUnitPrice > 0) then begin
-
-                    end;
                 end;
             end;
         end;
@@ -194,25 +177,13 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         TicketSetup: Record "NPR TM Ticket Setup";
-        Ticket: Record "NPR TM Ticket";
-        AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        ReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         TicketBom: Record "NPR TM Ticket Admission BOM";
-        TicketBom2: Record "NPR TM Ticket Admission BOM";
-        Admission: Record "NPR TM Admission";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         NumberOfTickets: Integer;
         TicketQuantity: Integer;
         i: Integer;
-        TicketValidDate: Date;
-        LowDate: Date;
-        HighDate: Date;
-        UserSetup: Record "User Setup";
         Window: Dialog;
-        WaitingListReferenceCode: Code[10];
-        CreateAdmission: Boolean;
         AdditionalAdmissionCosts: Decimal;
     begin
 
@@ -285,7 +256,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     local procedure _IssueOneTicket(ItemNo: Code[20]; VariantCode: Code[10]; QuantityPerTicket: Integer; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal)
     var
         Ticket: Record "NPR TM Ticket";
-        TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         LowDate: Date;
@@ -293,7 +263,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         UserSetup: Record "User Setup";
     begin
 
-        Ticket.Init;
+        Ticket.Init();
         Ticket."No." := '';
         Ticket."No. Series" := TicketType."No. Series";
         Ticket."Ticket Type Code" := TicketType.Code;
@@ -492,15 +462,13 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
                 until (Ticket.Next() = 0);
             end;
-        until (TicketReservationRequest.Next = 0);
+        until (TicketReservationRequest.Next() = 0);
     end;
 
     procedure ConfirmReservationRequest(Token: Text[100]; var ResponseMessage: Text) ReservationConfirmed: Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
 
         ReservationConfirmed := true;
@@ -559,7 +527,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     procedure ConfirmChangeRequest(Token: Text[100]);
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin
 
@@ -601,9 +568,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     procedure RevokeReservationTokenRequest(Token: Text[100]; DeferUntilPosting: Boolean)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        TicketNo: Code[20];
     begin
 
         // revoke a ticket request when a ticket has been issued. This will block the created tickets
@@ -675,10 +640,8 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        ResponseMessage: Text;
     begin
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -735,7 +698,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        ItemVariant: Record "Item Variant";
     begin
 
         ResolvingTable := 0;
@@ -926,18 +888,14 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
                 TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::UNPAID;
 
             TicketReservationRequest.Modify();
-        until (TicketReservationRequest.Next = 0);
+        until (TicketReservationRequest.Next() = 0);
 
         exit(true);
     end;
 
     procedure POS_CreateReservationRequest(SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; ExternalMemberNo: Code[20]) Token: Text[100]
     var
-        ReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
-        AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
     begin
 
         Token := GetNewToken();
@@ -1036,7 +994,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         DetTicketAccessEntry2: Record "NPR TM Det. Ticket AccessEntry";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         InitialQuantity: Integer;
         TotalRefundAmount: Decimal;
         AdmissionRefundAmount: Decimal;
@@ -1342,7 +1299,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     var
         Token: Text[100];
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        ReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         ResponseMessage: Text;
         ResponseCode: Integer;
         Ticket: Record "NPR TM Ticket";
@@ -1492,7 +1448,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         Name := FileManagement.ServerTempFileName('tmp');
 
         TempFile.Create(Name);
-        TempFile.Close;
+        TempFile.Close();
 
         REPORT.SaveAsExcel(REPORT::"NPR TM Ticket Batch Resp.", Name, TicketReservationRequest);
 
@@ -1539,7 +1495,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     local procedure OnAfterBlockTicketSubscriber(TicketNo: Code[20])
     var
         ResponseText: Text;
-        Token: Text[100];
     begin
 
         SendETicketVoidRequest(TicketNo, true, ResponseText);
@@ -1549,7 +1504,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     local procedure OnAfterUnblockTicketSubscriber(TicketNo: Code[20])
     var
         ResponseText: Text;
-        Token: Text[100];
     begin
 
         SendETicketVoidRequest(TicketNo, false, ResponseText);
@@ -1716,7 +1670,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         SeatingTemplate: Record "NPR TM Seating Template";
     begin
 
-        TicketNotificationEntry.Init;
+        TicketNotificationEntry.Init();
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
         // If this is an update, duplicate the lines (one per admission code) and set status pending
@@ -1781,7 +1735,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         repeat
             Admission.Get(TicketAdmissionBOM."Admission Code");
 
-            TicketNotificationEntry.Init;
+            TicketNotificationEntry.Init();
             TicketNotificationEntry."Entry No." := 0;
             TicketNotificationEntry."Notification Group Id" := 1;
 
@@ -1963,9 +1917,9 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::SENT;
         TicketNotificationEntry."Notification Sent At" := CurrentDateTime();
         TicketNotificationEntry."Notification Sent By User" := UserId;
-        TicketNotificationEntry.Modify;
+        TicketNotificationEntry.Modify();
         ResponseMessage := '';
-        Commit; // External System State can not roll back
+        Commit(); // External System State can not roll back
 
         exit(true);
     end;
@@ -2035,7 +1989,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     local procedure SetPassUrl(var TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonMessage: Text): Boolean
     var
         JSONResult: Text;
-        FailReason: Text;
         JObject: JsonObject;
 
     begin
@@ -2068,18 +2021,13 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
     procedure AssignDataToPassTemplate(var RecRef: RecordRef; Line: Text) NewLine: Text
     var
-        MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         FieldRef: FieldRef;
-        "Count": Integer;
         EndPos: Integer;
         FieldNo: Integer;
         i: Integer;
-        MemberEntryNo: Integer;
         OptionInt: Integer;
         SeparatorLength: Integer;
         StartPos: Integer;
-        B64Image: Text;
         EndSeparator: Text[10];
         StartSeparator: Text[10];
         OptionCaption: Text[1024];
@@ -2178,7 +2126,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
             ResponseMessage := 'Phone number is missing.';
 
         if (TicketNotificationEntry."Notification Address" <> '') then begin
-            Commit;
+            Commit();
             ResponseMessage := 'Template not found.';
             if (SMSManagement.FindTemplate(RecordRef, SMSTemplateHeader)) then begin
                 SmsBody := SMSManagement.MakeMessage(SMSTemplateHeader, TicketNotificationEntry);
@@ -2194,12 +2142,10 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     procedure NPPassServerInvokeApi(RequestMethod: Code[10]; TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
     var
         TicketSetup: Record "NPR TM Ticket Setup";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Client: HttpClient;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
         RequestHeaders: HttpHeaders;
-        Request: HttpRequestMessage;
         Response: HttpResponseMessage;
         AcceptTok: Label 'Accept', Locked = true;
         ContentTypeTxt: Label 'application/json', Locked = true;
@@ -2207,8 +2153,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         ContentTypeTok: Label 'Content-Type', Locked = true;
         UserAgentTxt: Label 'NP Dynamics Retail / Dynamics 365 Business Central', Locked = true;
         ConnectErrorTxt: Label 'NP Pass Service connection error. (HTTP Reason Code: %1)';
-        GenericErrorTxt: Label 'NP Pass Service connection error. (Reason: %1)';
-        ServerErrorTxt: Label 'NP Pass Service encountered an error processing the request: %1, %2';
         UserAgentTok: Label 'User-Agent', Locked = true;
         RequestOk: Boolean;
         Url: Text;

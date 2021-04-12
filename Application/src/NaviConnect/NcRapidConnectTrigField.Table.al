@@ -49,15 +49,13 @@ table 6151093 "NPR Nc RapidConnect Trig.Field"
         }
         field(15; "Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table ID"),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table ID"),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                "Field": Record "Field";
             begin
             end;
         }

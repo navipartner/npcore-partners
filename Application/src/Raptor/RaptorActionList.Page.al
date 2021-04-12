@@ -15,28 +15,28 @@ page 6151494 "NPR Raptor Action List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field';
                 }
-                field("Data Type Description"; "Data Type Description")
+                field("Data Type Description"; Rec."Data Type Description")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Data Type Description field';
                 }
-                field("Raptor Module Code"; "Raptor Module Code")
+                field("Raptor Module Code"; Rec."Raptor Module Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Raptor Module Code field';
                 }
-                field("Raptor Module API Req. String"; "Raptor Module API Req. String")
+                field("Raptor Module API Req. String"; Rec."Raptor Module API Req. String")
                 {
                     ApplicationArea = All;
                     Visible = false;

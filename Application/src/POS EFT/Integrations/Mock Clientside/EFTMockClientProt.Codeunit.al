@@ -99,10 +99,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
         OpenRequest: DotNet NPRNetOpenRequest;
         State: DotNet NPRNetState5;
         EFTSetup: Record "NPR EFT Setup";
-        ConnectionMethod: Integer;
-        COMPort: Integer;
-        IPAddr: Text;
-        EFTMockClientIntegration: Codeunit "NPR EFT Mock Client Integ.";
     begin
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."POS Payment Type Code");
 
@@ -137,7 +133,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
         VerifySetupRequest: DotNet NPRNetVerifySetupRequest;
         State: DotNet NPRNetState5;
         EFTSetup: Record "NPR EFT Setup";
-        EFTMockClientIntegration: Codeunit "NPR EFT Mock Client Integ.";
     begin
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."POS Payment Type Code");
 
@@ -247,7 +242,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
-        PaymentRequest: Integer;
         EftTransactionRequest: Record "NPR EFT Transaction Request";
         State: DotNet NPRNetState5;
     begin
@@ -266,7 +260,7 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
         //-NPR5.48 [339930]
         HandleReceipt(EftTransactionRequest, State);
         //+NPR5.48 [339930]
-        EftTransactionRequest.Modify;
+        EftTransactionRequest.Modify();
 
         OnAfterProtocolResponse(EftTransactionRequest);
     end;
@@ -513,8 +507,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
     end;
 
     local procedure SetCaptionState(var State: DotNet NPRNetState5)
-    var
-        Captions: DotNet NPRNetCaptions;
     begin
         State.Captions.CloseButton := DialogCloseButton;
         State.Captions.ForceCloseButton := DialogForceCloseButton;
@@ -549,8 +541,8 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
             ReceiptNo := CreditCardTransaction."Receipt No." + 1;
         end;
 
-        CreditCardTransaction.Init;
-        CreditCardTransaction.Date := Today;
+        CreditCardTransaction.Init();
+        CreditCardTransaction.Date := Today();
         CreditCardTransaction."Transaction Time" := Time;
         CreditCardTransaction.Type := 0;
         CreditCardTransaction."Register No." := EftTransactionRequest."Register No.";
@@ -563,7 +555,7 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
         while (not IsNull(Line)) do begin
             CreditCardTransaction."Entry No." := EntryNo;
             CreditCardTransaction.Text := Line;
-            CreditCardTransaction.Insert;
+            CreditCardTransaction.Insert();
             EntryNo += 1;
             Line := StringReader.ReadLine();
         end;

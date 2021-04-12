@@ -10,7 +10,7 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
 
         Capture(PaymentLine);
 
-        PaymentLine."Date Captured" := Today;
+        PaymentLine."Date Captured" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -35,7 +35,7 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
 
         Refund(PaymentLine);
 
-        PaymentLine."Date Refunded" := Today;
+        PaymentLine."Date Refunded" := Today();
         PaymentLine.Modify(true);
     end;
 
@@ -45,7 +45,6 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
@@ -53,7 +52,6 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
         Request: Text;
         CurrencyCode: Code[10];
         Reference: Text;
-        ErrorMessage: Text;
         Response: Text;
         ResponseJson: Text;
     begin
@@ -80,7 +78,7 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
                 end;
         end;
         if CurrencyCode = '' then begin
-            GeneralLedgerSetup.Get;
+            GeneralLedgerSetup.Get();
             CurrencyCode := GeneralLedgerSetup."LCY Code";
         end;
 
@@ -110,14 +108,12 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
     local procedure Cancel(PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
         Url: Text;
         Request: Text;
         Reference: Text;
-        ErrorMessage: Text;
         Response: Text;
         ResponseJson: Text;
     begin
@@ -153,7 +149,6 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
@@ -161,7 +156,6 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
         Request: Text;
         CurrencyCode: Code[10];
         Reference: Text;
-        ErrorMessage: Text;
         Response: Text;
         ResponseJson: Text;
     begin
@@ -188,7 +182,7 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
                 end;
         end;
         if CurrencyCode = '' then begin
-            GeneralLedgerSetup.Get;
+            GeneralLedgerSetup.Get();
             CurrencyCode := GeneralLedgerSetup."LCY Code";
         end;
 
@@ -256,7 +250,7 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
             exit;
 
         if not EFTShopperRecognition.Get(EFTAdyenCloudIntegration.IntegrationType(), PaymentLine."Payment Gateway Shopper Ref.") then begin
-            EFTShopperRecognition.Init;
+            EFTShopperRecognition.Init();
             EFTShopperRecognition."Integration Type" := EFTAdyenCloudIntegration.IntegrationType();
             EFTShopperRecognition."Shopper Reference" := PaymentLine."Payment Gateway Shopper Ref.";
             EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;

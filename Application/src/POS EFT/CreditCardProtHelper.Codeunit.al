@@ -27,7 +27,6 @@ codeunit 6014527 "NPR Credit Card Prot. Helper"
     local procedure MatchEFTBINRange(CardPan: Code[20]; var POSPaymentMethod: Record "NPR POS Payment Method"; LocationCode: Code[10]): Boolean
     var
         EFTBINRange: Record "NPR EFT BIN Range";
-        EFTBINGroup: Record "NPR EFT BIN Group";
         EFTBINGroupPaymentLink: Record "NPR EFT BIN Group Paym. Link";
     begin
         if EFTBINRange.IsEmpty then

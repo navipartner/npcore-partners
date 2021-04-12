@@ -212,7 +212,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
 
         if (MembershipRole.FindSet()) then begin
             repeat
-                tmpMemberInfoResponse.Init;
+                tmpMemberInfoResponse.Init();
                 Member.Get(MembershipRole."Member Entry No.");
 
                 tmpMemberInfoResponse.TransferFields(Member, true);

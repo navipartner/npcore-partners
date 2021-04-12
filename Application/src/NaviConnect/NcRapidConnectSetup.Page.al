@@ -17,37 +17,37 @@ page 6151091 "NPR Nc RapidConnect Setup"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Package Code"; "Package Code")
+                field("Package Code"; Rec."Package Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Package Code field';
                 }
-                field("Export Enabled"; "Export Enabled")
+                field("Export Enabled"; Rec."Export Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Export Enabled field';
                 }
-                field("Task Processor Code"; "Task Processor Code")
+                field("Task Processor Code"; Rec."Task Processor Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Processor Code field';
                 }
-                field("Import Enabled"; "Import Enabled")
+                field("Import Enabled"; Rec."Import Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Import Enabled field';
                 }
-                field("Import Type"; "Import Type")
+                field("Import Type"; Rec."Import Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Import Type field';
@@ -67,7 +67,7 @@ page 6151091 "NPR Nc RapidConnect Setup"
                 {
                     Caption = 'Download Ftp';
                     Image = Delegate;
-                    Visible = "Import Enabled";
+                    Visible = Rec."Import Enabled";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Download Ftp action';
 
@@ -76,7 +76,7 @@ page 6151091 "NPR Nc RapidConnect Setup"
                         NcImportType: Record "NPR Nc Import Type";
                         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
                     begin
-                        NcImportType.Get("Import Type");
+                        NcImportType.Get(Rec."Import Type");
                         NcSyncMgt.DownloadFtpType(NcImportType);
                     end;
                 }

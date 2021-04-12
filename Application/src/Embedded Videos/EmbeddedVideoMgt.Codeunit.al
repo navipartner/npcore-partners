@@ -59,7 +59,7 @@ codeunit 6014697 "NPR Embedded Video Mgt."
         Attribute: XmlAttribute;
         AttributeCollection: XmlAttributeCollection;
         ModuleCode, ModuleName : Text;
-        Columns, i, LineNo : Integer;
+        Columns, LineNo : Integer;
     begin
         if not Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'video_module'), Node) then
             exit;
@@ -115,15 +115,11 @@ codeunit 6014697 "NPR Embedded Video Mgt."
 
     local procedure SendEmbeddedVideoHttpWebRequest(SoapAction: Text; Request: Text; var Response: Text): Boolean
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        TempBlob: Codeunit "Temp Blob";
         Headers: HttpHeaders;
         Content: HttpContent;
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
-        OutStr: OutStream;
-        ContentText: Text;
     begin
         Response := '';
         Content.WriteFrom(Request);

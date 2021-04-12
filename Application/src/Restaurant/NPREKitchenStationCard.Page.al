@@ -56,7 +56,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 Caption = 'Station Selection Setup';
                 Image = Troubleshoot;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Kitchen Station Slct.";
@@ -70,7 +70,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 Caption = 'Kitchen Requests';
                 Image = BlanketOrder;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
@@ -78,9 +78,6 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 ToolTip = 'Executes the Kitchen Requests action';
 
                 trigger OnAction()
-                var
-                    KitchenRequest: Record "NPR NPRE Kitchen Request";
-                    KitchenRequests: Page "NPR NPRE Kitchen Req.";
                 begin
                     Rec.ShowKitchenRequests();
                 end;

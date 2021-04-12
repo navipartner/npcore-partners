@@ -1,4 +1,4 @@
-codeunit 6184532 "NPR EFT NETSCloud Integrat."
+﻿codeunit 6184532 "NPR EFT NETSCloud Integrat."
 {
     // NPR5.54/MMV /20200129 CASE 364340 Created object
     // NPR5.55/MMV /20200525 CASE 405984 Fixed frontend resume behaviour after lookup prompt.
@@ -35,39 +35,39 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
-        tmpEFTIntegrationType.Init;
+        tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT NETSCloud Integrat.";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
         tmpEFTAuxOperation.Description := CANCEL_ACTION;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
         tmpEFTAuxOperation.Description := BALANCE_ENQUIRY;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 3;
         tmpEFTAuxOperation.Description := DOWNLOAD_DATASET;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 4;
         tmpEFTAuxOperation.Description := DOWNLOAD_SOFTWARE;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
@@ -80,7 +80,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
             exit;
 
         GetPOSUnitParameters(EFTSetup, EFTNETSCloudPOSUnitSetup);
-        Commit;
+        Commit();
         EFTNETSCloudPOSUnitSetupPage.SetEFTSetup(EFTSetup);
         EFTNETSCloudPOSUnitSetupPage.SetRecord(EFTNETSCloudPOSUnitSetup);
         EFTNETSCloudPOSUnitSetupPage.RunModal();
@@ -95,7 +95,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
             exit;
 
         GetPaymentTypeParameters(EFTSetup, EFTNETSCloudPaymentSetup);
-        Commit;
+        Commit();
         PAGE.RunModal(PAGE::"NPR EFT NETS Cloud Paym. Setup", EFTNETSCloudPaymentSetup);
     end;
 
@@ -194,15 +194,14 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
     var
         EFTSetup: Record "NPR EFT Setup";
         POSSetup: Codeunit "NPR POS Setup";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         POSSession.GetSetup(POSSetup);
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
-        if not EFTSetup.FindFirst then begin
+        if not EFTSetup.FindFirst() then begin
             EFTSetup.SetRange("POS Unit No.", '');
-            if not EFTSetup.FindFirst then
+            if not EFTSetup.FindFirst() then
                 exit;
         end;
 
@@ -210,7 +209,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
             exit;
 
         tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert;
+        tmpEFTSetup.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
@@ -254,8 +253,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
         if not EFTTransactionRequest.IsType(IntegrationType()) then
             exit;
 
-        with EFTTransactionRequest do
-            Skip := ("Processing Type" in ["Processing Type"::SETUP, "Processing Type"::VOID, "Processing Type"::LOOK_UP, "Processing Type"::AUXILIARY, "Processing Type"::CLOSE]);
+        Skip := (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::SETUP, EFTTransactionRequest."Processing Type"::VOID, EFTTransactionRequest."Processing Type"::LOOK_UP, EFTTransactionRequest."Processing Type"::AUXILIARY, EFTTransactionRequest."Processing Type"::CLOSE]);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforeResumeFrontEnd', '', false, false)]
@@ -270,15 +268,13 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
             exit;
 
         //-NPR5.55 [405984]
-        with EFTTransactionRequest do
-            Skip := ("Processing Type" in ["Processing Type"::SETUP, "Processing Type"::VOID, "Processing Type"::AUXILIARY, "Processing Type"::CLOSE])
+        Skip := (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::SETUP, EFTTransactionRequest."Processing Type"::VOID, EFTTransactionRequest."Processing Type"::AUXILIARY, EFTTransactionRequest."Processing Type"::CLOSE])
         //+NPR5.55 [405984]
     end;
 
     procedure HandleProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
-        EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
     begin
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::PAYMENT,
@@ -321,7 +317,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
             EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
         end;
         EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
-        EftTransactionRequest.Modify;
+        EftTransactionRequest.Modify();
     end;
 
     local procedure HandleVoidResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
@@ -336,7 +332,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
                 EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
             end;
             EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end else begin
             Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         end;
@@ -346,7 +342,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
     begin
         if EftTransactionRequest.Successful then begin
             Message(RECONCILE_SUCCESS);
-            Commit;
+            Commit();
             if not CODEUNIT.Run(CODEUNIT::"NPR EFT Try Print Receipt", EftTransactionRequest) then
                 Message(GetLastErrorText);
         end else begin
@@ -427,9 +423,9 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
         EFTSetup.TestField("Payment Type POS");
 
         if not EFTNETSCloudPaymentSetupOut.Get(EFTSetup."Payment Type POS") then begin
-            EFTNETSCloudPaymentSetupOut.Init;
+            EFTNETSCloudPaymentSetupOut.Init();
             EFTNETSCloudPaymentSetupOut."Payment Type POS" := EFTSetup."Payment Type POS";
-            EFTNETSCloudPaymentSetupOut.Insert;
+            EFTNETSCloudPaymentSetupOut.Insert();
         end;
     end;
 
@@ -444,9 +440,9 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
     local procedure GetPOSUnitParameters(EFTSetup: Record "NPR EFT Setup"; var EFTNETSCloudPOSUnitSetup: Record "NPR EFT NETSCloud Unit Setup")
     begin
         if not EFTNETSCloudPOSUnitSetup.Get(EFTSetup."POS Unit No.") then begin
-            EFTNETSCloudPOSUnitSetup.Init;
+            EFTNETSCloudPOSUnitSetup.Init();
             EFTNETSCloudPOSUnitSetup."POS Unit No." := EFTSetup."POS Unit No.";
-            EFTNETSCloudPOSUnitSetup.Insert;
+            EFTNETSCloudPOSUnitSetup.Insert();
         end;
     end;
 
@@ -481,7 +477,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, EFTSetup, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Entry No.", false);
-        Commit;
+        Commit();
         EFTFrameworkMgt.SendRequest(VoidEFTTransactionRequest);
     end;
 
@@ -516,10 +512,10 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
 
         EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, EFTSetup, 1, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
         AbortEFTTransactionRequest."Processed Entry No." := EFTTransactionRequest."Entry No.";
-        AbortEFTTransactionRequest.Modify;
-        Commit;
+        AbortEFTTransactionRequest.Modify();
+        Commit();
         EFTFrameworkMgt.SendRequest(AbortEFTTransactionRequest);
-        AbortEFTTransactionRequest.Find;
+        AbortEFTTransactionRequest.Find();
         exit(AbortEFTTransactionRequest.Successful);
     end;
 
@@ -539,7 +535,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
         foreach JToken in JArray do begin
             TmpRetailList.Number += 1;
             TmpRetailList.Choice := JToken.Item('terminalId').ToString();
-            TmpRetailList.Insert;
+            TmpRetailList.Insert();
         end;
 
         if (PAGE.RunModal(0, TmpRetailList) <> ACTION::LookupOK) then
@@ -552,7 +548,6 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
     procedure ShowTerminalSettings(EFTSetup: Record "NPR EFT Setup")
     var
         EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol";
-        JSON: Text;
         JObject: DotNet NPRNetJObject;
     begin
         JObject := JObject.Parse(EFTNETSCloudProtocol.TerminalSettings(EFTSetup));
@@ -580,7 +575,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
               EFTTransactionRequest."Processing Type"::REFUND,
               EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD);
         end;
-        if (EFTTransactionRequest.FindLast) then
+        if (EFTTransactionRequest.FindLast()) then
             if (EFTTransactionRequest."Entry No." = EFTTransactionRequestIn."Processed Entry No.") then
                 exit;
 

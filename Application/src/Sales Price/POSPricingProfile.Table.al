@@ -56,7 +56,7 @@ table 6150656 "NPR POS Pricing Profile"
                 PriceCalcMgt.SelectFirstSubscribedFunction(Rec);
             end;
         }
-        
+
         field(22; "Item Price Codeunit Name"; Text[30])
         {
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),

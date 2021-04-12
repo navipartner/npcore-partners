@@ -14,11 +14,6 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    var
-        FunctionOptionString: Text;
-        JSArr: Text;
-        OptionName: Text;
-        N: Integer;
     begin
         DiscoverVoucherPaymentAction(Sender);
     end;
@@ -92,7 +87,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         if not NpRvVoucherType.Get(POSParameterValue.Value) then begin
             NpRvVoucherType.SetFilter(Code, '%1', POSParameterValue.Value + '*');
-            if NpRvVoucherType.FindFirst then
+            if NpRvVoucherType.FindFirst() then
                 POSParameterValue.Value := NpRvVoucherType.Code;
         end;
 
@@ -127,7 +122,6 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         VoucherType: Text;
         VoucherTypeCode: Code[20];
         ReferenceNo: Text;
-        Handled: Boolean;
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSLine: Record "NPR POS Sale Line";

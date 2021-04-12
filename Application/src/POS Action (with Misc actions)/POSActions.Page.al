@@ -19,27 +19,27 @@ page 6150703 "NPR POS Actions"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
@@ -50,24 +50,24 @@ page 6150703 "NPR POS Actions"
                     Caption = 'Workflow Defined';
                     ToolTip = 'Specifies the value of the Workflow Defined field';
                 }
-                field("Data Source Name"; "Data Source Name")
+                field("Data Source Name"; Rec."Data Source Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Source Name field';
                 }
-                field("Blocking UI"; "Blocking UI")
+                field("Blocking UI"; Rec."Blocking UI")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Blocking UI field';
                 }
-                field("<Blocking UI>"; "Codeunit ID")
+                field("<Blocking UI>"; Rec."Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
-                field("Secure Method Code"; "Secure Method Code")
+                field("Secure Method Code"; Rec."Secure Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Secure Method Code field';
@@ -85,7 +85,7 @@ page 6150703 "NPR POS Actions"
                 Caption = 'Refresh Workflow';
                 Image = RefreshLines;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -104,7 +104,7 @@ page 6150703 "NPR POS Actions"
                 Caption = 'Parameters';
                 Image = Answers;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Param.";
@@ -118,7 +118,7 @@ page 6150703 "NPR POS Actions"
                 Ellipsis = true;
                 Image = Debug;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Workflow";
@@ -131,7 +131,7 @@ page 6150703 "NPR POS Actions"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Type := 3;
+        Rec.Type := 3;
     end;
 
     trigger OnOpenPage()
@@ -156,7 +156,7 @@ page 6150703 "NPR POS Actions"
             Rec.Code := POSActionCode;
             Rec.Find('=><');
         end else
-            if Rec.FindFirst then;
+            if Rec.FindFirst() then;
         //+NPR5.40 [306347]
     end;
 
@@ -172,12 +172,12 @@ page 6150703 "NPR POS Actions"
         ActionCopy: Record "NPR POS Action";
     begin
         CurrPage.SetSelectionFilter(Action);
-        if Action.FindSet then begin
+        if Action.FindSet() then begin
             repeat
                 ActionCopy := Action;
                 ActionCopy.RefreshWorkflow();
-            until Action.Next = 0;
-            Message(Text001, Action.Count);
+            until Action.Next() = 0;
+            Message(Text001, Action.Count());
         end;
     end;
 

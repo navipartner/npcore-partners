@@ -68,10 +68,7 @@ report 6014426 "NPR Vendor Top/Sale"
             begin
                 VendorInt += 1;
 
-                if "NPR Sales (LCY)" <> 0 then
-                    dg := (("NPR Sales (LCY)" - "NPR COGS (LCY)") / "NPR Sales (LCY)") * 100
-                else
-                    dg := 0;
+
 
                 VendorAmount.Init();
                 VendorAmount."Vendor No." := "No.";
@@ -121,7 +118,6 @@ report 6014426 "NPR Vendor Top/Sale"
 
             trigger OnPreDataItem()
             begin
-                VendorCount := Vendor.Count;
                 i := 0;
                 VendorAmount.DeleteAll();
                 VendorAmountLastYear.DeleteAll();
@@ -454,7 +450,6 @@ report 6014426 "NPR Vendor Top/Sale"
         BalancePct: Decimal;
         CostAmtFooter: Decimal;
         DbLastYear: Decimal;
-        dg: Decimal;
         DgLastYear: Decimal;
         Index: Decimal;
         IndexDb: array[2] of Decimal;
@@ -481,7 +476,6 @@ report 6014426 "NPR Vendor Top/Sale"
         p: Integer;
         q: Integer;
         ShowQty: Integer;
-        VendorCount: Integer;
         VendorInt: Integer;
         Text10600002: Label 'Order by %1 ';
         Text10600001: Label 'Period: %1';

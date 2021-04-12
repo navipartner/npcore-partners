@@ -1,10 +1,10 @@
 table 6151398 "NPR CS Store Users"
 {
-   
+
     Caption = 'CS Store Users';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -16,7 +16,7 @@ table 6151398 "NPR CS Store Users"
             ValidateTableRelation = false;
             DataClassification = EndUserIdentifiableInformation;
 
-           
+
         }
         field(2; "POS Store"; Code[10])
         {
@@ -49,6 +49,6 @@ table 6151398 "NPR CS Store Users"
     {
     }
 
-   
+
 }
 

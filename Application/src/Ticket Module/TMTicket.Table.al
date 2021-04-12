@@ -188,15 +188,13 @@ table 6059785 "NPR TM Ticket"
     }
 
     trigger OnInsert()
-    var
-        TempInt: Integer;
     begin
         if "No." = '' then begin
             GetTicketType;
             NoSeriesMgt.InitSeries(TicketType."No. Series", xRec."No. Series", Today, "No.", "No. Series");
         end;
 
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
 
         if "Ticket Type Code" <> '' then begin
             GetTicketType;
@@ -206,13 +204,11 @@ table 6059785 "NPR TM Ticket"
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
     end;
 
     var
         TicketType: Record "NPR TM Ticket Type";
-        ErrCertNumber: Label 'Certificate Number is Missing';
-        ErrCertNumberExist: Label 'Certificate Number does not exist';
         NoSeriesMgt: Codeunit NoSeriesManagement;
         TicketMgt: Codeunit "NPR TM Ticket Management";
 

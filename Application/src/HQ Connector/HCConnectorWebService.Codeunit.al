@@ -1,4 +1,4 @@
-codeunit 6150903 "NPR HC Connector Web Service"
+﻿codeunit 6150903 "NPR HC Connector Web Service"
 {
     procedure InsertAuditRoll(var auditrolllineimport: XMLport "NPR HC Audit Roll")
     var
@@ -7,14 +7,14 @@ codeunit 6150903 "NPR HC Connector Web Service"
         OutStr: OutStream;
     begin
         SelectLatestVersion;
-        auditrolllineimport.Import;
+        auditrolllineimport.Import();
         InsertImportEntry('InsertAuditRoll', 6150904, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := CopyStr('NCConnectorAuditRoll' + auditrolllineimport.GetSalesTicketNo(), 1, MaxStrLen(NaviConnectImportEntry."Document Name") - 4) + '.xml';
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         auditrolllineimport.SetDestination(OutStr);
-        auditrolllineimport.Export;
+        auditrolllineimport.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
     end;
@@ -26,14 +26,14 @@ codeunit 6150903 "NPR HC Connector Web Service"
         OutStr: OutStream;
     begin
         SelectLatestVersion;
-        posentryimport.Import;
+        posentryimport.Import();
         InsertImportEntry('InsertPOSEntry', 6150915, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'BCConnectorPOSEntry.xml';
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         posentryimport.SetDestination(OutStr);
-        posentryimport.Export;
+        posentryimport.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
     end;
@@ -45,14 +45,14 @@ codeunit 6150903 "NPR HC Connector Web Service"
         OutStr: OutStream;
     begin
         SelectLatestVersion;
-        salesdocumentimport.Import;
+        salesdocumentimport.Import();
         InsertImportEntry('InsertSalesDocument', 6150906, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConenctorSalesDocument.xml';
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         salesdocumentimport.SetDestination(OutStr);
-        salesdocumentimport.Export;
+        salesdocumentimport.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
     end;
@@ -64,14 +64,14 @@ codeunit 6150903 "NPR HC Connector Web Service"
         OutStr: OutStream;
     begin
         SelectLatestVersion;
-        customerimport.Import;
+        customerimport.Import();
         InsertImportEntry('InsertCustomer', 6150907, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConnectorCustomer.xml';
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         customerimport.SetDestination(OutStr);
-        customerimport.Export;
+        customerimport.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
     end;
@@ -79,23 +79,22 @@ codeunit 6150903 "NPR HC Connector Web Service"
     procedure GetCustomerPrice(var customerPriceRequest: XMLport "NPR HC Customer Price Request")
     var
         NaviConnectImportEntry: Record "NPR Nc Import Entry";
-        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         CustomerPriceManagement: Codeunit "NPR HC Customer Price Mgt.";
         TmpSalesHeader: Record "Sales Header" temporary;
         TmpSalesLine: Record "Sales Line" temporary;
     begin
         SelectLatestVersion;
-        customerPriceRequest.Import;
+        customerPriceRequest.Import();
         InsertImportEntry('GetCustomerPrice', 6150908, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConnectorGetCustomerPrice.xml';
 
         // Store Request
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         customerPriceRequest.SetDestination(OutStr);
-        customerPriceRequest.Export;
+        customerPriceRequest.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         customerPriceRequest.GetRequest(TmpSalesHeader, TmpSalesLine);
         ClearLastError;
@@ -112,9 +111,9 @@ codeunit 6150903 "NPR HC Connector Web Service"
         //Store Result
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         customerPriceRequest.SetDestination(OutStr);
-        customerPriceRequest.Export;
+        customerPriceRequest.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
     end;
 
     procedure GenericWebRequest(var genericrequest: XMLport "NPR HC Generic Request")
@@ -126,16 +125,16 @@ codeunit 6150903 "NPR HC Connector Web Service"
         TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
     begin
         SelectLatestVersion;
-        genericrequest.Import;
+        genericrequest.Import();
         InsertImportEntry('GenericWebRequest', 6150911, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConnectorGenericRequest.xml';
 
         // Store Request
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         genericrequest.SetDestination(OutStr);
-        genericrequest.Export;
+        genericrequest.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         genericrequest.GetRequest(TmpHCGenericWebRequest);
         ClearLastError;
@@ -152,9 +151,9 @@ codeunit 6150903 "NPR HC Connector Web Service"
         //Store Result
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         genericrequest.SetDestination(OutStr);
-        genericrequest.Export;
+        genericrequest.Export();
         NaviConnectImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
     end;
@@ -163,7 +162,7 @@ codeunit 6150903 "NPR HC Connector Web Service"
     var
         NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         if NaviConnectSetupMgt.GetImportTypeCode(CodeunitID, WebserviceFunction) = '' then
             InsertImportType(CodeunitID, WebserviceFunction);
@@ -181,7 +180,7 @@ codeunit 6150903 "NPR HC Connector Web Service"
     var
         NcImportType: Record "NPR Nc Import Type";
     begin
-        NcImportType.Init;
+        NcImportType.Init();
         NcImportType.Code := CopyStr(Webservicefunction, 1, MaxStrLen(NcImportType.Code));
         NcImportType.Description := CopyStr(Webservicefunction, 1, MaxStrLen(NcImportType.Description));
         NcImportType."Keep Import Entries for" := 7 * 24 * 60 * 60 * 1000; //7 days

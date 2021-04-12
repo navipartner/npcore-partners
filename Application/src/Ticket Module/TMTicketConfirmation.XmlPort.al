@@ -220,7 +220,6 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
         ReservationID: Text[100];
         ExternalIdCount: Integer;
         QtySum: Integer;
-        n: Integer;
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
 
     procedure GetToken(): Text[100]
@@ -243,7 +242,7 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
             repeat
                 tmpTicketReservationResponse.TransferFields(TicketReservationResponse, true);
                 tmpTicketReservationResponse.Insert();
-            until (TicketReservationResponse.Next = 0);
+            until (TicketReservationResponse.Next() = 0);
 
         end else begin
             tmpTicketReservationResponse.Reset();

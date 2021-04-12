@@ -14,7 +14,7 @@ page 6059953 "NPR Disp. Content Lines Img"
     {
         area(content)
         {
-            field(Image; Image)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Image field';

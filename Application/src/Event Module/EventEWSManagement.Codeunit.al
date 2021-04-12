@@ -1,4 +1,4 @@
-codeunit 6060151 "NPR Event EWS Management"
+﻿codeunit 6060151 "NPR Event EWS Management"
 {
     var
         EventVersionSpecificMgt: Codeunit "NPR Event Vers. Specific Mgt.";
@@ -11,7 +11,6 @@ codeunit 6060151 "NPR Event EWS Management"
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
         Resource: Record Resource;
-        CancelConfirm: Label 'There is a scheduled meeting request for %1. Do you want to automatically cancel that meeting and send an update to %1?';
     begin
         if Rec.Type = Rec.Type::Resource then begin
             if Rec."No." <> '' then begin
@@ -34,7 +33,7 @@ codeunit 6060151 "NPR Event EWS Management"
                                                                     or (IsEmailBeingSent and (Job."Person Responsible" = '')));
         if SearchForDefaultAccount then begin
             EventExchIntEmail.SetRange("Default Organizer E-Mail", true);
-            SearchForDefaultAccount := EventExchIntEmail.IsEmpty;
+            SearchForDefaultAccount := EventExchIntEmail.IsEmpty();
             if SearchForDefaultAccount and Test then
                 Error(SetEMailError, EventExchIntEmail.FieldCaption("Default Organizer E-Mail"), EventExchIntEmail.TableCaption, Job.FieldCaption("NPR Organizer E-Mail"),
                       Job.FieldCaption("Person Responsible"), Resource.FieldCaption("NPR E-Mail"));
@@ -48,7 +47,7 @@ codeunit 6060151 "NPR Event EWS Management"
         UserName: Text;
     begin
         EventExchIntEmailGlobal.SetRange("Default Organizer E-Mail", true);
-        if EventExchIntEmailGlobal.FindFirst then begin
+        if EventExchIntEmailGlobal.FindFirst() then begin
             UserName := EventExchIntEmailGlobal."E-Mail";
             Source := GetObjectCaption(8, PAGE::"NPR Event Exch. Int. E-Mails") + ': ' + EventExchIntEmailGlobal.FieldCaption("Default Organizer E-Mail");
         end;
@@ -108,13 +107,9 @@ codeunit 6060151 "NPR Event EWS Management"
     procedure ParseEmailTemplateText(var RecRef: RecordRef; Line: Text) NewLine: Text
     var
         FieldRef: FieldRef;
-        "Count": Integer;
         EndPos: Integer;
         FieldNo: Integer;
-        i: Integer;
-        OptionInt: Integer;
         StartPos: Integer;
-        OptionCaption: Text;
     begin
         //this function is a copy of function ParseEmailText in codeunit 6014450 E-Mail Management
         NewLine := Line;
@@ -154,11 +149,9 @@ codeunit 6060151 "NPR Event EWS Management"
                 ReportID := REPORT::"NPR Event Team Template";
         end;
 
-        with ReportLayoutSelection do begin
-            if not Get(ReportID, CompanyName) then
-                exit(false);
-            exit((Type = Type::"Custom Layout") and CustomReportLayout.Get("Custom Report Layout Code"));
-        end;
+        if not ReportLayoutSelection.Get(ReportID, CompanyName) then
+            exit(false);
+        exit((ReportLayoutSelection.Type = ReportLayoutSelection.Type::"Custom Layout") and CustomReportLayout.Get(ReportLayoutSelection."Custom Report Layout Code"));
     end;
 
     procedure IncludeAttachmentCheck(Job: Record Job; Usage: Option): Boolean
@@ -178,8 +171,6 @@ codeunit 6060151 "NPR Event EWS Management"
     procedure CreateFileName(Job: Record Job; EMailTemplateHeader: Record "NPR E-mail Template Header") Name: Text
     var
         RecRef: RecordRef;
-        EventEmailMgt: Codeunit "NPR Event Email Management";
-        EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
     begin
         Name := Job.FieldCaption("NPR Event") + '-' + Format(Job."NPR Event Status") + '-' + Job."No.";
         if not EMailTemplateHeader.IsEmpty then begin
@@ -247,14 +238,14 @@ codeunit 6060151 "NPR Event EWS Management"
         FieldRef2: FieldRef;
         RecRef2: RecordRef;
     begin
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         RecRef2 := RecRef.Duplicate();
         EmailTemplateHeader.SetRange("Table No.", RecRef.Number);
-        if EmailTemplateHeader.FindSet then
+        if EmailTemplateHeader.FindSet() then
             repeat
                 EmailTemplateFilter.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
                 EmailTemplateFilter.SetRange("Table No.", EmailTemplateHeader."Table No.");
-                if EmailTemplateFilter.FindSet then begin
+                if EmailTemplateFilter.FindSet() then begin
                     RecordExists := true;
                     repeat
                         FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
@@ -263,14 +254,14 @@ codeunit 6060151 "NPR Event EWS Management"
                             RecordExists := RecordExists and (Format(FieldRef2) = Format(FieldRef))
                         else
                             RecordExists := false;
-                    until (EmailTemplateFilter.Next = 0) or (not RecordExists);
+                    until (EmailTemplateFilter.Next() = 0) or (not RecordExists);
                 end;
-            until (EmailTemplateHeader.Next = 0) or RecordExists;
+            until (EmailTemplateHeader.Next() = 0) or RecordExists;
 
         if RecordExists then
             EmailTemplateHeader.Get(EmailTemplateFilter."E-mail Template Code")
         else
-            RecordExists := EmailTemplateHeader.FindFirst;
+            RecordExists := EmailTemplateHeader.FindFirst();
         exit(RecordExists);
 
     end;
@@ -294,14 +285,14 @@ codeunit 6060151 "NPR Event EWS Management"
         EventExchIntTemplate.SetRange("Exch. Item Type", ExchItemType);
         if EventExchIntTemplate.IsEmpty then
             exit(false);
-        if EventExchIntTemplate.FindFirst and (EventExchIntTemplate.Count = 1) then
+        if EventExchIntTemplate.FindFirst() and (EventExchIntTemplate.Count() = 1) then
             exit(true);
         if SkipLookup then
             exit(false);
         EventExchIntTemplates.LookupMode := true;
         EventExchIntTemplates.Caption := StrSubstNo(ExchTemplateCaption, Format(ExchItemType, 0, 0));
         EventExchIntTemplates.SetTableView(EventExchIntTemplate);
-        if EventExchIntTemplates.RunModal = ACTION::LookupOK then begin
+        if EventExchIntTemplates.RunModal() = ACTION::LookupOK then begin
             EventExchIntTemplates.GetRecord(EventExchIntTemplate);
             exit(true);
         end;
@@ -320,7 +311,7 @@ codeunit 6060151 "NPR Event EWS Management"
         EventExchIntTempEntry.SetRange("Source Record ID", Job.RecordId);
         EventExchIntTempEntries.LookupMode := true;
         EventExchIntTempEntries.SetTableView(EventExchIntTempEntry);
-        if EventExchIntTempEntries.RunModal = ACTION::LookupOK then begin
+        if EventExchIntTempEntries.RunModal() = ACTION::LookupOK then begin
             EventExchIntTempEntries.GetRecord(EventExchIntTempEntry);
             EventExchIntTemplate.Get(EventExchIntTempEntry.Code);
             exit(true);
@@ -331,11 +322,10 @@ codeunit 6060151 "NPR Event EWS Management"
     procedure SetEmailPassword(var EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail")
     var
         EventStdDialog: Page "NPR Event Standard Dialog";
-        PasswordText: Text;
     begin
         EventExchIntEmail.TestField("E-Mail");
         EventStdDialog.UseForPassword();
-        if EventStdDialog.RunModal = ACTION::OK then
+        if EventStdDialog.RunModal() = ACTION::OK then
             SaveEmailPassword(EventExchIntEmail, EventStdDialog.GetPassword());
     end;
 
@@ -356,7 +346,7 @@ codeunit 6060151 "NPR Event EWS Management"
         CryptographyManagement: Codeunit "Cryptography Management";
         PasswordNotSet: Label 'Password is not set for %1 %2. Please set it before using this e-mail account.';
     begin
-        if not EventExchIntEmail.Password.HasValue then
+        if not EventExchIntEmail.Password.HasValue() then
             Error(PasswordNotSet, EventExchIntEmail.FieldCaption("E-Mail"), EventExchIntEmail."E-Mail");
         EventExchIntEmail.CalcFields(Password);
         EventExchIntEmail.Password.CreateInStream(InStream);
@@ -370,7 +360,6 @@ codeunit 6060151 "NPR Event EWS Management"
     var
         ExchService: DotNet NPRNetExchangeService;
         ConnectionSuccessMsg: Label 'Connection succeeded.';
-        Job: Record Job;
     begin
         EventExchIntEmail.TestField("E-Mail");
         EventVersionSpecificMgt.ExchServiceWrapperConstructor(EventExchIntEmail."E-Mail", GetEmailPassword(EventExchIntEmail));
@@ -422,10 +411,10 @@ codeunit 6060151 "NPR Event EWS Management"
         GetOrganizerSetup(Job, FromSource);
         ParentEntryNo := EventExchIntSumBuffer."Entry No.";
         AddExchObjToBuffer(EventExchIntSumBuffer, 1, FromText, FromEmail, FromSource, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
-        JobPlanningLine.Reset;
+        JobPlanningLine.Reset();
         EventCalendarMgt.SetJobPlanLineMeetingRequestSendFilter(Job, JobPlanningLine);
         AddJobPlanningLineToBuffer(EventExchIntSumBuffer, JobPlanningLine, ToText, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
-        EventExchIntSumBuffer.FindFirst;
+        EventExchIntSumBuffer.FindFirst();
     end;
 
     local procedure AddJobPlanningLineToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; var JobPlanningLine: Record "Job Planning Line"; ExchItem: Text; var EntryNo: Integer; ParentEntryNo: Integer)
@@ -436,18 +425,18 @@ codeunit 6060151 "NPR Event EWS Management"
         case true of
             JobPlanningLine.IsEmpty:
                 AddExchObjToBuffer(EventExchIntSumBuffer, 1, ExchItem, '', Source, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
-            JobPlanningLine.Count = 1:
+            JobPlanningLine.Count() = 1:
                 begin
-                    JobPlanningLine.FindFirst;
+                    JobPlanningLine.FindFirst();
                     AddExchObjToBuffer(EventExchIntSumBuffer, 1, ExchItem, JobPlanningLine."NPR Resource E-Mail", Source, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
                 end;
             else begin
                     AddExchObjToBuffer(EventExchIntSumBuffer, 1, ExchItem, '', Source, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
                     ParentEntryNo := EventExchIntSumBuffer."Entry No.";
-                    JobPlanningLine.FindSet;
+                    JobPlanningLine.FindSet();
                     repeat
                         AddExchObjToBuffer(EventExchIntSumBuffer, 2, '', JobPlanningLine."NPR Resource E-Mail", '', EventExchIntSumBuffer."Entry No.", ParentEntryNo);
-                    until JobPlanningLine.Next = 0;
+                    until JobPlanningLine.Next() = 0;
                 end;
         end;
     end;
@@ -455,14 +444,14 @@ codeunit 6060151 "NPR Event EWS Management"
     local procedure AddExchObjToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; Indentation: Integer; ExchItem: Text; EmailAccount: Text; Source: Text; var EntryNo: Integer; ParentEntryNo: Integer)
     begin
         EntryNo += 1;
-        EventExchIntSumBuffer.Init;
+        EventExchIntSumBuffer.Init();
         EventExchIntSumBuffer."Entry No." := EntryNo;
         EventExchIntSumBuffer."Parent Entry No." := ParentEntryNo;
         EventExchIntSumBuffer.Indentation := Indentation;
         EventExchIntSumBuffer."Exchange Item" := ExchItem;
         EventExchIntSumBuffer."E-mail Account" := EmailAccount;
         EventExchIntSumBuffer.Source := Source;
-        EventExchIntSumBuffer.Insert;
+        EventExchIntSumBuffer.Insert();
     end;
 
     local procedure GetObjectCaption(ObjectType: Integer; ObjectID: Integer): Text
@@ -495,10 +484,10 @@ codeunit 6060151 "NPR Event EWS Management"
                 begin
                     ColorStyle := 'Strong';
                     EventExchIntSummaryBuffer2.SetRange("Parent Entry No.", EventExchIntSummaryBuffer."Entry No.");
-                    if EventExchIntSummaryBuffer2.FindSet then
+                    if EventExchIntSummaryBuffer2.FindSet() then
                         repeat
                             Apply := Apply or ExchIntSummaryApplyStyleExpr(EventExchIntSummaryBuffer2, ColorStyle2);
-                        until (EventExchIntSummaryBuffer2.Next = 0) or Apply;
+                        until (EventExchIntSummaryBuffer2.Next() = 0) or Apply;
                     if Apply then
                         ColorStyle := 'Unfavorable';
                     exit(Apply);
@@ -506,8 +495,8 @@ codeunit 6060151 "NPR Event EWS Management"
             1:
                 if EventExchIntSummaryBuffer."E-mail Account" = '' then begin
                     ColorStyle := 'Attention';
-                    EventExchIntSummaryBuffer2.Reset;
-                    if (EventExchIntSummaryBuffer2.Next <> 0) and (EventExchIntSummaryBuffer2.Indentation = 2) then begin
+                    EventExchIntSummaryBuffer2.Reset();
+                    if (EventExchIntSummaryBuffer2.Next() <> 0) and (EventExchIntSummaryBuffer2.Indentation = 2) then begin
                         ColorStyle := 'Standard';
                         exit(false);
                     end;

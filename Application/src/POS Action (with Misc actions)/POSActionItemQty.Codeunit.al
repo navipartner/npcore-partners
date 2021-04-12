@@ -17,8 +17,6 @@ codeunit 6150856 "NPR POS Action: Item Qty."
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    var
-        itemTrackingCode: Text;
     begin
         if Sender.DiscoverAction(
           ActionCode,
@@ -51,18 +49,15 @@ codeunit 6150856 "NPR POS Action: Item Qty."
     var
         ItemReference: Record "Item Reference";
     begin
-        Captions.AddActionCaption(ActionCode, 'Barcode', Format(ItemReference."Reference Type"::"Bar Code"));
+        Captions.AddActionCaption(ActionCode(), 'Barcode', Format(ItemReference."Reference Type"::"Bar Code"));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        ControlId: Text;
-        Value: Text;
-        DoNotClearTextBox: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -168,10 +163,9 @@ codeunit 6150856 "NPR POS Action: Item Qty."
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         Item: Record Item;
-        ItemReference: Record "Item Reference";
     begin
         if not EanBoxEvent.Get(EventCodeItemQty()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemQty();
             EanBoxEvent."Module Name" := Item.TableCaption;
             EanBoxEvent.Description := CopyStr(Text000, 1, MaxStrLen(EanBoxEvent.Description));

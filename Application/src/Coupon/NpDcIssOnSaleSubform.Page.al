@@ -14,40 +14,40 @@ page 6151605 "NPR NpDc Iss.OnSale Subform"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item Description field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Lot Quantity"; "Lot Quantity")
+                field("Lot Quantity"; Rec."Lot Quantity")
                 {
                     ApplicationArea = All;
                     Visible = LotQtyVisible;
                     ToolTip = 'Specifies the value of the Lot Quantity field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Profit %"; "Profit %")
+                field("Profit %"; Rec."Profit %")
                 {
                     ApplicationArea = All;
                     Editable = false;

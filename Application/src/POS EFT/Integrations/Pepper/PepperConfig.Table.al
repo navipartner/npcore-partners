@@ -331,7 +331,6 @@ table 6184490 "NPR Pepper Config."
         TxtNotStored: Label 'File was not stored.';
         TxtCaptionLicense: Label 'Pepper License file';
         TxtCaptionAdditionalParameters: Label 'Pepper Additional Parameters';
-        TxtDescription: Label 'XML File';
         TxtXMLfilefilter: Label '*.xml';
         TxtXMLfileDescription: Label 'XML Files (*.xml)|*.xml';
         PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
@@ -355,7 +354,7 @@ table 6184490 "NPR Pepper Config."
                     CalcFields("License File");
                     Clear("License File");
 
-                    Modify;
+                    Modify();
                     CalcFields("License File");
 
                     RecRef.GetTable(Rec);
@@ -363,9 +362,9 @@ table 6184490 "NPR Pepper Config."
                     RecRef.SetTable(Rec);
 
                     "License ID" := PepperLibrary.GetKeyFromLicenseText(PepperConfigManagement.GetConfigurationText(Rec, 0));
-                    Modify;
+                    Modify();
 
-                    if not "License File".HasValue then
+                    if not "License File".HasValue() then
                         Error(TxtNotStored);
                 end;
             FileType::AdditionalParameters:
@@ -373,15 +372,15 @@ table 6184490 "NPR Pepper Config."
                     CalcFields("Additional Parameters");
                     Clear("Additional Parameters");
 
-                    Modify;
+                    Modify();
                     CalcFields("Additional Parameters");
 
                     RecRef.GetTable(Rec);
                     TempBlob.ToRecordRef(RecRef, FieldNo("Additional Parameters"));
                     RecRef.SetTable(Rec);
 
-                    Modify;
-                    if not "Additional Parameters".HasValue then
+                    Modify();
+                    if not "Additional Parameters".HasValue() then
                         Error(TxtNotStored);
                 end;
         end;
@@ -389,9 +388,6 @@ table 6184490 "NPR Pepper Config."
 
     procedure ClearFile(FileType: Option License,AdditionalParameters)
     var
-        FileManagement: Codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        UploadResult: Text[250];
         TxtNoLicense: Label 'No license file is configured.';
         TxtNoAdditionalParameters: Label 'No addtional parameters are configured.';
         TxtConfirmClearLicense: Label 'Are you sure you want to delete the license?';
@@ -403,23 +399,23 @@ table 6184490 "NPR Pepper Config."
             FileType::License:
                 begin
                     CalcFields("License File");
-                    if not "License File".HasValue then
+                    if not "License File".HasValue() then
                         Error(TxtNoLicense);
                     if not Confirm(TxtConfirmClearLicense) then
                         exit;
                     Clear("License File");
-                    Modify;
+                    Modify();
                     Message(TxtLicenseCleared);
                 end;
             FileType::AdditionalParameters:
                 begin
                     CalcFields("Additional Parameters");
-                    if not "Additional Parameters".HasValue then
+                    if not "Additional Parameters".HasValue() then
                         Error(TxtNoAdditionalParameters);
                     if not Confirm(TxtConfirmClearAdditionalParameters) then
                         exit;
                     Clear("Additional Parameters");
-                    Modify;
+                    Modify();
                     Message(TxtAdditionalParametersCleared);
                 end;
         end;
@@ -429,7 +425,6 @@ table 6184490 "NPR Pepper Config."
     var
         TxtNoLicense: Label 'No license file is configured.';
         TxtNoAdditionalParameters: Label 'No addtional parameters are configured.';
-        PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
         PepperVersion: Record "NPR Pepper Version";
         StreamIn: InStream;
         StreamOut: OutStream;
@@ -446,7 +441,7 @@ table 6184490 "NPR Pepper Config."
             FileType::License:
                 begin
                     CalcFields("License File");
-                    if not "License File".HasValue then
+                    if not "License File".HasValue() then
                         Error(TxtNoLicense);
                     ExportName := TxtFileNameLicense;
                     "License File".CreateInStream(StreamIn);
@@ -469,7 +464,7 @@ table 6184490 "NPR Pepper Config."
             FileType::AdditionalParameters:
                 begin
                     CalcFields("Additional Parameters");
-                    if not "Additional Parameters".HasValue then
+                    if not "Additional Parameters".HasValue() then
                         Error(TxtNoAdditionalParameters);
                     ExportName := TxtFilenameAddPar;
                     "Additional Parameters".CreateInStream(StreamIn);

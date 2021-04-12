@@ -61,7 +61,6 @@ page 6151040 "NPR Notification Dialog"
         MessageTxt: Text[250];
         Text001: Label 'You must add a title';
         NotificationColor: Option Red,Green,Blue,Yellow,Dark;
-        ToRegisterNo: Code[10];
         ActionType: Option Message,"Phone Call","Facetime Video","Facetime Audio";
         ActionValue: Text[100];
         gPOSNo: Code[10];
@@ -73,7 +72,7 @@ page 6151040 "NPR Notification Dialog"
         if TitleTxt = '' then
             Error(Text001);
 
-        AFNotificationHub.Init;
+        AFNotificationHub.Init();
         AFNotificationHub.Title := TitleTxt;
         AFNotificationHub.Body := MessageTxt;
         AFNotificationHub."Notification Color" := NotificationColor;

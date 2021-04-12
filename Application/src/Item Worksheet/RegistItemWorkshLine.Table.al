@@ -1310,9 +1310,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
     }
 
     trigger OnDelete()
-    var
-        ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
-        ItemWorksheetVrtValue: Record "NPR Item Worksh. Variety Value";
     begin
         RegItemWshtVariantLine.Reset();
         RegItemWshtVariantLine.SetRange("Registered Worksheet No.", "Registered Worksheet No.");

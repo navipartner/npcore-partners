@@ -58,25 +58,25 @@ page 6014409 "NPR POS Turnover"
                         StyleExpr = RowStyle1;
                         Editable = false;
                     }
-                    field("This Year"; "This Year")
+                    field("This Year"; Rec."This Year")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
                     }
-                    field("Last Year"; "Last Year")
+                    field("Last Year"; Rec."Last Year")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
                     }
-                    field(Difference; Difference)
+                    field(Difference; Rec.Difference)
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
                     }
-                    field("Difference %"; "Difference %")
+                    field("Difference %"; Rec."Difference %")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;

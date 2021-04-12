@@ -20,9 +20,9 @@ codeunit 6014411 "NPR Event Dimension Mgt"
             exit;
         AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
         AllObjWithCaption.SetRange("Object ID", TableID);
-        if AllObjWithCaption.FindFirst then begin
+        if AllObjWithCaption.FindFirst() then begin
             TempAllObjWithCaption := AllObjWithCaption;
-            TempAllObjWithCaption.Insert;
+            TempAllObjWithCaption.Insert();
         end;
     end;
 }

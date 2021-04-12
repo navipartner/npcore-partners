@@ -1,8 +1,8 @@
 report 6060101 "NPR Data Cleanup Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Data Cleanup Test.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Data Cleanup Test.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Data Cleanup Test';
     dataset

@@ -1,4 +1,4 @@
-page 6060166 "NPR Event Next 10 Events"
+﻿page 6060166 "NPR Event Next 10 Events"
 {
     Caption = 'Next 10 Events';
     CardPageID = "NPR Event Card";
@@ -16,7 +16,7 @@ page 6060166 "NPR Event Next 10 Events"
             group(Control6014410)
             {
                 ShowCaption = false;
-                field("GETFILTERS"; GetFilters)
+                field("GETFILTERS"; Rec.GetFilters)
                 {
                     ApplicationArea = All;
                     Caption = 'Filters';
@@ -25,32 +25,32 @@ page 6060166 "NPR Event Next 10 Events"
             }
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Bill-to Customer No."; "Bill-to Customer No.")
+                field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                 }
-                field("Event Status"; "NPR Event Status")
+                field("Event Status"; Rec."NPR Event Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Event Status field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Total Amount"; "NPR Total Amount")
+                field("Total Amount"; Rec."NPR Total Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Total Amount field';
@@ -90,9 +90,9 @@ page 6060166 "NPR Event Next 10 Events"
                         ResourceList: Page "Resource List";
                     begin
                         ResourceList.LookupMode := true;
-                        if ResourceList.RunModal = ACTION::LookupOK then begin
+                        if ResourceList.RunModal() = ACTION::LookupOK then begin
                             ResourceList.GetRecord(Resource);
-                            SetRange("Person Responsible", Resource."No.");
+                            Rec.SetRange("Person Responsible", Resource."No.");
                         end;
                     end;
                 }
@@ -106,7 +106,7 @@ page 6060166 "NPR Event Next 10 Events"
 
                 trigger OnAction()
                 begin
-                    Reset;
+                    Rec.Reset();
                 end;
             }
         }
@@ -127,16 +127,16 @@ page 6060166 "NPR Event Next 10 Events"
         JobCount: Integer;
     begin
         Job.SetCurrentKey("Starting Date");
-        FilterGroup := 2;
+        Rec.FilterGroup := 2;
         Job.SetRange("NPR Event", true);
-        Job.SetFilter("Starting Date", '>=%1', WorkDate);
-        FilterGroup := 0;
-        if Job.FindSet then
+        Job.SetFilter("Starting Date", '>=%1', WorkDate());
+        Rec.FilterGroup := 0;
+        if Job.FindSet() then
             repeat
                 JobCount += 1;
                 Rec := Job;
-                Rec.Insert;
-            until (Job.Next = 0) or (JobCount = MaxNoOfEvents);
+                Rec.Insert();
+            until (Job.Next() = 0) or (JobCount = MaxNoOfEvents);
     end;
 }
 

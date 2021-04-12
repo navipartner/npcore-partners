@@ -13,7 +13,6 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
 
     var
         Description: Label 'NETS PSAM integration via Flexiiterm';
-        NO_SESSION_ERROR: Label 'POS Session is missing. EFT Request cancelled.';
         ZERO_AMOUNT_ERROR: Label 'Cannot start EFT Request for zero amount';
 
     procedure IntegrationType(): Text
@@ -28,11 +27,11 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
-        tmpEFTIntegrationType.Init;
+        tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT Flexiiterm Integ.";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
@@ -127,19 +126,16 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
 
     procedure GetPOSDescription(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
     var
-        PepperCardType: Record "NPR Pepper Card Type";
         TextDescription: Label '%1:%2';
         TextUnknown: Label 'Card: %1';
     begin
-        with EFTTransactionRequest do begin
-            if ("Card Name" <> '') then begin
-                if (StrLen("Card Number") > 8) then
-                    exit(StrSubstNo(TextDescription, CopyStr("Card Name", 1, 8), CopyStr("Card Number", StrLen("Card Number") - 7)))
-                else
-                    exit(StrSubstNo("Card Name"));
-            end else begin
-                exit(StrSubstNo(TextUnknown, "Card Number"));
-            end;
+        if (EFTTransactionRequest."Card Name" <> '') then begin
+            if (StrLen(EFTTransactionRequest."Card Number") > 8) then
+                exit(StrSubstNo(TextDescription, CopyStr(EFTTransactionRequest."Card Name", 1, 8), CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
+            else
+                exit(StrSubstNo(EFTTransactionRequest."Card Name"));
+        end else begin
+            exit(StrSubstNo(TextUnknown, EFTTransactionRequest."Card Number"));
         end;
     end;
 

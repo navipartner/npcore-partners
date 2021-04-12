@@ -35,7 +35,7 @@ codeunit 6150636 "NPR POS Rounding"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        SaleLinePOS.Init;
+        SaleLinePOS.Init();
         SaleLinePOS."Register No." := SalePOS."Register No.";
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         SaleLinePOS.Date := SalePOS.Date;

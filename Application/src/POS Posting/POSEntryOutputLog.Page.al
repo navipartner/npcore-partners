@@ -16,42 +16,42 @@ page 6150672 "NPR POS Entry Output Log"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("POS Entry No."; "POS Entry No.")
+                field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Entry No. field';
                 }
-                field("Output Timestamp"; "Output Timestamp")
+                field("Output Timestamp"; Rec."Output Timestamp")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Output Timestamp field';
                 }
-                field("Output Type"; "Output Type")
+                field("Output Type"; Rec."Output Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Output Type field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Output Method"; "Output Method")
+                field("Output Method"; Rec."Output Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Output Method field';
                 }
-                field("Output Method Code"; "Output Method Code")
+                field("Output Method Code"; Rec."Output Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Output Method Code field';

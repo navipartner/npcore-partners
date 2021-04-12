@@ -1,4 +1,4 @@
-codeunit 6184511 "NPR EFT Mock Client Integ."
+﻿codeunit 6184511 "NPR EFT Mock Client Integ."
 {
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
@@ -43,11 +43,11 @@ codeunit 6184511 "NPR EFT Mock Client Integ."
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
-        tmpEFTIntegrationType.Init;
+        tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT Mock Client Integ.";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
@@ -55,27 +55,24 @@ codeunit 6184511 "NPR EFT Mock Client Integ."
     begin
         //Any non standard EFT operations are registered here:
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
         tmpEFTAuxOperation.Description := BalanceDescription;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
         tmpEFTAuxOperation.Description := ReprintLastDescription;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     var
-        EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
-        EFTTypePOSUnitBLOBParam: Record "NPR EFTType POSUnit BLOBParam.";
         Blob1: Codeunit "Temp Blob";
         Blob2: Codeunit "Temp Blob";
-        EFTInterface: Codeunit "NPR EFT Interface";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
@@ -94,8 +91,6 @@ codeunit 6184511 "NPR EFT Mock Client Integ."
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
     var
-        EFTTypePaymentBLOBParam: Record "NPR EFTType Paym. BLOB Param.";
-        EFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param.";
         Blob1: Codeunit "Temp Blob";
         Blob2: Codeunit "Temp Blob";
     begin
@@ -258,14 +253,14 @@ codeunit 6184511 "NPR EFT Mock Client Integ."
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
-        if not EFTSetup.FindFirst then begin
+        if not EFTSetup.FindFirst() then begin
             EFTSetup.SetRange("POS Unit No.", '');
-            if not EFTSetup.FindFirst then
+            if not EFTSetup.FindFirst() then
                 exit;
         end;
 
         tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert;
+        tmpEFTSetup.Insert();
     end;
 
     local procedure "// Protocol Response"()
@@ -367,8 +362,6 @@ codeunit 6184511 "NPR EFT Mock Client Integ."
 
     [EventSubscriber(ObjectType::Table, 6184482, 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnSetUnitBlobParameterName(Parameter: Record "NPR EFTType POSUnit BLOBParam."; var Caption: Text)
-    var
-        EFTSetup: Record "NPR EFT Setup";
     begin
         if Parameter."Integration Type" <> IntegrationType() then
             exit;

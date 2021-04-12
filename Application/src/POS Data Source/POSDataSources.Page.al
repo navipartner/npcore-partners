@@ -14,12 +14,12 @@ page 6150708 "NPR POS Data Sources"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -37,11 +37,11 @@ page 6150708 "NPR POS Data Sources"
         Rec.DiscoverDataSources();
         if DataSource <> '' then begin
             Rec.Name := DataSource;
-            if not Rec.Find then
+            if not Rec.Find() then
                 DataSource := '';
         end;
         if DataSource = '' then
-            if Rec.FindFirst then;
+            if Rec.FindFirst() then;
     end;
 
     var

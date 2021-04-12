@@ -47,7 +47,7 @@ page 6151438 "NPR Magento Store List"
                 Caption = 'Items';
                 Image = ViewPage;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Magento Store Item List";
@@ -61,7 +61,7 @@ page 6151438 "NPR Magento Store List"
 
     trigger OnInit()
     begin
-        MultiStore := Rec.Count > 1;
+        MultiStore := Rec.Count() > 1;
     end;
 
     var

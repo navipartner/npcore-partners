@@ -306,7 +306,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
         CompanyInformation.CalcFields(Picture);
 
         if ValueDate = 0D then
-            ValueDate := Today;
+            ValueDate := Today();
     end;
 
     var

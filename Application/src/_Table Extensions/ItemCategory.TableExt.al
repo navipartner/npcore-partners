@@ -1,4 +1,4 @@
-﻿tableextension 6014400 "NPR Item Category" extends "Item Category"
+tableextension 6014400 "NPR Item Category" extends "Item Category"
 {
     fields
     {

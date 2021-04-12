@@ -108,13 +108,13 @@ table 6151422 "NPR Magento Custom Option"
         ItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
     begin
         CustomOptionValue.SetRange("Custom Option No.", "No.");
-        CustomOptionValue.DeleteAll;
+        CustomOptionValue.DeleteAll();
 
         ItemCustomOption.SetRange("Custom Option No.", "No.");
-        ItemCustomOption.DeleteAll;
+        ItemCustomOption.DeleteAll();
 
         ItemCustomOptValue.SetRange("Custom Option No.", "No.");
-        ItemCustomOptValue.DeleteAll;
+        ItemCustomOptValue.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -139,7 +139,7 @@ table 6151422 "NPR Magento Custom Option"
         if "No. Series" <> '' then
             exit;
 
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         MagentoSetup.TestField("Custom Options No. Series");
         "No. Series" := MagentoSetup."Custom Options No. Series";
     end;

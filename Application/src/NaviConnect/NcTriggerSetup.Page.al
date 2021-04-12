@@ -14,12 +14,12 @@ page 6151521 "NPR Nc Trigger Setup"
         {
             group(General)
             {
-                field("Task Template Name"; "Task Template Name")
+                field("Task Template Name"; Rec."Task Template Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Template Name field';
                 }
-                field("Task Batch Name"; "Task Batch Name")
+                field("Task Batch Name"; Rec."Task Batch Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Batch Name field';

@@ -15,32 +15,32 @@ page 6014677 "NPR Endpoint Req. Batch List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Endpoint Code"; "Endpoint Code")
+                field("Endpoint Code"; Rec."Endpoint Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Endpoint Code field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Creation Date"; "Creation Date")
+                field("Creation Date"; Rec."Creation Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Creation Date field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("No. of Requests"; "No. of Requests")
+                field("No. of Requests"; Rec."No. of Requests")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. of Requests field';
@@ -78,7 +78,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
                     trigger OnAction()
                     begin
                         EndpointManagement.SetBatchStatus(Rec, 0);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Set to Ready to Send")
@@ -91,7 +91,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
                     trigger OnAction()
                     begin
                         EndpointManagement.SetBatchStatus(Rec, 1);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Set to Sent")
@@ -104,7 +104,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
                     trigger OnAction()
                     begin
                         EndpointManagement.SetBatchStatus(Rec, 2);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
             }

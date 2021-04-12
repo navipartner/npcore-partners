@@ -71,7 +71,7 @@ page 6150685 "NPR NPRE Kitchen Stations"
                 Caption = 'Kitchen Requests';
                 Image = BlanketOrder;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
@@ -79,9 +79,6 @@ page 6150685 "NPR NPRE Kitchen Stations"
                 ToolTip = 'Executes the Kitchen Requests action';
 
                 trigger OnAction()
-                var
-                    KitchenRequest: Record "NPR NPRE Kitchen Request";
-                    KitchenRequests: Page "NPR NPRE Kitchen Req.";
                 begin
                     Rec.ShowKitchenRequests();
                 end;

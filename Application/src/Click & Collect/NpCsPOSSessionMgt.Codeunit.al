@@ -17,20 +17,20 @@ codeunit 6151205 "NPR NpCs POSSession Mgt."
             exit;
 
         EntryNo := NpCsSaleLinePOSReference."Collect Document Entry No.";
-        NpCsSaleLinePOSReference.Delete;
+        NpCsSaleLinePOSReference.Delete();
 
         NpCsSaleLinePOSReference.SetRange("Register No.", Rec."Register No.");
         NpCsSaleLinePOSReference.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
         NpCsSaleLinePOSReference.SetRange("Sale Date", Rec.Date);
         NpCsSaleLinePOSReference.SetRange("Collect Document Entry No.", EntryNo);
-        if NpCsSaleLinePOSReference.FindSet then
+        if NpCsSaleLinePOSReference.FindSet() then
             repeat
                 if SaleLinePOS.Get(
                   NpCsSaleLinePOSReference."Register No.", NpCsSaleLinePOSReference."Sales Ticket No.",
                   NpCsSaleLinePOSReference."Sale Date", NpCsSaleLinePOSReference."Sale Type", NpCsSaleLinePOSReference."Sale Line No.")
                 then
                     SaleLinePOS.Delete(true);
-            until NpCsSaleLinePOSReference.Next = 0;
+            until NpCsSaleLinePOSReference.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, false)]
@@ -81,10 +81,10 @@ codeunit 6151205 "NPR NpCs POSSession Mgt."
         if NpCsDocument.IsEmpty then
             exit;
 
-        NpCsDocument.FindSet;
+        NpCsDocument.FindSet();
         repeat
             NpCsCollectMgt.DeliverDocument(NpCsDocument);
-        until NpCsDocument.Next = 0;
+        until NpCsDocument.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]

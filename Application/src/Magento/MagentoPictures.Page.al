@@ -1,4 +1,4 @@
-page 6151411 "NPR Magento Pictures"
+﻿page 6151411 "NPR Magento Pictures"
 {
     Caption = 'Magento Pictures';
     InsertAllowed = false;
@@ -100,19 +100,19 @@ page 6151411 "NPR Magento Pictures"
                     Total: Integer;
                 begin
                     Clear(Rec);
-                    Total := Rec.Count;
+                    Total := Rec.Count();
                     Window.Open(Text000);
-                    if Rec.FindSet then
+                    if Rec.FindSet() then
                         repeat
                             Counter += 1;
                             Window.Update(1, Round((Counter / Total) * 10000, 1));
 
                             Rec.Mark(not Rec.TryCheckPicture());
-                        until Rec.Next = 0;
-                    Window.Close;
+                        until Rec.Next() = 0;
+                    Window.Close();
 
                     Rec.MarkedOnly(true);
-                    if Rec.FindFirst then;
+                    if Rec.FindFirst() then;
                 end;
             }
         }
@@ -131,10 +131,10 @@ page 6151411 "NPR Magento Pictures"
         if MiniatureLinePicture then
             Rec.DownloadPicture(TempMagentoPicture2);
 
-        TempMagentoPicture.Init;
+        TempMagentoPicture.Init();
         TempMagentoPicture := Rec;
         TempMagentoPicture.Picture := TempMagentoPicture2.Picture;
-        TempMagentoPicture.Insert;
+        TempMagentoPicture.Insert();
     end;
 
     trigger OnInit()
@@ -163,22 +163,22 @@ page 6151411 "NPR Magento Pictures"
             Rec.Type::Item:
                 begin
                     MagentoPictureLink.SetRange("Picture Name", Rec.Name);
-                    Counter := MagentoPictureLink.Count;
+                    Counter := MagentoPictureLink.Count();
                 end;
             Rec.Type::"Item Group":
                 begin
                     MagentoItemGroup.SetRange(Picture, Rec.Name);
-                    Counter := MagentoItemGroup.Count;
+                    Counter := MagentoItemGroup.Count();
                 end;
             Rec.Type::Brand:
                 begin
                     MagentoBrand.SetRange(Picture, Rec.Name);
-                    Counter := MagentoBrand.Count;
+                    Counter := MagentoBrand.Count();
                 end;
             Rec.Type::Customer:
                 begin
                     MagentoAttributeLabel.SetRange(Image, Rec.Name);
-                    Counter := MagentoAttributeLabel.Count;
+                    Counter := MagentoAttributeLabel.Count();
                 end;
         end;
     end;
@@ -190,7 +190,6 @@ page 6151411 "NPR Magento Pictures"
         MagentoItemGroup: Record "NPR Magento Category";
         MagentoBrand: Record "NPR Magento Brand";
         TempItem: Record Item temporary;
-        TempItem2: Record Item temporary;
     begin
         if Counter <> 0 then begin
             case Rec.Type of
@@ -198,20 +197,20 @@ page 6151411 "NPR Magento Pictures"
                     begin
                         Clear(MagentoPictureLink);
                         MagentoPictureLink.SetRange("Picture Name", Rec.Name);
-                        if MagentoPictureLink.FindSet then
+                        if MagentoPictureLink.FindSet() then
                             repeat
                                 if not TempItem.Get(MagentoPictureLink."Item No.") then begin
                                     if Item.Get(MagentoPictureLink."Item No.") then begin
-                                        TempItem.Init;
+                                        TempItem.Init();
                                         TempItem := Item;
-                                        TempItem.Insert;
+                                        TempItem.Insert();
                                     end else begin
-                                        TempItem.Init;
+                                        TempItem.Init();
                                         TempItem."No." := MagentoPictureLink."Item No.";
-                                        TempItem.Insert;
+                                        TempItem.Insert();
                                     end;
                                 end;
-                            until MagentoPictureLink.Next = 0;
+                            until MagentoPictureLink.Next() = 0;
                         PAGE.Run(PAGE::"Item List", TempItem);
                     end;
                 Rec.Type::"Item Group":
@@ -232,7 +231,7 @@ page 6151411 "NPR Magento Pictures"
 
     local procedure GetMiniatureSetup()
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit;
         MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
         MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];

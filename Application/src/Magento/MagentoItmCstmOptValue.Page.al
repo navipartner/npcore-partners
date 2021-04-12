@@ -1,4 +1,4 @@
-page 6151429 "NPR Magento Itm Cstm Opt.Value"
+﻿page 6151429 "NPR Magento Itm Cstm Opt.Value"
 {
     Caption = 'Magento Item Custom Option Value';
     DeleteAllowed = false;
@@ -74,7 +74,7 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
             exit;
         end;
 
-        ItemCustomOptValue.Init;
+        ItemCustomOptValue.Init();
         ItemCustomOptValue := Rec;
         ItemCustomOptValue.Insert(true);
     end;
@@ -85,7 +85,7 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
         CustomOptionValue: Record "NPR Magento Custom Optn. Value";
         ItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
     begin
-        Rec.DeleteAll;
+        Rec.DeleteAll();
         if (not CustomOption.Get(CustomOptionNo)) or
            not (CustomOption.Type in [CustomOption.Type::SelectDropDown, CustomOption.Type::SelectRadioButtons,
                                             CustomOption.Type::SelectCheckbox, CustomOption.Type::SelectMultiple]) then begin
@@ -94,20 +94,20 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
         end;
 
         CustomOptionValue.SetRange("Custom Option No.", CustomOptionNo);
-        if CustomOptionValue.FindSet then
+        if CustomOptionValue.FindSet() then
             repeat
-                Rec.Init;
+                Rec.Init();
                 if ItemCustomOptValue.Get(ItemNo, CustomOptionValue."Custom Option No.", CustomOptionValue."Line No.") then
                     Rec := ItemCustomOptValue
                 else begin
-                    Rec.Init;
+                    Rec.Init();
                     Rec."Item No." := ItemNo;
                     Rec."Custom Option No." := CustomOptionValue."Custom Option No.";
                     Rec."Custom Option Value Line No." := CustomOptionValue."Line No.";
                     Rec.Enabled := false;
                 end;
-                Rec.Insert;
-            until CustomOptionValue.Next = 0;
+                Rec.Insert();
+            until CustomOptionValue.Next() = 0;
 
         CurrPage.Update(false);
     end;

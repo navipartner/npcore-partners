@@ -252,9 +252,6 @@ report 6060137 "NPR MM Membership Batch Renew"
     local procedure AddToJournal(Membership: Record "NPR MM Membership")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        FromDate: Date;
-        UntilDate: Date;
     begin
 
         MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::ALTERATION_JNL;
@@ -265,7 +262,7 @@ report 6060137 "NPR MM Membership Batch Renew"
         MemberInfoCapture."Membership Code" := Membership."Membership Code";
         MemberInfoCapture."Item No." := RenewUsingItem;
         MemberInfoCapture.Description := RenewDescription;
-        MemberInfoCapture."Document Date" := Today;
+        MemberInfoCapture."Document Date" := Today();
         MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::REGISTERED;
         MemberInfoCapture.Insert();
     end;
@@ -282,7 +279,7 @@ report 6060137 "NPR MM Membership Batch Renew"
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;
         MemberInfoCapture."Membership Code" := Membership."Membership Code";
-        MemberInfoCapture."Document Date" := Today;
+        MemberInfoCapture."Document Date" := Today();
         MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::FAILED;
         MemberInfoCapture."Response Message" := StrSubstNo(ExcludedLbl, CopyStr(Reason, 1, MaxStrLen(MemberInfoCapture."Response Message") - 20));
 

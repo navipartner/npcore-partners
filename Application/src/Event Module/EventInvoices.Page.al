@@ -19,50 +19,50 @@ page 6151587 "NPR Event Invoices"
         {
             repeater(Group)
             {
-                field("Document Type"; "Document Type")
+                field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Quantity Transferred"; "Quantity Transferred")
+                field("Quantity Transferred"; Rec."Quantity Transferred")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity Transferred field';
                 }
-                field("Transferred Date"; "Transferred Date")
+                field("Transferred Date"; Rec."Transferred Date")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
                     ToolTip = 'Specifies the value of the Transferred Date field';
                 }
-                field("Invoiced Date"; "Invoiced Date")
+                field("Invoiced Date"; Rec."Invoiced Date")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
                     ToolTip = 'Specifies the value of the Invoiced Date field';
                 }
-                field("Invoiced Amount (LCY)"; "Invoiced Amount (LCY)")
+                field("Invoiced Amount (LCY)"; Rec."Invoiced Amount (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Invoiced Amount (LCY) field';
                 }
-                field("Invoiced Cost Amount (LCY)"; "Invoiced Cost Amount (LCY)")
+                field("Invoiced Cost Amount (LCY)"; Rec."Invoiced Cost Amount (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Invoiced Cost Amount (LCY) field';
                 }
-                field("Job Ledger Entry No."; "Job Ledger Entry No.")
+                field("Job Ledger Entry No."; Rec."Job Ledger Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
@@ -86,7 +86,7 @@ page 6151587 "NPR Event Invoices"
                     Ellipsis = true;
                     Image = GetSourceDoc;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -98,7 +98,7 @@ page 6151587 "NPR Event Invoices"
                     begin
                         EventMgt.OpenSalesDocument(Rec);
                         JobCreateInvoice.FindInvoices(Rec, JobNo, JobTaskNo, JobPlanningLineNo, DetailLevel);
-                        if Get("Job No.", "Job Task No.", "Job Planning Line No.", "Document Type", "Document No.", "Line No.") then;
+                        if Rec.Get(Rec."Job No.", Rec."Job Task No.", Rec."Job Planning Line No.", Rec."Document Type", Rec."Document No.", Rec."Line No.") then;
                     end;
                 }
             }
@@ -111,8 +111,6 @@ page 6151587 "NPR Event Invoices"
     end;
 
     trigger OnOpenPage()
-    var
-        JobCreateInvoice: Codeunit "Job Create-Invoice";
     begin
         EventMgt.FindInvoices(Rec, JobNo, JobTaskNo, JobPlanningLineNo, DetailLevel);
     end;

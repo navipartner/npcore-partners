@@ -83,7 +83,7 @@ table 6059904 "NPR Task Log (Task)"
                 InStream: InStream;
             begin
                 CalcFields("Last Error Message BLOB");
-                if "Last Error Message BLOB".HasValue then begin
+                if "Last Error Message BLOB".HasValue() then begin
                     "Last Error Message BLOB".CreateInStream(InStream);
                     while not InStream.EOS do begin
                         InStream.ReadText(Text);
@@ -134,14 +134,12 @@ table 6059904 "NPR Task Log (Task)"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                "Object": Record "Object";
             begin
             end;
         }
         field(42; "No. of Output Log Entries"; Integer)
         {
-            CalcFormula = Count ("NPR Task Output Log" WHERE("Task Log Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR Task Output Log" WHERE("Task Log Entry No." = FIELD("Entry No.")));
             Caption = 'No. of Output Log Entries';
             FieldClass = FlowField;
         }
@@ -168,11 +166,11 @@ table 6059904 "NPR Task Log (Task)"
     procedure AddLogInit(TaskQueue: Record "NPR Task Queue"; TaskLine: Record "NPR Task Line") AddedEntryNo: Integer
     begin
         //-TQ1.28
-        //TaskLog.LOCKTABLE;
-        //IF TaskLog.FINDLAST THEN;
+        //TaskLog.LockTable();
+        //IF TaskLog.FindLast() THEN;
         //+TQ1.28
 
-        Init;
+        Init();
         //-TQ1.28
         //"Entry No." := TaskLog."Entry No." + 1;
         "Entry No." := 0;
@@ -191,7 +189,7 @@ table 6059904 "NPR Task Log (Task)"
         "Server Instance ID" := ServiceInstanceId;
         "Session ID" := SessionId;
 
-        Insert;
+        Insert();
         //-TQ1.29
         TaskQueueAdd2Log.SetCurrentLogEntryNo("Entry No.");
         //+TQ1.29
@@ -204,7 +202,7 @@ table 6059904 "NPR Task Log (Task)"
         OutStream: OutStream;
         TMPText: Text[1024];
     begin
-        TaskLog.LockTable;
+        TaskLog.LockTable();
         //-TQ1.28
         //TaskLog.GET(TaskQueueManager.GetCurrentLogEntryNo);
         Get(OrgEntryNo);
@@ -226,21 +224,20 @@ table 6059904 "NPR Task Log (Task)"
             "Last Error Message" := CopyStr(TMPText, 1, MaxStrLen("Last Error Message"));
             ClearLastError;
         end;
-        Modify;
+        Modify();
     end;
 
     procedure AddLogOtherFailure(TaskQueue: Record "NPR Task Queue"; TaskLine: Record "NPR Task Line") AddedEntryNo: Integer
     var
-        TaskLog: Record "NPR Task Log (Task)";
         TMPText: Text[1024];
         OutStream: OutStream;
     begin
         //-TQ1.28
-        //TaskLog.LOCKTABLE;
-        //IF TaskLog.FINDLAST THEN;
+        //TaskLog.LockTable();
+        //IF TaskLog.FindLast() THEN;
         //+TQ1.28
 
-        Init;
+        Init();
         //-TQ1.28
         //"Entry No." := TaskLog."Entry No." + 1;
         "Entry No." := 0;
@@ -267,21 +264,19 @@ table 6059904 "NPR Task Log (Task)"
         "Server Instance ID" := ServiceInstanceId;
         "Session ID" := SessionId;
 
-        Insert;
+        Insert();
         ClearLastError;
         exit("Entry No.");
     end;
 
     procedure AddMovedTask(TaskQueue: Record "NPR Task Queue"; TaskLine: Record "NPR Task Line")
-    var
-        TaskLog: Record "NPR Task Log (Task)";
     begin
         //-TQ1.28
-        //TaskLog.LOCKTABLE;
-        //IF TaskLog.FINDLAST THEN;
+        //TaskLog.LockTable();
+        //IF TaskLog.FindLast() THEN;
         //+TQ1.28
 
-        Init;
+        Init();
         //-TQ1.28
         //"Entry No." := TaskLog."Entry No." + 1;
         "Entry No." := 0;
@@ -300,22 +295,21 @@ table 6059904 "NPR Task Log (Task)"
         "Server Instance ID" := ServiceInstanceId;
         "Session ID" := SessionId;
 
-        Insert;
+        Insert();
     end;
 
     procedure AddMessage(TaskLine: Record "NPR Task Line"; MessageText: Text[1024])
     var
-        TaskLog: Record "NPR Task Log (Task)";
         TMPText: Text[1024];
         OutStream: OutStream;
     begin
         //-TQ1.17
         //-TQ1.28
-        //TaskLog.LOCKTABLE;
-        //IF TaskLog.FINDLAST THEN;
+        //TaskLog.LockTable();
+        //IF TaskLog.FindLast() THEN;
         //+TQ1.28
 
-        Init;
+        Init();
         //-TQ1.28
         //"Entry No." := TaskLog."Entry No." + 1;
         "Entry No." := 0;
@@ -334,7 +328,7 @@ table 6059904 "NPR Task Log (Task)"
         "Last Error Message BLOB".CreateOutStream(OutStream);
         OutStream.WriteText(TMPText);
         "Last Error Message" := CopyStr(TMPText, 1, MaxStrLen("Last Error Message"));
-        Insert;
+        Insert();
         //+TQ1.17
     end;
 

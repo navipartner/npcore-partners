@@ -110,8 +110,8 @@ page 6150616 "NPR POS Unit List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(POSUnit);
-                            DefaultDimMultiple.SetMultiRecord(POSUnit, FieldNo("No."));
-                            DefaultDimMultiple.RunModal;
+                            DefaultDimMultiple.SetMultiRecord(POSUnit, Rec.FieldNo("No."));
+                            DefaultDimMultiple.RunModal();
                         end;
                     }
                 }

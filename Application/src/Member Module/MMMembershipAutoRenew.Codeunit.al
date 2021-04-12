@@ -1,4 +1,4 @@
-codeunit 6060148 "NPR MM Membership Auto Renew"
+﻿codeunit 6060148 "NPR MM Membership Auto Renew"
 {
 
     trigger OnRun()
@@ -265,7 +265,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
                         exit(false);
 
                     if (not MembershipAutoRenew.Get(MemberInfoCapture."Auto-Renew Entry No.")) then
-                        MembershipAutoRenew.Init;
+                        MembershipAutoRenew.Init();
                     exit(CreateDocument(MemberInfoCapture, ValidFromDate, ValidUntilDate, Membership, MembershipAutoRenew));
                 end;
             MembershipSetup."Auto-Renew Model"::CUSTOMER_BALANCE:
@@ -287,7 +287,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         LineNo: Integer;
     begin
 
-        SalesHeader.Init;
+        SalesHeader.Init();
         SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
         SalesHeader."No." := '';
         SalesHeader.Insert(true);
@@ -364,39 +364,35 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         RecurringPaymentSetup.TestField("Gen. Journal Batch Name");
         RecurringPaymentSetup.TestField("Revenue Account");
 
-        with TmpGenJournalLine do begin
+        TmpGenJournalLine.Validate("Journal Template Name", RecurringPaymentSetup."Gen. Journal Template Name");
+        TmpGenJournalLine.Validate("Journal Batch Name", RecurringPaymentSetup."Gen. Journal Batch Name");
 
-            Validate("Journal Template Name", RecurringPaymentSetup."Gen. Journal Template Name");
-            Validate("Journal Batch Name", RecurringPaymentSetup."Gen. Journal Batch Name");
+        TmpGenJournalLine."Line No." := 10000;
+        TmpGenJournalLine.Insert(true);
 
-            "Line No." := 10000;
-            Insert(true);
+        TmpGenJournalLine.Validate("Posting Date", Today);
+        TmpGenJournalLine.Validate("Document Date", Today);
 
-            Validate("Posting Date", Today);
-            Validate("Document Date", Today);
+        TmpGenJournalLine.Validate("Document Type", TmpGenJournalLine."Document Type"::Invoice);
+        if (RecurringPaymentSetup."Document No. Series" <> '') then
+            TmpGenJournalLine."Posting No. Series" := RecurringPaymentSetup."Document No. Series";
+        TmpGenJournalLine."Document No." := NoSeriesManagement.GetNextNo(TmpGenJournalLine."Posting No. Series", TmpGenJournalLine."Posting Date", true);
 
-            Validate("Document Type", TmpGenJournalLine."Document Type"::Invoice);
-            if (RecurringPaymentSetup."Document No. Series" <> '') then
-                "Posting No. Series" := RecurringPaymentSetup."Document No. Series";
-            "Document No." := NoSeriesManagement.GetNextNo("Posting No. Series", "Posting Date", true);
+        TmpGenJournalLine."Account Type" := TmpGenJournalLine."Account Type"::Customer;
+        TmpGenJournalLine.Validate("Account No.", Membership."Customer No.");
 
-            "Account Type" := TmpGenJournalLine."Account Type"::Customer;
-            Validate("Account No.", Membership."Customer No.");
+        TmpGenJournalLine."Bal. Account Type" := TmpGenJournalLine."Bal. Account Type"::"G/L Account";
+        TmpGenJournalLine.Validate("Bal. Account No.", RecurringPaymentSetup."Revenue Account");
 
-            "Bal. Account Type" := "Bal. Account Type"::"G/L Account";
-            Validate("Bal. Account No.", RecurringPaymentSetup."Revenue Account");
+        if (RecurringPaymentSetup."Payment Terms Code" <> '') then
+            TmpGenJournalLine.Validate("Payment Terms Code", RecurringPaymentSetup."Payment Terms Code");
 
-            if (RecurringPaymentSetup."Payment Terms Code" <> '') then
-                Validate("Payment Terms Code", RecurringPaymentSetup."Payment Terms Code");
+        TmpGenJournalLine.Validate(Amount, MemberInfoCapture."Unit Price");
+        TmpGenJournalLine.Validate(Description, StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", ValidFromDate, ValidUntilDate));
 
-            Validate(Amount, MemberInfoCapture."Unit Price");
-            Validate(Description, StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", ValidFromDate, ValidUntilDate));
+        TmpGenJournalLine."External Document No." := MemberInfoCapture."Document No.";
 
-            "External Document No." := MemberInfoCapture."Document No.";
-
-            Modify(true);
-
-        end;
+        TmpGenJournalLine.Modify(true);
 
         GenJnlPostLine.Run(TmpGenJournalLine);
 
@@ -419,7 +415,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
 
         CopyDocumentMgt.SetPropertiesForInvoiceCorrection(true); //NAV 2017
 
-        SalesHeader.Init;
+        SalesHeader.Init();
         SalesHeader."Document Type" := SalesHeader."Document Type"::"Credit Memo";
         SalesHeader."No." := '';
         SalesHeader."External Document No." := PostedInvoiceNumber;
@@ -483,7 +479,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         MemberInfoCapture."Response Message" := CopyStr(ErrorDescription, 1, MaxStrLen(MemberInfoCapture."Response Message"));
     end;
 
-    local procedure CreateErrorLogEntry(MembershipEntryNo: Integer; var TmpMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary; ReasonText: Text) EntryNo: Integer
+    local procedure CreateErrorLogEntry(MembershipEntryNo: Integer; var TmpMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary; ReasonText: Text): Integer
     var
         Membership: Record "NPR MM Membership";
         MemberInfoCapture: Record "NPR MM Member Info Capture";

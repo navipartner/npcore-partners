@@ -30,69 +30,69 @@ page 6059905 "NPR Task Queue"
             }
             repeater(Group)
             {
-                field(Company; Company)
+                field(Company; Rec.Company)
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Company field';
                 }
-                field("Task Template"; "Task Template")
+                field("Task Template"; Rec."Task Template")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Task Template field';
                 }
-                field("Task Batch"; "Task Batch")
+                field("Task Batch"; Rec."Task Batch")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Task Batch field';
                 }
-                field("Task Line No."; "Task Line No.")
+                field("Task Line No."; Rec."Task Line No.")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Task Line No. field';
                 }
-                field("Next Run time"; "Next Run time")
+                field("Next Run time"; Rec."Next Run time")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Next Run time field';
                 }
-                field("Task Worker Group"; "Task Worker Group")
+                field("Task Worker Group"; Rec."Task Worker Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Worker Group field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Assigned To User"; "Assigned To User")
+                field("Assigned To User"; Rec."Assigned To User")
                 {
                     ApplicationArea = All;
                     DrillDown = false;
                     Lookup = false;
                     ToolTip = 'Specifies the value of the Assigned To User field';
                 }
-                field("Assigned Time"; "Assigned Time")
+                field("Assigned Time"; Rec."Assigned Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Assigned Time field';
                 }
-                field("Started Time"; "Started Time")
+                field("Started Time"; Rec."Started Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Started Time field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field("Estimated Duration"; "Estimated Duration")
+                field("Estimated Duration"; Rec."Estimated Duration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Estimated Duration field';
@@ -108,7 +108,7 @@ page 6059905 "NPR Task Queue"
     trigger OnModifyRecord(): Boolean
     begin
         //-TQ1.28
-        if Company <> CompanyName then
+        if Rec.Company <> CompanyName then
             Error(Text001);
         //+TQ1.28
     end;

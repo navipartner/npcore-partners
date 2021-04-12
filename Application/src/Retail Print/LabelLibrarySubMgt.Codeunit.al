@@ -128,8 +128,6 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PurchaseLine: Record "Purchase Line";
         TransferHeader: Record "Transfer Header";
         TransferLine: Record "Transfer Line";
-        ItemJournalTemplate: Record "Item Journal Template";
-        ItemJnlLine: Record "Item Journal Line";
         TransferShipmentHeader: Record "Transfer Shipment Header";
         TransferShipmentLine: Record "Transfer Shipment Line";
         PeriodDiscount: Record "NPR Period Discount";
@@ -196,7 +194,7 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
                 end;
             else begin
                     RecRef := RecRef2;
-                    RecRef.SetRecFilter;
+                    RecRef.SetRecFilter();
                 end;
         end;
         if FromPrintLabelFunction then begin

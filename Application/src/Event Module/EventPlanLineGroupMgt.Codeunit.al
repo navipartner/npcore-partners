@@ -1,4 +1,4 @@
-codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
+﻿codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
 {
     var
         NoDaysSetErr: Label 'You need to set at least one day of the week.';
@@ -24,7 +24,6 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         EventPlanLineBuffer: Record "NPR Event Plan. Line Buffer" temporary;
         Date: Record Date;
         EventPeriodDistrDlg: Page "NPR Event Period Distr. Dialog";
-        EventPlanLineBufferList: Page "NPR Event Plan. Line Buffer";
         DaysOfWeek: array[7] of Boolean;
         LineNo: Integer;
     begin
@@ -32,7 +31,7 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         if not Confirm(RecreateConfirm) then
             exit;
         EventPeriodDistrDlg.SetParameters(Rec);
-        if EventPeriodDistrDlg.RunModal <> ACTION::OK then
+        if EventPeriodDistrDlg.RunModal() <> ACTION::OK then
             exit;
         EventPeriodDistrDlg.GetParameters(JobPlanningLineTemp, DaysOfWeek);
         CheckParameters(JobPlanningLineTemp, DaysOfWeek);
@@ -40,20 +39,20 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         BackupCurrentDistribution(Rec, JobPlanningLineBackupTemp);
         NewRec := Rec;
         Rec.Delete(true);
-        Commit; //lines need to be deleted here as InsertBuffer has availability check which must not take current lines -
-                //if this process will require changing, will revert back to deleting after last OK is pressed and COMMIT will not be needed
-                //but this means that avaialbility check will take current lines into consideration as well
-                //this means BackupCurrentDistribution and RestoreOldDistribution will not be needed
+        Commit(); //lines need to be deleted here as InsertBuffer has availability check which must not take current lines -
+                  //if this process will require changing, will revert back to deleting after last OK is pressed and COMMIT will not be needed
+                  //but this means that avaialbility check will take current lines into consideration as well
+                  //this means BackupCurrentDistribution and RestoreOldDistribution will not be needed
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
         Date.SetRange("Period Start", JobPlanningLineTemp."Planning Date", JobPlanningLineTemp."Planned Delivery Date");
         Date.SetFilter("Period No.", PrepareDaysFilter(DaysOfWeek));
-        if Date.FindSet then
+        if Date.FindSet() then
             repeat
                 LineNo += 10000;
                 JobPlanningLineTemp."Planning Date" := Date."Period Start";
                 InsertBuffer(JobPlanningLineTemp, LineNo, EventPlanLineBuffer);
-            until Date.Next = 0;
+            until Date.Next() = 0;
 
         EventPlanLineBuffer.FilterGroup := 2;
         EventPlanLineBuffer.SetRange("Job No.", Rec."Job No.");
@@ -93,7 +92,7 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
 
     local procedure InsertBuffer(var JobPlanningLine: Record "Job Planning Line"; LineNo: Integer; var EventPlanLineBuffer: Record "NPR Event Plan. Line Buffer")
     begin
-        EventPlanLineBuffer.Init;
+        EventPlanLineBuffer.Init();
         EventPlanLineBuffer."Job No." := JobPlanningLine."Job No.";
         EventPlanLineBuffer."Job Task No." := JobPlanningLine."Job Task No.";
         EventPlanLineBuffer."Job Planning Line No." := JobPlanningLine."Line No.";
@@ -105,9 +104,9 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         EventPlanLineBuffer."Unit of Measure Code" := JobPlanningLine."Unit of Measure Code";
         EventPlanLineBuffer.Type := JobPlanningLine.Type.AsInteger();
         EventPlanLineBuffer."No." := JobPlanningLine."No.";
-        EventPlanLineBuffer.Insert;
+        EventPlanLineBuffer.Insert();
         CheckCapAndTimeAvailability(JobPlanningLine, EventPlanLineBuffer);
-        EventPlanLineBuffer.Modify;
+        EventPlanLineBuffer.Modify();
     end;
 
     local procedure CheckCapAndTimeAvailability(var JobPlanningLine: Record "Job Planning Line"; var EventPlanLineBuffer: Record "NPR Event Plan. Line Buffer")
@@ -167,7 +166,7 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         JobPlanningLineTemp."Unit of Measure Code" := EventPlanLineBuffer."Unit of Measure Code";
         CheckCapAndTimeAvailability(JobPlanningLineTemp, EventPlanLineBuffer);
         if WithModify then
-            EventPlanLineBuffer.Modify;
+            EventPlanLineBuffer.Modify();
     end;
 
     procedure CalcTimeQty(StartTime: Time; EndTime: Time; var Quantity: Decimal)
@@ -192,11 +191,11 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
             JobPlanningLine.SetRange("Job No.", Rec."Job No.");
             JobPlanningLine.SetRange("Job Task No.", Rec."Job Task No.");
             JobPlanningLine.SetRange("NPR Group Source Line No.", Rec."Line No.");
-            if JobPlanningLine.FindSet then
+            if JobPlanningLine.FindSet() then
                 repeat
                     JobPlanningLine.TestField("Qty. Transferred to Invoice", 0);
                     JobPlanningLine.TestField("Qty. Invoiced", 0);
-                until JobPlanningLine.Next = 0;
+                until JobPlanningLine.Next() = 0;
         end;
     end;
 
@@ -219,36 +218,36 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         LineNo := 10000;
         JobPlanningLine2.SetRange("Job No.", Rec."Job No.");
         JobPlanningLine2.SetRange("Job Task No.", Rec."Job Task No.");
-        if JobPlanningLine2.FindLast then
+        if JobPlanningLine2.FindLast() then
             LineNo := JobPlanningLine2."Line No." + 10000;
 
         EventPlanLineBuffer.SetRange(Type, EventPlanLineBuffer.Type::Resource);
-        if EventPlanLineBuffer.FindSet then
+        if EventPlanLineBuffer.FindSet() then
             repeat
                 if not ResourceTemp.Get(EventPlanLineBuffer."No.") then begin
                     ResourceTemp."No." := EventPlanLineBuffer."No.";
-                    ResourceTemp.Insert;
+                    ResourceTemp.Insert();
                 end;
-            until EventPlanLineBuffer.Next = 0;
-        if ResourceTemp.FindSet then
+            until EventPlanLineBuffer.Next() = 0;
+        if ResourceTemp.FindSet() then
             repeat
                 Resource.Get(Rec."No.");
                 Rec."No." := Resource."No.";
                 Rec."Line No." := LineNo;
                 Rec."NPR Group Line" := true;
-                Rec.Insert;
+                Rec.Insert();
                 LineNo += 10000;
                 EventPlanLineBuffer.SetRange("No.", ResourceTemp."No.");
-                if EventPlanLineBuffer.FindSet then
+                if EventPlanLineBuffer.FindSet() then
                     repeat
-                        JobPlanningLine2.Init;
+                        JobPlanningLine2.Init();
                         JobPlanningLine2."Job No." := Rec."Job No.";
                         JobPlanningLine2."Job Task No." := Rec."Job Task No.";
                         JobPlanningLine2."Line No." := LineNo;
                         JobPlanningLine2."NPR Skip Cap./Avail. Check" := EventPlanLineBuffer."Status Checked";
                         JobPlanningLine2."NPR Group Source Line No." := Rec."Line No.";
                         JobPlanningLine2."NPR Group Line" := true;
-                        JobPlanningLine2.Insert;
+                        JobPlanningLine2.Insert();
                         JobPlanningLine2.Validate("Line Type", Rec."Line Type");
                         JobPlanningLine2.Validate("Planning Date", EventPlanLineBuffer."Planning Date");
                         JobPlanningLine2.Validate(Type, EventPlanLineBuffer.Type::Resource);
@@ -265,10 +264,10 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
                             MinDate := JobPlanningLine2."Planning Date";
                         if JobPlanningLine2."Planning Date" > MaxDate then
                             MaxDate := JobPlanningLine2."Planning Date";
-                    until EventPlanLineBuffer.Next = 0;
+                    until EventPlanLineBuffer.Next() = 0;
                 Rec."Description 2" := StrSubstNo(Desc2AsPeriod, Format(MinDate), Format(MaxDate), Format(EventPlanLineBuffer.Count));
-                Rec.Modify;
-            until ResourceTemp.Next = 0;
+                Rec.Modify();
+            until ResourceTemp.Next() = 0;
     end;
 
     local procedure BackupCurrentDistribution(Rec: Record "Job Planning Line"; var RecBackup: Record "Job Planning Line")
@@ -276,26 +275,26 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         JobPlanningLine: Record "Job Planning Line";
     begin
         RecBackup := Rec;
-        RecBackup.Insert;
+        RecBackup.Insert();
         JobPlanningLine.SetRange("Job No.", Rec."Job No.");
         JobPlanningLine.SetRange("Job Task No.", Rec."Job Task No.");
         JobPlanningLine.SetRange("NPR Group Source Line No.", Rec."Line No.");
-        if JobPlanningLine.FindSet then
+        if JobPlanningLine.FindSet() then
             repeat
                 RecBackup := JobPlanningLine;
-                RecBackup.Insert;
-            until JobPlanningLine.Next = 0;
+                RecBackup.Insert();
+            until JobPlanningLine.Next() = 0;
     end;
 
     local procedure RestoreOldDistribution(var RecBackup: Record "Job Planning Line")
     var
         JobPlanningLine: Record "Job Planning Line";
     begin
-        if RecBackup.FindSet then
+        if RecBackup.FindSet() then
             repeat
                 JobPlanningLine := RecBackup;
-                JobPlanningLine.Insert;
-            until RecBackup.Next = 0;
+                JobPlanningLine.Insert();
+            until RecBackup.Next() = 0;
     end;
 }
 

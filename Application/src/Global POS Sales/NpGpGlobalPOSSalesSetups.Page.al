@@ -14,17 +14,17 @@ page 6151171 "NPR NpGp Global POSSalesSetups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Service Url"; "Service Url")
+                field("Service Url"; Rec."Service Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Service Url field';

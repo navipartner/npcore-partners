@@ -182,7 +182,7 @@ page 6151414 "NPR Magento Category Card"
                     MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::"Item Group");
                     MagentoDisplayConfig.SetRange("No.", Rec.Id);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
-                    MagentoDisplayConfigPage.Run;
+                    MagentoDisplayConfigPage.Run();
                 end;
             }
         }
@@ -190,7 +190,7 @@ page 6151414 "NPR Magento Category Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        MagentoItemGroupSubformVisible := Rec.Find;
+        MagentoItemGroupSubformVisible := Rec.Find();
         CurrPage.MagentoChildCategories.PAGE.SetParentItemGroup(Rec);
         CurrPage.PictureDragDropAddin.PAGE.SetItemGroupNo(Rec.Id, false);
         CurrPage.IconPictureDragDropAddin.PAGE.SetItemGroupNo(Rec.Id, true);
@@ -216,6 +216,6 @@ page 6151414 "NPR Magento Category Card"
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        DisplayConfigVisible := MagentoSetup.Get and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
+        DisplayConfigVisible := MagentoSetup.Get() and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
     end;
 }

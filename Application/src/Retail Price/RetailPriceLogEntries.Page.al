@@ -19,74 +19,74 @@ page 6014475 "NPR Retail Price Log Entries"
         {
             repeater(Group)
             {
-                field("Date and Time"; "Date and Time")
+                field("Date and Time"; Rec."Date and Time")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Date and Time field';
                 }
-                field("Date"; Date)
+                field("Date"; Rec.Date)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date field';
                 }
-                field("Time"; Time)
+                field("Time"; Rec.Time)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Time field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Change Log Entry No."; "Change Log Entry No.")
+                field("Change Log Entry No."; Rec."Change Log Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Change Log Entry No. field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table Caption"; "Table Caption")
+                field("Table Caption"; Rec."Table Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Caption field';
                 }
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Caption"; "Field Caption")
+                field("Field Caption"; Rec."Field Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Caption field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Old Value"; "Old Value")
+                field("Old Value"; Rec."Old Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Old Value field';
                 }
-                field("New Value"; "New Value")
+                field("New Value"; Rec."New Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the New Value field';
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -106,7 +106,7 @@ page 6014475 "NPR Retail Price Log Entries"
                 Caption = 'Update Price Log';
                 Image = RefreshLines;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -17,52 +17,52 @@ page 6060139 "NPR MM Create Membership"
             repeater(Group)
             {
                 Editable = false;
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field("Valid From Base"; "Valid From Base")
+                field("Valid From Base"; Rec."Valid From Base")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid From Base field';
                 }
-                field("Sales Cut-Off Date Calculation"; "Sales Cut-Off Date Calculation")
+                field("Sales Cut-Off Date Calculation"; Rec."Sales Cut-Off Date Calculation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Cut-Off Date Calculation field';
                 }
-                field("Valid From Date Calculation"; "Valid From Date Calculation")
+                field("Valid From Date Calculation"; Rec."Valid From Date Calculation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid From Date Calculation field';
                 }
-                field("Valid Until Calculation"; "Valid Until Calculation")
+                field("Valid Until Calculation"; Rec."Valid Until Calculation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid Until Calculation field';
                 }
-                field("Duration Formula"; "Duration Formula")
+                field("Duration Formula"; Rec."Duration Formula")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Duration Formula field';
@@ -145,12 +145,12 @@ page 6060139 "NPR MM Create Membership"
         // COMMIT ();
         //
         // MemberInfoCapturePage.LOOKUPMODE (TRUE);
-        // PageAction := MemberInfoCapturePage.RUNMODAL ();
+        // PageAction := MemberInfoCapturePage.RunModal() ();
         //
         // IF (PageAction = ACTION::LookupOK) THEN BEGIN
         //  MemberInfoCapturePage.GETRECORD (MemberInfoCapture);
         //  MembershipEntryNo := MembershipManagement.CreateMembershipAll (Rec, MemberInfoCapture, TRUE);
-        //  Membership.GET (MembershipEntryNo);
+        //  Membership.Get() (MembershipEntryNo);
         //  MembershipPage.SETRECORD (Membership);
         //  MembershipPage.RUN ();
         // END;

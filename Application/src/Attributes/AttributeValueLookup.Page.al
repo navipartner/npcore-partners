@@ -15,23 +15,23 @@ page 6014609 "NPR Attribute Value Lookup"
         {
             repeater(Group)
             {
-                field("Attribute Code"; "Attribute Code")
+                field("Attribute Code"; Rec."Attribute Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Attribute Code field';
                 }
-                field("Attribute Value Code"; "Attribute Value Code")
+                field("Attribute Value Code"; Rec."Attribute Value Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute Value Code field';
                 }
-                field("Attribute Value Name"; "Attribute Value Name")
+                field("Attribute Value Name"; Rec."Attribute Value Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute Value Name field';
                 }
-                field("Attribute Value Description"; "Attribute Value Description")
+                field("Attribute Value Description"; Rec."Attribute Value Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute Value Description field';

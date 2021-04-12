@@ -3,7 +3,7 @@ page 6060126 "NPR MM Members"
 
     Caption = 'Members';
     CardPageID = "NPR MM Member Card";
-    DataCaptionExpression = "External Member No.";
+    DataCaptionExpression = Rec."External Member No.";
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
@@ -18,82 +18,82 @@ page 6060126 "NPR MM Members"
         {
             repeater(Group)
             {
-                field("External Member No."; "External Member No.")
+                field("External Member No."; Rec."External Member No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Member No. field';
                 }
-                field("First Name"; "First Name")
+                field("First Name"; Rec."First Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the First Name field';
                 }
-                field("Middle Name"; "Middle Name")
+                field("Middle Name"; Rec."Middle Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Middle Name field';
                 }
-                field("Last Name"; "Last Name")
+                field("Last Name"; Rec."Last Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Name field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field(Gender; Gender)
+                field(Gender; Rec.Gender)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Gender field';
                 }
-                field(Birthday; Birthday)
+                field(Birthday; Rec.Birthday)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Birthday field';
                 }
-                field("Contact No."; "Contact No.")
+                field("Contact No."; Rec."Contact No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact No. field';
                 }
-                field("E-Mail News Letter"; "E-Mail News Letter")
+                field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
                 }
-                field("E-Mail Address"; "E-Mail Address")
+                field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
-                field("Phone No."; "Phone No.")
+                field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Address field';
                 }
-                field("Post Code Code"; "Post Code Code")
+                field("Post Code Code"; Rec."Post Code Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the ZIP Code field';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the City field';
                 }
-                field(Country; Country)
+                field(Country; Rec.Country)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Country field';
                 }
-                field("Display Name"; "Display Name")
+                field("Display Name"; Rec."Display Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Display Name field';
@@ -303,7 +303,7 @@ page 6060126 "NPR MM Members"
                     ResponseMessage: Text;
                 begin
 
-                    if (not MemberWebService.MemberRegisterArrival("External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
+                    if (not MemberWebService.MemberRegisterArrival(Rec."External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
                         Error(ResponseMessage);
 
                     Message(ResponseMessage);
@@ -344,7 +344,7 @@ page 6060126 "NPR MM Members"
                     if (not NPRAttrManagement.SetAttributeFilter(NPRAttributeValueSet)) then
                         exit;
 
-                    SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
+                    Rec.SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
 
                 end;
             }
@@ -401,7 +401,7 @@ page 6060126 "NPR MM Members"
                     begin
 
                         if (Membership."Customer No." = '') then
-                            Error(NO_ENTRIES, "External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
@@ -426,7 +426,7 @@ page 6060126 "NPR MM Members"
                     begin
 
                         if (Membership."Customer No." = '') then
-                            Error(NO_ENTRIES, "External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
@@ -442,7 +442,7 @@ page 6060126 "NPR MM Members"
     begin
 
         Clear(Membership);
-        MembershipRole.SetRange("Member Entry No.", "Entry No.");
+        MembershipRole.SetRange("Member Entry No.", Rec."Entry No.");
         MembershipRole.SetRange(Blocked, false);
         if MembershipRole.FindFirst() then
             Membership.Get(MembershipRole."Membership Entry No.");
@@ -474,7 +474,7 @@ page 6060126 "NPR MM Members"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
-        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
 
     end;
 
@@ -501,14 +501,14 @@ page 6060126 "NPR MM Members"
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
 
-        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
+        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, Rec."Entry No.", NPRAttrTextArray[AttributeNumber]);
 
     end;
 
     local procedure GetMasterDataAttributeValue()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, "Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
 
     end;
@@ -579,7 +579,6 @@ page 6060126 "NPR MM Members"
         MemberCommunity: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
-        MembershipPage: Page "NPR MM Membership Card";
         PageAction: Action;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin

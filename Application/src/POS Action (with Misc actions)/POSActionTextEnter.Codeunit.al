@@ -21,7 +21,7 @@ codeunit 6150722 "NPR POS Action: Text Enter"
         Sender.DiscoverAction(
           ActionCode,
           ActionDescription,
-          ActionVersion,
+          ActionVersion(),
           Sender.Type::BackEnd,
           Sender."Subscriber Instances Allowed"::Single);
     end;
@@ -36,7 +36,7 @@ codeunit 6150722 "NPR POS Action: Text Enter"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);

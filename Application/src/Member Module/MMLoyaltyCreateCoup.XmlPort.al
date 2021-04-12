@@ -48,7 +48,7 @@ xmlport 6060148 "NPR MM Loyalty Create Coup."
                     trigger OnBeforeInsertRecord()
                     begin
 
-                        tmpMemberInfoCapture."Document Date" := Today;
+                        tmpMemberInfoCapture."Document Date" := Today();
                     end;
                 }
                 tableelement(tmpmembershipresponse; "NPR MM Membership")
@@ -216,9 +216,6 @@ xmlport 6060148 "NPR MM Loyalty Create Coup."
     procedure AddResponse(MembershipEntryNo: Integer; var TmpCoupon: Record "NPR NpDc Coupon" temporary; ResponseMessageIn: Text)
     var
         Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        Member: Record "NPR MM Member";
-        MembershipRole: Record "NPR MM Membership Role";
     begin
 
         if (MembershipEntryNo <= 0) then begin

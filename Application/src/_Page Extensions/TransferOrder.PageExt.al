@@ -14,7 +14,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Ellipsis = true;
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Print action';
@@ -24,7 +24,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Caption = 'Price Label';
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -38,7 +38,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Caption = 'Import From Scanner File';
                 Image = Import;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import From Scanner File action';
 
@@ -58,11 +58,11 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
             {
                 Caption = '&Read from scanner';
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Read from scanner action';
-                Image = Add; 
+                Image = Add;
             }
         }
         addafter(PostAndPrint)
@@ -72,7 +72,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Caption = 'POS Post and &Print';
                 Image = PostPrint;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F9';

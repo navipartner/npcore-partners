@@ -1,4 +1,4 @@
-page 6014468 "NPR Sales Ticket Statistics"
+﻿page 6014468 "NPR Sales Ticket Statistics"
 {
     // NPR700.000    2201.13   TS : Added to replace Period Button which were previously on the forms.
     // NPR4.10/MMV/20150611 CASE 215921 Added code from latest 6.2 release
@@ -20,12 +20,12 @@ page 6014468 "NPR Sales Ticket Statistics"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Period Start"; "Period Start")
+                field("Period Start"; Rec."Period Start")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Start field';
                 }
-                field("Period Name"; "Period Name")
+                field("Period Name"; Rec."Period Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Name field';
@@ -77,34 +77,30 @@ page 6014468 "NPR Sales Ticket Statistics"
                             PeriodType::Day:
                                 begin
 
-                                    Tidsvalg := 1;
                                     VendPeriodLength := VendPeriodLength::Day;
-                                    CurrPage.Update;
+                                    CurrPage.Update();
 
                                 end;
                             PeriodType::Week:
                                 begin
 
-                                    Tidsvalg := 7;
                                     VendPeriodLength := VendPeriodLength::Week;
-                                    CurrPage.Update;
+                                    CurrPage.Update();
 
                                 end;
 
                             PeriodType::Month:
                                 begin
 
-                                    Tidsvalg := 31;
                                     VendPeriodLength := VendPeriodLength::Month;
-                                    CurrPage.Update;
+                                    CurrPage.Update();
 
                                 end;
                             PeriodType::Year:
                                 begin
 
-                                    Tidsvalg := 12;
                                     VendPeriodLength := VendPeriodLength::Year;
-                                    CurrPage.Update;
+                                    CurrPage.Update();
 
                                 end;
                         end;
@@ -139,7 +135,6 @@ page 6014468 "NPR Sales Ticket Statistics"
     trigger OnInit()
     begin
 
-        Tidsvalg := 1;
         VendPeriodLength := VendPeriodLength::Day;
         Dim1Filter := '';
         Dim2Filter := '';
@@ -153,14 +148,13 @@ page 6014468 "NPR Sales Ticket Statistics"
 
     trigger OnOpenPage()
     begin
-        Reset;
+        Rec.Reset();
     end;
 
     var
         PeriodFormMgt: Codeunit PeriodFormManagement;
         VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
         AmountType: Option "Net Change","Balance at Date";
-        Tidsvalg: Integer;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         PeriodType: Option Day,Week,Month,Year;
@@ -170,9 +164,9 @@ page 6014468 "NPR Sales Ticket Statistics"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            POSEntry.SetRange("Posting Date", "Period Start", "Period End")
+            POSEntry.SetRange("Posting Date", Rec."Period Start", Rec."Period End")
         else
-            POSEntry.SetRange("Posting Date", 0D, "Period End");
+            POSEntry.SetRange("Posting Date", 0D, Rec."Period End");
     end;
 
     procedure CalcAverage() Result: Decimal

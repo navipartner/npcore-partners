@@ -95,7 +95,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     Image = Add;
                     InFooterBar = true;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -136,7 +136,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 
         if not Rec.Marked then Rec."Marked Qty" := 0;
 
-        Rec.Modify;
+        Rec.Modify();
 
         StyleTxt := GetStyle;
     end;
@@ -145,7 +145,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
     begin
         OKLines := false;
         FirstOpen := true;
-        Rec.FindFirst;
+        Rec.FindFirst();
     end;
 
     var
@@ -159,7 +159,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
     local procedure ActionOKLine()
     begin
         OKLines := true;
-        CurrPage.Close;
+        CurrPage.Close();
     end;
 
     procedure fnSetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
@@ -169,14 +169,14 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 
     procedure fnGetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
     begin
-        TMPWaiterPadLine.DeleteAll;
+        TMPWaiterPadLine.DeleteAll();
 
-        Rec.FindFirst;
+        Rec.FindFirst();
 
         repeat
-            TMPWaiterPadLine.Init;
+            TMPWaiterPadLine.Init();
             TMPWaiterPadLine.TransferFields(Rec);
-            TMPWaiterPadLine.Insert;
+            TMPWaiterPadLine.Insert();
         until (0 = Rec.Next);
     end;
 

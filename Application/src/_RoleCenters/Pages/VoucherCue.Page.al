@@ -31,15 +31,11 @@ page 6151330 "NPR Voucher Cue"
 
     begin
         NpRvVoucher.Reset();
-        IF NOT NpRvVoucher.FindSet() THEN
-            VisibilityRetailVoucher := FALSE
-        ELSE
-            VisibilityRetailVoucher := TRUE;
+
     end;
 
     var
 
-        VisibilityRetailVoucher: Boolean;
         NpRvVoucher: Record "NPR NpRv Voucher";
 
 }

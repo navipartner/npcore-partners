@@ -18,22 +18,22 @@ page 6184497 "NPR Pepper Version Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Install Directory"; "Install Directory")
+                field("Install Directory"; Rec."Install Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Install Directory field';
                 }
-                field("Pepper DLL Version"; "Pepper DLL Version")
+                field("Pepper DLL Version"; Rec."Pepper DLL Version")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -50,7 +50,7 @@ page 6184497 "NPR Pepper Version Card"
             {
                 group(Configuration)
                 {
-                    field("XMLport Configuration"; "XMLport Configuration")
+                    field("XMLport Configuration"; Rec."XMLport Configuration")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -58,10 +58,10 @@ page 6184497 "NPR Pepper Version Card"
 
                         trigger OnValidate()
                         begin
-                            CurrPage.Update;
+                            CurrPage.Update();
                         end;
                     }
-                    field("XMLport Configuration Name"; "XMLport Configuration Name")
+                    field("XMLport Configuration Name"; Rec."XMLport Configuration Name")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -73,7 +73,7 @@ page 6184497 "NPR Pepper Version Card"
             {
                 group("Begin Workshift")
                 {
-                    field("Codeunit Begin Workshift"; "Codeunit Begin Workshift")
+                    field("Codeunit Begin Workshift"; Rec."Codeunit Begin Workshift")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -81,10 +81,10 @@ page 6184497 "NPR Pepper Version Card"
 
                         trigger OnValidate()
                         begin
-                            CurrPage.Update;
+                            CurrPage.Update();
                         end;
                     }
-                    field("Codeunit Begin Workshift Name"; "Codeunit Begin Workshift Name")
+                    field("Codeunit Begin Workshift Name"; Rec."Codeunit Begin Workshift Name")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -93,7 +93,7 @@ page 6184497 "NPR Pepper Version Card"
                 }
                 group(Transaction)
                 {
-                    field("Codeunit Transaction"; "Codeunit Transaction")
+                    field("Codeunit Transaction"; Rec."Codeunit Transaction")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -101,10 +101,10 @@ page 6184497 "NPR Pepper Version Card"
 
                         trigger OnValidate()
                         begin
-                            CurrPage.Update;
+                            CurrPage.Update();
                         end;
                     }
-                    field("Codeunit Transaction Name"; "Codeunit Transaction Name")
+                    field("Codeunit Transaction Name"; Rec."Codeunit Transaction Name")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -113,7 +113,7 @@ page 6184497 "NPR Pepper Version Card"
                 }
                 group("End Workshift")
                 {
-                    field("Codeunit End Workshift"; "Codeunit End Workshift")
+                    field("Codeunit End Workshift"; Rec."Codeunit End Workshift")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -121,10 +121,10 @@ page 6184497 "NPR Pepper Version Card"
 
                         trigger OnValidate()
                         begin
-                            CurrPage.Update;
+                            CurrPage.Update();
                         end;
                     }
-                    field("Codeunit End Workshift Name"; "Codeunit End Workshift Name")
+                    field("Codeunit End Workshift Name"; Rec."Codeunit End Workshift Name")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -133,7 +133,7 @@ page 6184497 "NPR Pepper Version Card"
                 }
                 group(Auxiliary)
                 {
-                    field("Codeunit Auxiliary Functions"; "Codeunit Auxiliary Functions")
+                    field("Codeunit Auxiliary Functions"; Rec."Codeunit Auxiliary Functions")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -141,10 +141,10 @@ page 6184497 "NPR Pepper Version Card"
 
                         trigger OnValidate()
                         begin
-                            CurrPage.Update;
+                            CurrPage.Update();
                         end;
                     }
-                    field("Codeunit Auxiliary Name"; "Codeunit Auxiliary Name")
+                    field("Codeunit Auxiliary Name"; Rec."Codeunit Auxiliary Name")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -153,13 +153,13 @@ page 6184497 "NPR Pepper Version Card"
                 }
                 group(Install)
                 {
-                    field("Codeunit Install"; "Codeunit Install")
+                    field("Codeunit Install"; Rec."Codeunit Install")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Codeunit Install field';
                     }
-                    field("Codeunit Install Name"; "Codeunit Install Name")
+                    field("Codeunit Install Name"; Rec."Codeunit Install Name")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
@@ -197,7 +197,7 @@ page 6184497 "NPR Pepper Version Card"
 
                     trigger OnAction()
                     begin
-                        UploadZipFile(0);
+                        Rec.UploadZipFile(0);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -214,7 +214,7 @@ page 6184497 "NPR Pepper Version Card"
 
                     trigger OnAction()
                     begin
-                        ClearZipFile(0);
+                        Rec.ClearZipFile(0);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -231,7 +231,7 @@ page 6184497 "NPR Pepper Version Card"
 
                     trigger OnAction()
                     begin
-                        ExportZipFile(0);
+                        Rec.ExportZipFile(0);
                     end;
                 }
             }

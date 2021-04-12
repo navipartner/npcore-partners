@@ -18,37 +18,37 @@ page 6150642 "NPR POS Info List"
             repeater(Group)
             {
                 Caption = 'Group';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Message"; Message)
+                field("Message"; Rec.Message)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Message field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Input Type"; "Input Type")
+                field("Input Type"; Rec."Input Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Input Type field';
                 }
-                field("Input Mandatory"; "Input Mandatory")
+                field("Input Mandatory"; Rec."Input Mandatory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Input Mandatory field';
                 }
-                field("Copy from Header"; "Copy from Header")
+                field("Copy from Header"; Rec."Copy from Header")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Copy from Header field';

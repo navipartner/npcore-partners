@@ -72,13 +72,13 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
                     Validate("Mobile No. Country", '');
                 end else begin
                     GlobalBlueCountries.SetFilter(Name, '@' + "Country Of Residence");
-                    if not GlobalBlueCountries.FindFirst then begin
+                    if not GlobalBlueCountries.FindFirst() then begin
                         GlobalBlueCountries.SetFilter(Name, '@' + "Country Of Residence" + '*');
-                        GlobalBlueCountries.FindFirst;
+                        GlobalBlueCountries.FindFirst();
                     end;
                     GlobalBlueBlockedCountries.SetRange("Shop Country Code", "Shop Country Code");
                     GlobalBlueBlockedCountries.SetRange("Country Code", GlobalBlueCountries."Country Code");
-                    if GlobalBlueBlockedCountries.FindFirst then
+                    if GlobalBlueBlockedCountries.FindFirst() then
                         Error(Error_BlockedCountry, GlobalBlueCountries.Name);
 
                     "Country Of Residence" := GlobalBlueCountries.Name;
@@ -148,9 +148,9 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
                     Validate("Mobile No. Prefix", 0)
                 else begin
                     GlobalBlueCountries.SetFilter(Name, '@' + "Mobile No. Country");
-                    if not GlobalBlueCountries.FindFirst then begin
+                    if not GlobalBlueCountries.FindFirst() then begin
                         GlobalBlueCountries.SetFilter(Name, '@' + "Mobile No. Country" + '*');
-                        GlobalBlueCountries.FindFirst;
+                        GlobalBlueCountries.FindFirst();
                     end;
 
                     "Mobile No. Country" := GlobalBlueCountries.Name;
@@ -177,9 +177,9 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
                 end else begin
                     GlobalBlueCountries.SetFilter("Passport Code", '<>%1', 0);
                     GlobalBlueCountries.SetFilter(Name, '@' + "Passport Country");
-                    if not GlobalBlueCountries.FindFirst then begin
+                    if not GlobalBlueCountries.FindFirst() then begin
                         GlobalBlueCountries.SetFilter(Name, '@' + "Passport Country" + '*');
-                        GlobalBlueCountries.FindFirst;
+                        GlobalBlueCountries.FindFirst();
                     end;
 
                     "Passport Country" := GlobalBlueCountries.Name;
@@ -230,9 +230,9 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
                     Validate("Final Destination Country Code", 0);
                 end else begin
                     GlobalBlueCountries.SetFilter(Name, '@' + "Final Destination Country");
-                    if not GlobalBlueCountries.FindFirst then begin
+                    if not GlobalBlueCountries.FindFirst() then begin
                         GlobalBlueCountries.SetFilter(Name, '@' + "Final Destination Country" + '*');
-                        GlobalBlueCountries.FindFirst;
+                        GlobalBlueCountries.FindFirst();
                     end;
 
                     "Final Destination Country" := GlobalBlueCountries.Name;
@@ -278,12 +278,12 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
     begin
         if not ShowBlocked then begin
             TaxFreeGBBlockedCountries.SetRange("Shop Country Code", "Shop Country Code");
-            if TaxFreeGBBlockedCountries.FindSet then
+            if TaxFreeGBBlockedCountries.FindSet() then
                 repeat
                     if FilterString <> '' then
                         FilterString += '&';
                     FilterString += '<>' + Format(TaxFreeGBBlockedCountries."Country Code");
-                until TaxFreeGBBlockedCountries.Next = 0;
+                until TaxFreeGBBlockedCountries.Next() = 0;
             if FilterString <> '' then
                 TaxFreeGBCountries.SetFilter("Country Code", FilterString);
         end;

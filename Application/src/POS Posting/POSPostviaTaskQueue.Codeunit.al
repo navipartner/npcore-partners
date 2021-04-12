@@ -36,19 +36,19 @@ codeunit 6150631 "NPR POS Post via Task Queue"
             1:
                 POSPostEntries.SetPostingDate(true, false, Today);        //1: Set Posting Date to Today
             2:
-                POSPostEntries.SetPostingDate(true, false, WorkDate);     //2: Set Posting Date to Workdate
+                POSPostEntries.SetPostingDate(true, false, WorkDate());     //2: Set Posting Date to Workdate
             3:
                 POSPostEntries.SetPostingDate(true, true, Today);         //3: Set Posting Date and Document Date to Today
             4:
-                POSPostEntries.SetPostingDate(true, true, WorkDate);      //4: Set Posting Date and Document Date to Workdate
+                POSPostEntries.SetPostingDate(true, true, WorkDate());      //4: Set Posting Date and Document Date to Workdate
             5:
                 POSPostEntries.SetPostingDate(true, false, Today - 1);    //5: Set Posting Date to Yesterday
             6:
-                POSPostEntries.SetPostingDate(true, false, WorkDate - 1); //6: Set Posting Date to Day before Workdate
+                POSPostEntries.SetPostingDate(true, false, WorkDate() - 1); //6: Set Posting Date to Day before Workdate
             7:
                 POSPostEntries.SetPostingDate(true, true, Today - 1);     //7: Set Posting Date and Document Date to Yesterday
             8:
-                POSPostEntries.SetPostingDate(true, true, WorkDate - 1);   //8: Set Posting Date and Document Date to Day before Workdate
+                POSPostEntries.SetPostingDate(true, true, WorkDate() - 1);   //8: Set Posting Date and Document Date to Day before Workdate
         end;
 
         POSEntryNoFilter := JQParamStrMgt.GetText(ParamPosEntryNofilter());
@@ -116,9 +116,6 @@ codeunit 6150631 "NPR POS Post via Task Queue"
 
     local procedure CheckForParameters(var JobQueueEntry: Record "Job Queue Entry")
     var
-        DateForm: DateFormula;
-        Obj: Record "Object";
-        FieldType: Option Text,Date,Time,DateTime,"Integer",Decimal,Boolean,DateFilter;
         NoParamsErr: Label 'No Parameters found.';
         AddParamsQst: Label 'No Parameters found. Do you wish to have empty Parameters added?';
         EmptyParamsErr: Label 'Empty Parameters added. Please fill in the parameters before run this task again';

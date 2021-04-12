@@ -1,4 +1,4 @@
-codeunit 6060064 "NPR Nonstock Purchase Mgt."
+﻿codeunit 6060064 "NPR Nonstock Purchase Mgt."
 {
     var
         ItemUnitofMeasure: Record "Item Unit of Measure";
@@ -28,10 +28,10 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
                 Execute := true;
         end else begin
             NonstockItem.SetRange("Vendor Item No.", ItemRef);
-            if not NonstockItem.FindFirst then begin
+            if not NonstockItem.FindFirst() then begin
                 NonstockItem.SetRange("Vendor Item No.");
                 NonstockItem.SetRange("Bar Code", ItemRef);
-                if not NonstockItem.FindFirst then
+                if not NonstockItem.FindFirst() then
                     exit;
             end;
             Execute := true;
@@ -64,13 +64,13 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
 
         if not UnitofMeasure.Get(NonStock."Unit of Measure") then begin
             UnitofMeasure.Code := NonStock."Unit of Measure";
-            UnitofMeasure.Insert;
+            UnitofMeasure.Insert();
         end;
 
         NewItem.SetRange("Vendor Item No.", NonStock."Vendor Item No.");
-        if NewItem.FindFirst then begin
+        if NewItem.FindFirst() then begin
             NonStock."Item No." := NewItem."No.";
-            NonStock.Modify;
+            NonStock.Modify();
             PurchaseLine2."No." := NewItem."No.";
             exit;
         end;
@@ -83,7 +83,7 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         ProgWindow.Update(2, NonStock."Vendor No.");
         ProgWindow.Update(3, NonStock."Vendor Item No.");
         ProgWindow.Update(4, PurchaseLine2."No.");
-        InvtSetup.Get;
+        InvtSetup.Get();
         InvtSetup.TestField("Item Nos.");
         NoSeriesMgt.InitSeries(InvtSetup."Item Nos.", NewItem."No. Series", 0D, NewItem."No.", NewItem."No. Series");
         NewItem.Description := NonStock.Description;
@@ -92,7 +92,7 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
             ItemUnitofMeasure."Item No." := NewItem."No.";
             ItemUnitofMeasure.Code := NonStock."Unit of Measure";
             ItemUnitofMeasure."Qty. per Unit of Measure" := 1;
-            ItemUnitofMeasure.Insert;
+            ItemUnitofMeasure.Insert();
         end;
         NewItem.Validate("Base Unit of Measure", NonStock."Unit of Measure");
         NewItem."Unit Price" := NonStock."Unit Price";
@@ -111,19 +111,19 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         NewItem."Item Category Code" := NonStock."Item Template Code";
         NewItem."Created From Nonstock Item" := true;
         NewItem."Unit Price" := NonStock."Unit Price";
-        NewItem.Insert;
+        NewItem.Insert();
 
         PurchaseLine2."No." := NewItem."No.";
 
         NonStock."Item No." := NewItem."No.";
-        NonStock.Modify;
+        NonStock.Modify();
 
         if CheckLicensePermission(DATABASE::"Item Vendor") then
             NonstockItemVend(NonStock);
         if CheckLicensePermission(DATABASE::"Item Reference") then
             NonstockItemRef(NonStock);
 
-        ProgWindow.Close;
+        ProgWindow.Close();
 
     end;
 
@@ -134,14 +134,14 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         LicensePermission.SetRange("Object Type", LicensePermission."Object Type"::TableData);
         LicensePermission.SetRange("Object Number", TableID);
         LicensePermission.SetFilter("Insert Permission", '<>%1', LicensePermission."Insert Permission"::" ");
-        exit(LicensePermission.FindFirst);
+        exit(LicensePermission.FindFirst());
     end;
 
     local procedure NonstockItemVend(NonStock2: Record "Nonstock Item")
     begin
         ItemVend.SetRange("Item No.", NonStock2."Item No.");
         ItemVend.SetRange("Vendor No.", NonStock2."Vendor No.");
-        if ItemVend.FindFirst then
+        if ItemVend.FindFirst() then
             exit;
 
         ItemVend."Item No." := NonStock2."Item No.";
@@ -159,28 +159,28 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
         ItemReference.SetRange("Reference Type No.", NonStock2."Vendor No.");
         ItemReference.SetRange("Reference No.", NonStock2."Vendor Item No.");
-        if not ItemReference.FindFirst then begin
-            ItemReference.Init;
+        if not ItemReference.FindFirst() then begin
+            ItemReference.Init();
             ItemReference.Validate("Item No.", NonStock2."Item No.");
             ItemReference.Validate("Unit of Measure", NonStock2."Unit of Measure");
             ItemReference.Validate("Reference Type", ItemReference."Reference Type"::Vendor);
             ItemReference.Validate("Reference Type No.", NonStock2."Vendor No.");
             ItemReference.Validate("Reference No.", NonStock2."Vendor Item No.");
-            ItemReference.Insert;
+            ItemReference.Insert();
         end;
         if NonStock2."Bar Code" <> '' then begin
-            ItemReference.Reset;
+            ItemReference.Reset();
             ItemReference.SetRange("Item No.", NonStock2."Item No.");
             ItemReference.SetRange("Unit of Measure", NonStock2."Unit of Measure");
             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetRange("Reference No.", NonStock2."Bar Code");
-            if not ItemReference.FindFirst then begin
-                ItemReference.Init;
+            if not ItemReference.FindFirst() then begin
+                ItemReference.Init();
                 ItemReference.Validate("Item No.", NonStock2."Item No.");
                 ItemReference.Validate("Unit of Measure", NonStock2."Unit of Measure");
                 ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"Bar Code");
                 ItemReference.Validate("Reference No.", NonStock2."Bar Code");
-                ItemReference.Insert;
+                ItemReference.Insert();
             end;
         end;
     end;
@@ -199,14 +199,14 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
     begin
         if (Rec."Item Reference No." <> '') and (Rec."Item Reference No." <> xRec."Item Reference No.") then begin
             Item.SetRange("Vendor Item No.", Rec."Item Reference No.");
-            if not Item.FindFirst then begin
+            if not Item.FindFirst() then begin
                 ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
                 ItemReference.SetRange("Reference No.", Rec."Item Reference No.");
-                if not ItemReference.FindFirst then begin
+                if not ItemReference.FindFirst() then begin
                     Item.SetRange("Vendor Item No.");
-                        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-                        if not ItemReference.FindFirst then
-                            ShowNonstock(Rec, Rec."Item Reference No.");
+                    ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+                    if not ItemReference.FindFirst() then
+                        ShowNonstock(Rec, Rec."Item Reference No.");
                 end;
             end;
         end;

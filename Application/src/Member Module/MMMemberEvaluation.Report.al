@@ -346,7 +346,6 @@ report 6014494 "NPR MM Member Evaluation"
         Member: Record "NPR MM Member";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         IssuedTicket: Record "NPR TM Ticket";
-        MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         MembershipSetup: Record "NPR MM Membership Setup";
         ItemReference: Record "Item Reference";
         POSEntry: Record "NPR POS Entry";

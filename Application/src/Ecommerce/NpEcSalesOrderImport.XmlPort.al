@@ -275,12 +275,12 @@ xmlport 6151300 "NPR NpEc Sales Order Import"
                             begin
                                 if TempSalesLine9.Get(TempSalesLine."Document Type", TempSalesLine."Document No.", TempSalesLine."Line No.") then begin
                                     TempSalesLine9."Description 2" := description_2;
-                                    TempSalesLine9.Modify;
+                                    TempSalesLine9.Modify();
                                 end else begin
-                                    TempSalesLine9.Init;
+                                    TempSalesLine9.Init();
                                     TempSalesLine9 := TempSalesLine;
                                     TempSalesLine9."Description 2" := description_2;
-                                    TempSalesLine9.Insert;
+                                    TempSalesLine9.Insert();
                                 end;
                             end;
                         }
@@ -330,7 +330,6 @@ xmlport 6151300 "NPR NpEc Sales Order Import"
 
     var
         LineNo: Integer;
-        TempSalesLine8: Record "Sales Line" temporary;
         TempSalesLine9: Record "Sales Line" temporary;
 
     procedure GetOrderNo(): Text

@@ -93,7 +93,7 @@ xmlport 6151197 "NPR NpCs Collect Store"
 
         POSStore.SetRange("Location Code", TempNpCsStore."Location Code");
         POSStore.SetFilter(Name, '<>%1', '');
-        if not POSStore.FindFirst then
+        if not POSStore.FindFirst() then
             exit(false);
 
         TempNpCsStore."Contact Name" := POSStore.Name;
@@ -140,7 +140,7 @@ xmlport 6151197 "NPR NpCs Collect Store"
     var
         CompanyInfo: Record "Company Information";
     begin
-        CompanyInfo.Get;
+        CompanyInfo.Get();
 
         TempNpCsStore."Contact Name" := CompanyInfo.Name;
         TempNpCsStore."Contact Name 2" := CompanyInfo."Name 2";

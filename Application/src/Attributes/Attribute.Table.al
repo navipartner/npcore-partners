@@ -82,7 +82,7 @@ table 6014552 "NPR Attribute"
         }
         field(25; "LookUp Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("LookUp Table Id")));
             Caption = 'LookUp Table Name';
             Editable = false;
@@ -96,7 +96,7 @@ table 6014552 "NPR Attribute"
         }
         field(27; "LookUp Value Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("LookUp Table Id"),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("LookUp Table Id"),
                                                         "No." = FIELD("LookUp Value Field Id")));
             Caption = 'LookUp Value Field Name';
             FieldClass = FlowField;
@@ -109,7 +109,7 @@ table 6014552 "NPR Attribute"
         }
         field(29; "LookUp Description Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("LookUp Table Id"),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("LookUp Table Id"),
                                                         "No." = FIELD("LookUp Description Field Id")));
             Caption = 'LookUp Description Field Name';
             FieldClass = FlowField;

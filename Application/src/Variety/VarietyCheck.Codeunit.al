@@ -49,7 +49,7 @@ codeunit 6059974 "NPR Variety Check"
         PurchLine.SetCurrentKey(Type, "No.", "Variant Code");
         ItemJnlLine.SetCurrentKey("Item No.");
 
-        if ItemVar.FindSet then
+        if ItemVar.FindSet() then
             repeat
                 SalesLine.SetRange(Type, SalesLine.Type::Item);
                 SalesLine.SetRange("No.", ItemVar."Item No.");
@@ -82,8 +82,8 @@ codeunit 6059974 "NPR Variety Check"
                     Error(Text001, POSSalesLine.TableCaption, ItemVar.TableCaption, ItemVar.Code);
 
                 ItemVar."NPR Blocked" := true;
-                ItemVar.Modify;
-            until ItemVar.Next = 0;
+                ItemVar.Modify();
+            until ItemVar.Next() = 0;
     end;
 
     procedure CheckItemVariantDeleteAllowed(ItemVar: Record "Item Variant")
@@ -102,7 +102,7 @@ codeunit 6059974 "NPR Variety Check"
         VRTSetup: Record "NPR Variety Setup";
         ItemVar: Record "Item Variant";
     begin
-        if not VRTSetup.Get then
+        if not VRTSetup.Get() then
             exit;
 
         if ItemJnlLine."Phys. Inventory" then
@@ -144,37 +144,37 @@ codeunit 6059974 "NPR Variety Check"
         ItemVariant.SetRange("NPR Variety 1", VRTValue.Type);
         ItemVariant.SetRange("NPR Variety 1 Table", VRTValue.Table);
         ItemVariant.SetRange("NPR Variety 1 Value", VRTValue.Value);
-        if ItemVariant.FindSet then
+        if ItemVariant.FindSet() then
             repeat
                 CheckItemVariantDeleteAllowed(ItemVariant);
-            until ItemVariant.Next = 0;
+            until ItemVariant.Next() = 0;
 
         ItemVariant.SetRange("NPR Variety 2", VRTValue.Type);
         ItemVariant.SetRange("NPR Variety 2 Table", VRTValue.Table);
         ItemVariant.SetRange("NPR Variety 2 Value", VRTValue.Value);
-        if ItemVariant.FindSet then
+        if ItemVariant.FindSet() then
             repeat
                 CheckItemVariantDeleteAllowed(ItemVariant);
-            until ItemVariant.Next = 0;
+            until ItemVariant.Next() = 0;
 
         ItemVariant.SetRange("NPR Variety 3", VRTValue.Type);
         ItemVariant.SetRange("NPR Variety 3 Table", VRTValue.Table);
         ItemVariant.SetRange("NPR Variety 3 Value", VRTValue.Value);
-        if ItemVariant.FindSet then
+        if ItemVariant.FindSet() then
             repeat
                 CheckItemVariantDeleteAllowed(ItemVariant);
-            until ItemVariant.Next = 0;
+            until ItemVariant.Next() = 0;
 
         ItemVariant.SetRange("NPR Variety 4", VRTValue.Type);
         ItemVariant.SetRange("NPR Variety 4 Table", VRTValue.Table);
         ItemVariant.SetRange("NPR Variety 4 Value", VRTValue.Value);
-        if ItemVariant.FindSet then
+        if ItemVariant.FindSet() then
             repeat
                 CheckItemVariantDeleteAllowed(ItemVariant);
-            until ItemVariant.Next = 0;
+            until ItemVariant.Next() = 0;
     end;
 
-    local procedure CheckModifyAlloved(Item: Record Item; XRecItem: Record Item) ModifyAllowed: Boolean
+    local procedure CheckModifyAlloved(Item: Record Item; XRecItem: Record Item): Boolean
     var
         ItemVar: Record "Item Variant";
         Variety: Record "NPR Variety";
@@ -200,7 +200,7 @@ codeunit 6059974 "NPR Variety Check"
             exit(false);
 
         ItemVar.SetRange("Item No.", Item."No.");
-        if ItemVar.FindSet then
+        if ItemVar.FindSet() then
             repeat
                 if (Item."NPR Variety 1" <> XRecItem."NPR Variety 1") or (Item."NPR Variety 1 Table" <> XRecItem."NPR Variety 1 Table") then begin
                     if not Variety.Get(Item."NPR Variety 1") then
@@ -237,7 +237,7 @@ codeunit 6059974 "NPR Variety Check"
                     if not VarietyValue.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table", ItemVar."NPR Variety 4 Value") then
                         exit(false);
                 end;
-            until ItemVar.Next = 0;
+            until ItemVar.Next() = 0;
         exit(true);
     end;
 
@@ -247,7 +247,7 @@ codeunit 6059974 "NPR Variety Check"
         VarValue: Record "NPR Variety Value";
     begin
         ItemVar.SetRange("Item No.", Item."No.");
-        if ItemVar.FindSet then
+        if ItemVar.FindSet() then
             repeat
                 if ItemVar."NPR Variety 1" <> Item."NPR Variety 1" then
                     ItemVar."NPR Variety 1" := Item."NPR Variety 1";
@@ -277,7 +277,7 @@ codeunit 6059974 "NPR Variety Check"
                 if ItemVar."NPR Variety 4" <> '' then
                     VarValue.Get(ItemVar."NPR Variety 4", ItemVar."NPR Variety 4 Table", ItemVar."NPR Variety 4 Value");
                 ItemVar.Modify(true);
-            until ItemVar.Next = 0;
+            until ItemVar.Next() = 0;
     end;
 
     local procedure SetNewMasterLineT37(OldMasterLine: Record "Sales Line")

@@ -120,7 +120,7 @@ page 6014565 "NPR Tax Free Voucher"
                     TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
                 begin
                     TFVoucher := Rec;
-                    TFVoucher.SetRecFilter;
+                    TFVoucher.SetRecFilter();
                     TaxFree.VoucherVoid(TFVoucher);
                 end;
             }
@@ -141,7 +141,7 @@ page 6014565 "NPR Tax Free Voucher"
                     TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
                 begin
                     TFVoucher := Rec;
-                    TFVoucher.SetRecFilter;
+                    TFVoucher.SetRecFilter();
                     TaxFree.VoucherPrint(TFVoucher);
                 end;
             }
@@ -162,7 +162,7 @@ page 6014565 "NPR Tax Free Voucher"
                     TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
                 begin
                     TFVoucher := Rec;
-                    TFVoucher.SetRecFilter;
+                    TFVoucher.SetRecFilter();
                     TaxFree.VoucherReissue(TFVoucher);
                 end;
             }
@@ -180,7 +180,6 @@ page 6014565 "NPR Tax Free Voucher"
                 trigger OnAction()
                 var
                     TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
-                    TaxFreeVoucherSaleLinks: Page "NPR Tax Free Vouch. Sale Links";
                 begin
                     if PAGE.RunModal(PAGE::"NPR Tax Free Vouch. Sale Links", TaxFreeVoucherSaleLink) = ACTION::LookupOK then begin
                         Rec.Get(TaxFreeVoucherSaleLink."Voucher Entry No.");
@@ -190,8 +189,5 @@ page 6014565 "NPR Tax Free Voucher"
         }
     }
 
-    var
-        Caption_ScanReceipt: Label 'Scan Sales Ticket';
-        Caption_NoVoucherFound: Label 'No tax free voucher found for this sales ticket';
 }
 

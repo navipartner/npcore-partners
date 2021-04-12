@@ -71,7 +71,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find;
+        SalePOS.Find();
         if SalespersonPurchaser.Get(SalePOS."Salesperson Code") then;
         SalespersonPurchaser.FilterGroup(2);
         SalespersonPurchaser.SetFilter("NPR Locked-to Register No.", '%1|%2', '', SalePOS."Register No.");
@@ -90,7 +90,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find;
+        SalePOS.Find();
 
         SalePOS.Validate("Salesperson Code", SalespersonCode);
         SalePOS.Modify(true);

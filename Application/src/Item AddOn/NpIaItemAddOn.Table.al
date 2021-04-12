@@ -48,11 +48,11 @@ table 6151125 "NPR NpIa Item AddOn"
         NpIaItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
     begin
         NpIaItemAddOnLineOption.SetRange("AddOn No.", "No.");
-        if NpIaItemAddOnLineOption.FindFirst then
+        if NpIaItemAddOnLineOption.FindFirst() then
             NpIaItemAddOnLineOption.DeleteAll();
 
         NpIaItemAddOnLine.SetRange("AddOn No.", "No.");
-        if NpIaItemAddOnLine.FindFirst then
+        if NpIaItemAddOnLine.FindFirst() then
             NpIaItemAddOnLine.DeleteAll();
     end;
 
@@ -62,7 +62,7 @@ table 6151125 "NPR NpIa Item AddOn"
         IntBuffer: Integer;
     begin
         if "No." = '' then begin
-            if not NpIaItemAddOn.FindLast then
+            if not NpIaItemAddOn.FindLast() then
                 "No." := '000001'
             else
                 if Evaluate(IntBuffer, CopyStr(NpIaItemAddOn."No.", StrLen(NpIaItemAddOn."No."), 1)) then

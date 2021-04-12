@@ -1,8 +1,8 @@
 report 6014497 "NPR Campaign Vendor List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Campaign Vendor List.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Campaign Vendor List.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Inventory Campaign Stat.';
     PreviewMode = PrintLayout;
@@ -218,8 +218,6 @@ report 6014497 "NPR Campaign Vendor List"
         CompanyInfo: Record "Company Information";
         Item: Record Item;
         Vendor1: Record Vendor;
-        VendorNo: Code[20];
-        VendorName: Text[50];
         VendorFilter: Text[100];
         Dimension1Filter: Text[200];
         LocationFilter: Text[200];

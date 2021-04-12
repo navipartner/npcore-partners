@@ -39,7 +39,7 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
         if ReferenceNo = '' then
             exit;
 
-        RetailCrossReference.Init;
+        RetailCrossReference.Init();
         RetailCrossReference."Retail ID" := RetailID;
         RetailCrossReference."Table ID" := TableID;
         RetailCrossReference."Record Value" := RecordValue;
@@ -93,7 +93,7 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
         RetailCrossReference.SetCurrentKey("Reference No.", "Table ID");
         RetailCrossReference.SetRange("Reference No.", ReferenceNo);
         RetailCrossReference.SetRange("Table ID", TableID);
-        if not RetailCrossReference.FindFirst then
+        if not RetailCrossReference.FindFirst() then
             exit;
 
         RetailID := RetailCrossReference."Retail ID";

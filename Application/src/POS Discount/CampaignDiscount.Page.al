@@ -1,4 +1,4 @@
-page 6014453 "NPR Campaign Discount"
+﻿page 6014453 "NPR Campaign Discount"
 {
     Caption = 'Period Discount';
     PageType = Card;
@@ -236,7 +236,7 @@ page 6014453 "NPR Campaign Discount"
                         begin
                             Clear(ItemList);
                             ItemList.LookupMode := true;
-                            if (ItemList.RunModal = ACTION::LookupOK) then begin
+                            if (ItemList.RunModal() = ACTION::LookupOK) then begin
                                 ItemList.GetRecord(Item);
                                 Item.SetRange("No.", Item."No.");
                                 Item.Find('-');
@@ -260,8 +260,8 @@ page 6014453 "NPR Campaign Discount"
                         begin
                             Clear(ItemCategories);
                             ItemCategories.LookupMode := true;
-                            if (ItemCategories.RunModal = ACTION::LookupOK) then begin
-                                Item.Reset;
+                            if (ItemCategories.RunModal() = ACTION::LookupOK) then begin
+                                Item.Reset();
                                 ItemCategories.GetRecord(ItemCategory);
                                 Item.SetRange("Item Category Code", ItemCategory.Code);
                                 Item.SetFilter("Unit Price", '<>0');
@@ -283,9 +283,9 @@ page 6014453 "NPR Campaign Discount"
                         begin
                             Clear(VendorList);
                             VendorList.LookupMode := true;
-                            if (VendorList.RunModal = ACTION::LookupOK) then begin
+                            if (VendorList.RunModal() = ACTION::LookupOK) then begin
                                 VendorList.GetRecord(Vendor);
-                                Item.Reset;
+                                Item.Reset();
                                 Item.SetRange("Vendor No.", Vendor."No.");
                                 Item.SetFilter("Unit Price", '<>0');
                                 TransferToPeriod();
@@ -313,7 +313,7 @@ page 6014453 "NPR Campaign Discount"
                             CampaignDiscounts.LookupMode := true;
                             CampaignDiscounts.Editable := false;
                             CampaignDiscounts.SetTableView(FromPeriodDiscount);
-                            if CampaignDiscounts.RunModal = ACTION::LookupOK then begin
+                            if CampaignDiscounts.RunModal() = ACTION::LookupOK then begin
                                 CampaignDiscounts.GetRecord(FromPeriodDiscount);
                                 FromPeriodDiscountLine.SetRange(Code, FromPeriodDiscount.Code);
                                 if not FromPeriodDiscountLine.FindSet() then
@@ -344,7 +344,7 @@ page 6014453 "NPR Campaign Discount"
                         var
                             MsgOkCancel: Label 'Do you wish to transfer all items to this period?';
                         begin
-                            Item.Reset;
+                            Item.Reset();
                             Item.SetFilter("Unit Price", '<>0');
                             if DIALOG.Confirm(MsgOkCancel, false) then
                                 TransferToPeriod();
@@ -362,7 +362,7 @@ page 6014453 "NPR Campaign Discount"
                     var
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        RetailJournalCode.Campaign2RetailJnl(Code, '');
+                        RetailJournalCode.Campaign2RetailJnl(Rec.Code, '');
                     end;
                 }
                 action("Copy Campaign Discount")
@@ -380,19 +380,19 @@ page 6014453 "NPR Campaign Discount"
                     begin
                         if Page.RunModal(Page::"NPR Campaign Discount List", PeriodDiscount1) <> Action::LookupOK then
                             exit;
-                        PeriodDiscountLine1.Reset;
+                        PeriodDiscountLine1.Reset();
                         PeriodDiscountLine1.SetRange(Code, Rec.Code);
-                        PeriodDiscountLine1.DeleteAll;
+                        PeriodDiscountLine1.DeleteAll();
 
-                        PeriodDiscountLine1.Reset;
+                        PeriodDiscountLine1.Reset();
                         PeriodDiscountLine1.SetRange(Code, PeriodDiscount1.Code);
                         if PeriodDiscountLine1.FindSet() then
                             repeat
-                                PeriodDiscountLine.Init;
+                                PeriodDiscountLine.Init();
                                 PeriodDiscountLine.TransferFields(PeriodDiscountLine1);
                                 PeriodDiscountLine.Code := Rec.Code;
                                 PeriodDiscountLine.Insert(true);
-                            until PeriodDiscountLine1.Next = 0;
+                            until PeriodDiscountLine1.Next() = 0;
                     end;
                 }
             }
@@ -412,9 +412,6 @@ page 6014453 "NPR Campaign Discount"
 
     trigger OnInit()
     begin
-        DimBtnVisible := true;
-        GlobDim2Visible := true;
-        GlobDim1Visible := true;
         SubFormVisible := true;
     end;
 
@@ -431,19 +428,8 @@ page 6014453 "NPR Campaign Discount"
     var
         Text10600000: Label 'Enter cost savings in % ';
         Item: Record Item;
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
-        PeriodDiscountLineGlobal: Record "NPR Period Discount Line";
-        PeriodDiscountLineRec: Record "NPR Period Discount Line";
-        TxtDoYouWantToCopyLoc: Label 'Do you want to copy the campaign to the following locations :';
-        TxtDoYouWantToCopyDim1: Label 'Do you want to copy the campaign to the following department code :';
         [InDataSet]
         SubFormVisible: Boolean;
-        [InDataSet]
-        GlobDim1Visible: Boolean;
-        [InDataSet]
-        GlobDim2Visible: Boolean;
-        [InDataSet]
-        DimBtnVisible: Boolean;
 
     procedure TransferToPeriod()
     var
@@ -461,7 +447,7 @@ page 6014453 "NPR Campaign Discount"
         Percentage := 0;
 
         InputDialog.SetInput(1, Percentage, Text10600000);
-        if InputDialog.RunModal = ACTION::OK then
+        if InputDialog.RunModal() = ACTION::OK then
             InputDialog.InputDecimal(1, Percentage);
 
         if Percentage = 0 then
@@ -470,7 +456,7 @@ page 6014453 "NPR Campaign Discount"
             if PeriodDiscountLine.Get(Rec.Code, Item."No.") then
                 Message(ErrorNo2, Item."No.")
             else begin
-                PeriodDiscountLine.Init;
+                PeriodDiscountLine.Init();
                 PeriodDiscountLine.Code := Rec.Code;
                 PeriodDiscountLine."Item No." := Item."No.";
                 PeriodDiscountLine."Campaign Unit Price" := (100 - Percentage) / 100 * Item."Unit Price";
@@ -484,7 +470,7 @@ page 6014453 "NPR Campaign Discount"
                 PeriodDiscountLine.Status := Rec.Status;
                 PeriodDiscountLine.Insert(true);
             end;
-        until Item.Next = 0;
+        until Item.Next() = 0;
         Message(OkMsg, Item.Count, Rec.Code);
     end;
 
@@ -539,12 +525,12 @@ page 6014453 "NPR Campaign Discount"
 
         FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView);
         FilterPageBuilder.PageCaption := Caption;
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number);
 
-        RecRef.Reset;
+        RecRef.Reset();
         if ReturnFilters <> '' then begin
             Clear(TempBlob);
             TempBlob.CreateOutStream(OutStream);
@@ -589,7 +575,7 @@ page 6014453 "NPR Campaign Discount"
 
         RecRef.FindSet();
         PrimaryKeyFilter := GetPrimaryKeyValue(RecRef);
-        while RecRef.Next <> 0 do
+        while RecRef.Next() <> 0 do
             PrimaryKeyFilter += '|' + GetPrimaryKeyValue(RecRef);
 
         CurrFieldRef.Value := CopyStr(PrimaryKeyFilter, 1, CurrFieldRef.Length);

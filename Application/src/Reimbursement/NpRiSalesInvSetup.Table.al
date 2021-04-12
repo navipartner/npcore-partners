@@ -71,8 +71,8 @@ table 6151110 "NPR NpRi Sales Inv. Setup"
         NpRiSalesInvoiceLine: Record "NPR NpRi Sales Inv. Setup Line";
     begin
         NpRiSalesInvoiceLine.SetRange("Template Code", "Template Code");
-        if NpRiSalesInvoiceLine.FindFirst then
-            NpRiSalesInvoiceLine.DeleteAll;
+        if NpRiSalesInvoiceLine.FindFirst() then
+            NpRiSalesInvoiceLine.DeleteAll();
     end;
 }
 

@@ -61,7 +61,7 @@ page 6014554 "NPR TouchScreen: SalesLineZoom"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Dimension Set ID field';
                 }
-                field("Discount Type"; "Discount Type")
+                field("Discount Type"; Rec."Discount Type")
                 {
                     ApplicationArea = All;
                     Editable = false;

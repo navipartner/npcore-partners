@@ -1,10 +1,10 @@
 table 6151391 "NPR CS Stock-Takes"
 {
-    
+
     Caption = 'CS Stock-Takes';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields
@@ -196,24 +196,24 @@ table 6151391 "NPR CS Stock-Takes"
     {
     }
 
-   
-    
 
-      
 
-   
 
-    
-   
-        
-        
 
-        
 
-       
 
-        
 
-        
+
+
+
+
+
+
+
+
+
+
+
+
 }
 

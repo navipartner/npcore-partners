@@ -1,4 +1,4 @@
-table 6151527 "NPR Nc Collection"
+﻿table 6151527 "NPR Nc Collection"
 {
     // NC2.01\BR\20160909  CASE 250447 NaviConnect: Object created
 
@@ -50,7 +50,7 @@ table 6151527 "NPR Nc Collection"
         }
         field(200; "No. of Lines"; Integer)
         {
-            CalcFormula = Count ("NPR Nc Collection Line" WHERE("Collector Code" = FIELD("Collector Code"),
+            CalcFormula = Count("NPR Nc Collection Line" WHERE("Collector Code" = FIELD("Collector Code"),
                                                             "Collection No." = FIELD("No.")));
             Caption = 'No. of Lines';
             Editable = false;
@@ -79,7 +79,7 @@ table 6151527 "NPR Nc Collection"
     var
         NcCollectionLine: Record "NPR Nc Collection Line";
     begin
-        NcCollectionLine.Reset;
+        NcCollectionLine.Reset();
         NcCollectionLine.SetFilter("Collection No.", '=%1', "No.");
         NcCollectionLine.DeleteAll(true);
     end;

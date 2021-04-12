@@ -14,7 +14,7 @@ page 6014417 "NPR Print Tags"
         {
             repeater(Group)
             {
-                field("Print Tag"; "Print Tag")
+                field("Print Tag"; Rec."Print Tag")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Print Tag field';
@@ -27,7 +27,7 @@ page 6014417 "NPR Print Tags"
 
                     trigger OnValidate()
                     begin
-                        ToggleTag("Print Tag");
+                        ToggleTag(Rec."Print Tag");
                     end;
                 }
             }
@@ -40,7 +40,7 @@ page 6014417 "NPR Print Tags"
 
     trigger OnAfterGetRecord()
     begin
-        Pick := SelectedPrintTagsTmp.Get("Print Tag");
+        Pick := SelectedPrintTagsTmp.Get(Rec."Print Tag");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -49,8 +49,6 @@ page 6014417 "NPR Print Tags"
     end;
 
     trigger OnOpenPage()
-    var
-        PrintTags: Record "NPR Print Tags";
     begin
         if TagText <> '' then
             FromText(TagText + ',');
@@ -66,11 +64,11 @@ page 6014417 "NPR Print Tags"
         TagString: Text;
         Tagged: Boolean;
     begin
-        if SelectedPrintTagsTmp.FindSet then
+        if SelectedPrintTagsTmp.FindSet() then
             repeat
                 TagString += SelectedPrintTagsTmp."Print Tag" + ',';
                 Tagged := true;
-            until SelectedPrintTagsTmp.Next = 0;
+            until SelectedPrintTagsTmp.Next() = 0;
 
         if Tagged then
             TagString := DelStr(TagString, StrLen(TagString));
@@ -109,9 +107,9 @@ page 6014417 "NPR Print Tags"
         if SelectedPrintTagsTmp.Get(PrintTag) then
             SelectedPrintTagsTmp.Delete
         else begin
-            SelectedPrintTagsTmp.Init;
+            SelectedPrintTagsTmp.Init();
             SelectedPrintTagsTmp."Print Tag" := PrintTag;
-            SelectedPrintTagsTmp.Insert;
+            SelectedPrintTagsTmp.Insert();
         end;
     end;
 }

@@ -9,7 +9,6 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
     var
         NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
         NpDcCouponListItemTotal: Record "NPR NpDc Coupon List Item";
-        SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcModuleValidateDefault: Codeunit "NPR NpDc ModuleValid.: Defa.";
     begin
         NpDcModuleValidateDefault.ValidateCoupon(SalePOS, Coupon);
@@ -36,35 +35,35 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
     var
         LineQty: Decimal;
     begin
-        NpDcCouponListItem.FindSet;
+        NpDcCouponListItem.FindSet();
         repeat
             LineQty := CalcSaleLinePOSItemQty(SalePOS, NpDcCouponListItem);
             if LineQty < NpDcCouponListItem."Validation Quantity" then
                 Error(Text005);
-        until NpDcCouponListItem.Next = 0;
+        until NpDcCouponListItem.Next() = 0;
     end;
 
     local procedure ValidateCouponQuantity(SalePOS: Record "NPR POS Sale"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var ValidationQty: Decimal)
     var
         TotalQty: Decimal;
     begin
-        NpDcCouponListItem.FindSet;
+        NpDcCouponListItem.FindSet();
         repeat
             TotalQty += CalcSaleLinePOSItemQty(SalePOS, NpDcCouponListItem);
             if TotalQty >= ValidationQty then
                 exit;
-        until NpDcCouponListItem.Next = 0;
+        until NpDcCouponListItem.Next() = 0;
         if TotalQty < ValidationQty then
             Error(Text005);
     end;
 
     local procedure ValidateCouponExists(SalePOS: Record "NPR POS Sale"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item")
     begin
-        NpDcCouponListItem.FindSet;
+        NpDcCouponListItem.FindSet();
         repeat
             if SaleLinePOSItemExists(SalePOS, NpDcCouponListItem) then
                 exit;
-        until NpDcCouponListItem.Next = 0;
+        until NpDcCouponListItem.Next() = 0;
         Error(Text004);
     end;
 
@@ -74,7 +73,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
         if CouponModule.Get(CouponModule.Type::"Validate Coupon", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Validate Coupon";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := 'Validate Coupon - Item List';
@@ -105,7 +104,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
         NpDcCouponListItem.FilterGroup(0);
         NpDcCouponListItems.SetTableView(NpDcCouponListItem);
         NpDcCouponListItems.SetValidationView(true);
-        NpDcCouponListItems.Run;
+        NpDcCouponListItems.Run();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunValidateCoupon', '', true, true)]
@@ -133,7 +132,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", Coupon."Coupon Type");
         NpDcCouponListItem.SetFilter("No.", '<>%1', '');
-        exit(NpDcCouponListItem.FindFirst);
+        exit(NpDcCouponListItem.FindFirst());
     end;
 
     local procedure SaleLinePOSItemExists(SalePOS: Record "NPR POS Sale"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
@@ -163,7 +162,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
                 end;
         end;
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
-        exit(SaleLinePOS.FindFirst);
+        exit(SaleLinePOS.FindFirst());
     end;
 
     local procedure CalcSaleLinePOSItemQty(SalePOS: Record "NPR POS Sale"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Decimal
@@ -193,7 +192,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
                 end;
         end;
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
-        if not SaleLinePOS.FindFirst then
+        if not SaleLinePOS.FindFirst() then
             exit(0);
 
         SaleLinePOS.CalcSums(Quantity);

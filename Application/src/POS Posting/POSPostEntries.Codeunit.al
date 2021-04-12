@@ -1,4 +1,4 @@
-codeunit 6150615 "NPR POS Post Entries"
+﻿codeunit 6150615 "NPR POS Post Entries"
 {
     TableNo = "NPR POS Entry";
 
@@ -18,7 +18,6 @@ codeunit 6150615 "NPR POS Post Entries"
         PostingDateExists: Boolean;
         ReplacePostingDate: Boolean;
         ReplaceDocumentDate: Boolean;
-        TextErrorAllreadyPosted: Label '%1 %2 has already been posted or sent to a journal.';
         TextErrorMultiple: Label '%3 %1 and %2 cannot be posted together. Only one %3 can be posted at a time.';
         TextErrorTaxMismatch: Label 'There is a mismatch between the calculated taxes and the tax lines for Pos Entry %1.';
         TextErrorSalesTaxCompressed: Label '%1 %2 cannot be posted compressed because it has Sales Tax Lines. Please check the POS posting compression settings.';
@@ -40,11 +39,7 @@ codeunit 6150615 "NPR POS Post Entries"
         POSPostingLogEntryNo: Integer;
         ErrorText: Text;
         Text006: Label 'Posting POS Entries individually\#1######\@2@@@@@@@@@@@@@\';
-        FakeDocNoTxt: Label '***';
         TextPostingSetupMissing: Label '%1 is missing for %2 in %3 %4.\\Values [%5].';
-        Debug: Boolean;
-        TextPostingSetupMissingMovement: Label '%1 is missing for %2 Movement to Bin in %3 %4.';
-        TextPostingSetupMissingDeposit: Label '%1 is missing for %2 Deposit to Bin in %3 %4.';
         TextClosingEntryFloat: Label 'Float Amount Closing POS Entry %1';
         TextSalesTaxDiscrepancy: Label 'There is a Sales Tax discrepancy. Sum of %1 on the lines is %2, while the calculated amount is %3.';
         TextPostingDifference: Label 'POS Posting Difference';
@@ -57,7 +52,6 @@ codeunit 6150615 "NPR POS Post Entries"
         TempPOSPaymentLinetoPost: Record "NPR POS Entry Payment Line" temporary;
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
-        GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         POSEntryTemp: Record "NPR POS Entry" temporary;
     begin
 
@@ -86,7 +80,7 @@ codeunit 6150615 "NPR POS Post Entries"
             //POS Entries must belong to the same POS Legder Register Entry
             POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry);
 
-            Commit;
+            Commit();
 
             CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost);
             CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer, PostCompressedVar);
@@ -108,7 +102,7 @@ codeunit 6150615 "NPR POS Post Entries"
                 UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
                 MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
             end else begin
-                Commit;
+                Commit();
                 if not CheckandPostGenJournal(TempGenJournalLine, POSEntry, POSEntryTemp) then begin
                     UpdatePOSPostingLogEntry(POSPostingLogEntryNo, true);
                     MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
@@ -120,15 +114,15 @@ codeunit 6150615 "NPR POS Post Entries"
             end;
         end;
 
-        if POSEntry.FindSet then
+        if POSEntry.FindSet() then
             repeat
                 OnAfterPostPOSEntry(POSEntry, false);
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
 
         OnAfterPostPOSEntryBatch(POSEntry, false);
 
         if ShowProgressDialog then
-            ProgressWindow.Close;
+            ProgressWindow.Close();
     end;
 
     procedure PostRangePerPOSEntry(var POSEntry: Record "NPR POS Entry")
@@ -141,9 +135,9 @@ codeunit 6150615 "NPR POS Post Entries"
         ShowProgressDialog := false;
         if GuiAllowed then begin
             PerEntryDialog.Open(Text006);
-            NoOfRecords := POSEntry.Count;
+            NoOfRecords := POSEntry.Count();
         end;
-        if POSEntry.FindSet then
+        if POSEntry.FindSet() then
             repeat
                 if GuiAllowed then begin
                     LineCount := LineCount + 1;
@@ -152,10 +146,10 @@ codeunit 6150615 "NPR POS Post Entries"
                 end;
                 POSEntry2.SetRange("Entry No.", POSEntry."Entry No.");
                 Code(POSEntry2);
-                Commit;
-            until POSEntry.Next = 0;
+                Commit();
+            until POSEntry.Next() = 0;
         if GuiAllowed then
-            PerEntryDialog.Close;
+            PerEntryDialog.Close();
     end;
 
     procedure PostFromPOSPostingLog(var POSPostingLog: Record "NPR POS Posting Log")
@@ -189,11 +183,11 @@ codeunit 6150615 "NPR POS Post Entries"
         if not POSPaymentLineToPost.IsTemporary then
             exit;
         if ShowProgressDialog then begin
-            NoOfRecords := POSEntry.Count;
+            NoOfRecords := POSEntry.Count();
             ProgressWindow.Update(2, NoOfRecords);
         end;
 
-        if POSEntry.FindFirst then
+        if POSEntry.FindFirst() then
             repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;
@@ -219,26 +213,26 @@ codeunit 6150615 "NPR POS Post Entries"
                         end;
                     end;
 
-                    POSSalesLine.Reset;
+                    POSSalesLine.Reset();
                     POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                     POSSalesLine.SetRange("Exclude from Posting", false);
-                    if POSSalesLine.FindSet then
+                    if POSSalesLine.FindSet() then
                         repeat
                             POSSalesLineToPost := POSSalesLine;
-                            POSSalesLineToPost.Insert;
-                        until POSSalesLine.Next = 0;
+                            POSSalesLineToPost.Insert();
+                        until POSSalesLine.Next() = 0;
 
-                    POSPaymentLine.Reset;
+                    POSPaymentLine.Reset();
                     POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                    if POSPaymentLine.FindSet then
+                    if POSPaymentLine.FindSet() then
                         repeat
                             POSPaymentLineToPost := POSPaymentLine;
-                            POSPaymentLineToPost.Insert;
-                        until POSPaymentLine.Next = 0;
+                            POSPaymentLineToPost.Insert();
+                        until POSPaymentLine.Next() = 0;
 
                     PreviousPOSPeriodRegister := POSEntry."POS Period Register No.";
                 end;
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
     end;
 
     local procedure CreateGenJnlLinesFromPOSPostingBuffer(var POSPostingBuffer: Record "NPR POS Posting Buffer"; var GenJournalLine: Record "Gen. Journal Line")
@@ -248,18 +242,17 @@ codeunit 6150615 "NPR POS Post Entries"
         POSPostingSetup: Record "NPR POS Posting Setup";
         Currency: Record Currency;
         POSPaymentMethod: Record "NPR POS Payment Method";
-        POSStore: Record "NPR POS Store";
         LineCount: Integer;
         NoOfRecords: Integer;
         GenPostingType: Enum "General Posting Type";
     begin
-        SalesReceivablesSetup.Get;
+        SalesReceivablesSetup.Get();
         if ShowProgressDialog then begin
-            NoOfRecords := POSPostingBuffer.Count;
+            NoOfRecords := POSPostingBuffer.Count();
             ProgressWindow.Update(4, NoOfRecords);
         end;
 
-        if POSPostingBuffer.FindSet then
+        if POSPostingBuffer.FindSet() then
             repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;
@@ -268,7 +261,7 @@ codeunit 6150615 "NPR POS Post Entries"
                 if POSPostingBuffer."Currency Code" <> '' then
                     Currency.Get(POSPostingBuffer."Currency Code")
                 else
-                    Currency.Init;
+                    Currency.Init();
                 case POSPostingBuffer."Line Type" of
                     POSPostingBuffer."Line Type"::Sales:
                         begin
@@ -386,7 +379,7 @@ codeunit 6150615 "NPR POS Post Entries"
                             if POSPostingBuffer."Applies-to Doc. No." <> '' then begin
                                 GenJournalLine.Validate("Applies-to Doc. Type", POSPostingBuffer."Applies-to Doc. Type");
                                 GenJournalLine.Validate("Applies-to Doc. No.", POSPostingBuffer."Applies-to Doc. No.");
-                                GenJournalLine.Modify;
+                                GenJournalLine.Modify();
                             end;
                             if POSPostingBuffer."Rounding Amount (LCY)" > 0 then begin
                                 POSPaymentMethod.Get(POSPostingBuffer."POS Payment Method Code");
@@ -420,7 +413,7 @@ codeunit 6150615 "NPR POS Post Entries"
                             end;
                         end;
                 end;
-            until POSPostingBuffer.Next = 0;
+            until POSPostingBuffer.Next() = 0;
     end;
 
     local procedure CreateGenJnlLinesFromPOSBalancingLines(var POSEntryIn: Record "NPR POS Entry"; var GenJournalLine: Record "Gen. Journal Line"): Boolean
@@ -429,18 +422,16 @@ codeunit 6150615 "NPR POS Post Entries"
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSPostingSetup: Record "NPR POS Posting Setup";
         POSPostingSetupNewBin: Record "NPR POS Posting Setup";
-        LineCount: Integer;
-        NoOfRecords: Integer;
         AmountToPostToAccount: Decimal;
     begin
         POSEntry.Copy(POSEntryIn);
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
         POSEntry.SetFilter(POSEntry."Post Entry Status", '<2');
 
-        if POSEntry.FindSet then
+        if POSEntry.FindSet() then
             repeat
                 POSBalancingLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                if POSBalancingLine.FindSet then
+                if POSBalancingLine.FindSet() then
                     repeat
                         GetPostingSetupFromBalancingLine(POSBalancingLine, POSPostingSetup);
                         POSPostingSetup.TestField("Account No.");
@@ -490,8 +481,8 @@ codeunit 6150615 "NPR POS Post Entries"
 
                         if AmountToPostToAccount <> 0 then
                             MakeGenJournalFromPOSBalancingLine(POSBalancingLine, AmountToPostToAccount, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.", POSBalancingLine.Description, GenJournalLine);
-                    until POSBalancingLine.Next = 0;
-            until POSEntry.Next = 0;
+                    until POSBalancingLine.Next() = 0;
+            until POSEntry.Next() = 0;
     end;
 
     local procedure PostItemEntries(var POSEntry: Record "NPR POS Entry")
@@ -504,13 +495,13 @@ codeunit 6150615 "NPR POS Post Entries"
     begin
 
         if ShowProgressDialog then begin
-            NoOfRecords := POSEntry.Count;
+            NoOfRecords := POSEntry.Count();
             ProgressWindow.Update(10, NoOfRecords);
         end;
 
-        Commit;
+        Commit();
 
-        if POSEntry.FindSet then
+        if POSEntry.FindSet() then
             repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;
@@ -527,23 +518,23 @@ codeunit 6150615 "NPR POS Post Entries"
                         if (not POSPostItemTransaction.Run(POSEntryToPost)) then;
                     end;
                 end;
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
     end;
 
     local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"): Boolean
     var
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
-        GenJournalLine.Reset;
+        GenJournalLine.Reset();
         GenJournalLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
         if not StopOnErrorVar then begin
-            if GenJournalLine.FindSet then begin
+            if GenJournalLine.FindSet() then begin
                 repeat
                     if not GenJnlCheckLine.Run(GenJournalLine) then begin
                         ErrorText := GetLastErrorText;
                         exit(false);
                     end;
-                until GenJournalLine.Next = 0;
+                until GenJournalLine.Next() = 0;
             end;
         end;
         if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 0) then
@@ -569,7 +560,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     if GenJournalLine.FindSet() then
                         repeat
                             GenJournalLine.Mark(true); //marking entries that need to be deleted
-                        until GenJournalLine.NEXT = 0;
+                        until GenJournalLine.Next() = 0;
                     POSEntryWithError."Entry No." := POSEntryWithError."Entry No." + 1;
                     POSEntryWithError."Document No." := GenJournalLine."Document No.";
                     POSEntryWithError.Insert();
@@ -585,7 +576,7 @@ codeunit 6150615 "NPR POS Post Entries"
                 GenJournalLine.DeleteAll();
             GenJournalLine.MarkedOnly(false);
         end;
-        exit(POSEntryWithError.IsEmpty);
+        exit(POSEntryWithError.IsEmpty());
     end;
 
     local procedure CheckGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
@@ -611,7 +602,6 @@ codeunit 6150615 "NPR POS Post Entries"
     local procedure PostGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
-        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         DifferenceAmount: Decimal;
     begin
         DifferenceAmount := CalculateDifferenceAmount(GenJournalLine);
@@ -659,13 +649,11 @@ codeunit 6150615 "NPR POS Post Entries"
     local procedure PostGenJournalLines(var GenJournalLine: Record "Gen. Journal Line"): Boolean
     var
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
-        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
-        GenJournalLine2: Record "Gen. Journal Line";
     begin
-        if GenJournalLine.FindSet then
+        if GenJournalLine.FindSet() then
             repeat
                 GenJnlPostLine.Run(GenJournalLine);
-            until GenJournalLine.Next = 0;
+            until GenJournalLine.Next() = 0;
         exit(true);
     end;
 
@@ -713,7 +701,6 @@ codeunit 6150615 "NPR POS Post Entries"
         POSSalesLine: Record "NPR POS Entry Sales Line";
         TempPOSSalesLine: Record "NPR POS Entry Sales Line" temporary;
         Currency: Record Currency;
-        SalesAmountIncludingTax: Decimal;
         TaxAmountSalesLines: Decimal;
         RemSalesTaxAmt: Decimal;
         TaxJurisdiction: Record "Tax Jurisdiction";
@@ -721,11 +708,11 @@ codeunit 6150615 "NPR POS Post Entries"
         if POSEntry."Currency Code" <> '' then
             Currency.Get(POSEntry."Currency Code")
         else
-            Currency.Init;
+            Currency.Init();
         TaxAmountSalesLines := 0;
 
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSTaxAmountLine.FindSet then
+        if POSTaxAmountLine.FindSet() then
             repeat
                 if POSTaxAmountLine."Tax Calculation Type" = POSTaxAmountLine."Tax Calculation Type"::"Sales Tax" then begin
                     if POSTaxAmountLine."Tax Jurisdiction Code" <> TaxJurisdiction.Code then begin
@@ -740,12 +727,12 @@ codeunit 6150615 "NPR POS Post Entries"
                     TempPOSTaxAmountLine."Amount Including Tax" += Round(POSTaxAmountLine."Amount Including Tax", Currency."Amount Rounding Precision");
                     TempPOSTaxAmountLine."Tax Base Amount" += Round(POSTaxAmountLine."Tax Base Amount", Currency."Amount Rounding Precision");
                 end;
-            until POSTaxAmountLine.Next = 0;
+            until POSTaxAmountLine.Next() = 0;
 
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetFilter(Type, '<>%1', POSSalesLine.Type::Rounding);
         POSSalesLine.SetRange("Exclude from Posting", false);
-        if POSSalesLine.FindSet then
+        if POSSalesLine.FindSet() then
             repeat
                 if POSSalesLine."VAT Calculation Type" = POSSalesLine."VAT Calculation Type"::"Sales Tax" then begin
                     TaxAmountSalesLines := TaxAmountSalesLines + (POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT");
@@ -754,7 +741,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     TempPOSSalesLine."Amount Incl. VAT" += POSSalesLine."Amount Incl. VAT";
                     TempPOSSalesLine."Amount Excl. VAT" += POSSalesLine."Amount Excl. VAT";
                 end;
-            until POSSalesLine.Next = 0;
+            until POSSalesLine.Next() = 0;
 
         if TempPOSTaxAmountLine."Tax Amount" <> TaxAmountSalesLines then
             Error(TextSalesTaxDiscrepancy, TempPOSTaxAmountLine.FieldCaption("Tax Amount"), TaxAmountSalesLines, TempPOSTaxAmountLine."Tax Amount");
@@ -770,9 +757,8 @@ codeunit 6150615 "NPR POS Post Entries"
         POSEntry: Record "NPR POS Entry";
         PostingDescription: Text;
         Compressionmethod: Option Uncompressed,"Per POS Entry","Per POS Period Register";
-        cnt: Integer;
     begin
-        if POSSalesLineToBeCompressed.FindSet then
+        if POSSalesLineToBeCompressed.FindSet() then
             repeat
 
                 POSEntry.Get(POSSalesLineToBeCompressed."POS Entry No.");
@@ -783,7 +769,7 @@ codeunit 6150615 "NPR POS Post Entries"
                         Error(TextErrorSalesTaxCompressed, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
 
                 Clear(POSPostingBuffer);
-                POSPostingBuffer.Init;
+                POSPostingBuffer.Init();
 
                 POSPostingBuffer."Posting Date" := POSEntry."Posting Date";
                 POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Sales;
@@ -861,7 +847,7 @@ codeunit 6150615 "NPR POS Post Entries"
                         end;
                 end;
 
-                if not POSPostingBuffer.Find then begin
+                if not POSPostingBuffer.Find() then begin
                     POSPostingBuffer."VAT Base Amount" := 0;
                     POSPostingBuffer.Quantity := 0;
                     POSPostingBuffer."VAT Difference" := 0;
@@ -874,7 +860,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     POSPostingBuffer."VAT Amount Discount" := 0;
                     POSPostingBuffer."VAT Amount Discount (LCY)" := 0;
                     POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
-                    POSPostingBuffer.Insert;
+                    POSPostingBuffer.Insert();
                 end;
                 POSPostingBuffer."VAT Base Amount" := POSPostingBuffer."VAT Base Amount" - POSSalesLineToBeCompressed."VAT Base Amount";
                 POSPostingBuffer.Quantity := POSPostingBuffer.Quantity + POSSalesLineToBeCompressed.Quantity;
@@ -887,8 +873,8 @@ codeunit 6150615 "NPR POS Post Entries"
                 POSPostingBuffer."Amount (LCY)" := POSPostingBuffer."Amount (LCY)" - POSSalesLineToBeCompressed."Amount Excl. VAT (LCY)";
                 POSPostingBuffer."VAT Amount Discount" := POSPostingBuffer."VAT Amount Discount" - (POSSalesLineToBeCompressed."Line Discount Amount Incl. VAT" - POSSalesLineToBeCompressed."Line Discount Amount Excl. VAT");
                 POSPostingBuffer."VAT Amount Discount (LCY)" := POSPostingBuffer."VAT Amount Discount (LCY)" - (POSSalesLineToBeCompressed."Line Dsc. Amt. Incl. VAT (LCY)" - POSSalesLineToBeCompressed."Line Dsc. Amt. Excl. VAT (LCY)");
-                POSPostingBuffer.Modify;
-            until POSSalesLineToBeCompressed.Next = 0;
+                POSPostingBuffer.Modify();
+            until POSSalesLineToBeCompressed.Next() = 0;
     end;
 
     local procedure CreatePostingBufferLinesFromPOSSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
@@ -899,7 +885,7 @@ codeunit 6150615 "NPR POS Post Entries"
         PostingDescription: Text;
         Compressionmethod: Option Uncompressed,"Per POS Entry","Per POS Period Register";
     begin
-        if POSPaymentLineToBeCompressed.FindSet then
+        if POSPaymentLineToBeCompressed.FindSet() then
             repeat
 
                 POSEntry.Get(POSPaymentLineToBeCompressed."POS Entry No.");
@@ -907,7 +893,7 @@ codeunit 6150615 "NPR POS Post Entries"
                 Compressionmethod := GetCompressionMethod(POSPeriodRegister, PostCompressedVar);
 
                 Clear(POSPostingBuffer);
-                POSPostingBuffer.Init;
+                POSPostingBuffer.Init();
 
                 POSPostingBuffer."Posting Date" := POSEntry."Posting Date";
                 POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Payment;
@@ -983,7 +969,7 @@ codeunit 6150615 "NPR POS Post Entries"
                         end;
                 end;
 
-                if not POSPostingBuffer.Find then begin
+                if not POSPostingBuffer.Find() then begin
                     POSPostingBuffer.Amount := 0;
                     POSPostingBuffer."Amount (LCY)" := 0;
                     POSPostingBuffer."Rounding Amount" := 0;
@@ -991,7 +977,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
                     POSPostingBuffer."VAT Amount (LCY)" := 0;
                     POSPostingBuffer."VAT Base Amount" := 0;
-                    POSPostingBuffer.Insert;
+                    POSPostingBuffer.Insert();
                 end;
 
                 POSPostingBuffer."Rounding Amount" := POSPostingBuffer."Rounding Amount" + POSPaymentLineToBeCompressed."Rounding Amount";
@@ -1002,8 +988,8 @@ codeunit 6150615 "NPR POS Post Entries"
                 POSPostingBuffer."VAT Amount" += POSPaymentLineToBeCompressed."VAT Amount (LCY)"; // VAT reversal in foreign currency not supported.
                 POSPostingBuffer."VAT Amount (LCY)" += POSPaymentLineToBeCompressed."VAT Amount (LCY)";
                 POSPostingBuffer."VAT Base Amount" += POSPaymentLineToBeCompressed."VAT Base Amount (LCY)";
-                POSPostingBuffer.Modify;
-            until POSPaymentLineToBeCompressed.Next = 0;
+                POSPostingBuffer.Modify();
+            until POSPaymentLineToBeCompressed.Next() = 0;
     end;
 
     local procedure CreatePOSPostingLogEntry(var POSEntry: Record "NPR POS Entry"): Integer
@@ -1011,9 +997,9 @@ codeunit 6150615 "NPR POS Post Entries"
         POSPostingLog: Record "NPR POS Posting Log";
         LastPOSEntry: Record "NPR POS Entry";
     begin
-        LastPOSEntry.Reset;
-        LastPOSEntry.FindLast;
-        POSPostingLog.Init;
+        LastPOSEntry.Reset();
+        LastPOSEntry.FindLast();
+        POSPostingLog.Init();
         POSPostingLog."Entry No." := 0;
         POSPostingLog."User ID" := UserId;
         POSPostingLog."Posting Timestamp" := CurrentDateTime;
@@ -1169,7 +1155,7 @@ codeunit 6150615 "NPR POS Post Entries"
         ProceedWithUpdate: Boolean;
         POSPeriodRegister: Record "NPR POS Period Register";
     begin
-        if POSEntry.FindSet then
+        if POSEntry.FindSet() then
             repeat
                 if (POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"]) then begin
                     case OptStatus of
@@ -1183,10 +1169,10 @@ codeunit 6150615 "NPR POS Post Entries"
                                 //if compressed by POS Entry or uncompressed, we're updating that specific pos entry as error
                                 POSPeriodRegister.Get(POSEntry."POS Period Register No.");
                                 POSEntryWithError.SetRange("Document No.", POSPeriodRegister."Document No.");
-                                ProceedWithUpdate := not POSEntryWithError.IsEmpty;
+                                ProceedWithUpdate := not POSEntryWithError.IsEmpty();
                                 if not ProceedWithUpdate then begin
                                     POSEntryWithError.SetRange("Document No.", POSEntry."Document No.");
-                                    ProceedWithUpdate := not POSEntryWithError.IsEmpty;
+                                    ProceedWithUpdate := not POSEntryWithError.IsEmpty();
                                 end;
                                 if ProceedWithUpdate then
                                     POSEntry.Validate("Post Entry Status", POSEntry."Post Entry Status"::"Error while Posting");
@@ -1195,7 +1181,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     POSEntry."POS Posting Log Entry No." := POSPostingLogEntryNo;
                     POSEntry.Modify(true);
                 end;
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
     end;
 
     local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; VATAmountIn: Decimal; VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
@@ -1295,7 +1281,7 @@ codeunit 6150615 "NPR POS Post Entries"
     local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; var GenJournalLine: Record "Gen. Journal Line")
     begin
         LineNumber := LineNumber + 10000;
-        GenJournalLine.Init;
+        GenJournalLine.Init();
         GenJournalLine."Journal Template Name" := '';
         GenJournalLine."Journal Batch Name" := '';
         GenJournalLine."Line No." := LineNumber;
@@ -1360,7 +1346,7 @@ codeunit 6150615 "NPR POS Post Entries"
         GenJournalLine."Salespers./Purch. Code" := SalespersonCode;
         GenJournalLine."Reason Code" := ReasonCode;
         GenJournalLine."Source Code" := SourceCode;
-        GenJournalLine.Insert;
+        GenJournalLine.Insert();
     end;
 
     local procedure CreateGenJournalLinesFromSalesTax(var POSEntry: Record "NPR POS Entry"; var GenJnlLine: Record "Gen. Journal Line")
@@ -1375,7 +1361,6 @@ codeunit 6150615 "NPR POS Post Entries"
         GLSetup: Record "General Ledger Setup";
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
-        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         TaxLineCount: Integer;
         RemSalesTaxAmt: Decimal;
         RemSalesTaxSrcAmt: Decimal;
@@ -1383,35 +1368,35 @@ codeunit 6150615 "NPR POS Post Entries"
         FldRef: FieldRef;
         IsNALocalized: Boolean;
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         RecRef.GetTable(GenJnlLine);
         IsNALocalized := RecRef.FieldExist(10011);
 
         if (TempPOSTaxAmountLine.IsTemporary()) then
-            TempPOSTaxAmountLine.DeleteAll;
+            TempPOSTaxAmountLine.DeleteAll();
 
         POSEntry2.CopyFilters(POSEntry);
         POSEntry2.SetFilter("Post Entry Status", '=%1|=%2', POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
-        if POSEntry2.FindSet then
+        if POSEntry2.FindSet() then
             repeat
                 POSTaxAmountLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
                 POSTaxAmountLine.SetRange("Tax Calculation Type", TempPOSTaxAmountLine."Tax Calculation Type"::"Sales Tax");
-                if POSTaxAmountLine.FindSet then
+                if POSTaxAmountLine.FindSet() then
                     repeat
                         if IsNALocalized then begin
                             TempPOSTaxAmountLine := POSTaxAmountLine;
-                            TempPOSTaxAmountLine.Insert;
+                            TempPOSTaxAmountLine.Insert();
                         end else begin
                             //IF Not in NA database, post as one line because of checks in Standard NAV
-                            TempPOSTaxAmountLine.Reset;
+                            TempPOSTaxAmountLine.Reset();
                             TempPOSTaxAmountLine.SetRange("Tax Calculation Type", POSTaxAmountLine."Tax Calculation Type");
                             TempPOSTaxAmountLine.SetRange("Tax Area Code", POSTaxAmountLine."Tax Area Code");
                             TempPOSTaxAmountLine.SetRange("Tax Group Code", POSTaxAmountLine."Tax Group Code");
                             TempPOSTaxAmountLine.SetRange("Use Tax", POSTaxAmountLine."Use Tax");
                             TempPOSTaxAmountLine.SetRange("Tax Area Code for Key", POSTaxAmountLine."Tax Area Code for Key");
-                            if not TempPOSTaxAmountLine.FindFirst then begin
+                            if not TempPOSTaxAmountLine.FindFirst() then begin
                                 TempPOSTaxAmountLine := POSTaxAmountLine;
-                                TempPOSTaxAmountLine.Insert;
+                                TempPOSTaxAmountLine.Insert();
                             end else begin
                                 TempPOSTaxAmountLine.Quantity := TempPOSTaxAmountLine.Quantity + POSTaxAmountLine.Quantity;
                                 TempPOSTaxAmountLine."Calculated Tax Amount" := TempPOSTaxAmountLine."Calculated Tax Amount" + POSTaxAmountLine."Calculated Tax Amount";
@@ -1420,14 +1405,14 @@ codeunit 6150615 "NPR POS Post Entries"
                                 TempPOSTaxAmountLine."Tax Amount" := TempPOSTaxAmountLine."Tax Amount" + POSTaxAmountLine."Tax Amount";
                                 TempPOSTaxAmountLine."Amount Including Tax" := TempPOSTaxAmountLine."Amount Including Tax" + POSTaxAmountLine."Tax Amount";
                                 TempPOSTaxAmountLine."Tax Base Amount FCY" := TempPOSTaxAmountLine."Tax Base Amount FCY" + POSTaxAmountLine."Tax Base Amount FCY";
-                                TempPOSTaxAmountLine.Modify;
+                                TempPOSTaxAmountLine.Modify();
                             end;
                         end;
-                    until POSTaxAmountLine.Next = 0;
-                TempPOSTaxAmountLine.Reset;
+                    until POSTaxAmountLine.Next() = 0;
+                TempPOSTaxAmountLine.Reset();
             until (POSEntry2.Next() = 0);
 
-        TempPOSTaxAmountLine.Reset;
+        TempPOSTaxAmountLine.Reset();
 
         if POSEntry.FindFirst() then
             repeat
@@ -1438,10 +1423,10 @@ codeunit 6150615 "NPR POS Post Entries"
                 if POSEntry."Currency Code" <> '' then
                     Currency.Get(POSEntry."Currency Code")
                 else
-                    Currency.Init;
+                    Currency.Init();
                 TempPOSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 TempPOSTaxAmountLine.SetRange("Tax Calculation Type", TempPOSTaxAmountLine."Tax Calculation Type"::"Sales Tax");
-                if TempPOSTaxAmountLine.FindFirst then begin
+                if TempPOSTaxAmountLine.FindFirst() then begin
                     repeat
                         LineNumber := LineNumber + 10000;
                         TaxLineCount := TaxLineCount + 1;
@@ -1450,7 +1435,7 @@ codeunit 6150615 "NPR POS Post Entries"
                            ((TempPOSTaxAmountLine.Quantity <> 0) and
                             (TempPOSTaxAmountLine."Tax Type" = TempPOSTaxAmountLine."Tax Type"::"Excise Tax"))
                         then begin
-                            GenJnlLine.Init;
+                            GenJnlLine.Init();
                             GenJnlLine."Posting Date" := POSEntry."Posting Date";
                             GenJnlLine."Document Date" := POSEntry."Document Date";
                             GenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(GenJnlLine.Description));
@@ -1525,11 +1510,11 @@ codeunit 6150615 "NPR POS Post Entries"
                             GenJnlLine."VAT Amount" := -GenJnlLine."VAT Amount";
                             GenJnlLine.Quantity := -GenJnlLine.Quantity;
                             GenJnlLine."VAT Difference" := -GenJnlLine."VAT Difference";
-                            GenJnlLine.Insert;
+                            GenJnlLine.Insert();
                         end;
-                    until TempPOSTaxAmountLine.Next = 0;
+                    until TempPOSTaxAmountLine.Next() = 0;
                 end;
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
     end;
 
     local procedure PostSalesTaxToGL(var POSEntry: Record "NPR POS Entry")
@@ -1549,16 +1534,16 @@ codeunit 6150615 "NPR POS Post Entries"
         RemSalesTaxSrcAmt: Decimal;
     begin
         POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
-        GLSetup.Get;
+        GLSetup.Get();
         TaxLineCount := 0;
         RemSalesTaxAmt := 0;
         RemSalesTaxSrcAmt := 0;
         if POSEntry."Currency Code" <> '' then
             Currency.Get(POSEntry."Currency Code")
         else
-            Currency.Init;
+            Currency.Init();
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSTaxAmountLine.FindFirst then begin
+        if POSTaxAmountLine.FindFirst() then begin
             repeat
                 TaxLineCount := TaxLineCount + 1;
                 if ((POSTaxAmountLine."Tax Base Amount" <> 0) and
@@ -1566,7 +1551,7 @@ codeunit 6150615 "NPR POS Post Entries"
                    ((POSTaxAmountLine.Quantity <> 0) and
                     (POSTaxAmountLine."Tax Type" = POSTaxAmountLine."Tax Type"::"Excise Tax"))
                 then begin
-                    TempGenJnlLine.Init;
+                    TempGenJnlLine.Init();
                     TempGenJnlLine."Posting Date" := POSEntry."Posting Date";
                     TempGenJnlLine."Document Date" := POSEntry."Document Date";
                     TempGenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(TempGenJnlLine.Description));
@@ -1632,7 +1617,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     TempGenJnlLine."VAT Difference" := -TempGenJnlLine."VAT Difference";
                     GenJnlPostLine.RunWithCheck(TempGenJnlLine);
                 end;
-            until POSTaxAmountLine.Next = 0;
+            until POSTaxAmountLine.Next() = 0;
         end;
     end;
 
@@ -1664,7 +1649,7 @@ codeunit 6150615 "NPR POS Post Entries"
         CustLedgerEntry.SetRange("Document No.", POSPostingBuffer."Applies-to Doc. No.");
         CustLedgerEntry.SetRange("Document Type", POSPostingBuffer."Applies-to Doc. Type");
         CustLedgerEntry.SetRange(Open, true);
-        if not CustLedgerEntry.FindFirst then
+        if not CustLedgerEntry.FindFirst() then
             exit;
 
         if CustLedgerEntry.Positive then begin
@@ -1677,7 +1662,7 @@ codeunit 6150615 "NPR POS Post Entries"
 
         GenJournalLine.Validate("Applies-to Doc. Type", POSPostingBuffer."Applies-to Doc. Type");
         GenJournalLine.Validate("Applies-to Doc. No.", POSPostingBuffer."Applies-to Doc. No.");
-        GenJournalLine.Modify;
+        GenJournalLine.Modify();
     end;
 
     local procedure CalculateDifferenceAmount(var GenJournalLine: Record "Gen. Journal Line") DifferenceAmount: Decimal
@@ -1733,9 +1718,9 @@ codeunit 6150615 "NPR POS Post Entries"
         POSEntry2.SetRange("Post Entry Status", POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
         POSEntry2.SetRange("Post Item Entry Status", POSEntry2."Post Item Entry Status"::Unposted, POSEntry2."Post Item Entry Status"::"Error while Posting");
         POSEntry2.FilterGroup(0);
-        if POSEntry2.FindSet then
+        if POSEntry2.FindSet() then
             repeat
                 POSPostingControl.CheckGlobalDimAndDimSetConsistency(POSEntry2.RecordId, POSEntry2."Shortcut Dimension 1 Code", POSEntry2."Shortcut Dimension 2 Code", POSEntry2."Dimension Set ID", 0);
-            until POSEntry2.Next = 0;
+            until POSEntry2.Next() = 0;
     end;
 }

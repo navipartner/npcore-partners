@@ -91,27 +91,25 @@ codeunit 6014580 "NPR Object Output Mgt."
 
     procedure TryGetOutputRec(ObjectType: Integer; ObjectID: Integer; PrintCode: Code[20]; User: Text; var ObjectOutputSelection: Record "NPR Object Output Selection"): Boolean
     begin
-        with ObjectOutputSelection do begin
-            if Get(User, ObjectType, ObjectID, PrintCode) then
+        if ObjectOutputSelection.Get(User, ObjectType, ObjectID, PrintCode) then
+            exit(true);
+
+        if ObjectID <> 0 then
+            if ObjectOutputSelection.Get(User, ObjectType, 0, PrintCode) then
                 exit(true);
 
-            if ObjectID <> 0 then
-                if Get(User, ObjectType, 0, PrintCode) then
-                    exit(true);
+        if StrLen(PrintCode) > 0 then
+            if ObjectOutputSelection.Get(User, ObjectType, ObjectID, '') then
+                exit(true);
 
-            if StrLen(PrintCode) > 0 then
-                if Get(User, ObjectType, ObjectID, '') then
-                    exit(true);
+        if not ((ObjectID = 0) and (StrLen(PrintCode) = 0)) then
+            if ObjectOutputSelection.Get(User, ObjectType, 0, '') then
+                exit(true);
 
-            if not ((ObjectID = 0) and (StrLen(PrintCode) = 0)) then
-                if Get(User, ObjectType, 0, '') then
-                    exit(true);
-
-            if StrLen(User) = 0 then
-                exit(false)
-            else
-                exit(TryGetOutputRec(ObjectType, ObjectID, PrintCode, '', ObjectOutputSelection));
-        end;
+        if StrLen(User) = 0 then
+            exit(false)
+        else
+            exit(TryGetOutputRec(ObjectType, ObjectID, PrintCode, '', ObjectOutputSelection));
     end;
 
     local procedure TryGetPrintOutput(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var ObjectOutputSelection: Record "NPR Object Output Selection"): Boolean

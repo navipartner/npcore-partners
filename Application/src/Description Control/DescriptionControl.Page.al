@@ -14,60 +14,60 @@ page 6059969 "NPR Description Control"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Setup Type"; "Setup Type")
+                field("Setup Type"; Rec."Setup Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Setup Type field';
                 }
-                field("Disable Item Translations"; "Disable Item Translations")
+                field("Disable Item Translations"; Rec."Disable Item Translations")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Disable Item Translations field';
                 }
-                field("Description 1 Var (Simple)"; "Description 1 Var (Simple)")
+                field("Description 1 Var (Simple)"; Rec."Description 1 Var (Simple)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 1 Var (Simple) field';
                 }
-                field("Description 2 Var (Simple)"; "Description 2 Var (Simple)")
+                field("Description 2 Var (Simple)"; Rec."Description 2 Var (Simple)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 2 Var (Simple) field';
                 }
-                field("Description 1 Std (Simple)"; "Description 1 Std (Simple)")
+                field("Description 1 Std (Simple)"; Rec."Description 1 Std (Simple)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 1 Std (Simple) field';
                 }
-                field("Description 2 Std (Simple)"; "Description 2 Std (Simple)")
+                field("Description 2 Std (Simple)"; Rec."Description 2 Std (Simple)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 2 Std (Simple) field';
                 }
-                field("Description 1 Var (Adv)"; "Description 1 Var (Adv)")
+                field("Description 1 Var (Adv)"; Rec."Description 1 Var (Adv)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 1 Var (Adv) field';
                 }
-                field("Description 2 Var (Adv)"; "Description 2 Var (Adv)")
+                field("Description 2 Var (Adv)"; Rec."Description 2 Var (Adv)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 2 Var (Adv) field';
                 }
-                field("Description 1 Std (Adv)"; "Description 1 Std (Adv)")
+                field("Description 1 Std (Adv)"; Rec."Description 1 Std (Adv)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 1 Std (Adv) field';
                 }
-                field("Description 2 Std (Adv)"; "Description 2 Std (Adv)")
+                field("Description 2 Std (Adv)"; Rec."Description 2 Std (Adv)")
                 {
                     ApplicationArea = All;
                     Visible = false;

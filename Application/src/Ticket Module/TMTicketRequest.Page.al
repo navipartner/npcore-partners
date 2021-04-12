@@ -298,7 +298,7 @@ page 6060103 "NPR TM Ticket Request"
                         ImportReferenceNo := OfflineTicketValidationMgr.AddRequestToOfflineValidation(TicketReservationRequest);
 
                         OfflineTicketValidation.SetFilter("Import Reference No.", '=%1', ImportReferenceNo);
-                        Commit;
+                        Commit();
                         PAGE.RunModal(PAGE::"NPR TM Offline Ticket Valid.", OfflineTicketValidation);
                     end;
                 }
@@ -351,13 +351,11 @@ page 6060103 "NPR TM Ticket Request"
     local procedure RevokeTicketRequest()
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        RevokeRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         RequestCount: Integer;
         TicketCount: Integer;
         RequestDateTime: DateTime;
-        ResponseMessage: Text;
         AmountToReverse: Decimal;
         QtyToRevoke: Integer;
         Token: Text[100];

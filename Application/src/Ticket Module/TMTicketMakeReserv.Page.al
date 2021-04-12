@@ -1,4 +1,4 @@
-page 6060113 "NPR TM Ticket Make Reserv."
+﻿page 6060113 "NPR TM Ticket Make Reserv."
 {
     Caption = 'Make your reservation';
     DataCaptionExpression = StrSubstNo('%1  - %2', Today, Time);
@@ -109,9 +109,6 @@ page 6060113 "NPR TM Ticket Make Reserv."
                     ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
-                    var
-                        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-                        ResponseMessage: Text;
                     begin
                         //-TM1.45 [382535]
                         if (Rec."Admission Inclusion" = Rec."Admission Inclusion"::NOT_SELECTED) then
@@ -152,7 +149,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                             Rec.SetFilter(Quantity, '<>%1', 0);
                             if (Rec.FindFirst()) then
                                 CommonQty := Rec.Quantity;
-                            Rec.Reset;
+                            Rec.Reset();
                             Rec.Get(CurrentEntryNo);
                             Rec.Quantity := CommonQty;
                             Rec."Admission Inclusion" := Rec."Admission Inclusion"::SELECTED;
@@ -379,7 +376,6 @@ page 6060113 "NPR TM Ticket Make Reserv."
         gReservationEdited: Boolean;
         gQuantityChanged: Boolean;
         gAllowQuantityChange: Boolean;
-        gRequestToken: Text[100];
         STATUS_CONFIRMED: Label 'The reservation is confirmed.';
         STATUS_UNCONFIRMED: Label 'Ticket is unconfirmed. Press OK to confirm new reservation.';
         QTY_MUST_BE_GT_ZERO: Label 'Ticket quantity must be greater than zero.';
@@ -389,7 +385,6 @@ page 6060113 "NPR TM Ticket Make Reserv."
         gDeliverTicketTo: Text;
         gShowDeliverTo: Boolean;
         WAITING_LIST: Label 'Waiting List';
-        gAddToWaitingList: Boolean;
         NO_NOTIFICATION_ADDR: Label 'When you have selected a ticket schedule with waiting list, you need to provide e-mail or sms in the deliver-to field.';
         gLimitToDateSelected: Date;
         DIFFERENT_DATES: Label 'The selected time schedules have different dates. This schedule is for %1 whereas the previous was for %2. Continue anyway?';
@@ -406,9 +401,6 @@ page 6060113 "NPR TM Ticket Make Reserv."
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ResponseMessage: Text;
         CurrentEntryNo: Integer;
     begin
 
@@ -431,14 +423,10 @@ page 6060113 "NPR TM Ticket Make Reserv."
     local procedure SelectSchedule()
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TMAdmission: Record "NPR TM Admission";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
         PageScheduleEntry: Page "NPR TM Ticket Select Schedule";
         PageAction: Action;
         OldEntryNo: Integer;
-        ResponseMessage: Text;
         "0DF": DateFormula;
         ToDate: Date;
     begin
@@ -633,7 +621,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
     begin
 
         if (gDeliverTicketTo <> '') then begin
-            Rec.Reset;
+            Rec.Reset();
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
@@ -648,7 +636,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
             until (Rec.Next() = 0);
         end;
 
-        Rec.Reset;
+        Rec.Reset();
         Rec.SetFilter("Scheduled Time Description", '=%1', WAITING_LIST);
         if (Rec.FindSet()) then begin
             if (gDeliverTicketTo = '') then begin
@@ -669,7 +657,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
 
         if (gReservationEdited) then begin
 
-            Rec.Reset;
+            Rec.Reset();
             if (Rec.FindFirst()) then;
             repeat
 
@@ -712,17 +700,14 @@ page 6060113 "NPR TM Ticket Make Reserv."
     procedure FinalizeChangeRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer;
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TickeChangeRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketBOM: Record "NPR TM Ticket Admission BOM";
         Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         NewTicketRequestEntryNo: Integer;
     begin
 
         if (gDeliverTicketTo <> '') then begin
-            Rec.RESET;
+            Rec.Reset();
             if (Rec.FINDSET()) then;
             repeat
                 TicketReservationRequest.GET(Rec."Entry No.");
@@ -736,7 +721,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
             until (Rec.NEXT() = 0);
         end;
 
-        Rec.RESET;
+        Rec.Reset();
         Rec.SETFILTER("Scheduled Time Description", '=%1', WAITING_LIST);
         if (NOT (Rec.ISEMPTY())) then begin
             ResponseMessage := 'Not in this version: It is not supported to change to a timeslot that is on a waitinglist.';

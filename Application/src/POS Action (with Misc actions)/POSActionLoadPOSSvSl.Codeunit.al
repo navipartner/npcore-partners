@@ -18,8 +18,6 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    var
-        itemTrackingCode: Text;
     begin
         if Sender.DiscoverAction(
           ActionCode,
@@ -62,11 +60,8 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        ControlId: Text;
-        Value: Text;
-        DoNotClearTextBox: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -110,9 +105,9 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
         end;
 
         POSQuoteEntry.SetRange("Sales Ticket No.", SalesTicketNo);
-        POSQuoteEntry.FindLast;
+        POSQuoteEntry.FindLast();
         LastQuoteEntryNo := POSQuoteEntry."Entry No.";
-        POSQuoteEntry.FindFirst;
+        POSQuoteEntry.FindFirst();
         if POSQuoteEntry."Entry No." <> LastQuoteEntryNo then begin
             if PAGE.RunModal(0, POSQuoteEntry) <> ACTION::LookupOK then
                 exit;
@@ -162,7 +157,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find;
+        SalePOS.Find();
 
         if LoadFromQuote(POSQuoteEntry, SalePOS) then begin
             // reload proper dimensions
@@ -170,7 +165,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
             POSStore.Get(SalePOS2."POS Store Code");
             SalePOS."Location Code" := POSStore."Location Code";
             SalePOS.Validate("POS Store Code", SalePOS2."POS Store Code");
-            SalePOS.Modify;
+            SalePOS.Modify();
 
             POSSale.Refresh(SalePOS);
             POSSale.SetModified();
@@ -197,7 +192,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindFirst then
+        if SaleLinePOS.FindFirst() then
             SaleLinePOS.DeleteAll(true);
     end;
 

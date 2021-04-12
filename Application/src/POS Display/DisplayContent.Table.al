@@ -23,7 +23,7 @@ table 6059951 "NPR Display Content"
         }
         field(12; "Content Lines"; Integer)
         {
-            CalcFormula = Count ("NPR Display Content Lines" WHERE("Content Code" = FIELD(Code)));
+            CalcFormula = Count("NPR Display Content Lines" WHERE("Content Code" = FIELD(Code)));
             Caption = 'Content Lines';
             FieldClass = FlowField;
         }

@@ -1,4 +1,4 @@
-page 6014588 "NPR Item Statistics Subpage"
+﻿page 6014588 "NPR Item Statistics Subpage"
 {
     Caption = 'Item Statistics Subform';
     Editable = false;
@@ -14,12 +14,12 @@ page 6014588 "NPR Item Statistics Subpage"
             repeater(Control6150623)
             {
                 ShowCaption = false;
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -39,7 +39,7 @@ page 6014588 "NPR Item Statistics Subpage"
                         SetItemLedgerEntryFilter(ItemledgerEntry);
                         ItemledgerEntryForm.SetTableView(ItemledgerEntry);
                         ItemledgerEntryForm.Editable(false);
-                        ItemledgerEntryForm.RunModal;
+                        ItemledgerEntryForm.RunModal();
                     end;
                 }
                 field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
@@ -64,7 +64,7 @@ page 6014588 "NPR Item Statistics Subpage"
                         SetValueEntryFilter(AuxValueEntry);
                         AuxValueEntries.SetTableView(AuxValueEntry);
                         AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal;
+                        AuxValueEntries.RunModal();
                     end;
                 }
                 field("LastYear Sale Amount"; "LastYear Sale Amount")
@@ -100,7 +100,7 @@ page 6014588 "NPR Item Statistics Subpage"
                     Visible = LPA;
                     ToolTip = 'Specifies the value of the Last Year Proifit Amount field';
                 }
-                field("Profit %"; "Profit %")
+                field("Profit %"; Rec."Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit %';
@@ -113,7 +113,7 @@ page 6014588 "NPR Item Statistics Subpage"
                     Visible = "LP%";
                     ToolTip = 'Specifies the value of the -> Last year field';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vendor No. field';
@@ -134,8 +134,8 @@ page 6014588 "NPR Item Statistics Subpage"
 
     trigger OnOpenPage()
     begin
-        if (Periodestart = 0D) then Periodestart := Today;
-        if (Periodeslut = 0D) then Periodeslut := Today;
+        if (Periodestart = 0D) then Periodestart := Today();
+        if (Periodeslut = 0D) then Periodeslut := Today();
     end;
 
     var
@@ -153,7 +153,6 @@ page 6014588 "NPR Item Statistics Subpage"
         "LastYear Sale Amount": Decimal;
         "Profit Amount": Decimal;
         "LastYear Profit Amount": Decimal;
-        "Profit %": Decimal;
         "LastYear Profit %": Decimal;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
@@ -162,8 +161,6 @@ page 6014588 "NPR Item Statistics Subpage"
         Periodestart: Date;
         Periodeslut: Date;
         LastYear: Boolean;
-        ShowSameWeekday: Boolean;
-        DateFilterLastYear: Text[50];
         CalcLastYear: Text[50];
         CostAmt: Decimal;
         "Last Year CostAmt": Decimal;
@@ -190,7 +187,7 @@ page 6014588 "NPR Item Statistics Subpage"
             ItemCatCodeFilter := ItemCatCode;
         end;
 
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     procedure Calc()
@@ -213,9 +210,9 @@ page 6014588 "NPR Item Statistics Subpage"
         //+NPR4.12
 
         if "Sale Amount" <> 0 then
-            "Profit %" := "Profit Amount" / "Sale Amount" * 100
+            Rec."Profit %" := "Profit Amount" / "Sale Amount" * 100
         else
-            "Profit %" := 0;
+            Rec."Profit %" := 0;
 
         // Calc last year
         LastYear := true;
@@ -246,7 +243,7 @@ page 6014588 "NPR Item Statistics Subpage"
         //SetItemLedgerEntryFilter
         ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
-        ItemLedgerEntry.SetRange("Item No.", "No.");
+        ItemLedgerEntry.SetRange("Item No.", Rec."No.");
         if not LastYear then
             ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -272,7 +269,7 @@ page 6014588 "NPR Item Statistics Subpage"
     begin
         //SetValueEntryFilter
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-        AuxValueEntry.SetRange("Item No.", "No.");
+        AuxValueEntry.SetRange("Item No.", Rec."No.");
         if not LastYear then
             AuxValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -309,7 +306,7 @@ page 6014588 "NPR Item Statistics Subpage"
         HideEmpty := true;
         //+NPR4.21
 
-        ClearMarks;
+        Rec.ClearMarks;
         if HideEmpty then begin
             Current := Rec;
             Dlg.Open(txtDlg);
@@ -317,36 +314,36 @@ page 6014588 "NPR Item Statistics Subpage"
                 repeat
                     Count += 1;
                     Dlg.Update(1, Item."No.");
-                    Dlg.Update(2, Round(Count / Item.Count * 10000, 1, '='));
+                    Dlg.Update(2, Round(Count / Item.Count() * 10000, 1, '='));
                     SetItemLedgerEntryFilter(ItemLedgerEntry);
                     ItemLedgerEntry.SetRange("Item No.", Item."No.");
                     ItemLedgerEntry.CalcSums(Quantity);
                     if ItemLedgerEntry.Quantity <> 0 then begin
-                        Get(Item."No.");
-                        Mark(true);
+                        Rec.Get(Item."No.");
+                        Rec.Mark(true);
                     end;
-                until Item.Next = 0;
-            Dlg.Close;
+                until Item.Next() = 0;
+            Dlg.Close();
 
-            MarkedOnly(true);
+            Rec.MarkedOnly(true);
             Rec := Current;
         end else begin
-            MarkedOnly(false);
+            Rec.MarkedOnly(false);
         end;
 
-        //CurrForm.UPDATE;
-        CurrPage.Update;
+        //CurrForm.Update();
+        CurrPage.Update();
         exit(HideEmpty);
     end;
 
     procedure InitForm()
     begin
         //InitForm()
-        Reset;
+        Rec.Reset();
         Dim1Filter := '';
         Dim2Filter := '';
-        Periodestart := Today;
-        Periodeslut := Today;
+        Periodestart := Today();
+        Periodeslut := Today();
         ItemCatCodeFilter := '';
         HideEmpty := true;
     end;
@@ -357,17 +354,17 @@ page 6014588 "NPR Item Statistics Subpage"
         if HideEmpty then begin
             HideEmpty := false;
             ChangeEmptyFilter;
-            //CurrForm.UPDATE;
-            CurrPage.Update;
+            //CurrForm.Update();
+            CurrPage.Update();
         end;
     end;
 
     procedure ReleaseLock()
     begin
         //ReleaseLock()
-        if Count = 0 then begin
-            MarkedOnly(false);
-            ClearMarks;
+        if Rec.Count() = 0 then begin
+            Rec.MarkedOnly(false);
+            Rec.ClearMarks;
         end;
     end;
 

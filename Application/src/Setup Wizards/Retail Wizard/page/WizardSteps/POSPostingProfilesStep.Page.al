@@ -12,7 +12,7 @@ page 6014681 "NPR POS Posting Profiles Step"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
@@ -20,40 +20,40 @@ page 6014681 "NPR POS Posting Profiles Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSPOSPostingProfile(ExistingPOSPostingProfiles, Code);
+                        CheckIfNoAvailableInPOSPOSPostingProfile(ExistingPOSPostingProfiles, Rec.Code);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Max. POS Posting Diff. (LCY)"; "Max. POS Posting Diff. (LCY)")
+                field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. POS Posting Diff. (LCY) field';
                 }
-                field("POS Posting Diff. Account2"; "POS Posting Diff. Account")
+                field("POS Posting Diff. Account2"; Rec."POS Posting Diff. Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Differences Account field';
                 }
-                field("POS Sales Rounding Account"; "POS Sales Rounding Account")
+                field("POS Sales Rounding Account"; Rec."POS Sales Rounding Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Sales Rounding Account field';
                 }
-                field("POS Sales Amt. Rndng Precision"; "POS Sales Amt. Rndng Precision")
+                field("POS Sales Amt. Rndng Precision"; Rec."POS Sales Amt. Rndng Precision")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Sales Amt. Rndng Precision field';
                 }
-                field("Rounding Type"; "Rounding Type")
+                field("Rounding Type"; Rec."Rounding Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rounding Type field';
                 }
-                field("Default POS Entry No. Series"; "Default POS Entry No. Series")
+                field("Default POS Entry No. Series"; Rec."Default POS Entry No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default POS Entry No. Series field';

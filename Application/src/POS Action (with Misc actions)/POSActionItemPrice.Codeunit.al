@@ -2,8 +2,6 @@ codeunit 6150852 "NPR POS Action - Item Price"
 {
     var
         ActionDescription: Label 'This action prompts for a numeric item number, and shows the price';
-        ValueSelection: Option LIST,"FIXED";
-        DimensionSource: Option SHORTCUT1,SHORTCUT2,ANY;
         Title: Label 'We need more information.';
         Caption: Label 'Item Number';
         PriceQuery: Label 'Price Query';
@@ -45,8 +43,8 @@ codeunit 6150852 "NPR POS Action - Item Price"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'Title', Title);
-        Captions.AddActionCaption(ActionCode, 'Caption', Caption);
+        Captions.AddActionCaption(ActionCode(), 'Title', Title);
+        Captions.AddActionCaption(ActionCode(), 'Caption', Caption);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]

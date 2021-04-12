@@ -1,4 +1,4 @@
-page 6150646 "NPR POS Info Lookup"
+﻿page 6150646 "NPR POS Info Lookup"
 {
     Caption = 'POS Info Lookup';
     PageType = List;
@@ -14,37 +14,37 @@ page 6150646 "NPR POS Info Lookup"
             repeater(Group)
             {
                 Caption = 'Group';
-                field("Field 1"; "Field 1")
+                field("Field 1"; Rec."Field 1")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field1Caption;
                     ToolTip = 'Specifies the value of the Field 1 field';
                 }
-                field("Field 2"; "Field 2")
+                field("Field 2"; Rec."Field 2")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field2Caption;
                     ToolTip = 'Specifies the value of the Field 2 field';
                 }
-                field("Field 3"; "Field 3")
+                field("Field 3"; Rec."Field 3")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field3Caption;
                     ToolTip = 'Specifies the value of the Field 3 field';
                 }
-                field("Field 4"; "Field 4")
+                field("Field 4"; Rec."Field 4")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field4Caption;
                     ToolTip = 'Specifies the value of the Field 4 field';
                 }
-                field("Field 5"; "Field 5")
+                field("Field 5"; Rec."Field 5")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field5Caption;
                     ToolTip = 'Specifies the value of the Field 5 field';
                 }
-                field("Field 6"; "Field 6")
+                field("Field 6"; Rec."Field 6")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field6Caption;
@@ -65,7 +65,7 @@ page 6150646 "NPR POS Info Lookup"
         if POSInfo."Input Type" = POSInfo."Input Type"::SubCode then
             LoadSubcodes;
 
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     var
@@ -97,7 +97,7 @@ page 6150646 "NPR POS Info Lookup"
         if POSInfo."Table No." = 0 then
             Error('error');
 
-        if not POSInfoLookupSetup.FindFirst then
+        if not POSInfoLookupSetup.FindFirst() then
             Error('Error');
         repeat
             case POSInfoLookupSetup."Map To" of
@@ -126,12 +126,12 @@ page 6150646 "NPR POS Info Lookup"
                         FieldMappingARR[6] := POSInfoLookupSetup."Field No.";
                     end;
             end;
-        until POSInfoLookupSetup.Next = 0;
+        until POSInfoLookupSetup.Next() = 0;
 
         RecRef.Open(POSInfo."Table No.");
-        if RecRef.FindFirst then
+        if RecRef.FindFirst() then
             repeat
-                Rec.Init;
+                Rec.Init();
                 Rec."Entry No." := EntryNo;
                 EntryNo := EntryNo + 1;
                 Rec."Table No." := 0; //Function to create a combined key
@@ -166,8 +166,8 @@ page 6150646 "NPR POS Info Lookup"
                     Field6Caption := FieldRef.Caption;
                 end;
                 Rec.RecID := RecRef.RecordId;
-                Rec.Insert;
-            until RecRef.Next = 0;
+                Rec.Insert();
+            until RecRef.Next() = 0;
     end;
 
     local procedure LoadSubcodes()
@@ -176,21 +176,21 @@ page 6150646 "NPR POS Info Lookup"
         EntryNo: Integer;
     begin
         EntryNo := 1;
-        POSInfoSubcode.Reset;
+        POSInfoSubcode.Reset();
         POSInfoSubcode.SetRange(Code, POSInfo.Code);
-        if not POSInfoSubcode.FindFirst then
+        if not POSInfoSubcode.FindFirst() then
             Error(ErrText001, POSInfo.Code);
         repeat
-            Rec.Init;
+            Rec.Init();
             Rec."Entry No." := EntryNo;
             EntryNo := EntryNo + 1;
             Rec."Field 1" := POSInfoSubcode.Subcode;
             Field1Caption := POSInfoSubcode.Subcode;
             Rec."Field 2" := POSInfoSubcode.Description;
             Field2Caption := POSInfoSubcode.Description;
-            Rec.Insert;
+            Rec.Insert();
 
-        until POSInfoSubcode.Next = 0;
+        until POSInfoSubcode.Next() = 0;
     end;
 }
 

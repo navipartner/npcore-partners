@@ -576,7 +576,7 @@ xmlport 6151152 "NPR M2 Get Account"
             end;
 
             ResponseCode := 'OK';
-            ResponseMessage := ''; //STRSUBSTNO ('%1 %2', TmpBillToCustomer.COUNT, TmpSellToCustomer.count);
+            ResponseMessage := ''; //STRSUBSTNO ('%1 %2', TmpBillToCustomer.COUNT, TmpSellToCustomer.Count());
         end;
 
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));

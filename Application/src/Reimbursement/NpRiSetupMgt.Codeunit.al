@@ -21,12 +21,12 @@ codeunit 6151100 "NPR NpRi Setup Mgt."
         RecRef := RecID.GetRecord;
         if (NpRiReimbursementEntry."Source Company Name" <> '') and (NpRiReimbursementEntry."Source Company Name" <> CompanyName) then begin
             RecordPosition := RecRef.GetPosition(false);
-            RecRef.Close;
+            RecRef.Close();
 
             RecRef.Open(NpRiReimbursementEntry."Source Table No.", false, NpRiReimbursementEntry."Source Company Name");
             RecRef.SetPosition(RecordPosition);
         end;
-        RecRef.Find;
+        RecRef.Find();
 
         PageMgt.PageRun(RecRef);
     end;

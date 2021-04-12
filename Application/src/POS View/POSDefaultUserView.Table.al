@@ -62,20 +62,20 @@ table 6150712 "NPR POS Default User View"
         DefaultView.SetRange(Type, Type);
         DefaultView.SetRange("Register No.", RegisterNo);
         DefaultView.SetRange("User Name", UserId);
-        if not DefaultView.FindFirst then begin
+        if not DefaultView.FindFirst() then begin
             if ViewCode = '' then
                 exit;
             DefaultView.Type := Type;
             DefaultView."Register No." := RegisterNo;
             DefaultView."User Name" := UserId;
-            DefaultView.Insert;
+            DefaultView.Insert();
         end;
 
         DefaultView."POS View Code" := ViewCode;
         if ViewCode <> '' then
             DefaultView.Modify
         else
-            DefaultView.Delete;
+            DefaultView.Delete();
 
         Rec := DefaultView;
     end;
@@ -87,7 +87,7 @@ table 6150712 "NPR POS Default User View"
         DefaultView.SetRange(Type, Type);
         DefaultView.SetRange("Register No.", RegisterNo);
         DefaultView.SetRange("User Name", UserId);
-        if DefaultView.FindFirst then begin
+        if DefaultView.FindFirst() then begin
             Rec := DefaultView;
             exit(true);
         end;

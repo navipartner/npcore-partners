@@ -16,22 +16,22 @@ page 6059945 "NPR CashKeeper Setup"
         {
             repeater(Group)
             {
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Payment Type"; "Payment Type")
+                field("Payment Type"; Rec."Payment Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Type field';
                 }
-                field("CashKeeper IP"; "CashKeeper IP")
+                field("CashKeeper IP"; Rec."CashKeeper IP")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the CashKeeper IP field';
                 }
-                field("Debug Mode"; "Debug Mode")
+                field("Debug Mode"; Rec."Debug Mode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Debug Mode field';

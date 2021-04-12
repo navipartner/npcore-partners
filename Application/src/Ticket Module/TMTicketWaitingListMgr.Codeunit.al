@@ -61,7 +61,6 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
     procedure CreateWaitingListEntry(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; NotificationAddress: Text[200])
     var
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
-        WaitingListEntry: Record "NPR TM Waiting List Entry";
         Admission: Record "NPR TM Admission";
         WaitingListSetup: Record "NPR TM Waiting List Setup";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -168,15 +167,13 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
 
         NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADDED_TO_WL;
         NotificationEntry.Insert();
-        Commit;
+        Commit();
 
         NotificationEntry.SetRecFilter();
         TicketNotifyParticipant.SendGeneralNotification(NotificationEntry);
     end;
 
-    local procedure CreateRemoveFromListNotification() EntryNo: Integer
-    var
-        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+    local procedure CreateRemoveFromListNotification(): Integer
     begin
     end;
 
@@ -240,7 +237,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
     begin
 
         NotificationEntry."Entry No." := 0;
-        NotificationEntry."Date To Notify" := Today;
+        NotificationEntry."Date To Notify" := Today();
 
         NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::WAITINGLIST;
         NotificationEntry."Notification Address" := TicketWaitingList."Notification Address";
@@ -398,12 +395,6 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
     procedure ProcessAdmission(Admission: Record "NPR TM Admission"; ReferenceDate: Date; SendNotifications: Boolean)
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        TmpTicketWaitingListToNotify: Record "NPR TM Ticket Wait. List" temporary;
-        TmpTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
-        TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
-        TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
-        FromEntryNo: Integer;
-        ToEntryNo: Integer;
     begin
 
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', Admission."Admission Code");

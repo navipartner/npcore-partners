@@ -57,7 +57,7 @@ page 6151041 "NPR Notification List"
                 trigger OnAction()
                 begin
                     AFAPIWebService.SetNotificationCompletedFlag(UserId, gPOSNo, Format(Rec.Id));
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
             action(Cancel)
@@ -74,7 +74,7 @@ page 6151041 "NPR Notification List"
                 trigger OnAction()
                 begin
                     AFAPIWebService.SetNotificationCancelledFlag(UserId, gPOSNo, Format(Rec.Id));
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
         }
@@ -83,7 +83,7 @@ page 6151041 "NPR Notification List"
     trigger OnAfterGetCurrRecord()
     begin
         Rec."Temp Current Pos Unit No." := gPOSNo;
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     trigger OnOpenPage()

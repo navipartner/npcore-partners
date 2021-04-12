@@ -87,12 +87,12 @@ page 6151454 "NPR Magento Payment Line List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date Captured field';
                 }
-                field("Charge ID"; "Charge ID")
+                field("Charge ID"; Rec."Charge ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Charge ID';
                 }
-                field("Date Refunded"; "Date Refunded")
+                field("Date Refunded"; Rec."Date Refunded")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -130,7 +130,7 @@ page 6151454 "NPR Magento Payment Line List"
                     MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
-                    if "Date Captured" <> 0D then begin
+                    if Rec."Date Captured" <> 0D then begin
                         if not Confirm(Text002, false) then
                             exit;
                         Rec."Date Captured" := 0D;
@@ -141,8 +141,8 @@ page 6151454 "NPR Magento Payment Line List"
                     MagentoPaymentGateway.TestField("Capture Codeunit Id");
 
                     MagentoPmtMgt.CapturePaymentLine(Rec);
-                    if "Date Captured" <> 0D then
-                        Message(Text001, "Payment Gateway Code", "No.");
+                    if Rec."Date Captured" <> 0D then
+                        Message(Text001, Rec."Payment Gateway Code", Rec."No.");
                 end;
             }
             action("Refund Payment")
@@ -162,7 +162,7 @@ page 6151454 "NPR Magento Payment Line List"
                     MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
-                    if "Date Refunded" <> 0D then begin
+                    if Rec."Date Refunded" <> 0D then begin
                         if not Confirm(Text003, false) then
                             exit;
                         Rec."Date Refunded" := 0D;
@@ -173,8 +173,8 @@ page 6151454 "NPR Magento Payment Line List"
                     MagentoPaymentGateway.TestField("Capture Codeunit Id");
 
                     MagentoPmtMgt.RefundPaymentLine(Rec);
-                    if "Date Refunded" <> 0D then
-                        Message(Text000, "Payment Gateway Code", "No.");
+                    if Rec."Date Refunded" <> 0D then
+                        Message(Text000, Rec."Payment Gateway Code", Rec."No.");
                 end;
             }
             action("Post Payment")
@@ -218,7 +218,7 @@ page 6151454 "NPR Magento Payment Line List"
                     NavigateForm: Page Navigate;
                 begin
                     NavigateForm.SetDoc(Rec."Posting Date", Rec."Document No.");
-                    NavigateForm.Run;
+                    NavigateForm.Run();
                 end;
             }
             action("Document Card")

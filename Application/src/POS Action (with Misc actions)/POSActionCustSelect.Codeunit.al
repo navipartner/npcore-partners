@@ -23,21 +23,19 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('Select', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('Select', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('Operation', 'Attach,Remove', 'Attach');
-                RegisterTextParameter('CustomerTableView', '');
-                RegisterIntegerParameter('CustomerLookupPage', 0);
-                RegisterTextParameter('customerNo', '');
-            end;
+            Sender.RegisterOptionParameter('Operation', 'Attach,Remove', 'Attach');
+            Sender.RegisterTextParameter('CustomerTableView', '');
+            Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
+            Sender.RegisterTextParameter('customerNo', '');
         end;
     end;
 
@@ -50,7 +48,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         CustomerLookupPage: Integer;
         SpecificCustomerNo: Text;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -115,7 +113,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -131,7 +129,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -147,7 +145,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -161,9 +159,8 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
     var
         FilterPageBuilder: FilterPageBuilder;
         Customer: Record Customer;
-        AllObj: Record AllObj;
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -187,7 +184,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         PageId: Integer;
         Customer: Record Customer;
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -198,7 +195,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
                     Evaluate(PageId, POSParameterValue.Value);
                     PageMetadata.SetRange(ID, PageId);
                     PageMetadata.SetRange(SourceTable, DATABASE::Customer);
-                    PageMetadata.FindFirst;
+                    PageMetadata.FindFirst();
                 end;
             'CustomerTableView':
                 begin
@@ -215,7 +212,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         if not EanBoxEvent.Get(EventCodeCustNo()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeCustNo();
             EanBoxEvent."Module Name" := Customer.TableCaption;
             EanBoxEvent.Description := CopyStr(CustLedgerEntry.FieldCaption("Customer No."), 1, MaxStrLen(EanBoxEvent.Description));

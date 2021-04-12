@@ -1,8 +1,8 @@
 report 6014611 "NPR Sales Stats w/ Variants"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Item - Sales Statistics';
     PreviewMode = PrintLayout;
@@ -161,7 +161,6 @@ report 6014611 "NPR Sales Stats w/ Variants"
 
                 SalesQtyTotal := SalesQty;
                 SalesAmountTotal := SalesAmount;
-                COGSAmountTotal := COGSAmount;
                 ItemProfitTotal := ItemProfit;
                 if (SalesAmount = 0) and not PrintAlsoWithoutSale then
                     CurrReport.Skip();
@@ -221,7 +220,6 @@ report 6014611 "NPR Sales Stats w/ Variants"
         ItemStatisticsBuf: Record "Item Statistics Buffer";
         PrintAlsoWithoutSale: Boolean;
         COGSAmount: Decimal;
-        COGSAmountTotal: Decimal;
         ItemInventory: Decimal;
         ItemProfit: Decimal;
         ItemProfitPct: Decimal;

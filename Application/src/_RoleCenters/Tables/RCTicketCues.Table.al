@@ -83,7 +83,7 @@ table 6060112 "NPR RC Ticket Cues"
         EventDate: Date;
     begin
 
-        EventDate := WorkDate;
+        EventDate := WorkDate();
         GetEventCues(EventDate, "Event Count 1", "Event Capacity 1", "Event Open Reservations 1", "Event Admitted 1", "Event Utilization Avg. 1");
 
         EventDate := CalcDate('<+1D>', EventDate);

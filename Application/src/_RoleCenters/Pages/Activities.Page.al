@@ -1,4 +1,4 @@
-page 6151255 "NPR Activities"
+﻿page 6151255 "NPR Activities"
 
 {
     Caption = 'Retail Activities';
@@ -66,12 +66,12 @@ page 6151255 "NPR Activities"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
-        Rec.SetFilter("Date Filter", '=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '=%1', WorkDate());
     end;
 
 }

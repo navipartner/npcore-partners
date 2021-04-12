@@ -1,4 +1,4 @@
-codeunit 6014433 "NPR Customer Discount Mgt."
+﻿codeunit 6014433 "NPR Customer Discount Mgt."
 {
     trigger OnRun()
     begin
@@ -19,10 +19,10 @@ codeunit 6014433 "NPR Customer Discount Mgt."
             TempSaleLinePOS.SetRange(Date, Rec.Date);
             TempSaleLinePOS.SetRange("Sale Type", Rec."Sale Type");
             TempSaleLinePOS.SetFilter("Discount Type", '=%1|=%2', TempSaleLinePOS."Discount Type"::" ", TempSaleLinePOS."Discount Type"::Campaign);
-            if TempSaleLinePOS.FindSet then
+            if TempSaleLinePOS.FindSet() then
                 repeat
                     ApplyDiscountOnLine(SalePOS, TempSaleLinePOS);
-                until TempSaleLinePOS.Next = 0;
+                until TempSaleLinePOS.Next() = 0;
         end else
             if TempSaleLinePOS.Get(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") then
                 ApplyDiscountOnLine(SalePOS, TempSaleLinePOS);
@@ -33,14 +33,14 @@ codeunit 6014433 "NPR Customer Discount Mgt."
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
     begin
         TempSaleLinePOS."Discount Calculated" := true;
-        TempSaleLinePOS.Modify;
+        TempSaleLinePOS.Modify();
 
         if not TempSaleLinePOS."Allow Line Discount" then
             exit;
 
         if TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::" " then begin
             ApplyCustomerDiscountOnLine(SalePOS, TempSaleLinePOS);
-            TempSaleLinePOS.Modify;
+            TempSaleLinePOS.Modify();
         end;
 
         if TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::Campaign then begin
@@ -48,7 +48,7 @@ codeunit 6014433 "NPR Customer Discount Mgt."
             ApplyCustomerDiscountOnLine(SalePOS, TempSaleLinePOS2);
             if TempSaleLinePOS2."Discount %" <= TempSaleLinePOS."Discount %" then
                 exit;
-            TempSaleLinePOS2.Modify;
+            TempSaleLinePOS2.Modify();
         end;
     end;
 
@@ -62,7 +62,7 @@ codeunit 6014433 "NPR Customer Discount Mgt."
             TempSaleLinePOS."FP Anvendt" := false;
             TempSaleLinePOS."MR Anvendt antal" := 0;
             TempSaleLinePOS."Discount Calculated" := true;
-            TempSaleLinePOS.Modify;
+            TempSaleLinePOS.Modify();
         end;
     end;
 
@@ -76,7 +76,7 @@ codeunit 6014433 "NPR Customer Discount Mgt."
         if DiscountPriority.Get(DiscSourceTableId()) then
             exit;
 
-        DiscountPriority.Init;
+        DiscountPriority.Init();
         DiscountPriority."Table ID" := DiscSourceTableId();
         DiscountPriority.Priority := 2;
         DiscountPriority.Disabled := false;
@@ -96,7 +96,6 @@ codeunit 6014433 "NPR Customer Discount Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'OnFindActiveSaleLineDiscounts', '', false, false)]
     local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     var
-        IsActive: Boolean;
         DiscountPriority: Record "NPR Discount Priority";
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
     begin
@@ -108,9 +107,9 @@ codeunit 6014433 "NPR Customer Discount Mgt."
             exit;
 
         if POSSalesPriceCalcMgt.SalesLineLineDiscExists(SalePOS, Rec, false) then begin
-            tmpDiscountPriority.Init;
+            tmpDiscountPriority.Init();
             tmpDiscountPriority := DiscountPriority;
-            tmpDiscountPriority.Insert;
+            tmpDiscountPriority.Insert();
         end;
     end;
 
@@ -147,13 +146,11 @@ codeunit 6014433 "NPR Customer Discount Mgt."
     local procedure DiscountLineActiveNow(var SalesLineDiscount: Record "Sales Line Discount"): Boolean
     var
         CurrDate: Date;
-        CurrTime: Time;
     begin
         if SalesLineDiscount.IsTemporary then
             exit(false);
 
-        CurrDate := Today;
-        CurrTime := Time;
+        CurrDate := Today();
         if SalesLineDiscount."Starting Date" > CurrDate then
             exit(false);
         if (SalesLineDiscount."Ending Date" > 0D) and (SalesLineDiscount."Ending Date" < CurrDate) then

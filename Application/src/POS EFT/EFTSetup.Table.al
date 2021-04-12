@@ -58,8 +58,6 @@ table 6184485 "NPR EFT Setup"
     end;
 
     trigger OnInsert()
-    var
-        Guid: Guid;
     begin
         TestField("Payment Type POS");
         TestField("EFT Integration Type");
@@ -84,13 +82,13 @@ table 6184485 "NPR EFT Setup"
 
     procedure ShowEftPOSUnitParameters()
     begin
-        Commit; //In case any parameters were just injected
+        Commit(); //In case any parameters were just injected
         PAGE.RunModal(PAGE::"NPR EFT POSUnit Param. Setup", Rec);
     end;
 
     procedure ShowEftPaymentParameters()
     begin
-        Commit; //In case any parameters were just injected
+        Commit(); //In case any parameters were just injected
         PAGE.RunModal(PAGE::"NPR EFT Payment Param. Setup", Rec);
     end;
 
@@ -108,11 +106,11 @@ table 6184485 "NPR EFT Setup"
     begin
         EFTTypePOSUnitGenParam.SetRange("Integration Type", "EFT Integration Type");
         EFTTypePOSUnitGenParam.SetRange("POS Unit No.", "POS Unit No.");
-        EFTTypePOSUnitGenParam.DeleteAll;
+        EFTTypePOSUnitGenParam.DeleteAll();
 
         EFTTypePOSUnitBLOBParam.SetRange("Integration Type", "EFT Integration Type");
         EFTTypePOSUnitBLOBParam.SetRange("POS Unit No.", "POS Unit No.");
-        EFTTypePOSUnitBLOBParam.DeleteAll;
+        EFTTypePOSUnitBLOBParam.DeleteAll();
     end;
 }
 

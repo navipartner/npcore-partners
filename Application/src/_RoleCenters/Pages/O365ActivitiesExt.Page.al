@@ -1,4 +1,4 @@
-page 6151333 "NPR O365 Activities Ext"
+﻿page 6151333 "NPR O365 Activities Ext"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -62,7 +62,7 @@ page 6151333 "NPR O365 Activities Ext"
                 trigger OnAction()
                 begin
                     Rec."Last Date/Time Modified" := 0DT;
-                    Rec.Modify;
+                    Rec.Modify();
 
                     CODEUNIT.Run(CODEUNIT::"Activities Mgt.");
                     CurrPage.Update(false);
@@ -98,26 +98,19 @@ page 6151333 "NPR O365 Activities Ext"
         OCRServiceMgt: Codeunit "OCR Service Mgt.";
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
-        NewRecord: Boolean;
-        ActivitiesMgt: Codeunit "NPR Activities Mgt.";
-        HeadlineMan: Codeunit "NPR NP Retail Headline Mgt.";
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
-            Commit;
-            NewRecord := true;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
+            Commit();
         end;
 
         ShowAwaitingIncomingDoc := OCRServiceMgt.OcrServiceIsEnable;
-        ShowIntercompanyActivities := false;
-        ShowDocumentsPendingDocExchService := false;
         ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType <> CLIENTTYPE::Phone;
         ShowIntelligentCloud := not EnvironmentInformation.IsSaaS();
         IntegrationSynchJobErrors.SetDataIntegrationUIElementsVisible(ShowDataIntegrationCues);
         ShowD365SIntegrationCues := CRMConnectionSetup.IsEnabled;
-        ShowIntegrationErrorsCue := ShowDataIntegrationCues and (not ShowD365SIntegrationCues);
         RoleCenterNotificationMgt.ShowNotifications;
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
 
@@ -132,28 +125,21 @@ page 6151333 "NPR O365 Activities Ext"
 
 
     var
-        ActivitiesMgt: Codeunit "NPR Activities Mgt.";
         CueAndKPIs: Codeunit "Cues And KPIs";
         O365GettingStartedMgt: Codeunit "O365 Getting Started Mgt.";
         ClientTypeManagement: Codeunit "Client Type Management";
         EnvironmentInformation: Codeunit "Environment Information";
-        UserTaskManagement: Codeunit "User Task Management";
 
 
 
-        HasCamera: Boolean;
         ShowDocumentsPendingDocExchService: Boolean;
         ShowAwaitingIncomingDoc: Boolean;
         ShowIntercompanyActivities: Boolean;
         ShowProductVideosActivities: Boolean;
         ShowIntelligentCloud: Boolean;
-        TileGettingStartedVisible: Boolean;
-        ReplayGettingStartedVisible: Boolean;
-        HideNpsDialog: Boolean;
         WhatIsNewTourVisible: Boolean;
         ShowD365SIntegrationCues: Boolean;
         ShowDataIntegrationCues: Boolean;
-        ShowIntegrationErrorsCue: Boolean;
 
 
     local procedure SetActivityGroupVisibility()
@@ -161,12 +147,12 @@ page 6151333 "NPR O365 Activities Ext"
         DocExchServiceSetup: Record "Doc. Exch. Service Setup";
         CompanyInformation: Record "Company Information";
     begin
-        if DocExchServiceSetup.Get then
+        if DocExchServiceSetup.Get() then
             ShowDocumentsPendingDocExchService := DocExchServiceSetup.Enabled;
 
-        if CompanyInformation.Get then
+        if CompanyInformation.Get() then
             ShowIntercompanyActivities :=
-              (CompanyInformation."IC Partner Code" <> '') and (("IC Inbox Transactions" <> 0) or ("IC Outbox Transactions" <> 0));
+              (CompanyInformation."IC Partner Code" <> '') and ((Rec."IC Inbox Transactions" <> 0) or (Rec."IC Outbox Transactions" <> 0));
     end;
 
     local procedure StartWhatIsNewTour(hasTourCompleted: Boolean)

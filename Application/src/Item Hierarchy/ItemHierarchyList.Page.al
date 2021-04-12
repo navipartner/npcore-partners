@@ -15,23 +15,23 @@ page 6151050 "NPR Item Hierarchy List"
         {
             repeater(Group)
             {
-                field("Hierarchy Code"; "Hierarchy Code")
+                field("Hierarchy Code"; Rec."Hierarchy Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Hierarchy Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("No. Of Levels"; "No. Of Levels")
+                field("No. Of Levels"; Rec."No. Of Levels")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the No. Of Levels field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Visible = false;

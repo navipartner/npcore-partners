@@ -112,7 +112,7 @@ page 6014432 "NPR SMS Log"
                     CurrPage.SetSelectionFilter(MessageLog);
                     if MessageLog.FindFirst() then begin
                         MessageLog.CalcFields(Message);
-                        if MessageLog.Message.HasValue then begin
+                        if MessageLog.Message.HasValue() then begin
                             MessageLog.Message.CreateInStream(InStr);
                             InStr.Read(Msg);
                             Message(Msg);
@@ -136,7 +136,7 @@ page 6014432 "NPR SMS Log"
                     CurrPage.SetSelectionFilter(MessageLog);
                     if MessageLog.FindFirst() then begin
                         MessageLog.CalcFields("Error Message");
-                        if MessageLog."Error Message".HasValue then begin
+                        if MessageLog."Error Message".HasValue() then begin
                             MessageLog."Error Message".CreateInStream(InStr);
                             InStr.Read(ErrorMsg);
                             Message(ErrorMsg);

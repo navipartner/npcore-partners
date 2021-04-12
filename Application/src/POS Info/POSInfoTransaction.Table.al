@@ -114,7 +114,7 @@ table 6150644 "NPR POS Info Transaction"
     begin
         if "Entry No." = 0 then begin
             POSInfoTransaction.SetCurrentKey("Entry No.");
-            if POSInfoTransaction.FindLast then
+            if POSInfoTransaction.FindLast() then
                 "Entry No." := POSInfoTransaction."Entry No." + 1
             else
                 "Entry No." := 1;

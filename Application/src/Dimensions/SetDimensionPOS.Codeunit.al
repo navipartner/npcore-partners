@@ -18,7 +18,6 @@ codeunit 6014451 "NPR Set Dimension POS"
         DimVal: Record "Dimension Value";
         DimSetEntryTmp: Record "Dimension Set Entry" temporary;
         DimMgt: Codeunit DimensionManagement;
-        DimValues: Page "Dimension Values";
         DimText: Code[20];
         DimValueText: Code[20];
         OldDimSetID: Integer;
@@ -30,7 +29,7 @@ codeunit 6014451 "NPR Set Dimension POS"
                 if DimVal.Get(Dim.Code, DimValueText) then begin
                     DimMgt.GetDimensionSet(DimSetEntryTmp, Sale."Dimension Set ID");
                     DimSetEntryTmp.SetRange("Dimension Code", Dim.Code);
-                    if DimSetEntryTmp.FindFirst then;
+                    if DimSetEntryTmp.FindFirst() then;
                     DimSetEntryTmp."Dimension Code" := Dim.Code;
                     DimSetEntryTmp."Dimension Value Code" := DimVal.Code;
                     DimSetEntryTmp."Dimension Value ID" := DimVal."Dimension Value ID";

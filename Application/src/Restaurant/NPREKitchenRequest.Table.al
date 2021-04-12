@@ -226,7 +226,7 @@ table 6150678 "NPR NPRE Kitchen Request"
     begin
         KitchenReqStation.SetRange("Request No.", "Request No.");
         if not KitchenReqStation.IsEmpty then
-            KitchenReqStation.DeleteAll;
+            KitchenReqStation.DeleteAll();
 
         DeleteSourceLinks();
     end;
@@ -234,7 +234,6 @@ table 6150678 "NPR NPRE Kitchen Request"
     var
         Item: Record Item;
         KitchenOrderLine: Record "NPR NPRE Kitchen Request";
-        ChangesAllowedTestSuppressed: Boolean;
 
     local procedure TestChangesAllowed()
     begin
@@ -244,13 +243,12 @@ table 6150678 "NPR NPRE Kitchen Request"
 
     procedure SuppressChangesAllowedTest(Suppress: Boolean)
     begin
-        ChangesAllowedTestSuppressed := Suppress;
     end;
 
     local procedure RevertToNewLineState()
     begin
         KitchenOrderLine := Rec;
-        Init;
+        Init();
         "Restaurant Code" := KitchenOrderLine."Restaurant Code";
         Type := KitchenOrderLine.Type;
     end;
@@ -268,14 +266,14 @@ table 6150678 "NPR NPRE Kitchen Request"
         KitchenReqStation: Record "NPR NPRE Kitchen Req. Station";
     begin
         KitchenReqStation.SetRange("Request No.", "Request No.");
-        if not KitchenReqStation.FindLast then
+        if not KitchenReqStation.FindLast() then
             KitchenReqStation."Line No." := 0;
         exit(KitchenReqStation."Line No." + 10000);
     end;
 
     procedure InitFromWaiterPadLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     begin
-        Init;
+        Init();
         "Request No." := 0;
         Type := WaiterPadLine.Type;
         "No." := WaiterPadLine."No.";
@@ -297,7 +295,7 @@ table 6150678 "NPR NPRE Kitchen Request"
                 KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
                     begin
                         SeatingWaiterPadLink.SetRange("Waiter Pad No.", KitchenReqSourceLink."Source Document No.");
-                        if not SeatingWaiterPadLink.FindFirst then
+                        if not SeatingWaiterPadLink.FindFirst() then
                             SeatingWaiterPadLink."Seating Code" := '';
                         exit(SeatingWaiterPadLink."Seating Code");
                     end;
@@ -312,6 +310,6 @@ table 6150678 "NPR NPRE Kitchen Request"
         KitchenReqSourceLink.SetCurrentKey("Request No.");
         KitchenReqSourceLink.SetRange("Request No.", "Request No.");
         if not KitchenReqSourceLink.IsEmpty then
-            KitchenReqSourceLink.DeleteAll;
+            KitchenReqSourceLink.DeleteAll();
     end;
 }

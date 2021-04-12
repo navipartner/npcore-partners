@@ -65,7 +65,6 @@ table 6014560 "NPR RP Device Settings"
                 StringLibrary: Codeunit "NPR String Library";
                 i: Integer;
                 OptionCount: Integer;
-                Option: Text;
                 tmpRetailList: Record "NPR Retail List" temporary;
             begin
                 if "Data Type" <> "Data Type"::Option then
@@ -79,7 +78,7 @@ table 6014560 "NPR RP Device Settings"
                 for i := 1 to OptionCount + 1 do begin
                     tmpRetailList.Number += 1;
                     tmpRetailList.Choice := StringLibrary.SelectStringSep(i, ',');
-                    tmpRetailList.Insert;
+                    tmpRetailList.Insert();
                 end;
 
                 if tmpRetailList.IsEmpty then

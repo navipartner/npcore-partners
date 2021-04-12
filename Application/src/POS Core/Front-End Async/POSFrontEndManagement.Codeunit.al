@@ -1,4 +1,4 @@
-codeunit 6150704 "NPR POS Front End Management"
+﻿codeunit 6150704 "NPR POS Front End Management"
 {
     var
         POSSession: Codeunit "NPR POS Session";
@@ -81,24 +81,24 @@ codeunit 6150704 "NPR POS Front End Management"
         end;
 
         if not Pausing then begin
-            if WorkflowStack.Count > 0 then
+            if WorkflowStack.Count() > 0 then
                 WorkflowStack.Pop()
         end else
             Pausing := false;
 
-        if ActionStack.Count > 0 then
+        if ActionStack.Count() > 0 then
             ActionStack.Pop();
     end;
 
     local procedure CurrentWorkflowID(): Integer
     begin
-        if WorkflowStack.Count > 0 then
+        if WorkflowStack.Count() > 0 then
             exit(WorkflowStack.Peek());
     end;
 
     local procedure CurrentActionID(): Integer
     begin
-        if ActionStack.Count > 0 then
+        if ActionStack.Count() > 0 then
             exit(ActionStack.Peek());
     end;
 
@@ -193,9 +193,7 @@ codeunit 6150704 "NPR POS Front End Management"
     var
         POSAction: Record "NPR POS Action";
         Button: Record "NPR POS Menu Button";
-        UI: Codeunit "NPR POS UI Management";
         WorkflowAction: Codeunit "NPR Workflow Action";
-        POSParameterValue: Record "NPR POS Parameter Value";
     begin
         if RegisteredWorkflows.Contains(Name) then
             exit;
@@ -259,7 +257,6 @@ codeunit 6150704 "NPR POS Front End Management"
         POSView: Record "NPR POS View";
         DefaultView: Record "NPR POS Default View";
         DataMgt: Codeunit "NPR POS Data Management";
-        SessionEvent: Codeunit "NPR POS Session";
         POSViewChangeWorkflowMgt: Codeunit "NPR POS View Change WF Mgt.";
         Request: Codeunit "NPR Front-End: SetView";
         DataSource: Codeunit "NPR Data Source";
@@ -268,7 +265,6 @@ codeunit 6150704 "NPR POS Front End Management"
         DataSourceNames: List of [Text];
         Markup: Text;
         SourceId: Text;
-        KnownView: Boolean;
     begin
         MakeSureFrameworkIsAvailable(true);
         case ViewType of
@@ -346,7 +342,7 @@ codeunit 6150704 "NPR POS Front End Management"
             RequestView.AddDataSource(DataSource);
         end;
 
-        if RequestView.GetDataSources().Count = 0 then
+        if RequestView.GetDataSources().Count() = 0 then
             DataMgt.SetupDefaultDataSourcesForView(RequestView, Setup);
 
         InvokeFrontEndAsync(Request);
@@ -447,15 +443,15 @@ codeunit 6150704 "NPR POS Front End Management"
         Methods: JsonArray;
         PackageDefinition: JsonObject;
     begin
-        if Package.FindSet then begin
+        if Package.FindSet() then begin
             repeat
-                PackageMethod.Reset;
+                PackageMethod.Reset();
                 PackageMethod.SetRange("Package Name", Package.Name);
-                if PackageMethod.FindSet then begin
+                if PackageMethod.FindSet() then begin
                     Clear(Methods);
                     repeat
                         Methods.Add(PackageMethod."Method Name");
-                    until PackageMethod.Next = 0;
+                    until PackageMethod.Next() = 0;
 
                     Clear(PackageDefinition);
                     PackageDefinition.Add('Name', Package.Name);
@@ -463,7 +459,7 @@ codeunit 6150704 "NPR POS Front End Management"
                     PackageDefinition.Add('Methods', Methods);
                 end;
                 Request.AddPackage(PackageDefinition);
-            until Package.Next = 0;
+            until Package.Next() = 0;
 
             InvokeFrontEndAsync(Request);
         end;
@@ -500,7 +496,7 @@ codeunit 6150704 "NPR POS Front End Management"
             SequenceEntry.Add('action', Sequence."POS Action Code");
             SequenceEntry.Add('priority', Sequence."Sequence No.");
             SequenceContent.Add(SequenceEntry);
-        until Sequence.Next = 0;
+        until Sequence.Next() = 0;
         Request.SetSequences(SequenceContent);
         InvokeFrontEndAsync(Request);
     end;
@@ -602,7 +598,7 @@ codeunit 6150704 "NPR POS Front End Management"
                 if SecureMethodTmp.Type = SecureMethodTmp.Type::Custom then
                     Method.Add('handler', SecureMethodTmp.GetCustomMethodCode());
                 Request.AddMethod(SecureMethodTmp.Code, Method);
-            until SecureMethodTmp.Next = 0;
+            until SecureMethodTmp.Next() = 0;
         InvokeFrontEndAsync(Request);
 
         SecureMethodTmp.SetRange(Type, SecureMethodTmp.Type::"Password Client");
@@ -718,7 +714,7 @@ codeunit 6150704 "NPR POS Front End Management"
         MakeSureFrameworkIsInitialized();
         RegisterWorkflowIfNecessary(POSAction.Code);
 
-        Request.Initialize(CurrentWorkflowID(), POSAction.Code, '', CreateGuid);
+        Request.Initialize(CurrentWorkflowID(), POSAction.Code, '', CreateGuid());
         Request.SetExplicit(true);
         if POSSession.IsInAction and (CurrentWorkflowID > 0) then
             Request.SetNested(true);
@@ -760,7 +756,7 @@ codeunit 6150704 "NPR POS Front End Management"
         DataSetLine: JsonToken;
     begin
         MakeSureFrameworkIsAvailable(true);
-        if DataSets.Count = 0 then
+        if DataSets.Count() = 0 then
             exit;
 
         foreach DataSetLine in DataSets do
@@ -923,7 +919,7 @@ codeunit 6150704 "NPR POS Front End Management"
                 HasWorkflowResponse := false;
                 Request.SetWorkflowResponse(WorkflowResponseContent);
             end;
-            if QueuedWorkflows.Count > 0 then
+            if QueuedWorkflows.Count() > 0 then
                 Request.SetQueuedWorkflows(QueuedWorkflows);
         end;
         InvokeFrontEndAsync(Request);

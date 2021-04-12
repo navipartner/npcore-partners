@@ -1,8 +1,8 @@
 report 6014510 "NPR Purch Return Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Purch Return Order NP.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Purch Return Order NP.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Return Order';
     PreviewMode = PrintLayout;
@@ -467,7 +467,7 @@ report 6014510 "NPR Purch Return Order"
                             if not MoreLines then
                                 CurrReport.Break();
                             PurchLine.SetRange("Line No.", 0, PurchLine."Line No.");
-                            SetRange(Number, 1, PurchLine.Count);
+                            SetRange(Number, 1, PurchLine.Count());
                         end;
                     }
                     dataitem(VATCounter; "Integer")
@@ -542,7 +542,7 @@ report 6014510 "NPR Purch Return Order"
                         begin
                             if VATAmount = 0 then
                                 CurrReport.Break();
-                            SetRange(Number, 1, VATAmountLine.Count);
+                            SetRange(Number, 1, VATAmountLine.Count());
                         end;
                     }
                     dataitem(VATCounterLCY; "Integer")
@@ -590,7 +590,7 @@ report 6014510 "NPR Purch Return Order"
                             then
                                 CurrReport.Break();
 
-                            SetRange(Number, 1, VATAmountLine.Count);
+                            SetRange(Number, 1, VATAmountLine.Count());
 
                             if GLSetup."LCY Code" = '' then
                                 VALSpecLCYHeader := Text007 + Text008
@@ -712,7 +712,7 @@ report 6014510 "NPR Purch Return Order"
                 DimSetEntry1.SetRange("Dimension Set ID", "Dimension Set ID");
 
                 if "Purchaser Code" = '' then begin
-                    SalesPurchPerson.Init;
+                    SalesPurchPerson.Init();
                     PurchaserText := '';
                 end else begin
                     SalesPurchPerson.Get("Purchaser Code");

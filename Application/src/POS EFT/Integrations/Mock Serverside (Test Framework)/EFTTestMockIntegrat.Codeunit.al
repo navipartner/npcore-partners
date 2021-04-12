@@ -9,7 +9,6 @@ codeunit 6184543 "NPR EFT Test Mock Integrat."
     end;
 
     var
-        Description: Label 'Mock for test framework';
         DeviceResponseMode: Option SUCCESS,FAILURE,HANDLED_ERROR;
         CreateRequestMode: Option SUCCESS,UNHANDLED_ERROR;
         PaymentConfirmationMode: Option APPROVE,DECLINE;
@@ -31,11 +30,11 @@ codeunit 6184543 "NPR EFT Test Mock Integrat."
     begin
         //Any non standard EFT operations are registered here:
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
         tmpEFTAuxOperation.Description := 'Aux operation';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
@@ -75,8 +74,6 @@ codeunit 6184543 "NPR EFT Test Mock Integrat."
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
     local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
-    var
-        OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;

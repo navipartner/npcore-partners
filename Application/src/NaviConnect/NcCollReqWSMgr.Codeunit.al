@@ -1,4 +1,4 @@
-codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
+﻿codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
 {
     // NC2.01/BR  /20160912  CASE 250447 NaviConnect: Object created
     // NC2.08/BR  /20171123  CASE 297355 Deleted unused variables
@@ -8,7 +8,6 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
     trigger OnRun()
     var
         XmlDoc: DotNet "NPRNetXmlDocument";
-        ImportType: Record "NPR Nc Import Type";
         FunctionName: Text[100];
     begin
 
@@ -27,13 +26,7 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Initialized: Boolean;
-        ITEM_NOT_FOUND: Label 'The sales item specified in external_id %1, was not found.';
-        CHANGE_NOT_ALLOWED: Label 'Confirmed tickets can''t be changed.';
-        TOKEN_NOT_FOUND: Label 'The token %1 was not found, or has incorrect state.';
-        TOKEN_EXPIRED: Label 'The token %1 has expired. Use PreConfirm to re-reserve tickets.';
-        TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %1 state.';
         MISSING_CASE: Label 'No handler for %1 [%2].';
-        VENDOR_NOT_FOUND: Label 'The Vendor %1 could not be found in the database.';
 
     local procedure CreateCollectorRequests(XmlDoc: DotNet "NPRNetXmlDocument"; RequestEntryNo: Integer; DocumentID: Text[100])
     var
@@ -64,15 +57,15 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
         if not NpXmlDomMgt.FindNodes(XmlElement, 'collectorrequest', XmlNodeList) then
             exit;
 
-        for i := 0 to XmlNodeList.Count - 1 do begin
+        for i := 0 to XmlNodeList.Count() - 1 do begin
             XmlElement := XmlNodeList.ItemOf(i);
             CreateCollectorRequest(XmlElement, Token, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
-    local procedure CreateCollectorRequest(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; DocumentID: Text[100]) Imported: Boolean
+    local procedure CreateCollectorRequest(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; DocumentID: Text[100]): Boolean
     var
         XmlNodeList: DotNet NPRNetXmlNodeList;
         NcCollectorRequest: Record "NPR Nc Collector Request";
@@ -86,7 +79,7 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
 
         ReadCollectorRequest(XmlElement, Token, NcCollectorRequest);
         if NpXmlDomMgt.FindNodes(XmlElement, 'collectorrequestfilter', XmlNodeList) then
-            for i := 0 to XmlNodeList.Count - 1 do begin
+            for i := 0 to XmlNodeList.Count() - 1 do begin
                 XmlElement := XmlNodeList.ItemOf(i);
                 CreateCollectorRequestFilter(XmlElement, Token, DocumentID, NcCollectorRequest);
             end;
@@ -97,7 +90,7 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
         exit(true);
     end;
 
-    local procedure CreateCollectorRequestFilter(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; DocumentID: Text[100]; var NcCollectorRequest: Record "NPR Nc Collector Request") Imported: Boolean
+    local procedure CreateCollectorRequestFilter(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; DocumentID: Text[100]; var NcCollectorRequest: Record "NPR Nc Collector Request"): Boolean
     var
         NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter";
     begin
@@ -118,29 +111,18 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
     end;
 
     local procedure InsertCollectorRequests(var NcCollectorRequest: Record "NPR Nc Collector Request"): Boolean
-    var
-        ResponseMessage: Text;
-        ResponseCode: Integer;
     begin
 
         NcCollectorRequest.Init();
     end;
 
     local procedure ReadCollectorRequest(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; var NcCollectorRequest: Record "NPR Nc Collector Request")
-    var
-        VendorVATRegNo: Text;
-        TempText: Text;
-        TempDec: Decimal;
-        TempBool: Boolean;
-        TempInteger: Integer;
-        TempDateFormula: DateFormula;
-        TempDate: Date;
     begin
 
         Initialize;
 
         Clear(NcCollectorRequest);
-        NcCollectorRequest.Init;
+        NcCollectorRequest.Init();
         NcCollectorRequest."Creation Date" := CurrentDateTime();
         if NpXmlDomMgt.GetXmlText(XmlElement, 'no', MaxStrLen(NcCollectorRequest.Name), false) <> '' then
             Evaluate(NcCollectorRequest."External No.", NpXmlDomMgt.GetXmlText(XmlElement, 'no', MaxStrLen(NcCollectorRequest.Name), false), 9);
@@ -156,28 +138,18 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
     end;
 
     local procedure InsertCollectorRequestFilters(var NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter"): Boolean
-    var
-        ResponseMessage: Text;
-        ResponseCode: Integer;
     begin
 
         NcCollectorRequestFilter.Init();
     end;
 
     local procedure ReadCollectorRequestFilter(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; var NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter"; var NcCollectorRequest: Record "NPR Nc Collector Request")
-    var
-        TempText: Text;
-        TempDec: Decimal;
-        TempBool: Boolean;
-        TempInteger: Integer;
-        TempDateFormula: DateFormula;
-        TempDate: Date;
     begin
 
         Initialize;
 
         Clear(NcCollectorRequestFilter);
-        NcCollectorRequestFilter.Init;
+        NcCollectorRequestFilter.Init();
         NcCollectorRequestFilter."Nc Collector Request No." := NcCollectorRequest."No.";
         Evaluate(NcCollectorRequestFilter."Table No.", NpXmlDomMgt.GetXmlText(XmlElement, 'tableno', 0, false), 9);
         Evaluate(NcCollectorRequestFilter."Field No.", NpXmlDomMgt.GetXmlText(XmlElement, 'fieldno', 0, false), 9);
@@ -186,14 +158,10 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
     end;
 
     local procedure SetImportParameters(XmlElement: DotNet NPRNetXmlElement; Token: Text[100])
-    var
-        TempText: Text;
     begin
     end;
 
     local procedure FindCollectorRequest(VendorNo: Code[20]; VendorVATRegNo: Text; ItemNo: Code[20]; var ItemWorksheetTemplateCode: Code[20]; var ItemWorksheetCode: Code[20]; var ItemWorksheetLineNo: Integer)
-    var
-        Vendor: Record Vendor;
     begin
     end;
 
@@ -209,7 +177,7 @@ codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
         end;
     end;
 
-    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]) FunctionName: Text[100]
+    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text[100]
     var
         ImportType: Record "NPR Nc Import Type";
     begin

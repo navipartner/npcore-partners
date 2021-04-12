@@ -473,7 +473,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         POSSale.GetCurrentSale(SalePOS);
         _Item.Get(_Item."No.");
         _Item."Unit Price" := TransactionAmount;
-        _Item.Modify;
+        _Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
 
@@ -511,7 +511,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         POSSale.GetCurrentSale(SalePOS);
         _Item.Get(_Item."No.");
         _Item."Unit Price" := TransactionAmount;
-        _Item.Modify;
+        _Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
 
@@ -566,7 +566,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         POSSale.GetCurrentSale(SalePOS);
         _Item.Get(_Item."No.");
         _Item."Unit Price" := TransactionAmount;
-        _Item.Modify;
+        _Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
 
@@ -609,7 +609,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         POSSale.GetCurrentSale(SalePOS);
         _Item.Get(_Item."No.");
         _Item."Unit Price" := TransactionAmount;
-        _Item.Modify;
+        _Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
 
@@ -699,7 +699,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
             _Initialized := true;
         end;
 
-        Commit;
+        Commit();
     end;
 
 }

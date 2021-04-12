@@ -17,30 +17,30 @@ page 6151092 "NPR Nc RapidConnect Subform"
         {
             repeater(Group)
             {
-                field("Table ID"; "Table ID")
+                field("Table ID"; Rec."Table ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table ID field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Insert Trigger"; "Insert Trigger")
+                field("Insert Trigger"; Rec."Insert Trigger")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Insert Trigger field';
                 }
-                field("Modify Trigger"; "Modify Trigger")
+                field("Modify Trigger"; Rec."Modify Trigger")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Modify Trigger field';
                 }
-                field(Control6151408; "Trigger Fields")
+                field(Control6151408; Rec."Trigger Fields")
                 {
                     ApplicationArea = All;
-                    HideValue = ("Modify Trigger" <> 2);
+                    HideValue = (Rec."Modify Trigger" <> 2);
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Trigger Fields field';
                 }
@@ -58,7 +58,7 @@ page 6151092 "NPR Nc RapidConnect Subform"
                 RunObject = Page "NPR Nc RapidConnect Trg.Fields";
                 RunPageLink = "Setup Code" = FIELD("Setup Code"),
                               "Table ID" = FIELD("Table ID");
-                Visible = ("Modify Trigger" = 2);
+                Visible = (Rec."Modify Trigger" = 2);
                 ApplicationArea = All;
                 ToolTip = 'Executes the Trigger Fields action';
             }

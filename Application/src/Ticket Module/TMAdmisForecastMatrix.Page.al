@@ -164,7 +164,6 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
         PageAdmissionCode: Code[20];
         PageStatisticsOption: Option INITIAL,RESERVATION,UTILIZATION_PCT,CAPACITY_PCT;
         PagePeriodOption: Option ACTUAL,DAY,WEEK,MONTH,QUARTER,YEAR;
-        PageDateFilter: Text;
         MATRIX_MatrixRecords: array[32] of Record "NPR TM Admis. Schedule Entry";
         MATRIX_CaptionSet: array[32] of Text[80];
         MATRIX_CaptionRange: Text[250];
@@ -179,8 +178,6 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
         MATRIX_PeriodRecords: array[32] of Record Date;
         i: Integer;
         RecRef: RecordRef;
-        FieldRef: FieldRef;
-        ColumnFieldNo: Integer;
         TmpAdmSchEntry: Record "NPR TM Admis. Schedule Entry" temporary;
     begin
 

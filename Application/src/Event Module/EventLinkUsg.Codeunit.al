@@ -1,4 +1,4 @@
-codeunit 6060157 "NPR Event Link Usg."
+﻿codeunit 6060157 "NPR Event Link Usg."
 {
     //New object copied from standard codeunit 1026
     Permissions = TableData "Job Usage Link" = rimd;
@@ -85,7 +85,7 @@ codeunit 6060157 "NPR Event Link Usg."
         Resource: Record Resource;
         "Filter": Text;
     begin
-        JobPlanningLine.Reset;
+        JobPlanningLine.Reset();
         JobPlanningLine.SetCurrentKey("Job No.", "Schedule Line", Type, "No.", "Planning Date");
         JobPlanningLine.SetRange("Job No.", JobLedgerEntry."Job No.");
         JobPlanningLine.SetRange("Job Task No.", JobLedgerEntry."Job Task No.");
@@ -118,14 +118,14 @@ codeunit 6060157 "NPR Event Link Usg."
         end;
 
         // Match most specific Job Planning Line.
-        if JobPlanningLine.FindFirst then
+        if JobPlanningLine.FindFirst() then
             exit(true);
 
         JobPlanningLine.SetRange("Variant Code", '');
         JobPlanningLine.SetRange("Work Type Code", '');
 
         // Match Location Code, while Variant Code and Work Type Code are blank.
-        if JobPlanningLine.FindFirst then
+        if JobPlanningLine.FindFirst() then
             exit(true);
 
         JobPlanningLine.SetRange("Location Code", '');
@@ -138,14 +138,14 @@ codeunit 6060157 "NPR Event Link Usg."
         end;
 
         // Match Variant Code / Work Type Code, while Location Code is blank.
-        if JobPlanningLine.FindFirst then
+        if JobPlanningLine.FindFirst() then
             exit(true);
 
         JobPlanningLine.SetRange("Variant Code", '');
         JobPlanningLine.SetRange("Work Type Code", '');
 
         // Match unspecific Job Planning Line.
-        if JobPlanningLine.FindFirst then
+        if JobPlanningLine.FindFirst() then
             exit(true);
 
         exit(false);
@@ -164,16 +164,16 @@ codeunit 6060157 "NPR Event Link Usg."
             JobLedgerEntry."Line Type"::Billable:
                 JobLedgerEntry."Line Type" := JobLedgerEntry."Line Type"::"Both Budget and Billable";
         end;
-        JobPlanningLine.Reset;
+        JobPlanningLine.Reset();
         JobPostLine.InsertPlLineFromLedgEntry(JobLedgerEntry);
         // Retrieve the newly created Job PlanningLine.
         JobPlanningLine.SetRange("Job No.", JobLedgerEntry."Job No.");
         JobPlanningLine.SetRange("Job Task No.", JobLedgerEntry."Job Task No.");
         JobPlanningLine.SetRange("Schedule Line", true);
-        JobPlanningLine.FindLast;
+        JobPlanningLine.FindLast();
         JobPlanningLine.Validate("Usage Link", true);
         JobPlanningLine.Validate(Quantity, RemainingQtyToMatch);
-        JobPlanningLine.Modify;
+        JobPlanningLine.Modify();
 
         // If type is Both Schedule And Contract and that type isn't allowed,
         // retrieve the Contract line and modify the quantity as well.
@@ -184,7 +184,7 @@ codeunit 6060157 "NPR Event Link Usg."
         then begin
             JobPlanningLine.Get(JobLedgerEntry."Job No.", JobLedgerEntry."Job Task No.", JobPlanningLine."Line No." + 10000);
             JobPlanningLine.Validate(Quantity, RemainingQtyToMatch);
-            JobPlanningLine.Modify;
+            JobPlanningLine.Modify();
             JobPlanningLine.Get(JobLedgerEntry."Job No.", JobLedgerEntry."Job Task No.", JobPlanningLine."Line No." - 10000);
         end;
     end;

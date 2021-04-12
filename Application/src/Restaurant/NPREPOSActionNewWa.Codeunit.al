@@ -99,7 +99,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -158,18 +158,18 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
         WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
         NPREWaiterPad."Number of Guests" := NumberOfGuests;
-        NPREWaiterPad.Modify;
+        NPREWaiterPad.Modify();
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find;
+        SalePOS.Find();
         SalePOS."NPRE Number of Guests" := NumberOfGuests;
         SalePOS."NPRE Pre-Set Waiter Pad No." := NPREWaiterPad."No.";
         SalePOS.Validate("NPRE Pre-Set Seating Code", SeatingCode);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
         POSSession.RequestRefreshData();
-        Commit;
+        Commit();
 
         if OpenWaiterPad then begin
             WaiterPadPOSManagement.UIShowWaiterPad(NPREWaiterPad);
@@ -212,7 +212,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         if NPRESeatingWaiterPadLink.IsEmpty then
             exit('');
 
-        NPRESeatingWaiterPadLink.FindSet;
+        NPRESeatingWaiterPadLink.FindSet();
         ConfirmString := StrSubstNo(Text001, NPRESeating.Code);
         ConfirmString += '\';
         repeat
@@ -222,7 +222,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
             ConfirmString += ' ' + Format(NPREWaiterPad."Start Time");
             if NPREWaiterPad.Description <> '' then
                 ConfirmString += ' ' + NPREWaiterPad.Description;
-        until NPRESeatingWaiterPadLink.Next = 0;
+        until NPRESeatingWaiterPadLink.Next() = 0;
 
         exit(ConfirmString);
     end;

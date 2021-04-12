@@ -92,7 +92,7 @@ table 6060141 "NPR MM Loyalty Point Setup"
         }
         field(1015; "Discount Type"; Option)
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Discount Type" WHERE(Code = FIELD("Coupon Type Code")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Discount Type" WHERE(Code = FIELD("Coupon Type Code")));
             Caption = 'Discount Type';
             Editable = false;
             FieldClass = FlowField;
@@ -101,7 +101,7 @@ table 6060141 "NPR MM Loyalty Point Setup"
         }
         field(1020; "Discount %"; Decimal)
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Discount %" WHERE(Code = FIELD("Coupon Type Code")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Discount %" WHERE(Code = FIELD("Coupon Type Code")));
             Caption = 'Discount %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -112,7 +112,7 @@ table 6060141 "NPR MM Loyalty Point Setup"
         field(1022; "Max. Discount Amount"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Max. Discount Amount" WHERE(Code = FIELD("Coupon Type Code")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Max. Discount Amount" WHERE(Code = FIELD("Coupon Type Code")));
             Caption = 'Max. Discount Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -120,7 +120,7 @@ table 6060141 "NPR MM Loyalty Point Setup"
         field(1025; "Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Discount Amount" WHERE(Code = FIELD("Coupon Type Code")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Discount Amount" WHERE(Code = FIELD("Coupon Type Code")));
             Caption = 'Discount Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -152,7 +152,7 @@ table 6060141 "NPR MM Loyalty Point Setup"
         if ("Line No." = 0) then begin
             "Line No." := 10000;
             LoyaltyPointsSetup.SetFilter(Code, '=%1', Code);
-            if (LoyaltyPointsSetup.FindLast) then
+            if (LoyaltyPointsSetup.FindLast()) then
                 "Line No." += LoyaltyPointsSetup."Line No.";
         end;
     end;

@@ -115,7 +115,7 @@ report 6014443 "NPR Period Discount Stat."
 
                     Item.SetRange("No.", "Item No.");
                     Item.SetFilter("Date Filter", '%1..%2', 0D, "Period Discount"."Ending Date");
-                    if Item.FindFirst then
+                    if Item.FindFirst() then
                         Item.CalcFields("Net Change");
 
                     if (Turnover <> 0) and ("Quantity Sold" <> 0) then begin

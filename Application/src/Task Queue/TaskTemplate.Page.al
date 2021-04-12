@@ -15,52 +15,52 @@ page 6059900 "NPR Task Template"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Test Report ID"; "Test Report ID")
+                field("Test Report ID"; Rec."Test Report ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Test Report ID field';
                 }
-                field("Page ID"; "Page ID")
+                field("Page ID"; Rec."Page ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Form ID field';
                 }
-                field("Mail From Address"; "Mail From Address")
+                field("Mail From Address"; Rec."Mail From Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mail From Address field';
                 }
-                field("Mail From Name"; "Mail From Name")
+                field("Mail From Name"; Rec."Mail From Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mail From Name field';
                 }
-                field("Task Worker Group"; "Task Worker Group")
+                field("Task Worker Group"; Rec."Task Worker Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Worker Group field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Test Report Name"; "Test Report Name")
+                field("Test Report Name"; Rec."Test Report Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Test Report Name field';
                 }
-                field("Page Name"; "Page Name")
+                field("Page Name"; Rec."Page Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Form Name field';

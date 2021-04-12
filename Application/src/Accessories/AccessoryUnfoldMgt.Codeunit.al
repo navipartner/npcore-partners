@@ -1,4 +1,4 @@
-codeunit 6014506 "NPR Accessory Unfold Mgt."
+﻿codeunit 6014506 "NPR Accessory Unfold Mgt."
 {
     trigger OnRun()
     begin
@@ -29,11 +29,11 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
         if not RunDynamicRequestPage(ItemLedgEntry) then
             exit;
 
-        if not ItemLedgEntry.FindSet then
+        if not ItemLedgEntry.FindSet() then
             exit;
 
         if GuiAllowed then begin
-            Total := ItemLedgEntry.Count;
+            Total := ItemLedgEntry.Count();
             Window.Open(Text001);
         end;
 
@@ -45,10 +45,10 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
 
             if FindAccessories(ItemLedgEntry."Item No.", TempAccessorySparePart) then
                 ItemLedgEntry2Worksheet(AccessoryUnfoldWorksheet, ItemLedgEntry, TempAccessorySparePart);
-        until ItemLedgEntry.Next = 0;
+        until ItemLedgEntry.Next() = 0;
 
         if GuiAllowed then
-            Window.Close;
+            Window.Close();
     end;
 
     local procedure ItemLedgEntry2Worksheet(AccessoryUnfoldWorksheet: Record "NPR Accessory Unfold Worksheet"; ItemLedgEntry: Record "Item Ledger Entry"; var TempAccessorySparePart: Record "NPR Accessory/Spare Part" temporary)
@@ -57,7 +57,7 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
             exit;
 
         if not AccessoryUnfoldWorksheet.Get(ItemLedgEntry."Item No.", ItemLedgEntry."Entry No.", '') then begin
-            AccessoryUnfoldWorksheet.Init;
+            AccessoryUnfoldWorksheet.Init();
             AccessoryUnfoldWorksheet.Validate("Accessory Item No.", ItemLedgEntry."Item No.");
             AccessoryUnfoldWorksheet.Validate("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
             AccessoryUnfoldWorksheet.Validate("Item No.", '');
@@ -65,16 +65,16 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
         end;
 
         SetAccessoryFilter(ItemLedgEntry."Item No.", TempAccessorySparePart);
-        TempAccessorySparePart.FindSet;
+        TempAccessorySparePart.FindSet();
         repeat
             if not AccessoryUnfoldWorksheet.Get(ItemLedgEntry."Item No.", ItemLedgEntry."Entry No.", TempAccessorySparePart."Item No.") then begin
-                AccessoryUnfoldWorksheet.Init;
+                AccessoryUnfoldWorksheet.Init();
                 AccessoryUnfoldWorksheet.Validate("Accessory Item No.", ItemLedgEntry."Item No.");
                 AccessoryUnfoldWorksheet.Validate("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
                 AccessoryUnfoldWorksheet.Validate("Item No.", TempAccessorySparePart."Item No.");
                 AccessoryUnfoldWorksheet.Insert(true);
             end;
-        until TempAccessorySparePart.Next = 0;
+        until TempAccessorySparePart.Next() = 0;
     end;
 
     local procedure FindAccessories(AccessoryItemNo: Code[20]; var TempAccessorySparePart: Record "NPR Accessory/Spare Part" temporary): Boolean
@@ -82,19 +82,19 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
         AccessorySparePart: Record "NPR Accessory/Spare Part";
     begin
         SetAccessoryFilter(AccessoryItemNo, TempAccessorySparePart);
-        if TempAccessorySparePart.FindFirst then
+        if TempAccessorySparePart.FindFirst() then
             exit(true);
 
         SetAccessoryFilter(AccessoryItemNo, AccessorySparePart);
         if AccessorySparePart.IsEmpty then
             exit(false);
 
-        AccessorySparePart.FindSet;
+        AccessorySparePart.FindSet();
         repeat
-            TempAccessorySparePart.Init;
+            TempAccessorySparePart.Init();
             TempAccessorySparePart := AccessorySparePart;
-            TempAccessorySparePart.Insert;
-        until AccessorySparePart.Next = 0;
+            TempAccessorySparePart.Insert();
+        until AccessorySparePart.Next() = 0;
 
         exit(true);
     end;
@@ -115,21 +115,19 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
     begin
         AccessoryUnfoldEntry.SetRange("Accessory Item No.", ItemLedgEntry."Item No.");
         AccessoryUnfoldEntry.SetRange("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
-        if AccessoryUnfoldEntry.FindFirst then
+        if AccessoryUnfoldEntry.FindFirst() then
             exit(true);
 
-        AccessoryUnfoldEntry.Reset;
+        AccessoryUnfoldEntry.Reset();
         AccessoryUnfoldEntry.SetRange("Accessory Item No.", ItemLedgEntry."Item No.");
         AccessoryUnfoldEntry.SetRange("Unfold Item Ledger Entry No.", ItemLedgEntry."Entry No.");
-        exit(AccessoryUnfoldEntry.FindFirst);
+        exit(AccessoryUnfoldEntry.FindFirst());
     end;
 
     local procedure RunDynamicRequestPage(var ItemLedgEntry: Record "Item Ledger Entry"): Boolean
     var
-        RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
         FilterName: Text;
-        FilterView: Text;
     begin
         if not GuiAllowed then
             exit(true);
@@ -146,7 +144,7 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
         FilterPageBuilder.ADdField(FilterName, ItemLedgEntry."Document No.");
         FilterPageBuilder.SetView(FilterName, ItemLedgEntry.GetView(false));
 
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         ItemLedgEntry.SetView(FilterPageBuilder.GetView(FilterName, false));
@@ -178,11 +176,11 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
         AccessoryUnfoldWorksheet2.FilterGroup(40);
         AccessoryUnfoldWorksheet2.SetFilter("Accessory Item No.", '<>%1', '');
         AccessoryUnfoldWorksheet2.SetFilter("Item Ledger Entry No.", '>%1', 0);
-        if not AccessoryUnfoldWorksheet2.FindSet then
+        if not AccessoryUnfoldWorksheet2.FindSet() then
             exit(false);
 
         if GuiAllowed then begin
-            Total := AccessoryUnfoldWorksheet2.Count;
+            Total := AccessoryUnfoldWorksheet2.Count();
             Window.Open(Text003);
         end;
 
@@ -192,12 +190,12 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
                 Window.Update(1, Round((Counter / Total) * 10000, 1));
             end;
             TestVatSetup(AccessoryUnfoldWorksheet2."Accessory Item No.", AccessoryUnfoldWorksheet2."Item No.");
-        until AccessoryUnfoldWorksheet2.Next = 0;
+        until AccessoryUnfoldWorksheet2.Next() = 0;
 
         if UseDialog() then
             Counter := 0;
 
-        AccessoryUnfoldWorksheet2.FindSet;
+        AccessoryUnfoldWorksheet2.FindSet();
         repeat
             if UseDialog() then begin
                 Counter += 1;
@@ -207,10 +205,10 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
             TransferWorksheet2UnfoldEntry(AccessoryUnfoldWorksheet2);
             AccessoryUnfoldWorksheet2.Delete(true);
             PostItemJnlLine(TempItemJnlLine);
-        until AccessoryUnfoldWorksheet2.Next = 0;
+        until AccessoryUnfoldWorksheet2.Next() = 0;
 
         if UseDialog() then
-            Window.Close;
+            Window.Close();
 
         exit(true);
     end;
@@ -220,10 +218,10 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
         AccessoryUnfoldEntry: Record "NPR Accessory Unfold Entry";
         ItemLedgEntry: Record "Item Ledger Entry";
     begin
-        ItemLedgEntry.LockTable;
-        if ItemLedgEntry.FindLast then;
+        ItemLedgEntry.LockTable();
+        if ItemLedgEntry.FindLast() then;
 
-        AccessoryUnfoldEntry.Init;
+        AccessoryUnfoldEntry.Init();
         AccessoryUnfoldEntry."Accessory Item No." := AccessoryUnfoldWorksheet."Accessory Item No.";
         AccessoryUnfoldEntry."Item Ledger Entry No." := AccessoryUnfoldWorksheet."Item Ledger Entry No.";
         AccessoryUnfoldEntry."Item No." := AccessoryUnfoldWorksheet."Item No.";
@@ -241,11 +239,11 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
     begin
         AuxItemLedgerEntry.Get(AccessoryUnfoldWorksheet."Item Ledger Entry No.");
         ValueEntry.SetRange("Item Ledger Entry No.", AuxItemLedgerEntry."Entry No.");
-        ValueEntry.FindFirst;
+        ValueEntry.FindFirst();
 
         LineNo += 10000;
 
-        TempItemJnlLine.Init;
+        TempItemJnlLine.Init();
         TempItemJnlLine."Line No." := LineNo;
         if AccessoryUnfoldWorksheet."Item No." <> '' then
             TempItemJnlLine.Validate("Item No.", AccessoryUnfoldWorksheet."Item No.")
@@ -267,7 +265,7 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
         TempItemJnlLine.Validate("Shortcut Dimension 2 Code", AuxItemLedgerEntry."Global Dimension 2 Code");
         TempItemJnlLine.Validate("Salespers./Purch. Code", AuxItemLedgerEntry."Salespers./Purch. Code");
         TempItemJnlLine.Validate("Unit Amount", AccessoryUnfoldWorksheet."Unit Price");
-        TempItemJnlLine.Insert;
+        TempItemJnlLine.Insert();
     end;
 
     local procedure PostItemJnlLine(var TempItemJnlLine: Record "Item Journal Line" temporary)

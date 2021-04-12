@@ -16,17 +16,17 @@ page 6184481 "NPR EFT Setup"
         {
             repeater(Group)
             {
-                field("Payment Type POS"; "Payment Type POS")
+                field("Payment Type POS"; Rec."Payment Type POS")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Type POS field';
                 }
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("EFT Integration Type"; "EFT Integration Type")
+                field("EFT Integration Type"; Rec."EFT Integration Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the EFT Integration Type field';
@@ -44,7 +44,7 @@ page 6184481 "NPR EFT Setup"
                 Caption = 'POS Unit Parameters';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -53,7 +53,6 @@ page 6184481 "NPR EFT Setup"
                 trigger OnAction()
                 var
                     EFTInterface: Codeunit "NPR EFT Interface";
-                    Handled: Boolean;
                 begin
                     EFTInterface.OnConfigureIntegrationUnitSetup(Rec);
                 end;
@@ -63,7 +62,7 @@ page 6184481 "NPR EFT Setup"
                 Caption = 'Payment Type Parameters';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

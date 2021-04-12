@@ -54,9 +54,7 @@ table 6151122 "NPR GDPR Agreement Version"
 
     trigger OnInsert()
     var
-        GDPRSetup: Record "NPR GDPR Setup";
         GDPRAgreement: Record "NPR GDPR Agreement";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
 
         TestField("Activation Date");

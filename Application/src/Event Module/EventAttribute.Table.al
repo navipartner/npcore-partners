@@ -40,7 +40,7 @@ table 6060162 "NPR Event Attribute"
         if not EventAttributeEntry.IsEmpty then begin
             if not Confirm(StrSubstNo(ConfirmAttributeDelete, "Template Name")) then
                 Error('');
-            EventAttributeEntry.DeleteAll;
+            EventAttributeEntry.DeleteAll();
         end;
     end;
 

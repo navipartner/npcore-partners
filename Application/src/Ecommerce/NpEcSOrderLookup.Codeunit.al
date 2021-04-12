@@ -5,7 +5,6 @@ codeunit 6151302 "NPR NpEc S.Order Lookup"
     trigger OnRun()
     var
         TempSalesHeader: Record "Sales Header" temporary;
-        TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary;
         TempSalesInvHeader: Record "Sales Invoice Header" temporary;
     begin
         if not GetOrderDocuments(Rec, TempSalesHeader, TempSalesInvHeader) then
@@ -48,29 +47,29 @@ codeunit 6151302 "NPR NpEc S.Order Lookup"
         foreach Node in NodeList do begin
             Element := Node.AsXmlElement();
             if NpEcSalesDocImportMgt.FindOrder(Element, SalesHeader) and not TempSalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin
-                TempSalesHeader.Init;
+                TempSalesHeader.Init();
                 TempSalesHeader := SalesHeader;
-                TempSalesHeader.Insert;
+                TempSalesHeader.Insert();
             end;
 
             NpEcSalesDocImportMgt.FindPostedInvoices(Element, TempSalesInvHeader);
         end;
 
-        exit(TempSalesHeader.FindSet or TempSalesInvHeader.FindSet);
+        exit(TempSalesHeader.FindSet() or TempSalesInvHeader.FindSet);
     end;
 
     procedure RunPageSalesOrder(var TempSalesHeader: Record "Sales Header" temporary): Boolean
     var
         SalesHeader: Record "Sales Header";
     begin
-        case TempSalesHeader.Count of
+        case TempSalesHeader.Count() of
             0:
                 begin
                     exit(false);
                 end;
             1:
                 begin
-                    TempSalesHeader.FindFirst;
+                    TempSalesHeader.FindFirst();
                     SalesHeader.Get(TempSalesHeader."Document Type", TempSalesHeader."No.");
                     PAGE.Run(PAGE::"Sales Order", SalesHeader);
                 end;
@@ -85,14 +84,14 @@ codeunit 6151302 "NPR NpEc S.Order Lookup"
     var
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        case TempSalesInvHeader.Count of
+        case TempSalesInvHeader.Count() of
             0:
                 begin
                     exit(false);
                 end;
             1:
                 begin
-                    TempSalesInvHeader.FindFirst;
+                    TempSalesInvHeader.FindFirst();
                     SalesInvHeader.Get(TempSalesInvHeader."No.");
                     PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
                 end;

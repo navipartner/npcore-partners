@@ -62,14 +62,14 @@ codeunit 6184531 "NPR EFT Adyen Abort Unfin. Trx"
           LastEFTTransactionRequest."Processing Type"::PAYMENT,
           LastEFTTransactionRequest."Processing Type"::REFUND,
           LastEFTTransactionRequest."Processing Type"::VOID);
-        if not LastEFTTransactionRequest.FindLast then
+        if not LastEFTTransactionRequest.FindLast() then
             exit(-1);
 
         EntryNoToCheck := LastEFTTransactionRequest."Entry No.";
 
         LastEFTTransactionRequest.SetRange("Processing Type", LastEFTTransactionRequest."Processing Type"::AUXILIARY);
         LastEFTTransactionRequest.SetFilter("Auxiliary Operation ID", '%1|%2|%3', 2, 4, 5);
-        if LastEFTTransactionRequest.FindLast then
+        if LastEFTTransactionRequest.FindLast() then
             if LastEFTTransactionRequest."Entry No." > EntryNoToCheck then
                 EntryNoToCheck := LastEFTTransactionRequest."Entry No.";
 

@@ -221,7 +221,7 @@ report 6060130 "NPR MM Membership Points Value"
                 PointsToRedeem := 0;
                 PerPointDistributionValue := 0;
                 TotalPointDistributionValue := 0;
-                TempLoyaltyPointsPerMembership.DeleteAll;
+                TempLoyaltyPointsPerMembership.DeleteAll();
                 SumRemainingPoints += "MM Membership"."Remaining Points";
             end;
 

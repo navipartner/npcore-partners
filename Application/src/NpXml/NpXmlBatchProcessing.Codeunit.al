@@ -5,7 +5,6 @@ codeunit 6151512 "NPR NpXml Batch Processing"
     trigger OnRun()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
         if FindNpXmlTemplate(Rec, NpXmlTemplate) then
             ProcessNpXmlBatch(NpXmlTemplate)
@@ -23,10 +22,10 @@ codeunit 6151512 "NPR NpXml Batch Processing"
     begin
         NpXmlTemplate.SetRange("Batch Task", true);
         NpXmlTemplate.SetFilter("Next Batch Run", '<=%1', CurrentDateTime);
-        if NpXmlTemplate.FindSet then
+        if NpXmlTemplate.FindSet() then
             repeat
                 ProcessNpXmlBatch(NpXmlTemplate);
-            until NpXmlTemplate.Next = 0;
+            until NpXmlTemplate.Next() = 0;
     end;
 
     local procedure ProcessNpXmlBatch(var NpXmlTemplate: Record "NPR NpXml Template")
@@ -36,7 +35,7 @@ codeunit 6151512 "NPR NpXml Batch Processing"
             NpXmlTemplate."Last Error Message" := CopyStr(GetLastErrorText, 1, MaxStrLen(NpXmlTemplate.Code));
             NpXmlTemplate.Modify(true);
         end;
-        Commit;
+        Commit();
     end;
 
     local procedure FindNpXmlTemplate(JobQueueEntry: Record "Job Queue Entry"; var NpXmlTemplate: Record "NPR NpXml Template"): Boolean
@@ -147,7 +146,7 @@ codeunit 6151512 "NPR NpXml Batch Processing"
 
     procedure ScheduleBatchTask(NpXmlTemplate: Record "NPR NpXml Template"; var JobQueueEntry: Record "Job Queue Entry")
     begin
-        JobQueueEntry.Init;
+        JobQueueEntry.Init();
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
         JobQueueEntry."Object ID to Run" := CurrCodeunitId();
         JobQueueEntry.Validate("Parameter String", ParamTemplateCode() + '=' + NpXmlTemplate.Code);

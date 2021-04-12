@@ -138,15 +138,15 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
         EFTTypePOSUnitBlobParam: Record "NPR EFTType POSUnit BLOBParam.";
         EFTMobilePayIntegration: Codeunit "NPR EFT MobilePay Integ.";
     begin
-        EFTTypePOSUnitGenParam.SetRange("Integration Type", "EFT Integration Type");
-        EFTTypePOSUnitGenParam.SetRange("POS Unit No.", "POS Unit No.");
-        ShowPOSUnitGenParameter := not EFTTypePOSUnitGenParam.IsEmpty;
+        EFTTypePOSUnitGenParam.SetRange("Integration Type", Rec."EFT Integration Type");
+        EFTTypePOSUnitGenParam.SetRange("POS Unit No.", Rec."POS Unit No.");
+        ShowPOSUnitGenParameter := not EFTTypePOSUnitGenParam.IsEmpty();
 
-        EFTTypePOSUnitBlobParam.SetRange("Integration Type", "EFT Integration Type");
-        EFTTypePOSUnitBlobParam.SetRange("POS Unit No.", "POS Unit No.");
-        ShowPOSUnitBLOBParameter := not EFTTypePOSUnitBlobParam.IsEmpty;
+        EFTTypePOSUnitBlobParam.SetRange("Integration Type", Rec."EFT Integration Type");
+        EFTTypePOSUnitBlobParam.SetRange("POS Unit No.", Rec."POS Unit No.");
+        ShowPOSUnitBLOBParameter := not EFTTypePOSUnitBlobParam.IsEmpty();
 
-        IsMobilePay := "EFT Integration Type" = EFTMobilePayIntegration.IntegrationType(); //This check & page actions can be in V2 extension.
+        IsMobilePay := Rec."EFT Integration Type" = EFTMobilePayIntegration.IntegrationType(); //This check & page actions can be in V2 extension.
     end;
 
     var

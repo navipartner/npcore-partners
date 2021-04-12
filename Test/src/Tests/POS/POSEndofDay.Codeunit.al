@@ -55,7 +55,7 @@ codeunit 85020 "NPR POS End of Day"
             VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
             Item."Unit Price" := _PrimeNumbers[SalesOffset];
-            Item.Modify;
+            Item.Modify();
 
             LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals            
             NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", LineQty);
@@ -188,7 +188,7 @@ codeunit 85020 "NPR POS End of Day"
             VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
             Item."Unit Price" := _PrimeNumbers[SalesOffset];
-            Item.Modify;
+            Item.Modify();
 
             LineQty := -1 * (1 + _PrimeNumbers[SalesOffset] / 100); // will be 2 decimals            
             NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", LineQty);
@@ -321,7 +321,7 @@ codeunit 85020 "NPR POS End of Day"
             VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
             Item."Unit Price" := _PrimeNumbers[SalesOffset];
-            Item.Modify;
+            Item.Modify();
 
             LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals            
             NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", LineQty);
@@ -420,7 +420,7 @@ codeunit 85020 "NPR POS End of Day"
         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
         Item."Unit Price" := _PrimeNumbers[SalesOffset];
-        Item.Modify;
+        Item.Modify();
 
         LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals            
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", LineQty);
@@ -500,7 +500,7 @@ codeunit 85020 "NPR POS End of Day"
         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
         Item."Unit Price" := _PrimeNumbers[SalesOffset];
-        Item.Modify;
+        Item.Modify();
 
         LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals            
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", LineQty);
@@ -583,7 +583,7 @@ codeunit 85020 "NPR POS End of Day"
         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
         Item."Unit Price" := _PrimeNumbers[SalesOffset];
-        Item.Modify;
+        Item.Modify();
 
         LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals            
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", LineQty);
@@ -660,7 +660,7 @@ codeunit 85020 "NPR POS End of Day"
         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
         Item."Unit Price" := _PrimeNumbers[SalesOffset];
-        Item.Modify;
+        Item.Modify();
 
         LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals   
         LineAmount := Round(_PrimeNumbers[SalesOffset] * LineQty, _POSPaymentMethod."Rounding Precision");
@@ -747,7 +747,7 @@ codeunit 85020 "NPR POS End of Day"
         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
 
         Item."Unit Price" := _PrimeNumbers[SalesOffset];
-        Item.Modify;
+        Item.Modify();
 
         DiscountPct := _PrimeNumbers[SalesOffset];
         LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals            
@@ -883,7 +883,7 @@ codeunit 85020 "NPR POS End of Day"
         end;
         NPRLibraryPOSMasterData.ItemReferenceCleanup();
 
-        Commit;
+        Commit();
     end;
 
     local procedure CreateVoucherInPOSTransaction(var NpRvVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)

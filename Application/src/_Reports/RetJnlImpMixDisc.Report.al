@@ -1,8 +1,8 @@
 report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
 {
     Caption = 'Import Mixed Discounts';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {

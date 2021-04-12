@@ -4,14 +4,13 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
         StdActionDisabledMsg: Label 'This Action is disabled by setup. Please use ''Post and Pdf2Nav''';
         Pdf2NavActionDisabledMsg1: Label 'This Action is disabled by setup. Please use ''Post and Print'' or ''Post and Email ''';
         Pdf2NavActionDisabledMsg2: Label 'This Action is disabled by setup. Please use ''Post and Send'', ''Post and Print'' or ''Post and Email ''';
-        Pdf2NavActionDisabledMsg3: Label 'This Action is disabled by setup. Please use ''Post and Print''';
 
     [EventSubscriber(ObjectType::Page, 42, 'OnBeforeActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
     local procedure Page42OnBeforeActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
                 Error(Pdf2NavActionDisabledMsg1);
     end;
@@ -27,7 +26,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
                 Error(StdActionDisabledMsg);
     end;
@@ -37,7 +36,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
                 Error(Pdf2NavActionDisabledMsg2);
     end;
@@ -53,7 +52,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
                 Error(StdActionDisabledMsg);
     end;
@@ -63,7 +62,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
                 Error(StdActionDisabledMsg);
     end;
@@ -73,7 +72,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
                 Error(StdActionDisabledMsg);
     end;
@@ -83,7 +82,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
                 Error(Pdf2NavActionDisabledMsg1);
     end;
@@ -99,7 +98,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
                 Error(StdActionDisabledMsg);
     end;
@@ -109,7 +108,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
                 Error(StdActionDisabledMsg);
     end;
@@ -119,7 +118,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
     begin
-        if SalesPostandPdf2NavSetup.Get then
+        if SalesPostandPdf2NavSetup.Get() then
             if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
                 Error(Pdf2NavActionDisabledMsg1);
     end;

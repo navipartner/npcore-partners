@@ -94,13 +94,11 @@ xmlport 6151137 "NPR M2 Get WorkingDay Calendar"
     var
         CompanyInformation: Record "Company Information";
         Customer: Record Customer;
-        DateRec: Record Date;
-        EntryNo: Integer;
     begin
 
         PeriodRequest.FindFirst();
         if (PeriodRequest."Start Date" = 0D) then
-            PeriodRequest."Start Date" := Today;
+            PeriodRequest."Start Date" := Today();
 
         if (PeriodRequest."End Date" = 0D) then
             PeriodRequest."End Date" := CalcDate('<CM>', Today);

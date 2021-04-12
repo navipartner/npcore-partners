@@ -74,7 +74,7 @@ table 6150705 "NPR POS Parameter Value"
 
     procedure InitForMenuButton(MenuButton: Record "NPR POS Menu Button")
     begin
-        Init;
+        Init();
         "Table No." := DATABASE::"NPR POS Menu Button";
         Code := MenuButton."Menu Code";
         ID := MenuButton.ID;
@@ -87,7 +87,7 @@ table 6150705 "NPR POS Parameter Value"
     begin
         RecRef.Get(RecordID);
 
-        Init;
+        Init();
         "Table No." := RecRef.Number;
         Code := '';
         ID := FieldID;
@@ -263,7 +263,7 @@ table 6150705 "NPR POS Parameter Value"
                     foreach Part in Parts do begin
                         TempRetailList.Number += 1;
                         TempRetailList.Choice := Part;
-                        TempRetailList.Insert;
+                        TempRetailList.Insert();
                     end;
                 end;
 
@@ -273,7 +273,7 @@ table 6150705 "NPR POS Parameter Value"
                     foreach Part in Parts do begin
                         TempRetailList.Number += 1;
                         TempRetailList.Choice := Part;
-                        TempRetailList.Insert;
+                        TempRetailList.Insert();
                     end;
                 end;
             else
@@ -289,7 +289,7 @@ table 6150705 "NPR POS Parameter Value"
                 "Data Type"::Option:
                     TempRetailList.SetRange(Choice, GetOptionStringCaption(OptionsCaption));
             end;
-        if TempRetailList.FindFirst then;
+        if TempRetailList.FindFirst() then;
         TempRetailList.SetRange(Choice);
 
         if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then
@@ -307,7 +307,7 @@ table 6150705 "NPR POS Parameter Value"
         ParamValue.SetRange("Record ID", RecordID);
         ParamValue.SetRange(ID, ID);
         ParamValue.SetRange(Name, Name);
-        if ParamValue.FindFirst then begin
+        if ParamValue.FindFirst() then begin
             Rec := ParamValue;
             exit(true);
         end;

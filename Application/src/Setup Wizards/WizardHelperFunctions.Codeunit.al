@@ -9,7 +9,7 @@ codeunit 6014458 "NPR Wizard Helper Functions"
             if returnNewValue then
                 NoToFormat += '1'
         end else
-              NoToFormat := IncStr(NoToFormat);
+            NoToFormat := IncStr(NoToFormat);
     end;
 
 

@@ -102,7 +102,7 @@ codeunit 6060136 "NPR MM Member Notification"
                     // Notification Date is offset from subscription ends
                     StartDate := CalcDate('<+1D>', MembershipNotification."Date To Notify" + NotificationSetup."Days Before");
                     if (StartDate < Today) then
-                        StartDate := Today;
+                        StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
                         exit(-1); // membership is valid, cancel notification
@@ -118,7 +118,7 @@ codeunit 6060136 "NPR MM Member Notification"
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
                     if (StartDate < Today) then
-                        StartDate := Today;
+                        StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
                         exit(1); // valid, send notification
@@ -137,7 +137,7 @@ codeunit 6060136 "NPR MM Member Notification"
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
                     if (StartDate < Today) then
-                        StartDate := Today;
+                        StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
                         exit(1); // valid, send notification
@@ -162,7 +162,6 @@ codeunit 6060136 "NPR MM Member Notification"
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
         Method: Code[10];
-        Address: Text;
     begin
 
         NotificationSetup.Get(MembershipNotification."Notification Code");
@@ -259,31 +258,29 @@ codeunit 6060136 "NPR MM Member Notification"
                     if (MemberNotificationEntry."Card Valid Until" = 0D) then
                         MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
 
-                    with MemberNotificationEntry do
-                        case "Notification Trigger" of
-                            "Notification Trigger"::WELCOME:
-                                MembershipManagement.GetCommunicationMethod_Welcome("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
-                            "Notification Trigger"::RENEWAL:
-                                MembershipManagement.GetCommunicationMethod_Renew("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
-                            "Notification Trigger"::WALLET_CREATE:
-                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
-                            "Notification Trigger"::WALLET_UPDATE:
-                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
-                        end;
+                    case MemberNotificationEntry."Notification Trigger" of
+                        MemberNotificationEntry."Notification Trigger"::WELCOME:
+                            MembershipManagement.GetCommunicationMethod_Welcome(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
+                        MemberNotificationEntry."Notification Trigger"::RENEWAL:
+                            MembershipManagement.GetCommunicationMethod_Renew(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
+                        MemberNotificationEntry."Notification Trigger"::WALLET_CREATE:
+                            MembershipManagement.GetCommunicationMethod_MemberCard(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
+                        MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE:
+                            MembershipManagement.GetCommunicationMethod_MemberCard(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
+                    end;
 
-                    with MemberNotificationEntry do
-                        case Method of
-                            'SMS':
-                                "Notification Method" := "Notification Method"::SMS;
-                            'W-SMS':
-                                "Notification Method" := "Notification Method"::SMS;
-                            'EMAIL':
-                                "Notification Method" := "Notification Method"::EMAIL;
-                            'W-EMAIL':
-                                "Notification Method" := "Notification Method"::EMAIL;
-                            else
-                                "Notification Method" := "Notification Method"::NONE;
-                        end;
+                    case Method of
+                        'SMS':
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
+                        'W-SMS':
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
+                        'EMAIL':
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
+                        'W-EMAIL':
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
+                        else
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
+                    end;
 
                     if (MembershipNotification."Notification Method Source" = MembershipNotification."Notification Method Source"::EXTERNAL) then
                         MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
@@ -574,9 +571,6 @@ codeunit 6060136 "NPR MM Member Notification"
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         CommunitySetup: Record "NPR MM Member Community";
-        NotificationSetup: Record "NPR MM Member Notific. Setup";
-        MembershipNotification: Record "NPR MM Membership Notific.";
-        DaysToRenewal: Integer;
     begin
 
         Membership.Get(MembershipLedgerEntry."Membership Entry No.");
@@ -613,7 +607,7 @@ codeunit 6060136 "NPR MM Member Notification"
         if (not ((MembershipSetup."Create Renewal Notifications") or (CommunitySetup."Create Renewal Notifications"))) then
             exit;
 
-        DaysToRenewal := MembershipLedgerEntry."Valid Until Date" - Today;
+        DaysToRenewal := MembershipLedgerEntry."Valid Until Date" - Today();
 
         NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
         NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::RENEWAL);
@@ -646,7 +640,6 @@ codeunit 6060136 "NPR MM Member Notification"
     procedure GenerateNotificationToken() Token: Text[64]
     var
         n: Integer;
-        t: Char;
     begin
 
         Randomize;
@@ -676,19 +669,18 @@ codeunit 6060136 "NPR MM Member Notification"
         MessageResponse: JsonToken;
     begin
 
-        with MemberNotificationEntry do
-            case "Notification Trigger" OF
-                "Notification Trigger"::RENEWAL:
-                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::RENEW);
-                "Notification Trigger"::WELCOME:
-                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::WELCOME);
-                "Notification Trigger"::WALLET_CREATE:
-                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::MEMBERCARD);
-                "Notification Trigger"::WALLET_UPDATE:
-                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::MEMBERCARD);
-                else
-                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::WELCOME);
-            end;
+        case MemberNotificationEntry."Notification Trigger" OF
+            MemberNotificationEntry."Notification Trigger"::RENEWAL:
+                MemberCommunicationSetup.Get(MemberNotificationEntry."Membership Code", MemberCommunicationSetup."Message Type"::RENEW);
+            MemberNotificationEntry."Notification Trigger"::WELCOME:
+                MemberCommunicationSetup.Get(MemberNotificationEntry."Membership Code", MemberCommunicationSetup."Message Type"::WELCOME);
+            MemberNotificationEntry."Notification Trigger"::WALLET_CREATE:
+                MemberCommunicationSetup.Get(MemberNotificationEntry."Membership Code", MemberCommunicationSetup."Message Type"::MEMBERCARD);
+            MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE:
+                MemberCommunicationSetup.Get(MemberNotificationEntry."Membership Code", MemberCommunicationSetup."Message Type"::MEMBERCARD);
+            else
+                MemberCommunicationSetup.Get(MemberNotificationEntry."Membership Code", MemberCommunicationSetup."Message Type"::WELCOME);
+        end;
 
         MemberCommunicationSetup.CalcFields("Sender Template");
         if (not MemberCommunicationSetup."Sender Template".HasValue()) then
@@ -914,8 +906,6 @@ codeunit 6060136 "NPR MM Member Notification"
         MessageText: Text;
         Body: JsonToken;
         Response: JsonToken;
-        StartPos: Integer;
-        EndPos: Integer;
         ResponseText: Text;
     begin
 
@@ -1101,7 +1091,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
     end;
 
-    local procedure CreateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; NotificationTriggerType: Option; NotificationSource: Option; DateToSendNotification: Date) EntryNo: Integer
+    local procedure CreateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; NotificationTriggerType: Option; NotificationSource: Option; DateToSendNotification: Date): Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -1134,7 +1124,7 @@ codeunit 6060136 "NPR MM Member Notification"
         NotificationSetup.FindFirst();
 
         if (DateToSendNotification = 0D) then
-            DateToSendNotification := TODAY;
+            DateToSendNotification := Today();
 
         MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipNotification.SetFilter("Member Card Entry No.", '=%1', MemberCardEntryNo);
@@ -1230,12 +1220,10 @@ codeunit 6060136 "NPR MM Member Notification"
     [TryFunction]
     procedure NPPassServerInvokeApi(RequestMethod: Code[10]; MemberNotificationSetup: Record "NPR MM Member Notific. Setup"; PassID: Text; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Client: HttpClient;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
         RequestHeaders: HttpHeaders;
-        Request: HttpRequestMessage;
         Response: HttpResponseMessage;
         AcceptTok: Label 'Accept', Locked = true;
         ContentTypeTxt: Label 'application/json', Locked = true;
@@ -1243,8 +1231,6 @@ codeunit 6060136 "NPR MM Member Notification"
         ContentTypeTok: Label 'Content-Type', Locked = true;
         UserAgentTxt: Label 'NP Dynamics Retail / Dynamics 365 Business Central', Locked = true;
         ConnectErrorTxt: Label 'NP Pass Service connection error. (HTTP Reason Code: %1)';
-        GenericErrorTxt: Label 'NP Pass Service connection error. (Reason: %1)';
-        ServerErrorTxt: Label 'NP Pass Service encountered an error processing the request: %1, %2';
         UserAgentTok: Label 'User-Agent', Locked = true;
         RequestOk: Boolean;
         Url: Text;

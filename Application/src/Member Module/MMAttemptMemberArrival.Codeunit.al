@@ -145,7 +145,6 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
         oStream: OutStream;
         TicketReservation: XMLport "NPR TM Ticket Reservation";
         TicketWebService: Codeunit "NPR TM Ticket WebService";
-        txtRead: Text;
     begin
 
         xmltext :=

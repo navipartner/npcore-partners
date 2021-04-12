@@ -13,59 +13,59 @@ page 6060107 "NPR MM Loy. Item Point Setup"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Constraint; Constraint)
+                field(Constraint; Rec.Constraint)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint field';
                 }
-                field("Allow On Discounted Sale"; "Allow On Discounted Sale")
+                field("Allow On Discounted Sale"; Rec."Allow On Discounted Sale")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow On Discounted Sale field';
                 }
-                field(Award; Award)
+                field(Award; Rec.Award)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Award field';
                 }
-                field(Points; Points)
+                field(Points; Rec.Points)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Points field';
                 }
-                field("Amount Factor"; "Amount Factor")
+                field("Amount Factor"; Rec."Amount Factor")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Factor field';

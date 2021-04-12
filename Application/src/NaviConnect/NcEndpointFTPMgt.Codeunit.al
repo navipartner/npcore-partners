@@ -1,8 +1,7 @@
-codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
+﻿codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 {
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; Filename: Text; var NcTask: Record "NPR Nc Task")
     var
-        NcTrigger: Record "NPR Nc Trigger";
         NcEndpoint: Record "NPR Nc Endpoint";
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
         NcEndpointTriggerLink: Record "NPR Nc Endpoint Trigger Link";
@@ -10,9 +9,9 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         case NcTask."Table No." of
             DATABASE::"NPR Nc Trigger":
                 begin
-                    NcEndpointTriggerLink.Reset;
+                    NcEndpointTriggerLink.Reset();
                     NcEndpointTriggerLink.SetRange("Trigger Code", NcTriggerCode);
-                    if NcEndpointTriggerLink.FindSet then
+                    if NcEndpointTriggerLink.FindSet() then
                         repeat
                             if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
                                 if NcEndpoint."Endpoint Type" = NcEndpointFTP.GetEndpointTypeCode then begin
@@ -21,7 +20,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
                                     end;
                                 end;
                             end;
-                        until NcEndpointTriggerLink.Next = 0;
+                        until NcEndpointTriggerLink.Next() = 0;
                 end;
             DATABASE::"NPR Nc Endpoint FTP":
                 begin
@@ -29,9 +28,9 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
                     NcEndpointFTP.SetPosition(NcTask."Record Position");
                     NcEndpointFTP.SetRange(Code, NcEndpointFTP.Code);
                     NcEndpointFTP.SetRange(Enabled, true);
-                    if NcEndpointFTP.FindFirst then begin
+                    if NcEndpointFTP.FindFirst() then begin
                         ProcessEndPointTask(NcEndpointFTP, NcTask, Output, Filename);
-                        NcTask.Modify;
+                        NcTask.Modify();
                     end;
                 end;
         end;
@@ -47,11 +46,11 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         if not NcTrigger."Split Trigger and Endpoint" then begin
             //Process Trigger Task Directly
             FtpProcess(NcTask, NcEndpointFTP, Output, Filename);
-            NcTask.Modify;
+            NcTask.Modify();
         end else begin
             //Insert New Task per Endpoint
             InsertEndpointTask(NcEndpointFTP, NcTask, Filename);
-            NcTask.Modify;
+            NcTask.Modify();
         end;
     end;
 
@@ -67,7 +66,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         RecRef.Get(NcEndpointFTP.RecordId);
         NcTriggerSyncMgt.InsertTask(RecRef, TaskEntryNo);
         NewTask.Get(TaskEntryNo);
-        TempNcEndPointFTP.Init;
+        TempNcEndPointFTP.Init();
         TempNcEndPointFTP.Copy(NcEndpointFTP);
         TempNcEndPointFTP."Output Nc Task Entry No." := NcTask."Entry No.";
         TempNcEndPointFTP.Filename := Filename;
@@ -118,8 +117,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
     end;
 
     local procedure SendFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
-    var
-        "Field": Record "Field";
     begin
         if not NcEndpointFTP.Enabled then
             exit(false);
@@ -139,7 +136,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 
     local procedure SendDotNetFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
     var
-        "Field": Record "Field";
         Credential: DotNet NPRNetNetworkCredential;
         Encoding: DotNet NPRNetUTF8Encoding;
         FtpWebRequest: DotNet NPRNetFtpWebRequest;
@@ -174,7 +170,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         IoStream := FtpWebRequest.GetRequestStream;
         IoStream.Write(Encoding.GetBytes(OutputText), 0, FtpWebRequest.ContentLength);
         IoStream.Flush;
-        IoStream.Close;
+        IoStream.Close();
         Clear(IoStream);
         FtpWebResponse := FtpWebRequest.GetResponse;
         ResponseDescriptionText := FtpWebResponse.StatusDescription;
@@ -193,7 +189,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
     begin
         LocalPath := TemporaryPath;
         UploadFile.Create(LocalPath + Filename);
-        UploadFile.Close;
+        UploadFile.Close();
 
         case NcEndpointFTP."File Encoding" of
             NcEndpointFTP."File Encoding"::ANSI:
@@ -206,7 +202,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         StreamWriter := StreamWriter.StreamWriter(LocalPath + Filename, true, Encoding);
         StreamWriter.Write(OutputText);
         StreamWriter.Flush;
-        StreamWriter.Close;
+        StreamWriter.Close();
 
         SharpSFtp := SharpSFtp.Sftp(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password);
         SharpSFtp.Connect(NcEndpointFTP.Port);
@@ -239,7 +235,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 
     local procedure SendDotNetFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP"): Boolean
     var
-        "Field": Record "Field";
         Credential: DotNet NPRNetNetworkCredential;
         FtpWebRequest: DotNet NPRNetFtpWebRequest;
         FtpWebResponse: DotNet NPRNetFtpWebResponse;
@@ -266,7 +261,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         Stream := FtpWebRequest.GetRequestStream;
         CopyStream(Stream, InStream);
         Stream.Flush;
-        Stream.Close;
+        Stream.Close();
         Clear(Stream);
 
         FtpWebResponse := FtpWebRequest.GetResponse;
@@ -294,7 +289,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
     local procedure InitEndpoint(NcEndpointFTP: Record "NPR Nc Endpoint FTP")
     var
         Credential: DotNet NPRNetNetworkCredential;
-        FtpFolder: Text;
         FtpFolders: Text;
         FtpPath: Text;
         List: Text;
@@ -360,7 +354,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
         FtpWebRequest.Abort();
         Clear(FtpWebRequest);
@@ -384,7 +378,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         List := StreamReader.ReadToEnd;
 
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
         FtpWebRequest.Abort();
         Clear(FtpWebRequest);
@@ -449,9 +443,9 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         NcEndpointType: Record "NPR Nc Endpoint Type";
     begin
         if not NcEndpointType.Get(NcEndpointFTP.GetEndpointTypeCode) then begin
-            NcEndpointType.Init;
+            NcEndpointType.Init();
             NcEndpointType.Code := NcEndpointFTP.GetEndpointTypeCode;
-            NcEndpointType.Insert;
+            NcEndpointType.Insert();
         end;
     end;
 
@@ -465,10 +459,10 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         if Sender."Endpoint Type" <> NcEndpointFTP.GetEndpointTypeCode then
             exit;
         if not NcEndpointFTP.Get(Sender.Code) then begin
-            NcEndpointFTP.Init;
+            NcEndpointFTP.Init();
             NcEndpointFTP.Validate(Code, Sender.Code);
             NcEndpointFTP.Description := Sender.Description;
-            NcEndpointFTP.Insert;
+            NcEndpointFTP.Insert();
         end else begin
             if NcEndpointFTP.Description <> Sender.Description then begin
                 NcEndpointFTP.Description := Sender.Description;

@@ -10,7 +10,6 @@ codeunit 6151132 "NPR TM POS Action - Seating"
 
     var
         ActionDescription: Label 'This is a built-in action for running the ticket seating functionality';
-        POSSetup: Codeunit "NPR POS Setup";
 
     local procedure ActionCode(): Text
     begin
@@ -25,25 +24,22 @@ codeunit 6151132 "NPR TM POS Action - Seating"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'respond();');
-                RegisterWorkflow(false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterWorkflow(false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        Context: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -60,7 +56,7 @@ codeunit 6151132 "NPR TM POS Action - Seating"
         JSON: Codeunit "NPR POS JSON Management";
     begin
 
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;

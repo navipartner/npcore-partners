@@ -71,9 +71,9 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         Location.SetFilter(Code, POSParameterValue.Value);
-        if not Location.FindFirst then begin
+        if not Location.FindFirst() then begin
             Location.SetFilter(Code, '%1', POSParameterValue.Value + '*');
-            if Location.FindFirst then
+            if Location.FindFirst() then
                 POSParameterValue.Value := Location.Code;
         end;
     end;
@@ -199,7 +199,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
             DataRow.Fields.Add('UnprocessedOrdersQty', 0);
     end;
 
-    local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session") LocationFilter: Text
+    local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"): Text
     var
         POSStore: Record "NPR POS Store";
         POSMenuButton: Record "NPR POS Menu Button";
@@ -211,9 +211,9 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         POSSale.GetCurrentSale(SalePOS);
         POSMenuButton.SetRange("Action Code", ActionCode());
         POSMenuButton.SetRange("Register No.", SalePOS."Register No.");
-        if not POSMenuButton.FindFirst then
+        if not POSMenuButton.FindFirst() then
             POSMenuButton.SetRange("Register No.");
-        if not POSMenuButton.FindFirst then
+        if not POSMenuButton.FindFirst() then
             exit('');
 
         if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'Location From') then
@@ -240,7 +240,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         NpCsDocument: Record "NPR NpCs Document";
     begin
         SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        exit(NpCsDocument.FindFirst);
+        exit(NpCsDocument.FindFirst());
     end;
 
     local procedure GetUnprocessedOrdersQty(LocationFilter: Text): Integer
@@ -248,7 +248,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         NpCsDocument: Record "NPR NpCs Document";
     begin
         SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        exit(NpCsDocument.Count);
+        exit(NpCsDocument.Count());
     end;
 
     local procedure SetUnprocessedFilter(LocationFilter: Text; var NpCsDocument: Record "NPR NpCs Document")

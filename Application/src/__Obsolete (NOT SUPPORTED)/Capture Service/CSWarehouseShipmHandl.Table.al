@@ -1,10 +1,10 @@
 table 6151393 "NPR CS Warehouse Shipm. Handl."
 {
-    
+
     Caption = 'CS Warehouse Shipment Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -63,7 +63,7 @@ table 6151393 "NPR CS Warehouse Shipm. Handl."
         {
             Caption = 'Bin Code';
             DataClassification = CustomerContent;
-           
+
         }
         field(27; "Assignment Date"; Date)
         {
@@ -81,7 +81,7 @@ table 6151393 "NPR CS Warehouse Shipm. Handl."
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
-            
+
         }
         field(51; "Variant Code"; Code[10])
         {
@@ -137,6 +137,6 @@ table 6151393 "NPR CS Warehouse Shipm. Handl."
     {
     }
 
-    
+
 }
 

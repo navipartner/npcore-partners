@@ -20,22 +20,22 @@ page 6151603 "NPR NpDc Valid Time Interv."
                     ShowCaption = false;
                     repeater(Group)
                     {
-                        field("Start Time"; "Start Time")
+                        field("Start Time"; Rec."Start Time")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Start Time field';
                         }
-                        field("End Time"; "End Time")
+                        field("End Time"; Rec."End Time")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the End Time field';
                         }
-                        field("Period Type"; "Period Type")
+                        field("Period Type"; Rec."Period Type")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Period Type field';
                         }
-                        field("Period Description"; "Period Description")
+                        field("Period Description"; Rec."Period Description")
                         {
                             ApplicationArea = All;
                             Editable = false;
@@ -49,38 +49,38 @@ page 6151603 "NPR NpDc Valid Time Interv."
                     group(Control6014409)
                     {
                         ShowCaption = false;
-                        Visible = ("Period Type" = 1);
-                        field(Monday; Monday)
+                        Visible = (Rec."Period Type" = 1);
+                        field(Monday; Rec.Monday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Monday field';
                         }
-                        field(Tuesday; Tuesday)
+                        field(Tuesday; Rec.Tuesday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Tuesday field';
                         }
-                        field(Wednesday; Wednesday)
+                        field(Wednesday; Rec.Wednesday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Wednesday field';
                         }
-                        field(Thursday; Thursday)
+                        field(Thursday; Rec.Thursday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Thursday field';
                         }
-                        field(Friday; Friday)
+                        field(Friday; Rec.Friday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Friday field';
                         }
-                        field(Saturday; Saturday)
+                        field(Saturday; Rec.Saturday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Saturday field';
                         }
-                        field(Sunday; Sunday)
+                        field(Sunday; Rec.Sunday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Sunday field';

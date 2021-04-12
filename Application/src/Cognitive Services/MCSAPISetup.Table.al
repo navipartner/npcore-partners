@@ -94,7 +94,7 @@ table 6059955 "NPR MCS API Setup"
         InStr: InStream;
     begin
         CalcFields(BaseURL);
-        if BaseURL.HasValue then begin
+        if BaseURL.HasValue() then begin
             BaseURL.CreateInStream(InStr);
             InStr.Read(Url);
         end;

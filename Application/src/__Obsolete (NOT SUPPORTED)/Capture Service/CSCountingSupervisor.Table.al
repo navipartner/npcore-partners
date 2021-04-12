@@ -1,12 +1,12 @@
 table 6151367 "NPR CS Counting Supervisor"
 {
-    
+
     Caption = 'CS Counting Supervisor';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
-    
+
 
     fields
     {
@@ -25,7 +25,7 @@ table 6151367 "NPR CS Counting Supervisor"
                 UserSelection.ValidateUserName("User ID");
             end;
         }
-       
+
         field(11; Pin; Code[6])
         {
             Caption = 'Pin';
@@ -46,7 +46,5 @@ table 6151367 "NPR CS Counting Supervisor"
     {
     }
 
-    var
-        UserManagement: Codeunit "User Management";
 }
 

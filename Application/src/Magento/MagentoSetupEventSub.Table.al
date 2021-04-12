@@ -42,7 +42,7 @@ table 6151418 "NPR Magento Setup Event Sub."
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Codeunit ID");
                 if "Function Name" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Function Name");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(10; "Function Name"; Text[80])
@@ -74,7 +74,7 @@ table 6151418 "NPR Magento Setup Event Sub."
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Codeunit ID");
                 if "Function Name" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Function Name");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(15; Enabled; Boolean)

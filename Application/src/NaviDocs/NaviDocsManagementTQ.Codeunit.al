@@ -6,7 +6,7 @@ codeunit 6059768 "NPR NaviDocs Management TQ"
     var
         NaviDocsSetup: Record "NPR NaviDocs Setup";
     begin
-        if NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs" then
+        if NaviDocsSetup.Get() and NaviDocsSetup."Enable NaviDocs" then
             DocManageNaviDocs();
 
         CleanupNaviDocs();

@@ -1,4 +1,4 @@
-codeunit 6151199 "NPR NpCs Collect WS"
+﻿codeunit 6151199 "NPR NpCs Collect WS"
 {
     var
         Text000: Label 'Import Collect in Store Sales Document';
@@ -15,21 +15,21 @@ codeunit 6151199 "NPR NpCs Collect WS"
         NulChr: Char;
         ErrorMessage: Text;
     begin
-        sales_documents.Import;
+        sales_documents.Import();
         sales_documents.CopySourceTable(TempSalesHeader);
-        if not TempSalesHeader.FindFirst then
+        if not TempSalesHeader.FindFirst() then
             exit;
 
         InsertImportEntry('ImportSalesDocuments', ImportEntry);
         ImportEntry."Document Name" := Format(TempSalesHeader."Document Type") + ' ' + TempSalesHeader."No." + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_documents.SetDestination(OutStr);
-        sales_documents.Export;
+        sales_documents.Export();
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
-        Commit;
+        Commit();
         if ImportEntry."Runtime Error" then begin
             ErrorMessage := NcImportMgt.GetErrorMessage(ImportEntry, false);
             ErrorMessage := DelChr(ErrorMessage, '=', Format(NulChr));
@@ -39,13 +39,13 @@ codeunit 6151199 "NPR NpCs Collect WS"
 
     procedure GetCollectDocuments(var collect_documents: XMLport "NPR NpCs Collect Documents")
     begin
-        collect_documents.Import;
+        collect_documents.Import();
         collect_documents.RefreshSourceTable();
     end;
 
     procedure GetCollectStores(var stores: XMLport "NPR NpCs Collect Store")
     begin
-        stores.Import;
+        stores.Import();
     end;
 
     procedure RunNextWorkflowStep(var collect_documents: XMLport "NPR NpCs Collect Documents")
@@ -54,29 +54,29 @@ codeunit 6151199 "NPR NpCs Collect WS"
         TempNpCsDocument: Record "NPR NpCs Document" temporary;
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
-        collect_documents.Import;
+        collect_documents.Import();
         collect_documents.RefreshSourceTable();
         collect_documents.GetSourceTable(TempNpCsDocument);
-        if TempNpCsDocument.FindSet then
+        if TempNpCsDocument.FindSet() then
             repeat
                 NpCsDocument.SetRange(Type, TempNpCsDocument.Type);
                 NpCsDocument.SetRange("Document Type", TempNpCsDocument."Document Type");
                 NpCsDocument.SetRange("Document No.", TempNpCsDocument."Document No.");
                 NpCsDocument.SetRange("From Store Code", TempNpCsDocument."From Store Code");
                 NpCsDocument.SetRange("Reference No.", TempNpCsDocument."Reference No.");
-                NpCsDocument.FindFirst;
+                NpCsDocument.FindFirst();
                 NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
-            until TempNpCsDocument.Next = 0;
+            until TempNpCsDocument.Next() = 0;
     end;
 
     procedure GetLocalInventory(var local_inventory: XMLport "NPR NpCs Local Inventory")
     begin
-        local_inventory.Import;
+        local_inventory.Import();
     end;
 
     procedure GetStoreInventory(var store_inventory: XMLport "NPR NpCs Store Inv.")
     begin
-        store_inventory.Import;
+        store_inventory.Import();
     end;
 
     procedure UpdateProcessingStatus(var collect_documents: XMLport "NPR NpCs Collect Documents")
@@ -85,9 +85,9 @@ codeunit 6151199 "NPR NpCs Collect WS"
         TempNpCsDocument: Record "NPR NpCs Document" temporary;
         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
     begin
-        collect_documents.Import;
+        collect_documents.Import();
         collect_documents.GetSourceTable(TempNpCsDocument);
-        if not TempNpCsDocument.FindSet then
+        if not TempNpCsDocument.FindSet() then
             exit;
 
         repeat
@@ -95,9 +95,9 @@ codeunit 6151199 "NPR NpCs Collect WS"
                 Error(Text001, TempNpCsDocument."From Document Type", TempNpCsDocument."From Document No.");
 
             TestProcessingStatusChange(NpCsDocument, TempNpCsDocument);
-        until TempNpCsDocument.Next = 0;
+        until TempNpCsDocument.Next() = 0;
 
-        TempNpCsDocument.FindSet;
+        TempNpCsDocument.FindSet();
         repeat
             FindNpCsDocument(TempNpCsDocument, NpCsDocument);
             case TempNpCsDocument."Processing Status" of
@@ -118,7 +118,7 @@ codeunit 6151199 "NPR NpCs Collect WS"
                         NpCsCollectMgt.ExpireProcessing(NpCsDocument, false);
                     end;
             end;
-        until TempNpCsDocument.Next = 0;
+        until TempNpCsDocument.Next() = 0;
 
         collect_documents.RefreshSourceTable();
     end;
@@ -144,7 +144,7 @@ codeunit 6151199 "NPR NpCs Collect WS"
                 end;
         end;
         NpCsDocument.SetRange("From Store Code", TempNpCsDocument."From Store Code");
-        NpCsDocument.FindFirst;
+        NpCsDocument.FindFirst();
     end;
 
     local procedure TestProcessingStatusChange(NpCsDocumentFrom: Record "NPR NpCs Document"; NpCsDocumentTo: Record "NPR NpCs Document")
@@ -195,11 +195,11 @@ codeunit 6151199 "NPR NpCs Collect WS"
 
         Clear(NcImportType);
         NcImportType.SetRange("Import Codeunit ID", SalesDocCodeunitId);
-        if NcImportType.FindFirst then
+        if NcImportType.FindFirst() then
             exit;
 
         if not NcImportType.WritePermission then
-            NcImportType.FindFirst;
+            NcImportType.FindFirst();
 
         Code := 'COLLECT_SALES_DOC';
         if NcImportType.Get(Code) then begin
@@ -208,7 +208,7 @@ codeunit 6151199 "NPR NpCs Collect WS"
                 Code := IncStr(Code);
         end;
 
-        NcImportType.Init;
+        NcImportType.Init();
         NcImportType.Code := Code;
         NcImportType.Description := CopyStr(Text000, 1, MaxStrLen(NcImportType.Description));
         NcImportType."Import Codeunit ID" := SalesDocCodeunitId;
@@ -224,7 +224,7 @@ codeunit 6151199 "NPR NpCs Collect WS"
     begin
         InitSalesDocImportType(NcImportType);
 
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := NcImportType.Code;
         ImportEntry.Date := CurrentDateTime;

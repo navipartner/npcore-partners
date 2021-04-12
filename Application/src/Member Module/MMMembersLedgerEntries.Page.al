@@ -17,54 +17,54 @@ page 6060129 "NPR MM Members. Ledger Entries"
             repeater(Group)
             {
                 Editable = false;
-                field("Activate On First Use"; "Activate On First Use")
+                field("Activate On First Use"; Rec."Activate On First Use")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Activate On First Use field';
                 }
-                field("Valid From Date"; "Valid From Date")
+                field("Valid From Date"; Rec."Valid From Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid From Date field';
                 }
-                field("Valid Until Date"; "Valid Until Date")
+                field("Valid Until Date"; Rec."Valid Until Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid Until Date field';
                 }
-                field("Created At"; "Created At")
+                field("Created At"; Rec."Created At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created At field';
                 }
-                field(Context; Context)
+                field(Context; Rec.Context)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Context field';
                 }
-                field("Receipt No."; "Receipt No.")
+                field("Receipt No."; Rec."Receipt No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt No. field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("Auto-Renew Entry No."; "Auto-Renew Entry No.")
+                field("Auto-Renew Entry No."; Rec."Auto-Renew Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -79,17 +79,17 @@ page 6060129 "NPR MM Members. Ledger Entries"
                     StyleExpr = AccentuateAmount;
                     ToolTip = 'Specifies the value of the Remaining Amount (LCY) field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field("Blocked By"; "Blocked By")
+                field("Blocked By"; Rec."Blocked By")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked By field';

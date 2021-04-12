@@ -1,10 +1,10 @@
 table 6151385 "NPR CS Rfid Tag Models"
 {
-   
+
     Caption = 'CS Rfid Tag Models';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields

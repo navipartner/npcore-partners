@@ -36,9 +36,9 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
             begin
                 EventExchIntEMail.SetRange("Default Organizer E-Mail", true);
                 EventExchIntEMail.SetFilter("Search E-Mail", '<>%1', "Search E-Mail");
-                if EventExchIntEMail.FindFirst then begin
+                if EventExchIntEMail.FindFirst() then begin
                     EventExchIntEMail."Default Organizer E-Mail" := false;
-                    EventExchIntEMail.Modify;
+                    EventExchIntEMail.Modify();
                 end;
             end;
         }
@@ -57,7 +57,7 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
                 if TimeZone.Get("Time Zone No.") then
                     TimeZones.SetRecord(TimeZone);
                 TimeZones.LookupMode(true);
-                if TimeZones.RunModal = ACTION::LookupOK then begin
+                if TimeZones.RunModal() = ACTION::LookupOK then begin
                     TimeZones.GetRecord(TimeZone);
                     Validate("Time Zone No.", TimeZone."No.");
                 end;
@@ -114,13 +114,13 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
     procedure SetPassword()
     begin
         EventEWSMgt.SetEmailPassword(Rec);
-        Modify;
+        Modify();
     end;
 
     procedure TestServerConnection()
     begin
         EventEWSMgt.TestEmailServerConnection(Rec);
-        Modify;
+        Modify();
     end;
 
     local procedure UpdateSearchEmail()

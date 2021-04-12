@@ -48,7 +48,7 @@ table 6184511 "NPR EFT BIN Group"
         EFTBINRange: Record "NPR EFT BIN Range";
     begin
         EFTBINRange.SetRange("BIN Group Code", Code);
-        EFTBINRange.DeleteAll;
+        EFTBINRange.DeleteAll();
     end;
 
     trigger OnInsert()

@@ -1,10 +1,10 @@
 table 6151380 "NPR CS Wareh. Receipt Handl."
 {
-    
+
     Caption = 'CS Warehouse Receipt Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -63,7 +63,7 @@ table 6151380 "NPR CS Wareh. Receipt Handl."
         {
             Caption = 'Bin Code';
             DataClassification = CustomerContent;
-            
+
         }
         field(27; "Assignment Date"; Date)
         {
@@ -76,7 +76,7 @@ table 6151380 "NPR CS Wareh. Receipt Handl."
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
-           
+
         }
         field(51; "Variant Code"; Code[10])
         {
@@ -84,7 +84,7 @@ table 6151380 "NPR CS Wareh. Receipt Handl."
             DataClassification = CustomerContent;
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
-       field(100; "Table No."; Integer)
+        field(100; "Table No."; Integer)
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
@@ -126,6 +126,6 @@ table 6151380 "NPR CS Wareh. Receipt Handl."
     fieldgroups
     {
     }
-    
+
 }
 

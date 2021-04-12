@@ -16,49 +16,49 @@ page 6014562 "NPR RP Data Item Links"
         {
             repeater(Group)
             {
-                field("Parent Field ID"; "Parent Field ID")
+                field("Parent Field ID"; Rec."Parent Field ID")
                 {
                     ApplicationArea = All;
-                    Enabled = "Filter Type" = 0;
+                    Enabled = Rec."Filter Type" = 0;
                     Style = Subordinate;
-                    StyleExpr = "Filter Type" <> 0;
+                    StyleExpr = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Parent Field ID field';
                 }
-                field("Parent Field Name"; "Parent Field Name")
+                field("Parent Field Name"; Rec."Parent Field Name")
                 {
                     ApplicationArea = All;
-                    Enabled = "Filter Type" = 0;
+                    Enabled = Rec."Filter Type" = 0;
                     Style = Subordinate;
-                    StyleExpr = "Filter Type" <> 0;
+                    StyleExpr = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
-                field("Filter Type"; "Filter Type")
+                field("Filter Type"; Rec."Filter Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Type field';
                 }
-                field("Field ID"; "Field ID")
+                field("Field ID"; Rec."Field ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field ID field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Filter Value"; "Filter Value")
+                field("Filter Value"; Rec."Filter Value")
                 {
                     ApplicationArea = All;
-                    Enabled = "Filter Type" <> 0;
+                    Enabled = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Filter Value field';
                 }
-                field("Link Type"; "Link Type")
+                field("Link Type"; Rec."Link Type")
                 {
                     ApplicationArea = All;
-                    Enabled = "Filter Type" = 0;
+                    Enabled = Rec."Filter Type" = 0;
                     Style = Subordinate;
-                    StyleExpr = "Filter Type" <> 0;
+                    StyleExpr = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Link Type field';
                 }
             }

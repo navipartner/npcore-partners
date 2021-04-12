@@ -1,10 +1,10 @@
 table 6151387 "NPR CS Devices"
 {
-    
+
     Caption = 'CS Devices';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields
@@ -62,6 +62,6 @@ table 6151387 "NPR CS Devices"
     {
     }
 
-   
+
 }
 

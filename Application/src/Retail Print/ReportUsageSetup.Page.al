@@ -1,4 +1,4 @@
-page 6014487 "NPR Report Usage Setup"
+﻿page 6014487 "NPR Report Usage Setup"
 {
     // NPR5.48/TJ  /20181108 CASE 324444 New object
 
@@ -14,7 +14,7 @@ page 6014487 "NPR Report Usage Setup"
         {
             group(General)
             {
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
@@ -29,10 +29,10 @@ page 6014487 "NPR Report Usage Setup"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

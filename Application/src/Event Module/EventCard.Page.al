@@ -24,7 +24,7 @@ page 6060150 "NPR Event Card"
                     trigger OnAssistEdit()
                     begin
                         if Rec.AssistEdit(xRec) then
-                            CurrPage.Update;
+                            CurrPage.Update();
                     end;
                 }
                 field("Event Status"; Rec."NPR Event Status")
@@ -1205,7 +1205,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Event &Task Lines';
                     Image = TaskList;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Event Task Lines";
@@ -1230,7 +1230,7 @@ page 6060150 "NPR Event Card"
                     Caption = '&Statistics';
                     Image = Statistics;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Statistics";
                     RunPageLink = "No." = FIELD("No.");
@@ -1243,7 +1243,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Sales &Documents';
                     Image = GetSourceDoc;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View sales documents that are related to the selected event.';
@@ -1253,7 +1253,7 @@ page 6060150 "NPR Event Card"
                         EventInvoices: Page "NPR Event Invoices";
                     begin
                         EventInvoices.SetPrJob(Rec);
-                        EventInvoices.RunModal;
+                        EventInvoices.RunModal();
                     end;
                 }
                 separator(Separator64)
@@ -1286,7 +1286,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Activity Log';
                     Image = Log;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View more details about potential errors/actions that occur on this event.';
@@ -1303,7 +1303,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Attributes';
                     Image = BulletList;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Attributes";
                     RunPageLink = "Job No." = FIELD("No.");
@@ -1315,7 +1315,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Word Layouts';
                     Image = Quote;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View or add a word document with specific layout/data for this event.';
@@ -1325,7 +1325,7 @@ page 6060150 "NPR Event Card"
                         EventWordLayouts: Page "NPR Event Word Layouts";
                     begin
                         EventWordLayouts.SetEvent(Rec);
-                        EventWordLayouts.RunModal;
+                        EventWordLayouts.RunModal();
                     end;
                 }
                 action(ExchIntTemplates)
@@ -1333,7 +1333,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Exch. Int. Templates';
                     Image = InteractionTemplate;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1346,7 +1346,7 @@ page 6060150 "NPR Event Card"
                     begin
                         EventExchIntTempEntry.SetRange("Source Record ID", Rec.RecordId);
                         EventExchIntTempEntries.SetTableView(EventExchIntTempEntry);
-                        EventExchIntTempEntries.Run;
+                        EventExchIntTempEntries.Run();
                     end;
                 }
                 action(ExchIntEmailSummary)
@@ -1354,7 +1354,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Exch. Int. E-mail Summary';
                     Image = ValidateEmailLoggingSetup;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View a summary that shows a nice overview of who the sender and receipients are when using Microsoft Exchange integration. Removes the uncertainty of not knowing to whom the e-mail or a meeting request will be send to.';
@@ -1374,7 +1374,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Sales Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you sell to the customer. A product price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
@@ -1394,7 +1394,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Sales Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
@@ -1414,7 +1414,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Purchase Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you buy from the vendor. A product price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
@@ -1434,7 +1434,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Purchase Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you buy from the vendor. A product discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
@@ -1478,7 +1478,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Ticket Schedules';
                     Image = Workdays;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket Schedules";
@@ -1490,7 +1490,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Ticket Admissions';
                     Image = WorkCenter;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1505,7 +1505,7 @@ page 6060150 "NPR Event Card"
                         if Rec."NPR Admission Code" = '' then
                             Admission.SetRange("Admission Code");
                         TicketAdmissions.SetTableView(Admission);
-                        TicketAdmissions.Run;
+                        TicketAdmissions.Run();
                     end;
                 }
                 action(AdmissionScheduleLines)
@@ -1513,7 +1513,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Admission Schedule Lines';
                     Image = CalendarWorkcenter;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1528,7 +1528,7 @@ page 6060150 "NPR Event Card"
                         if Rec."NPR Admission Code" = '' then
                             AdmissionScheduleLine.SetRange("Admission Code");
                         AdmissionScheduleLines.SetTableView(AdmissionScheduleLine);
-                        AdmissionScheduleLines.Run;
+                        AdmissionScheduleLines.Run();
                     end;
                 }
                 action(AdmissionScheduleEntry)
@@ -1536,7 +1536,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Admission Schedule Entry';
                     Image = WorkCenterLoad;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Admis. Schedule Entry";
@@ -1554,7 +1554,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Ledger E&ntries';
                     Image = JobLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Job Ledger Entries";
                     RunPageLink = "Job No." = FIELD("No.");
@@ -1594,7 +1594,7 @@ page 6060150 "NPR Event Card"
                     Ellipsis = true;
                     Image = CopyToTask;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1605,7 +1605,7 @@ page 6060150 "NPR Event Card"
                         CopyJobTasks: Page "Copy Job Tasks";
                     begin
                         CopyJobTasks.SetToJob(Rec);
-                        CopyJobTasks.RunModal;
+                        CopyJobTasks.RunModal();
                     end;
                 }
                 action("Copy Job Tasks &to...")
@@ -1614,7 +1614,7 @@ page 6060150 "NPR Event Card"
                     Ellipsis = true;
                     Image = CopyFromTask;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1625,7 +1625,7 @@ page 6060150 "NPR Event Card"
                         CopyJobTasks: Page "Copy Job Tasks";
                     begin
                         CopyJobTasks.SetFromJob(Rec);
-                        CopyJobTasks.RunModal;
+                        CopyJobTasks.RunModal();
                     end;
                 }
                 action(CopyAttribute)
@@ -1634,7 +1634,7 @@ page 6060150 "NPR Event Card"
                     Ellipsis = true;
                     Image = Copy;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1645,7 +1645,7 @@ page 6060150 "NPR Event Card"
                         EventCopy: Page "NPR Event Copy Attr./Templ.";
                     begin
                         EventCopy.SetFromEvent(Rec."No.", 0);
-                        EventCopy.RunModal;
+                        EventCopy.RunModal();
                         CurrPage.Update(false);
                     end;
                 }
@@ -1740,7 +1740,7 @@ page 6060150 "NPR Event Card"
                 Caption = 'Job Analysis';
                 Image = "Report";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Analysis";
                 ApplicationArea = All;
@@ -1751,7 +1751,7 @@ page 6060150 "NPR Event Card"
                 Caption = 'Job - Planning Lines';
                 Image = "Report";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job - Planning Lines";
                 ApplicationArea = All;
@@ -1766,14 +1766,14 @@ page 6060150 "NPR Event Card"
     begin
         CurrencyCheck;
         Clear(EventAttributeTemplateName);
-        EventAttribute.SetRange("Job No.", "No.");
+        EventAttribute.SetRange("Job No.", Rec."No.");
         EventAttribute.SetRange(Promote, true);
-        if EventAttribute.FindSet then
+        if EventAttribute.FindSet() then
             repeat
                 i += 1;
                 if i <= ArrayLen(EventAttributeTemplateName) then
                     EventAttributeTemplateName[i] := EventAttribute."Template Name";
-            until EventAttribute.Next = 0;
+            until EventAttribute.Next() = 0;
         for i := 1 to ArrayLen(EventAttributeTemplateName) do begin
             GetAttributeTemplateSetup(i);
             AssignTemplateSetupToVariables(i);
@@ -1927,7 +1927,7 @@ page 6060150 "NPR Event Card"
             if j = 1 then
                 ColumnEditable[j] [AttributeSetNo] := EventAttrColValue.FindSet
             else
-                ColumnEditable[j] [AttributeSetNo] := EventAttrColValue.Next <> 0;
+                ColumnEditable[j] [AttributeSetNo] := EventAttrColValue.Next() <> 0;
             if ColumnEditable[j] [AttributeSetNo] then begin
                 ColumnCaption[j] [AttributeSetNo] := EventAttrColValue.Description;
                 ColumnLineNo[j] [AttributeSetNo] := EventAttrColValue."Line No.";
@@ -1939,7 +1939,7 @@ page 6060150 "NPR Event Card"
             if i = 1 then
                 RowEditable[i] [AttributeSetNo] := EventAttrRowValue.FindSet
             else
-                RowEditable[i] [AttributeSetNo] := EventAttrRowValue.Next <> 0;
+                RowEditable[i] [AttributeSetNo] := EventAttrRowValue.Next() <> 0;
             if RowEditable[i] [AttributeSetNo] then begin
                 RowEditable[i] [AttributeSetNo] := EventAttrRowValue.Type = EventAttrRowValue.Type::" ";
                 RowDescription[i] [AttributeSetNo] := EventAttrRowValue.Description;
@@ -1952,7 +1952,7 @@ page 6060150 "NPR Event Card"
                 EventAttributeEntry.SetRange("Row Line No.", RowLineNo[i] [AttributeSetNo]);
                 EventAttributeEntry.SetRange("Column Line No.", ColumnLineNo[j] [AttributeSetNo]);
                 EventAttributeEntry.SetRange(Filter, false);
-                if EventAttributeEntry.FindFirst then
+                if EventAttributeEntry.FindFirst() then
                     AttributeValue[i] [j] [AttributeSetNo] := EventAttributeEntry."Value Text";
             end;
         end;
@@ -2038,7 +2038,7 @@ page 6060150 "NPR Event Card"
     begin
         JobPlanningLine.SetRange("Job No.", Rec."No.");
         JobPlanningLine.SetFilter("NPR Group Source Line No.", '<>0');
-        GroupedLineGroupVisible := not JobPlanningLine.IsEmpty;
+        GroupedLineGroupVisible := not JobPlanningLine.IsEmpty();
     end;
 }
 

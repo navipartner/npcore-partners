@@ -143,9 +143,6 @@ table 6150614 "NPR POS Store"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                VATRegNoFormat: Record "VAT Registration No. Format";
-                VATRegistrationLogMgt: Codeunit "VAT Registration Log Mgt.";
             begin
             end;
         }

@@ -12,13 +12,11 @@ page 6059804 "NPR E-mail Txt Editor Dlg"
 
         OKClicked := true;
 
-        CloseAllowed := true;
         exit(false);
     end;
 
     var
         EditorContent: Text;
-        CloseAllowed: Boolean;
         OKClicked: Boolean;
 
 

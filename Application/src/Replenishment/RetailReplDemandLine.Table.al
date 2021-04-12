@@ -599,7 +599,6 @@ table 6151061 "NPR Retail Repl. Demand Line"
 
     local procedure UpdateDescription()
     var
-        ItemVend: Record "Item Vendor";
         ItemTranslation: Record "Item Translation";
         Vend: Record Vendor;
     begin

@@ -1,4 +1,4 @@
-page 6060153 "NPR Event Activities"
+﻿page 6060153 "NPR Event Activities"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -75,13 +75,13 @@ page 6060153 "NPR Event Activities"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
-        Rec.SetFilter("Date Filter", '>=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '>=%1', WorkDate());
     end;
 
     local procedure DrillDownPage(FieldNo2: Integer)
@@ -99,7 +99,7 @@ page 6060153 "NPR Event Activities"
                 Job.SetRange("NPR Event Status", Job."NPR Event Status"::Cancelled);
         end;
         EventList.SetTableView(Job);
-        EventList.Run;
+        EventList.Run();
     end;
 }
 

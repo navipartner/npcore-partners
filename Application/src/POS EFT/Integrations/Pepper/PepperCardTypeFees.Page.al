@@ -14,32 +14,32 @@ page 6184486 "NPR Pepper Card Type Fees"
         {
             repeater(Group)
             {
-                field("Card Type Code"; "Card Type Code")
+                field("Card Type Code"; Rec."Card Type Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Type Code field';
                 }
-                field("Minimum Amount"; "Minimum Amount")
+                field("Minimum Amount"; Rec."Minimum Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Minimum Amount field';
                 }
-                field("Merchant Fee %"; "Merchant Fee %")
+                field("Merchant Fee %"; Rec."Merchant Fee %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Merchant Fee % field';
                 }
-                field("Merchant Fee Amount"; "Merchant Fee Amount")
+                field("Merchant Fee Amount"; Rec."Merchant Fee Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Merchant Fee Amount field';
                 }
-                field("Customer Surcharge %"; "Customer Surcharge %")
+                field("Customer Surcharge %"; Rec."Customer Surcharge %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Surcharge % field';
                 }
-                field("Customer Surcharge Amount"; "Customer Surcharge Amount")
+                field("Customer Surcharge Amount"; Rec."Customer Surcharge Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Surcharge Amount field';

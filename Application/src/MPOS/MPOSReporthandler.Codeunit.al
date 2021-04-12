@@ -44,7 +44,6 @@ codeunit 6059976 "NPR MPOS Report handler"
         RecRef: RecordRef;
         OutStr: OutStream;
         InStr: InStream;
-        Result: Text;
         XmlParameters: Text;
         Filename: Text;
         Base64String: Text;
@@ -77,7 +76,7 @@ codeunit 6059976 "NPR MPOS Report handler"
         JSON := BuildJSONParams(Filename, '', Base64String, '', CreatePDFFailedErr);
 
         JSBridge.SetParameters('CREATEPDF', JSON, '');
-        JSBridge.RunModal;
+        JSBridge.RunModal();
 
         exit(true);
     end;

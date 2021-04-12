@@ -31,7 +31,7 @@ codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
         WaiterPad: Record "NPR NPRE Waiter Pad";
         SeatingCode: Code[20];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;

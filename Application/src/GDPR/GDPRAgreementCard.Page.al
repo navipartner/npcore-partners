@@ -16,12 +16,12 @@ page 6151123 "NPR GDPR Agreement Card"
         {
             group(General)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -30,7 +30,7 @@ page 6151123 "NPR GDPR Agreement Card"
             group(Control6014407)
             {
                 ShowCaption = false;
-                field("Anonymize After"; "Anonymize After")
+                field("Anonymize After"; Rec."Anonymize After")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Anonymize After field';
@@ -53,7 +53,7 @@ page 6151123 "NPR GDPR Agreement Card"
                 Caption = 'Push Consent Request';
                 Image = Apply;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -62,7 +62,7 @@ page 6151123 "NPR GDPR Agreement Card"
                 trigger OnAction()
                 begin
 
-                    GDPRManagement.OnNewAgreementVersion("No.");
+                    GDPRManagement.OnNewAgreementVersion(Rec."No.");
                 end;
             }
         }

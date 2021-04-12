@@ -2,8 +2,6 @@ codeunit 6150884 "NPR Customer Action" implements "NPR IAction", "NPR IJsonSeria
 {
     var
         _code: Text;
-        _state: JsonObject;
-        _type: Enum "NPR Action Type";
         _base: Codeunit "NPR Base Action";
 
     procedure Code(): Text;

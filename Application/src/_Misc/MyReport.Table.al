@@ -30,7 +30,6 @@ table 6014618 "NPR My Report"
     local procedure AddEntities(FilterStr: Text[250])
     var
         AllObj: Record AllObj;
-        "Report": Record "Object";
     begin
         AllObj.SetRange("Object Type", AllObj."Object Type"::Report);
         AllObj.SetFilter("Object ID", FilterStr);

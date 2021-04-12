@@ -1,4 +1,4 @@
-codeunit 6014491 "NPR Ticket Attempt Create"
+﻿codeunit 6014491 "NPR Ticket Attempt Create"
 {
     SingleInstance = true;
 
@@ -118,13 +118,12 @@ codeunit 6014491 "NPR Ticket Attempt Create"
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         IsRepeatedEntry: Boolean;
-        AbortTicketRevalidate: Boolean;
     begin
 
         // Precheck if member has tickets for today with same item numbers and qty. If so try to reuse those tickets.
         IsRepeatedEntry := true;
 
-        TmpTicketReservationRequest.Reset;
+        TmpTicketReservationRequest.Reset();
         TmpTicketReservationRequest.FindSet();
 
         repeat
@@ -149,7 +148,6 @@ codeunit 6014491 "NPR Ticket Attempt Create"
             TicketReservationRequest.SetCurrentKey("Session Token ID");
             TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
             if (TicketReservationRequest.FindSet()) then begin
-                AbortTicketRevalidate := false;
 
                 repeat
                     Ticket.SetCurrentKey("Ticket Reservation Entry No.");
@@ -183,7 +181,6 @@ codeunit 6014491 "NPR Ticket Attempt Create"
     var
         TicketRequest: Codeunit "NPR TM Ticket Request Manager";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
     begin
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");

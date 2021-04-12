@@ -1,4 +1,4 @@
-codeunit 6151401 "NPR Magento Setup Mgt."
+﻿codeunit 6151401 "NPR Magento Setup Mgt."
 {
     var
         Text000: Label 'Root Categoery is missing for Website %1';
@@ -16,13 +16,10 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoStore: Record "NPR Magento Store";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XNode: XmlNode;
         XNodeSibling: XmlNode;
         XNodeChild: XmlNode;
         XNodeList: XmlNodeList;
         XAttribute: XmlAttribute;
-        i: Integer;
-        j: Integer;
         RootItemGroupNo: Code[20];
     begin
         if XmlElement.IsEmpty then
@@ -39,7 +36,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
                 XNodeChild.AsXmlElement().Attributes().Get('code', XAttribute);
 
                 if not MagentoStore.Get(UpperCase(XAttribute.Value)) then begin
-                    MagentoStore.Init;
+                    MagentoStore.Init();
                     MagentoStore.Code := UpperCase(XAttribute.Value);
                     MagentoStore."Website Code" := MagentoWebsite.Code;
                     MagentoStore.Name := XNodeChild.AsXmlElement().InnerText;
@@ -70,7 +67,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             exit;
         end;
 
-        ItemGroup.Init;
+        ItemGroup.Init();
         ItemGroup.Id := ItemGroupNo;
         ItemGroup.Validate(Name, ItemGroupName);
         ItemGroup.Root := true;
@@ -85,25 +82,25 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoWebsite: Record "NPR Magento Website";
     begin
         MagentoWebsite.SetRange("Default Website", true);
-        if not MagentoWebsite.FindFirst then
+        if not MagentoWebsite.FindFirst() then
             exit;
 
         MagentoStore.SetRange("Website Code", MagentoWebsite.Code);
         MagentoStore.SetFilter("Root Item Group No.", '<>%1', '');
-        if not MagentoStore.FindFirst then
+        if not MagentoStore.FindFirst() then
             exit;
 
         ItemGroup.SetFilter("Parent Category Id", '=%1', '');
         ItemGroup.SetFilter("Root No.", '=%1', '');
         ItemGroup.SetRange(Root, false);
-        if not ItemGroup.FindSet then
+        if not ItemGroup.FindSet() then
             exit;
 
         repeat
             ItemGroup."Parent Category Id" := MagentoStore."Root Item Group No.";
             ItemGroup."Root No." := MagentoStore."Root Item Group No.";
             ItemGroup.Modify(true);
-        until ItemGroup.Next = 0;
+        until ItemGroup.Next() = 0;
     end;
 
     procedure SetupClientAddIns()
@@ -139,7 +136,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         HttpResponse.Content.ReadAs(StreamIn);
 
         if not ClientAddin.Get(Name, PublicKeyToken) then begin
-            ClientAddin.Init;
+            ClientAddin.Init();
             ClientAddin."Add-in Name" := Name;
             ClientAddin."Public Key Token" := PublicKeyToken;
             ClientAddin.Version := Version;
@@ -159,7 +156,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         NaviConnectImportType: Record "NPR Nc Import Type";
     begin
         if not (NaviConnectImportType.Get('ORDER')) then begin
-            NaviConnectImportType.Init;
+            NaviConnectImportType.Init();
             NaviConnectImportType.Code := 'ORDER';
             NaviConnectImportType.Description := 'magento_services';
             NaviConnectImportType."Import Codeunit ID" := CODEUNIT::"NPR Magento Sales Order Mgt.";
@@ -188,7 +185,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         PrevRec: Text;
     begin
         if not (NcImportType.Get('RETURN_ORD')) then begin
-            NcImportType.Init;
+            NcImportType.Init();
             NcImportType.Code := 'RETURN_ORD';
             NcImportType.Description := 'magento_services';
             NcImportType."Import Codeunit ID" := CODEUNIT::"NPR Magento Imp. Ret. Order";
@@ -228,7 +225,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         XmlDoc: XmlDocument;
         XElement: XmlElement;
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
 
@@ -261,10 +258,9 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         XNode: XmlNode;
         XAttribute: XmlAttribute;
         XNodeList: XmlNodeList;
-        i: Integer;
         GroupCode: Text[32];
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
         if not MagentoSetup."Customers Enabled" then
@@ -277,7 +273,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             GroupCode := CopyStr(XAttribute.Value, 1, MaxStrLen(MagentoCustomerGroup.Code));
             if GroupCode <> '' then
                 if not MagentoCustomerGroup.Get(GroupCode) then begin
-                    MagentoCustomerGroup.Init;
+                    MagentoCustomerGroup.Init();
                     MagentoCustomerGroup.Code := GroupCode;
                     MagentoCustomerGroup."Magento Tax Class" := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'tax_class_code', 0, false);
                     MagentoCustomerGroup.Insert(true);
@@ -297,11 +293,10 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         XmlDoc: XmlDocument;
         XNode: XmlNode;
         XNodeList: XmlNodeList;
-        i: Integer;
         ClassName: Text[250];
         ClassType: Integer;
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'tax_classes', XmlDoc);
@@ -318,7 +313,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             end;
             if (ClassName <> '') and (ClassType >= 0) then
                 if not MagentoTaxClass.Get(ClassName, ClassType) then begin
-                    MagentoTaxClass.Init;
+                    MagentoTaxClass.Init();
                     MagentoTaxClass.Name := ClassName;
                     MagentoTaxClass.Type := Enum::"NPR Magento Tax Class Type".FromInteger(ClassType);
                     MagentoTaxClass.Insert(true);
@@ -334,13 +329,11 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDoc: XmlDocument;
         XNode: XmlNode;
-        XNode2: XmlNode;
         XNodeList: XmlNodeList;
         XAttribute: XmlAttribute;
-        XElement: XmlElement;
         i: Integer;
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'websites', XmlDoc);
@@ -349,7 +342,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         foreach XNode in XNodeList do begin
             XNode.AsXmlElement().Attributes().Get('code', XAttribute);
             if not MagentoWebsite.Get(XAttribute.Value) then begin
-                MagentoWebsite.Init;
+                MagentoWebsite.Init();
                 MagentoWebsite.Code := UpperCase(XAttribute.Value);
                 MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'name', 0, false);
                 MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'is_default', 0, false) = '1';
@@ -375,16 +368,14 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoSetup: Record "NPR Magento Setup";
         PaymentMapping: Record "NPR Magento Payment Mapping";
         MagentoMgt: Codeunit "NPR Magento Mgt.";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDoc: XmlDocument;
         XNode: XmlNode;
         XNodeList: XmlNodeList;
         XAttribute: XmlAttribute;
-        i: Integer;
         PaymentCode: Text[50];
         PaymentType: Text[50];
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'payment_methods', XmlDoc);
@@ -397,7 +388,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             PaymentType := XAttribute.Value;
 
             if not PaymentMapping.Get(PaymentCode, PaymentType) then begin
-                PaymentMapping.Init;
+                PaymentMapping.Init();
                 PaymentMapping."External Payment Method Code" := PaymentCode;
                 PaymentMapping."External Payment Type" := PaymentType;
                 PaymentMapping.Insert(true);
@@ -410,15 +401,13 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoSetup: Record "NPR Magento Setup";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
         MagentoMgt: Codeunit "NPR Magento Mgt.";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDoc: XmlDocument;
         XNode: XmlNode;
         XNodeList: XmlNodeList;
         XAttribute: XmlAttribute;
-        i: Integer;
         ShipmentCode: Text[50];
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'shipping_methods', XmlDoc);
@@ -428,7 +417,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             XNode.AsXmlElement().Attributes().Get('carrier', XAttribute);
             ShipmentCode := XAttribute.Value;
             if not ShipmentMapping.Get(ShipmentCode) then begin
-                ShipmentMapping.Init;
+                ShipmentMapping.Init();
                 ShipmentMapping."External Shipment Method Code" := ShipmentCode;
                 ShipmentMapping.Insert(true);
             end;
@@ -438,17 +427,11 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     local procedure SetupNpXmlTemplates()
     var
         MagentoSetup: Record "NPR Magento Setup";
-        NpXmlElement: Record "NPR NpXml Element";
-        NpXmlElement2: Record "NPR NpXml Element";
-        NpXmlFilter: Record "NPR NpXml Filter";
         TempBlob: Codeunit "Temp Blob";
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NpXmlSetupMgt: Codeunit "NPR Magento NpXml Setup Mgt";
-        VariaXElementLineNo: Integer;
-        ColorDimension: Code[20];
-        SizeDimension: Code[20];
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit;
 
         MagentoGenericSetupMgt.InitGenericMagentoSetup(MagentoSetup);
@@ -522,14 +505,14 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoVATBusinessGroup: Record "NPR Magento VAT Bus. Group";
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
     begin
-        if VATBusinessPostingGroup.FindSet then
+        if VATBusinessPostingGroup.FindSet() then
             repeat
                 if not MagentoVATBusinessGroup.Get(VATBusinessPostingGroup.Code) then begin
-                    MagentoVATBusinessGroup.Init;
+                    MagentoVATBusinessGroup.Init();
                     MagentoVATBusinessGroup."VAT Business Posting Group" := VATBusinessPostingGroup.Code;
                     MagentoVATBusinessGroup.Insert(true);
                 end;
-            until VATBusinessPostingGroup.Next = 0;
+            until VATBusinessPostingGroup.Next() = 0;
     end;
 
     procedure SetupVATProductPostingGroups()
@@ -537,14 +520,14 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoVATProductGroup: Record "NPR Magento VAT Prod. Group";
         VATProductPostingGroup: Record "VAT Product Posting Group";
     begin
-        if VATProductPostingGroup.FindSet then
+        if VATProductPostingGroup.FindSet() then
             repeat
                 if not MagentoVATProductGroup.Get(VATProductPostingGroup.Code) then begin
-                    MagentoVATProductGroup.Init;
+                    MagentoVATProductGroup.Init();
                     MagentoVATProductGroup."VAT Product Posting Group" := VATProductPostingGroup.Code;
                     MagentoVATProductGroup.Insert(true);
                 end;
-            until VATProductPostingGroup.Next = 0;
+            until VATProductPostingGroup.Next() = 0;
     end;
 
     procedure HasSetupCategories(): Boolean
@@ -555,7 +538,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoSetupEventSub.SetFilter("Codeunit ID", '>%1', 0);
         MagentoSetupEventSub.SetFilter("Function Name", '<>%1', '');
         MagentoSetupEventSub.SetRange(Enabled, true);
-        exit(MagentoSetupEventSub.FindFirst);
+        exit(MagentoSetupEventSub.FindFirst());
     end;
 
     procedure HasSetupBrands(): Boolean
@@ -566,7 +549,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoSetupEventSub.SetFilter("Codeunit ID", '>%1', 0);
         MagentoSetupEventSub.SetFilter("Function Name", '<>%1', '');
         MagentoSetupEventSub.SetRange(Enabled, true);
-        exit(MagentoSetupEventSub.FindFirst);
+        exit(MagentoSetupEventSub.FindFirst());
     end;
 
     #endregion
@@ -834,17 +817,17 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             exit;
         end;
 
-        NoSeries.Init;
+        NoSeries.Init();
         NoSeries.Code := NoSeriesCode;
         NoSeries.Description := Text001;
         NoSeries."Default Nos." := true;
         NoSeries."Manual Nos." := true;
         NoSeries.Insert(true);
 
-        NoSeriesLine.Init;
+        NoSeriesLine.Init();
         NoSeriesLine."Series Code" := NoSeries.Code;
         NoSeriesLine."Line No." := 10000;
-        NoSeriesLine."Starting Date" := Today;
+        NoSeriesLine."Starting Date" := Today();
         NoSeriesLine."Starting No." := '00001';
         NoSeriesLine.Insert(true);
 
@@ -867,7 +850,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     begin
         if not GuiAllowed then
             exit;
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
         if Confirm(Text10000, false) then
@@ -904,7 +887,6 @@ codeunit 6151401 "NPR Magento Setup Mgt."
 
     procedure ShowMissingObjects(var MagentoSetup: Record "NPR Magento Setup")
     var
-        NcManagedNavModulesMgt: Codeunit "NPR Nc Man. Nav Modules Mgt.";
         TempObject: Record AllObj temporary;
     begin
         // NcManagedNavModulesMgt.FindMissingObjects(MagentoVersionId(), MagentoSetup."Version No.",

@@ -49,7 +49,7 @@ codeunit 6150630 "NPR POS Manage POS Unit"
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        POSPeriodRegister.Init;
+        POSPeriodRegister.Init();
         POSPeriodRegister."No." := 0;
 
         POSPeriodRegister."POS Unit No." := POSUnit."No.";

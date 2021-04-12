@@ -23,20 +23,19 @@ codeunit 6150794 "NPR POS Action: Tax Free"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'respond();');
-                RegisterOptionParameter('Operation', 'Sale Toggle,Voucher List,Unit List,Print Last,Consolidate', 'Sale Toggle');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterOptionParameter('Operation', 'Sale Toggle,Voucher List,Unit List,Print Last,Consolidate', 'Sale Toggle');
+            Sender.RegisterWorkflow(false);
 
-                RegisterDataSourceBinding('BUILTIN_SALE');
-            end;
+            Sender.RegisterDataSourceBinding('BUILTIN_SALE');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -50,7 +49,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -146,7 +145,6 @@ codeunit 6150794 "NPR POS Action: Tax Free"
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        DataType: Enum "NPR Data Type";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
     begin
@@ -191,10 +189,10 @@ codeunit 6150794 "NPR POS Action: Tax Free"
         EFTTransactionRequest.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         EFTTransactionRequest.SetRange(Successful, true);
         EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
-        if EFTTransactionRequest.FindSet then
+        if EFTTransactionRequest.FindSet() then
             repeat
                 Valid := TaxFreeMgt.IsValidTerminalIIN(TaxFreeUnit, PadStr(CopyStr(EFTTransactionRequest."Card Number", 1, 6), StrLen(EFTTransactionRequest."Card Number"), 'X'));
-            until (EFTTransactionRequest.Next = 0) or Valid;
+            until (EFTTransactionRequest.Next() = 0) or Valid;
 
         if not Valid then
             exit;

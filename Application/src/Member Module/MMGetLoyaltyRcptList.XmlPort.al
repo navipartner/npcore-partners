@@ -34,7 +34,7 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
                     trigger OnBeforeInsertRecord()
                     begin
 
-                        tmpMemberInfoCapture."Document Date" := Today;
+                        tmpMemberInfoCapture."Document Date" := Today();
                     end;
                 }
                 tableelement(tmpmembershipresponse; "NPR MM Membership")

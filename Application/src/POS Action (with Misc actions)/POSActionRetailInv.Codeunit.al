@@ -1,7 +1,7 @@
 codeunit 6151086 "NPR POS Action - Retail Inv."
 {
     // NPR5.40/MHA /20180320  CASE 307025 Object created - Retail Inventory Set
-    // NPR5.46/MHA /20180910  CASE 326622 Changed from PAGE.RUN to PAGE.RUNMODAL to fix issue with focus
+    // NPR5.46/MHA /20180910  CASE 326622 Changed from PAGE.RUN to PAGE.RunModal() to fix issue with focus
 
 
     trigger OnRun()
@@ -14,20 +14,19 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if Sender.DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Single)
-            then begin
-                RegisterWorkflowStep('ProcessInventorySet', 'respond();');
+        if Sender.DiscoverAction(
+  ActionCode(),
+  Text000,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Single)
+then begin
+            Sender.RegisterWorkflowStep('ProcessInventorySet', 'respond();');
 
-                RegisterTextParameter('FixedInventorySetCode', '');
-                RegisterWorkflow(false);
-                RegisterDataBinding();
-            end;
+            Sender.RegisterTextParameter('FixedInventorySetCode', '');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataBinding();
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -35,7 +34,7 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -83,9 +82,9 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
         if (FixedInventorySetCode <> '') and RetailInventorySet.Get(FixedInventorySetCode) then
             exit(true);
 
-        RetailInventorySet.FindLast;
+        RetailInventorySet.FindLast();
         FixedInventorySetCode := RetailInventorySet.Code;
-        RetailInventorySet.FindFirst;
+        RetailInventorySet.FindFirst();
         if FixedInventorySetCode = RetailInventorySet.Code then
             exit(true);
 

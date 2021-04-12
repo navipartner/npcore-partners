@@ -27,11 +27,10 @@ page 6014518 "NPR Sales Order Pick"
                     if SalesOrderNoSearch <> '' then begin
                         SalesOrderTestSearch.Get(Rec."Document Type"::Order, SalesOrderNoSearch);
                         Rec.Reset();
-                        Rec.SetRange("Document Type", "Document Type"::Order);
+                        Rec.SetRange("Document Type", Rec."Document Type"::Order);
                         Rec.SetRange("No.", SalesOrderNoSearch);
                         CurrPage.Update();
-                    end else
-                        ItemBarcodeInput := '';
+                    end;
                 end;
             }
             field("Item No."; ItemBarcode."No.")
@@ -668,7 +667,6 @@ page 6014518 "NPR Sales Order Pick"
 
     trigger OnAfterGetRecord()
     begin
-        JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -679,7 +677,7 @@ page 6014518 "NPR Sales Order Pick"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        CheckCreditMaxBeforeInsert;
+        Rec.CheckCreditMaxBeforeInsert;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -695,7 +693,7 @@ page 6014518 "NPR Sales Order Pick"
             Rec.FilterGroup(0);
         end;
 
-        Rec.SetRange("Date Filter", 0D, WorkDate - 1);
+        Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
 
         SetDocNoVisible();
     end;
@@ -703,22 +701,11 @@ page 6014518 "NPR Sales Order Pick"
     var
         ItemBarcode: Record Item;
         ItemVariantBarcode: Record "Item Variant";
-        CopySalesDoc: Report "Copy Sales Document";
-        MoveNegSalesLines: Report "Move Negative Sales Lines";
-        ArchiveManagement: Codeunit ArchiveManagement;
-        DocPrint: Codeunit "Document-Print";
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-        SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
         ReportPrint: Codeunit "Test Report-Print";
         UserMgt: Codeunit "User Setup Management";
-        ChangeExchangeRate: Page "Change Exchange Rate";
         DocNoVisible: Boolean;
         DynamicEditable: Boolean;
-        ExternalDocNoMandatory: Boolean;
         ItemFoundonLines: Boolean;
-        [InDataSet]
-        JobQueueVisible: Boolean;
-        ItemBarcodeInput: Code[20];
         SalesOrderNoSearch: Code[20];
         ChangeRecordsQst: Label 'Do you want to change %1 in all related records in the warehouse?';
         UpdateErr: Label 'The update has been interrupted to respect the warning.';

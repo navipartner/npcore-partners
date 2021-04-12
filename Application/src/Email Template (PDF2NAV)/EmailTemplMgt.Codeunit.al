@@ -1,4 +1,4 @@
-codeunit 6014452 "NPR E-mail Templ. Mgt."
+﻿codeunit 6014452 "NPR E-mail Templ. Mgt."
 {
 
     trigger OnRun()
@@ -84,35 +84,35 @@ codeunit 6014452 "NPR E-mail Templ. Mgt."
         EmailTemplateHeaderTo.Modify(true);
 
         EmailTemplateLineTo.SetRange("E-mail Template Code", EmailTemplateHeaderTo.Code);
-        if EmailTemplateLineTo.FindFirst then
-            EmailTemplateLineTo.DeleteAll;
+        if EmailTemplateLineTo.FindFirst() then
+            EmailTemplateLineTo.DeleteAll();
 
         EmailTemplateLineFrom.SetRange("E-mail Template Code", EmailTemplateHeaderFrom.Code);
-        if EmailTemplateLineFrom.FindSet then
+        if EmailTemplateLineFrom.FindSet() then
             repeat
-                EmailTemplateLineTo.Init;
+                EmailTemplateLineTo.Init();
                 EmailTemplateLineTo.TransferFields(EmailTemplateLineFrom, true);
                 EmailTemplateLineTo."E-mail Template Code" := EmailTemplateHeaderTo.Code;
                 EmailTemplateLineTo.Insert(true);
-            until EmailTemplateLineFrom.Next = 0;
+            until EmailTemplateLineFrom.Next() = 0;
 
         EmailTemplateFilterTo.SetRange("E-mail Template Code", EmailTemplateHeaderTo.Code);
-        if EmailTemplateFilterTo.FindFirst then
-            EmailTemplateFilterTo.DeleteAll;
+        if EmailTemplateFilterTo.FindFirst() then
+            EmailTemplateFilterTo.DeleteAll();
 
         EmailTemplateFilterFrom.SetRange("E-mail Template Code", EmailTemplateHeaderFrom.Code);
-        if EmailTemplateFilterFrom.FindSet then
+        if EmailTemplateFilterFrom.FindSet() then
             repeat
-                EmailTemplateLineTo.Init;
+                EmailTemplateLineTo.Init();
                 EmailTemplateFilterTo.TransferFields(EmailTemplateFilterFrom, true);
                 EmailTemplateFilterTo."E-mail Template Code" := EmailTemplateHeaderTo.Code;
                 EmailTemplateFilterTo.Insert(true);
-            until EmailTemplateFilterFrom.Next = 0;
+            until EmailTemplateFilterFrom.Next() = 0;
     end;
 
     procedure DeleteHtmlTemplate(var EmailTemplateHeader: Record "NPR E-mail Template Header")
     begin
-        if not EmailTemplateHeader."HTML Template".HasValue then
+        if not EmailTemplateHeader."HTML Template".HasValue() then
             exit;
 
         if not Confirm(Text002, false) then

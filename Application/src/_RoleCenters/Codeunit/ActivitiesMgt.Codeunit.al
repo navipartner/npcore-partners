@@ -1,4 +1,4 @@
-codeunit 6151242 "NPR Activities Mgt."
+﻿codeunit 6151242 "NPR Activities Mgt."
 {
 
     trigger OnRun()
@@ -65,7 +65,7 @@ codeunit 6151242 "NPR Activities Mgt."
         VendorLedgerEntry: Record "Vendor Ledger Entry";
     begin
         VendorLedgerEntry.SetRange("Document Type", VendorLedgerEntry."Document Type"::Invoice);
-        VendorLedgerEntry.SetFilter("Due Date", '<%1', WorkDate);
+        VendorLedgerEntry.SetFilter("Due Date", '<%1', WorkDate());
         VendorLedgerEntry.SetFilter("Remaining Amt. (LCY)", '<>0');
         VendorLedgerEntry.SetCurrentKey("Remaining Amt. (LCY)");
         VendorLedgerEntry.Ascending := true;
@@ -97,14 +97,14 @@ codeunit 6151242 "NPR Activities Mgt."
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        ItemLedgerEntry.Reset;
+        ItemLedgerEntry.Reset();
         ItemLedgerEntry.SetFilter("Entry Type", '%1', ItemLedgerEntry."Entry Type"::Sale);
         ItemLedgerEntry.SetRange("Posting Date", CalcDate('<-CM>', Today), Today);
-        IF ItemLedgerEntry.FindSet THEN begin
+        IF ItemLedgerEntry.FindSet() THEN begin
             repeat
                 ItemLedgerEntry.CalcFields("sales Amount (Actual)");
                 Amount += ItemLedgerEntry."sales Amount (Actual)";
-            until ItemLedgerEntry.Next = 0;
+            until ItemLedgerEntry.Next() = 0;
         end;
     end;
 
@@ -112,14 +112,14 @@ codeunit 6151242 "NPR Activities Mgt."
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        ItemLedgerEntry.Reset;
+        ItemLedgerEntry.Reset();
         ItemLedgerEntry.SetFilter("Entry Type", '%1', ItemLedgerEntry."Entry Type"::Sale);
         ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CALCDATE('<-CM-1Y>', TODAY), CALCDATE('<CM-1Y>', TODAY));
-        IF ItemLedgerEntry.FindSet THEN begin
+        IF ItemLedgerEntry.FindSet() THEN begin
             repeat
                 ItemLedgerEntry.CalcFields("sales Amount (Actual)");
                 Amount += ItemLedgerEntry."sales Amount (Actual)";
-            until ItemLedgerEntry.Next = 0;
+            until ItemLedgerEntry.Next() = 0;
         end;
     end;
 
@@ -163,11 +163,11 @@ codeunit 6151242 "NPR Activities Mgt."
         GLAccount.SetRange("Account Category", GLAccount."Account Category"::Assets);
         GLAccount.SetRange("Account Type", GLAccount."Account Type"::Posting);
         GLAccount.SetRange("Account Subcategory Entry No.", 3);
-        if GLAccount.FindSet then begin
+        if GLAccount.FindSet() then begin
             repeat
                 GLAccount.CalcFields(Balance);
                 CashAccountBalance += GLAccount.Balance;
-            until GLAccount.Next = 0;
+            until GLAccount.Next() = 0;
         end;
     end;
 
@@ -185,22 +185,22 @@ codeunit 6151242 "NPR Activities Mgt."
     var
         ActivitiesCue: Record "Activities Cue";
     begin
-        ActivitiesCue.LockTable;
+        ActivitiesCue.LockTable();
 
-        ActivitiesCue.Get;
+        ActivitiesCue.Get();
         ActivitiesCue."NPR Sales This Month Last Year" := NPCalcSalesThisMonthAmountLastYear(false);
         ActivitiesCue."NPR Sales This Month ILE" := NPCalcSalesThisMonthAmount(false);
 
         ActivitiesCue."Last Date/Time Modified" := CurrentDateTime;
-        ActivitiesCue.Modify;
-        Commit;
+        ActivitiesCue.Modify();
+        Commit();
     end;
 
     procedure IsCueDataStale(): Boolean
     var
         ActivitiesCue: Record "Activities Cue";
     begin
-        if not ActivitiesCue.Get then
+        if not ActivitiesCue.Get() then
             exit(false);
 
         exit(IsPassedCueDataStale(ActivitiesCue));

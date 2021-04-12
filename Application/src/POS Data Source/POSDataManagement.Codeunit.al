@@ -53,7 +53,7 @@ codeunit 6150710 "NPR POS Data Management"
             Error(Text001, Name);
 
         OnDiscoverDataSourceExtensions(Name, Extensions);
-        if Extensions.Count > 0 then begin
+        if Extensions.Count() > 0 then begin
             DataSource.AddExtensions(Extensions);
 
             foreach ExtensionName in Extensions do begin
@@ -88,14 +88,14 @@ codeunit 6150710 "NPR POS Data Management"
 
         RecRef.GetTable(Record);
         CurrentPosition := RecRef.GetPosition();
-        if RecRef.Find then
+        if RecRef.Find() then
             CurrDataSet.SetCurrentPosition(CurrentPosition);
 
-        if RecRef.FindSet then
+        if RecRef.FindSet() then
             repeat
                 CurrDataSet.NewRow(RecRef.GetPosition(), DataRow);
                 NavOneRecordToDataRow(RecRef, DataRow, DataSource, POSSession, FrontEnd);
-            until RecRef.Next = 0;
+            until RecRef.Next() = 0;
     end;
 
     local procedure NavOneRecordToDataRow(var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -112,11 +112,9 @@ codeunit 6150710 "NPR POS Data Management"
         FieldIdText: Text;
         Extension: Text;
         FieldId: Integer;
-        i: Integer;
         Handled: Boolean;
         HasVariables: Boolean;
         IsExtensionField: Boolean;
-        FieldValueVariant: Variant;
     begin
         foreach DataColumnToken in DataSource.Columns do begin
             DataColumnObject := DataColumnToken.AsObject();

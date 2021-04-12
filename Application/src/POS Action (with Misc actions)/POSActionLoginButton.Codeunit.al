@@ -23,18 +23,15 @@ codeunit 6150860 "NPR POS Action: LoginButton"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
 
-        with Sender do begin
-            if (DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple))
-            then begin
-                RegisterTextParameter('SalespersonCode', 'KIOSK-01');
-                RegisterWorkflow(false);
-            end;
-
+        if (Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple))
+then begin
+            Sender.RegisterTextParameter('SalespersonCode', 'KIOSK-01');
+            Sender.RegisterWorkflow(false);
         end;
     end;
 
@@ -54,7 +51,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         HostName: Text;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -179,7 +176,6 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         SalePOS: Record "NPR POS Sale";
         POSAction: Record "NPR POS Action";
         POSSale: Codeunit "NPR POS Sale";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
     begin
 
         POSSession.StartTransaction();

@@ -23,7 +23,7 @@ page 6059942 "NPR SMS Template Subform"
                     trigger OnValidate()
                     begin
                         Rec.SetCurrentKey("Template Code", "Line No.");
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
             }

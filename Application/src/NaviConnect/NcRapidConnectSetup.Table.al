@@ -135,12 +135,12 @@ table 6151090 "NPR Nc RapidConnect Setup"
         NcRapidConnectTrigger: Record "NPR Nc RapidConnect Trig.Table";
     begin
         NcRapidConnectTrigger.SetRange("Setup Code", Code);
-        if NcRapidConnectTrigger.FindFirst then
-            NcRapidConnectTrigger.DeleteAll;
+        if NcRapidConnectTrigger.FindFirst() then
+            NcRapidConnectTrigger.DeleteAll();
 
         NcRapidConnectEndpoint.SetRange("Setup Code", Code);
-        if NcRapidConnectEndpoint.FindFirst then
-            NcRapidConnectEndpoint.DeleteAll;
+        if NcRapidConnectEndpoint.FindFirst() then
+            NcRapidConnectEndpoint.DeleteAll();
     end;
 }
 

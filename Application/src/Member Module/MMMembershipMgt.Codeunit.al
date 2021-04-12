@@ -33,11 +33,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         CONFLICTING_ENTRY: Label 'There is already a membership period active in the time period %1 - %2.';
         EXTEND_MEMBERSHIP: Label 'Do you want to extend the membership with %1 (%2 - %3).';
         UPGRADE_MEMBERSHIP: Label 'Do you want to upgrade the membership with %1 (%2 - %3).';
-        CANCEL_MEMBERSHIP_NOT_ALLOWED: Label 'The membership can''t be refunded at this time. ';
-        FUTUREDATE_NOT_SUPPORTED: Label 'When changing membeship type, a future date may not be used.';
-        PRICEMODEL_NOT_SUPPORTED: Label 'The pricemodel %1 is not supported with operation %2.';
         EXTEND_TO_SHORT: Label 'When extending a subscription, the new until date (%1) must exceed the current subscriptons until date (%2).';
-        OVERLAPPING_TIMEFRAME: Label 'There are overlapping time frames for membership entry no %1, for date %2.';
         MULTIPLE_TIMEFRAMES: Label 'The operation %1 can not span multiple time frames for member entry no. %2. The new time frame %3 - %4, span current time frame entries %5 and %6.';
         NO_TIMEFRAME: Label 'Date of cancel (%1) must be within the active time frame (%2 - %3).';
         STACKING_NOT_ALLOWED: Label 'Setup does not allow stacking - having multiple open time frames.  Membership entry no %1, for date %2.';
@@ -45,7 +41,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MEMBERSHIP_BLOCKED: Label 'The membership %1 for card %2 is blocked. Block date is %3.';
         MEMBERCARD_NOT_FOUND: Label 'The member card %1 was not found.';
         MEMBERCARD_BLOCKED: Label 'The member card %1 is blocked.';
-        MEMBERCARD_EXPIRED: Label 'The member card %1 has expired.';
         NO_ADMIN_MEMBER: Label 'At least one member must have an administrative role in the membership. This members information will not be synchronized to customer. Membership could not be created.';
         MEMBERCARD_BLANK: Label 'Membercard number can''t be empty or blank.';
         INVALID_CONTACT: Label 'The contact number %1 is not valid in context of customer number %2';
@@ -154,7 +149,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         GDPRAnonymizationRequestWS: Codeunit "NPR GDPR Anon. Req. WS";
         OriginalCustomerNo: Code[20];
         MembershipTimeFrameEntries: Boolean;
-        ReasonCode: Text;
         AnonymizationResponseCode: Integer;
     begin
 
@@ -626,7 +620,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
 
         if (ReferenceDate = 0D) then
-            ReferenceDate := Today;
+            ReferenceDate := Today();
 
         MembershipEntry.SetCurrentKey("Membership Entry No.");
         MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
@@ -737,7 +731,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
 
         if (ReferenceDate = 0D) then
-            ReferenceDate := TODAY;
+            ReferenceDate := Today();
 
         MembershipEntry.SetCurrentKey("Membership Entry No.");
         MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
@@ -929,9 +923,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MembershipRole: Record "NPR MM Membership Role";
         MembershipRole2: Record "NPR MM Membership Role";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MM_GDPRManagement: Codeunit "NPR MM GDPR Management";
         GDPRManagement: Codeunit "NPR GDPR Management";
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
         if (not MembershipRole.Get(MembershipEntryNo, MemberEntryNo)) then
@@ -1084,7 +1076,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberInfoCapture."Entry No." := 0;
         PrefillMemberInfoCapture(MemberInfoCapture, Member, Membership, ExternalMemberCardNo, RegretWithItemNo);
 
-        MemberInfoCapture."Document Date" := Today;
+        MemberInfoCapture."Document Date" := Today();
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::REGRET;
 
         if (not RegretMembership(MemberInfoCapture, true, false, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price")) then
@@ -1108,7 +1100,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(RegretMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    local procedure RegretMembershipWorker(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text) Success: Boolean
+    local procedure RegretMembershipWorker(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -1116,7 +1108,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
-            MemberInfoCapture."Document Date" := Today;
+            MemberInfoCapture."Document Date" := Today();
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
@@ -1253,7 +1245,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         PrefillMemberInfoCapture(MemberInfoCapture, Member, Membership, ExternalMemberCardNo, CancelWithItemNo);
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::CANCEL;
-        MemberInfoCapture."Document Date" := Today; // Active
+        MemberInfoCapture."Document Date" := Today(); // Active
 
         if (not CancelMembership(MemberInfoCapture, true, false, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price")) then
             Error('');
@@ -1284,8 +1276,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Item: Record Item;
         EndDateNew: Date;
         CancelledFraction: Decimal;
-        NewFraction: Decimal;
-        HaveAlterationRule: Boolean;
     begin
 
         OutStartDate := 0D;
@@ -1293,7 +1283,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         SuggestedUnitPrice := 0;
 
         if (MemberInfoCapture."Document Date" = 0D) then
-            MemberInfoCapture."Document Date" := Today;
+            MemberInfoCapture."Document Date" := Today();
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
@@ -1349,7 +1339,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 exit(false);
 
         CancelledFraction := 1 - CalculatePeriodStartToDateFraction(MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", EndDateNew);
-        NewFraction := 0;
         case MembershipAlterationSetup."Price Calculation" of
             MembershipAlterationSetup."Price Calculation"::UNIT_PRICE:
                 SuggestedUnitPrice := -1 * MembershipEntry."Unit Price";
@@ -1382,7 +1371,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MembershipEntry: Record "NPR MM Membership Entry";
-        MemberCard: Record "NPR MM Member Card";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         NotFoundReasonText: Text;
@@ -1409,7 +1397,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         PrefillMemberInfoCapture(MemberInfoCapture, Member, Membership, ExternalMemberCardNo, RenewWithItemNo);
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;
-        MemberInfoCapture."Document Date" := Today; // Active
+        MemberInfoCapture."Document Date" := Today(); // Active
 
         if (not RenewMembership(MemberInfoCapture, true, false, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price")) then
             Error('');
@@ -1444,7 +1432,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
-            MemberInfoCapture."Document Date" := Today;
+            MemberInfoCapture."Document Date" := Today();
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
@@ -1485,7 +1473,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         if (MembershipAlterationSetup."Alteration Activate From" <> MembershipAlterationSetup."Alteration Activate From"::B2B) then
             if (StartDateNew < Today) then
-                StartDateNew := Today;
+                StartDateNew := Today();
 
         EndDateNew := CalcDate(MembershipAlterationSetup."Membership Duration", StartDateNew);
 
@@ -1579,7 +1567,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         PrefillMemberInfoCapture(MemberInfoCapture, Member, Membership, ExternalMemberCardNo, RenewWithItemNo);
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::EXTEND;
-        MemberInfoCapture."Document Date" := Today; // Active
+        MemberInfoCapture."Document Date" := Today(); // Active
 
         if (not ExtendMembership(MemberInfoCapture, true, false, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price")) then
             Error('');
@@ -1624,7 +1612,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         SuggestedUnitPrice := 0;
 
         if (MemberInfoCapture."Document Date" = 0D) then
-            MemberInfoCapture."Document Date" := Today;
+            MemberInfoCapture."Document Date" := Today();
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
@@ -1784,7 +1772,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberInfoCapture."Item No." := UpgradeWithItemNo;
 
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::UPGRADE;
-        MemberInfoCapture."Document Date" := Today; // Active
+        MemberInfoCapture."Document Date" := Today(); // Active
 
         if (not UpgradeMembership(MemberInfoCapture, true, false, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price")) then
             Error('');
@@ -1823,7 +1811,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
-            MemberInfoCapture."Document Date" := Today;
+            MemberInfoCapture."Document Date" := Today();
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
@@ -2091,7 +2079,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
         MemberInfoCapture."Item No." := RenewWithItemNo;
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
-        MemberInfoCapture."Document Date" := Today; // Active
+        MemberInfoCapture."Document Date" := Today(); // Active
 
         if (not AutoRenewMembershipWorker(MemberInfoCapture, false, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price", ReasonText)) then
             exit(0);
@@ -2124,7 +2112,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
-            MemberInfoCapture."Document Date" := Today;
+            MemberInfoCapture."Document Date" := Today();
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
@@ -2164,7 +2152,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
 
         if (StartDateNew < Today) then
-            StartDateNew := Today;
+            StartDateNew := Today();
 
         EndDateNew := CalcDate(MembershipAlterationSetup."Membership Duration", StartDateNew);
 
@@ -2260,12 +2248,8 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     local procedure CheckExtendMemberCards(WithUpdate: Boolean; MembershipEntryNo: Integer; ExpiredCardOption: Integer; NewTimeFrameEndDate: Date; ExternalCardNo: Text[100]; var MemberCardEntryNoOut: Integer; var ResponseMessage: Text): Boolean
     var
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
         MemberCard: Record "NPR MM Member Card";
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        NewUntilDate: Date;
         UpdateRequired: Boolean;
         NewCardEntryNo: Integer;
         LastEntryNo: Integer;
@@ -2361,7 +2345,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
 
         if (DocumentDate = 0D) then
-            DocumentDate := WorkDate;
+            DocumentDate := WorkDate();
 
         CalculateLedgerEntryDates_NEW(
           MembershipSalesSetup,
@@ -2413,7 +2397,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             MembershipSalesSetup."Valid From Base"::DATEFORMULA:
                 begin
                     ValidFromDate := SalesDate;
-                    if (SalesDate = WorkDate) then begin
+                    if (SalesDate = WorkDate()) then begin
                         MembershipSalesSetup.TestField("Valid From Date Calculation");
                         ValidFromDate := CalcDate(MembershipSalesSetup."Valid From Date Calculation", SalesDate);
                     end;
@@ -2444,7 +2428,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         DocumentDate := MemberInfoCapture."Document Date";
         if (DocumentDate = 0D) then
-            DocumentDate := WorkDate;
+            DocumentDate := WorkDate();
 
         CalculateLedgerEntryDates_NEW(
           MembershipSalesSetup,
@@ -2454,21 +2438,20 @@ codeunit 6060127 "NPR MM Membership Mgt."
           ValidFromDate,
           ValidUntilDate);
 
-        with MembershipSetup do
-            case "Validate Age Against" of
-                "Validate Age Against"::SALESDATE_Y,
-              "Validate Age Against"::SALESDATE_YM,
-              "Validate Age Against"::SALESDATE_YMD:
-                    ConstraintDate := DocumentDate;
-                "Validate Age Against"::PERIODBEGIN_Y,
-              "Validate Age Against"::PERIODBEGIN_YM,
-              "Validate Age Against"::PERIODBEGIN_YMD:
-                    ConstraintDate := ValidFromDate;
-                "Validate Age Against"::PERIODEND_Y,
-              "Validate Age Against"::PERIODEND_YM,
-              "Validate Age Against"::PERIODEND_YMD:
-                    ConstraintDate := ValidUntilDate;
-            end;
+        case MembershipSetup."Validate Age Against" of
+            MembershipSetup."Validate Age Against"::SALESDATE_Y,
+  MembershipSetup."Validate Age Against"::SALESDATE_YM,
+  MembershipSetup."Validate Age Against"::SALESDATE_YMD:
+                ConstraintDate := DocumentDate;
+            MembershipSetup."Validate Age Against"::PERIODBEGIN_Y,
+  MembershipSetup."Validate Age Against"::PERIODBEGIN_YM,
+  MembershipSetup."Validate Age Against"::PERIODBEGIN_YMD:
+                ConstraintDate := ValidFromDate;
+            MembershipSetup."Validate Age Against"::PERIODEND_Y,
+  MembershipSetup."Validate Age Against"::PERIODEND_YM,
+  MembershipSetup."Validate Age Against"::PERIODEND_YMD:
+                ConstraintDate := ValidUntilDate;
+        end;
 
         exit(ConstraintDate);
 
@@ -2647,29 +2630,27 @@ codeunit 6060127 "NPR MM Membership Mgt."
     procedure ApplyGracePeriodPreset(Preset: Option; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup")
     begin
 
-        with MembershipAlterationSetup do begin
-            case Preset of
-                "Grace Period Presets"::NA:
-                    begin
-                    end;
-                "Grace Period Presets"::EXPIRED_MEMBERSHIP:
-                    begin
-                        "Grace Period Calculation" := "Grace Period Calculation"::ADVANCED;
-                        "Grace Period Relates To" := "Grace Period Relates To"::END_DATE;
-                        Evaluate("Grace Period Before", '<+1D>');
-                        Evaluate("Grace Period After", '<+100Y>');
-                        "Activate Grace Period" := true;
-                    end;
+        case Preset of
+            MembershipAlterationSetup."Grace Period Presets"::NA:
+                begin
+                end;
+            MembershipAlterationSetup."Grace Period Presets"::EXPIRED_MEMBERSHIP:
+                begin
+                    MembershipAlterationSetup."Grace Period Calculation" := MembershipAlterationSetup."Grace Period Calculation"::ADVANCED;
+                    MembershipAlterationSetup."Grace Period Relates To" := MembershipAlterationSetup."Grace Period Relates To"::END_DATE;
+                    Evaluate(MembershipAlterationSetup."Grace Period Before", '<+1D>');
+                    Evaluate(MembershipAlterationSetup."Grace Period After", '<+100Y>');
+                    MembershipAlterationSetup."Activate Grace Period" := true;
+                end;
 
-                "Grace Period Presets"::ACTIVE_MEMBERSHIP:
-                    begin
-                        "Grace Period Calculation" := "Grace Period Calculation"::ADVANCED;
-                        "Grace Period Relates To" := "Grace Period Relates To"::END_DATE;
-                        Evaluate("Grace Period Before", '<-100Y>');
-                        Evaluate("Grace Period After", '<0D>');
-                        "Activate Grace Period" := true;
-                    end;
-            end;
+            MembershipAlterationSetup."Grace Period Presets"::ACTIVE_MEMBERSHIP:
+                begin
+                    MembershipAlterationSetup."Grace Period Calculation" := MembershipAlterationSetup."Grace Period Calculation"::ADVANCED;
+                    MembershipAlterationSetup."Grace Period Relates To" := MembershipAlterationSetup."Grace Period Relates To"::END_DATE;
+                    Evaluate(MembershipAlterationSetup."Grace Period Before", '<-100Y>');
+                    Evaluate(MembershipAlterationSetup."Grace Period After", '<0D>');
+                    MembershipAlterationSetup."Activate Grace Period" := true;
+                end;
         end;
     end;
 
@@ -2993,26 +2974,24 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (not MembershipSetup."Enable Age Verification") then
             exit(true);
 
-        with MembershipSetup do
-            case "Validate Age Against" of
-                "Validate Age Against"::SALESDATE_Y,
-              "Validate Age Against"::SALESDATE_YM,
-              "Validate Age Against"::SALESDATE_YMD:
-                    ReferenceDate := SalesDate;
+        case MembershipSetup."Validate Age Against" of
+            MembershipSetup."Validate Age Against"::SALESDATE_Y,
+  MembershipSetup."Validate Age Against"::SALESDATE_YM,
+  MembershipSetup."Validate Age Against"::SALESDATE_YMD:
+                ReferenceDate := SalesDate;
 
-                "Validate Age Against"::PERIODBEGIN_Y,
-              "Validate Age Against"::PERIODBEGIN_YM,
-              "Validate Age Against"::PERIODBEGIN_YMD:
-                    ReferenceDate := PeriodStartDate;
+            MembershipSetup."Validate Age Against"::PERIODBEGIN_Y,
+  MembershipSetup."Validate Age Against"::PERIODBEGIN_YM,
+  MembershipSetup."Validate Age Against"::PERIODBEGIN_YMD:
+                ReferenceDate := PeriodStartDate;
 
-                "Validate Age Against"::PERIODEND_Y,
-              "Validate Age Against"::PERIODEND_YM,
-              "Validate Age Against"::PERIODEND_YMD:
-                    ReferenceDate := PeriodEndDate;
-            end;
+            MembershipSetup."Validate Age Against"::PERIODEND_Y,
+  MembershipSetup."Validate Age Against"::PERIODEND_YM,
+  MembershipSetup."Validate Age Against"::PERIODEND_YMD:
+                ReferenceDate := PeriodEndDate;
+        end;
 
-        with MembershipAlterationSetup do
-            exit(CheckMemberAgeConstraint(Membership."Entry No.", ReferenceDate, MembershipSetup."Validate Age Against", "Age Constraint Type", "Age Constraint (Years)", "Age Constraint Applies To", ReasonText));
+        exit(CheckMemberAgeConstraint(Membership."Entry No.", ReferenceDate, MembershipSetup."Validate Age Against", MembershipAlterationSetup."Age Constraint Type", MembershipAlterationSetup."Age Constraint (Years)", MembershipAlterationSetup."Age Constraint Applies To", ReasonText));
 
     end;
 
@@ -3020,12 +2999,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MembershipRole: Record "NPR MM Membership Role";
-        MembershipEntry: Record "NPR MM Membership Entry";
         Member: Record "NPR MM Member";
         AgeConstraintOk: Boolean;
         MemberEntryNo: Integer;
         MemberBirthDate: Date;
-        AgeDuration: Duration;
     begin
 
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
@@ -3046,7 +3023,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             MemberBirthDate := 0D;
             MemberEntryNo := -1;
             if (AppliesTo = MembershipSalesSetup."Age Constraint Applies To"::OLDEST) then
-                MemberBirthDate := Today;
+                MemberBirthDate := Today();
             repeat
                 if (Member.Get(MembershipRole."Member Entry No.")) then begin
                     if (not Member.Blocked) then begin
@@ -3090,9 +3067,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     procedure CheckAgeConstraint(ReferenceDate1: Date; ReferenceDate2: Date; ReferenceDateType: Option; ConstraintType: Option NA,LT,LTE,GT,GTE,E; Years: Integer) ConstraintOK: Boolean
     var
-        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MembershipRole: Record "NPR MM Membership Role";
-        MembershipEntry: Record "NPR MM Membership Entry";
         MembershipSetup: Record "NPR MM Membership Setup";
         LowRange: Date;
         HighRange: Date;
@@ -3135,41 +3109,39 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 ConstraintOK := (Date2DMY(DateToValidate, 3) <= Date2DMY(HighDate, 3));
         end;
 
-        with MembershipSetup do
-            if (ReferenceDateType in ["Validate Age Against"::SALESDATE_YM, "Validate Age Against"::PERIODBEGIN_YM, "Validate Age Against"::PERIODEND_YM]) then
-                case ConstraintType of
-                    ConstraintType::E:
-                        ConstraintOK := ConstraintOK and (Date2DMY(DateToValidate, 2) = Date2DMY(HighDate, 2));
-                    ConstraintType::LT:
-                        ConstraintOK := (DateToValidate > CalcDate('<CM>', HighDate));
-                    ConstraintType::LTE:
-                        ConstraintOK := (DateToValidate >= CalcDate('<CM-1M>', HighDate));
-                    ConstraintType::GT:
-                        ConstraintOK := (DateToValidate < CalcDate('<CM-1M>', HighDate));
-                    ConstraintType::GTE:
-                        ConstraintOK := (DateToValidate <= CalcDate('<CM>', HighDate));
-                end;
+        if (ReferenceDateType in [MembershipSetup."Validate Age Against"::SALESDATE_YM, MembershipSetup."Validate Age Against"::PERIODBEGIN_YM, MembershipSetup."Validate Age Against"::PERIODEND_YM]) then
+            case ConstraintType of
+                ConstraintType::E:
+                    ConstraintOK := ConstraintOK and (Date2DMY(DateToValidate, 2) = Date2DMY(HighDate, 2));
+                ConstraintType::LT:
+                    ConstraintOK := (DateToValidate > CalcDate('<CM>', HighDate));
+                ConstraintType::LTE:
+                    ConstraintOK := (DateToValidate >= CalcDate('<CM-1M>', HighDate));
+                ConstraintType::GT:
+                    ConstraintOK := (DateToValidate < CalcDate('<CM-1M>', HighDate));
+                ConstraintType::GTE:
+                    ConstraintOK := (DateToValidate <= CalcDate('<CM>', HighDate));
+            end;
 
-        with MembershipSetup do
-            if (ReferenceDateType in ["Validate Age Against"::SALESDATE_YMD, "Validate Age Against"::PERIODBEGIN_YMD, "Validate Age Against"::PERIODEND_YMD]) then
-                case ConstraintType of
-                    ConstraintType::E:
-                        ConstraintOK := (DateToValidate = HighDate);
-                    ConstraintType::LT:
-                        ConstraintOK := (DateToValidate > HighDate);
-                    ConstraintType::LTE:
-                        ConstraintOK := (DateToValidate >= HighDate);
-                    ConstraintType::GT:
-                        ConstraintOK := (DateToValidate < HighDate);
-                    ConstraintType::GTE:
-                        ConstraintOK := (DateToValidate <= HighDate);
-                end;
+        if (ReferenceDateType in [MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSetup."Validate Age Against"::PERIODBEGIN_YMD, MembershipSetup."Validate Age Against"::PERIODEND_YMD]) then
+            case ConstraintType of
+                ConstraintType::E:
+                    ConstraintOK := (DateToValidate = HighDate);
+                ConstraintType::LT:
+                    ConstraintOK := (DateToValidate > HighDate);
+                ConstraintType::LTE:
+                    ConstraintOK := (DateToValidate >= HighDate);
+                ConstraintType::GT:
+                    ConstraintOK := (DateToValidate < HighDate);
+                ConstraintType::GTE:
+                    ConstraintOK := (DateToValidate <= HighDate);
+            end;
 
         exit(ConstraintOK);
 
     end;
 
-    local procedure GetMembershipMemberCount(MembershipEntryNo: Integer) MemberCount: Integer
+    local procedure GetMembershipMemberCount(MembershipEntryNo: Integer): Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -3203,25 +3175,23 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         GetMemberCount(MembershipEntryNo, AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
 
-        with MembershipAlterationSetup do begin
-            case "Member Count Calculation" of
-                "Member Count Calculation"::NA:
-                    MemberCount := 0;
-                "Member Count Calculation"::NAMED:
-                    MemberCount := AdminMemberCount + MemberMemberCount;
-                "Member Count Calculation"::ANONYMOUS:
-                    MemberCount := AnonymousMemberCount;
-                "Member Count Calculation"::ALL:
-                    MemberCount := AdminMemberCount + MemberMemberCount + AnonymousMemberCount;
-                else
-                    Error('Undefined Member Count Calculation %1', MembershipAlterationSetup."Member Count Calculation");
-            end;
+        case MembershipAlterationSetup."Member Count Calculation" of
+            MembershipAlterationSetup."Member Count Calculation"::NA:
+                MemberCount := 0;
+            MembershipAlterationSetup."Member Count Calculation"::NAMED:
+                MemberCount := AdminMemberCount + MemberMemberCount;
+            MembershipAlterationSetup."Member Count Calculation"::ANONYMOUS:
+                MemberCount := AnonymousMemberCount;
+            MembershipAlterationSetup."Member Count Calculation"::ALL:
+                MemberCount := AdminMemberCount + MemberMemberCount + AnonymousMemberCount;
+            else
+                Error('Undefined Member Count Calculation %1', MembershipAlterationSetup."Member Count Calculation");
         end;
 
         exit(MemberCount);
     end;
 
-    local procedure ConflictingLedgerEntries(MembershipEntryNo: Integer; StartDate: Date; EndDate: Date; var StartEntryNo: Integer; var EndEntryNo: Integer) HaveConflict: Boolean
+    local procedure ConflictingLedgerEntries(MembershipEntryNo: Integer; StartDate: Date; EndDate: Date; var StartEntryNo: Integer; var EndEntryNo: Integer): Boolean
     begin
 
         if (not GetLedgerEntryForDate(MembershipEntryNo, StartDate, StartEntryNo)) then
@@ -3252,7 +3222,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(true);
     end;
 
-    local procedure CalculatePeriodStartToDateFraction(Period_Start: Date; Period_End: Date; Period_Date: Date) Fraction: Decimal
+    local procedure CalculatePeriodStartToDateFraction(Period_Start: Date; Period_End: Date; Period_Date: Date): Decimal
     begin
 
         // Calculates the fraction from start to date in the timeframe start..end
@@ -3269,7 +3239,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit((Period_Date - Period_Start) / (Period_End - Period_Start));
     end;
 
-    local procedure AddMembershipLedgerEntry(MembershipEntryNo: Integer; MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date) MemberShipLedgerEntryNo: Integer
+    local procedure AddMembershipLedgerEntry(MembershipEntryNo: Integer; MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date): Integer
     var
         MembershipLedgerEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -3446,7 +3416,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(MembershipEntry."Activate On First Use");
     end;
 
-    local procedure GetCommunityMembership(MembershipCode: Code[20]; CreateWhenMissing: Boolean) MembershipEntryNo: Integer
+    local procedure GetCommunityMembership(MembershipCode: Code[20]; CreateWhenMissing: Boolean): Integer
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
@@ -3469,7 +3439,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             Membership.Description := Community.Description;
             Membership."Community Code" := MembershipSetup."Community Code";
             Membership."Membership Code" := MembershipCode;
-            Membership."Issued Date" := Today;
+            Membership."Issued Date" := Today();
 
             Membership."External Membership No." := AssignExternalMembershipNo(MembershipSetup."Community Code");
 
@@ -3493,7 +3463,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(Membership."Entry No.");
     end;
 
-    local procedure GetNewMembership(MembershipCode: Code[20]; MemberInfoCapture: Record "NPR MM Member Info Capture"; CreateWhenMissing: Boolean) MembershipEntryNo: Integer
+    local procedure GetNewMembership(MembershipCode: Code[20]; MemberInfoCapture: Record "NPR MM Member Info Capture"; CreateWhenMissing: Boolean): Integer
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
@@ -3519,7 +3489,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             Membership."Community Code" := MembershipSetup."Community Code";
             Membership."Membership Code" := MembershipCode;
             Membership."Company Name" := MemberInfoCapture."Company Name";
-            Membership."Issued Date" := Today;
+            Membership."Issued Date" := Today();
             Membership."Document ID" := MemberInfoCapture."Import Entry Document ID";
             Membership."Modified At" := CurrentDateTime();
             if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::FOREIGN) then
@@ -3564,7 +3534,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(Membership."Entry No.");
     end;
 
-    local procedure CreateCustomerFromTemplate(CustomerNoSeriesCode: Code[20]; CustTemplateCode: Code[10]; ContTemplateCode: Code[10]; ExternalCustomerNo: Code[20]) CustomerNo: Code[20]
+    local procedure CreateCustomerFromTemplate(CustomerNoSeriesCode: Code[20]; CustTemplateCode: Code[10]; ContTemplateCode: Code[10]; ExternalCustomerNo: Code[20]): Code[20]
     var
         Contact: Record Contact;
         ContBusRelation: Record "Contact Business Relation";
@@ -3868,7 +3838,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
     end;
 
-    local procedure AddCommunityMember(MembershipEntryNo: Integer; NumberOfMembers: Integer) MemberEntryNo: Integer
+    local procedure AddCommunityMember(MembershipEntryNo: Integer; NumberOfMembers: Integer): Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
@@ -3993,7 +3963,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit;
     end;
 
-    local procedure ValidateMemberFields(MembershipEntryNo: Integer; Member: Record "NPR MM Member"; ResponseMessage: Text) IsValid: Boolean
+    local procedure ValidateMemberFields(MembershipEntryNo: Integer; Member: Record "NPR MM Member"; ResponseMessage: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         Community: Record "NPR MM Member Community";
@@ -4038,7 +4008,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MembershipSetup: Record "NPR MM Membership Setup";
         GDPRManagement: Codeunit "NPR GDPR Management";
         MemberGDPRManagement: Codeunit "NPR MM GDPR Management";
-        GuardianMemberEntryNo: Integer;
     begin
 
         Member.Get(MemberEntryNo);
@@ -4307,7 +4276,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
     end;
 
-    local procedure EncodeSHA1(Plain: Text) Encoded: Text
+    local procedure EncodeSHA1(Plain: Text): Text
     begin
 
         exit(Plain);
@@ -4655,7 +4624,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(MemberLogonId);
     end;
 
-    local procedure RaiseError(var ResponseMessage: Text; MessageText: Text; MessageId: Text) MessageNumber: Integer
+    local procedure RaiseError(var ResponseMessage: Text; MessageText: Text; MessageId: Text): Integer
     begin
         ResponseMessage := MessageText;
 
@@ -4794,7 +4763,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure GetMembershipFromExtCardNoWorker(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text; var CardEntryNo: Integer) MembershipEntryNo: Integer
+    local procedure GetMembershipFromExtCardNoWorker(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text; var CardEntryNo: Integer): Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
@@ -4824,7 +4793,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
 
         if (ReferenceDate = 0D) then
-            ReferenceDate := WorkDate;
+            ReferenceDate := WorkDate();
 
         if (not Membership.Get(MemberCard."Membership Entry No.")) then begin
             ReasonNotFound := StrSubstNo(MEMBERSHIP_CARD_REF, ExternalCardNo, MemberCard."Membership Entry No.");
@@ -4929,7 +4898,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         NotFoundReasonText := '';
 
         if (ReferenceDate = 0D) then
-            ReferenceDate := Today;
+            ReferenceDate := Today();
 
         MembershipEntryNo := GetMembershipFromExtCardNoWorker(ExternalCardNo, ReferenceDate, NotFoundReasonText, CardEntryNo);
         if (MembershipEntryNo = 0) then
@@ -5001,7 +4970,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             exit(0);
 
         if (ReferenceDate < Today) then
-            ReferenceDate := Today;
+            ReferenceDate := Today();
 
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         MemberCard.SetFilter(Blocked, '=%1', false);
@@ -5056,8 +5025,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
     local procedure OnAfterNavigateFindRecordsSubscriber(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
     var
         MembershipEntry: Record "NPR MM Membership Entry";
-        POSPeriodRegister: Record "NPR POS Period Register";
-        POSEntry: Record "NPR POS Entry";
         Entries: Integer;
     begin
 
@@ -5102,16 +5069,14 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);
 
-        with DocumentEntry do begin
-            Init();
-            "Entry No." := "Entry No." + 1;
-            "Table ID" := DocTableID;
-            "Document Type" := DocType;
-            "Document No." := DocNoFilter;
-            "Table Name" := CopyStr(DocTableName, 1, MaxStrLen("Table Name"));
-            "No. of Records" := DocNoOfRecords;
-            Insert();
-        end;
+        DocumentEntry.Init();
+        DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
+        DocumentEntry."Table ID" := DocTableID;
+        DocumentEntry."Document Type" := DocType;
+        DocumentEntry."Document No." := DocNoFilter;
+        DocumentEntry."Table Name" := CopyStr(DocTableName, 1, MaxStrLen(DocumentEntry."Table Name"));
+        DocumentEntry."No. of Records" := DocNoOfRecords;
+        DocumentEntry.Insert();
 
         exit(DocNoOfRecords);
 

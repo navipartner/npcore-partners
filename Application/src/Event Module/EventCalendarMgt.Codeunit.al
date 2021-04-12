@@ -21,14 +21,11 @@ codeunit 6060152 "NPR Event Calendar Mgt."
 
         Rec."NPR Calendar Item ID" := '';
         Rec."NPR Calendar Item Status" := Rec."NPR Calendar Item Status"::" ";
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterModifyEvent', '', false, false)]
     local procedure JobOnAfterModify(var Rec: Record Job; var xRec: Record Job; RunTrigger: Boolean)
-    var
-        JobsSetup: Record "Jobs Setup";
-        JobTask: Record "Job Task";
     begin
         if not RunTrigger then
             exit;
@@ -42,7 +39,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         if Rec."NPR Calendar Item Status" = xRec."NPR Calendar Item Status" then
             if EventEWSMgt.OrganizerAccountSet(Rec, false, false) then begin
                 Rec."NPR Calendar Item Status" := Rec."NPR Calendar Item Status"::Send;
-                Rec.Modify;
+                Rec.Modify();
             end;
     end;
 
@@ -55,7 +52,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         if Rec."NPR Organizer E-Mail" <> xRec."NPR Organizer E-Mail" then begin
             JobPlanningLine.SetRange("Job No.", Rec."No.");
             JobPlanningLine.SetFilter("NPR Calendar Item ID", '<>%1', '');
-            if (Rec."NPR Calendar Item ID" <> '') or JobPlanningLine.FindFirst then
+            if (Rec."NPR Calendar Item ID" <> '') or JobPlanningLine.FindFirst() then
                 if not Confirm(StrSubstNo(IntegrationEmailUsed, xRec."NPR Organizer E-Mail")) then
                     Error('');
         end;
@@ -76,7 +73,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         Rec."NPR Calendar Item ID" := '';
         Rec."NPR Calendar Item Status" := Rec."NPR Calendar Item Status"::" ";
         Rec."NPR Meeting Request Response" := Rec."NPR Meeting Request Response"::" ";
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterModifyEvent', '', false, false)]
@@ -97,7 +94,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         if Rec."NPR Calendar Item Status" = xRec."NPR Calendar Item Status" then
             if (Rec.Type = Rec.Type::Resource) and (Rec."NPR Resource E-Mail" <> '') then begin
                 Rec."NPR Calendar Item Status" := Rec."NPR Calendar Item Status"::Send;
-                Rec.Modify;
+                Rec.Modify();
             end;
     end;
 
@@ -120,8 +117,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
-    var
-        Resource: Record Resource;
     begin
         if Rec."No." <> xRec."No." then
             CheckForCalendarAndRemove(Rec, xRec);
@@ -180,11 +175,11 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                         Job."NPR Calendar Item Status" := Job."NPR Calendar Item Status"::Sent
                     else
                         Job."NPR Calendar Item Status" := Job."NPR Calendar Item Status"::Error;
-                    Job.Modify;
+                    Job.Modify();
                     //COMMIT needs to be here as it separates two distinct processes, sending of an appointment and a meeting request
                     //each of those processes has a template selection subprocess which requires user selection for exchange templates
                     //can be recoded to show template selection before the transaction begins, so one template selection for an appointment and one for meeting request
-                    Commit;
+                    Commit();
                     if CalendarType = CalendarType::Both then
                         SendMultipleLinesToCalendar(Job);
                 end;
@@ -203,10 +198,10 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         JobPlanningLine: Record "Job Planning Line";
     begin
         SetJobPlanLineMeetingRequestSendFilter(Job, JobPlanningLine);
-        if JobPlanningLine.FindSet then
+        if JobPlanningLine.FindSet() then
             repeat
                 SendLineToCalendar(JobPlanningLine, false, false, false, false);
-            until JobPlanningLine.Next = 0;
+            until JobPlanningLine.Next() = 0;
     end;
 
     procedure SendLineToCalendarAction(var JobPlanningLine: Record "Job Planning Line")
@@ -252,7 +247,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         else
             JobPlanningLine."NPR Calendar Item Status" := JobPlanningLine."NPR Calendar Item Status"::Error;
         JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::" ";
-        JobPlanningLine.Modify;
+        JobPlanningLine.Modify();
         exit(JobPlanningLine."NPR Calendar Item Status" = JobPlanningLine."NPR Calendar Item Status"::Sent);
 
     end;
@@ -306,7 +301,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                         Job."NPR Calendar Item Status" := Job."NPR Calendar Item Status"::Removed
                     else
                         Job."NPR Calendar Item Status" := Job."NPR Calendar Item Status"::Error;
-                    Job.Modify;
+                    Job.Modify();
                     if CalendarType = CalendarType::Both then
                         RemoveMultipleLinesFromCalendar(JobPlanningLine, CancelMsg);
                 end;
@@ -318,11 +313,11 @@ codeunit 6060152 "NPR Event Calendar Mgt."
 
     local procedure RemoveMultipleLinesFromCalendar(var JobPlanningLine: Record "Job Planning Line"; CancelMsg: Text)
     begin
-        if JobPlanningLine.FindSet then
+        if JobPlanningLine.FindSet() then
             repeat
                 if JobPlanningLine."NPR Calendar Item ID" <> '' then
                     RemoveLineFromCalendar(JobPlanningLine, false, false, CancelMsg);
-            until JobPlanningLine.Next = 0;
+            until JobPlanningLine.Next() = 0;
     end;
 
     procedure RemoveLineFromCalendarAction(JobPlanningLine: Record "Job Planning Line"; ConfirmNeeded: Boolean)
@@ -335,7 +330,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         CancelConfirm: Label 'This will cancel a meeting request. Do you want to continue?';
         NothingToRemoveMsg: Label 'There are no calendar items to remove.';
         RecRef: RecordRef;
-        Job: Record Job;
         Processed: Boolean;
     begin
         if ConfirmNeeded then
@@ -357,7 +351,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
             JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::" ";
         end else
             JobPlanningLine."NPR Calendar Item Status" := JobPlanningLine."NPR Calendar Item Status"::Error;
-        JobPlanningLine.Modify;
+        JobPlanningLine.Modify();
         exit(JobPlanningLine."NPR Calendar Item Status" = JobPlanningLine."NPR Calendar Item Status"::Removed);
     end;
 
@@ -413,7 +407,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         TimeZoneInfo: DotNet NPRNetTimeZoneInfo;
         StringList: DotNet NPRNetStringList;
         BodyText: Text;
-        Resource: Record Resource;
         EMailTemplateHeader: Record "NPR E-mail Template Header";
         EMailTemplateLine: Record "NPR E-mail Templ. Line";
         RecRef2: RecordRef;
@@ -561,10 +554,10 @@ codeunit 6060152 "NPR Event Calendar Mgt."
 
         if UseTemplate and EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then begin
             EMailTemplateLine.SetRange("E-mail Template Code", EMailTemplateHeader.Code);
-            if EMailTemplateLine.FindSet then
+            if EMailTemplateLine.FindSet() then
                 repeat
                     BodyText += EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateLine."Mail Body Line") + '</br>';
-                until EMailTemplateLine.Next = 0;
+                until EMailTemplateLine.Next() = 0;
         end else
             BodyText += Job.FieldCaption("No.") + ': ' + Job."No." + '</br>' +
                         Job.FieldCaption(Description) + ': ' + Job.Description + '</br>';
@@ -572,10 +565,10 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         if UseTemplate and EventExchIntTemplate."Include Comments (Calendar)" then begin
             CommentLine.SetRange("Table Name", CommentLine."Table Name"::Job);
             CommentLine.SetRange("No.", Job."No.");
-            if CommentLine.FindSet then
+            if CommentLine.FindSet() then
                 repeat
                     BodyText += CommentLine.Comment + '</br>'
-                until CommentLine.Next = 0;
+                until CommentLine.Next() = 0;
         end;
         BodyText += '</font>';
         AppointmentItem.Body := MessageBody.MessageBody(BodyType.HTML, BodyText);
@@ -632,10 +625,10 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         EventEWSMgt.OrganizerAccountSet(Job, true, false);
         RecRef.GetTable(Job);
         EventEWSMgt.SetJobPlanLineFilter(Job, JobPlanningLine);
-        if JobPlanningLine.FindSet then
+        if JobPlanningLine.FindSet() then
             repeat
                 GetCalendarAttendeeResponse(JobPlanningLine);
-            until JobPlanningLine.Next = 0;
+            until JobPlanningLine.Next() = 0;
     end;
 
     procedure GetCalendarAttendeeResponseAction(var JobPlanningLine: Record "Job Planning Line")
@@ -679,7 +672,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
             end;
             JobPlanningLine."NPR Calendar Item Status" := JobPlanningLine."NPR Calendar Item Status"::Received;
         end;
-        JobPlanningLine.Modify;
+        JobPlanningLine.Modify();
         exit(JobPlanningLine."NPR Calendar Item Status" = JobPlanningLine."NPR Calendar Item Status"::Received);
 
     end;
@@ -741,7 +734,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         EventStdDialog: Page "NPR Event Standard Dialog";
     begin
         EventStdDialog.UseForMessage();
-        if EventStdDialog.RunModal = ACTION::OK then
+        if EventStdDialog.RunModal() = ACTION::OK then
             exit(EventStdDialog.GetMessage());
         exit('');
     end;
@@ -772,7 +765,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
             Action::Reset, Action::Assign:
                 begin
                     FieldRef.Value(CalendarID);
-                    RecRef.Modify;
+                    RecRef.Modify();
                 end;
             Action::Get:
                 exit(Format(FieldRef));
@@ -908,7 +901,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         //one of those is Russian Standard Time
         //quickest workaround is to use other timezones of same offset
         TimeZone.SetRange(ID, TimeZoneId);
-        if TimeZone.FindFirst then
+        if TimeZone.FindFirst() then
             case TimeZone.ID of
                 'Russian Standard Time':
                     TimeZoneId := 'Belarus Standard Time';

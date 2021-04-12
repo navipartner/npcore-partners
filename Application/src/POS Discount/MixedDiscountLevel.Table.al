@@ -83,7 +83,7 @@ table 6014427 "NPR Mixed Discount Level"
         MixedDiscount: Record "NPR Mixed Discount";
     begin
         if not MixedDiscount.Get("Mixed Discount Code") then
-            MixedDiscount.Init;
+            MixedDiscount.Init();
 
         if not MixedDiscount."Total Amount Excl. VAT" then
             exit('2,1,' + GetFieldCaption(FieldNumber))

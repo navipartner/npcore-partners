@@ -73,13 +73,8 @@ table 6059908 "NPR Session Log"
     {
     }
 
-    var
-        TaskQueueManager: Codeunit "NPR Task Queue Manager";
-        Text001: Label 'Moved Execution Time due to invalid date / Time scheduling';
 
     procedure AddLogin(TaskWorker: Record "NPR Task Worker") AddedEntryNo: Integer
-    var
-        TaskLog: Record "NPR Task Log (Task)";
     begin
         //-TQ1.29
         //InitLine;
@@ -88,13 +83,11 @@ table 6059908 "NPR Session Log"
         "Log Type" := "Log Type"::LoginMaster;
         "Task Worker Group" := TaskWorker."Task Worker Group";
 
-        Insert;
+        Insert();
         exit("Entry No.");
     end;
 
     procedure AddLogout(TaskWorker: Record "NPR Task Worker") AddedEntryNo: Integer
-    var
-        TaskLog: Record "NPR Task Log (Task)";
     begin
         //-TQ1.29
         //InitLine;
@@ -104,13 +97,13 @@ table 6059908 "NPR Session Log"
         "Log Type" := "Log Type"::LogoutMaster;
         "Task Worker Group" := TaskWorker."Task Worker Group";
 
-        Insert;
+        Insert();
         exit("Entry No.");
     end;
 
     local procedure InitLine(TaskWorker: Record "NPR Task Worker")
     begin
-        Init;
+        Init();
         "Entry No." := 0;
         "Log Time" := CurrentDateTime;
         //-TQ1.29
@@ -123,8 +116,6 @@ table 6059908 "NPR Session Log"
     end;
 
     procedure LogStartSession(MasterTaskWorker: Record "NPR Task Worker"; TaskQueue: Record "NPR Task Queue") AddedEntryNo: Integer
-    var
-        TaskLog: Record "NPR Task Log (Task)";
     begin
         //-TQ1.29
         //InitLine;
@@ -136,7 +127,7 @@ table 6059908 "NPR Session Log"
         "Task Worker Group" := TaskQueue."Task Worker Group";
         "Company Name" := TaskQueue.Company;
         //+TQ1.29
-        Insert;
+        Insert();
         exit("Entry No.");
     end;
 }

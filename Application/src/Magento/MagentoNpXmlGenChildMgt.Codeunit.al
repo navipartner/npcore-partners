@@ -21,19 +21,19 @@ codeunit 6151448 "NPR Magento NpXml Gen.ChildMgt"
                 begin
                     ParentRecRef.SetTable(MagentoStoreItem);
                     ItemVariant.SetFilter(ItemVariant."Item No.", MagentoStoreItem."Item No.");
-                    if ItemVariant.FindSet then
+                    if ItemVariant.FindSet() then
                         repeat
                             if not MagentoStore.Get(MagentoStoreItem."Store Code") then
                                 exit;
 
-                            TempItemVariant.Init;
+                            TempItemVariant.Init();
                             TempItemVariant := ItemVariant;
                             if ItemTranslation.Get(ItemVariant."Item No.", ItemVariant.Code, MagentoStore."Language Code") then begin
                                 TempItemVariant.Description := ItemTranslation.Description;
                                 TempItemVariant."Description 2" := ItemTranslation."Description 2";
                             end;
-                            TempItemVariant.Insert;
-                        until ItemVariant.Next = 0;
+                            TempItemVariant.Insert();
+                        until ItemVariant.Next() = 0;
                 end;
         end;
         ChildRecRef.GetTable(TempItemVariant);

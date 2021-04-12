@@ -17,29 +17,26 @@ codeunit 6150802 "NPR POS Action: Run Page"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'respond();');
-                RegisterWorkflow(false);
-                RegisterIntegerParameter('PageId', 0);
-                RegisterBooleanParameter('RunModal', false);
-                RegisterIntegerParameter('TableID', 0);
-                RegisterTextParameter('TableView', '');
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterIntegerParameter('PageId', 0);
+            Sender.RegisterBooleanParameter('RunModal', false);
+            Sender.RegisterIntegerParameter('TableID', 0);
+            Sender.RegisterTextParameter('TableView', '');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        Context: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -59,7 +56,7 @@ codeunit 6150802 "NPR POS Action: Run Page"
         TableID: Integer;
         TableView: Text;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -86,7 +83,7 @@ codeunit 6150802 "NPR POS Action: Run Page"
         POSParameterTableIDValue.SetRange(ID, POSParameterValue.ID);
         POSParameterTableIDValue.SetRange("Record ID", POSParameterValue."Record ID");
         POSParameterTableIDValue.SetRange(Name, 'TableID');
-        if POSParameterTableIDValue.FindFirst then
+        if POSParameterTableIDValue.FindFirst() then
             if Evaluate(TableID, POSParameterTableIDValue.Value) then
                 if TableID <> 0 then begin
                     POSParameterValue.Value := POSParameterValue.GetTableViewString(TableID, POSParameterValue.Value);
@@ -109,7 +106,7 @@ codeunit 6150802 "NPR POS Action: Run Page"
             POSParameterTableIDValue.SetRange(ID, POSParameterValue.ID);
             POSParameterTableIDValue.SetRange("Record ID", POSParameterValue."Record ID");
             POSParameterTableIDValue.SetRange(Name, 'TableID');
-            if POSParameterTableIDValue.FindFirst then
+            if POSParameterTableIDValue.FindFirst() then
                 if Evaluate(TableID, POSParameterTableIDValue.Value) then
                     if TableID <> 0 then begin
                         RecRef.Open(TableID);
@@ -125,7 +122,6 @@ codeunit 6150802 "NPR POS Action: Run Page"
 
     local procedure RunPage(PageId: Integer; RunModal: Boolean; TableID: Integer; TableView: Text)
     var
-        "Object": Record "Object";
         RecRef: RecordRef;
         RecRefVar: Variant;
     begin

@@ -9,9 +9,6 @@ codeunit 6151061 "NPR GDPR Anon. Req. WS"
     end;
 
     procedure AnonymizationRequest(CustomerNo: Code[20]; ContactNo: Code[20]): Boolean
-    var
-        Customer: Record Customer;
-        Contact: Record Contact;
     begin
 
         //-NPR5.55 [388813]
@@ -42,7 +39,7 @@ codeunit 6151061 "NPR GDPR Anon. Req. WS"
                 exit(true);
 
         if (not GDPRSetup.Get()) then
-            GDPRSetup.Init;
+            GDPRSetup.Init();
 
         RequestEntryNo := InsertRequestEntry(CustomerNo, ContactNo);
         if (RequestEntryNo = 0) then

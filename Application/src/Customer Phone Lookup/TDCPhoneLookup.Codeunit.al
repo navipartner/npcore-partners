@@ -95,8 +95,6 @@ codeunit 6184550 "NPR TDC Phone Lookup"
 
     procedure DelPreSpaces(TxtString: Text[250]) TxtResult: Text[250]
     var
-        i: Integer;
-        j: Integer;
         Out: Boolean;
     begin
         //DelPreSpaces

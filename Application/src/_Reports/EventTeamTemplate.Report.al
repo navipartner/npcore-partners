@@ -441,7 +441,7 @@ report 6060151 "NPR Event Team Template"
                 begin
                     Clear(NoteText);
                     FromTo := '';
-                    if Note.HasValue then begin
+                    if Note.HasValue() then begin
                         CalcFields(Note);
                         Note.CreateInStream(NoteInStream);
                         NoteText.Read(NoteInStream);
@@ -476,7 +476,7 @@ report 6060151 "NPR Event Team Template"
                 EventAttribute.SetRange(Promote, true);
                 if EventAttribute.FindSet() then
                     EventAttributeTempName1 := EventAttribute."Template Name";
-                if EventAttribute.Next <> 0 then
+                if EventAttribute.Next() <> 0 then
                     EventAttributeTempName2 := EventAttribute."Template Name";
             end;
         }
@@ -509,7 +509,7 @@ report 6060151 "NPR Event Team Template"
         EveryoneLbl: Label 'Everyone';
     begin
         User.SetRange("User Name", UserID);
-        if User.FindFirst and (User."Full Name" <> '') then
+        if User.FindFirst() and (User."Full Name" <> '') then
             exit(User."Full Name");
         if UserID = '' then
             exit(EveryoneLbl);

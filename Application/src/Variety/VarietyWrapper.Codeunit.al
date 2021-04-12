@@ -23,7 +23,7 @@ codeunit 6059970 "NPR Variety Wrapper"
         //test variant item
         TestItemIsVariety(ItemParm);
         ItemVar.SetRange("Item No.", ItemParm."No.");
-        ItemParm.SetFilter("Date Filter", GetCalculationDate(WorkDate));
+        ItemParm.SetFilter("Date Filter", GetCalculationDate(WorkDate()));
         RecRef.GetTable(ItemVar);
         VRTShowTable.ShowBooleanMatrix(RecRef, ItemParm, ShowFieldNo);
     end;
@@ -471,6 +471,6 @@ codeunit 6059970 "NPR Variety Wrapper"
         if DateIn <> 0D then
             exit(Format(DateIn));
 
-        exit(Format(WorkDate));
+        exit(Format(WorkDate()));
     end;
 }

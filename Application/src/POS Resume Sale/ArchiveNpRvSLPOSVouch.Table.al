@@ -140,7 +140,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
                         ContBusinessRelation.SetCurrentKey("Link to Table", "No.");
                         ContBusinessRelation.SetRange("Link to Table", ContBusinessRelation."Link to Table"::Customer);
                         ContBusinessRelation.SetRange("No.", "Customer No.");
-                        if ContBusinessRelation.FindFirst then
+                        if ContBusinessRelation.FindFirst() then
                             Cont.SetRange("Company No.", ContBusinessRelation."Contact No.")
                         else
                             Cont.SetRange("No.", '');
@@ -165,7 +165,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
                     ContBusinessRelation.SetRange("Contact No.", Cont."Company No.");
                     ContBusinessRelation.SetRange("Link to Table", ContBusinessRelation."Link to Table"::Customer);
                     ContBusinessRelation.SetFilter("No.", '<>%1', '');
-                    if ContBusinessRelation.FindFirst and Cust.Get(ContBusinessRelation."No.") then
+                    if ContBusinessRelation.FindFirst() and Cust.Get(ContBusinessRelation."No.") then
                         "Customer No." := Cust."No.";
                 end;
 
@@ -278,7 +278,6 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
 
     local procedure UpdateContactInfo()
     var
-        ContBusinessRelation: Record "Contact Business Relation";
         Cust: Record Customer;
         Cont: Record Contact;
     begin

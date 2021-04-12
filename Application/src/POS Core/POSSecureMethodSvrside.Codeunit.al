@@ -9,7 +9,6 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         Text004: Label 'supervisors password.';
         Text005: Label 'Retail Setup Open Register Password.';
         Text006: Label 'You are not authorized to execute this action. Function requires %1';
-        Text007: Label 'A supervisor salesperson is required for this action.';
         Text008: Label 'Retail Setup Admin Password.';
         ReadingErr: Label 'reading in %1';
 
@@ -42,7 +41,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
                     POSSetup.GetPOSUnit(POSUnit);
                     SecureMethod := JSON.GetStringOrFail('method', StrSubstNo(ReadingErr, MethodName()));
                     RequestId := JSON.GetIntegerOrFail('requestId', StrSubstNo(ReadingErr, MethodName()));
-                    OnSecureMethodValidatePassword(SecureMethod, JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, MethodName())),POSUnit, ActionHandled);
+                    OnSecureMethodValidatePassword(SecureMethod, JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, MethodName())), POSUnit, ActionHandled);
                     if not ActionHandled then
                         FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, SecureMethod));
                 end;

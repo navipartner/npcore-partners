@@ -1,4 +1,4 @@
-codeunit 6059904 "NPR Task Queue NAS Login"
+﻿codeunit 6059904 "NPR Task Queue NAS Login"
 {
     // TQ1.18/MH  /20141110 CASE 198170 Max No. Of Active Task Workers is managed by each Group instead of only the Master Group.
     // TQ1.24/JDH /20150317 CASE 209090 added function CheckHeartBeatForSessions
@@ -42,10 +42,6 @@ codeunit 6059904 "NPR Task Queue NAS Login"
     end;
 
     var
-        MaxNoOfTreads: Integer;
-        TaskLog: Record "NPR Task Log (Task)";
-        TaskWorkerGroup: Record "NPR Task Worker Group";
-        NoOfNewTaskWorkers: Integer;
         LastCheckTime: DateTime;
         HeartBeatCheckInterval: Duration;
         TaskWorker2: Record "NPR Task Worker";
@@ -58,15 +54,6 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         MaxSleepTime: Integer;
 
     procedure MasterThreadLoop(NasID: Text[250])
-    var
-        TaskWorkerGroup: Record "NPR Task Worker Group";
-        TempTaskQueue: Record "NPR Task Queue" temporary;
-        taskQueueMgt: Codeunit "NPR Task Queue Manager";
-        AvailableWorkers: Integer;
-        "Count": Integer;
-        MaxMilisecondsSleep: Integer;
-        MilisecondsBetweenPolls: Integer;
-        Duration: Duration;
     begin
         //-TQ1.34 [326930]
         // MilisecondsBetweenPolls := 1000;
@@ -88,13 +75,13 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         //  TaskWorker2.GET(SERVICEINSTANCEID, SESSIONID);
         //  IF TaskWorker2.Active THEN BEGIN
         //    TaskWorkerGroup.SETFILTER("Max. Concurrent Threads",'>%1',0);
-        //    IF TaskWorkerGroup.FINDSET THEN REPEAT
+        //    IF TaskWorkerGroup.FindSet() THEN REPEAT
         //      TaskWorkerGroup.CALCFIELDS("No. of Active Threads");
         //      AvailableWorkers := TaskWorkerGroup."Max. Concurrent Threads" - TaskWorkerGroup."No. of Active Threads";
         //      IF AvailableWorkers > 0 THEN
         //        IF FindPendingTasks(TaskWorkerGroup.Code,TempTaskQueue) THEN
         //          StartTaskWorkers(AvailableWorkers,TempTaskQueue);
-        //    UNTIL TaskWorkerGroup.NEXT = 0;
+        //    UNTIL TaskWorkerGroup.Next() = 0;
         //  END;
         //  //-TQ1.29
         //  //CLEARALL;
@@ -105,7 +92,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         //  IF MilisecondsBetweenPolls = 0 THEN
         //    MilisecondsBetweenPolls := 1000 * 60;
         //  //+TQ1.30 [272741]
-        //  IF TempTaskQueue.FINDFIRST THEN
+        //  IF TempTaskQueue.FindFirst() THEN
         //    MilisecondsBetweenPolls := 1000;
         //  FOR Count := 1 TO MilisecondsBetweenPolls DIV MaxMilisecondsSleep DO
         //    SLEEP(MaxMilisecondsSleep);
@@ -122,7 +109,6 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         AvailableWorkers: Integer;
         "Count": Integer;
         MilisecondsBetweenPolls: Integer;
-        Duration: Duration;
     begin
         //-TQ1.34 [326930]
         MilisecondsBetweenPolls := MinSleepTime;
@@ -132,14 +118,14 @@ codeunit 6059904 "NPR Task Queue NAS Login"
             TaskWorker2.Get(ServiceInstanceId, SessionId);
             if TaskWorker2.Active then begin
                 TaskWorkerGroup.SetFilter("Max. Concurrent Threads", '>%1', 0);
-                if TaskWorkerGroup.FindSet then
+                if TaskWorkerGroup.FindSet() then
                     repeat
                         TaskWorkerGroup.CalcFields("No. of Active Threads");
                         AvailableWorkers := TaskWorkerGroup."Max. Concurrent Threads" - TaskWorkerGroup."No. of Active Threads";
                         if AvailableWorkers > 0 then
                             if FindPendingTasks(TaskWorkerGroup.Code, TempTaskQueue) then
                                 StartTaskWorkers(AvailableWorkers, TempTaskQueue);
-                    until TaskWorkerGroup.Next = 0;
+                    until TaskWorkerGroup.Next() = 0;
             end;
             CalcSleepTime(MilisecondsBetweenPolls);
 
@@ -154,23 +140,21 @@ codeunit 6059904 "NPR Task Queue NAS Login"
     end;
 
     local procedure StartTaskWorkers(var AvailableWorkers: Integer; var TempTaskQueue: Record "NPR Task Queue" temporary)
-    var
-        RecRef: RecordRef;
     begin
         if AvailableWorkers < 0 then
             exit;
         Clear(TempTaskQueue);
-        if not TempTaskQueue.FindSet then
+        if not TempTaskQueue.FindSet() then
             exit;
 
         TempTaskQueue.SetCurrentKey("Next Run time");
         //-TQ1.35 [358261]
-        while TempTaskQueue.FindFirst and (AvailableWorkers >= 1) do begin
+        while TempTaskQueue.FindFirst() and (AvailableWorkers >= 1) do begin
             if StartTaskWorker(TempTaskQueue) then
                 AvailableWorkers -= 1;
 
             TempTaskQueue.SetRange(Company, TempTaskQueue.Company);
-            TempTaskQueue.DeleteAll;
+            TempTaskQueue.DeleteAll();
             TempTaskQueue.SetRange(Company);
         end;
         //+TQ1.35 [358261]
@@ -179,7 +163,6 @@ codeunit 6059904 "NPR Task Queue NAS Login"
     procedure StartTaskWorker(TaskQueue: Record "NPR Task Queue"): Boolean
     var
         Company: Record Company;
-        Session: Integer;
         TaskWorker: Record "NPR Task Worker";
         TaskLogMaster: Record "NPR Session Log";
         StartAttempt: Integer;
@@ -188,7 +171,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         ActiveSession: Record "Active Session";
     begin
         if not Company.Get(TaskQueue.Company) then begin
-            TaskQueue.Delete;
+            TaskQueue.Delete();
             exit;
         end;
 
@@ -197,10 +180,10 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         //SELECTLATESTVERSION;
         //+NPR5.45 [313269]
 
-        TaskWorker.Reset;
+        TaskWorker.Reset();
         TaskWorker.SetRange("Current Company", TaskQueue.Company);
         TaskWorker.SetRange("Task Worker Group", TaskQueue."Task Worker Group");
-        if TaskWorker.FindLast then //force read lock
+        if TaskWorker.FindLast() then //force read lock
             exit;
 
         //-TQ1.29
@@ -233,8 +216,8 @@ codeunit 6059904 "NPR Task Queue NAS Login"
                 TaskLogMaster."Error Message" := CopyStr(StrSubstNo(TextErrorStartingSession + ' ' + TextNoLastError, StartAttempt, ActiveSession."Server Computer Name"), 1, MaxStrLen(TaskLogMaster."Error Message"));
             end else
                 TaskLogMaster."Error Message" := CopyStr(StrSubstNo(TextErrorStartingSession + ' ' + TextLastError, StartAttempt, ErrorMessage), 1, MaxStrLen(TaskLogMaster."Error Message"));
-            TaskLogMaster.Modify;
-            Commit;
+            TaskLogMaster.Modify();
+            Commit();
             //-TQ1.32 [310092]
             //STARTSESSION(Session ,CODEUNIT::"Task Queue Manager", TaskQueue.Company, TaskQueue);
             if TryStartSession(TaskQueue) then;
@@ -257,7 +240,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         //+TQ1.32 [310092]
     end;
 
-    local procedure FindPendingTasks(TaskWorkerGroupCode: Code[10]; var TempTaskQueue: Record "NPR Task Queue" temporary) PendingTasksExist: Boolean
+    local procedure FindPendingTasks(TaskWorkerGroupCode: Code[10]; var TempTaskQueue: Record "NPR Task Queue" temporary): Boolean
     var
         TaskQueue: Record "NPR Task Queue";
         RecRef: RecordRef;
@@ -267,7 +250,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         if not RecRef.IsTemporary then
             exit(false);
 
-        TempTaskQueue.DeleteAll;
+        TempTaskQueue.DeleteAll();
 
         Timestamp := CurrentDateTime;
         //-TQ1.34 [326930]
@@ -279,15 +262,15 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         TaskQueue.SetRange(Enabled, true);
         TaskQueue.SetRange("Task Worker Group", TaskWorkerGroupCode);
         TaskQueue.SetRange("Next Run time", 0DT, Timestamp);
-        if TaskQueue.FindSet then
+        if TaskQueue.FindSet() then
             repeat
-                TempTaskQueue.Init;
+                TempTaskQueue.Init();
                 TempTaskQueue := TaskQueue;
                 //-TQ1.29 [253201]
                 //TempTaskQueue."Next Run time" := CalcExpectedRuntime(Timestamp,TaskQueue);
                 //-TQ1.29 [253201]
-                TempTaskQueue.Insert;
-            until TaskQueue.Next = 0;
+                TempTaskQueue.Insert();
+            until TaskQueue.Next() = 0;
 
         exit(TempTaskQueue.FindSet);
     end;
@@ -298,32 +281,30 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         ActiveSession: Record "Active Session";
         TaskLogMaster: Record "NPR Session Log";
     begin
-        with TaskWorker do begin
-            if not Get(ServiceInstanceId, SessionId) then begin
-                LockTable;
-                if FindLast then; //force a read lock
+        if not TaskWorker.Get(ServiceInstanceId, SessionId) then begin
+            TaskWorker.LockTable();
+            if TaskWorker.FindLast() then; //force a read lock
 
-                ActiveSession.Get(ServiceInstanceId, SessionId);
+            ActiveSession.Get(ServiceInstanceId, SessionId);
 
-                Init;
-                "Server Instance ID" := ActiveSession."Server Instance ID";
-                "User ID" := ActiveSession."User ID";
-                "Session ID" := ActiveSession."Session ID";
-                "Login Time" := ActiveSession."Login Datetime";
-                "Current Company" := CompanyName;
-                "Application Name" := ActiveSession."Server Computer Name";
-                "DB Name" := ActiveSession."Database Name";
-                "Host Name" := ActiveSession."Client Computer Name";
-                "Task Worker Group" := 'MASTER';
-                "Current Check Interval" := MilisecondsBetweenPolls;
-                "Current Language ID" := GlobalLanguage;
-                Active := true;
-                Insert;
-            end;
+            TaskWorker.Init();
+            TaskWorker."Server Instance ID" := ActiveSession."Server Instance ID";
+            TaskWorker."User ID" := ActiveSession."User ID";
+            TaskWorker."Session ID" := ActiveSession."Session ID";
+            TaskWorker."Login Time" := ActiveSession."Login Datetime";
+            TaskWorker."Current Company" := CompanyName;
+            TaskWorker."Application Name" := ActiveSession."Server Computer Name";
+            TaskWorker."DB Name" := ActiveSession."Database Name";
+            TaskWorker."Host Name" := ActiveSession."Client Computer Name";
+            TaskWorker."Task Worker Group" := 'MASTER';
+            TaskWorker."Current Check Interval" := MilisecondsBetweenPolls;
+            TaskWorker."Current Language ID" := GlobalLanguage;
+            TaskWorker.Active := true;
+            TaskWorker.Insert();
         end;
 
         TaskLogMaster.AddLogin(TaskWorker);
-        Commit;
+        Commit();
     end;
 
     local procedure CheckWorkers()
@@ -348,7 +329,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         //+TQ1.29
     end;
 
-    local procedure CheckIfWorkerUpdateIsUnnecessary(var LastCheckTime: DateTime) IsNotNeeded: Boolean
+    local procedure CheckIfWorkerUpdateIsUnnecessary(var LastCheckTime: DateTime): Boolean
     var
         TaskWorker2: Record "NPR Task Worker";
     begin
@@ -362,7 +343,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
 
         LastCheckTime := CurrentDateTime;
 
-        exit(TaskWorker2.IsEmpty);
+        exit(TaskWorker2.IsEmpty());
         //+TQ1.34 [326930]
     end;
 
@@ -376,32 +357,32 @@ codeunit 6059904 "NPR Task Queue NAS Login"
 
         //TaskWorker.SETRANGE("Last HeartBeat (When Idle)", CREATEDATETIME(010101D,0T), CURRENTDATETIME - HeartBeatCheckInterval);
         //-NPR5.45 [326707]
-        // TaskWorker.LOCKTABLE;
+        // TaskWorker.LockTable();
         //+NPR5.45 [326707]
         //+TQ1.29
 
-        if TaskWorker.FindSet then
+        if TaskWorker.FindSet() then
             repeat
                 if ActiveSession.Get(TaskWorker."Server Instance ID", TaskWorker."Session ID") then begin
                     //-NPR5.45 [326707]
                     // TaskWorker."Last HeartBeat (When Idle)" := CURRENTDATETIME;
-                    // TaskWorker.MODIFY;
-                    TaskWorker.LockTable;
+                    // TaskWorker.Modify();
+                    TaskWorker.LockTable();
                     if TaskWorker.Get(TaskWorker."Server Instance ID", TaskWorker."Session ID") then begin
                         TaskWorker."Last HeartBeat (When Idle)" := CurrentDateTime;
-                        TaskWorker.Modify;
+                        TaskWorker.Modify();
                     end;
                     Commit
                     //+NPR5.45 [326707]
                     //-TQ1.29
-                    //  COMMIT;
+                    //  Commit();
                     //END ELSE
                 end;
             //  taskQueueMgt.Logout(TaskWorker."Server Instance ID", TaskWorker."Session ID");
             //+TQ1.29
-            until TaskWorker.Next = 0;
+            until TaskWorker.Next() = 0;
         //-TQ1.29
-        Commit;
+        Commit();
         //+TQ1.29
     end;
 
@@ -412,7 +393,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
         taskQueueMgt: Codeunit "NPR Task Queue Manager";
     begin
         //-TQ1.29
-        if TaskWorker.FindSet then
+        if TaskWorker.FindSet() then
             repeat
                 if (not ActiveSession.Get(TaskWorker."Server Instance ID", TaskWorker."Session ID")) or (ActiveSession."User ID" <> TaskWorker."User ID") or
                   //-TQ1.31 [298741]
@@ -420,7 +401,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
                     //+TQ1.31 [298741]
                     //the session doesnt exists any more -> delete it
                     taskQueueMgt.Logout(TaskWorker."Server Instance ID", TaskWorker."Session ID");
-            until TaskWorker.Next = 0;
+            until TaskWorker.Next() = 0;
         //+TQ1.29
     end;
 
@@ -454,7 +435,7 @@ codeunit 6059904 "NPR Task Queue NAS Login"
                 exit;
 
             TaskLogMaster.AddLogout(TaskWorker);
-            TaskWorker.Delete;
+            TaskWorker.Delete();
         end;
         //+TQ1.29
 

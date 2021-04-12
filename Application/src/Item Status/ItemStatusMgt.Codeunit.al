@@ -1,4 +1,4 @@
-codeunit 6060055 "NPR Item Status Mgt."
+﻿codeunit 6060055 "NPR Item Status Mgt."
 {
     // NPR5.25\BR  \20160720  CASE 246088 Object Created
 
@@ -17,9 +17,9 @@ codeunit 6060055 "NPR Item Status Mgt."
     begin
         if Rec."NPR Item Status" <> '' then
             exit;
-        ItemStatus.Reset;
+        ItemStatus.Reset();
         ItemStatus.SetRange(Initial, true);
-        if ItemStatus.FindFirst then
+        if ItemStatus.FindFirst() then
             Rec.Validate("NPR Item Status", ItemStatus.Code)
         else
             Rec.Validate("NPR Item Status", CreateInitialStatus);
@@ -130,7 +130,7 @@ codeunit 6060055 "NPR Item Status Mgt."
             ItemStatus.Validate(Initial, true);
             ItemStatus.Modify(true);
         end else begin
-            ItemStatus.Init;
+            ItemStatus.Init();
             ItemStatus.Validate(Code, InitialStatusCode);
             ItemStatus.Validate(Description, TxtInitialStatusDescription);
             ItemStatus.Validate(Initial, true);

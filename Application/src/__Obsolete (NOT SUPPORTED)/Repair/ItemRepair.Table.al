@@ -36,7 +36,7 @@ table 6059982 "NPR Item Repair"
         }
         field(20; "Item Ledger Entry Qty."; Integer)
         {
-            CalcFormula = Count ("Item Ledger Entry" WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Count("Item Ledger Entry" WHERE("Item No." = FIELD("Item No."),
                                                            "Variant Code" = FIELD("Variant Code")));
             Caption = 'Item Ledger Entry Qty.';
             Editable = false;
@@ -49,7 +49,7 @@ table 6059982 "NPR Item Repair"
         }
         field(22; "Item Ledger Entry Open"; Boolean)
         {
-            CalcFormula = Exist ("Item Ledger Entry" WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Exist("Item Ledger Entry" WHERE("Item No." = FIELD("Item No."),
                                                            "Variant Code" = FIELD("Variant Code"),
                                                            Open = CONST(true)));
             Caption = 'Item Ledger Entry Open';

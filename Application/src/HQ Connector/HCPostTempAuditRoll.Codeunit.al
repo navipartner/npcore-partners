@@ -1,4 +1,4 @@
-codeunit 6150902 "NPR HC Post Temp Audit Roll"
+﻿codeunit 6150902 "NPR HC Post Temp Audit Roll"
 {
     trigger OnRun()
     var
@@ -35,7 +35,6 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         PostOnlySalesTicketNo: Boolean;
         StraksBogfVarePostFraEkspAfsl: Boolean;
         DoNotPost: Boolean;
-        StraksBogf: Boolean;
         DebugPostingMsg: Boolean;
         ProgressVis: Boolean;
         GlobalPostingNo: Code[20];
@@ -48,45 +47,42 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         "S & R Setup": Record "Sales & Receivables Setup";
         Item: Record Item;
     begin
-        with TempPost do begin
-            SetRange("Sale Date", TempPost."Sale Date");
-            SetFilter("Sales Ticket No.", TempPost.GetFilter("Sales Ticket No."));
-            PrintKey('"Virksomheds-bogf�ringsgruppe","Produkt-bogf�ringsgruppe", Ekspeditionsart, Type', GetFilters, 9);
-            CalcSums("Amount Including VAT", "Line Discount Amount");
-            if not GeneralPostingSetup.Get(GetRangeMax("Gen. Bus. Posting Group"), GetRangeMax("Gen. Prod. Posting Group")) then begin
-                TempPost.TestField(Type, TempPost.Type::Item);
-                Item.Get("No.");
-                "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
-                GeneralPostingSetup.Get(GetRangeMax("Gen. Bus. Posting Group"), "Gen. Prod. Posting Group");
-            end;
-            GeneralPostingSetup.TestField("Sales Account");
-            GeneralPostingSetup.TestField("Sales Line Disc. Account");
-
-            PrintKey('F�r Dim', '', 91);
-            HCRetailSetup.Get;
-
-            PrintKey('Efter Dim', '', 92);
-
-            // Posting off full amount
-            "S & R Setup".Get;
-            if ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"All Discounts") or
-               ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"Line Discounts")
-              then begin
-                if ("Amount Including VAT" + TempPost."Line Discount Amount") <> 0 then
-                    PostTransaction(GeneralPostingSetup."Sales Account", -("Amount Including VAT" + TempPost."Line Discount Amount"),
-                                     "Register No.", AccountType::"G/L", "Shortcut Dimension 1 Code", '', BogfDate, TempPost)
-            end else
-                PostTransaction(GeneralPostingSetup."Sales Account", -("Amount Including VAT"),
-                                 "Register No.", AccountType::"G/L", TempPost."Shortcut Dimension 1 Code", '', BogfDate, TempPost);
-
-            // Posting of discount amount
-            if (TempPost."Line Discount Amount" <> 0) and
-              ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"All Discounts") or
-              ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"Line Discounts") then
-                PostTransaction(GeneralPostingSetup."Sales Line Disc. Account", TempPost."Line Discount Amount", "Register No.", AccountType::"G/L",
-                                TempPost."Shortcut Dimension 1 Code", '', BogfDate, TempPost);
-
+        TempPost.SetRange("Sale Date", TempPost."Sale Date");
+        TempPost.SetFilter("Sales Ticket No.", TempPost.GetFilter("Sales Ticket No."));
+        PrintKey('"Virksomheds-bogf�ringsgruppe","Produkt-bogf�ringsgruppe", Ekspeditionsart, Type', TempPost.GetFilters, 9);
+        TempPost.CalcSums("Amount Including VAT", "Line Discount Amount");
+        if not GeneralPostingSetup.Get(TempPost.GetRangeMax("Gen. Bus. Posting Group"), TempPost.GetRangeMax("Gen. Prod. Posting Group")) then begin
+            TempPost.TestField(Type, TempPost.Type::Item);
+            Item.Get(TempPost."No.");
+            TempPost."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
+            GeneralPostingSetup.Get(TempPost.GetRangeMax("Gen. Bus. Posting Group"), TempPost."Gen. Prod. Posting Group");
         end;
+        GeneralPostingSetup.TestField("Sales Account");
+        GeneralPostingSetup.TestField("Sales Line Disc. Account");
+
+        PrintKey('F�r Dim', '', 91);
+        HCRetailSetup.Get();
+
+        PrintKey('Efter Dim', '', 92);
+
+        // Posting off full amount
+        "S & R Setup".Get();
+        if ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"All Discounts") or
+           ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"Line Discounts")
+          then begin
+            if (TempPost."Amount Including VAT" + TempPost."Line Discount Amount") <> 0 then
+                PostTransaction(GeneralPostingSetup."Sales Account", -(TempPost."Amount Including VAT" + TempPost."Line Discount Amount"),
+                                 TempPost."Register No.", AccountType::"G/L", TempPost."Shortcut Dimension 1 Code", '', BogfDate, TempPost)
+        end else
+            PostTransaction(GeneralPostingSetup."Sales Account", -(TempPost."Amount Including VAT"),
+                             TempPost."Register No.", AccountType::"G/L", TempPost."Shortcut Dimension 1 Code", '', BogfDate, TempPost);
+
+        // Posting of discount amount
+        if (TempPost."Line Discount Amount" <> 0) and
+          ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"All Discounts") or
+          ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"Line Discounts") then
+            PostTransaction(GeneralPostingSetup."Sales Line Disc. Account", TempPost."Line Discount Amount", TempPost."Register No.", AccountType::"G/L",
+                            TempPost."Shortcut Dimension 1 Code", '', BogfDate, TempPost);
     end;
 
     procedure PostRegisterTransactions(var TempPost: Record "NPR HC Audit Roll Posting" temporary)
@@ -94,55 +90,53 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         CurrentPost: Record "NPR HC Audit Roll Posting" temporary;
         BankAccount: Record "Bank Account";
     begin
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
 
-        HCRetailSetup.Get;
+        HCRetailSetup.Get();
 
-        with TempPost do begin
-            SetCurrentKey("Sale Type", Type, "No.");
-            SetRange("Sale Date", "Sale Date");
-            SetRange("No.", "No.");
-            PrintKey('Ekspeditionsart, Type, Nummer', GetFilters, 10);
-            CalcSums("Amount Including VAT", "Currency Amount");
-            BetalingsValg.Get("No.");
-            if BetalingsValg."Account Type" = BetalingsValg."Account Type"::"G/L Account" then begin
-                if "Amount Including VAT" <> 0 then begin
-                    PostTransaction(GetPaymentPostingSetup(BetalingsValg, "Register No."), "Amount Including VAT", "Register No.", AccountType::"G/L",
-                                    TempPost."Department Code", '', BogfDate, TempPost);
-                    SetFilter("Posting Date", '%1..', CalcDate('+1<D>', "Sale Date"));
-                    CalcSums("Amount Including VAT");
-                    if "Amount Including VAT" <> 0 then begin
-                        CurrentPost := TempPost;
-                        FindFirst;
-                        repeat
-                            SetRange("Posting Date", "Posting Date");
-                            FindLast;
-                            CalcSums("Amount Including VAT");
-                            PostDayClearing(TempPost, BetalingsValg, "Amount Including VAT");
-                            SetFilter("Posting Date", '>%1', CurrentPost."Sale Date");
-                        until Next = 0;
-                    end;
-                    SetRange("Posting Date");
-                    TempPost := CurrentPost;
+        TempPost.SetCurrentKey("Sale Type", Type, "No.");
+        TempPost.SetRange("Sale Date", TempPost."Sale Date");
+        TempPost.SetRange("No.", TempPost."No.");
+        PrintKey('Ekspeditionsart, Type, Nummer', TempPost.GetFilters, 10);
+        TempPost.CalcSums("Amount Including VAT", "Currency Amount");
+        BetalingsValg.Get(TempPost."No.");
+        if BetalingsValg."Account Type" = BetalingsValg."Account Type"::"G/L Account" then begin
+            if TempPost."Amount Including VAT" <> 0 then begin
+                PostTransaction(GetPaymentPostingSetup(BetalingsValg, TempPost."Register No."), TempPost."Amount Including VAT", TempPost."Register No.", AccountType::"G/L",
+                                TempPost."Department Code", '', BogfDate, TempPost);
+                TempPost.SetFilter("Posting Date", '%1..', CalcDate('+1<D>', TempPost."Sale Date"));
+                TempPost.CalcSums("Amount Including VAT");
+                if TempPost."Amount Including VAT" <> 0 then begin
+                    CurrentPost := TempPost;
+                    TempPost.FindFirst();
+                    repeat
+                        TempPost.SetRange("Posting Date", TempPost."Posting Date");
+                        TempPost.FindLast();
+                        TempPost.CalcSums("Amount Including VAT");
+                        PostDayClearing(TempPost, BetalingsValg, TempPost."Amount Including VAT");
+                        TempPost.SetFilter("Posting Date", '>%1', CurrentPost."Sale Date");
+                    until TempPost.Next() = 0;
                 end;
+                TempPost.SetRange("Posting Date");
+                TempPost := CurrentPost;
             end;
+        end;
 
-            if BetalingsValg."Account Type" = BetalingsValg."Account Type"::Customer then begin
-                BetalingsValg.TestField("Customer No.");
-                if "Amount Including VAT" <> 0 then
-                    PostTransaction(BetalingsValg."Customer No.", "Amount Including VAT", "Register No.", AccountType::Customer,
-                    TempPost."Department Code", '', BogfDate, TempPost);
-            end;
-            if BetalingsValg."Account Type" = BetalingsValg."Account Type"::Bank then begin
-                BankAccount.Get(GetPaymentPostingSetup(BetalingsValg, "Register No."));
-                if (BankAccount."Currency Code" <> '') and (BankAccount."Currency Code" <> GeneralLedgerSetup."LCY Code") and ("Currency Amount" <> 0) then
-                    PostTransaction(BankAccount."No.", "Currency Amount", "Register No.", AccountType::Bank,
-                                     TempPost."Department Code", '', BogfDate, TempPost)
-                else
-                    if "Amount Including VAT" <> 0 then
-                        PostTransaction(BankAccount."No.", "Amount Including VAT", "Register No.", AccountType::Bank,
-                                         TempPost."Department Code", '', BogfDate, TempPost);
-            end;
+        if BetalingsValg."Account Type" = BetalingsValg."Account Type"::Customer then begin
+            BetalingsValg.TestField("Customer No.");
+            if TempPost."Amount Including VAT" <> 0 then
+                PostTransaction(BetalingsValg."Customer No.", TempPost."Amount Including VAT", TempPost."Register No.", AccountType::Customer,
+                TempPost."Department Code", '', BogfDate, TempPost);
+        end;
+        if BetalingsValg."Account Type" = BetalingsValg."Account Type"::Bank then begin
+            BankAccount.Get(GetPaymentPostingSetup(BetalingsValg, TempPost."Register No."));
+            if (BankAccount."Currency Code" <> '') and (BankAccount."Currency Code" <> GeneralLedgerSetup."LCY Code") and (TempPost."Currency Amount" <> 0) then
+                PostTransaction(BankAccount."No.", TempPost."Currency Amount", TempPost."Register No.", AccountType::Bank,
+                                 TempPost."Department Code", '', BogfDate, TempPost)
+            else
+                if TempPost."Amount Including VAT" <> 0 then
+                    PostTransaction(BankAccount."No.", TempPost."Amount Including VAT", TempPost."Register No.", AccountType::Bank,
+                                     TempPost."Department Code", '', BogfDate, TempPost);
         end;
     end;
 
@@ -151,66 +145,64 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         Betalingsvalg: Record "NPR HC Payment Type POS";
         BankAccount: Record "Bank Account";
     begin
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
 
-        with RevRulle do begin
-            Betalingsvalg.Get("No.");
+        Betalingsvalg.Get(RevRulle."No.");
 
-            if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::"G/L Account" then begin
-                if "Amount Including VAT" <> 0 then begin
-                    PostTransaction(
-                      GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."),
-                      "Amount Including VAT",
-                      RevRulle."Register No.",
-                      AccountType::"G/L",
-                      RevRulle."Department Code",
-                      RevRulle.Description,
-                      BogfDate,
-                      RevRulle);
-                    if (RevRulle."Posting Date" <> 0D) and (RevRulle."Posting Date" <> RevRulle."Sale Date") then begin
-                        PostDayClearing(RevRulle, Betalingsvalg, "Amount Including VAT");
-                    end;
+        if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::"G/L Account" then begin
+            if RevRulle."Amount Including VAT" <> 0 then begin
+                PostTransaction(
+                  GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."),
+                  RevRulle."Amount Including VAT",
+                  RevRulle."Register No.",
+                  AccountType::"G/L",
+                  RevRulle."Department Code",
+                  RevRulle.Description,
+                  BogfDate,
+                  RevRulle);
+                if (RevRulle."Posting Date" <> 0D) and (RevRulle."Posting Date" <> RevRulle."Sale Date") then begin
+                    PostDayClearing(RevRulle, Betalingsvalg, RevRulle."Amount Including VAT");
                 end;
             end;
+        end;
 
-            if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::Customer then begin
-                Betalingsvalg.TestField("Customer No.");
-                if "Amount Including VAT" <> 0 then
-                    PostTransaction(
-                      Betalingsvalg."Customer No.",
-                      "Amount Including VAT",
-                      RevRulle."Register No.",
-                      AccountType::Customer,
-                      RevRulle."Department Code",
-                      RevRulle.Description,
-                      BogfDate,
-                      RevRulle);
-            end;
+        if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::Customer then begin
+            Betalingsvalg.TestField("Customer No.");
+            if RevRulle."Amount Including VAT" <> 0 then
+                PostTransaction(
+                  Betalingsvalg."Customer No.",
+                  RevRulle."Amount Including VAT",
+                  RevRulle."Register No.",
+                  AccountType::Customer,
+                  RevRulle."Department Code",
+                  RevRulle.Description,
+                  BogfDate,
+                  RevRulle);
+        end;
 
-            if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::Bank then begin
-                BankAccount.Get(GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."));
-                if (BankAccount."Currency Code" <> '') and (BankAccount."Currency Code" <> GeneralLedgerSetup."LCY Code") and ("Currency Amount" <> 0) then
+        if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::Bank then begin
+            BankAccount.Get(GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."));
+            if (BankAccount."Currency Code" <> '') and (BankAccount."Currency Code" <> GeneralLedgerSetup."LCY Code") and (RevRulle."Currency Amount" <> 0) then
+                PostTransaction(
+                             GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."),
+                             RevRulle."Currency Amount",
+                             RevRulle."Register No.",
+                             AccountType::Bank,
+                             RevRulle."Department Code",
+                             RevRulle.Description,
+                             BogfDate,
+                             RevRulle)
+            else
+                if RevRulle."Amount Including VAT" <> 0 then
                     PostTransaction(
-                                 GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."),
-                                 "Currency Amount",
-                                 RevRulle."Register No.",
-                                 AccountType::Bank,
-                                 RevRulle."Department Code",
-                                 RevRulle.Description,
-                                 BogfDate,
-                                 RevRulle)
-                else
-                    if "Amount Including VAT" <> 0 then
-                        PostTransaction(
-                                         BankAccount."No.",
-                                         "Amount Including VAT",
-                                         RevRulle."Register No.",
-                                         AccountType::Bank,
-                                         RevRulle."Department Code",
-                                         RevRulle.Description,
-                                         BogfDate,
-                                         RevRulle);
-            end;
+                                     BankAccount."No.",
+                                     RevRulle."Amount Including VAT",
+                                     RevRulle."Register No.",
+                                     AccountType::Bank,
+                                     RevRulle."Department Code",
+                                     RevRulle.Description,
+                                     BogfDate,
+                                     RevRulle);
         end;
     end;
 
@@ -284,13 +276,13 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
 
         FinKldLinie."Document Date" := PostingDate;
         FinKldLinie."System-Created Entry" := true;
-        HCRetailSetup.Get;
+        HCRetailSetup.Get();
 
         FinKldLinie."Shortcut Dimension 1 Code" := TempPost."Shortcut Dimension 1 Code";
         FinKldLinie."Shortcut Dimension 2 Code" := TempPost."Shortcut Dimension 2 Code";
         FinKldLinie."Dimension Set ID" := TempPost."Dimension Set ID";
 
-        FinKldLinie.Insert;
+        FinKldLinie.Insert();
         if HCRetailSetup."Gen. Journal Batch" <> '' then begin
             GenJournalLine := FinKldLinie;
             GenJournalLine.Insert(true);
@@ -301,56 +293,56 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
     var
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
-        HCRetailSetup.Get;
+        HCRetailSetup.Get();
         Clear(Counter);
         if FinKldLinie.Find('-') then begin
-            Total := FinKldLinie.Count;
+            Total := FinKldLinie.Count();
             repeat
                 Counter += 1;
                 if HCRetailSetup."Gen. Journal Batch" = '' then
                     GenJnlPostLine.RunWithCheck(FinKldLinie);
                 UpdateStatusWindow(10, '', Round(Counter / Total) * 10000);
-            until FinKldLinie.Next = 0;
+            until FinKldLinie.Next() = 0;
         end;
 
         Clear(Counter);
 
         if VarekldLinie.Find('-') then begin
-            Total := VarekldLinie.Count;
+            Total := VarekldLinie.Count();
             repeat
                 Counter += 1;
                 if HCRetailSetup."Item Journal Batch" = '' then
                     ItemJnlPostLine.RunWithCheck(VarekldLinie);
                 UpdateStatusWindow(11, '', Round(Counter / Total) * 10000);
-            until VarekldLinie.Next = 0;
+            until VarekldLinie.Next() = 0;
         end else
             UpdateStatusWindow(11, '', 10000);
 
-        Debitorpost1.LockTable;
+        Debitorpost1.LockTable();
         if Debitorpost.Find('-') then begin
             if Debitorpost1.Find('+') then;
             DebPostLbrNr := Debitorpost1."Entry No.";
             repeat
                 Debitorpost1 := Debitorpost;
                 Debitorpost1."Entry No." := Debitorpost."Entry No." + DebPostLbrNr;
-                HCRetailSetup.Get;
-            until Debitorpost.Next = 0;
+                HCRetailSetup.Get();
+            until Debitorpost.Next() = 0;
         end;
     end;
 
     procedure PostTodaysItemEntries(var TempPost: Record "NPR HC Audit Roll Posting" temporary)
     begin
-        HCRetailSetup.Get;
+        HCRetailSetup.Get();
         Clear(Counter);
 
         if VarekldLinie.Find('-') then begin
-            Total := VarekldLinie.Count;
+            Total := VarekldLinie.Count();
             repeat
                 Counter += 1;
                 if HCRetailSetup."Item Journal Batch" = '' then
                     ItemJnlPostLine.RunWithCheck(VarekldLinie);
                 UpdateStatusWindow(11, '', Round(Counter / Total) * 10000);
-            until VarekldLinie.Next = 0;
+            until VarekldLinie.Next() = 0;
         end else
             UpdateStatusWindow(11, '', 10000);
     end;
@@ -380,26 +372,26 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         Betalingsvalg.SetRange("Processing Type",
                                Betalingsvalg."Processing Type"::"Foreign Currency");
 
-        if Betalingsvalg.FindSet then
+        if Betalingsvalg.FindSet() then
             repeat
                 Amount2 := 0;
                 CurrencyAmount := 0;
 
                 AuditRoll.SetRange("Register No.", Rec."Register No.");
                 AuditRoll.SetRange("Sale Date", Rec."Sale Date");
-                if AuditRoll.FindFirst then
+                if AuditRoll.FindFirst() then
                     repeat
                         if (AuditRoll."Sale Type" = AuditRoll."Sale Type"::Payment) and
                           (AuditRoll.Type = AuditRoll.Type::Payment) and
                           (AuditRoll."No." = Betalingsvalg."No.") then
                             CurrencyAmount += AuditRoll."Currency Amount";
-                    until (AuditRoll.Next = 0) or (AuditRoll.Type = AuditRoll.Type::"Open/Close");
+                    until (AuditRoll.Next() = 0) or (AuditRoll.Type = AuditRoll.Type::"Open/Close");
                 HCAuditRoll2.SetRange("Payment Type No.", Betalingsvalg."No.");
 
-                if HCAuditRoll2.FindSet then
+                if HCAuditRoll2.FindSet() then
                     repeat
                         Amount2 += HCAuditRoll2.Amount;
-                    until HCAuditRoll2.Next = 0;
+                    until HCAuditRoll2.Next() = 0;
 
                 Difference := CurrencyAmount - Amount2;
 
@@ -409,7 +401,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
                     if Finkllbr = 0 then
                         Finkllbr := GetLastGenJournalLine;
                     Finkllbr += 10000;
-                    FinKldLinie.Init;
+                    FinKldLinie.Init();
                     FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
                     FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
 
@@ -450,143 +442,140 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
                     FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
                     FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
-                    HCRetailSetup.Get;
+                    HCRetailSetup.Get();
 
                     FinKldLinie."System-Created Entry" := true;
 
-                    FinKldLinie.Insert;
+                    FinKldLinie.Insert();
                     if HCRetailSetup."Gen. Journal Batch" <> '' then begin
                         GenJournalLine := FinKldLinie;
                         GenJournalLine.Insert(true);
                     end;
                 end;
-            until Betalingsvalg.Next = 0;
+            until Betalingsvalg.Next() = 0;
     end;
 
     procedure PosterVarekladde(var RevRulle: Record "NPR HC Audit Roll Posting" temporary; Straks: Boolean; Bogfdate: Date): Boolean
     var
         Sporing: Record "Reservation Entry";
         Varepost: Record "Item Ledger Entry";
-        ErrSerial: Label 'Serialno. %2 on item %1 has allready been sold!';
         ItemTrackingCode: Record "Item Tracking Code";
         Item: Record Item;
         ItemUnitofMeasure: Record "Item Unit of Measure";
     begin
-        HCRetailSetup.Get;
+        HCRetailSetup.Get();
 
-        with RevRulle do begin
-            CreateRetPurchOrder(RevRulle);
+        CreateRetPurchOrder(RevRulle);
 
-            Kasse.Get("Register No.");
-            VarekldLinie.Init;
-            if Varekllbr = 0 then
-                Varekllbr := GetLastItemJournalLine;
-            Varekllbr += 10000;
-            VarekldLinie."Journal Template Name" := HCRetailSetup."Item Journal Template";
-            VarekldLinie."Journal Batch Name" := HCRetailSetup."Item Journal Batch";
-            VarekldLinie."Line No." := Varekllbr;
+        Kasse.Get(RevRulle."Register No.");
+        VarekldLinie.Init();
+        if Varekllbr = 0 then
+            Varekllbr := GetLastItemJournalLine;
+        Varekllbr += 10000;
+        VarekldLinie."Journal Template Name" := HCRetailSetup."Item Journal Template";
+        VarekldLinie."Journal Batch Name" := HCRetailSetup."Item Journal Batch";
+        VarekldLinie."Line No." := Varekllbr;
 
-            if HCRetailSetup."Appendix no. eq Sales Ticket" then
-                VarekldLinie."Document No." := "Sales Ticket No."
-            else
-                VarekldLinie."Document No." := GetDocumentNo(RevRulle);
+        if HCRetailSetup."Appendix no. eq Sales Ticket" then
+            VarekldLinie."Document No." := RevRulle."Sales Ticket No."
+        else
+            VarekldLinie."Document No." := GetDocumentNo(RevRulle);
 
-            VarekldLinie."Entry Type" := VarekldLinie."Entry Type"::Sale;
-            VarekldLinie."Source No." := "Customer No.";
-            VarekldLinie."Source Type" := VarekldLinie."Source Type"::Customer;
+        VarekldLinie."Entry Type" := VarekldLinie."Entry Type"::Sale;
+        VarekldLinie."Source No." := RevRulle."Customer No.";
+        VarekldLinie."Source Type" := VarekldLinie."Source Type"::Customer;
 
-            VarekldLinie."Posting Date" := Bogfdate;
-            VarekldLinie."Document Date" := Bogfdate;
-            VarekldLinie."Discount Amount" := "Line Discount Amount";
-            if (VarekldLinie."Discount Amount" <> 0) and Item.Get(RevRulle."No.") then begin
-                if Item."Price Includes VAT" then
-                    VarekldLinie."Discount Amount" := VarekldLinie."Discount Amount" / ((100 + RevRulle."VAT %") / 100);
-            end;
-            VarekldLinie."Reason Code" := "Reason Code";
-            VarekldLinie."Bin Code" := "Bin Code";
+        VarekldLinie."Posting Date" := Bogfdate;
+        VarekldLinie."Document Date" := Bogfdate;
+        VarekldLinie."Discount Amount" := RevRulle."Line Discount Amount";
+        if (VarekldLinie."Discount Amount" <> 0) and Item.Get(RevRulle."No.") then begin
+            if Item."Price Includes VAT" then
+                VarekldLinie."Discount Amount" := VarekldLinie."Discount Amount" / ((100 + RevRulle."VAT %") / 100);
+        end;
+        VarekldLinie."Reason Code" := RevRulle."Reason Code";
+        VarekldLinie."Bin Code" := RevRulle."Bin Code";
 
-            if Vare.Type <> Vare.Type::Service then
-                VarekldLinie.Validate("Item No.", "No.")
-            else begin
-                VarekldLinie."Item No." := "No.";
-                VarekldLinie."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
-                VarekldLinie."Gen. Prod. Posting Group" := "Gen. Prod. Posting Group";
-            end;
-            VarekldLinie.Validate(Quantity, Quantity);
-            if not ItemUnitofMeasure.Get("No.", Unit) then begin
-                Item.Get("No.");
-                VarekldLinie.Validate("Unit of Measure Code", Item."Base Unit of Measure");
-            end else
-                VarekldLinie.Validate("Unit of Measure Code", Unit);
-            VarekldLinie.Validate(Amount, Amount);
-            VarekldLinie."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
-            VarekldLinie.Description := Description;
-            VarekldLinie."Salespers./Purch. Code" := "Salesperson Code";
-            if Lokationskode = '' then
-                VarekldLinie."Location Code" := Kasse."Location Code" else
-                VarekldLinie."Location Code" := Lokationskode;
-            VarekldLinie."Source Code" := HCRetailSetup."Posting Source Code";
-            if "Serial No." <> '' then begin
-                Sporing.SetCurrentKey("Entry No.", Positive);
-                Sporing.SetRange(Positive, false);
-                if Sporing.Find('+') then;
-                Sporing.Init;
-                Sporing."Entry No." += 1;
-                Sporing.Positive := false;
-                Sporing."Item No." := "No.";
-                Sporing."Location Code" := Lokationskode;
-                Sporing."Quantity (Base)" := -Quantity;
-                Sporing."Reservation Status" := Sporing."Reservation Status"::Prospect;
-                Vare.TestField("Item Tracking Code");
-                ItemTrackingCode.Get(Vare."Item Tracking Code");
-                if ItemTrackingCode."SN Specific Tracking" then begin
-                    Varepost.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
-                    Varepost.SetRange(Open, true);
-                    Varepost.SetRange(Positive, true);
-                    Varepost.SetRange("Serial No.", "Serial No.");
-                    Varepost.SetRange("Item No.", "No.");
-                    Varepost.FindFirst;
-                    Sporing."Creation Date" := Varepost."Posting Date";
-                end else begin
-                    if Quantity <= 0 then begin
-                        Sporing."Creation Date" := Today;
-                        VarekldLinie.Validate(Amount, -VarekldLinie.Amount);
-                    end;
+        if Vare.Type <> Vare.Type::Service then
+            VarekldLinie.Validate("Item No.", RevRulle."No.")
+        else begin
+            VarekldLinie."Item No." := RevRulle."No.";
+            VarekldLinie."Gen. Bus. Posting Group" := RevRulle."Gen. Bus. Posting Group";
+            VarekldLinie."Gen. Prod. Posting Group" := RevRulle."Gen. Prod. Posting Group";
+        end;
+        VarekldLinie.Validate(Quantity, RevRulle.Quantity);
+        if not ItemUnitofMeasure.Get(RevRulle."No.", RevRulle.Unit) then begin
+            Item.Get(RevRulle."No.");
+            VarekldLinie.Validate("Unit of Measure Code", Item."Base Unit of Measure");
+        end else
+            VarekldLinie.Validate("Unit of Measure Code", RevRulle.Unit);
+        VarekldLinie.Validate(Amount, RevRulle.Amount);
+        VarekldLinie."Gen. Bus. Posting Group" := RevRulle."Gen. Bus. Posting Group";
+        VarekldLinie.Description := RevRulle.Description;
+        VarekldLinie."Salespers./Purch. Code" := RevRulle."Salesperson Code";
+        if RevRulle.Lokationskode = '' then
+            VarekldLinie."Location Code" := Kasse."Location Code" else
+            VarekldLinie."Location Code" := RevRulle.Lokationskode;
+        VarekldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+        if RevRulle."Serial No." <> '' then begin
+            Sporing.SetCurrentKey("Entry No.", Positive);
+            Sporing.SetRange(Positive, false);
+            if Sporing.Find('+') then;
+            Sporing.Init();
+            Sporing."Entry No." += 1;
+            Sporing.Positive := false;
+            Sporing."Item No." := RevRulle."No.";
+            Sporing."Location Code" := RevRulle.Lokationskode;
+            Sporing."Quantity (Base)" := -RevRulle.Quantity;
+            Sporing."Reservation Status" := Sporing."Reservation Status"::Prospect;
+            Vare.TestField("Item Tracking Code");
+            ItemTrackingCode.Get(Vare."Item Tracking Code");
+            if ItemTrackingCode."SN Specific Tracking" then begin
+                Varepost.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
+                Varepost.SetRange(Open, true);
+                Varepost.SetRange(Positive, true);
+                Varepost.SetRange("Serial No.", RevRulle."Serial No.");
+                Varepost.SetRange("Item No.", RevRulle."No.");
+                Varepost.FindFirst();
+                Sporing."Creation Date" := Varepost."Posting Date";
+            end else begin
+                if RevRulle.Quantity <= 0 then begin
+                    Sporing."Creation Date" := Today();
+                    VarekldLinie.Validate(Amount, -VarekldLinie.Amount);
                 end;
-                Sporing."Source Type" := 83;
-                Sporing."Source Subtype" := 1;
-                Sporing."Source ID" := VarekldLinie."Journal Template Name";
-                Sporing."Source Batch Name" := VarekldLinie."Journal Batch Name";
-                Sporing."Source Ref. No." := VarekldLinie."Line No.";
-                Sporing."Expected Receipt Date" := Today;
-                Sporing."Serial No." := "Serial No.";
-                Sporing."Created By" := RevRulle."Salesperson Code";
-                Sporing."Qty. per Unit of Measure" := Quantity;
-                Sporing.Quantity := -Quantity;
-                Sporing."Qty. to Handle (Base)" := -Quantity;
-                Sporing."Qty. to Invoice (Base)" := -Quantity;
-                Sporing.Insert;
             end;
-            VarekldLinie."Variant Code" := CopyStr("Variant Code", 1, 10);
+            Sporing."Source Type" := 83;
+            Sporing."Source Subtype" := 1;
+            Sporing."Source ID" := VarekldLinie."Journal Template Name";
+            Sporing."Source Batch Name" := VarekldLinie."Journal Batch Name";
+            Sporing."Source Ref. No." := VarekldLinie."Line No.";
+            Sporing."Expected Receipt Date" := Today();
+            Sporing."Serial No." := RevRulle."Serial No.";
+            Sporing."Created By" := RevRulle."Salesperson Code";
+            Sporing."Qty. per Unit of Measure" := RevRulle.Quantity;
+            Sporing.Quantity := -RevRulle.Quantity;
+            Sporing."Qty. to Handle (Base)" := -RevRulle.Quantity;
+            Sporing."Qty. to Invoice (Base)" := -RevRulle.Quantity;
+            Sporing.Insert();
+        end;
+        VarekldLinie."Variant Code" := CopyStr(RevRulle."Variant Code", 1, 10);
 
-            if "Unit Cost" <> 0 then
-                VarekldLinie.Validate("Unit Cost", "Unit Cost");
+        if RevRulle."Unit Cost" <> 0 then
+            VarekldLinie.Validate("Unit Cost", RevRulle."Unit Cost");
 
-            VarekldLinie.Validate("Return Reason Code", "Return Reason Code");
-            VarekldLinie."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
-            VarekldLinie."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
-            VarekldLinie."Dimension Set ID" := "Dimension Set ID";
+        VarekldLinie.Validate("Return Reason Code", RevRulle."Return Reason Code");
+        VarekldLinie."Shortcut Dimension 1 Code" := RevRulle."Shortcut Dimension 1 Code";
+        VarekldLinie."Shortcut Dimension 2 Code" := RevRulle."Shortcut Dimension 2 Code";
+        VarekldLinie."Dimension Set ID" := RevRulle."Dimension Set ID";
 
-            VarekldLinie.Insert;
-            if HCRetailSetup."Item Journal Batch" <> '' then begin
-                ItemJournalLine := VarekldLinie;
-                ItemJournalLine.Insert(true);
-            end;
+        VarekldLinie.Insert();
+        if HCRetailSetup."Item Journal Batch" <> '' then begin
+            ItemJournalLine := VarekldLinie;
+            ItemJournalLine.Insert(true);
+        end;
 
-            if Straks then begin
-                if HCRetailSetup."Item Journal Batch" = '' then
-                    ItemJnlPostLine.RunWithCheck(VarekldLinie);
-            end;
+        if Straks then begin
+            if HCRetailSetup."Item Journal Batch" = '' then
+                ItemJnlPostLine.RunWithCheck(VarekldLinie);
         end;
 
     end;
@@ -598,12 +587,9 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         txtIndbetalingSales: Label 'Payment on %1 %2';
         Bogf1: Label 'POS-Debitsale on %1 Register %2';
         txtKasse: Label '%1/Register %2';
-        TmpJrnlLineDimloc: Codeunit "Temp Blob";
         SalesHeader: Record "Sales Header";
-        SalesPostYNPrepmt: Codeunit "Sales-Post Prepayment (Yes/No)";
         SalesPost: Codeunit "Sales-Post";
         SalesDocTypeText: Text;
-        PrepayPercent: Decimal;
         txtSalesQuote: Label 'quote';
         txtSalesOrder: Label 'order';
         txtSalesInoice: Label 'invoice';
@@ -613,107 +599,105 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
     begin
         Clear(FinKldLinie);
 
-        with RevRulle do begin
-            HCRetailSetup.Get;
-            if Finkllbr = 0 then
-                Finkllbr := GetLastGenJournalLine;
-            Finkllbr += 10000;
-            FinKldLinie."Line No." := Finkllbr;
-            FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
-            FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
-            FinKldLinie."Document No." := GetDocumentNo(RevRulle);
+        HCRetailSetup.Get();
+        if Finkllbr = 0 then
+            Finkllbr := GetLastGenJournalLine;
+        Finkllbr += 10000;
+        FinKldLinie."Line No." := Finkllbr;
+        FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
+        FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
+        FinKldLinie."Document No." := GetDocumentNo(RevRulle);
 
-            FinKldLinie."Posting Date" := BogfDate;
-            FinKldLinie."Document Date" := BogfDate;
-            FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
-            FinKldLinie."Bal. Account No." := '';
-            if "Sale Type" = "Sale Type"::Deposit then begin
-                FinKldLinie.Validate("Document Type", FinKldLinie."Document Type"::Payment);
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::Customer;
-                FinKldLinie.Validate("Account No.", "No.");
-                FinKldLinie.Validate(Amount, -"Amount Including VAT");
-                FinKldLinie."Allow Application" := true;
-                /*************************************************************************
-                * Bruges kun i forbindelse med udl�sninger fa gl.Butik3 / Butik2000     *
-                * l�sninger. Konverterer debetsalg til finansposteringer p� debitor     *
-                *************************************************************************/
-                if "N3 Debit Sale Conversion" then
-                    FinKldLinie.Description := StrSubstNo(Bogf1, BogfDate, "Register No.")
-                else begin
-                    if RevRulle."Sales Document No." <> '' then begin
-                        case RevRulle."Sales Document Type" of
-                            SalesHeader."Document Type"::Quote:
-                                SalesDocTypeText := txtSalesQuote;
-                            SalesHeader."Document Type"::Order:
-                                SalesDocTypeText := txtSalesOrder;
-                            SalesHeader."Document Type"::Invoice:
-                                SalesDocTypeText := txtSalesInoice;
-                            SalesHeader."Document Type"::"Credit Memo":
-                                SalesDocTypeText := txtSalesCreditMemo;
-                            SalesHeader."Document Type"::"Blanket Order":
-                                SalesDocTypeText := txtSalesBlanketOrder;
-                            SalesHeader."Document Type"::"Return Order":
-                                SalesDocTypeText := txtSalesReturnOrder;
-                        end;
-                        FinKldLinie.Description := StrSubstNo(txtIndbetalingSales, SalesDocTypeText, RevRulle."Sales Document No.");
-                    end else
-                        FinKldLinie.Description := txtIndbetaling;
-                end;
+        FinKldLinie."Posting Date" := BogfDate;
+        FinKldLinie."Document Date" := BogfDate;
+        FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+        FinKldLinie."Bal. Account No." := '';
+        if RevRulle."Sale Type" = RevRulle."Sale Type"::Deposit then begin
+            FinKldLinie.Validate("Document Type", FinKldLinie."Document Type"::Payment);
+            FinKldLinie."Account Type" := FinKldLinie."Account Type"::Customer;
+            FinKldLinie.Validate("Account No.", RevRulle."No.");
+            FinKldLinie.Validate(Amount, -RevRulle."Amount Including VAT");
+            FinKldLinie."Allow Application" := true;
+            /*************************************************************************
+            * Bruges kun i forbindelse med udl�sninger fa gl.Butik3 / Butik2000     *
+            * l�sninger. Konverterer debetsalg til finansposteringer p� debitor     *
+            *************************************************************************/
+            if RevRulle."N3 Debit Sale Conversion" then
+                FinKldLinie.Description := StrSubstNo(Bogf1, BogfDate, RevRulle."Register No.")
+            else begin
+                if RevRulle."Sales Document No." <> '' then begin
+                    case RevRulle."Sales Document Type" of
+                        SalesHeader."Document Type"::Quote:
+                            SalesDocTypeText := txtSalesQuote;
+                        SalesHeader."Document Type"::Order:
+                            SalesDocTypeText := txtSalesOrder;
+                        SalesHeader."Document Type"::Invoice:
+                            SalesDocTypeText := txtSalesInoice;
+                        SalesHeader."Document Type"::"Credit Memo":
+                            SalesDocTypeText := txtSalesCreditMemo;
+                        SalesHeader."Document Type"::"Blanket Order":
+                            SalesDocTypeText := txtSalesBlanketOrder;
+                        SalesHeader."Document Type"::"Return Order":
+                            SalesDocTypeText := txtSalesReturnOrder;
+                    end;
+                    FinKldLinie.Description := StrSubstNo(txtIndbetalingSales, SalesDocTypeText, RevRulle."Sales Document No.");
+                end else
+                    FinKldLinie.Description := txtIndbetaling;
             end;
+        end;
 
 
-            if (Type = Type::Payment) then begin
-                BetalingsValg.Get("No.");
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
-                FinKldLinie.Validate("Account No.", GetPaymentPostingSetup(BetalingsValg, "Register No."));
-                FinKldLinie.Validate(Amount, "Amount Including VAT");
-                FinKldLinie.Description := StrSubstNo(txtKasse, Description, "Register No.");
+        if (RevRulle.Type = RevRulle.Type::Payment) then begin
+            BetalingsValg.Get(RevRulle."No.");
+            FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
+            FinKldLinie.Validate("Account No.", GetPaymentPostingSetup(BetalingsValg, RevRulle."Register No."));
+            FinKldLinie.Validate(Amount, RevRulle."Amount Including VAT");
+            FinKldLinie.Description := StrSubstNo(txtKasse, RevRulle.Description, RevRulle."Register No.");
+        end;
+
+        if (RevRulle.Type = RevRulle.Type::"G/L") then begin
+            FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
+            FinKldLinie.Validate("Account No.", RevRulle."No.");
+            FinKldLinie.Validate(Amount, RevRulle."Amount Including VAT");
+            FinKldLinie.Description := StrSubstNo(txtKasse, RevRulle.Description, RevRulle."Register No.")
+        end;
+
+        Kasse.Get(RevRulle."Register No.");
+
+        FinKldLinie."Document Date" := BogfDate;
+        FinKldLinie."Applies-to Doc. Type" := RevRulle."Buffer Document Type";
+        FinKldLinie.Validate("Applies-to Doc. No.", RevRulle."Buffer Invoice No.");
+        FinKldLinie."Shortcut Dimension 1 Code" := RevRulle."Shortcut Dimension 1 Code";
+        FinKldLinie."Shortcut Dimension 2 Code" := RevRulle."Shortcut Dimension 2 Code";
+        FinKldLinie."Dimension Set ID" := RevRulle."Dimension Set ID";
+
+        HCRetailSetup.Get();
+
+        FinKldLinie."System-Created Entry" := true;
+
+        FinKldLinie.Insert();
+
+        if HCRetailSetup."Gen. Journal Batch" <> '' then begin
+            GenJournalLine := FinKldLinie;
+            GenJournalLine.Insert(true);
+        end;
+
+        RevRulle.Modify();
+
+        if SalesHeader.Get(RevRulle."Sales Document Type", RevRulle."Sales Document No.") then begin
+            if RevRulle."Sales Document Prepayment" then begin
+                SalesHeader.CalcFields("Amount Including VAT");
+                SalesHeader.SetHideValidationDialog(true);
+                SalesHeader.Validate("Prepayment %", RevRulle."Sales Doc. Prepayment %");
+                SalesHeader.Modify(true);
+                PostPrepmtInvoiceYN(SalesHeader);
+
             end;
-
-            if (Type = Type::"G/L") then begin
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
-                FinKldLinie.Validate("Account No.", "No.");
-                FinKldLinie.Validate(Amount, "Amount Including VAT");
-                FinKldLinie.Description := StrSubstNo(txtKasse, Description, "Register No.")
-            end;
-
-            Kasse.Get("Register No.");
-
-            FinKldLinie."Document Date" := BogfDate;
-            FinKldLinie."Applies-to Doc. Type" := RevRulle."Buffer Document Type";
-            FinKldLinie.Validate("Applies-to Doc. No.", RevRulle."Buffer Invoice No.");
-            FinKldLinie."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
-            FinKldLinie."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
-            FinKldLinie."Dimension Set ID" := "Dimension Set ID";
-
-            HCRetailSetup.Get;
-
-            FinKldLinie."System-Created Entry" := true;
-
-            FinKldLinie.Insert;
-
-            if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-                GenJournalLine := FinKldLinie;
-                GenJournalLine.Insert(true);
-            end;
-
-            Modify;
-
-            if SalesHeader.Get("Sales Document Type", "Sales Document No.") then begin
-                if "Sales Document Prepayment" then begin
-                    SalesHeader.CalcFields("Amount Including VAT");
-                    SalesHeader.SetHideValidationDialog(true);
-                    SalesHeader.Validate("Prepayment %", RevRulle."Sales Doc. Prepayment %");
-                    SalesHeader.Modify(true);
-                    PostPrepmtInvoiceYN(SalesHeader);
-
-                end;
-                if "Sales Document Invoice" or "Sales Document Ship" then begin
-                    SalesHeader.Ship := "Sales Document Ship";
-                    SalesHeader.Invoice := "Sales Document Invoice";
-                    SalesHeader.Modify;
-                    SalesPost.Run(SalesHeader);
-                end;
+            if RevRulle."Sales Document Invoice" or RevRulle."Sales Document Ship" then begin
+                SalesHeader.Ship := RevRulle."Sales Document Ship";
+                SalesHeader.Invoice := RevRulle."Sales Document Invoice";
+                SalesHeader.Modify();
+                SalesPost.Run(SalesHeader);
             end;
         end;
 
@@ -741,7 +725,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             if Finkllbr = 0 then
                 Finkllbr := GetLastGenJournalLine;
             Finkllbr += 10000;
-            FinKldLinie.Init;
+            FinKldLinie.Init();
             FinKldLinie."Line No." := Finkllbr;
             FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
             FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
@@ -766,11 +750,11 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
             FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
-            HCRetailSetup.Get;
+            HCRetailSetup.Get();
 
             FinKldLinie."System-Created Entry" := true;
 
-            FinKldLinie.Insert;
+            FinKldLinie.Insert();
             if HCRetailSetup."Gen. Journal Batch" <> '' then begin
                 GenJournalLine := FinKldLinie;
                 GenJournalLine.Insert(true);
@@ -788,7 +772,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             if Finkllbr = 0 then
                 Finkllbr := GetLastGenJournalLine;
             Finkllbr += 10000;
-            FinKldLinie.Init;
+            FinKldLinie.Init();
             FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
             FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
             FinKldLinie."Line No." := Finkllbr;
@@ -814,11 +798,11 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
             FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
-            HCRetailSetup.Get;
+            HCRetailSetup.Get();
 
             FinKldLinie."System-Created Entry" := true;
 
-            FinKldLinie.Insert;
+            FinKldLinie.Insert();
 
             if HCRetailSetup."Gen. Journal Batch" <> '' then begin
                 GenJournalLine := FinKldLinie;
@@ -836,7 +820,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             if Finkllbr = 0 then
                 Finkllbr := GetLastGenJournalLine;
             Finkllbr += 10000;
-            FinKldLinie.Init;
+            FinKldLinie.Init();
             FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
             FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
             FinKldLinie."Line No." := Finkllbr;
@@ -860,11 +844,11 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
             FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
-            HCRetailSetup.Get;
+            HCRetailSetup.Get();
 
             FinKldLinie."System-Created Entry" := true;
 
-            FinKldLinie.Insert;
+            FinKldLinie.Insert();
 
             if HCRetailSetup."Gen. Journal Batch" <> '' then begin
                 GenJournalLine := FinKldLinie;
@@ -910,7 +894,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         if heltal.Find('-') then
             repeat
                 Window.Update(heltal.Number, 0);
-            until heltal.Next = 0;
+            until heltal.Next() = 0;
 
         Window.Update(103, 0);
     end;
@@ -919,7 +903,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
     begin
         if not WindowIsOpen then
             exit;
-        Window.Close;
+        Window.Close();
         WindowIsOpen := false;
     end;
 
@@ -948,7 +932,6 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
 
     procedure StraksBogfCurrent(SetProp: Boolean)
     begin
-        StraksBogf := SetProp;
     end;
 
     procedure PrintKey("Key": Text[250]; "Filter": Text[500]; ID: Integer)
@@ -968,245 +951,242 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         ChangeSum: Decimal;
         ChangeDep: Code[20];
     begin
-        with Rec do begin
-            DebugPostingMsg := false;
+        DebugPostingMsg := false;
+        HCRetailSetup.Get();
+
+        if not Rec.FindLast() then
+            exit;
+
+        if not DoNotPost then begin
+            Kasse.Get(Rec."Register No.");
+            PostOnlySalesTicketNo := true;
+            if Rec.FindSet() then begin
+                XBonNr := Rec."Sales Ticket No.";
+                repeat
+                    if (XBonNr <> Rec."Sales Ticket No.") then
+                        PostOnlySalesTicketNo := false;
+                    XBonNr := Rec."Sales Ticket No.";
+                until (Rec.Next() = 0) or (not PostOnlySalesTicketNo);
+            end;
+
             HCRetailSetup.Get();
 
-            if not Rec.FindLast then
-                exit;
+            FinKldLinie.DeleteAll();
+            VarekldLinie.DeleteAll();
+            Debitorpost.DeleteAll();
 
-            if not DoNotPost then begin
-                Kasse.Get("Register No.");
-                PostOnlySalesTicketNo := true;
-                if FindSet then begin
-                    XBonNr := "Sales Ticket No.";
-                    repeat
-                        if (XBonNr <> "Sales Ticket No.") then
-                            PostOnlySalesTicketNo := false;
-                        XBonNr := "Sales Ticket No.";
-                    until (Next = 0) or (not PostOnlySalesTicketNo);
-                end;
+            HCRetailSetup.TestField("Posting Source Code");
+            BogfDate := Rec."Sale Date";
 
-                HCRetailSetup.Get;
+            UpdateStatusWindow(1, Format(BogfDate), 0);
+            UpdateStatusWindow(2, Rec."Register No.", 0);
 
-                FinKldLinie.DeleteAll;
-                VarekldLinie.DeleteAll;
-                Debitorpost.DeleteAll;
+            Rec.LockTable();
 
-                HCRetailSetup.TestField("Posting Source Code");
-                BogfDate := Rec."Sale Date";
+            /* #########################################
+               Post register balancing (end-of-day )
+              ######################################### */
 
-                UpdateStatusWindow(1, Format(BogfDate), 0);
-                UpdateStatusWindow(2, "Register No.", 0);
+            Rec.Reset();
+            Rec.SetCurrentKey(Type, Balancing);
+            Rec.SetRange(Type, Rec.Type::"Open/Close");
+            Rec.SetRange(Balancing, true);
+            PrintKey('Type,Kasseafslutning', Rec.GetFilters, 1);
+            if Rec.FindFirst() then
+                repeat
+                    PosterKasseAfslutning(Rec);
+                until Rec.Next() = 0;
 
-                LockTable;
+            /* #########################################
+               Post customer entries to debit zero sales
+              ######################################### */
 
-                /* #########################################
-                   Post register balancing (end-of-day )
-                  ######################################### */
+            Clear(Rec.Quantity);
+            Clear(Dummy);
+            Rec.Reset();
+            if Debitorpost.Find('+')
+              then
+                ;
+            Rec.SetCurrentKey("Sale Type", Type, "Customer Type", "Customer No.");
+            Rec.SetRange("Sale Type", Rec."Sale Type"::Payment);
+            Rec.SetRange(Type, Rec.Type::Payment);
+            Rec.SetRange("Customer Type", Rec."Customer Type"::Alm);
+            Rec.SetFilter("Customer No.", '<> %1', blank);
+            Total := Rec.Count();
+            PrintKey('Ekspeditionsart, Type, Debitortype, Kundenummer', Rec.GetFilters, 2);
+            Dummy.CopyFilters(Rec);
+            if Rec.FindSet() then begin
+                repeat
+                    Counter += Rec.Count();
+                    Rec.SetCurrentKey("Sale Type", Type, "Customer Type", "Customer No.");
+                    Rec.CopyFilters(Dummy);
+                    Rec.FindLast();
+                    UpdateStatusWindow(8, '', Round(Counter / Total) * 10000);
+                until Rec.Next() = 0;
+            end;
+            UpdateStatusWindow(8, '', 10000);
 
-                Reset;
-                SetCurrentKey(Type, Balancing);
-                SetRange(Type, Type::"Open/Close");
-                SetRange(Balancing, true);
-                PrintKey('Type,Kasseafslutning', GetFilters, 1);
-                if FindFirst then
-                    repeat
-                        PosterKasseAfslutning(Rec);
-                    until Next = 0;
+            /* ########################################
+              Post payments on customer account
+              ######################################## */
 
-                /* #########################################
-                   Post customer entries to debit zero sales
-                  ######################################### */
+            Rec.Reset();
+            Clear(Rec.Quantity);
+            Rec.SetCurrentKey("Sale Type", Type);
+            Rec.SetRange("Sale Type", Rec."Sale Type"::Deposit);
+            Rec.SetRange(Type, Rec.Type::Customer);
+            Total := Rec.Count();
+            PrintKey('Ekspeditionsart, Type', Rec.GetFilters, 3);
+            if Rec.FindSet() then begin
+                repeat
+                    Counter += 1;
+                    PosterDebitorIndbetaling(Rec);
+                    UpdateStatusWindow(6, '', Round(Counter / Total) * 10000);
+                until Rec.Next() = 0
+            end;
+            UpdateStatusWindow(6, '', 10000);
 
-                Clear(Quantity);
-                Clear(Dummy);
-                Reset;
-                if Debitorpost.Find('+')
-                  then
-                    ;
-                SetCurrentKey("Sale Type", Type, "Customer Type", "Customer No.");
-                SetRange("Sale Type", "Sale Type"::Payment);
-                SetRange(Type, Type::Payment);
-                SetRange("Customer Type", "Customer Type"::Alm);
-                SetFilter("Customer No.", '<> %1', blank);
-                Total := Count;
-                PrintKey('Ekspeditionsart, Type, Debitortype, Kundenummer', GetFilters, 2);
-                Dummy.CopyFilters(Rec);
-                if FindSet then begin
-                    repeat
-                        Counter += Count;
-                        SetCurrentKey("Sale Type", Type, "Customer Type", "Customer No.");
-                        CopyFilters(Dummy);
-                        FindLast;
-                        UpdateStatusWindow(8, '', Round(Counter / Total) * 10000);
-                    until Next = 0;
-                end;
-                UpdateStatusWindow(8, '', 10000);
+            /* ################################################
+              Post (item) sales on g/l accounts
+              ################################################ */
 
-                /* ########################################
-                  Post payments on customer account
-                  ######################################## */
+            Clear(Dummy);
+            Clear(Counter);
+            Rec.Reset();
+            Rec.SetCurrentKey("Sale Type", Type,
+                            "Gen. Bus. Posting Group", "Gen. Prod. Posting Group",
+                            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID",
+                            "VAT Bus. Posting Group", "VAT Prod. Posting Group");
+            Rec.SetRange("Sale Type", Rec."Sale Type"::Sale);
+            Rec.SetRange(Type, Rec.Type::Item);
+            Total := Rec.Count();
+            PrintKey('Kassenummer,Ekspeditionsdato,Ekspeditionsart,Type,Bogf�rt...', Rec.GetFilters, 5);
+            PrintKey('"Virksomheds-bogf�ringsgruppe","Produkt-bogf�ringsgruppe"', Rec.GetFilters, 5);
+            Dummy.CopyFilters(Rec);
+            if Rec.FindFirst() then begin
+                repeat
+                    Rec.SetRange("Gen. Bus. Posting Group", Rec."Gen. Bus. Posting Group");
+                    Rec.SetRange("Gen. Prod. Posting Group", Rec."Gen. Prod. Posting Group");
+                    Rec.SetRange("VAT Bus. Posting Group", Rec."VAT Bus. Posting Group");
+                    Rec.SetRange("VAT Prod. Posting Group", Rec."VAT Prod. Posting Group");
+                    Rec.SetRange("Shortcut Dimension 1 Code", Rec."Shortcut Dimension 1 Code");
+                    Rec.SetRange("Shortcut Dimension 2 Code", Rec."Shortcut Dimension 2 Code");
+                    Rec.SetRange("Dimension Set ID", Rec."Dimension Set ID");
+                    Counter += Rec.Count();
+                    PostItemSale(Rec);
+                    Rec.SetCurrentKey("Sale Type", Type,
+                                    "Gen. Bus. Posting Group", "Gen. Prod. Posting Group",
+                                    "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID",
+                                    "VAT Bus. Posting Group", "VAT Prod. Posting Group");
+                    Rec.FindLast();
+                    Rec.CopyFilters(Dummy);
+                    UpdateStatusWindow(4, '', Round(Counter / Total) * 10000);
+                until Rec.Next() = 0;
+            end;
+            UpdateStatusWindow(4, '', 10000);
 
-                Reset;
-                Clear(Quantity);
-                SetCurrentKey("Sale Type", Type);
-                SetRange("Sale Type", "Sale Type"::Deposit);
-                SetRange(Type, Type::Customer);
-                Total := Count;
-                PrintKey('Ekspeditionsart, Type', GetFilters, 3);
-                if FindSet then begin
-                    repeat
-                        Counter += 1;
-                        PosterDebitorIndbetaling(Rec);
-                        UpdateStatusWindow(6, '', Round(Counter / Total) * 10000);
-                    until Next = 0
-                end;
-                UpdateStatusWindow(6, '', 10000);
+            /* ##############################################
+              Post money transactions - Payments
+              ############################################## */
 
-                /* ################################################
-                  Post (item) sales on g/l accounts
-                  ################################################ */
+            Clear(Counter);
+            Clear(Dummy);
+            Rec.Reset();
+            Rec.SetCurrentKey("Sale Type", Type, "No.", "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID");
+            Rec.SetRange("Sale Type", Rec."Sale Type"::Payment);
+            Rec.SetRange(Type, Rec.Type::Payment);
+            Total := Rec.Count();
+            PrintKey('Ekspeditionsart, Type, Nummer', Rec.GetFilters, 6);
+            Dummy.CopyFilters(Rec);
+            if Rec.FindSet() then begin
+                repeat
+                    BetValgRec.Get(Rec."No.");
+                    case BetValgRec.Posting of
+                        BetValgRec.Posting::Condensed:
+                            begin
+                                Rec.SetRange("Shortcut Dimension 1 Code", Rec."Shortcut Dimension 1 Code");
+                                Rec.SetRange("Shortcut Dimension 2 Code", Rec."Shortcut Dimension 2 Code");
+                                Rec.SetRange("Dimension Set ID", Rec."Dimension Set ID");
+                                PostRegisterTransactions(Rec);
+                                Counter += Rec.Count();
+                                Rec.SetCurrentKey("Sale Type", Type, "No.", "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID");
+                                Rec.FindLast();
+                                Rec.CopyFilters(Dummy);
+                                UpdateStatusWindow(5, '', Round(Counter / Total) * 10000);
+                            end;
+                        BetValgRec.Posting::"Single Entry":
+                            begin
+                                PostRegisterTransactionsPerEntry(Rec);
+                                Counter += 1;
+                                UpdateStatusWindow(5, '', Round(Counter / Total) * 10000);
+                            end;
+                    end;
+                until Rec.Next() = 0;
+            end;
+            UpdateStatusWindow(5, '', 10000);
 
-                Clear(Dummy);
-                Clear(Counter);
-                Reset;
-                SetCurrentKey("Sale Type", Type,
-                                "Gen. Bus. Posting Group", "Gen. Prod. Posting Group",
-                                "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID",
-                                "VAT Bus. Posting Group", "VAT Prod. Posting Group");
-                SetRange("Sale Type", "Sale Type"::Sale);
-                SetRange(Type, Type::Item);
-                Total := Count;
-                PrintKey('Kassenummer,Ekspeditionsdato,Ekspeditionsart,Type,Bogf�rt...', GetFilters, 5);
-                PrintKey('"Virksomheds-bogf�ringsgruppe","Produkt-bogf�ringsgruppe"', GetFilters, 5);
-                Dummy.CopyFilters(Rec);
-                if FindFirst then begin
-                    repeat
-                        SetRange("Gen. Bus. Posting Group", "Gen. Bus. Posting Group");
-                        SetRange("Gen. Prod. Posting Group", "Gen. Prod. Posting Group");
-                        SetRange("VAT Bus. Posting Group", "VAT Bus. Posting Group");
-                        SetRange("VAT Prod. Posting Group", "VAT Prod. Posting Group");
-                        SetRange("Shortcut Dimension 1 Code", "Shortcut Dimension 1 Code");
-                        SetRange("Shortcut Dimension 2 Code", "Shortcut Dimension 2 Code");
-                        SetRange("Dimension Set ID", "Dimension Set ID");
-                        Counter += Count;
-                        PostItemSale(Rec);
-                        SetCurrentKey("Sale Type", Type,
-                                        "Gen. Bus. Posting Group", "Gen. Prod. Posting Group",
-                                        "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID",
-                                        "VAT Bus. Posting Group", "VAT Prod. Posting Group");
-                        FindLast;
-                        CopyFilters(Dummy);
-                        UpdateStatusWindow(4, '', Round(Counter / Total) * 10000);
-                    until Next = 0;
-                end;
-                UpdateStatusWindow(4, '', 10000);
+            /* #################################################################
+              Post payments on g/l account - gift/credit vouchers
+              ################################################################# */
 
-                /* ##############################################
-                  Post money transactions - Payments
-                  ############################################## */
+            Clear(Counter);
+            Rec.Reset();
+            Rec.SetCurrentKey("Sale Type", Type);
+            Rec.SetRange("Sale Type", Rec."Sale Type"::Deposit);
+            Rec.SetRange(Type, Rec.Type::"G/L");
+            Total := Rec.Count();
+            PrintKey('Ekspeditionsart, Type', Rec.GetFilters, 7);
+            if Rec.FindSet() then
+                repeat
+                    Counter += 1;
+                    PostTransaction(Rec."No.", -Rec."Amount Including VAT", Rec."Register No.", AccountType::"G/L", Rec."Department Code", '', BogfDate, Rec);
+                    UpdateStatusWindow(9, '', Round(Counter / Total) * 10000);
+                until Rec.Next() = 0;
+            UpdateStatusWindow(9, '', 10000);
 
-                Clear(Counter);
-                Clear(Dummy);
-                Reset;
-                SetCurrentKey("Sale Type", Type, "No.", "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID");
-                SetRange("Sale Type", "Sale Type"::Payment);
-                SetRange(Type, Type::Payment);
-                Total := Count;
-                PrintKey('Ekspeditionsart, Type, Nummer', GetFilters, 6);
-                Dummy.CopyFilters(Rec);
-                if FindSet then begin
-                    repeat
-                        BetValgRec.Get("No.");
-                        case BetValgRec.Posting of
-                            BetValgRec.Posting::Condensed:
-                                begin
-                                    SetRange("Shortcut Dimension 1 Code", "Shortcut Dimension 1 Code");
-                                    SetRange("Shortcut Dimension 2 Code", "Shortcut Dimension 2 Code");
-                                    SetRange("Dimension Set ID", "Dimension Set ID");
-                                    PostRegisterTransactions(Rec);
-                                    Counter += Count;
-                                    SetCurrentKey("Sale Type", Type, "No.", "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID");
-                                    FindLast;
-                                    CopyFilters(Dummy);
-                                    UpdateStatusWindow(5, '', Round(Counter / Total) * 10000);
-                                end;
-                            BetValgRec.Posting::"Single Entry":
-                                begin
-                                    PostRegisterTransactionsPerEntry(Rec);
-                                    Counter += 1;
-                                    UpdateStatusWindow(5, '', Round(Counter / Total) * 10000);
-                                end;
-                        end;
-                    until Next = 0;
-                end;
-                UpdateStatusWindow(5, '', 10000);
+            /* ##############################################
+              Post outpayments on g/l accounts
+              ############################################## */
 
-                /* #################################################################
-                  Post payments on g/l account - gift/credit vouchers
-                  ################################################################# */
+            Clear(Counter);
+            Rec.Reset();
+            Rec.SetCurrentKey("Sale Type", Type);
+            Rec.SetRange("Sale Type", Rec."Sale Type"::"Out payment");
+            Rec.SetRange(Type, Rec.Type::"G/L");
+            Total := Rec.Count();
+            PrintKey('Ekspeditionsart,Type', Rec.GetFilters, 8);
+            if Rec.FindSet() then
+                repeat
+                    RevisionUdbetaling := Rec;
+                    Counter += 1;
+                    if Rec."No." = Kasse.Rounding then begin
+                        ChangeSum += Rec."Amount Including VAT";
+                        ChangeDep := Rec."Department Code";
+                    end else
+                        PostTransaction(Rec."No.", Rec."Amount Including VAT", Rec."Register No.", AccountType::"G/L", Rec."Department Code", '', BogfDate, Rec);
+                    UpdateStatusWindow(7, '', Round(Counter / Total) * 10000);
+                until Rec.Next() = 0;
+            if ChangeSum <> 0 then
+                PostTransaction(Kasse.Rounding, ChangeSum, Rec."Register No.", AccountType::"G/L", ChangeDep, '', BogfDate, Rec);
 
-                Clear(Counter);
-                Reset;
-                SetCurrentKey("Sale Type", Type);
-                SetRange("Sale Type", "Sale Type"::Deposit);
-                SetRange(Type, Type::"G/L");
-                Total := Count;
-                PrintKey('Ekspeditionsart, Type', GetFilters, 7);
-                if FindSet then
-                    repeat
-                        Counter += 1;
-                        PostTransaction("No.", -"Amount Including VAT", "Register No.", AccountType::"G/L", "Department Code", '', BogfDate, Rec);
-                        UpdateStatusWindow(9, '', Round(Counter / Total) * 10000);
-                    until Next = 0;
-                UpdateStatusWindow(9, '', 10000);
+            UpdateStatusWindow(7, '', 10000);
 
-                /* ##############################################
-                  Post outpayments on g/l accounts
-                  ############################################## */
+            Rec.Reset();
 
-                Clear(Counter);
-                Reset;
-                SetCurrentKey("Sale Type", Type);
-                SetRange("Sale Type", "Sale Type"::"Out payment");
-                SetRange(Type, Type::"G/L");
-                Total := Count;
-                PrintKey('Ekspeditionsart,Type', GetFilters, 8);
-                if FindSet then
-                    repeat
-                        RevisionUdbetaling := Rec;
-                        Counter += 1;
-                        if "No." = Kasse.Rounding then begin
-                            ChangeSum += "Amount Including VAT";
-                            ChangeDep := "Department Code";
-                        end else
-                            PostTransaction("No.", "Amount Including VAT", "Register No.", AccountType::"G/L", "Department Code", '', BogfDate, Rec);
-                        UpdateStatusWindow(7, '', Round(Counter / Total) * 10000);
-                    until Next = 0;
-                if ChangeSum <> 0 then
-                    PostTransaction(Kasse.Rounding, ChangeSum, "Register No.", AccountType::"G/L", ChangeDep, '', BogfDate, Rec);
+            PostTodaysGLEntries(Rec);
 
-                UpdateStatusWindow(7, '', 10000);
+            Rec.Reset();
 
-                Reset;
+            Rec.SetRange("Posted Doc. No.", '');
+            Rec.ModifyAll("Posted Doc. No.", GetDocumentNo(Rec));
+            Rec.SetRange("Posted Doc. No.");
+            Rec.ModifyAll(Posted, true);
+            FinKldLinie.DeleteAll(true);
+            VarekldLinie.DeleteAll(true);
 
-                PostTodaysGLEntries(Rec);
+        end;   /*** DoNotbogf�r ***/
 
-                Reset;
-
-                SetRange("Posted Doc. No.", '');
-                ModifyAll("Posted Doc. No.", GetDocumentNo(Rec));
-                SetRange("Posted Doc. No.");
-                ModifyAll(Posted, true);
-                FinKldLinie.DeleteAll(true);
-                VarekldLinie.DeleteAll(true);
-
-            end;   /*** DoNotbogf�r ***/
-
-            Reset;
-
-        end;
+        Rec.Reset();
 
     end;
 
@@ -1214,89 +1194,86 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
     var
         XBonNr: Code[20];
     begin
-        with Rec do begin
-            DebugPostingMsg := false;
-            HCRetailSetup.Get();
+        DebugPostingMsg := false;
+        HCRetailSetup.Get();
 
-            if not Rec.FindLast then
-                exit;
+        if not Rec.FindLast() then
+            exit;
 
-            if not DoNotPost then begin
-                PostOnlySalesTicketNo := true;
-                if Find('-') then begin
-                    XBonNr := "Sales Ticket No.";
-                    repeat
-                        if (XBonNr <> "Sales Ticket No.") then
-                            PostOnlySalesTicketNo := false;
-                        XBonNr := "Sales Ticket No.";
-                    until (Next = 0) or (not PostOnlySalesTicketNo);
-                end;
-
-                HCRetailSetup.Get;
-
-                FinKldLinie.DeleteAll;
-                VarekldLinie.DeleteAll;
-                Debitorpost.DeleteAll;
-
-                HCRetailSetup.TestField("Posting Source Code");
-                BogfDate := Rec."Sale Date";
-
-                UpdateStatusWindow(1, Format(BogfDate), 0);
-                UpdateStatusWindow(2, "Register No.", 0);
-
-                LockTable;
-
-                /* ##############################################
-                  Post�rer Varebev�gelser
-                  ############################################## */
-
-                Reset;
-                SetCurrentKey("Sale Type", Type, "Item Entry Posted");
-                SetRange("Sale Type", "Sale Type"::Sale);
-                SetRange(Type, Type::Item);
-                SetRange("Item Entry Posted", false);
-                Total := Count;
-                Clear(Counter);
-                PrintKey('Ekspeditionsart, Type, "Varepost bogf�rt"', GetFilters, 4);
-                if FindSet then begin
-                    repeat
-                        Counter += 1;
-                        if Quantity <> 0 then begin
-                            PosterVarekladde(Rec, false, BogfDate);
-                        end;
-                        UpdateStatusWindow(3, '', Round(Counter / Total) * 10000);
-                    until Next = 0;
-                end;
-                UpdateStatusWindow(3, '', 10000);
-
-                Rec.ModifyAll("Item Entry Posted", true);
-
-                Reset;
-
-                PostTodaysItemEntries(Rec);
-
-                Reset;
-
-            end;   /*** DoNotbogf�r ***/
-
-            if StraksBogfVarePostFraEkspAfsl then begin
-                SetCurrentKey("Sale Type", Type, "Item Entry Posted");
-                SetRange("Sale Type", "Sale Type"::Sale);
-                SetRange(Type, Type::Item);
-                SetRange("Item Entry Posted", false);
-
-
-                if FindSet then
-                    repeat
-                        PosterVarekladde(Rec, true, Rec."Sale Date");
-                        Modify;
-                    until Next = 0;
-                ModifyAll("Item Entry Posted", true);
+        if not DoNotPost then begin
+            PostOnlySalesTicketNo := true;
+            if Rec.Find('-') then begin
+                XBonNr := Rec."Sales Ticket No.";
+                repeat
+                    if (XBonNr <> Rec."Sales Ticket No.") then
+                        PostOnlySalesTicketNo := false;
+                    XBonNr := Rec."Sales Ticket No.";
+                until (Rec.Next() = 0) or (not PostOnlySalesTicketNo);
             end;
 
-            Reset;
+            HCRetailSetup.Get();
 
+            FinKldLinie.DeleteAll();
+            VarekldLinie.DeleteAll();
+            Debitorpost.DeleteAll();
+
+            HCRetailSetup.TestField("Posting Source Code");
+            BogfDate := Rec."Sale Date";
+
+            UpdateStatusWindow(1, Format(BogfDate), 0);
+            UpdateStatusWindow(2, Rec."Register No.", 0);
+
+            Rec.LockTable();
+
+            /* ##############################################
+              Post�rer Varebev�gelser
+              ############################################## */
+
+            Rec.Reset();
+            Rec.SetCurrentKey("Sale Type", Type, "Item Entry Posted");
+            Rec.SetRange("Sale Type", Rec."Sale Type"::Sale);
+            Rec.SetRange(Type, Rec.Type::Item);
+            Rec.SetRange("Item Entry Posted", false);
+            Total := Rec.Count();
+            Clear(Counter);
+            PrintKey('Ekspeditionsart, Type, "Varepost bogf�rt"', Rec.GetFilters, 4);
+            if Rec.FindSet() then begin
+                repeat
+                    Counter += 1;
+                    if Rec.Quantity <> 0 then begin
+                        PosterVarekladde(Rec, false, BogfDate);
+                    end;
+                    UpdateStatusWindow(3, '', Round(Counter / Total) * 10000);
+                until Rec.Next() = 0;
+            end;
+            UpdateStatusWindow(3, '', 10000);
+
+            Rec.ModifyAll("Item Entry Posted", true);
+
+            Rec.Reset();
+
+            PostTodaysItemEntries(Rec);
+
+            Rec.Reset();
+
+        end;   /*** DoNotbogf�r ***/
+
+        if StraksBogfVarePostFraEkspAfsl then begin
+            Rec.SetCurrentKey("Sale Type", Type, "Item Entry Posted");
+            Rec.SetRange("Sale Type", Rec."Sale Type"::Sale);
+            Rec.SetRange(Type, Rec.Type::Item);
+            Rec.SetRange("Item Entry Posted", false);
+
+
+            if Rec.FindSet() then
+                repeat
+                    PosterVarekladde(Rec, true, Rec."Sale Date");
+                    Rec.Modify();
+                until Rec.Next() = 0;
+            Rec.ModifyAll("Item Entry Posted", true);
         end;
+
+        Rec.Reset();
 
     end;
 
@@ -1316,132 +1293,129 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         VirksBogfGrp: Record "Gen. Business Posting Group";
         ProdBogfGrp: Record "Gen. Product Posting Group";
         DebBogfGrp: Record "Customer Posting Group";
-        t001: Label 'Item %1 %2 does not exists. Posting has terminated!';
         t002: Label 'Customer %1 %2 does not exists. Posting terminated!';
         t003: Label 'Financialaccount %1 %2 does not exists. Posting terminated!';
         nCount: Integer;
         nTotal: Integer;
     begin
-        with Rec do begin
-            Reset;
-            SetCurrentKey("Sale Date");
-            nTotal := Rec.Count;
+        Rec.Reset();
+        Rec.SetCurrentKey("Sale Date");
+        nTotal := Rec.Count();
 
-            if Find('-') then
-                repeat
-                    if ProgressVis then begin
-                        nCount += 1;
-                        Window.Update(102, Round(nCount / nTotal * 10000, 1, '>'));
-                    end;
+        if Rec.Find('-') then
+            repeat
+                if ProgressVis then begin
+                    nCount += 1;
+                    Window.Update(102, Round(nCount / nTotal * 10000, 1, '>'));
+                end;
 
-                    if ("Sale Type" <> "Sale Type"::Comment) and not (Type in [Type::Cancelled, Type::Comment]) then
-                        TestField("No.");
-                    case "Sale Type" of
+                if (Rec."Sale Type" <> Rec."Sale Type"::Comment) and not (Rec.Type in [Rec.Type::Cancelled, Rec.Type::Comment]) then
+                    Rec.TestField("No.");
+                case Rec."Sale Type" of
 
-                        /*-1-*/
-                        "Sale Type"::Sale:
-                            begin
-                                if Vare."VAT Bus. Posting Gr. (Price)" <> '' then
-                                    "VAT Bus. Posting Group" := Vare."VAT Bus. Posting Gr. (Price)"
-                                else begin
-                                    HCRetailSetup.Get;
-                                    HCRetailSetup.TestField("Vat Bus. Posting Group");
-                                    "VAT Bus. Posting Group" := HCRetailSetup."Vat Bus. Posting Group";
-                                end;
-                                Modify;
-                                TestField("Gen. Bus. Posting Group");
-                                "BogfOps.".Get("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
-                                "BogfOps.".TestField("Sales Account");
-                                Finanskonto.Get("BogfOps."."Sales Account");
-                                VirksBogfGrp.Get("Gen. Bus. Posting Group");
-                                ProdBogfGrp.Get("Gen. Prod. Posting Group");
-                                MomsbogfOps.Get(VirksBogfGrp."Def. VAT Bus. Posting Group", ProdBogfGrp."Def. VAT Prod. Posting Group");
-                                MomsbogfOps.TestField("Sales VAT Account");
-                                Finanskonto.Get(MomsbogfOps."Sales VAT Account");
-                                Finanskonto.TestField(Blocked, false);
-
-                                /*######------SLUT------######*/
-
+                    /*-1-*/
+                    Rec."Sale Type"::Sale:
+                        begin
+                            if Vare."VAT Bus. Posting Gr. (Price)" <> '' then
+                                Rec."VAT Bus. Posting Group" := Vare."VAT Bus. Posting Gr. (Price)"
+                            else begin
+                                HCRetailSetup.Get();
+                                HCRetailSetup.TestField("Vat Bus. Posting Group");
+                                Rec."VAT Bus. Posting Group" := HCRetailSetup."Vat Bus. Posting Group";
                             end;
+                            Rec.Modify();
+                            Rec.TestField("Gen. Bus. Posting Group");
+                            "BogfOps.".Get(Rec."Gen. Bus. Posting Group", Rec."Gen. Prod. Posting Group");
+                            "BogfOps.".TestField("Sales Account");
+                            Finanskonto.Get("BogfOps."."Sales Account");
+                            VirksBogfGrp.Get(Rec."Gen. Bus. Posting Group");
+                            ProdBogfGrp.Get(Rec."Gen. Prod. Posting Group");
+                            MomsbogfOps.Get(VirksBogfGrp."Def. VAT Bus. Posting Group", ProdBogfGrp."Def. VAT Prod. Posting Group");
+                            MomsbogfOps.TestField("Sales VAT Account");
+                            Finanskonto.Get(MomsbogfOps."Sales VAT Account");
+                            Finanskonto.TestField(Blocked, false);
+
+                            /*######------SLUT------######*/
+
+                        end;
 
 
-                        /*-2-*/
-                        "Sale Type"::Deposit:
-                            begin
+                    /*-2-*/
+                    Rec."Sale Type"::Deposit:
+                        begin
 
-                                if Type = Type::Customer then begin
-                                    if not Debitor.Get("No.") then
-                                        Error(t002, "No.", Description);
+                            if Rec.Type = Rec.Type::Customer then begin
+                                if not Debitor.Get(Rec."No.") then
+                                    Error(t002, Rec."No.", Rec.Description);
 
-                                    /*##########################################################
-                                     ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
-                                     ## fra tekstbaseret Navision ---30112000 NP-MD          ##
-                                     ##########################################################*/
-
-                                    DebBogfGrp.Get(Debitor."Customer Posting Group");
-                                    DebBogfGrp.TestField("Receivables Account");
-                                    Finanskonto.Get(DebBogfGrp."Receivables Account");
-                                    Finanskonto.TestField(Blocked, false);
-
-                                    /*######------SLUT------######*/
-
-                                end;
-                            end;
-
-                        /*-3-*/
-                        "Sale Type"::"Out payment":
-                            begin
-                                if Type = Type::"G/L" then begin
-                                    if not Finanskonto.Get("No.") then
-                                        Error(t003,
-                                          "No.", Description);
-                                    Finanskonto.TestField(Blocked, false);
-                                end;
-                            end;
-
-                        /*-4-*/
-                        "Sale Type"::Payment:
-                            begin
-
-                                Betalingsvalg.Get("No.");
                                 /*##########################################################
                                  ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
                                  ## fra tekstbaseret Navision ---30112000 NP-MD          ##
                                  ##########################################################*/
 
-                                case Betalingsvalg."Account Type" of
-                                    Betalingsvalg."Account Type"::"G/L Account":
-                                        begin
-                                            Finanskonto.Get(GetPaymentPostingSetup(Betalingsvalg, Rec."Register No."));
-                                        end;
-                                    Betalingsvalg."Account Type"::Customer:
-                                        begin
-                                            Betalingsvalg.TestField("Customer No.");
-                                            Debitor.Get(Betalingsvalg."Customer No.");
-                                        end;
-                                end;
-
+                                DebBogfGrp.Get(Debitor."Customer Posting Group");
+                                DebBogfGrp.TestField("Receivables Account");
+                                Finanskonto.Get(DebBogfGrp."Receivables Account");
                                 Finanskonto.TestField(Blocked, false);
+
                                 /*######------SLUT------######*/
 
                             end;
-                        "Sale Type"::Comment:
-                            begin
-                                case Type of
-                                    Type::"Open/Close":
-                                        begin
-                                            if "Transferred to Balance Account" <> 0 then begin
+                        end;
 
-                                            end;
-                                            if Difference <> 0 then begin
-
-                                            end;
-                                        end;
-                                end;
+                    /*-3-*/
+                    Rec."Sale Type"::"Out payment":
+                        begin
+                            if Rec.Type = Rec.Type::"G/L" then begin
+                                if not Finanskonto.Get(Rec."No.") then
+                                    Error(t003,
+                                      Rec."No.", Rec.Description);
+                                Finanskonto.TestField(Blocked, false);
                             end;
-                    end;
-                until Next = 0;
-        end;
+                        end;
+
+                    /*-4-*/
+                    Rec."Sale Type"::Payment:
+                        begin
+
+                            Betalingsvalg.Get(Rec."No.");
+                            /*##########################################################
+                             ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
+                             ## fra tekstbaseret Navision ---30112000 NP-MD          ##
+                             ##########################################################*/
+
+                            case Betalingsvalg."Account Type" of
+                                Betalingsvalg."Account Type"::"G/L Account":
+                                    begin
+                                        Finanskonto.Get(GetPaymentPostingSetup(Betalingsvalg, Rec."Register No."));
+                                    end;
+                                Betalingsvalg."Account Type"::Customer:
+                                    begin
+                                        Betalingsvalg.TestField("Customer No.");
+                                        Debitor.Get(Betalingsvalg."Customer No.");
+                                    end;
+                            end;
+
+                            Finanskonto.TestField(Blocked, false);
+                            /*######------SLUT------######*/
+
+                        end;
+                    Rec."Sale Type"::Comment:
+                        begin
+                            case Rec.Type of
+                                Rec.Type::"Open/Close":
+                                    begin
+                                        if Rec."Transferred to Balance Account" <> 0 then begin
+
+                                        end;
+                                        if Rec.Difference <> 0 then begin
+
+                                        end;
+                                    end;
+                            end;
+                        end;
+                end;
+            until Rec.Next() = 0;
         if ProgressVis then
             Window.Update(102, 10000);
 
@@ -1474,7 +1448,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         Rulle.SetRange(Type, Rulle.Type::"G/L");
         Rulle.SetRange("No.", '*');
 
-        nTotal := Rulle.Count;
+        nTotal := Rulle.Count();
         nCount := 0;
 
         Linie.CopyFilters(Rulle);
@@ -1484,17 +1458,17 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
                     nCount += 1;
                     Window.Update(101, Round(nCount / nTotal * 5000, 1, '>'));
                 end;
-                Rulle.Reset;
+                Rulle.Reset();
                 Rulle.SetCurrentKey("Sales Ticket No.");
                 Rulle.SetRange("Sales Ticket No.", Rulle."Sales Ticket No.");
-                Rulle.DeleteAll;
+                Rulle.DeleteAll();
                 Rulle.SetCurrentKey("Sale Type", Type, "No.");
                 Rulle.CopyFilters(Linie);
-            until Rulle.Next = 0;
+            until Rulle.Next() = 0;
 
         Rulle.SetRange("Sale Type", Rulle."Sale Type"::Deposit);
         Rulle.SetRange(Type, Rulle.Type::Customer);
-        nTotal := Rulle.Count;
+        nTotal := Rulle.Count();
         nCount := 0;
 
         Linie.CopyFilters(Rulle);
@@ -1504,13 +1478,13 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
                     nCount += 1;
                     Window.Update(101, Round(nCount / nTotal * 5000 + 50000, 1, '>'));
                 end;
-                Rulle.Reset;
+                Rulle.Reset();
                 Rulle.SetCurrentKey("Sales Ticket No.");
                 Rulle.SetRange("Sales Ticket No.", Rulle."Sales Ticket No.");
-                Rulle.DeleteAll;
+                Rulle.DeleteAll();
                 Rulle.SetCurrentKey("Sale Type", Type, "No.");
                 Rulle.CopyFilters(Linie);
-            until Rulle.Next = 0;
+            until Rulle.Next() = 0;
         if ProgressVis then
             Window.Update(101, 10000);
     end;
@@ -1527,20 +1501,18 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
     begin
         PaymentType.TestField("Day Clearing Account");
 
-        with TempAuditRoll do begin
-            PostTransaction(
-              GetPaymentPostingSetup(PaymentType, "Register No."), -"Amount Including VAT", "Register No.", AccountType::"G/L",
-              "Department Code", Description, BogfDate, TempAuditRoll);
-            PostTransaction(
-              PaymentType."Day Clearing Account", "Amount Including VAT", "Register No.", AccountType::"G/L",
-              "Department Code", Description, BogfDate, TempAuditRoll);
-            PostTransaction(
-              GetPaymentPostingSetup(PaymentType, "Register No."), "Amount Including VAT", "Register No.", AccountType::"G/L",
-              "Department Code", Description, "Posting Date", TempAuditRoll);
-            PostTransaction(
-              PaymentType."Day Clearing Account", -"Amount Including VAT", "Register No.", AccountType::"G/L",
-              "Department Code", Description, "Posting Date", TempAuditRoll);
-        end;
+        PostTransaction(
+  GetPaymentPostingSetup(PaymentType, TempAuditRoll."Register No."), -TempAuditRoll."Amount Including VAT", TempAuditRoll."Register No.", AccountType::"G/L",
+  TempAuditRoll."Department Code", TempAuditRoll.Description, BogfDate, TempAuditRoll);
+        PostTransaction(
+          PaymentType."Day Clearing Account", TempAuditRoll."Amount Including VAT", TempAuditRoll."Register No.", AccountType::"G/L",
+          TempAuditRoll."Department Code", TempAuditRoll.Description, BogfDate, TempAuditRoll);
+        PostTransaction(
+          GetPaymentPostingSetup(PaymentType, TempAuditRoll."Register No."), TempAuditRoll."Amount Including VAT", TempAuditRoll."Register No.", AccountType::"G/L",
+          TempAuditRoll."Department Code", TempAuditRoll.Description, TempAuditRoll."Posting Date", TempAuditRoll);
+        PostTransaction(
+          PaymentType."Day Clearing Account", -TempAuditRoll."Amount Including VAT", TempAuditRoll."Register No.", AccountType::"G/L",
+          TempAuditRoll."Department Code", TempAuditRoll.Description, TempAuditRoll."Posting Date", TempAuditRoll);
     end;
 
     procedure getNewPostingNo(increment1: Boolean): Code[20]
@@ -1550,7 +1522,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         code20: Code[20];
     begin
         //Instead of kasse."Last G/L Posting No."
-        npc.Get;
+        npc.Get();
         code20 := Nos.GetNextNo(npc."Posting No. Management", Today, increment1);
 
         exit(code20);
@@ -1576,7 +1548,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         PurchaseHeader.SetRange("Order Date", Today);
         PurchaseHeader.SetRange("Your Reference", AuditRoll."Sales Ticket No.");
         PurchaseHeader.SetRange("Buy-from Vendor No.", AuditRoll.Vendor);
-        if PurchaseHeader.Count > 0 then begin
+        if PurchaseHeader.Count() > 0 then begin
             exit(false);
         end;
 
@@ -1587,7 +1559,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
 
     procedure CreateRetPurchHeader(var PurchaseHeader: Record "Purchase Header"; AuditRoll: Record "NPR HC Audit Roll Posting")
     begin
-        PurchaseHeader.Init;
+        PurchaseHeader.Init();
         PurchaseHeader."Document Type" := PurchaseHeader."Document Type"::"Return Order";
         PurchaseHeader.Validate("Buy-from Vendor No.", AuditRoll.Vendor);
         PurchaseHeader.Validate("Posting Date", Today);
@@ -1612,7 +1584,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
 
         if AuditRollTemp.Find('-') then
             repeat
-                PurchaseLine.Init;
+                PurchaseLine.Init();
                 PurchaseLine."Document Type" := PurchaseHeader."Document Type";
                 PurchaseLine."Document No." := PurchaseHeader."No.";
                 PurchaseLine."Line No." := AuditRollTemp."Line No.";
@@ -1621,7 +1593,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
                 PurchaseLine.Validate(Quantity, -AuditRollTemp.Quantity);
                 PurchaseLine."Return Reason Code" := AuditRollTemp."Return Reason Code";
                 PurchaseLine.Insert(true);
-            until AuditRollTemp.Next = 0;
+            until AuditRollTemp.Next() = 0;
     end;
 
     procedure PostPrepmtInvoiceYN(var SalesHeader2: Record "Sales Header")
@@ -1630,11 +1602,9 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
     begin
         SalesHeader.Copy(SalesHeader2);
-        with SalesHeader do begin
-            SalesPostPrepayments.Invoice(SalesHeader);
-            Commit;
-            SalesHeader2 := SalesHeader;
-        end;
+        SalesPostPrepayments.Invoice(SalesHeader);
+        Commit();
+        SalesHeader2 := SalesHeader;
     end;
 
     procedure PostPrepmtCrMemoYN(var SalesHeader2: Record "Sales Header")
@@ -1643,11 +1613,9 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
     begin
         SalesHeader.Copy(SalesHeader2);
-        with SalesHeader do begin
-            SalesPostPrepayments.CreditMemo(SalesHeader);
-            Commit;
-            SalesHeader2 := SalesHeader;
-        end;
+        SalesPostPrepayments.CreditMemo(SalesHeader);
+        Commit();
+        SalesHeader2 := SalesHeader;
     end;
 
     local procedure GetLastGenJournalLine(): Integer
@@ -1658,7 +1626,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             exit(0);
         GenJournalLine.SetRange("Journal Template Name", HCRetailSetup."Gen. Journal Template");
         GenJournalLine.SetRange("Journal Batch Name", HCRetailSetup."Gen. Journal Batch");
-        if GenJournalLine.FindLast then
+        if GenJournalLine.FindLast() then
             exit(GenJournalLine."Line No.");
         exit(0);
     end;
@@ -1671,14 +1639,13 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
             exit(0);
         ItemJournalLine.SetRange("Journal Template Name", HCRetailSetup."Item Journal Template");
         ItemJournalLine.SetRange("Journal Batch Name", HCRetailSetup."Item Journal Batch");
-        if ItemJournalLine.FindLast then
+        if ItemJournalLine.FindLast() then
             exit(ItemJournalLine."Line No.");
         exit(0);
     end;
 
     local procedure GetPaymentPostingSetup(BCPaymentTypePOS: Record "NPR HC Payment Type POS"; BCRegisterCode: Code[10]): Code[20]
     var
-        BCRegister: Record "NPR HC Register";
         BCPaymentTypePostingSetup: Record "NPR HC Paym.Type Post.Setup";
     begin
         case BCPaymentTypePOS."Account Type" of
@@ -1721,10 +1688,10 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         if HCRetailSetup."Gen. Journal Batch" <> '' then begin
             GenJournalLine."Applies-to Doc. Type" := FinKldLinie."Applies-to Doc. Type";
             GenJournalLine.Validate("Applies-to Doc. No.", SalesHeader."Last Posting No.");
-            GenJournalLine.Insert;
+            GenJournalLine.Insert();
         end else begin
             FinKldLinie.Validate("Applies-to Doc. No.", SalesHeader."Last Posting No.");
-            FinKldLinie.Modify;
+            FinKldLinie.Modify();
         end;
     end;
 }

@@ -20,14 +20,14 @@ codeunit 6014421 "NPR Retail Item Jnl. Mgt."
         ItemJnlTemplate: Record "Item Journal Template";
     begin
         ItemJnlTemplate.SetRange("Page ID", PageID);
-        exit(ItemJnlTemplate.FindFirst);
+        exit(ItemJnlTemplate.FindFirst());
     end;
 
     procedure CreateTemplate(PageID: Integer; PageTemplate: Option; RecurringJnl: Boolean)
     var
         ItemJnlTemplate: Record "Item Journal Template";
     begin
-        ItemJnlTemplate.Init;
+        ItemJnlTemplate.Init();
         ItemJnlTemplate.Recurring := RecurringJnl;
         ItemJnlTemplate.Validate(Type, PageTemplate);
         ItemJnlTemplate.Validate("Page ID", PageID);
@@ -38,7 +38,7 @@ codeunit 6014421 "NPR Retail Item Jnl. Mgt."
             ItemJnlTemplate.Name := CopyStr(StrSubstNo(NamePrefix, '', ItemJnlTemplate.Type), 1, MaxStrLen(ItemJnlTemplate.Name));
             ItemJnlTemplate.Description := StrSubstNo(JournalDescription, LowerCase(Format(ItemJnlTemplate.Type)));
         end;
-        ItemJnlTemplate.Insert;
+        ItemJnlTemplate.Insert();
     end;
 
     procedure GetItem(ItemNo: Code[20]; var ItemDescription: Text[100])
@@ -50,7 +50,7 @@ codeunit 6014421 "NPR Retail Item Jnl. Mgt."
             ItemDescription := '';
             if ItemNo <> '' then begin
                 ItemReference.SetRange("Reference No.", ItemNo);
-                if ItemReference.FindFirst then
+                if ItemReference.FindFirst() then
                     ItemNo := ItemReference."Item No.";
                 if Item.Get(ItemNo) then
                     ItemDescription := Item.Description;

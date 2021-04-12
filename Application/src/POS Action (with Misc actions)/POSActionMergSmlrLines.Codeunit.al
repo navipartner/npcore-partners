@@ -25,17 +25,16 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescriptionCaption,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('', 'respond();');
-                RegisterWorkflow(false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescriptionCaption,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('', 'respond();');
+            Sender.RegisterWorkflow(false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -45,7 +44,7 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -71,54 +70,52 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
         SaleLinePOS: Record "NPR POS Sale Line";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
     begin
-        with SaleLinePOS do begin
-            SetCurrentKey("No.");
-            SetRange("Register No.", SalePOS."Register No.");
-            SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SetRange(Date, SalePOS.Date);
-            SetRange("Sale Type", SalePOS."Sale type");
-            SetRange(Type, Type::Item);
-            SetFilter("Discount Type", '<>%1', "Discount Type"::Manual);
-            if not FindSet then
-                Error(NoLinesErr);
+        SaleLinePOS.SetCurrentKey("No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, SalePOS.Date);
+        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
+        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetFilter("Discount Type", '<>%1', SaleLinePOS."Discount Type"::Manual);
+        if not SaleLinePOS.FindSet() then
+            Error(NoLinesErr);
 
-            repeat
-                SetRange("No.", "No.");
-                //-NPR5.52 [360269]
-                SetRange("Unit Price", "Unit Price");
-                //+NPR5.52 [360269]
+        repeat
+            SaleLinePOS.SetRange("No.", SaleLinePOS."No.");
+            //-NPR5.52 [360269]
+            SaleLinePOS.SetRange("Unit Price", SaleLinePOS."Unit Price");
+            //+NPR5.52 [360269]
 
-                if Count > 1 then begin
-                    TempSaleLinePOS := SaleLinePOS;
-                    TempSaleLinePOS.Insert;
+            if SaleLinePOS.Count() > 1 then begin
+                TempSaleLinePOS := SaleLinePOS;
+                TempSaleLinePOS.Insert();
 
-                    Delete(true);
+                SaleLinePOS.Delete(true);
 
-                    while Next > 0 do begin
-                        TempSaleLinePOS.Quantity += Quantity;
-                        Delete(true);
-                    end;
-
-                    TempSaleLinePOS.Modify;
+                while SaleLinePOS.Next() > 0 do begin
+                    TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
+                    SaleLinePOS.Delete(true);
                 end;
 
-                SetRange("No.");
-                //-NPR5.52 [360269]
-                SetRange("Unit Price");
-            //+NPR5.52 [360269]
-            until Next = 0;
+                TempSaleLinePOS.Modify();
+            end;
 
-            if not TempSaleLinePOS.FindSet then
-                exit;
+            SaleLinePOS.SetRange("No.");
+            //-NPR5.52 [360269]
+            SaleLinePOS.SetRange("Unit Price");
+        //+NPR5.52 [360269]
+        until SaleLinePOS.Next() = 0;
 
-            repeat
-                SaleLinePOS := TempSaleLinePOS;
-                Insert;
+        if not TempSaleLinePOS.FindSet() then
+            exit;
 
-                UpdateAmounts(SaleLinePOS);
-                Modify;
-            until TempSaleLinePOS.Next = 0;
-        end;
+        repeat
+            SaleLinePOS := TempSaleLinePOS;
+            SaleLinePOS.Insert();
+
+            SaleLinePOS.UpdateAmounts(SaleLinePOS);
+            SaleLinePOS.Modify();
+        until TempSaleLinePOS.Next() = 0;
     end;
 }
 

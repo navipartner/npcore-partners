@@ -329,7 +329,6 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
     procedure RefreshWaiterPadContent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterpadCode: Code[20]);
     var
         Seating: Record "NPR NPRE Seating";
-        SeatingLocation: Record "NPR NPRE Seating Location";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";

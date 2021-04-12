@@ -1,4 +1,4 @@
-codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
+﻿codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
 {
 
     trigger OnRun()
@@ -12,9 +12,6 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
     procedure IssueOneCoupon(CouponTypeCode: Code[20]; MembershipEntryNo: Integer; DocumentNo: Code[20]; PostingDate: Date; PointsToRedeem: Integer; ValueToRedeem: Decimal) CouponNo: Code[20]
     var
         CouponType: Record "NPR NpDc Coupon Type";
-        NpDcIssueCouponsQty: Report "NPR NpDc Request Coupon Qty.";
-        IssueCouponsQty: Integer;
-        i: Integer;
     begin
 
         CouponType.Get(CouponTypeCode);
@@ -28,9 +25,6 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
     procedure IssueOneCouponAndPrint(CouponTypeCode: Code[20]; MembershipEntryNo: Integer; DocumentNo: Code[20]; PostingDate: Date; PointsToRedeem: Integer; ValueToRedeem: Decimal) CouponNo: Code[20]
     var
         CouponType: Record "NPR NpDc Coupon Type";
-        NpDcIssueCouponsQty: Report "NPR NpDc Request Coupon Qty.";
-        IssueCouponsQty: Integer;
-        i: Integer;
     begin
         CouponType.Get(CouponTypeCode);
         CouponType.TestField("Reference No. Pattern");
@@ -40,7 +34,7 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
 
     end;
 
-    local procedure IssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; MembershipEntryNo: Integer; DocumentNo: Code[20]; PostingDate: Date; PointsToRedeem: Integer; ValueToRedeem: Decimal; WithPrint: Boolean) CouponNo: Code[20]
+    local procedure IssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; MembershipEntryNo: Integer; DocumentNo: Code[20]; PostingDate: Date; PointsToRedeem: Integer; ValueToRedeem: Decimal; WithPrint: Boolean): Code[20]
     var
         Coupon: Record "NPR NpDc Coupon";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
@@ -50,7 +44,7 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
 
         Membership.Get(MembershipEntryNo);
 
-        Coupon.Init;
+        Coupon.Init();
         Coupon.Validate("Coupon Type", CouponType.Code);
         Coupon."No." := '';
         Coupon.Insert(true);
@@ -88,7 +82,7 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
         if CouponModule.Get(CouponModule.Type::"Issue Coupon", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Issue Coupon";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := Text000;

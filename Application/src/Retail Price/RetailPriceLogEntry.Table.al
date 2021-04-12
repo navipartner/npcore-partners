@@ -50,7 +50,7 @@ table 6014476 "NPR Retail Price Log Entry"
         }
         field(27; "Table Caption"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Table No.")));
             Caption = 'Table Caption';
             Editable = false;
@@ -64,7 +64,7 @@ table 6014476 "NPR Retail Price Log Entry"
         }
         field(35; "Field Caption"; Text[80])
         {
-            CalcFormula = Lookup (Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
                                                               "No." = FIELD("Field No.")));
             Caption = 'Field Caption';
             Editable = false;

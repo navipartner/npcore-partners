@@ -89,8 +89,6 @@ table 6060044 "NPR Item Worksh. Variety Value"
     }
 
     trigger OnDelete()
-    var
-        VRTCheck: Codeunit "NPR Variety Check";
     begin
     end;
 

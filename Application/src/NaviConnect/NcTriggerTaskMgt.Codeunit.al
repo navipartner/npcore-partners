@@ -4,7 +4,6 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
 
     trigger OnRun()
     var
-        NcTriggerSetup: Record "NPR Nc Trigger Setup";
         NcTask: Record "NPR Nc Task";
         NcTrigger: Record "NPR Nc Trigger";
         TriggerDisabledErr: Label 'Trigger %1 is disabled or missing.', Comment = '%1=Trigger Code';
@@ -59,9 +58,6 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
     end;
 
     var
-        TextWrongTable: Label 'Codeunit %1 can only be used in combination with table %2.';
-        TextRecordNotFound: Label 'Record %1 not found in table %2.';
-        TextNotHandled: Label 'Trigger %1 is unhandled. Please create a subscription codeunit or set the Subscriber Codeunit ID.';
         NoOutputErr: Label 'Output is missing';
         WrongIterationErr: Label 'Technical error: the expected iteration is %1, but the subscriber returned %2.', Comment = '%1=Expected Iteration;%2=Current Iteration';
 
@@ -82,7 +78,6 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
 
     local procedure GetNcTriggerCode(NcTask: Record "NPR Nc Task"; var NcTriggerCode: Code[20]): Boolean
     var
-        RecRef: RecordRef;
         NcTrigger: Record "NPR Nc Trigger";
     begin
         if NcTask."Table No." <> DATABASE::"NPR Nc Trigger" then
@@ -159,10 +154,6 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
     procedure ManualTransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var Filename: Text; var Subject: Text; var Body: Text): Boolean
     var
         TaskOutput: Record "NPR Nc Task Output" temporary;
-        JObject: JsonObject;
-        OutStr: OutStream;
-        InStr: InStream;
-        Args: Text;
         IsAssertError: Boolean;
     begin
         WriteArgsForManualTransferOutputNcTriggerTaskMgt(TaskOutput, NcTriggerCode, NcTask, Output, FileName, Subject, Body);
@@ -178,8 +169,6 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
     var
         DataTypeManagement: Codeunit "Data Type Management";
         JObject: JsonObject;
-        JToken: JsonToken;
-        JValue: JsonValue;
         RecRef: RecordRef;
         RecId: RecordId;
         InStr: InStream;

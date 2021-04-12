@@ -18,32 +18,32 @@ page 6184505 "NPR EFT Shopper Recognition"
         {
             repeater(Group)
             {
-                field("Integration Type"; "Integration Type")
+                field("Integration Type"; Rec."Integration Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Integration Type field';
                 }
-                field("Shopper Reference"; "Shopper Reference")
+                field("Shopper Reference"; Rec."Shopper Reference")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shopper Reference field';
                 }
-                field("Contract ID"; "Contract ID")
+                field("Contract ID"; Rec."Contract ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contract ID field';
                 }
-                field("Contract Type"; "Contract Type")
+                field("Contract Type"; Rec."Contract Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contract Type field';
                 }
-                field("Entity Type"; "Entity Type")
+                field("Entity Type"; Rec."Entity Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entity Type field';
                 }
-                field("Entity Key"; "Entity Key")
+                field("Entity Key"; Rec."Entity Key")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entity Key field';

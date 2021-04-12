@@ -33,35 +33,35 @@ page 6184498 "NPR EFT Transaction Requests"
             repeater(Group)
             {
                 InstructionalText = 'Blue: Recovered & in sync\Yellow: Recovered but on different receipt number\Red: Unfinished, no external result or unposted amount';
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Integration Type"; "Integration Type")
+                field("Integration Type"; Rec."Integration Type")
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
                     ToolTip = 'Specifies the value of the Integration Type field';
                 }
-                field("Processing Type"; "Processing Type")
+                field("Processing Type"; Rec."Processing Type")
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
                     ToolTip = 'Specifies the value of the Processing Type field';
                 }
-                field("Auxiliary Operation Desc."; "Auxiliary Operation Desc.")
+                field("Auxiliary Operation Desc."; Rec."Auxiliary Operation Desc.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auxiliary Operation Desc. field';
                 }
-                field(Started; Started)
+                field(Started; Rec.Started)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Started field';
                 }
-                field(Finished; Finished)
+                field(Finished; Rec.Finished)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Finished field';
@@ -73,240 +73,240 @@ page 6184498 "NPR EFT Transaction Requests"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Duration field';
                 }
-                field("Result Amount"; "Result Amount")
+                field("Result Amount"; Rec."Result Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Result Amount field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field(Successful; Successful)
+                field(Successful; Rec.Successful)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Successful field';
                 }
-                field("External Result Known"; "External Result Known")
+                field("External Result Known"; Rec."External Result Known")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Result Known field';
                 }
-                field("Result Processed"; "Result Processed")
+                field("Result Processed"; Rec."Result Processed")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Result Processed field';
                 }
-                field("Force Closed"; "Force Closed")
+                field("Force Closed"; Rec."Force Closed")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Force Closed field';
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reversed field';
                 }
-                field(Recovered; Recovered)
+                field(Recovered; Rec.Recovered)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Recovered field';
                 }
-                field("Result Display Text"; "Result Display Text")
+                field("Result Display Text"; Rec."Result Display Text")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Result Display Text field';
                 }
-                field("NST Error"; "NST Error")
+                field("NST Error"; Rec."NST Error")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NST Error field';
                 }
-                field("Client Error"; "Client Error")
+                field("Client Error"; Rec."Client Error")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Error field';
                 }
-                field("Result Code"; "Result Code")
+                field("Result Code"; Rec."Result Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Result Code field';
                 }
-                field("Result Description"; "Result Description")
+                field("Result Description"; Rec."Result Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Result Description field';
                 }
-                field("Card Type"; "Card Type")
+                field("Card Type"; Rec."Card Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Type field';
                 }
-                field("Card Name"; "Card Name")
+                field("Card Name"; Rec."Card Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Name field';
                 }
-                field("Card Number"; "Card Number")
+                field("Card Number"; Rec."Card Number")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Number field';
                 }
-                field("Card Expiry Date"; "Card Expiry Date")
+                field("Card Expiry Date"; Rec."Card Expiry Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Expiry Date field';
                 }
-                field("Reference Number Input"; "Reference Number Input")
+                field("Reference Number Input"; Rec."Reference Number Input")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference Number Input field';
                 }
-                field("Reference Number Output"; "Reference Number Output")
+                field("Reference Number Output"; Rec."Reference Number Output")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference Number Output field';
                 }
-                field("Authorisation Number"; "Authorisation Number")
+                field("Authorisation Number"; Rec."Authorisation Number")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Authorisation Number field';
                 }
-                field("Auxiliary Operation ID"; "Auxiliary Operation ID")
+                field("Auxiliary Operation ID"; Rec."Auxiliary Operation ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auxiliary Operation ID field';
                 }
-                field(Mode; Mode)
+                field(Mode; Rec.Mode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mode field';
                 }
-                field("Offline mode"; "Offline mode")
+                field("Offline mode"; Rec."Offline mode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Offline mode field';
                 }
-                field("Integration Version Code"; "Integration Version Code")
+                field("Integration Version Code"; Rec."Integration Version Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Integration Version Code field';
                 }
-                field("Client Assembly Version"; "Client Assembly Version")
+                field("Client Assembly Version"; Rec."Client Assembly Version")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Assembly Version field';
                 }
-                field("Pepper Terminal Code"; "Pepper Terminal Code")
+                field("Pepper Terminal Code"; Rec."Pepper Terminal Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Pepper Terminal Code field';
                 }
-                field("Pepper Transaction Type Code"; "Pepper Transaction Type Code")
+                field("Pepper Transaction Type Code"; Rec."Pepper Transaction Type Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Pepper Transaction Type Code field';
                 }
-                field("Pepper Trans. Subtype Code"; "Pepper Trans. Subtype Code")
+                field("Pepper Trans. Subtype Code"; Rec."Pepper Trans. Subtype Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Pepper Transaction Subtype Code field';
                 }
-                field("External Transaction ID"; "External Transaction ID")
+                field("External Transaction ID"; Rec."External Transaction ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Transaction ID field';
                 }
-                field("External Customer ID"; "External Customer ID")
+                field("External Customer ID"; Rec."External Customer ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Customer ID field';
                 }
-                field("Hardware ID"; "Hardware ID")
+                field("Hardware ID"; Rec."Hardware ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Hardware ID field';
                 }
-                field("Transaction Date"; "Transaction Date")
+                field("Transaction Date"; Rec."Transaction Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Date field';
                 }
-                field("Transaction Time"; "Transaction Time")
+                field("Transaction Time"; Rec."Transaction Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Time field';
                 }
-                field("Authentication Method"; "Authentication Method")
+                field("Authentication Method"; Rec."Authentication Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Authentication Method field';
                 }
-                field("Bookkeeping Period"; "Bookkeeping Period")
+                field("Bookkeeping Period"; Rec."Bookkeeping Period")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bookkeeping Period field';
                 }
-                field("Amount Input"; "Amount Input")
+                field("Amount Input"; Rec."Amount Input")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Input field';
                 }
-                field("Amount Output"; "Amount Output")
+                field("Amount Output"; Rec."Amount Output")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Output field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Cashback Amount"; "Cashback Amount")
+                field("Cashback Amount"; Rec."Cashback Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cashback Amount field';
                 }
-                field("Fee Amount"; "Fee Amount")
+                field("Fee Amount"; Rec."Fee Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Fee Amount field';
                 }
-                field("Financial Impact"; "Financial Impact")
+                field("Financial Impact"; Rec."Financial Impact")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Financial Impact field';
                 }
-                field("Processed Entry No."; "Processed Entry No.")
+                field("Processed Entry No."; Rec."Processed Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processed Entry No. field';
                 }
-                field("Reversed by Entry No."; "Reversed by Entry No.")
+                field("Reversed by Entry No."; Rec."Reversed by Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reversed by Entry No. field';
                 }
-                field("Recovered by Entry No."; "Recovered by Entry No.")
+                field("Recovered by Entry No."; Rec."Recovered by Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Recovered by Entry No. field';
                 }
-                field("Initiated from Entry No."; "Initiated from Entry No.")
+                field("Initiated from Entry No."; Rec."Initiated from Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Initiated from Entry No. field';
@@ -315,30 +315,30 @@ page 6184498 "NPR EFT Transaction Requests"
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Receipt 1.HasValue field';
+                    ToolTip = 'Specifies the value of the Receipt 1.HasValue() field';
                 }
                 field("Receipt 2"; "Receipt 2".HasValue)
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Receipt 2.HasValue field';
+                    ToolTip = 'Specifies the value of the Receipt 2.HasValue() field';
                 }
-                field("No. of Reprints"; "No. of Reprints")
+                field("No. of Reprints"; Rec."No. of Reprints")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. of Reprints field';
                 }
-                field(Token; Token)
+                field(Token; Rec.Token)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Token field';
                 }
-                field("Number of Attempts"; "Number of Attempts")
+                field("Number of Attempts"; Rec."Number of Attempts")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Number of Attempts field';
                 }
-                field("FF Moved to POS Entry"; "FF Moved to POS Entry")
+                field("FF Moved to POS Entry"; Rec."FF Moved to POS Entry")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Moved to POS Entry field';
@@ -451,8 +451,8 @@ page 6184498 "NPR EFT Transaction Requests"
     begin
         //-NPR5.28 [259563]
         TransDuration := 0;
-        if (Finished <> 0DT) and (Started <> 0DT) then
-            TransDuration := Finished - Started;
+        if (Rec.Finished <> 0DT) and (Rec.Started <> 0DT) then
+            TransDuration := Rec.Finished - Rec.Started;
         //+NPR5.28 [259563]
 
         //-NPR5.53 [377533]
@@ -462,14 +462,13 @@ page 6184498 "NPR EFT Transaction Requests"
 
     trigger OnOpenPage()
     begin
-            UsesPOSEntry := true;
-        SetAutoCalcFields("FF Moved to POS Entry");
+        UsesPOSEntry := true;
+        Rec.SetAutoCalcFields("FF Moved to POS Entry");
 
-        if FindFirst then;
+        if Rec.FindFirst() then;
     end;
 
     var
-        DisplayText: Text;
         TransDuration: Duration;
         Style: Text;
         UsesPOSEntry: Boolean;
@@ -488,25 +487,24 @@ page 6184498 "NPR EFT Transaction Requests"
     local procedure SetStyle(): Text
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
     begin
-        if (Recovered) then begin
-            if EFTTransactionRequest.Get("Recovered by Entry No.") then
+        if (Rec.Recovered) then begin
+            if EFTTransactionRequest.Get(Rec."Recovered by Entry No.") then
                 if EFTTransactionRequest."Result Amount" <> 0 then
-                    if EFTTransactionRequest."Sales Ticket No." <> "Sales Ticket No." then
+                    if EFTTransactionRequest."Sales Ticket No." <> Rec."Sales Ticket No." then
                         exit('Ambiguous'); //Recovered with an amount but too late to post automatically in same sale.
 
             exit('StrongAccent'); //Recovered and in sync.
         end;
 
         //-NPR5.54 [377533]
-        if ((Finished = 0DT) or (not "External Result Known"))
-          and ("Amount Input" <> 0) then begin
+        if ((Rec.Finished = 0DT) or (not Rec."External Result Known"))
+          and (Rec."Amount Input" <> 0) then begin
             exit('Unfavorable'); //Lost trx result
         end;
 
-        if "Result Amount" <> 0 then begin
-            if ((not "FF Moved to POS Entry") and UsesPOSEntry) then
+        if Rec."Result Amount" <> 0 then begin
+            if ((not Rec."FF Moved to POS Entry") and UsesPOSEntry) then
                 exit('Unfavorable'); //EFT handled it correctly but sale never ended.
         end;
 

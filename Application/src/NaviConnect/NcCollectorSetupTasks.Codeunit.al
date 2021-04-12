@@ -12,12 +12,11 @@ codeunit 6151531 "NPR Nc Collector Setup Tasks"
 
     procedure SetupTaskQueue()
     var
-        SyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         TaskCode: Code[10];
         TaskDescription: Text[50];
         TaskLineNo: Integer;
     begin
-        NaviConnectSetup.Get;
+        NaviConnectSetup.Get();
         if not NaviConnectSetup."Task Queue Enabled" then
             exit;
         TaskCode := NaviConnectSetup."Task Worker Group";
@@ -39,10 +38,10 @@ codeunit 6151531 "NPR Nc Collector Setup Tasks"
                 if not TaskQueue.Get(CompanyName, TemplateName, BatchName, LineNo) then begin
                     TaskQueue.SetupNewLine(TaskLine, false);
                     TaskQueue."Next Run time" := CurrentDateTime;
-                    TaskQueue.Insert;
+                    TaskQueue.Insert();
                 end else begin
                     TaskQueue."Next Run time" := CurrentDateTime;
-                    TaskQueue.Modify;
+                    TaskQueue.Modify();
                 end;
             TaskLine.Validate(Enabled, Enabled);
             TaskLine.Modify(true);
@@ -54,7 +53,7 @@ codeunit 6151531 "NPR Nc Collector Setup Tasks"
         TaskLine: Record "NPR Task Line";
     begin
         if not TaskLine.Get(TemplateName, BatchName, LineNo) then begin
-            TaskLine.Init;
+            TaskLine.Init();
             TaskLine."Journal Template Name" := TemplateName;
             TaskLine."Journal Batch Name" := BatchName;
             TaskLine."Line No." := LineNo;

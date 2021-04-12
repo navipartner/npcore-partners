@@ -27,7 +27,7 @@ table 6150729 "NPR POS Sales Workflow"
         }
         field(15; "Publisher Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Publisher Codeunit ID")));
             Caption = 'Publisher Codeunit Name';
             Editable = false;
@@ -40,7 +40,7 @@ table 6150729 "NPR POS Sales Workflow"
         }
         field(100; "Workflow Steps"; Integer)
         {
-            CalcFormula = Count ("NPR POS Sales Workflow Step" WHERE("Set Code" = CONST(''),
+            CalcFormula = Count("NPR POS Sales Workflow Step" WHERE("Set Code" = CONST(''),
                                                                  "Workflow Code" = FIELD(Code)));
             Caption = 'Workflow Steps';
             Description = 'NPR5.45';
@@ -65,8 +65,8 @@ table 6150729 "NPR POS Sales Workflow"
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
     begin
         POSSalesWorkflowStep.SetRange("Workflow Code", Code);
-        if POSSalesWorkflowStep.FindFirst then
-            POSSalesWorkflowStep.DeleteAll;
+        if POSSalesWorkflowStep.FindFirst() then
+            POSSalesWorkflowStep.DeleteAll();
     end;
 
     procedure DiscoverPOSSalesWorkflow(NewCode: Code[20]; NewDescription: Text[100]; NewPublisherCodeunitId: Integer; NewPublisherFunction: Text[80])
@@ -74,7 +74,7 @@ table 6150729 "NPR POS Sales Workflow"
         PrevRec: Text;
     begin
         if not Get(NewCode) then begin
-            Init;
+            Init();
             Code := NewCode;
             Insert(true);
         end;
@@ -102,7 +102,7 @@ table 6150729 "NPR POS Sales Workflow"
         EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
         EventSubscription.SetRange("Publisher Object ID", "Publisher Codeunit ID");
         EventSubscription.SetRange("Published Function", "Publisher Function");
-        if not EventSubscription.FindSet then
+        if not EventSubscription.FindSet() then
             exit(0);
 
         repeat
@@ -112,7 +112,7 @@ table 6150729 "NPR POS Sales Workflow"
                 //+NPR5.45 [321266]
                 StepsInitiated += 1;
 
-                POSSalesWorkflowStep.Init;
+                POSSalesWorkflowStep.Init();
                 //-NPR5.45 [321266]
                 POSSalesWorkflowStep."Set Code" := '';
                 //+NPR5.45 [321266]
@@ -122,7 +122,7 @@ table 6150729 "NPR POS Sales Workflow"
                 POSSalesWorkflowStep.Enabled := true;
                 POSSalesWorkflowStep.Insert(true);
             end;
-        until EventSubscription.Next = 0;
+        until EventSubscription.Next() = 0;
 
         exit(StepsInitiated);
     end;

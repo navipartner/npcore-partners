@@ -53,60 +53,60 @@ page 6014423 "NPR Report Selection: Retail"
             repeater(Control6150626)
             {
                 ShowCaption = false;
-                field(Sequence; Sequence)
+                field(Sequence; Rec.Sequence)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sequence field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report ID field';
                 }
-                field("Report Name"; "Report Name")
+                field("Report Name"; Rec."Report Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report Name field';
                 }
-                field("XML Port ID"; "XML Port ID")
+                field("XML Port ID"; Rec."XML Port ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the XML Port ID field';
                 }
-                field("XML Port Name"; "XML Port Name")
+                field("XML Port Name"; Rec."XML Port Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the XML Port Name field';
                 }
-                field("Codeunit ID"; "Codeunit ID")
+                field("Codeunit ID"; Rec."Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
-                field("Codeunit Name"; "Codeunit Name")
+                field("Codeunit Name"; Rec."Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit Name field';
                 }
-                field("Print Template"; "Print Template")
+                field("Print Template"; Rec."Print Template")
                 {
                     ApplicationArea = All;
                     Width = 20;
                     ToolTip = 'Specifies the value of the Print Template field';
                 }
-                field("Filter Object ID"; "Filter Object ID")
+                field("Filter Object ID"; Rec."Filter Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Object ID field';
                 }
-                field("Record Filter"; "Record Filter")
+                field("Record Filter"; Rec."Record Filter")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -121,22 +121,22 @@ page 6014423 "NPR Report Selection: Retail"
                     begin
                         //-NPR4.18
                         AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
-                        AllObjWithCaption.SetRange("Object ID", "Filter Object ID");
-                        if AllObjWithCaption.FindFirst then
+                        AllObjWithCaption.SetRange("Object ID", Rec."Filter Object ID");
+                        if AllObjWithCaption.FindFirst() then
                             TableCaption := AllObjWithCaption."Object Caption";
 
 
                         TableFilter.FilterGroup(2);
-                        TableFilter.SetRange("Table Number", "Filter Object ID");
+                        TableFilter.SetRange("Table Number", Rec."Filter Object ID");
                         TableFilter.FilterGroup(0);
                         TableFilterPage.SetTableView(TableFilter);
-                        TableFilterPage.SetSourceTable(Format("Record Filter"), "Filter Object ID", TableCaption);
-                        if ACTION::OK = TableFilterPage.RunModal then
-                            Evaluate("Record Filter", TableFilterPage.CreateTextTableFilter(false));
+                        TableFilterPage.SetSourceTable(Format(Rec."Record Filter"), Rec."Filter Object ID", TableCaption);
+                        if ACTION::OK = TableFilterPage.RunModal() then
+                            Evaluate(Rec."Record Filter", TableFilterPage.CreateTextTableFilter(false));
                         //+NPR4.18
                     end;
                 }
-                field(Optional; Optional)
+                field(Optional; Rec.Optional)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Optional field';
@@ -171,7 +171,7 @@ page 6014423 "NPR Report Selection: Retail"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        NewRecord;
+        Rec.NewRecord;
     end;
 
     trigger OnOpenPage()
@@ -184,14 +184,14 @@ page 6014423 "NPR Report Selection: Retail"
 
     local procedure SetUsageFilter()
     begin
-        FilterGroup(2);
-        SetRange("Report Type", ReportType2);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Report Type", ReportType2);
+        Rec.FilterGroup(0);
     end;
 
     local procedure ReportUsage2OnAfterValidate()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 }
 

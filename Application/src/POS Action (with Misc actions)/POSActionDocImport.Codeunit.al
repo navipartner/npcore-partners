@@ -1,12 +1,7 @@
-codeunit 6150861 "NPR POS Action: Doc. Import"
+﻿codeunit 6150861 "NPR POS Action: Doc. Import"
 {
     var
         ActionDescription: Label 'Import an open standard NAV sales document to current POS sale and delete the document.';
-        Setup: Codeunit "NPR POS Setup";
-        REMOVE: Codeunit "NPR Sales Doc. Exp. Mgt.";
-        ERRDOCTYPE: Label 'Wrong Document Type. Document Type is set to %1. It must be one of %2, %3, %4 or %5';
-        ERRPARSED: Label 'SalesDocumentToPOS and SalesDocumentAmountToPOS can not be used simultaneously. This is an error in parameter setting on menu button for action %1.';
-        ERRPARSEDCOMB: Label 'Import of amount is only supported for Document Type Order. This is an error in parameter setting on menu button for action %1.';
         CaptionDocType: Label 'Document Type';
         CaptionLocationFrom: Label 'Location From';
         CaptionLocationFilter: Label 'Location Filter';
@@ -33,23 +28,21 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('ImportDocument', 'respond();');
-                RegisterWorkflow(false);
-                RegisterDataSourceBinding(ThisDataSource);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('ImportDocument', 'respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataSourceBinding(ThisDataSource);
 
-                RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
-                RegisterBooleanParameter('SelectCustomer', true);
-                RegisterTextParameter('SalesDocViewString', '');
-                Sender.RegisterOptionParameter('LocationFrom', 'POS Store,Location Filter Parameter', 'POS Store');
-                Sender.RegisterTextParameter('LocationFilter', '');
-            end;
+            Sender.RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
+            Sender.RegisterTextParameter('SalesDocViewString', '');
+            Sender.RegisterOptionParameter('LocationFrom', 'POS Store,Location Filter Parameter', 'POS Store');
+            Sender.RegisterTextParameter('LocationFilter', '');
         end;
     end;
 
@@ -65,7 +58,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         LocationFilter: Text;
         SalesDocViewString: Text;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -117,7 +110,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
             exit(false);
 
         SetPosSaleCustomer(POSSale, Customer."No.");
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -161,13 +154,12 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         if LocationFilter <> '' then
             SalesHeader.SetFilter("Location Code", LocationFilter);
         SalesHeader.FilterGroup(0);
-        if SalesHeader.FindFirst then;
+        if SalesHeader.FindFirst() then;
         exit(RetailSalesDocImpMgt.SelectSalesDocument('', SalesHeader));
     end;
 
     local procedure ImportFromDocument(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var SalesHeader: Record "Sales Header")
     var
-        JSON: Codeunit "NPR POS JSON Management";
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
@@ -182,7 +174,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -202,7 +194,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -222,7 +214,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -241,7 +233,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         LocationList: Page "Location List";
         FilterPageBuilder: FilterPageBuilder;
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -252,7 +244,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
                         SalesHeader.SetView(POSParameterValue.Value);
                         FilterPageBuilder.SetView(SalesHeader.TableCaption, SalesHeader.GetView(false));
                     end;
-                    if FilterPageBuilder.RunModal then
+                    if FilterPageBuilder.RunModal() then
                         POSParameterValue.Value := FilterPageBuilder.GetView(SalesHeader.TableCaption, false);
                 end;
 
@@ -262,7 +254,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
                     Location.SetRange("Use As In-Transit", false);
                     LocationList.SetTableView(Location);
                     LocationList.LookupMode(true);
-                    if LocationList.RunModal = ACTION::LookupOK then
+                    if LocationList.RunModal() = ACTION::LookupOK then
                         POSParameterValue.Value := LocationList.GetSelectionFilter();
                 end;
         end;
@@ -273,7 +265,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     var
         SalesHeader: Record "Sales Header";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -336,7 +328,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         if LocationFilter <> '' then
             SalesHeader.SetFilter("Location Code", LocationFilter);
 
-        DataRow.Add('OpenOrdersQty', SalesHeader.Count);
+        DataRow.Add('OpenOrdersQty', SalesHeader.Count());
     end;
 
     local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"): Text
@@ -351,9 +343,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         POSSale.GetCurrentSale(SalePOS);
         POSMenuButton.SetRange("Action Code", ActionCode());
         POSMenuButton.SetRange("Register No.", SalePOS."Register No.");
-        if not POSMenuButton.FindFirst then
+        if not POSMenuButton.FindFirst() then
             POSMenuButton.SetRange("Register No.");
-        if not POSMenuButton.FindFirst then
+        if not POSMenuButton.FindFirst() then
             exit('');
 
         if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'LocationFrom') then
@@ -363,13 +355,13 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
             'POS Store':
                 begin
                     if not POSStore.Get(SalePOS."POS Store Code") then
-                        POSStore.Init;
+                        POSStore.Init();
                     exit(POSStore."Location Code");
                 end;
             'Location Filter Parameter':
                 begin
                     if not POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'LocationFilter') then
-                        POSParameterValue.Init;
+                        POSParameterValue.Init();
                     exit(POSParameterValue.Value);
                 end;
         end;

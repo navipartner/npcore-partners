@@ -1,8 +1,8 @@
 report 6060100 "NPR Data Cleanup Fill"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Data Cleanup Fill.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Data Cleanup Fill.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Data Cleanup Customer';
     dataset
@@ -68,7 +68,7 @@ report 6060100 "NPR Data Cleanup Fill"
             trigger OnAfterGetRecord()
             begin
                 if TableOption <> TableOption::Customer then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 Func_OnAfterGetRec();
             end;
@@ -198,7 +198,7 @@ report 6060100 "NPR Data Cleanup Fill"
             trigger OnAfterGetRecord()
             begin
                 if TableOption <> TableOption::GLAccount then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 Func_OnAfterGetRec();
             end;
@@ -331,7 +331,7 @@ report 6060100 "NPR Data Cleanup Fill"
             case TableOption of
                 TableOption::Customer:
                     begin
-                        LedgerCnt := "Cust. Ledger Entry".Count;
+                        LedgerCnt := "Cust. Ledger Entry".Count();
                         if FillTable and Deleteable then begin
                             if LedgerCnt = 0 then
                                 if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Delete, DataCleanupCVI.Type::Customer, Customer."No.") then
@@ -340,7 +340,7 @@ report 6060100 "NPR Data Cleanup Fill"
                     end;
                 TableOption::Vendor:
                     begin
-                        LedgerCnt := "Vendor Ledger Entry".Count;
+                        LedgerCnt := "Vendor Ledger Entry".Count();
                         if FillTable and Deleteable then begin
                             if LedgerCnt = 0 then
                                 if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Delete, DataCleanupCVI.Type::Vendor, Vendor."No.") then
@@ -349,7 +349,7 @@ report 6060100 "NPR Data Cleanup Fill"
                     end;
                 TableOption::Item:
                     begin
-                        LedgerCnt := "Item Ledger Entry".Count;
+                        LedgerCnt := "Item Ledger Entry".Count();
                         if FillTable and Deleteable then begin
                             if LedgerCnt = 0 then
                                 if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Delete, DataCleanupCVI.Type::Item, Item."No.") then
@@ -358,7 +358,7 @@ report 6060100 "NPR Data Cleanup Fill"
                     end;
                 TableOption::GLAccount:
                     begin
-                        LedgerCnt := "G/L Entry".Count;
+                        LedgerCnt := "G/L Entry".Count();
                         if FillTable and Deleteable then begin
                             if LedgerCnt = 0 then
                                 if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Delete, DataCleanupCVI.Type::"G/L Account", "G/L Account"."No.") then

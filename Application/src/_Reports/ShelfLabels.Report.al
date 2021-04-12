@@ -14,8 +14,6 @@ report 6014428 "NPR Shelf Labels"
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()
-            var
-                j: Integer;
             begin
                 if Retail_Journal_Line."Quantity to Print" > 0 then begin
                     for k := 1 to Retail_Journal_Line."Quantity to Print" do begin
@@ -168,7 +166,6 @@ report 6014428 "NPR Shelf Labels"
 
     trigger OnPreReport()
     begin
-        i := 1;
         CurrencyChar := 8364;
         BarcodeLib.SetBarcodeType('CODE128');
         BarcodeLib.SetShowText(false);
@@ -182,14 +179,12 @@ report 6014428 "NPR Shelf Labels"
         BlobBuffer: Record "NPR BLOB buffer" temporary;
         ItemCategory: Record "Item Category";
         BarcodeLib: Codeunit "NPR Barcode Image Library";
-        StringLibrary: Codeunit "NPR String Library";
         TempBlobCol1: Codeunit "Temp Blob";
         CurrencyChar: Char;
         TMPBeforeUnitPrice: Decimal;
         TMPRetailLineDiscount: Decimal;
         TMPUnitPrice: Decimal;
         TMPUnitPriceCard: Decimal;
-        i: Integer;
         k: Integer;
         LineNo: Integer;
         TextCaptionClass: Label '6014555,27,%1,2';
@@ -225,7 +220,6 @@ report 6014428 "NPR Shelf Labels"
 
     local procedure CalculatePrice(ItemNo: Code[20]; var TMPBeforeUnitPrice: Decimal; var TMPUnitPrice: Decimal)
     var
-        PeriodDisc: Record "NPR Period Discount";
         PeriodDiscountLine: Record "NPR Period Discount Line";
         StatusOptionString: Option Await,Active,Balanced;
     begin
@@ -249,9 +243,7 @@ report 6014428 "NPR Shelf Labels"
 
     local procedure CalculatePriceCampaign(ItemNo: Code[20]; var TMPBeforeUnitPrice: Decimal; var TMPUnitPrice: Decimal)
     var
-        PeriodDisc: Record "NPR Period Discount";
         PeriodDiscountLine: Record "NPR Period Discount Line";
-        StatusOptionString: Option Await,Active,Balanced;
     begin
         PeriodDiscountLine.Reset();
         PeriodDiscountLine.SetRange(Code, TMPRetail_Journal_Line_Col1."Discount Code");

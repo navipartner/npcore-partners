@@ -1,4 +1,4 @@
-table 6014451 "NPR Retail Journal Header"
+﻿table 6014451 "NPR Retail Journal Header"
 {
     Caption = 'Label Printing Header';
     LookupPageID = "NPR Retail Journal List";
@@ -87,20 +87,20 @@ table 6014451 "NPR Retail Journal Header"
 
     trigger OnDelete()
     begin
-        RetailJournalLine.Reset;
+        RetailJournalLine.Reset();
         RetailJournalLine.SetRange("No.", "No.");
         RetailJournalLine.DeleteAll(true);
     end;
 
     trigger OnInsert()
     var
-    GuidVar: Code[40];
+        GuidVar: Code[40];
     begin
         if Rec."No." = '' then begin
-            Evaluate(GuidVar,CreateGuid());
-            Rec."No." := GuidVar;        
-        end;    
-        "Date of creation" := Today;
+            Evaluate(GuidVar, CreateGuid());
+            Rec."No." := GuidVar;
+        end;
+        "Date of creation" := Today();
     end;
 
     trigger OnModify()
@@ -114,17 +114,17 @@ table 6014451 "NPR Retail Journal Header"
 
     procedure SetPrintQuantityByInventory()
     begin
-        RetailJournalLine.Reset;
+        RetailJournalLine.Reset();
         RetailJournalLine.SetRange("No.", "No.");
-        if RetailJournalLine.FindSet then
+        if RetailJournalLine.FindSet() then
             repeat
                 RetailJournalLine.SetFilter("Location Filter", "Location Code");
                 RetailJournalLine.CalcFields(Inventory);
                 if RetailJournalLine.Inventory >= 0 then begin
                     RetailJournalLine."Quantity to Print" := RetailJournalLine.Inventory;
-                    RetailJournalLine.Modify;
+                    RetailJournalLine.Modify();
                 end;
-            until RetailJournalLine.Next = 0;
+            until RetailJournalLine.Next() = 0;
     end;
 
     local procedure UpdateJournalLines()
@@ -136,13 +136,13 @@ table 6014451 "NPR Retail Journal Header"
           ("Location Code" <> xRec."Location Code") then begin
 
             RetailJournalLine1.SetRange("No.", "No.");
-            if RetailJournalLine1.FindSet then
+            if RetailJournalLine1.FindSet() then
                 repeat
                     RetailJournalLine1."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
                     RetailJournalLine1."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
                     RetailJournalLine1."Location Code" := "Location Code";
-                    RetailJournalLine1.Modify;
-                until RetailJournalLine1.Next = 0;
+                    RetailJournalLine1.Modify();
+                until RetailJournalLine1.Next() = 0;
         end;
     end;
 }

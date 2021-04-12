@@ -1,8 +1,8 @@
 report 6014495 "NPR Whse. - Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/NP Whse. - Shipment.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/NP Whse. - Shipment.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Whse. - Shipment';
     dataset

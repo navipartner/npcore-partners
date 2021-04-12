@@ -188,14 +188,6 @@ page 6060112 "NPR TM Ticket Select Schedule"
     end;
 
     local procedure AddToTempRecord(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10])
-    var
-        MaxCapacity: Integer;
-        CapacityControl: Option;
-        Admission: Record "NPR TM Admission";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        Item: Record Item;
-        TicketType: Record "NPR TM Ticket Type";
-        AdmitOnSales: Boolean;
     begin
 
         if (TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, Remaining)) then begin

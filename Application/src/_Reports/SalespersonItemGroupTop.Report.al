@@ -1,4 +1,4 @@
-report 6014405 "NPR Salesperson/Item Group Top"
+﻿report 6014405 "NPR Salesperson/Item Group Top"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/SalespersonItem Group Top.rdlc';
@@ -198,7 +198,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                         if not ItemAmount.Find('-') then
                             CurrReport.Break();
                     end else
-                        if ItemAmount.Next = 0 then
+                        if ItemAmount.Next() = 0 then
                             CurrReport.Break();
 
                     "Item Category".Get(ItemAmount."Item No.");
@@ -231,7 +231,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                 SalesLCY := 0;
                 CogsLCY := 0;
 
-                AuxValueEntry.Reset;
+                AuxValueEntry.Reset();
                 AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
                 AuxValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
                 CopyFilter("Date Filter", AuxValueEntry."Posting Date");
@@ -297,7 +297,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                             sortSalesPerson := false;
                             sortSalesPersonVisible := false;
                             ShowQtyVisible := false;
-                            RequestOptionsPage.Update;
+                            RequestOptionsPage.Update();
                         end;
                     }
                     field(sortSalesPerson; sortSalesPerson)
@@ -361,9 +361,6 @@ report 6014405 "NPR Salesperson/Item Group Top"
         CogsLCY: Decimal;
         CogsLCYGP: Decimal;
         CogsLCYGPINT: Decimal;
-        ConsumptionAmt: Decimal;
-        ConsumptionAmtGP: Decimal;
-        ConsumptionAmtINT: Decimal;
         db: Decimal;
         dg: Decimal;
         ProfitPctSalesperson: Decimal;

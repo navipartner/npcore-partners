@@ -1,8 +1,8 @@
 report 6060042 "NPR Import Excel Item Worksh."
 {
     Caption = 'Import Excel Item Worksheet';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -15,7 +15,7 @@ report 6060042 "NPR Import Excel Item Worksh."
                 ItemWorksheetLine.Reset();
                 ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Worksheet"."Item Template Name");
                 ItemWorksheetLine.SetRange("Worksheet Name", "Item Worksheet".Name);
-                if ItemWorksheetLine.FindLast then
+                if ItemWorksheetLine.FindLast() then
                     LastItemWorksheetLine := ItemWorksheetLine
                 else
                     LastItemWorksheetLine.Init();
@@ -137,7 +137,6 @@ report 6060042 "NPR Import Excel Item Worksh."
         ExcelBuf2: Record "Excel Buffer";
         RecField: Record "Field";
         GLSetup: Record "General Ledger Setup";
-        NPRAttributeID: Record "NPR Attribute ID";
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         LastItemWorksheetLine: Record "NPR Item Worksheet Line";
@@ -145,7 +144,6 @@ report 6060042 "NPR Import Excel Item Worksh."
         ItemWorksheetMgt: Codeunit "NPR Item Worksheet Mgt.";
         ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
         CombineVarieties: Boolean;
-        NPRAttrVisibleArray: array[40] of Boolean;
         SetItemsToSkip: Boolean;
         Window: Dialog;
         FirstLine: Integer;
@@ -162,38 +160,27 @@ report 6060042 "NPR Import Excel Item Worksh."
         ActionIfVariantUnknown: Option Skip,Create;
         ActionIfVarietyUnknown: Option Skip,Create;
         ExcludeColumnsFilter: Text;
-        FilterText: Text;
-        NPRAttrTextArray: array[40] of Text;
         ServerFileName: Text;
         SheetName: Text[250];
 
     local procedure AnalyzeData()
     var
         BudgetBuf: Record "Budget Buffer";
-        TempBudgetBuf: Record "Budget Buffer" temporary;
         TempExcelBuf: Record "Excel Buffer" temporary;
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
-        VarietyValue: Record "NPR Variety Value";
         MappingFound: Boolean;
-        DimCode3: Code[20];
         TempDate: Date;
-        TestDateTime: DateTime;
         TempDec: Decimal;
         AttributeNo: Integer;
-        CountDim: Integer;
-        DimRowNo: Integer;
         FieldLength: Integer;
-        HeaderRowNo: Integer;
-        I: Integer;
         MappedColumnNo: Integer;
-        OldRowNo: Integer;
     begin
         Window.Open(
          AnalyzingDataLbl +
           '@1@@@@@@@@@@@@@@@@@@@@@@@@@\');
         Window.Update(1, 0);
         ExcelBuf.SetRange("Row No.", 2, 999999);
-        TotalRecNo := ExcelBuf.Count;
+        TotalRecNo := ExcelBuf.Count();
         RecNo := 0;
         BudgetBuf.DeleteAll();
 
@@ -420,8 +407,8 @@ report 6060042 "NPR Import Excel Item Worksh."
         ItemWorksheetVariantLine.SetRange("Worksheet Name", "Item Worksheet".Name);
         ItemWorksheetVariantLine.SetRange("Worksheet Line No.", FirstLine, LineNo);
         ItemWorksheetVariantLine.SetRange(Action, ItemWorksheetVariantLine.Action::Skip);
-        if (ItemWorksheetVariantLine.Count > 0) then begin
-            Message(SkipWarningMsg, ItemWorksheetVariantLine.Count);
+        if (ItemWorksheetVariantLine.Count() > 0) then begin
+            Message(SkipWarningMsg, ItemWorksheetVariantLine.Count());
         end;
     end;
 
@@ -446,7 +433,6 @@ report 6060042 "NPR Import Excel Item Worksh."
     local procedure ProcessColumnMapping(ParTableNo: Integer; ParFieldNoFilter: Text; ParColumnsFilter: Text): Boolean
     var
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
-        Df: DateFormula;
         RecRef: RecordRef;
         FldRef: FieldRef;
         I: Integer;
@@ -527,17 +513,14 @@ report 6060042 "NPR Import Excel Item Worksh."
 
     local procedure GetAttributeMapping(ParTableNo: Integer): Boolean
     var
-        Attribute: Record "NPR Attribute";
         AttributeID: Record "NPR Attribute ID";
-        AttributeKey: Record "NPR Attribute Key";
-        AttributeValueSet: Record "NPR Attribute Value Set";
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
     begin
         ItemWorksheetExcelColumn.Reset();
         ItemWorksheetExcelColumn.SetRange("Worksheet Template Name", "Item Worksheet"."Item Template Name");
         ItemWorksheetExcelColumn.SetRange("Worksheet Name", "Item Worksheet".Name);
         ItemWorksheetExcelColumn.SetRange("Process as", ItemWorksheetExcelColumn."Process as"::"Item Attribute");
-        if ItemWorksheetExcelColumn.FindSet then
+        if ItemWorksheetExcelColumn.FindSet() then
             repeat
                 if ExcelBuf2.Get(ExcelBuf."Row No.", ItemWorksheetExcelColumn."Excel Column No.") then begin
                     AttributeID.Reset();

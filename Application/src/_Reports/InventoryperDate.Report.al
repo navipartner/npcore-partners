@@ -131,7 +131,7 @@ report 6014417 "NPR Inventory per Date"
                 ItemLedgerEntry.SetFilter("Item No.", '=%1', "No.");
                 ItemLedgerEntry.SetFilter("Entry Type", '=%1', ItemLedgerEntry."Entry Type"::Purchase);
                 LatestPurchaseDate := 0D;
-                if ItemLedgerEntry.FindFirst then
+                if ItemLedgerEntry.FindFirst() then
                     LatestPurchaseDate := ItemLedgerEntry."Posting Date";
 
                 // If prices include VAT

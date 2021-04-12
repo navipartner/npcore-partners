@@ -43,7 +43,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
         Ticket: Record "NPR TM Ticket";
         AccessEntry: Record "NPR TM Ticket Access Entry";
-        DetailedAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         InvalidEntry: Boolean;
         ScheduleEntryNo: Integer;
@@ -87,7 +86,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
             TicketAdmissionBOM.SetFilter(Default, '=%1', true);
             if (TicketAdmissionBOM.IsEmpty()) then begin
                 TicketAdmissionBOM.SetFilter(Default, '=%1', false);
-                if (TicketAdmissionBOM.Count > 1) then begin
+                if (TicketAdmissionBOM.Count() > 1) then begin
                     OfflineTicketValidation."Process Status" := OfflineTicketValidation."Process Status"::INVALID;
                     OfflineTicketValidation."Process Response Text" := ADM_CODE_AMBIGIOUS;
                     OfflineTicketValidation.Modify();
@@ -134,7 +133,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
                 SetReservationTime(ExternalEntryNo, true, OfflineTicketValidation);
 
             if (OfflineTicketValidation."Event Date" = 0D) then begin
-                OfflineTicketValidation."Event Date" := Today;
+                OfflineTicketValidation."Event Date" := Today();
                 OfflineTicketValidation."Process Response Text" := StrSubstNo('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
             end;
 
@@ -189,7 +188,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         repeat
             // All tickets in the ticket request must relate to same schedules entry time request.
             // This will not account for different admission codes.
-            EventStartDate := Today;
+            EventStartDate := Today();
             EventStartTime := Time;
 
             if (TicketReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
@@ -207,7 +206,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
             if (Ticket.FindSet()) then begin
 
                 repeat
-                    TicketOfflineValidation.Init;
+                    TicketOfflineValidation.Init();
                     TicketOfflineValidation."Entry No." := 0;
 
                     TicketOfflineValidation."Ticket Reference Type" := TicketOfflineValidation."Ticket Reference Type"::EXTERNALTICKETNO;
@@ -224,7 +223,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
                     TicketOfflineValidation."Event Type" := TicketOfflineValidation."Event Type"::ADMIT;
 
                     //-TM1.40 [348952]
-                    // TicketOfflineValidation."Event Date" := TODAY;
+                    // TicketOfflineValidation."Event Date" := Today();
                     // TicketOfflineValidation."Event Time" := TIME;
                     TicketOfflineValidation."Event Date" := EventStartDate;
                     TicketOfflineValidation."Event Time" := EventStartTime;
@@ -326,7 +325,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ArrivalDate);
         AdmissionScheduleEntry.SetFilter("Admission End Time", '>=%1', ArrivalTime);
 
-        //IF (AdmissionScheduleEntry.FINDLAST ()) THEN ;
+        //IF (AdmissionScheduleEntry.FindLast() ()) THEN ;
         if (AdmissionScheduleEntry.FindFirst()) then;
 
         exit(AdmissionScheduleEntry."Entry No.");

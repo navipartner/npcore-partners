@@ -13,7 +13,6 @@ codeunit 6150741 "NPR POS Method - Kiosk"
     var
         JSON: Codeunit "NPR POS JSON Management";
         Request: Codeunit "NPR Front-End: Generic";
-        Pin: Text;
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
         SSProfile: Record "NPR SS Profile";

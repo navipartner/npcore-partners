@@ -4,12 +4,11 @@ codeunit 6151575 "NPR AF Event Subscriber"
     local procedure T6151574OnAfterInsert(var Rec: Record "NPR AF Notification Hub"; RunTrigger: Boolean)
     var
         AFArgumentsNotificationHub: Record "NPR AF Arguments - Notific.Hub" temporary;
-        AFAPINotificationHub: Codeunit "NPR AF API - Notification Hub";
     begin
         if not RunTrigger then
             exit;
 
-        AFArgumentsNotificationHub.Init;
+        AFArgumentsNotificationHub.Init();
         AFArgumentsNotificationHub."Action Type" := Rec."Action Type";
         AFArgumentsNotificationHub."Action Value" := Rec."Action Value";
         AFArgumentsNotificationHub."Created By" := Rec."Created By";

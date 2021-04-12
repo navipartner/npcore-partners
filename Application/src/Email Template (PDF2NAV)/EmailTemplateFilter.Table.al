@@ -51,7 +51,7 @@ table 6014464 "NPR E-mail Template Filter"
         }
         field(10; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Description = 'PN1.07,PN1.08';

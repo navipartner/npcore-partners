@@ -271,8 +271,6 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipSetupTiers: Record "NPR MM Membership Setup";
-        Member: Record "NPR MM Member";
-        MembershipRole: Record "NPR MM Membership Role";
         LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members.";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
         MemberCommunity: Record "NPR MM Member Community";

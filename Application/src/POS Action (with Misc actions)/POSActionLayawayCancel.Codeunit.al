@@ -32,21 +32,19 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('CancelLayaway', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('CancelLayaway', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterTextParameter('CancellationFeeItemNo', '');
-                RegisterTextParameter('OrderPaymentTermsFilter', '');
-                RegisterBooleanParameter('SkipFeeInvoice', false); //Can be used to cancel a layaway that was created by accident, where no fees should be invoiced.
-                RegisterBooleanParameter('SelectCustomer', true);
-            end;
+            Sender.RegisterTextParameter('CancellationFeeItemNo', '');
+            Sender.RegisterTextParameter('OrderPaymentTermsFilter', '');
+            Sender.RegisterBooleanParameter('SkipFeeInvoice', false); //Can be used to cancel a layaway that was created by accident, where no fees should be invoiced.
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
         end;
     end;
 
@@ -54,7 +52,6 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalesHeader: Record "Sales Header";
-        ServiceSalesInvoice: Record "Sales Invoice Header";
         JSON: Codeunit "NPR POS JSON Management";
         POSLayawayMgt: Codeunit "NPR POS Layaway Mgt.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -62,13 +59,10 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         CreditMemoNo: Text;
         OrderPaymentTermsFilter: Text;
         ServiceInvoiceNo: Text;
-        CancellationAmount: Decimal;
-        RefundAmount: Decimal;
-        ServiceFeeAmount: Decimal;
         SelectCustomer: Boolean;
         SkipFeeInvoice: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -93,7 +87,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         ServiceInvoiceNo := PostServiceInvoice(SalesHeader, SkipFeeInvoice); //COMMITS
         DeleteOrder(SalesHeader);
         InsertCommentLine(POSSaleLine, StrSubstNo(LAYAWAY_CANCEL_LINE, SalesHeader."Document Type", SalesHeader."No."));
-        Commit;
+        Commit();
 
         ClearLastError();
         Clear(POSLayawayMgt);
@@ -127,7 +121,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -161,7 +155,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         CustLedgerEntry.SetAutoCalcFields(Amount, "Remaining Amount");
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
         CustLedgerEntry.SetRange("Document No.", SalesHeader."Last Prepmt. Cr. Memo No.");
-        CustLedgerEntry.FindFirst;
+        CustLedgerEntry.FindFirst();
         //If customer application method is set to apply to oldest, we error here before anything is committed as we won't be able to apply the credit memo correctly and trust the final refund amount.
         CustLedgerEntry.TestField(Open);
         CustLedgerEntry.TestField(Amount, CustLedgerEntry."Remaining Amount");
@@ -213,7 +207,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
                     SalesLine.Validate("Qty. to Ship", 0);
                 end;
                 SalesLine.Modify(true);
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
 
         SalesHeader.Invoice := true;
         SalesHeader.Ship := true;
@@ -250,11 +244,11 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         POSEntry: Record "NPR POS Entry";
     begin
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        if SalesInvoiceHeader.FindSet then
+        if SalesInvoiceHeader.FindSet() then
             repeat
                 POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
                 POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvoiceHeader."No.");
-                if POSEntrySalesDocLink.FindSet then
+                if POSEntrySalesDocLink.FindSet() then
                     repeat
                         POSEntry.Get(POSEntrySalesDocLink."POS Entry No.");
                         if POSEntry."Post Entry Status" <> POSEntry."Post Entry Status"::Posted then begin
@@ -266,14 +260,14 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
                               SalesHeader."Document Type"::Invoice,
                               SalesInvoiceHeader."No.");
                         end;
-                    until POSEntrySalesDocLink.Next = 0;
-            until SalesInvoiceHeader.Next = 0;
+                    until POSEntrySalesDocLink.Next() = 0;
+            until SalesInvoiceHeader.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -291,7 +285,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -309,7 +303,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -322,7 +316,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         Item: Record Item;
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -346,7 +340,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         Item: Record Item;
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

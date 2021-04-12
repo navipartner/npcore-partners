@@ -6,7 +6,6 @@ codeunit 6150748 "NPR POS Run Workflow"
     procedure RunWorkflow(ActionCode: Code[20]; var Parameters: Record "NPR POS Parameter Value" temporary; Context: JsonObject) Result: Guid
     var
         Request: Codeunit "NPR Front-End: Generic";
-        JContent: JsonObject;
         JParameters: JsonObject;
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin

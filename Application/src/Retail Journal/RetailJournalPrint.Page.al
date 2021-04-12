@@ -16,27 +16,27 @@ page 6014473 "NPR Retail Journal Print"
         {
             repeater(Group)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 2 field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Quantity to Print"; "Quantity to Print")
+                field("Quantity to Print"; Rec."Quantity to Print")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity to Print field';
@@ -55,24 +55,24 @@ page 6014473 "NPR Retail Journal Print"
                         LabelLibrary.ToggleLine(RecRef);
                     end;
                 }
-                field(Barcode; Barcode)
+                field(Barcode; Rec.Barcode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Barcode field';
                 }
-                field("Discount Price Incl. Vat"; "Discount Price Incl. Vat")
+                field("Discount Price Incl. Vat"; Rec."Discount Price Incl. Vat")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit Price';
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Vendor No. field';
                 }
-                field("Vendor Item No."; "Vendor Item No.")
+                field("Vendor Item No."; Rec."Vendor Item No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -190,7 +190,6 @@ page 6014473 "NPR Retail Journal Print"
 
     procedure InvertSelection()
     var
-        RetailJournalLine: Record "NPR Retail Journal Line";
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);

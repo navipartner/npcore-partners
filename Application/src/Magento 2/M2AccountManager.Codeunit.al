@@ -1,4 +1,4 @@
-codeunit 6151151 "NPR M2 Account Manager"
+﻿codeunit 6151151 "NPR M2 Account Manager"
 {
     trigger OnRun()
     begin
@@ -92,14 +92,6 @@ codeunit 6151151 "NPR M2 Account Manager"
     end;
 
     procedure GetAccount(ContactNo: Code[20]; var TmpContact: Record Contact temporary; var TmpSellToCustomer: Record Customer temporary; var TmpBillToCustomer: Record Customer temporary; var TmpShipToAddress: Record "Ship-to Address" temporary): Boolean
-    var
-        Contact: Record Contact;
-        SellToCustomer: Record Customer;
-        BillToCustomer: Record Customer;
-        ShipToAddress: Record "Ship-to Address";
-        MarketingSetup: Record "Marketing Setup";
-        ContactBusinessRelation: Record "Contact Business Relation";
-        MagentoContactShiptoAdrs: Record "NPR Magento Contact ShipToAdr.";
     begin
         ClearLastError();
         exit(GetAccountWorker(ContactNo, TmpContact, TmpSellToCustomer, TmpBillToCustomer, TmpShipToAddress));
@@ -129,8 +121,6 @@ codeunit 6151151 "NPR M2 Account Manager"
     end;
 
     procedure AddAccount(var TmpAccount: Record Contact temporary; var TmpAccountResponse: Record Contact temporary; var ReasonText: Text): Boolean
-    var
-        TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
     begin
         if (TryAddAccount(TmpAccount, TmpAccountResponse)) then begin
             ReasonText := '';
@@ -315,10 +305,6 @@ codeunit 6151151 "NPR M2 Account Manager"
     #region Try Function - by invoking self
 
     local procedure TryAuthenticatePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary; AllowBlankPassword: Boolean) bOk: Boolean
-    var
-        Contact: Record Contact;
-        OneTimePassword: Record "NPR M2 One Time Password";
-        OTPAuthentication: Boolean;
     begin
         Clear(AccountManager);
         AccountManager.SetFunction(AccountFunctions::AUTHENTICATE);
@@ -332,8 +318,6 @@ codeunit 6151151 "NPR M2 Account Manager"
     end;
 
     local procedure TryChangePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary) bOk: Boolean
-    var
-        Contact: Record Contact;
     begin
         Clear(AccountManager);
         AccountManager.SetFunction(AccountFunctions::CHANGE_PASSWORD);
@@ -350,13 +334,9 @@ codeunit 6151151 "NPR M2 Account Manager"
     local procedure TryResetPassword(Email: Text)
     var
         Contact: Record Contact;
-        AccountComTemplate: Record "NPR M2 Account Com. Template";
         Customer: Record Customer;
         ContactBusinessRelation: Record "Contact Business Relation";
         MarketingSetup: Record "Marketing Setup";
-        Token: Text[40];
-        TemplateEntryNo: Integer;
-        ReasonText: Text;
         Body: JsonToken;
         Result: JsonToken;
         msg: Text;
@@ -394,17 +374,7 @@ codeunit 6151151 "NPR M2 Account Manager"
 
     local procedure TryCreateAccount(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccount: Record Contact temporary) bOk: Boolean
     var
-        Contact: Record Contact;
-        Customer: Record Customer;
-        MarketingSetup: Record "Marketing Setup";
-        ContactBusinessRelation: Record "Contact Business Relation";
         TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
-        ConfigTemplateHeader: Record "Config. Template Header";
-        MagentoSetup: Record "NPR Magento Setup";
-        CustContUpdate: Codeunit "CustCont-Update";
-        ConfigTemplateMgt: Codeunit "Config. Template Management";
-        RecRef: RecordRef;
-        ReasonText: Text;
     begin
         Clear(AccountManager);
         AccountManager.SetFunction(AccountFunctions::CREATE_ACCOUNT);
@@ -627,13 +597,11 @@ codeunit 6151151 "NPR M2 Account Manager"
         Customer: Record Customer;
         MarketingSetup: Record "Marketing Setup";
         ContactBusinessRelation: Record "Contact Business Relation";
-        TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
         ConfigTemplateHeader: Record "Config. Template Header";
         MagentoSetup: Record "NPR Magento Setup";
         CustContUpdate: Codeunit "CustCont-Update";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
-        ReasonText: Text;
     begin
 
         if (not MarketingSetup.Get()) then
@@ -746,7 +714,6 @@ codeunit 6151151 "NPR M2 Account Manager"
         Customer: Record Customer;
         MarketingSetup: Record "Marketing Setup";
         ContactBusinessRelation: Record "Contact Business Relation";
-        CustContUpdate: Codeunit "CustCont-Update";
         UpdateCustomerData: Boolean;
     begin
 
@@ -960,12 +927,6 @@ codeunit 6151151 "NPR M2 Account Manager"
     local procedure DeleteAccountWorker(var TmpContact: Record Contact)
     var
         Account: Record Contact;
-        Contact: Record Contact;
-        ContactXrec: Record Contact;
-        Customer: Record Customer;
-        MarketingSetup: Record "Marketing Setup";
-        ContactBusinessRelation: Record "Contact Business Relation";
-        CustContUpdate: Codeunit "CustCont-Update";
     begin
 
         TmpContact.FindFirst();
@@ -1052,14 +1013,12 @@ codeunit 6151151 "NPR M2 Account Manager"
 
     local procedure UpdateShiptoAddressWorker(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var TmpShiptoAddressResponse: Record "Ship-to Address" temporary)
     var
-        AccountSetup: Record "NPR M2 Account Setup";
         Account: Record Contact;
         Contact: Record Contact;
         ShiptoAddress: Record "Ship-to Address";
         MarketingSetup: Record "Marketing Setup";
         ContactBusinessRelation: Record "Contact Business Relation";
         MagentoContactShiptoAdrs: Record "NPR Magento Contact ShipToAdr.";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
         AllowAction: Boolean;
     begin
 
@@ -1111,14 +1070,12 @@ codeunit 6151151 "NPR M2 Account Manager"
 
     local procedure DeleteShiptoAddressWorker(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary)
     var
-        AccountSetup: Record "NPR M2 Account Setup";
         Account: Record Contact;
         Contact: Record Contact;
         ShiptoAddress: Record "Ship-to Address";
         MarketingSetup: Record "Marketing Setup";
         ContactBusinessRelation: Record "Contact Business Relation";
         MagentoContactShiptoAdrs: Record "NPR Magento Contact ShipToAdr.";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
         AllowAction: Boolean;
     begin
 
@@ -1242,8 +1199,6 @@ codeunit 6151151 "NPR M2 Account Manager"
     local procedure BlockMember(Contact: Record Contact): Boolean
     var
         MembershipRole: Record "NPR MM Membership Role";
-        Member: Record "NPR MM Member";
-        Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin
         MembershipRole.SetFilter("Contact No.", '=%1', Contact."No.");
@@ -1262,7 +1217,7 @@ codeunit 6151151 "NPR M2 Account Manager"
 
     local procedure TransferToInfoCapture(var TmpContact: Record Contact temporary; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
-        MemberInfoCapture.Init;
+        MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         MemberInfoCapture."Company Name" := CopyStr(TmpContact."Company Name", 1, MaxStrLen(MemberInfoCapture."Company Name"));
@@ -1293,7 +1248,7 @@ codeunit 6151151 "NPR M2 Account Manager"
         if (AccountSetup."OTP Validity (Hours)" = 0) then
             AccountSetup."OTP Validity (Hours)" := 24;
 
-        OneTimePassword."Password (Hash)" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        OneTimePassword."Password (Hash)" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         OneTimePassword."E-Mail" := LowerCase(EMail);
         OneTimePassword."Created At" := CurrentDateTime;
         OneTimePassword."Valid Until" := CurrentDateTime + AccountSetup."OTP Validity (Hours)" * 3600 * 1000;
@@ -1309,7 +1264,6 @@ codeunit 6151151 "NPR M2 Account Manager"
     var
         AccountComTemplate: Record "NPR M2 Account Com. Template";
         AccountSetup: Record "NPR M2 Account Setup";
-        AuthenticationLog: Record "NPR Authentication Log";
         Base65: Codeunit "Base64 Convert";
     begin
         if (not AccountSetup.Get()) then;
@@ -1335,7 +1289,7 @@ codeunit 6151151 "NPR M2 Account Manager"
     var
         AuthenticationLog: Record "NPR Authentication Log";
     begin
-        AuthenticationLog.Init;
+        AuthenticationLog.Init();
 
         AuthenticationLog.Type := Type;
         AuthenticationLog."Created At" := CurrentDateTime;
@@ -1405,7 +1359,7 @@ codeunit 6151151 "NPR M2 Account Manager"
 
         Body.WriteTo(ContentTxt);
 
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         MagentoSetup.TestField("Api Url");
         if MagentoSetup."Api Url"[StrLen(MagentoSetup."Api Url")] <> '/' then
             MagentoSetup."Api Url" += '/';

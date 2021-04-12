@@ -140,8 +140,6 @@ page 6151132 "NPR TM Seating Wizard"
         RowLabel: Text[30];
         SeatLabel: Text[30];
         SeatingIncrement: Option CONSECUTIVE,ODD,EVEN;
-        ShowStructure: Boolean;
-        ShowNumbering: Boolean;
         RowNumberLayout: Option ACROSS,DOWN;
         SelectedSectionCount: Integer;
         SpanSections: Boolean;
@@ -157,13 +155,11 @@ page 6151132 "NPR TM Seating Wizard"
     procedure ShowStructureTab(Show: Boolean)
     begin
 
-        ShowStructure := Show;
     end;
 
     procedure ShowNumberingTab(Show: Boolean)
     begin
 
-        ShowNumbering := Show;
     end;
 
     procedure ShowSplitOption()

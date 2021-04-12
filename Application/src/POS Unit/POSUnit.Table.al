@@ -276,7 +276,7 @@ table 6150615 "NPR POS Unit"
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR POS Unit", "No.", FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 
     procedure GetProfile(var POSPricingProfile: Record "NPR POS Pricing Profile"): Boolean
@@ -370,7 +370,7 @@ table 6150615 "NPR POS Unit"
     begin
         if UserSetup.Get(UserId) then begin
             UserSetup."NPR Backoffice Register No." := UnitNo;
-            UserSetup.Modify;
+            UserSetup.Modify();
         end else begin
             UserSetup.Init();
             UserSetup."User ID" := UserId;

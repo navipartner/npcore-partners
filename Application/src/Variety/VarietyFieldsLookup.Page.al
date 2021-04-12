@@ -18,42 +18,42 @@ page 6059979 "NPR Variety Fields Lookup"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Secondary Type"; "Secondary Type")
+                field("Secondary Type"; Rec."Secondary Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Secondary Type field';
                 }
-                field("Secondary Field No."; "Secondary Field No.")
+                field("Secondary Field No."; Rec."Secondary Field No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Secondary Field No. field';
                 }
-                field("Secondary Description"; "Secondary Description")
+                field("Secondary Description"; Rec."Secondary Description")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -70,7 +70,7 @@ page 6059979 "NPR Variety Fields Lookup"
     trigger OnOpenPage()
     begin
         //-NPR5.32 [274170]
-        UpdateToLatestVersion;
+        Rec.UpdateToLatestVersion;
         //+NPR5.32 [274170]
     end;
 }

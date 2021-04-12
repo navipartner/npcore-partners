@@ -3,7 +3,6 @@ codeunit 6014648 "NPR BTF Nc Import Type" implements "NPR Nc Import List IUpdate
     Permissions = TableData "Job Queue Entry" = rm;
 
     var
-        RegisterService: Codeunit "NPR BTF Register Service";
         ImportTypeDescriptionLbl: Label 'BTwentyFour integration. Run all enabled services';
         ServiceSetupNotFoundLbl: Label '%1 not found for %2: %3 or it''s not enabled. Check out by running an action "Show Setup Page"', Comment = '%1=ServiceSetup.TableCaption();%2=ImportType.TableCaption();%3=ImportType.Code';
         ServiceEndPointsNotFoundLbl: Label '%1 not found for %2: %3 or endpoints exist but they are not enabled. Try to navigate to service endpoints through the setup by running an action "Show Setup Page"', Comment = '%1=ServiceEndPoint.TableCaption();%2=ServiceSetup.TableCaption();%3=ServiceSetup.Code';

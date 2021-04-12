@@ -15,59 +15,59 @@ page 6151591 "NPR NpDc Coupon Types"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Discount Type"; "Discount Type")
+                field("Discount Type"; Rec."Discount Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Type field';
                 }
-                field("Discount %"; "Discount %")
+                field("Discount %"; Rec."Discount %")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     ToolTip = 'Specifies the value of the Discount % field';
                 }
-                field("Discount Amount"; "Discount Amount")
+                field("Discount Amount"; Rec."Discount Amount")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     ToolTip = 'Specifies the value of the Discount Amount field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Ending Date"; "Ending Date")
+                field("Ending Date"; Rec."Ending Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Date field';
                 }
-                field("Application Sequence No."; "Application Sequence No.")
+                field("Application Sequence No."; Rec."Application Sequence No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Application Sequence No. field';
                 }
-                field("Coupon Qty. (Open)"; "Coupon Qty. (Open)")
+                field("Coupon Qty. (Open)"; Rec."Coupon Qty. (Open)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Coupon Qty. (Open) field';
                 }
-                field("Arch. Coupon Qty."; "Arch. Coupon Qty.")
+                field("Arch. Coupon Qty."; Rec."Arch. Coupon Qty.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';

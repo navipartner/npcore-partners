@@ -17,34 +17,34 @@ page 6151492 "NPR Raptor Data Buffer Entries"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Date-Time Created"; "Date-Time Created")
+                field("Date-Time Created"; Rec."Date-Time Created")
                 {
                     ApplicationArea = All;
                     Visible = ShowCreatedDateTime;
                     ToolTip = 'Specifies the value of the Date-Time Created field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Item Description"; "Item Description")
+                field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Description field';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = All;
                     Visible = ShowPriority;
@@ -63,7 +63,7 @@ page 6151492 "NPR Raptor Data Buffer Entries"
                 Caption = 'Show Item Card';
                 Image = Item;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Item Card";
                 RunPageLink = "No." = FIELD("Item No.");

@@ -1,4 +1,4 @@
-table 6014561 "NPR RP Data Items"
+﻿table 6014561 "NPR RP Data Items"
 {
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
     // NPR5.34/MMV /20170724 CASE 284505 TESTFIELD on critical fields.
@@ -33,8 +33,6 @@ table 6014561 "NPR RP Data Items"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                AllObj: Record AllObj;
             begin
             end;
         }
@@ -57,7 +55,7 @@ table 6014561 "NPR RP Data Items"
                 AllObj.SetRange("Object Type", AllObj."Object Type");
                 AllObjects.SetTableView(AllObj);
                 AllObjects.LookupMode(true);
-                if AllObjects.RunModal = ACTION::LookupOK then begin
+                if AllObjects.RunModal() = ACTION::LookupOK then begin
                     AllObjects.GetRecord(AllObj);
                     "Data Source" := AllObj."Object Name";
                     "Table ID" := AllObj."Object ID";
@@ -72,9 +70,9 @@ table 6014561 "NPR RP Data Items"
                 AllObj: Record AllObj;
             begin
                 AllObj.SetFilter("Object Name", '@' + "Data Source");
-                if not AllObj.FindFirst then
+                if not AllObj.FindFirst() then
                     AllObj.SetFilter("Object Name", '@' + "Data Source" + '*');
-                AllObj.FindFirst;
+                AllObj.FindFirst();
 
                 "Data Source" := AllObj."Object Name";
                 "Table ID" := AllObj."Object ID";
@@ -139,13 +137,13 @@ table 6014561 "NPR RP Data Items"
             begin
                 Key.SetRange(TableNo, "Table ID");
                 Key.SetRange(Enabled, true);
-                if Key.FindSet then
+                if Key.FindSet() then
                     repeat
                         TempRetailList.Number += 1;
                         TempRetailList.Choice := Key.Key;
                         TempRetailList.Value := Format(Key."No.");
-                        TempRetailList.Insert;
-                    until Key.Next = 0;
+                        TempRetailList.Insert();
+                    until Key.Next() = 0;
 
                 if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then begin
                     Evaluate(IntegerBuffer, TempRetailList.Value);
@@ -161,7 +159,7 @@ table 6014561 "NPR RP Data Items"
                     Key.SetRange(TableNo, "Table ID");
                     Key.SetRange(Enabled, true);
                     Key.SetRange("No.", "Key ID");
-                    Key.FindFirst;
+                    Key.FindFirst();
                 end;
             end;
         }
@@ -191,27 +189,27 @@ table 6014561 "NPR RP Data Items"
                 Field.SetRange(Enabled, true);
                 Field.SetFilter(Type, '%1|%2|%3|%4', Field.Type::Decimal, Field.Type::Integer, Field.Type::BigInteger, Field.Type::Duration);
 
-                if Field.FindSet then
+                if Field.FindSet() then
                     repeat
                         TempRetailList.Number += 1;
                         TempRetailList.Choice := Field.FieldName;
                         TempRetailList.Value := Format(Field."No.");
-                        TempRetailList.Insert;
-                    until Field.Next = 0;
+                        TempRetailList.Insert();
+                    until Field.Next() = 0;
 
                 RetailListPage.LookupMode(true);
                 RetailListPage.SetMultipleChoiceMode(true);
                 RetailListPage.SetRec(TempRetailList);
-                if RetailListPage.RunModal = ACTION::LookupOK then begin
+                if RetailListPage.RunModal() = ACTION::LookupOK then begin
                     RetailListPage.GetRec(TempRetailList);
                     FieldString := '';
                     TempRetailList.SetRange(Chosen, true);
-                    if TempRetailList.FindSet then
+                    if TempRetailList.FindSet() then
                         repeat
                             if StrLen(FieldString) > 0 then
                                 FieldString += ',';
                             FieldString += TempRetailList.Value;
-                        until TempRetailList.Next = 0;
+                        until TempRetailList.Next() = 0;
 
                     "Total Fields" := FieldString;
                 end;
@@ -234,7 +232,7 @@ table 6014561 "NPR RP Data Items"
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Field ID" := Field."No.";
                 end;
@@ -299,17 +297,17 @@ table 6014561 "NPR RP Data Items"
         DataItem.SetRange(Code, Code);
         DataItem.SetRange("Parent Line No.", "Line No.");
         DataItem.SetRange("Parent Table ID", "Table ID");
-        DataItem.DeleteAll;
+        DataItem.DeleteAll();
 
         DataItemLinks.SetRange("Data Item Code", Code);
         DataItemLinks.SetRange("Parent Line No.", "Line No.");
         ;
-        DataItemLinks.DeleteAll;
+        DataItemLinks.DeleteAll();
 
-        DataItemLinks.Reset;
+        DataItemLinks.Reset();
         DataItemLinks.SetRange("Data Item Code", Code);
         DataItemLinks.SetRange("Child Line No.", "Line No.");
-        DataItemLinks.DeleteAll;
+        DataItemLinks.DeleteAll();
 
         DataItemConstraint.SetRange("Data Item Code", Code);
         DataItemConstraint.SetRange("Data Item Line No.", "Line No.");
@@ -317,9 +315,9 @@ table 6014561 "NPR RP Data Items"
             repeat
                 DataItemConstraintLinks.SetRange("Data Item Code", DataItemConstraint."Data Item Code");
                 DataItemConstraintLinks.SetRange("Constraint Line No.", DataItemConstraint."Line No.");
-                DataItemConstraintLinks.DeleteAll;
-            until DataItemConstraint.Next = 0;
-        DataItemConstraint.DeleteAll;
+                DataItemConstraintLinks.DeleteAll();
+            until DataItemConstraint.Next() = 0;
+        DataItemConstraint.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -355,7 +353,7 @@ table 6014561 "NPR RP Data Items"
         DataItem.SetRange(Code, Code);
         DataItem.SetFilter("Line No.", '<%1', "Line No.");
         DataItem.SetFilter(Level, '<%1', Level);
-        if DataItem.FindLast then begin
+        if DataItem.FindLast() then begin
             "Parent Line No." := DataItem."Line No.";
             "Parent Table ID" := DataItem."Table ID";
         end;
@@ -379,15 +377,15 @@ table 6014561 "NPR RP Data Items"
     begin
         DataItemLinks.SetRange("Data Item Code", Code);
         DataItemLinks.SetRange("Parent Line No.", "Line No.");
-        Prompt := not DataItemLinks.IsEmpty;
+        Prompt := not DataItemLinks.IsEmpty();
 
         DataItemLinks.SetRange("Parent Line No.");
         DataItemLinks.SetRange("Child Line No.", "Line No.");
-        Prompt := Prompt or not DataItemLinks.IsEmpty;
+        Prompt := Prompt or not DataItemLinks.IsEmpty();
 
         DataItemConstraint.SetRange("Data Item Code", Code);
         DataItemConstraint.SetRange("Data Item Line No.", "Line No.");
-        Prompt := Prompt or not DataItemConstraint.IsEmpty;
+        Prompt := Prompt or not DataItemConstraint.IsEmpty();
 
         if not Prompt then
             exit;
@@ -395,7 +393,7 @@ table 6014561 "NPR RP Data Items"
         if not Confirm(Error_DeleteLinks) then
             Error('');
 
-        DataItemLinks.Reset;
+        DataItemLinks.Reset();
         DataItemLinks.SetRange("Data Item Code", Code);
         DataItemLinks.SetRange("Parent Line No.", "Line No.");
         DataItemLinks.DeleteAll(true);

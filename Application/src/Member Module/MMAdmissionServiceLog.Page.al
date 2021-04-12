@@ -14,92 +14,92 @@ page 6060092 "NPR MM Admission Service Log"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action field';
                 }
-                field("Created Date"; "Created Date")
+                field("Created Date"; Rec."Created Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created Date field';
                 }
-                field(Token; Token)
+                field(Token; Rec.Token)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Token field';
                 }
-                field("Key"; Key)
+                field("Key"; Rec.Key)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Key field';
                 }
-                field("Scanner Station Id"; "Scanner Station Id")
+                field("Scanner Station Id"; Rec."Scanner Station Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
                 }
-                field("Request Barcode"; "Request Barcode")
+                field("Request Barcode"; Rec."Request Barcode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request Barcode field';
                 }
-                field("Request Scanner Station Id"; "Request Scanner Station Id")
+                field("Request Scanner Station Id"; Rec."Request Scanner Station Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request Scanner Station Id field';
                 }
-                field("Request No"; "Request No")
+                field("Request No"; Rec."Request No")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request No field';
                 }
-                field("Request Token"; "Request Token")
+                field("Request Token"; Rec."Request Token")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request Token field';
                 }
-                field("Response No"; "Response No")
+                field("Response No"; Rec."Response No")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response No field';
                 }
-                field("Response Token"; "Response Token")
+                field("Response Token"; Rec."Response Token")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response Token field';
                 }
-                field("Response Name"; "Response Name")
+                field("Response Name"; Rec."Response Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response Name field';
                 }
-                field("Response PictureBase64"; "Response PictureBase64")
+                field("Response PictureBase64"; Rec."Response PictureBase64")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response PictureBase64 field';
                 }
-                field("Error Number"; "Error Number")
+                field("Error Number"; Rec."Error Number")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Number field';
                 }
-                field("Error Description"; "Error Description")
+                field("Error Description"; Rec."Error Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Description field';
                 }
-                field("Return Value"; "Return Value")
+                field("Return Value"; Rec."Return Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Return Value field';
@@ -117,7 +117,7 @@ page 6060092 "NPR MM Admission Service Log"
                 Caption = 'Test';
                 Image = TestFile;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -136,10 +136,10 @@ page 6060092 "NPR MM Admission Service Log"
                     RefPictureBase64: Text;
                     RefTransaktion: Code[10];
                 begin
-                    GaestByNrResponse := MMAdmissionServiceWS.GuestValidation("Request Barcode", "Scanner Station Id", RefNo, RefToken, RefErrorNumber, RefErrorDescription);
+                    GaestByNrResponse := MMAdmissionServiceWS.GuestValidation(Rec."Request Barcode", Rec."Scanner Station Id", RefNo, RefToken, RefErrorNumber, RefErrorDescription);
                     Message('Web Service function GuestValidation Status: ' + Format(GaestByNrResponse));
                     if (RefErrorNumber = '') then begin
-                        GaestEnteredDoorResponse := MMAdmissionServiceWS.GuestArrivalV2(RefNo, RefToken, "Scanner Station Id", RefName, RefPictureBase64, RefTransaktion, RefErrorNumber, RefErrorDescription);
+                        GaestEnteredDoorResponse := MMAdmissionServiceWS.GuestArrivalV2(RefNo, RefToken, Rec."Scanner Station Id", RefName, RefPictureBase64, RefTransaktion, RefErrorNumber, RefErrorDescription);
                         Message('Web Service function GuestArrivalV2 Status: ' + Format(GaestEnteredDoorResponse));
                         if (RefErrorNumber = '') then begin
                             Message('Ticket/Membership validated OK');

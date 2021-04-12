@@ -16,22 +16,22 @@ page 6014612 "NPR Retail Campaign Subform"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Type field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount("Campaign Code", "Line No."))
+                field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount(Rec."Campaign Code", Rec."Line No."))
                 {
                     ApplicationArea = All;
                     Caption = 'Sales Amount';
@@ -39,10 +39,10 @@ page 6014612 "NPR Retail Campaign Subform"
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries(Rec."Campaign Code", Rec."Line No.");
                     end;
                 }
-                field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount("Campaign Code", "Line No."))
+                field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount(Rec."Campaign Code", Rec."Line No."))
                 {
                     ApplicationArea = All;
                     Caption = 'Cost Amount';
@@ -50,10 +50,10 @@ page 6014612 "NPR Retail Campaign Subform"
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries(Rec."Campaign Code", Rec."Line No.");
                     end;
                 }
-                field(Profit; RetailCampaignCalcMgt.CalcProfit("Campaign Code", "Line No."))
+                field(Profit; RetailCampaignCalcMgt.CalcProfit(Rec."Campaign Code", Rec."Line No."))
                 {
                     ApplicationArea = All;
                     Caption = 'Profit';
@@ -61,10 +61,10 @@ page 6014612 "NPR Retail Campaign Subform"
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries(Rec."Campaign Code", Rec."Line No.");
                     end;
                 }
-                field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct("Campaign Code", "Line No."))
+                field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct(Rec."Campaign Code", Rec."Line No."))
                 {
                     ApplicationArea = All;
                     Caption = 'Profit %';
@@ -72,7 +72,7 @@ page 6014612 "NPR Retail Campaign Subform"
 
                     trigger OnDrillDown()
                     begin
-                        RetailCampaignCalcMgt.DrilldownItemEntries("Campaign Code", "Line No.");
+                        RetailCampaignCalcMgt.DrilldownItemEntries(Rec."Campaign Code", Rec."Line No.");
                     end;
                 }
             }
@@ -100,11 +100,10 @@ page 6014612 "NPR Retail Campaign Subform"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Type := xRec.Type;
+        Rec.Type := xRec.Type;
     end;
 
     var
-        RetailCampaignHeader: Record "NPR Retail Campaign Header";
         RetailCampaignCalcMgt: Codeunit "NPR Retail Campaign Calc. Mgt.";
 }
 

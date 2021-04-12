@@ -2,8 +2,6 @@ codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializa
 {
     var
         _code: Text;
-        _state: JsonObject;
-        _type: Enum "NPR Action Type";
         _base: Codeunit "NPR Base Action";
 
     procedure Code(): Text;

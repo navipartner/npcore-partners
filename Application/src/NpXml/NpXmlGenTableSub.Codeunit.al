@@ -1,4 +1,4 @@
-codeunit 6151561 "NPR NpXml Gen. Table Sub."
+﻿codeunit 6151561 "NPR NpXml Gen. Table Sub."
 {
     [EventSubscriber(ObjectType::Codeunit, 6151551, 'OnSetupGenericChildTable', '', true, true)]
     local procedure SetupStockkeepingUnit(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
@@ -21,38 +21,38 @@ codeunit 6151561 "NPR NpXml Gen. Table Sub."
             DATABASE::Item:
                 begin
                     ParentRecRef.SetTable(Item);
-                    if Location.FindSet then
+                    if Location.FindSet() then
                         repeat
                             if StockkeepingUnit.Get(Location.Code, Item."No.", '') then begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit := StockkeepingUnit;
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end else begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit."Location Code" := Location.Code;
                                 TempStockkeepingUnit."Item No." := Item."No.";
                                 TempStockkeepingUnit."Variant Code" := '';
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end;
-                        until Location.Next = 0;
+                        until Location.Next() = 0;
                 end;
             DATABASE::"Item Variant":
                 begin
                     ParentRecRef.SetTable(ItemVariant);
-                    if Location.FindSet then
+                    if Location.FindSet() then
                         repeat
                             if StockkeepingUnit.Get(Location.Code, ItemVariant."Item No.", ItemVariant.Code) then begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit := StockkeepingUnit;
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end else begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit."Location Code" := Location.Code;
                                 TempStockkeepingUnit."Item No." := Item."No.";
                                 TempStockkeepingUnit."Variant Code" := ItemVariant.Code;
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end;
-                        until Location.Next = 0;
+                        until Location.Next() = 0;
                 end;
         end;
 
@@ -80,17 +80,17 @@ codeunit 6151561 "NPR NpXml Gen. Table Sub."
                 begin
                     ParentRecRef.SetTable(MagentoStoreItem);
                     ItemVariant.SetFilter(ItemVariant."Item No.", MagentoStoreItem."Item No.");
-                    if ItemVariant.FindSet then
+                    if ItemVariant.FindSet() then
                         repeat
                             if not MagentoStore.Get(MagentoStoreItem."Store Code") then
                                 exit;
 
-                            TempItemVariant.Init;
+                            TempItemVariant.Init();
                             TempItemVariant := ItemVariant;
                             if ItemTranslation.Get(ItemVariant."Item No.", ItemVariant.Code, MagentoStore."Language Code") then
                                 TempItemVariant.Description := ItemTranslation.Description;
-                            TempItemVariant.Insert;
-                        until ItemVariant.Next = 0;
+                            TempItemVariant.Insert();
+                        until ItemVariant.Next() = 0;
                 end;
         end;
         ChildRecRef.GetTable(TempItemVariant);
@@ -117,38 +117,38 @@ codeunit 6151561 "NPR NpXml Gen. Table Sub."
             DATABASE::Item:
                 begin
                     ChildLinkRecRef.SetTable(Item);
-                    if Location.FindSet then
+                    if Location.FindSet() then
                         repeat
                             if StockkeepingUnit.Get(Location.Code, Item."No.", '') then begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit := StockkeepingUnit;
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end else begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit."Location Code" := Location.Code;
                                 TempStockkeepingUnit."Item No." := Item."No.";
                                 TempStockkeepingUnit."Variant Code" := '';
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end;
-                        until Location.Next = 0;
+                        until Location.Next() = 0;
                 end;
             DATABASE::"Item Variant":
                 begin
                     ChildLinkRecRef.SetTable(ItemVariant);
-                    if Location.FindSet then
+                    if Location.FindSet() then
                         repeat
                             if StockkeepingUnit.Get(Location.Code, ItemVariant."Item No.", ItemVariant.Code) then begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit := StockkeepingUnit;
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end else begin
-                                TempStockkeepingUnit.Init;
+                                TempStockkeepingUnit.Init();
                                 TempStockkeepingUnit."Location Code" := Location.Code;
                                 TempStockkeepingUnit."Item No." := Item."No.";
                                 TempStockkeepingUnit."Variant Code" := ItemVariant.Code;
-                                TempStockkeepingUnit.Insert;
+                                TempStockkeepingUnit.Insert();
                             end;
-                        until Location.Next = 0;
+                        until Location.Next() = 0;
                 end;
         end;
 

@@ -31,19 +31,19 @@ codeunit 6060115 "NPR TM Ticket WebService"
         OutStr: OutStream;
     begin
 
-        Reservation.Import;
+        Reservation.Import();
 
         InsertImportEntry('MakeTicketReservation', ImportEntry);
         ImportEntry."Document ID" := Reservation.GetToken();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('TicketReservation-%1-%2.xml', ImportEntry."Document ID", Reservation.GetSummary());
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Reservation.SetDestination(OutStr);
-        Reservation.Export;
+        Reservation.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -59,9 +59,9 @@ codeunit 6060115 "NPR TM Ticket WebService"
         end;
 
         Reservation.SetDestination(OutStr);
-        Reservation.Export;
+        Reservation.Export();
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
     end;
 
@@ -72,19 +72,19 @@ codeunit 6060115 "NPR TM Ticket WebService"
         OutStr: OutStream;
     begin
 
-        PreConfirm.Import;
+        PreConfirm.Import();
 
         InsertImportEntry('PreConfirmReservation', ImportEntry);
         ImportEntry."Document ID" := PreConfirm.GetToken();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('TicketPreConfirm-%1-%2.xml', ImportEntry."Document ID", PreConfirm.GetSummary());
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         PreConfirm.SetDestination(OutStr);
-        PreConfirm.Export;
+        PreConfirm.Export();
 
         ImportEntry.Modify(true);
 
@@ -102,19 +102,19 @@ codeunit 6060115 "NPR TM Ticket WebService"
         OutStr: OutStream;
     begin
 
-        Cancelation.Import;
+        Cancelation.Import();
 
         InsertImportEntry('CancelReservation', ImportEntry);
         ImportEntry."Document ID" := Cancelation.GetToken();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('TicketCancelation-%1-%2.xml', ImportEntry."Document ID", Cancelation.GetSummary());
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Cancelation.SetDestination(OutStr);
-        Cancelation.Export;
+        Cancelation.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -128,7 +128,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ImportEntry.Imported := true;
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Cancelation.SetDestination(OutStr);
-        Cancelation.Export;
+        Cancelation.Export();
 
         ImportEntry.Modify(true);
         //-TM1.48 [414413]
@@ -141,19 +141,19 @@ codeunit 6060115 "NPR TM Ticket WebService"
         OutStr: OutStream;
     begin
 
-        Confirmation.Import;
+        Confirmation.Import();
 
         InsertImportEntry('ConfirmReservation', ImportEntry);
         ImportEntry."Document ID" := Confirmation.GetToken();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('TicketConfirmation-%1-%2.xml', ImportEntry."Document ID", Confirmation.GetSummary());
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Confirmation.SetDestination(OutStr);
-        Confirmation.Export;
+        Confirmation.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -165,9 +165,9 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Confirmation.SetReservationResult(ImportEntry."Document ID");
         Confirmation.SetDestination(OutStr);
-        Confirmation.Export;
+        Confirmation.Export();
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         exit(true);
     end;
@@ -182,13 +182,13 @@ codeunit 6060115 "NPR TM Ticket WebService"
         TicketChangeRequest.IMPORT();
         InsertImportEntry('GetTicketChangeRequest', ImportEntry);
 
-        ImportEntry."Document ID" := UPPERCASE(DELCHR(FORMAT(CREATEGUID), '=', '{}-'));
+        ImportEntry."Document ID" := UPPERCASE(DELCHR(FORMAT(CreateGuid()), '=', '{}-'));
         ImportEntry."Document Name" := STRSUBSTNO('GetTicketChangeRequest-%1.xml', ImportEntry."Document ID");
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
         TicketChangeRequest.SETDESTINATION(OutStr);
-        TicketChangeRequest.EXPORT;
+        TicketChangeRequest.Export();
         ImportEntry.MODIFY(TRUE);
 
         COMMIT();
@@ -205,7 +205,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
 
         ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
         TicketChangeRequest.SETDESTINATION(OutStr);
-        TicketChangeRequest.EXPORT;
+        TicketChangeRequest.Export();
         ImportEntry.MODIFY(TRUE);
     end;
 
@@ -225,7 +225,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
 
         ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
         TicketConfChangeRequest.SETDESTINATION(OutStr);
-        TicketConfChangeRequest.EXPORT;
+        TicketConfChangeRequest.Export();
         ImportEntry.MODIFY(TRUE);
 
         COMMIT();
@@ -242,7 +242,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
 
         ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
         TicketConfChangeRequest.SETDESTINATION(OutStr);
-        TicketConfChangeRequest.EXPORT;
+        TicketConfChangeRequest.Export();
         ImportEntry.MODIFY(TRUE);
 
     end;
@@ -254,19 +254,19 @@ codeunit 6060115 "NPR TM Ticket WebService"
         OutStr: OutStream;
     begin
 
-        Reservation.Import;
+        Reservation.Import();
 
         InsertImportEntry('ReserveConfirmArrive', ImportEntry);
         ImportEntry."Document ID" := Reservation.GetToken();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('ReserveConfirmArrive-%1-%2.xml', ImportEntry."Document ID", Reservation.GetSummary());
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Reservation.SetDestination(OutStr);
-        Reservation.Export;
+        Reservation.Export();
 
         ImportEntry.Modify(true);
 
@@ -352,27 +352,26 @@ codeunit 6060115 "NPR TM Ticket WebService"
     procedure OfflineTicketValidation(var OfflineTicketValidation: XMLport "NPR TM Offline Ticket Valid.") Success: Boolean
     var
         ImportEntry: Record "NPR Nc Import Entry";
-        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
 
-        OfflineTicketValidation.Import;
+        OfflineTicketValidation.Import();
 
         InsertImportEntry('OfflineTicketValidation', ImportEntry);
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('OfflineTicketValidation-%1.xml', ImportEntry."Document ID");
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         OfflineTicketValidation.SetDestination(OutStr);
-        OfflineTicketValidation.Export;
+        OfflineTicketValidation.Export();
         ImportEntry.Modify(true);
         Commit();
 
         OfflineTicketValidation.ProcessImportedRecords();
 
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -383,19 +382,19 @@ codeunit 6060115 "NPR TM Ticket WebService"
         OutStr: OutStream;
     begin
 
-        Attributes.Import;
+        Attributes.Import();
 
         InsertImportEntry('SetAttributes', ImportEntry);
         ImportEntry."Document ID" := Attributes.GetToken();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('SetAttributes-%1.xml', ImportEntry."Document ID");
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Attributes.SetDestination(OutStr);
-        Attributes.Export;
+        Attributes.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -406,7 +405,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Attributes.SetDestination(OutStr);
-        Attributes.Export;
+        Attributes.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -416,7 +415,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
     procedure GetAdmissionCapacity(var AdmissionCapacityCheck: XMLport "NPR TM Admis. Capacity Check")
     begin
 
-        AdmissionCapacityCheck.Import;
+        AdmissionCapacityCheck.Import();
         AdmissionCapacityCheck.AddResponse();
 
     end;
@@ -431,7 +430,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
     procedure ListTickets(var TicketDetails: XMLport "NPR TM Ticket Details")
     begin
 
-        TicketDetails.Import;
+        TicketDetails.Import();
         TicketDetails.CreateResponse();
 
     end;
@@ -452,11 +451,9 @@ codeunit 6060115 "NPR TM Ticket WebService"
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
-    var
-        NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
 
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR TM Ticket WebService", WebserviceFunction);
         if (ImportEntry."Import Type" = '') then begin
@@ -473,7 +470,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ImportEntry.Insert(true);
     end;
 
-    local procedure GetDocumentSequence(DocumentID: Text[100]) SequenceNo: Integer
+    local procedure GetDocumentSequence(DocumentID: Text[100]): Integer
     var
         ImportEntry: Record "NPR Nc Import Entry";
     begin
@@ -539,7 +536,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", '%1', CopyStr(WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));
 
-        if ImportType.FindFirst then
+        if ImportType.FindFirst() then
             exit(ImportType.Code);
 
         exit('');

@@ -43,8 +43,6 @@ codeunit 6150765 "NPR Front-End: WorkflowRequest" implements "NPR Front-End Asyn
     end;
 
     procedure SetParameters(Parameters: JsonObject)
-    var
-        Check: Text;
     begin
         _parametersSet := false;
         if IsEmpty(Parameters) then

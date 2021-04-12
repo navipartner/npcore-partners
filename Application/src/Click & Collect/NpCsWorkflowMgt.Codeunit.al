@@ -233,12 +233,12 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
             NpCsArchDocument.SetRange("From Store Code", NpCsDocument."From Store Code");
             if not NpCsArchDocument.FindLast() then
                 exit;
-            if not NpCsArchDocument."Callback Data".HasValue then
+            if not NpCsArchDocument."Callback Data".HasValue() then
                 exit;
             NpCsArchDocument.CalcFields("Callback Data");
             NpCsDocument."Callback Data" := NpCsArchDocument."Callback Data";
         end;
-        if not NpCsDocument."Callback Data".HasValue then
+        if not NpCsDocument."Callback Data".HasValue() then
             exit;
         NpCsDocument.CalcFields("Callback Data");
         NpCsDocument."Callback Data".CreateInStream(InStr, TEXTENCODING::UTF8);

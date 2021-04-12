@@ -64,7 +64,7 @@ page 6059962 "NPR MPOS EOD Receipts"
 
                 trigger OnAction()
                 begin
-                    if not Rec."Callback Receipt 1".HasValue then
+                    if not Rec."Callback Receipt 1".HasValue() then
                         ReceiptData := ''
                     else begin
                         Rec."Callback Receipt 1".CreateInStream(IStream);
@@ -88,7 +88,7 @@ page 6059962 "NPR MPOS EOD Receipts"
 
                 trigger OnAction()
                 begin
-                    if not Rec."Response Json".HasValue then
+                    if not Rec."Response Json".HasValue() then
                         ResponseData := ''
                     else begin
                         Rec."Response Json".CreateInStream(IStream);

@@ -118,7 +118,7 @@ table 6014491 "NPR Archive POS Info Trx"
     begin
         if "Entry No." = 0 then begin
             POSInfoTransaction.SetCurrentKey("Entry No.");
-            if POSInfoTransaction.FindLast then
+            if POSInfoTransaction.FindLast() then
                 "Entry No." := POSInfoTransaction."Entry No." + 1
             else
                 "Entry No." := 1;

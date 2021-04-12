@@ -58,7 +58,7 @@ codeunit 6150912 "NPR HC Handle Inv. Message"
                     Location.SetFilter(Code, UpperCase(CopyStr(Parameter[3], 6)));
                 Item.CalcFields(Inventory);
                 Inventory := Item.Inventory;
-                if Location.FindSet then
+                if Location.FindSet() then
                     repeat
                         Item.SetFilter("Location Filter", Location.Code);
                         Item.CalcFields(Inventory);
@@ -70,7 +70,7 @@ codeunit 6150912 "NPR HC Handle Inv. Message"
                         else
                             Response[1] := Response[1] + Location.Code;
                         Response[1] := Response[1] + ': ' + Format(Item.Inventory);
-                    until Location.Next = 0 else begin
+                    until Location.Next() = 0 else begin
                     ErrorDescription := NoLocationsFound;
                     exit(false);
                 end;

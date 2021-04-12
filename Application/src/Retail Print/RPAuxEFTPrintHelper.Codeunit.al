@@ -23,7 +23,7 @@ codeunit 6014536 "NPR RP Aux: EFT Print Helper"
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := Choice;
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     local procedure "// Event Subscribers"()
@@ -36,9 +36,9 @@ codeunit 6014536 "NPR RP Aux: EFT Print Helper"
         AllObj: Record AllObj;
     begin
         AllObj.Get(AllObj."Object Type"::Codeunit, CODEUNIT::"NPR RP Aux: EFT Print Helper");
-        tmpAllObj.Init;
+        tmpAllObj.Init();
         tmpAllObj := AllObj;
-        tmpAllObj.Insert;
+        tmpAllObj.Insert();
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionList', '', false, false)]
@@ -58,7 +58,6 @@ codeunit 6014536 "NPR RP Aux: EFT Print Helper"
         CreditCardTransaction: Record "NPR EFT Receipt";
         NewReceipt: Boolean;
         CreditCardTransaction2: Record "NPR EFT Receipt";
-        FirstReceipt: Boolean;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux: EFT Print Helper" then
@@ -72,7 +71,7 @@ codeunit 6014536 "NPR RP Aux: EFT Print Helper"
         RecRef := RecID.GetRecord;
         RecRef.SetTable(CreditCardTransaction);
 
-        if not CreditCardTransaction.Find then
+        if not CreditCardTransaction.Find() then
             exit;
 
         //-NPR5.46 [290734]
@@ -86,31 +85,29 @@ codeunit 6014536 "NPR RP Aux: EFT Print Helper"
         CreditCardTransaction2.SetFilter("Entry No.", '<%1', CreditCardTransaction."Entry No.");
         //-NPR5.46 [290734]
         NewReceipt := true;
-        if CreditCardTransaction2.FindLast then
+        if CreditCardTransaction2.FindLast() then
             NewReceipt := (CreditCardTransaction."Receipt No." <> CreditCardTransaction2."Receipt No.") or (CreditCardTransaction."EFT Trans. Request Entry No." <> CreditCardTransaction2."EFT Trans. Request Entry No.");
-        // IF CreditCardTransaction2.FINDLAST THEN
+        // IF CreditCardTransaction2.FindLast() THEN
         //  NewReceipt := (CreditCardTransaction."No. Printed" = CreditCardTransaction2."No. Printed")
         //                AND ((CreditCardTransaction."Receipt No." <> CreditCardTransaction2."Receipt No.") OR (CreditCardTransaction."EFT Trans. Request Entry No." <> CreditCardTransaction2."EFT Trans. Request Entry No."));
         //+NPR5.46 [290734]
-
-        with TemplateLine do
-            case FunctionName of
-                'PRINT_COPY':
-                    //-NPR5.46 [290734]
-                    //      IF NewReceipt OR FirstReceipt THEN
-                    //        IF CreditCardTransaction."No. Printed" > 0 THEN
-                    if NewReceipt then
-                        if EFTTransactionRequest."No. of Reprints" > 0 then
-                            //+NPR5.46 [290734]
-                            TemplateLine."Processing Value" := Caption_Copy;
-            //-NPR5.46 [290734]
-            //    'CUT_BETWEEN' :
-            //      IF NewReceipt AND (NOT FirstReceipt) THEN BEGIN
-            //        TemplateLine."Type Option" := 'Control'; //Change to PAPERCUT when properly implemented.
-            //        TemplateLine."Processing Value" := 'PAPERCUT';
-            //      END;
-            //+NPR5.46 [290734]
-            end;
+        case FunctionName of
+            'PRINT_COPY':
+                //-NPR5.46 [290734]
+                //      IF NewReceipt OR FirstReceipt THEN
+                //        IF CreditCardTransaction."No. Printed" > 0 THEN
+                if NewReceipt then
+                    if EFTTransactionRequest."No. of Reprints" > 0 then
+                        //+NPR5.46 [290734]
+                        TemplateLine."Processing Value" := Caption_Copy;
+        //-NPR5.46 [290734]
+        //    'CUT_BETWEEN' :
+        //      IF NewReceipt AND (NOT FirstReceipt) THEN BEGIN
+        //        TemplateLine."Type Option" := 'Control'; //Change to PAPERCUT when properly implemented.
+        //        TemplateLine."Processing Value" := 'PAPERCUT';
+        //      END;
+        //+NPR5.46 [290734]
+        end;
     end;
 }
 

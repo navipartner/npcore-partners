@@ -1,8 +1,6 @@
 codeunit 6151571 "NPR AF Helper Functions"
 {
 
-    var
-        TXT001: Label 'Clear the customer tag and disable notifications?';
 
     [Obsolete('Use native Business Central objects')]
     procedure GetValueAsText(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Text
@@ -195,7 +193,7 @@ codeunit 6151571 "NPR AF Helper Functions"
     begin
         MagentoPictureLink.SetRange("Item No.", Item."No.");
         MagentoPictureLink.SetRange("Base Image", true);
-        if not MagentoPictureLink.FindFirst then
+        if not MagentoPictureLink.FindFirst() then
             exit(Base64String);
 
         if not MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then

@@ -14,62 +14,62 @@ page 6151071 "NPR Retail Replenish. SKU List"
         {
             repeater(Group)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Reordering Policy"; "Reordering Policy")
+                field("Reordering Policy"; Rec."Reordering Policy")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reordering Policy field';
                 }
-                field("Reorder Point"; "Reorder Point")
+                field("Reorder Point"; Rec."Reorder Point")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reorder Point field';
                 }
-                field("Replenishment System"; "Replenishment System")
+                field("Replenishment System"; Rec."Replenishment System")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Replenishment System field';
                 }
-                field("Reorder Quantity"; "Reorder Quantity")
+                field("Reorder Quantity"; Rec."Reorder Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reorder Quantity field';
                 }
-                field("Maximum Inventory"; "Maximum Inventory")
+                field("Maximum Inventory"; Rec."Maximum Inventory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Maximum Inventory field';
                 }
-                field("Minimum Order Quantity"; "Minimum Order Quantity")
+                field("Minimum Order Quantity"; Rec."Minimum Order Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Minimum Order Quantity field';
                 }
-                field("Maximum Order Quantity"; "Maximum Order Quantity")
+                field("Maximum Order Quantity"; Rec."Maximum Order Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Maximum Order Quantity field';
                 }
-                field("Safety Stock Quantity"; "Safety Stock Quantity")
+                field("Safety Stock Quantity"; Rec."Safety Stock Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Safety Stock Quantity field';
@@ -82,8 +82,5 @@ page 6151071 "NPR Retail Replenish. SKU List"
     {
     }
 
-    var
-        ItemHierachy: Code[10];
-        DistributionGroup: Code[10];
 }
 

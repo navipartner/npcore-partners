@@ -1075,12 +1075,6 @@ table 6014401 "NPR Register"
 
     var
         Text1060003: Label 'Register %1 cannot be renamed!';
-        DimMgt: Codeunit DimensionManagement;
-        PostCode: Record "Post Code";
-        Text1060006: Label 'Acount No. %1 is used for  %2.';
-        ErrKasse: Label 'Acount No. %1 is used for Register Acount!';
-        Text1060008: Label 'Warning:\You are about to delete register %1\Last entry is registered on %2\Do you wish to delete it anyway?';
-        Text1060009: Label 'Warning:\You are about to delete register %1\Do you wish to delete it anyway?';
         TXT001: Label '2nd Display is already activated on register %1\. Deactivate 2nd Display before activating Customer Display';
 
     procedure DimsAreDiscontinuedOnRegister()

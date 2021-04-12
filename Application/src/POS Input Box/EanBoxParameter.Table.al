@@ -101,7 +101,7 @@ table 6060108 "NPR Ean Box Parameter"
         //      FOREACH Part IN Parts DO BEGIN
         //        TempRetailList.Number += 1;
         //        TempRetailList.Choice := Part;
-        //        TempRetailList.INSERT;
+        //        TempRetailList.Insert();
         //      END;
         //    END;
         //  ELSE
@@ -138,7 +138,7 @@ table 6060108 "NPR Ean Box Parameter"
 
     local procedure InitPOSParameterValue(var TempPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     begin
-        TempPOSParameterValue.Init;
+        TempPOSParameterValue.Init();
         TempPOSParameterValue."Action Code" := "Action Code";
         TempPOSParameterValue.Name := Name;
         TempPOSParameterValue."Data Type" := "Data Type";

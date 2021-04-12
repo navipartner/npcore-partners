@@ -1,4 +1,4 @@
-table 6060119 "NPR TM Admis. Schedule Lines"
+﻿table 6060119 "NPR TM Admis. Schedule Lines"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM80.1.09/TSA/20160310  CASE 236689 Change field from percentage to absolute
@@ -213,14 +213,14 @@ table 6060119 "NPR TM Admis. Schedule Lines"
         }
         field(200; "Scheduled Start Time"; Time)
         {
-            CalcFormula = Lookup ("NPR TM Admis. Schedule"."Start Time" WHERE("Schedule Code" = FIELD("Schedule Code")));
+            CalcFormula = Lookup("NPR TM Admis. Schedule"."Start Time" WHERE("Schedule Code" = FIELD("Schedule Code")));
             Caption = 'Scheduled Start Time';
             Editable = false;
             FieldClass = FlowField;
         }
         field(201; "Scheduled Stop Time"; Time)
         {
-            CalcFormula = Lookup ("NPR TM Admis. Schedule"."Stop Time" WHERE("Schedule Code" = FIELD("Schedule Code")));
+            CalcFormula = Lookup("NPR TM Admis. Schedule"."Stop Time" WHERE("Schedule Code" = FIELD("Schedule Code")));
             Caption = 'Scheduled Stop Time';
             Editable = false;
             FieldClass = FlowField;
@@ -249,13 +249,13 @@ table 6060119 "NPR TM Admis. Schedule Lines"
         if (not Confirm(ADM_SCH_DELETE, false)) then
             Error('');
 
-        TMAdmissionScheduleEntry.Reset;
+        TMAdmissionScheduleEntry.Reset();
         TMAdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
         TMAdmissionScheduleEntry.SetRange("Admission Code", "Admission Code");
         TMAdmissionScheduleEntry.SetRange("Schedule Code", "Schedule Code");
         TMAdmissionScheduleEntry.ModifyAll(Cancelled, true);
 
-        TMAdmissionScheduleEntry.Reset;
+        TMAdmissionScheduleEntry.Reset();
         TMAdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
         TMAdmissionScheduleEntry.SetRange("Admission Code", "Admission Code");
         TMAdmissionScheduleEntry.SetRange("Schedule Code", "Schedule Code");
@@ -274,7 +274,6 @@ table 6060119 "NPR TM Admis. Schedule Lines"
 
     trigger OnInsert()
     var
-        TicketAdmissionSchedules: Record "NPR TM Admis. Schedule Lines";
         Admission: Record "NPR TM Admission";
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
@@ -374,12 +373,12 @@ table 6060119 "NPR TM Admis. Schedule Lines"
         TextUncancelled: Label 'Please cancel all future Admission Schedule Entries for %1 %2 %3.';
     begin
         //-TM1.11
-        TMAdmissionScheduleEntry.Reset;
+        TMAdmissionScheduleEntry.Reset();
         TMAdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
         TMAdmissionScheduleEntry.SetRange("Admission Code", "Admission Code");
         TMAdmissionScheduleEntry.SetRange("Schedule Code", "Schedule Code");
         TMAdmissionScheduleEntry.SetRange(Cancelled, false);
-        TMAdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', WorkDate);
+        TMAdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', WorkDate());
         if not TMAdmissionScheduleEntry.IsEmpty then
             Error(TextUncancelled, TableCaption, "Admission Code", "Schedule Code");
         //+TM1.11

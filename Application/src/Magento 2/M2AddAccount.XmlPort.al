@@ -150,7 +150,7 @@ xmlport 6151157 "NPR M2 Add Account"
                         begin
 
                             if (TmpContactResponse."First Name" = '') and (TmpContactResponse.Surname = '') then
-                                currXMLport.Skip;
+                                currXMLport.Skip();
                         end;
                     }
                     fieldelement(Email; TmpContactResponse."E-Mail")
@@ -202,7 +202,7 @@ xmlport 6151157 "NPR M2 Add Account"
         StartTime := Time;
         SetErrorResponse('No response.');
 
-        TmpContactRequest.FindFirst;
+        TmpContactRequest.FindFirst();
         TmpContact.TransferFields(TmpContactRequest, true);
         TmpContact.Insert();
     end;

@@ -12,12 +12,12 @@ page 6151581 "NPR Event Attr. Temp. Filters"
         {
             repeater(Group)
             {
-                field("Filter Name"; "Filter Name")
+                field("Filter Name"; Rec."Filter Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -35,7 +35,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Caption = 'Values';
                 Image = BulletList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Values action';
@@ -44,9 +44,9 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 var
                     EventAttributeMatrix: Page "NPR Event Attribute Matrix";
                 begin
-                    EventAttributeMatrix.SetAttrTemplate("Template Name");
-                    EventAttributeMatrix.SetFilterMode("Filter Name");
-                    EventAttributeMatrix.Run;
+                    EventAttributeMatrix.SetAttrTemplate(Rec."Template Name");
+                    EventAttributeMatrix.SetFilterMode(Rec."Filter Name");
+                    EventAttributeMatrix.Run();
                 end;
             }
             action(ShowEvents)
@@ -54,7 +54,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Caption = 'Show Events in Attribute Filter';
                 Image = ShowList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -62,7 +62,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
 
                 trigger OnAction()
                 begin
-                    if not EventAttrMgt.ShowEventsInAttributesFilter("Template Name", "Filter Name") then
+                    if not EventAttrMgt.ShowEventsInAttributesFilter(Rec."Template Name", Rec."Filter Name") then
                         Message(NoEventsInFilter);
                 end;
             }

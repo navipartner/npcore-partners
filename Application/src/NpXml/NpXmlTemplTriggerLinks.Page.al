@@ -14,7 +14,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
         {
             repeater(Group)
             {
-                field("Link Type"; "Link Type")
+                field("Link Type"; Rec."Link Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Link Type field';
@@ -24,7 +24,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                         SetEnabled();
                     end;
                 }
-                field("Parent Field No."; "Parent Field No.")
+                field("Parent Field No."; Rec."Parent Field No.")
                 {
                     ApplicationArea = All;
                     Enabled = XmlTemplateFieldNoEnabled;
@@ -32,12 +32,12 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     StyleExpr = NOT XmlTemplateFieldNoEnabled;
                     ToolTip = 'Specifies the value of the Parent Field No. field';
                 }
-                field("Parent Field Name"; "Parent Field Name")
+                field("Parent Field Name"; Rec."Parent Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
-                field("Parent Filter Value"; "Parent Filter Value")
+                field("Parent Filter Value"; Rec."Parent Filter Value")
                 {
                     ApplicationArea = All;
                     Enabled = XmlTemplateFilterValueEnabled;
@@ -45,7 +45,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     StyleExpr = NOT XmlTemplateFilterValueEnabled;
                     ToolTip = 'Specifies the value of the Parent Filter Value field';
                 }
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     Enabled = FieldNoEnabled;
@@ -53,12 +53,12 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     StyleExpr = NOT FieldNoEnabled;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Filter Value"; "Filter Value")
+                field("Filter Value"; Rec."Filter Value")
                 {
                     ApplicationArea = All;
                     Enabled = FilterValueEnabled;
@@ -66,7 +66,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     StyleExpr = NOT FilterValueEnabled;
                     ToolTip = 'Specifies the value of the Filter Value field';
                 }
-                field("Previous Filter Value"; "Previous Filter Value")
+                field("Previous Filter Value"; Rec."Previous Filter Value")
                 {
                     ApplicationArea = All;
                     Enabled = PreviousFilterValueEnabled;
@@ -90,8 +90,8 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Parent Table No." := XmlTemplateTableNo;
-        "Table No." := TableNo;
+        Rec."Parent Table No." := XmlTemplateTableNo;
+        Rec."Table No." := TableNo;
     end;
 
     var
@@ -105,19 +105,19 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
 
     local procedure SetEnabled()
     begin
-        XmlTemplateFilterValueEnabled := "Link Type" in ["Link Type"::ParentConstant, "Link Type"::ParentFilter];
-        XmlTemplateFieldNoEnabled := XmlTemplateFilterValueEnabled or ("Link Type" in ["Link Type"::TableLink, "Link Type"::PreviousTableLink]);
+        XmlTemplateFilterValueEnabled := Rec."Link Type" in [Rec."Link Type"::ParentConstant, Rec."Link Type"::ParentFilter];
+        XmlTemplateFieldNoEnabled := XmlTemplateFilterValueEnabled or (Rec."Link Type" in [Rec."Link Type"::TableLink, Rec."Link Type"::PreviousTableLink]);
         FieldNoEnabled := not XmlTemplateFilterValueEnabled;
-        FilterValueEnabled := "Link Type" in ["Link Type"::Constant, "Link Type"::Filter];
-        PreviousFilterValueEnabled := "Link Type" = "Link Type"::PreviousConstant;
+        FilterValueEnabled := Rec."Link Type" in [Rec."Link Type"::Constant, Rec."Link Type"::Filter];
+        PreviousFilterValueEnabled := Rec."Link Type" = Rec."Link Type"::PreviousConstant;
     end;
 
     procedure SetTemplateTriggerView(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger")
     begin
-        FilterGroup(2);
-        SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
-        SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
-        FilterGroup(2);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
+        Rec.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
+        Rec.FilterGroup(2);
 
         XmlTemplateTableNo := NpXmlTemplateTrigger."Parent Table No.";
         TableNo := NpXmlTemplateTrigger."Table No.";

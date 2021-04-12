@@ -149,7 +149,7 @@ table 6060054 "NPR Item Status"
         FldRefBoolean.SetRange(true);
         FldRefCode := RecRef.Field(10);
         FldRefCode.SetFilter('<>%1', Code);
-        if not RecRef.FindFirst then
+        if not RecRef.FindFirst() then
             Error(StrSubstNo(TextStatusDoesNotExist), FldRefBoolean.Caption);
     end;
 }

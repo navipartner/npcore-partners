@@ -35,7 +35,7 @@ page 6150705 "NPR POS Parameter Values"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -54,8 +54,8 @@ page 6150705 "NPR POS Parameter Values"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         //-NPR5.40 [308050]
-                        LookupValue();
-                        Modify;
+                        Rec.LookupValue();
+                        Rec.Modify();
                         SetParameterValue();
                         //+NPR5.40 [308050]
                     end;
@@ -63,8 +63,8 @@ page 6150705 "NPR POS Parameter Values"
                     trigger OnValidate()
                     begin
                         //-NPR5.40 [308050]
-                        Validate(Value, ParameterValue);
-                        Modify;
+                        Rec.Validate(Value, ParameterValue);
+                        Rec.Modify();
                         SetParameterValue();
                         //+NPR5.40 [308050]
                     end;
@@ -82,7 +82,7 @@ page 6150705 "NPR POS Parameter Values"
                 Caption = 'Reset Values';
                 Image = UpdateDescription;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -123,8 +123,8 @@ page 6150705 "NPR POS Parameter Values"
         POSActionParameter: Record "NPR POS Action Parameter";
     begin
         //-NPR5.34 [282915]
-        if POSActionParameter.Get("Action Code", Name) then
-            exit(POSActionParameter."Default Value" = Value);
+        if POSActionParameter.Get(Rec."Action Code", Rec.Name) then
+            exit(POSActionParameter."Default Value" = Rec.Value);
         exit(false);
         //+NPR5.34 [282915]
     end;
@@ -133,9 +133,9 @@ page 6150705 "NPR POS Parameter Values"
     begin
         //-NPR5.40 [308050]
         Clear(ParameterName);
-        OnGetParameterNameCaption(Rec, ParameterName);
+        Rec.OnGetParameterNameCaption(Rec, ParameterName);
         if (ParameterName = '') then
-            ParameterName := Name;
+            ParameterName := Rec.Name;
         //+NPR5.40 [308050]
     end;
 
@@ -143,7 +143,7 @@ page 6150705 "NPR POS Parameter Values"
     begin
         //-NPR5.40 [308050]
         Clear(ParameterDescription);
-        OnGetParameterDescriptionCaption(Rec, ParameterDescription);
+        Rec.OnGetParameterDescriptionCaption(Rec, ParameterDescription);
         //+NPR5.40 [308050]
     end;
 
@@ -154,16 +154,16 @@ page 6150705 "NPR POS Parameter Values"
         //-NPR5.40 [308050]
         Clear(ParameterOptionString);
         Clear(ParameterValue);
-        OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
+        Rec.OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
         //-NPR5.54 [335834]
-        if "Data Type" = "Data Type"::Boolean then
-            ParameterValue := GetBooleanStringCaption()
+        if Rec."Data Type" = Rec."Data Type"::Boolean then
+            ParameterValue := Rec.GetBooleanStringCaption()
         else
             //+NPR5.54 [335834]
-            if (ParameterOptionString = '') or ("Data Type" <> "Data Type"::Option) then
-                ParameterValue := Value
+            if (ParameterOptionString = '') or (Rec."Data Type" <> Rec."Data Type"::Option) then
+                ParameterValue := Rec.Value
             else
-                ParameterValue := GetOptionStringCaption(ParameterOptionString)
+                ParameterValue := Rec.GetOptionStringCaption(ParameterOptionString)
         //+NPR5.40 [308050]
     end;
 }

@@ -16,28 +16,28 @@ page 6150741 "NPR POS Admin. Template List"
         {
             repeater(Group)
             {
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Id field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Persist on Client"; "Persist on Client")
+                field("Persist on Client"; Rec."Persist on Client")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Persist on Client field';
@@ -55,7 +55,7 @@ page 6150741 "NPR POS Admin. Template List"
                 Caption = 'Scopes';
                 Image = UserInterface;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Admin. Template Scopes";

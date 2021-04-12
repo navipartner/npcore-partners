@@ -1,4 +1,4 @@
-page 6151553 "NPR NpXml Elements"
+﻿page 6151553 "NPR NpXml Elements"
 {
     AutoSplitKey = true;
     Caption = 'Xml Elements';
@@ -18,33 +18,33 @@ page 6151553 "NPR NpXml Elements"
             repeater(Group)
             {
                 FreezeColumn = Hidden;
-                IndentationColumn = Level;
+                IndentationColumn = Rec.Level;
                 IndentationControls = "Element Name";
                 ShowAsTree = true;
-                field("Element Name"; "Element Name")
+                field("Element Name"; Rec."Element Name")
                 {
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = ContainerElement;
                     ToolTip = 'Specifies the value of the Element Name field';
                 }
-                field(Namespace; Namespace)
+                field(Namespace; Rec.Namespace)
                 {
                     ApplicationArea = All;
                     Visible = NamespacesEnabled;
                     ToolTip = 'Specifies the value of the Namespace field';
                 }
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active field';
                 }
-                field(Hidden; Hidden)
+                field(Hidden; Rec.Hidden)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Hidden field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
@@ -55,133 +55,133 @@ page 6151553 "NPR NpXml Elements"
                         InsertRelations();
                     end;
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Template Version No."; "Template Version No.")
+                field("Template Version No."; Rec."Template Version No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Version No. field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field';
                 }
-                field("Default Value"; "Default Value")
+                field("Default Value"; Rec."Default Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default Value field';
                 }
-                field(Prefix; Prefix)
+                field(Prefix; Rec.Prefix)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prefix field';
                 }
-                field(CDATA; CDATA)
+                field(CDATA; Rec.CDATA)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the CDATA field';
                 }
-                field("Field Type"; "Field Type")
+                field("Field Type"; Rec."Field Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Type field';
                 }
-                field("Enum List (,)"; "Enum List (,)")
+                field("Enum List (,)"; Rec."Enum List (,)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enum List field';
                 }
-                field("Custom Codeunit ID"; "Custom Codeunit ID")
+                field("Custom Codeunit ID"; Rec."Custom Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Custom Codeunit ID field';
                 }
-                field("Custom Codeunit Name"; "Custom Codeunit Name")
+                field("Custom Codeunit Name"; Rec."Custom Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Custom Codeunit Name field';
                 }
-                field("Xml Value Function"; "Xml Value Function")
+                field("Xml Value Function"; Rec."Xml Value Function")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Xml Value Function field';
                 }
-                field("Xml Value Codeunit ID"; "Xml Value Codeunit ID")
+                field("Xml Value Codeunit ID"; Rec."Xml Value Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Xml Value Codeunit ID field';
                 }
-                field("Xml Value Codeunit Name"; "Xml Value Codeunit Name")
+                field("Xml Value Codeunit Name"; Rec."Xml Value Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Xml Value Codeunit Name field';
                 }
-                field("Generic Child Function"; "Generic Child Function")
+                field("Generic Child Function"; Rec."Generic Child Function")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Generic Child Function field';
                 }
-                field("Generic Child Codeunit ID"; "Generic Child Codeunit ID")
+                field("Generic Child Codeunit ID"; Rec."Generic Child Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Generic Child Codeunit ID field';
                 }
-                field("Generic Child Codeunit Name"; "Generic Child Codeunit Name")
+                field("Generic Child Codeunit Name"; Rec."Generic Child Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Generic Child Codeunit Name field';
                 }
-                field("Only with Value"; "Only with Value")
+                field("Only with Value"; Rec."Only with Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Only with Value field';
                 }
-                field("Iteration Type"; "Iteration Type")
+                field("Iteration Type"; Rec."Iteration Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Iteration Type field';
                 }
-                field("Reverse Sign"; "Reverse Sign")
+                field("Reverse Sign"; Rec."Reverse Sign")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reverse Sign field';
                 }
-                field("Lower Case"; "Lower Case")
+                field("Lower Case"; Rec."Lower Case")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Lower Case field';
                 }
-                field("Blank Zero"; "Blank Zero")
+                field("Blank Zero"; Rec."Blank Zero")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blank Zero field';
                 }
-                field("Has Filter"; "Has Filter")
+                field("Has Filter"; Rec."Has Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Has Filter field';
                 }
-                field("Has Attribute"; "Has Attribute")
+                field("Has Attribute"; Rec."Has Attribute")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Has Attribute field';
@@ -215,7 +215,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Sibling)';
                     Image = New;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Insert';
                     ApplicationArea = All;
@@ -231,7 +231,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Child)';
                     Image = New;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Insert';
                     ApplicationArea = All;
@@ -247,7 +247,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Parent)';
                     Image = New;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Alt+Insert';
                     ApplicationArea = All;
@@ -263,7 +263,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Delete';
                     Image = Delete;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Delete';
@@ -295,7 +295,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        NpXmlTemplateMgt.CopyXmlTemplate("Xml Template Code");
+                        NpXmlTemplateMgt.CopyXmlTemplate(Rec."Xml Template Code");
                         CurrPage.Update(false);
                     end;
                 }
@@ -304,7 +304,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Preview Xml';
                     Image = XMLFile;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -326,8 +326,8 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        NpXmlTemplateMgt.NormalizeNpXmlElementLineNo("Xml Template Code", Rec);
-                        Find;
+                        NpXmlTemplateMgt.NormalizeNpXmlElementLineNo(Rec."Xml Template Code", Rec);
+                        Rec.Find();
                     end;
                 }
             }
@@ -338,7 +338,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Move Up';
                     Image = MoveUp;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -354,7 +354,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Move Down';
                     Image = MoveDown;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -370,7 +370,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Decrement Level';
                     Image = PreviousRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -386,7 +386,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Increment Level';
                     Image = NextRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -403,14 +403,14 @@ page 6151553 "NPR NpXml Elements"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.PagePartAttributes.PAGE.SetTableNo("Table No.");
-        CurrPage.PagePartMappingFilter.PAGE.SetTableNo("Table No.");
-        CurrPage.PagePartMappingFilter.PAGE.SetParentTableNo("Parent Table No.");
+        CurrPage.PagePartAttributes.PAGE.SetTableNo(Rec."Table No.");
+        CurrPage.PagePartMappingFilter.PAGE.SetTableNo(Rec."Table No.");
+        CurrPage.PagePartMappingFilter.PAGE.SetParentTableNo(Rec."Parent Table No.");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ContainerElement := IsContainer();
+        ContainerElement := Rec.IsContainer();
     end;
 
     trigger OnOpenPage()
@@ -419,9 +419,6 @@ page 6151553 "NPR NpXml Elements"
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
-    var
-        NpXmlTemplate: Record "NPR NpXml Template";
-        TemplateCode: Code[10];
     begin
     end;
 
@@ -439,23 +436,23 @@ page 6151553 "NPR NpXml Elements"
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
     begin
         if ElementType = ElementType::Parent then
-            NpXmlTemplateMgt.InitNpXmlElementAbove("Xml Template Code", "Line No.", NpXmlElement)
+            NpXmlTemplateMgt.InitNpXmlElementAbove(Rec."Xml Template Code", Rec."Line No.", NpXmlElement)
         else
-            NpXmlTemplateMgt.InitNpXmlElementBelow("Xml Template Code", "Line No.", NpXmlElement);
+            NpXmlTemplateMgt.InitNpXmlElementBelow(Rec."Xml Template Code", Rec."Line No.", NpXmlElement);
 
         case ElementType of
             ElementType::Sibling:
-                NpXmlElement.Level := Level;
+                NpXmlElement.Level := Rec.Level;
             ElementType::Child:
-                NpXmlElement.Level := Level + 1;
+                NpXmlElement.Level := Rec.Level + 1;
             ElementType::Parent:
                 begin
-                    NpXmlElement.Level := Level - 1;
+                    NpXmlElement.Level := Rec.Level - 1;
                     if NpXmlElement.Level < 0 then
                         NpXmlElement.Level := 0;
                 end;
         end;
-        NpXmlElement."Table No." := "Table No.";
+        NpXmlElement."Table No." := Rec."Table No.";
         NpXmlElement."Element Name" := 'new_element_' + LowerCase(Format(ElementType));
         NpXmlElement.Insert(true);
     end;
@@ -463,7 +460,6 @@ page 6151553 "NPR NpXml Elements"
     local procedure InsertRelations()
     var
         "Field": Record "Field";
-        ObjectMetadata: Record "Object Metadata";
         NpXmlElement: Record "NPR NpXml Element";
         NpXmlFilter: Record "NPR NpXml Filter";
         TempField: Record "Field" temporary;
@@ -474,36 +470,36 @@ page 6151553 "NPR NpXml Elements"
         LineNo: Integer;
         i: Integer;
     begin
-        if not TableMetadata.Get("Table No.") then
+        if not TableMetadata.Get(Rec."Table No.") then
             exit;
 
         NpXmlElement := Rec;
-        NpXmlElement.SetRange("Xml Template Code", "Xml Template Code");
+        NpXmlElement.SetRange("Xml Template Code", Rec."Xml Template Code");
         repeat
             if NpXmlElement.Next(-1) = 0 then
                 exit;
-        until NpXmlElement.Level + 1 = Level;
+        until NpXmlElement.Level + 1 = Rec.Level;
 
-        if NpXmlElement."Table No." = "Table No." then
+        if NpXmlElement."Table No." = Rec."Table No." then
             exit;
         if not TableMetadata.Get(NpXmlElement."Table No.") then
             exit;
 
-        RecRef.Open("Table No.");
+        RecRef.Open(Rec."Table No.");
         KeyRef := RecRef.KeyIndex(1);
-        RecRef.Close;
+        RecRef.Close();
         for i := 1 to KeyRef.FieldCount do begin
             FieldRef := KeyRef.FieldIndex(i);
 
-            Field.Get("Table No.", FieldRef.Number);
+            Field.Get(Rec."Table No.", FieldRef.Number);
             if Field.RelationTableNo = NpXmlElement."Table No." then begin
-                TempField.Init;
+                TempField.Init();
                 TempField := Field;
-                TempField.Insert;
+                TempField.Insert();
             end;
         end;
 
-        if not TempField.FindSet then
+        if not TempField.FindSet() then
             exit;
 
         NpXmlElement.CalcFields("Table Name");
@@ -512,18 +508,18 @@ page 6151553 "NPR NpXml Elements"
 
         RecRef.Open(NpXmlElement."Table No.");
         KeyRef := RecRef.KeyIndex(1);
-        RecRef.Close;
+        RecRef.Close();
         FieldRef := KeyRef.FieldIndex(1);
 
-        NpXmlFilter.SetRange("Xml Template Code", "Xml Template Code");
-        NpXmlFilter.SetRange("Xml Element Line No.", "Line No.");
-        NpXmlFilter.DeleteAll;
+        NpXmlFilter.SetRange("Xml Template Code", Rec."Xml Template Code");
+        NpXmlFilter.SetRange("Xml Element Line No.", Rec."Line No.");
+        NpXmlFilter.DeleteAll();
         LineNo := 0;
         repeat
             LineNo += 10000;
-            NpXmlFilter.Init;
-            NpXmlFilter."Xml Template Code" := "Xml Template Code";
-            NpXmlFilter."Xml Element Line No." := "Line No.";
+            NpXmlFilter.Init();
+            NpXmlFilter."Xml Template Code" := Rec."Xml Template Code";
+            NpXmlFilter."Xml Element Line No." := Rec."Line No.";
             NpXmlFilter."Line No." := LineNo;
             NpXmlFilter."Filter Type" := NpXmlFilter."Filter Type"::TableLink;
             NpXmlFilter."Parent Table No." := TempField.RelationTableNo;
@@ -533,7 +529,7 @@ page 6151553 "NPR NpXml Elements"
             NpXmlFilter."Table No." := TempField.TableNo;
             NpXmlFilter."Field No." := TempField."No.";
             NpXmlFilter.Insert(true);
-        until TempField.Next = 0;
+        until TempField.Next() = 0;
     end;
 
     procedure MoveDown()
@@ -543,23 +539,23 @@ page 6151553 "NPR NpXml Elements"
     begin
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlElement);
-        if not NpXmlElement.FindSet then
+        if not NpXmlElement.FindSet() then
             exit;
 
-        if Next = 0 then
+        if Rec.Next() = 0 then
             exit;
 
-        TempNpXmlElement.DeleteAll;
+        TempNpXmlElement.DeleteAll();
         repeat
-            TempNpXmlElement.Init;
+            TempNpXmlElement.Init();
             TempNpXmlElement := NpXmlElement;
-            TempNpXmlElement.Insert;
-        until NpXmlElement.Next = 0;
+            TempNpXmlElement.Insert();
+        until NpXmlElement.Next() = 0;
 
-        NpXmlElement.Reset;
+        NpXmlElement.Reset();
         NpXmlElement.Get(TempNpXmlElement."Xml Template Code", TempNpXmlElement."Line No.");
         NpXmlElement.SetRange("Xml Template Code", TempNpXmlElement."Xml Template Code");
-        if NpXmlElement.Next = 0 then
+        if NpXmlElement.Next() = 0 then
             exit;
 
         repeat
@@ -576,21 +572,21 @@ page 6151553 "NPR NpXml Elements"
     begin
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlElement);
-        if not NpXmlElement.FindLast then
+        if not NpXmlElement.FindLast() then
             exit;
 
-        if Next(-1) = 0 then
+        if Rec.Next(-1) = 0 then
             exit;
-        LineNo := "Line No.";
+        LineNo := Rec."Line No.";
 
-        TempNpXmlElement.DeleteAll;
+        TempNpXmlElement.DeleteAll();
         repeat
-            TempNpXmlElement.Init;
+            TempNpXmlElement.Init();
             TempNpXmlElement := NpXmlElement;
-            TempNpXmlElement.Insert;
+            TempNpXmlElement.Insert();
         until NpXmlElement.Next(-1) = 0;
 
-        NpXmlElement.Reset;
+        NpXmlElement.Reset();
         NpXmlElement.Get(TempNpXmlElement."Xml Template Code", TempNpXmlElement."Line No.");
         NpXmlElement.SetRange("Xml Template Code", TempNpXmlElement."Xml Template Code");
         if NpXmlElement.Next(-1) = 0 then
@@ -599,22 +595,22 @@ page 6151553 "NPR NpXml Elements"
         repeat
             NpXmlTemplateMgt.SwapNpXmlElementLineNo(TempNpXmlElement, NpXmlElement);
             NpXmlElement.Get(TempNpXmlElement."Xml Template Code", TempNpXmlElement."Line No.");
-        until TempNpXmlElement.Next = 0;
+        until TempNpXmlElement.Next() = 0;
 
-        FindFirst;
-        Get("Xml Template Code", LineNo);
+        Rec.FindFirst();
+        Rec.Get(Rec."Xml Template Code", LineNo);
     end;
 
     local procedure PreviewXml()
     begin
-        NpXmlMgt.PreviewXml("Xml Template Code");
+        NpXmlMgt.PreviewXml(Rec."Xml Template Code");
     end;
 
     local procedure SetEnabledFilters()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        if NpXmlTemplate.Get(GetFilter("Xml Template Code")) then;
+        if NpXmlTemplate.Get(Rec.GetFilter("Xml Template Code")) then;
         NamespacesEnabled := NpXmlTemplate."Namespaces Enabled";
         CurrPage.PagePartAttributes.PAGE.SetEnabledFilters(NpXmlTemplate);
     end;
@@ -623,23 +619,23 @@ page 6151553 "NPR NpXml Elements"
     var
         NpXmlElement: Record "NPR NpXml Element";
     begin
-        NpXmlElement.Reset;
+        NpXmlElement.Reset();
         CurrPage.SetSelectionFilter(NpXmlElement);
-        if NpXmlElement.FindSet then
+        if NpXmlElement.FindSet() then
             repeat
                 NpXmlElement.Level += Steps;
                 if NpXmlElement.Level < 0 then
                     NpXmlElement.Level := 0;
                 NpXmlElement.Modify(true);
-            until NpXmlElement.Next = 0;
+            until NpXmlElement.Next() = 0;
 
-        NpXmlElement.Reset;
-        NpXmlElement.SetRange("Xml Template Code", "Xml Template Code");
-        if NpXmlElement.FindSet then
+        NpXmlElement.Reset();
+        NpXmlElement.SetRange("Xml Template Code", Rec."Xml Template Code");
+        if NpXmlElement.FindSet() then
             repeat
                 NpXmlElement.UpdateParentInfo();
-                NpXmlElement.Modify;
-            until NpXmlElement.Next = 0;
+                NpXmlElement.Modify();
+            until NpXmlElement.Next() = 0;
 
         CurrPage.Update(false);
     end;

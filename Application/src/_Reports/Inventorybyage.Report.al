@@ -151,7 +151,7 @@ report 6014400 "NPR Inventory by age"
 
                     if not ShowZeroLines then
                         if ((TotalRemaingAmt[1] = 0) and (TotalAmtCalc[1] = 0)) then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
 
                     ExistNonZeroItemRecords[1] := true;
                 end;
@@ -248,7 +248,7 @@ report 6014400 "NPR Inventory by age"
 
                         if not ShowZeroLines then
                             if ((TotalRemaingAmt[2] = 0) and (TotalAmtCalc[2] = 0)) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
 
                         ExistNonZeroItemRecords[2] := true;
                     end;
@@ -346,7 +346,7 @@ report 6014400 "NPR Inventory by age"
 
                             if not ShowZeroLines then
                                 if ((TotalRemaingAmt[3] = 0) and (TotalAmtCalc[3] = 0)) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                             ExistNonZeroItemRecords[3] := true;
                         end;
@@ -444,7 +444,7 @@ report 6014400 "NPR Inventory by age"
 
                                 if not ShowZeroLines then
                                     if ((TotalRemaingAmt[4] = 0) and (TotalAmtCalc[4] = 0)) then
-                                        CurrReport.Skip;
+                                        CurrReport.Skip();
 
                                 ExistNonZeroItemRecords[4] := true;
                             end;
@@ -751,11 +751,11 @@ report 6014400 "NPR Inventory by age"
 
     trigger OnInitReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
 
         if PeriodStartDato[2] = 0D then
-            PeriodStartDato[2] := WorkDate;
+            PeriodStartDato[2] := WorkDate();
         if PeriodLength = '' then
             PeriodLength := '1M';
     end;

@@ -1,8 +1,8 @@
 report 6060124 "NPR TM Ticket Batch Resp."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/TM Ticket Batch Response.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/TM Ticket Batch Response.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Ticket Batch Response';
     dataset

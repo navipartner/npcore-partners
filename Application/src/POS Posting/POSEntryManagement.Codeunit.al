@@ -87,14 +87,14 @@ codeunit 6150629 "NPR POS Entry Management"
 
         POSTaxAmountLine.Reset();
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSTaxAmountLine.FindSet then
+        if POSTaxAmountLine.FindSet() then
             repeat
                 CalcTotalVATAmount := CalcTotalVATAmount + POSTaxAmountLine."Tax Amount";
             until POSTaxAmountLine.Next() = 0;
 
         POSPaymentLine.Reset();
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSPaymentLine.FindSet then
+        if POSPaymentLine.FindSet() then
             repeat
                 CalcTotalPaymentAmountLCY := CalcTotalPaymentAmountLCY + POSPaymentLine."Amount (LCY)";
             until POSPaymentLine.Next() = 0;
@@ -186,6 +186,7 @@ codeunit 6150629 "NPR POS Entry Management"
         if (BankAccount."Currency Code" <> POSPaymentMethod."Currency Code") then
             Error(TextInconsistent, BankAccount.FieldCaption("Currency Code"), BankAccount."Currency Code", BankAccount.TableCaption, POSPaymentMethod."Currency Code", POSPaymentMethod.TableCaption, POSPostingSetup.TableCaption);
     end;
+
     procedure ShowSalesDocument(POSEntry: Record "NPR POS Entry"): Boolean
     var
         SalesHeader: Record "Sales Header";
@@ -201,7 +202,7 @@ codeunit 6150629 "NPR POS Entry Management"
             POSEntry."Sales Document Type"::"Credit Memo":
                 begin
                     SalesCrMemoHeader.SetRange("Pre-Assigned No.", POSEntry."Sales Document No.");
-                    if SalesCrMemoHeader.FindFirst then begin
+                    if SalesCrMemoHeader.FindFirst() then begin
                         PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
                         exit(true);
                     end;
@@ -209,7 +210,7 @@ codeunit 6150629 "NPR POS Entry Management"
             POSEntry."Sales Document Type"::Invoice:
                 begin
                     SalesInvoiceHeader.SetRange("Pre-Assigned No.", POSEntry."Sales Document No.");
-                    if SalesInvoiceHeader.FindFirst then begin
+                    if SalesInvoiceHeader.FindFirst() then begin
                         PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                         exit(true);
                     end;
@@ -217,7 +218,7 @@ codeunit 6150629 "NPR POS Entry Management"
             POSEntry."Sales Document Type"::Order:
                 begin
                     SalesInvoiceHeader.SetRange("Order No.", POSEntry."Sales Document No.");
-                    if SalesInvoiceHeader.FindFirst then begin
+                    if SalesInvoiceHeader.FindFirst() then begin
                         PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                         exit(true);
                     end;
@@ -225,12 +226,12 @@ codeunit 6150629 "NPR POS Entry Management"
             POSEntry."Sales Document Type"::Quote:
                 begin
                     SalesHeader.SetRange("Quote No.", POSEntry."Sales Document No.");
-                    if SalesHeader.FindFirst then begin
+                    if SalesHeader.FindFirst() then begin
                         PAGE.Run(SalesHeader.GetCardpageID, SalesHeader);
                         exit(true);
                     end else begin
                         SalesInvoiceHeader.SetRange("Quote No.", POSEntry."Sales Document No.");
-                        if SalesInvoiceHeader.FindFirst then begin
+                        if SalesInvoiceHeader.FindFirst() then begin
                             PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                             exit(true);
                         end;
@@ -294,7 +295,7 @@ codeunit 6150629 "NPR POS Entry Management"
                 POSAuditProfile.Init();
             if (POSAuditProfile."Allow Printing Receipt Copy" = POSAuditProfile."Allow Printing Receipt Copy"::Never)
                or
-               ((POSAuditProfile."Allow Printing Receipt Copy" = POSAuditProfile."Allow Printing Receipt Copy"::"Only Once") and (POSEntryOutputLog.Count > 1))
+               ((POSAuditProfile."Allow Printing Receipt Copy" = POSAuditProfile."Allow Printing Receipt Copy"::"Only Once") and (POSEntryOutputLog.Count() > 1))
             then
                 Error(ReprintNotAllowedErrMsg, POSEntryOutputLog.FieldCaption("POS Entry No."), POSEntry."Entry No.");
         end;

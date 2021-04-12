@@ -60,7 +60,7 @@ table 6151439 "NPR Magento Video Link"
         Lineno: Integer;
     begin
         MagentoVideoLink.SetRange("Item No.", "Item No.");
-        if MagentoVideoLink.FindLast then;
+        if MagentoVideoLink.FindLast() then;
         Lineno := MagentoVideoLink."Line No." + 10000;
 
         Validate("Line No.", Lineno);

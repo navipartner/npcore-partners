@@ -15,19 +15,19 @@ page 6150627 "NPR POS Workshift Checkp. Card"
             group(Balancing)
             {
                 Caption = 'Balancing';
-                field("Created At"; "Created At")
+                field("Created At"; Rec."Created At")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Created At field';
                 }
-                field("Direct Sales Count"; "Direct Sales Count")
+                field("Direct Sales Count"; Rec."Direct Sales Count")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Direct Sales Count field';
                 }
-                field("Direct Item Returns Line Count"; "Direct Item Returns Line Count")
+                field("Direct Item Returns Line Count"; Rec."Direct Item Returns Line Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Direct Item Returns Line Count field';
@@ -39,13 +39,13 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group(Sales)
                 {
                     Caption = 'Sales';
-                    field("Direct Item Sales (LCY)"; "Direct Item Sales (LCY)")
+                    field("Direct Item Sales (LCY)"; Rec."Direct Item Sales (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Direct Item Sales (LCY) field';
                     }
-                    field("Direct Item Returns (LCY)"; "Direct Item Returns (LCY)")
+                    field("Direct Item Returns (LCY)"; Rec."Direct Item Returns (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
@@ -55,12 +55,12 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group("Cash Movement")
                 {
                     Caption = 'Cash Movement';
-                    field("Local Currency (LCY)"; "Local Currency (LCY)")
+                    field("Local Currency (LCY)"; Rec."Local Currency (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Local Currency (LCY) field';
                     }
-                    field("Foreign Currency (LCY)"; "Foreign Currency (LCY)")
+                    field("Foreign Currency (LCY)"; Rec."Foreign Currency (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Foreign Currency (LCY) field';
@@ -69,17 +69,17 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group("Other Payments")
                 {
                     Caption = 'Other Payments';
-                    field("Debtor Payment (LCY)"; "Debtor Payment (LCY)")
+                    field("Debtor Payment (LCY)"; Rec."Debtor Payment (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Debtor Payment (LCY) field';
                     }
-                    field("EFT (LCY)"; "EFT (LCY)")
+                    field("EFT (LCY)"; Rec."EFT (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the EFT (LCY) field';
                     }
-                    field("GL Payment (LCY)"; "GL Payment (LCY)")
+                    field("GL Payment (LCY)"; Rec."GL Payment (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the GL Payment (LCY) field';
@@ -87,12 +87,12 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 }
                 group(Voucher)
                 {
-                    field("Redeemed Vouchers (LCY)"; "Redeemed Vouchers (LCY)")
+                    field("Redeemed Vouchers (LCY)"; Rec."Redeemed Vouchers (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Redeemed Vouchers (LCY) field';
                     }
-                    field("Issued Vouchers (LCY)"; "Issued Vouchers (LCY)")
+                    field("Issued Vouchers (LCY)"; Rec."Issued Vouchers (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issued Vouchers (LCY) field';
@@ -101,19 +101,19 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group(Other)
                 {
                     Caption = 'Other';
-                    field("Rounding (LCY)"; "Rounding (LCY)")
+                    field("Rounding (LCY)"; Rec."Rounding (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Rounding (LCY) field';
                     }
-                    field("Bin Transfer Out Amount (LCY)"; "Bin Transfer Out Amount (LCY)")
+                    field("Bin Transfer Out Amount (LCY)"; Rec."Bin Transfer Out Amount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Bin Transfer Out Amount (LCY) field';
                     }
-                    field("Bin Transfer In Amount (LCY)"; "Bin Transfer In Amount (LCY)")
+                    field("Bin Transfer In Amount (LCY)"; Rec."Bin Transfer In Amount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -123,17 +123,17 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group("Credit Sales")
                 {
                     Caption = 'Credit Sales';
-                    field("Credit Sales Count"; "Credit Sales Count")
+                    field("Credit Sales Count"; Rec."Credit Sales Count")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Credit Sales Count field';
                     }
-                    field("Credit Sales Amount (LCY)"; "Credit Sales Amount (LCY)")
+                    field("Credit Sales Amount (LCY)"; Rec."Credit Sales Amount (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Credit Sales Amount (LCY) field';
                     }
-                    field("Credit Net Sales Amount (LCY)"; "Credit Net Sales Amount (LCY)")
+                    field("Credit Net Sales Amount (LCY)"; Rec."Credit Net Sales Amount (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Credit Net Sales Amount (LCY) field';
@@ -141,25 +141,25 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                     group(Details)
                     {
                         Caption = 'Details';
-                        field("Credit Unreal. Sale Amt. (LCY)"; "Credit Unreal. Sale Amt. (LCY)")
+                        field("Credit Unreal. Sale Amt. (LCY)"; Rec."Credit Unreal. Sale Amt. (LCY)")
                         {
                             ApplicationArea = All;
                             Importance = Additional;
                             ToolTip = 'Specifies the value of the Credit Unreal. Sale Amt. (LCY) field';
                         }
-                        field("Credit Unreal. Ret. Amt. (LCY)"; "Credit Unreal. Ret. Amt. (LCY)")
+                        field("Credit Unreal. Ret. Amt. (LCY)"; Rec."Credit Unreal. Ret. Amt. (LCY)")
                         {
                             ApplicationArea = All;
                             Importance = Additional;
                             ToolTip = 'Specifies the value of the Credit Unreal. Ret. Amt. (LCY) field';
                         }
-                        field("Credit Real. Sale Amt. (LCY)"; "Credit Real. Sale Amt. (LCY)")
+                        field("Credit Real. Sale Amt. (LCY)"; Rec."Credit Real. Sale Amt. (LCY)")
                         {
                             ApplicationArea = All;
                             Importance = Additional;
                             ToolTip = 'Specifies the value of the Credit Real. Sale Amt. (LCY) field';
                         }
-                        field("Credit Real. Return Amt. (LCY)"; "Credit Real. Return Amt. (LCY)")
+                        field("Credit Real. Return Amt. (LCY)"; Rec."Credit Real. Return Amt. (LCY)")
                         {
                             ApplicationArea = All;
                             Importance = Additional;
@@ -180,18 +180,18 @@ page 6150627 "NPR POS Workshift Checkp. Card"
             group(Turnover)
             {
                 Caption = 'Turnover';
-                field("Turnover (LCY)"; "Turnover (LCY)")
+                field("Turnover (LCY)"; Rec."Turnover (LCY)")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Turnover (LCY) field';
                 }
-                field("Net Turnover (LCY)"; "Net Turnover (LCY)")
+                field("Net Turnover (LCY)"; Rec."Net Turnover (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Net Turnover (LCY) field';
                 }
-                field("Net Cost (LCY)"; "Net Cost (LCY)")
+                field("Net Cost (LCY)"; Rec."Net Cost (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Net Cost (LCY) field';
@@ -199,13 +199,13 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group(Profit)
                 {
                     Caption = 'Profit';
-                    field("Profit Amount (LCY)"; "Profit Amount (LCY)")
+                    field("Profit Amount (LCY)"; Rec."Profit Amount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Profit Amount (LCY) field';
                     }
-                    field("Profit %"; "Profit %")
+                    field("Profit %"; Rec."Profit %")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
@@ -215,13 +215,13 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group(Direct)
                 {
                     Caption = 'Direct';
-                    field("Direct Turnover (LCY)"; "Direct Turnover (LCY)")
+                    field("Direct Turnover (LCY)"; Rec."Direct Turnover (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Direct Turnover (LCY) field';
                     }
-                    field("Direct Net Turnover (LCY)"; "Direct Net Turnover (LCY)")
+                    field("Direct Net Turnover (LCY)"; Rec."Direct Net Turnover (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -231,13 +231,13 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group(Credit)
                 {
                     Caption = 'Credit';
-                    field("Credit Turnover (LCY)"; "Credit Turnover (LCY)")
+                    field("Credit Turnover (LCY)"; Rec."Credit Turnover (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Credit Turnover (LCY) field';
                     }
-                    field("Credit Net Turnover (LCY)"; "Credit Net Turnover (LCY)")
+                    field("Credit Net Turnover (LCY)"; Rec."Credit Net Turnover (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -251,43 +251,43 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group("Discount Amounts")
                 {
                     Caption = 'Discount Amounts';
-                    field("Campaign Discount (LCY)"; "Campaign Discount (LCY)")
+                    field("Campaign Discount (LCY)"; Rec."Campaign Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Campaign Discount (LCY) field';
                     }
-                    field("Mix Discount (LCY)"; "Mix Discount (LCY)")
+                    field("Mix Discount (LCY)"; Rec."Mix Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Mix Discount (LCY) field';
                     }
-                    field("Quantity Discount (LCY)"; "Quantity Discount (LCY)")
+                    field("Quantity Discount (LCY)"; Rec."Quantity Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Quantity Discount (LCY) field';
                     }
-                    field("Custom Discount (LCY)"; "Custom Discount (LCY)")
+                    field("Custom Discount (LCY)"; Rec."Custom Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Custom Discount (LCY) field';
                     }
-                    field("BOM Discount (LCY)"; "BOM Discount (LCY)")
+                    field("BOM Discount (LCY)"; Rec."BOM Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the BOM Discount (LCY) field';
                     }
-                    field("Customer Discount (LCY)"; "Customer Discount (LCY)")
+                    field("Customer Discount (LCY)"; Rec."Customer Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Customer Discount (LCY) field';
                     }
-                    field("Line Discount (LCY)"; "Line Discount (LCY)")
+                    field("Line Discount (LCY)"; Rec."Line Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -297,43 +297,43 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 group("Dicount Percent")
                 {
                     Caption = 'Dicount Percent';
-                    field("Campaign Discount %"; "Campaign Discount %")
+                    field("Campaign Discount %"; Rec."Campaign Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Campaign Discount % field';
                     }
-                    field("Mix Discount %"; "Mix Discount %")
+                    field("Mix Discount %"; Rec."Mix Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Mix Discount % field';
                     }
-                    field("Quantity Discount %"; "Quantity Discount %")
+                    field("Quantity Discount %"; Rec."Quantity Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Quantity Discount % field';
                     }
-                    field("Custom Discount %"; "Custom Discount %")
+                    field("Custom Discount %"; Rec."Custom Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Custom Discount % field';
                     }
-                    field("BOM Discount %"; "BOM Discount %")
+                    field("BOM Discount %"; Rec."BOM Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the BOM Discount % field';
                     }
-                    field("Customer Discount %"; "Customer Discount %")
+                    field("Customer Discount %"; Rec."Customer Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Customer Discount % field';
                     }
-                    field("Line Discount %"; "Line Discount %")
+                    field("Line Discount %"; Rec."Line Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -342,13 +342,13 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 }
                 group("Discount Total")
                 {
-                    field("Total Discount (LCY)"; "Total Discount (LCY)")
+                    field("Total Discount (LCY)"; Rec."Total Discount (LCY)")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Total Discount (LCY) field';
                     }
-                    field("Total Discount %"; "Total Discount %")
+                    field("Total Discount %"; Rec."Total Discount %")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
@@ -376,7 +376,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Ellipsis = true;
                 Image = Balance;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -385,7 +385,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 trigger OnAction()
                 begin
 
-                    CreateBinCheckpoint("POS Unit No.");
+                    CreateBinCheckpoint(Rec."POS Unit No.");
                 end;
             }
             action("Create X-Report")
@@ -396,12 +396,6 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 ToolTip = 'Executes the Create X-Report action';
 
                 trigger OnAction()
-                var
-                    POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
-                    POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-                    POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-                    POSCreateEntry: Codeunit "NPR POS Create Entry";
-                    CheckpointEntryNo: Integer;
                 begin
                     //POSCheckpointMgr.CreateEndWorkshiftCheckpoint_AuditRoll ("POS Unit No.");
                     //FINDLAST();
@@ -415,7 +409,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Caption = 'Tax & VAT Summary';
                 Image = VATLedger;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Tax & VAT Summary action';
@@ -438,7 +432,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Caption = 'X-Report';
                 Image = PrintVAT;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'Executes the X-Report action';
@@ -450,7 +444,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                     ReportSelectionRetail: Record "NPR Report Selection Retail";
                 begin
 
-                    POSWorkshiftCheckpoint.Get("Entry No.");
+                    POSWorkshiftCheckpoint.Get(Rec."Entry No.");
                     POSWorkshiftCheckpoint.SetRecFilter();
 
                     ReportSelectionRetail.SetFilter("Report Type", '=%1', ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
@@ -491,13 +485,12 @@ page 6150627 "NPR POS Workshift Checkp. Card"
 
     local procedure CreateBinCheckpoint(POSUnitNo: Code[10])
     var
-        PaymentBinCheckpoint: Codeunit "NPR POS Payment Bin Checkpoint";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
         POSWorkshiftCheckpoint.CreateBinCheckpoint(Rec."Entry No.");
-        Commit;
+        Commit();
 
         POSPaymentBinCheckpoint.Reset();
         POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', Rec."Entry No.");

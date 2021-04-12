@@ -140,12 +140,12 @@ table 6014439 "NPR Quantity Discount Header"
     begin
         QtyDiscLine.SetRange("Item No.", "Item No.");
         QtyDiscLine.SetRange("Main no.", "Main No.");
-        QtyDiscLine.DeleteAll;
+        QtyDiscLine.DeleteAll();
 
         RetailComment.SetRange("Table ID", DATABASE::"NPR Quantity Discount Header");
         RetailComment.SetRange("No.", "Item No.");
         RetailComment.SetRange("No. 2", "Main No.");
-        RetailComment.DeleteAll;
+        RetailComment.DeleteAll();
 
         DimMgt.DeleteDefaultDim(DATABASE::"NPR Quantity Discount Header", "Main No.");
     end;
@@ -154,14 +154,14 @@ table 6014439 "NPR Quantity Discount Header"
     var
         Date: Record Date;
     begin
-        "Creating Date" := Today;
+        "Creating Date" := Today();
 
         if "Main No." = '' then
             NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Series", 0D, "Main No.", "No. Series");
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
-        "Starting Date" := Today;
-        if Date.FindLast then
+        "Starting Date" := Today();
+        if Date.FindLast() then
             "Closing Date" := Date."Period Start";
 
         DimMgt.UpdateDefaultDim(
@@ -171,7 +171,7 @@ table 6014439 "NPR Quantity Discount Header"
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
     end;
 
     var
@@ -182,7 +182,7 @@ table 6014439 "NPR Quantity Discount Header"
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR Quantity Discount Header", "Main No.", FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 
     procedure AssistEdit(QtyDiscHeader: Record "NPR Quantity Discount Header"): Boolean

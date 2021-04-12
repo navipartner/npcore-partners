@@ -10,9 +10,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         ActionDescription: Label 'POS Action for boarding pass scan';
         ERRNOTVALID: Label 'Scanned code can not be validated as boarding pass.';
         ERRAPCODE: Label 'Boarding pass is not valid.\\Boarding pass does not include airport code %1.\\%2';
-        ERR: Label 'Error';
         ERRTRAVELDATE: Label 'Boarding pass is not valid.\\Travel date is not today (%1).\\%2';
-        TXTBPASS: Label 'Scanned Boarding Pass';
         Text000: Label 'Tax Free';
         Text001: Label 'Boarding Pass';
 
@@ -34,31 +32,30 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                Sender.RegisterWorkflowStep(
-                  'boardingpass_input',
-                    'if(!param.BoardingPassString) {' +
-                    '  input({title: labels.BoardingPass,caption: labels.BoardingPass,value: param.BoardingPassString,notBlank: true}).cancel(abort);' +
-                    '} else {' +
-                    '  context.$boardingpass_input = {"input": param.BoardingPassString};' +
-                    '};');
-                RegisterWorkflowStep('process', 'respond()');
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep(
+              'boardingpass_input',
+                'if(!param.BoardingPassString) {' +
+                '  input({title: labels.BoardingPass,caption: labels.BoardingPass,value: param.BoardingPassString,notBlank: true}).cancel(abort);' +
+                '} else {' +
+                '  context.$boardingpass_input = {"input": param.BoardingPassString};' +
+                '};');
+            Sender.RegisterWorkflowStep('process', 'respond()');
 
-                RegisterWorkflow(false);
-                //RegisterDataBinding();
-                RegisterTextParameter('BoardingPassString', '');
-                RegisterBooleanParameter('RequiredTravelToday', true);
-                RegisterTextParameter('RequiredLegAirPortCode', '');
-                RegisterBooleanParameter('ShowTripMessage', true);
-                RegisterTextParameter('InfoCode', '');
-            end;
+            Sender.RegisterWorkflow(false);
+            //RegisterDataBinding();
+            Sender.RegisterTextParameter('BoardingPassString', '');
+            Sender.RegisterBooleanParameter('RequiredTravelToday', true);
+            Sender.RegisterTextParameter('RequiredLegAirPortCode', '');
+            Sender.RegisterBooleanParameter('ShowTripMessage', true);
+            Sender.RegisterTextParameter('InfoCode', '');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
@@ -104,7 +101,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
             POSInfo.SetFilter(Code, '%1', POSParameterValue.Value + '*');
             POSInfo.SetRange("Input Type", POSInfo."Input Type"::Text);
             POSInfo.SetRange(Type, POSInfo.Type::"Request Data");
-            if POSInfo.FindFirst then
+            if POSInfo.FindFirst() then
                 POSParameterValue.Value := POSInfo.Code;
         end;
         POSInfo.Get(POSParameterValue.Value);
@@ -136,7 +133,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         SettingScopeErr: Label 'setting scope in %1';
         ReadingErr: Label 'reading in %1';
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -159,14 +156,14 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
             Error(ERRAPCODE, RequiredLegAirPortCode, TravelDescription);
         end;
 
-        if (RequiredLegAirPortCode <> '') and (RequiredLegAirPortCodeInTrip) and (RequiredTravelToday) and (RequiredLegAirPortFlightDate <> WorkDate) then begin
+        if (RequiredLegAirPortCode <> '') and (RequiredLegAirPortCodeInTrip) and (RequiredTravelToday) and (RequiredLegAirPortFlightDate <> WorkDate()) then begin
             //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
             //Handled := TRUE;
             //EXIT;
             Error(ERRTRAVELDATE, WorkDate, TravelDescription);
         end;
 
-        if RequiredTravelToday and ((WorkDate < TravelStartDate) or (WorkDate > TravelEndDate)) then begin
+        if RequiredTravelToday and ((WorkDate() < TravelStartDate) or (WorkDate() > TravelEndDate)) then begin
             //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
             //Handled := TRUE;
             //EXIT;
@@ -208,12 +205,10 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         LegStringArray: array[10] of Text;
         NewStartRead: Integer;
         CurrentLeg: Integer;
-        "--1": Integer;
         FromAirportCode: Code[3];
         ToAirportCode: Code[3];
         OperatorFlightNo: Code[8];
         FlightDate: Date;
-        "--2": Integer;
     begin
         //Identifies traveldate and airportcodes for trip on boarding pass
 
@@ -295,7 +290,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         CalcDateFormula: Text;
     begin
         //Takes julian day part and makes date
-        oDate := CalcDate('<-CY>', WorkDate);
+        oDate := CalcDate('<-CY>', WorkDate());
         CalcDateFormula := StrSubstNo('<+%1D>', iJulianDate - 1);
         oDate := CalcDate(CalcDateFormula, oDate);
     end;
@@ -308,7 +303,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     begin
         if not EanBoxEvent.Get(EventCodeBoardingPass()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeBoardingPass();
             EanBoxEvent."Module Name" := CopyStr(Text000, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(Text001, 1, MaxStrLen(EanBoxEvent.Description));

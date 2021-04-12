@@ -1,4 +1,4 @@
-table 6059902 "NPR Task Line"
+﻿table 6059902 "NPR Task Line"
 {
     // TQ1.16/JDH/20140916 CASE 179044 added field "Send Only if File Exists" -possible to send ok emails only if a file has been generated
     // TQ1.17/JDH/20141008 CASE 179044 added function, so a manual check can be done, if the line is still valid to run (timeslot expired)
@@ -15,7 +15,7 @@ table 6059902 "NPR Task Line"
     // TQ1.28/RMT/20151130 CASE 219795 Change of parameters to function call "CalculateNextRunTime"
     // TQ1.29/JDH /20161101 CASE 242044 possible to use the new 2016 feature to store requestpage parameters in a blob
     // TQ1.33/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 11
-    // NPR5.47/MHA /20181022  CASE 333301 Updated AllObj.GET to reflect Primary Key in Object No. - OnValidate()
+    // NPR5.47/MHA /20181022  CASE 333301 Updated AllObj.Get() to reflect Primary Key in Object No. - OnValidate()
 
     Caption = 'Task Line';
     DataClassification = CustomerContent;
@@ -69,7 +69,7 @@ table 6059902 "NPR Task Line"
                     if (Indentation > 0) then
                         exit;
                     TaskQueue.SetupNewLine(Rec, false);
-                    TaskQueue.Insert;
+                    TaskQueue.Insert();
                     //-TQ1.28
                     //RunTask.CalculateNextRunTime(Rec,TRUE);
                     RunTask.CalculateNextRunTime(Rec, true, DummyEnabled);
@@ -550,12 +550,12 @@ table 6059902 "NPR Task Line"
         TaskOutputLog: Record "NPR Task Output Log";
         TaskLineParm: Record "NPR Task Line Parameters";
     begin
-        TaskQueue.LockTable;
+        TaskQueue.LockTable();
         TaskQueue.SetRange(Company, CompanyName);
         TaskQueue.SetRange("Task Template", "Journal Template Name");
         TaskQueue.SetRange("Task Batch", "Journal Batch Name");
         TaskQueue.SetRange("Task Line No.", "Line No.");
-        if TaskQueue.FindFirst then begin
+        if TaskQueue.FindFirst() then begin
             TaskQueue.TestField(Status, TaskQueue.Status::Awaiting);
             TaskQueue.Delete(true);
         end;
@@ -568,8 +568,8 @@ table 6059902 "NPR Task Line"
                 TaskLog."Journal Template Name" := '';
                 TaskLog."Journal Batch Name" := '';
                 TaskLog."Line No." := 0;
-                TaskLog.Modify;
-            until TaskLog.Next = 0;
+                TaskLog.Modify();
+            until TaskLog.Next() = 0;
 
         TaskOutputLog.SetRange("Journal Template Name", "Journal Template Name");
         TaskOutputLog.SetRange("Journal Batch Name", "Journal Batch Name");
@@ -579,13 +579,13 @@ table 6059902 "NPR Task Line"
                 TaskOutputLog."Journal Template Name" := '';
                 TaskOutputLog."Journal Batch Name" := '';
                 TaskOutputLog."Journal Line No." := 0;
-                TaskOutputLog.Modify;
-            until TaskOutputLog.Next = 0;
+                TaskOutputLog.Modify();
+            until TaskOutputLog.Next() = 0;
 
         TaskLineParm.SetRange("Journal Template Name", "Journal Template Name");
         TaskLineParm.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParm.SetRange("Journal Line No.", "Line No.");
-        TaskLineParm.DeleteAll;
+        TaskLineParm.DeleteAll();
 
         TaskJnlMgt.SyncroniseCompanies(Rec, 2);
     end;
@@ -631,7 +631,7 @@ table 6059902 "NPR Task Line"
 
         //-TQ1.18
         //NASGroup.SETRANGE(Default,TRUE);
-        //IF NASGroup.FINDFIRST THEN
+        //IF NASGroup.FindFirst() THEN
         //  "Task Worker Group" := NASGroup.Code;
         if TaskBatch.Get("Journal Template Name", "Journal Batch Name") and (TaskBatch."Task Worker Group" <> '') then
             "Task Worker Group" := TaskBatch."Task Worker Group"
@@ -640,7 +640,7 @@ table 6059902 "NPR Task Line"
                 "Task Worker Group" := TaskTemplate."Task Worker Group"
             else begin
                 NASGroup.SetRange(Default, true);
-                if NASGroup.FindFirst then
+                if NASGroup.FindFirst() then
                     "Task Worker Group" := NASGroup.Code;
             end;
         //+TQ1.18
@@ -651,7 +651,7 @@ table 6059902 "NPR Task Line"
         TaskQueue: Record "NPR Task Queue";
     begin
         if not TaskQueue.Get(CompanyName, "Journal Template Name", "Journal Batch Name", "Line No.") then
-            TaskQueue.Init;
+            TaskQueue.Init();
 
         exit(TaskQueue."Next Run time");
     end;
@@ -667,14 +667,14 @@ table 6059902 "NPR Task Line"
             if AssignTask2Me then
                 TaskQueue.Validate(Status, TaskQueue.Status::Assigned);
             //+TQ1.25
-            TaskQueue.Insert;
+            TaskQueue.Insert();
         end else begin
             TaskQueue."Next Run time" := NextRunDateTime;
             //-TQ1.25
             if AssignTask2Me then
                 TaskQueue.Validate(Status, TaskQueue.Status::Assigned);
             //+TQ1.25
-            TaskQueue.Modify;
+            TaskQueue.Modify();
         end;
     end;
 
@@ -712,13 +712,13 @@ table 6059902 "NPR Task Line"
         TaskLog.SetRange("Line No.", "Line No.");
         TaskLog.Ascending(false);
 
-        if TaskLog.FindFirst then
+        if TaskLog.FindFirst() then
             repeat
                 if TaskLog."Ending Time" <> 0DT then begin
                     Counter += 1;
                     TotalDur += TaskLog."Ending Time" - TaskLog."Starting Time";
                 end;
-            until (TaskLog.Next = 0) or (Counter = 5);
+            until (TaskLog.Next() = 0) or (Counter = 5);
         if Counter <> 0 then
             exit(Round(TotalDur / Counter, 1));
     end;
@@ -727,7 +727,7 @@ table 6059902 "NPR Task Line"
     var
         TaskQueue: Record "NPR Task Queue";
     begin
-        TaskQueue.LockTable;
+        TaskQueue.LockTable();
         if not TaskQueue.Get(CompanyName, "Journal Template Name", "Journal Batch Name", "Line No.") then
             exit;
 
@@ -739,7 +739,7 @@ table 6059902 "NPR Task Line"
         TaskQueue."Task Worker Group" := "Task Worker Group";
         TaskQueue."Object Type" := "Object Type";
         TaskQueue."Object No." := "Object No.";
-        TaskQueue.Modify;
+        TaskQueue.Modify();
     end;
 
     procedure GetLogEntryNo(): Integer
@@ -766,14 +766,14 @@ table 6059902 "NPR Task Line"
             CheckIndentation;
 
         Indentation += 1;
-        Modify;
+        Modify();
     end;
 
     procedure DecreaseIndentation()
     begin
         if Indentation > 0 then
             Indentation -= 1;
-        Modify;
+        Modify();
     end;
 
     procedure CheckIndentation()
@@ -789,7 +789,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if TaskLineParam.FindFirst then
+        if TaskLineParam.FindFirst() then
             exit(TaskLineParam.Value);
 
         //-TQ1.17
@@ -805,7 +805,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if TaskLineParam.FindFirst then
+        if TaskLineParam.FindFirst() then
             exit(TaskLineParam."Integer Value");
 
         //-TQ1.17
@@ -821,7 +821,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if TaskLineParam.FindFirst then
+        if TaskLineParam.FindFirst() then
             exit(TaskLineParam."Boolean Value");
 
         //-TQ1.17
@@ -838,7 +838,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if TaskLineParam.FindFirst then
+        if TaskLineParam.FindFirst() then
             exit(TaskLineParam."Date Value");
         InsertParameter(ParameterName, 1);
         //+TQ1.17
@@ -853,7 +853,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if TaskLineParam.FindFirst then
+        if TaskLineParam.FindFirst() then
             exit(TaskLineParam."Time Value");
         InsertParameter(ParameterName, 2);
         //+TQ1.17
@@ -867,7 +867,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if TaskLineParam.FindFirst then
+        if TaskLineParam.FindFirst() then
             exit(Format(TaskLineParam."Date Formula"));
         //-TQ1.16
         InsertParameter(ParameterName, 7);
@@ -876,7 +876,6 @@ table 6059902 "NPR Task Line"
 
     procedure GetParameterCalcDate(ParameterName: Text[30]): Date
     var
-        TaskLineParam: Record "NPR Task Line Parameters";
         DateFormula: DateFormula;
     begin
         //-TQ1.16
@@ -897,11 +896,11 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if not TaskLineParam.FindFirst then
+        if not TaskLineParam.FindFirst() then
             exit;
 
         TaskLineParam.Value := Value;
-        TaskLineParam.Modify;
+        TaskLineParam.Modify();
         //+TQ1.17
     end;
 
@@ -914,11 +913,11 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if not TaskLineParam.FindFirst then
+        if not TaskLineParam.FindFirst() then
             exit;
 
         TaskLineParam."Integer Value" := Value;
-        TaskLineParam.Modify;
+        TaskLineParam.Modify();
         //+TQ1.17
     end;
 
@@ -931,11 +930,11 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if not TaskLineParam.FindFirst then
+        if not TaskLineParam.FindFirst() then
             exit;
 
         TaskLineParam."Boolean Value" := Value;
-        TaskLineParam.Modify;
+        TaskLineParam.Modify();
         //+TQ1.17
     end;
 
@@ -948,11 +947,11 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if not TaskLineParam.FindFirst then
+        if not TaskLineParam.FindFirst() then
             exit;
 
         TaskLineParam."Date Value" := Value;
-        TaskLineParam.Modify;
+        TaskLineParam.Modify();
         //+TQ1.17
     end;
 
@@ -965,11 +964,11 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if not TaskLineParam.FindFirst then
+        if not TaskLineParam.FindFirst() then
             exit;
 
         TaskLineParam."Time Value" := Value;
-        TaskLineParam.Modify;
+        TaskLineParam.Modify();
         //+TQ1.17
     end;
 
@@ -982,11 +981,11 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field Code", ParameterName);
-        if not TaskLineParam.FindFirst then
+        if not TaskLineParam.FindFirst() then
             exit;
 
         TaskLineParam."Date Formula" := Value;
-        TaskLineParam.Modify;
+        TaskLineParam.Modify();
         //+TQ1.20.01
     end;
 
@@ -998,7 +997,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field No.", 0);
-        exit(not TaskLineParam.IsEmpty);
+        exit(not TaskLineParam.IsEmpty());
     end;
 
     procedure InsertParameter(ParameterName: Code[20]; FieldType: Option Text,Date,Time,DateTime,"Integer",Decimal,Boolean,DateFilter)
@@ -1015,12 +1014,12 @@ table 6059902 "NPR Task Line"
         TaskLineParam.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLineParam.SetRange("Journal Line No.", "Line No.");
         TaskLineParam.SetRange("Field No.", 0);
-        if TaskLineParam.FindLast then
+        if TaskLineParam.FindLast() then
             LineNo := TaskLineParam."Line No." + 10000
         else
             LineNo := 10000;
 
-        TaskLineParam.Init;
+        TaskLineParam.Init();
         TaskLineParam."Journal Template Name" := "Journal Template Name";
         TaskLineParam."Journal Batch Name" := "Journal Batch Name";
         TaskLineParam."Journal Line No." := "Line No.";
@@ -1028,7 +1027,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam."Line No." := LineNo;
         TaskLineParam."Field Code" := ParameterName;
         TaskLineParam."Field Type" := FieldType;
-        TaskLineParam.Insert;
+        TaskLineParam.Insert();
     end;
 
     local procedure TableFilter2View(TableNo: Integer; TableFilter: Text[1024]; TableKey: Text[1024]; CurrTableView: Text[1024]): Text[1024]
@@ -1202,7 +1201,7 @@ table 6059902 "NPR Task Line"
         TestField("Object No.");
 
         CalcFields("Request Page XML");
-        if "Request Page XML".HasValue then begin
+        if "Request Page XML".HasValue() then begin
             "Request Page XML".CreateInStream(InStr, TEXTENCODING::UTF8);
             InStr.Read(Params);
         end;
@@ -1224,7 +1223,7 @@ table 6059902 "NPR Task Line"
             "Request Page XML".CreateOutStream(OutStr, TEXTENCODING::UTF8);
             OutStr.Write(Params);
         end;
-        Modify;
+        Modify();
         //+TQ1.29 [242044]
     end;
 

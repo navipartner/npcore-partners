@@ -58,7 +58,5 @@ table 6014461 "NPR E-mail Templ. Report"
         TestField(Filename);
     end;
 
-    var
-        ReportSelection2: Record "Report Selections";
 }
 

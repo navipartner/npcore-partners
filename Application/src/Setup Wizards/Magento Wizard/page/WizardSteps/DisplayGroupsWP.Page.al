@@ -14,7 +14,7 @@ page 6014616 "NPR Display Groups WP"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
@@ -22,10 +22,10 @@ page 6014616 "NPR Display Groups WP"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInMagDisplayGroup(ExistingMagDisplayGroups, Code);
+                        CheckIfNoAvailableInMagDisplayGroup(ExistingMagDisplayGroups, Rec.Code);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

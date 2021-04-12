@@ -46,27 +46,27 @@ page 6059902 "NPR Task Journal"
                 IndentationColumn = NameIndent;
                 IndentationControls = Description;
                 ShowCaption = false;
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Object Type"; "Object Type")
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Type field';
                 }
-                field("Object No."; "Object No.")
+                field("Object No."; Rec."Object No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object No. field';
                 }
-                field("Report Name"; "Report Name")
+                field("Report Name"; Rec."Report Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report Name field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
@@ -80,26 +80,26 @@ page 6059902 "NPR Task Journal"
                     begin
                         //-TQ1.25
                         //SetNextRuntime(NextExecutionTime);
-                        SetNextRuntime(NextExecutionTime, false);
+                        Rec.SetNextRuntime(NextExecutionTime, false);
                         //+TQ1.25
                     end;
                 }
-                field("Call Object With Task Record"; "Call Object With Task Record")
+                field("Call Object With Task Record"; Rec."Call Object With Task Record")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Call Object With Task Record field';
                 }
-                field(Recurrence; Recurrence)
+                field(Recurrence; Rec.Recurrence)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Recurrence field';
                 }
-                field("Recurrence Interval"; "Recurrence Interval")
+                field("Recurrence Interval"; Rec."Recurrence Interval")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Recurrence Interval field';
                 }
-                field("Dependence Type"; "Dependence Type")
+                field("Dependence Type"; Rec."Dependence Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Dependence Type field';
@@ -178,7 +178,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     RunObject = Page "NPR TQ Task Card";
                     RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
                                   "Journal Batch Name" = FIELD("Journal Batch Name"),
@@ -192,7 +192,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Task Log';
                     Image = Log;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Task Log (Task)";
@@ -216,7 +216,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Decrease';
                     Image = PreviousRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -225,7 +225,7 @@ page 6059902 "NPR Task Journal"
                     trigger OnAction()
                     begin
                         CurrPage.SaveRecord;
-                        DecreaseIndentation;
+                        Rec.DecreaseIndentation;
                         CurrPage.Update(true);
                     end;
                 }
@@ -234,7 +234,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Increase';
                     Image = NextRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -243,7 +243,7 @@ page 6059902 "NPR Task Journal"
                     trigger OnAction()
                     begin
                         CurrPage.SaveRecord;
-                        IncreaseIndentation;
+                        Rec.IncreaseIndentation;
                         CurrPage.Update(true);
                     end;
                 }
@@ -256,7 +256,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Run Task';
                     Image = Migration;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -280,8 +280,8 @@ page 6059902 "NPR Task Journal"
 
     trigger OnAfterGetRecord()
     begin
-        NextExecutionTime := LookupNextRunTime;
-        NameIndent := Indentation;
+        NextExecutionTime := Rec.LookupNextRunTime;
+        NameIndent := Rec.Indentation;
 
         //-TQ1.31 [302644]
         GetLastLogInfo;
@@ -290,16 +290,16 @@ page 6059902 "NPR Task Journal"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
     end;
 
     trigger OnOpenPage()
     var
         JnlSelected: Boolean;
     begin
-        OpenedFromBatch := ("Journal Batch Name" <> '') and ("Journal Template Name" = '');
+        OpenedFromBatch := (Rec."Journal Batch Name" <> '') and (Rec."Journal Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             JobJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
         end;
@@ -335,12 +335,12 @@ page 6059902 "NPR Task Journal"
         LastStatus := LastStatus::" ";
         LastExecutionTime := 0DT;
         TaskLogTask.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Line No.");
-        TaskLogTask.SetRange("Journal Template Name", "Journal Template Name");
-        TaskLogTask.SetRange("Journal Batch Name", "Journal Batch Name");
-        TaskLogTask.SetRange("Line No.", "Line No.");
-        if TaskLogTask.FindLast then begin
-            if (TaskLogTask."Object Type" <> "Object Type") or
-               (TaskLogTask."Object No." <> "Object No.") then
+        TaskLogTask.SetRange("Journal Template Name", Rec."Journal Template Name");
+        TaskLogTask.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+        TaskLogTask.SetRange("Line No.", Rec."Line No.");
+        if TaskLogTask.FindLast() then begin
+            if (TaskLogTask."Object Type" <> Rec."Object Type") or
+               (TaskLogTask."Object No." <> Rec."Object No.") then
                 exit;
             LastStatus := TaskLogTask.Status;
             LastExecutionTime := TaskLogTask."Ending Time";

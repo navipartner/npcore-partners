@@ -35,7 +35,7 @@ codeunit 6151511 "NPR Nc Import Processor"
     local procedure MarkAsStarted(var NcImportEntry: Record "NPR Nc Import Entry")
     begin
         ClearLastError;
-        NcImportEntry.LockTable;
+        NcImportEntry.LockTable();
         NcImportEntry.Get(NcImportEntry."Entry No.");
         Clear(NcImportEntry."Last Error Message");
         NcImportEntry.Imported := false;
@@ -49,7 +49,7 @@ codeunit 6151511 "NPR Nc Import Processor"
         NcImportEntry."Server Instance Id" := ServiceInstanceId;
         NcImportEntry."Session Id" := SessionId;
         NcImportEntry.Modify(true);
-        Commit;
+        Commit();
     end;
 
     local procedure MarkAsCompleted(Success: Boolean; var NcImportEntry: Record "NPR Nc Import Entry")
@@ -59,7 +59,7 @@ codeunit 6151511 "NPR Nc Import Processor"
         OutStr: OutStream;
         LastErrorText: Text;
     begin
-        NcImportEntry.LockTable;
+        NcImportEntry.LockTable();
         NcImportEntry.Get(NcImportEntry."Entry No.");
         NcImportEntry."Import Completed at" := CurrentDateTime;
         if NcImportEntry."Import Started at" <> 0DT then
@@ -75,7 +75,7 @@ codeunit 6151511 "NPR Nc Import Processor"
             OutStr.WriteText(LastErrorText);
         end;
         NcImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         if Success then
             exit;
@@ -85,12 +85,12 @@ codeunit 6151511 "NPR Nc Import Processor"
             exit;
         if NcImportType."Send e-mail on Error" then begin
             if NcImportMgt.SendErrorMail(NcImportEntry) then begin
-                NcImportEntry.LockTable;
+                NcImportEntry.LockTable();
                 NcImportEntry.Get(NcImportEntry."Entry No.");
                 NcImportEntry."Last Error E-mail Sent at" := CurrentDateTime;
                 NcImportEntry."Last Error E-mail Sent to" := NcImportType."E-mail address on Error";
                 NcImportEntry.Modify(true);
-                Commit;
+                Commit();
             end;
         end;
     end;
@@ -107,11 +107,11 @@ codeunit 6151511 "NPR Nc Import Processor"
             exit;
 
         if NcImportType."Delay between Retries" > 0 then begin
-            NcImportEntry.LockTable;
+            NcImportEntry.LockTable();
             NcImportEntry.Get(NcImportEntry."Entry No.");
             NcImportEntry."Earliest Import Datetime" := CurrentDateTime + NcImportType."Delay between Retries";
             NcImportEntry.Modify(true);
-            Commit;
+            Commit();
         end;
 
         ScheduleImport(NcImportEntry);

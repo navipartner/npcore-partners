@@ -25,29 +25,25 @@ table 6014564 "NPR RP Data Item Constr. Links"
             DataClassification = CustomerContent;
 
             trigger OnLookup()
-            var
-                DataItem: Record "NPR RP Data Items";
-                DataItemConstraint: Record "NPR RP Data Item Constr.";
-                tmpRetailList: Record "NPR Retail List" temporary;
             begin
                 // DataItemConstraint.SETRANGE("Data Item Code", "Data Item Code");
                 // DataItemConstraint.SETRANGE("Line No.", "Constraint Line No.");
-                // DataItemConstraint.FINDFIRST;
+                // DataItemConstraint.FindFirst();
                 //
                 // DataItem.SETRANGE(Code, "Data Item Code");
                 // DataItem.SETRANGE("Line No.", DataItemConstraint."Data Item Line No.");
-                // DataItem.FINDFIRST;
+                // DataItem.FindFirst();
                 //
                 // tmpRetailList.Choice := DataItem.Name;
                 // tmpRetailList.Value := FORMAT(DataItem."Table ID");
-                // tmpRetailList.INSERT;
+                // tmpRetailList.Insert();
                 //
                 // DataItem.SETRANGE("Line No.", DataItem."Parent Item Line No.");
-                // IF DataItem.FINDFIRST THEN BEGIN
+                // IF DataItem.FindFirst() THEN BEGIN
                 //  tmpRetailList.Number += 1;
                 //  tmpRetailList.Choice := DataItem.Name;
                 //  tmpRetailList.Value := FORMAT(DataItem."Table ID");
-                //  tmpRetailList.INSERT;
+                //  tmpRetailList.Insert();
                 // END;
                 //
                 // IF PAGE.RUNMODAL(PAGE::"Retail List", tmpRetailList) = ACTION::LookupOK THEN
@@ -55,29 +51,26 @@ table 6014564 "NPR RP Data Item Constr. Links"
             end;
 
             trigger OnValidate()
-            var
-                DataItem: Record "NPR RP Data Items";
-                DataItemConstraint: Record "NPR RP Data Item Constr.";
             begin
                 // DataItemConstraint.SETRANGE("Data Item Code", "Data Item Code");
                 // DataItemConstraint.SETRANGE("Line No.", "Constraint Line No.");
-                // DataItemConstraint.FINDFIRST;
+                // DataItemConstraint.FindFirst();
                 //
                 // DataItem.SETRANGE(Code, "Data Item Code");
                 // DataItem.SETRANGE("Line No.", DataItemConstraint."Data Item Line No.");
                 // DataItem.SETFILTER(Name,'@' + "Data Item Name" + '*');
-                // IF DataItem.FINDFIRST THEN BEGIN
+                // IF DataItem.FindFirst() THEN BEGIN
                 //  "Data Item Name" := DataItem.Name;
                 //  "Data Item Table ID" := DataItem."Table ID";
                 //  EXIT;
                 // END;
                 //
                 // DataItem.SETRANGE(Name);
-                // DataItem.FINDFIRST;
+                // DataItem.FindFirst();
                 //
                 // DataItem.SETRANGE("Line No.", DataItem."Parent Item Line No.");
                 // DataItem.SETFILTER(Name,'@' + "Data Item Name" + '*');
-                // DataItem.FINDFIRST;
+                // DataItem.FindFirst();
                 //
                 // "Data Item Name" := DataItem.Name;
                 // "Data Item Table ID" := DataItem."Table ID";
@@ -102,7 +95,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
                 DataItem.Get("Data Item Code", DataItemConstraint."Data Item Line No.");
 
                 Field.FilterGroup(2);
@@ -111,7 +104,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Data Item Field Name" := Field.FieldName;
                     "Data Item Field ID" := Field."No.";
@@ -126,13 +119,13 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
                 DataItem.Get("Data Item Code", DataItemConstraint."Data Item Line No.");
 
                 //Field.SETRANGE(TableNo,"Data Item Table ID");
                 Field.SetRange(TableNo, DataItem."Table ID");
                 Field.SetRange("No.", "Data Item Field ID");
-                Field.FindFirst;
+                Field.FindFirst();
                 "Data Item Field Name" := Field.FieldName;
             end;
         }
@@ -150,7 +143,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
                 DataItem.Get("Data Item Code", DataItemConstraint."Data Item Line No.");
 
                 Field.FilterGroup(2);
@@ -159,7 +152,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Data Item Field Name" := Field.FieldName;
                     "Data Item Field ID" := Field."No.";
@@ -174,15 +167,15 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
                 DataItem.Get("Data Item Code", DataItemConstraint."Data Item Line No.");
 
                 //Field.SETRANGE(TableNo,"Data Item Table ID");
                 Field.SetRange(TableNo, DataItem."Table ID");
                 Field.SetRange(FieldName, "Data Item Field Name");
-                if not Field.FindFirst then
+                if not Field.FindFirst() then
                     Field.SetFilter(FieldName, '@' + "Data Item Field Name" + '*');
-                Field.FindFirst;
+                Field.FindFirst();
 
                 "Data Item Field Name" := Field.FieldName;
                 "Data Item Field ID" := Field."No."
@@ -201,14 +194,14 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
 
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, DataItemConstraint."Table ID");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
@@ -222,11 +215,11 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
 
                 Field.SetRange(TableNo, DataItemConstraint."Table ID");
                 Field.SetRange("No.", "Field ID");
-                Field.FindFirst;
+                Field.FindFirst();
                 "Field Name" := Field.FieldName;
             end;
         }
@@ -243,14 +236,14 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
 
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, DataItemConstraint."Table ID");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
@@ -264,13 +257,13 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
 
                 Field.SetRange(TableNo, DataItemConstraint."Table ID");
                 Field.SetRange(FieldName, "Field Name");
-                if not Field.FindFirst then
+                if not Field.FindFirst() then
                     Field.SetFilter(FieldName, '@' + "Field Name" + '*');
-                Field.FindFirst;
+                Field.FindFirst();
 
                 "Field Name" := Field.FieldName;
                 "Field ID" := Field."No.";
@@ -313,7 +306,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
             begin
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
-                DataItemConstraint.FindFirst;
+                DataItemConstraint.FindFirst();
 
                 if not Field.Get(DataItemConstraint."Table ID", "Field ID") then
                     exit;
@@ -324,11 +317,11 @@ table 6014564 "NPR RP Data Item Constr. Links"
                     'boolean':
                         begin
                             TempRetailList.Choice := 'True';
-                            TempRetailList.Insert;
+                            TempRetailList.Insert();
 
                             TempRetailList.Number += 1;
                             TempRetailList.Choice := 'False';
-                            TempRetailList.Insert;
+                            TempRetailList.Insert();
                             if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then
                                 "Filter Value" := TempRetailList.Choice;
                         end;
@@ -340,22 +333,22 @@ table 6014564 "NPR RP Data Item Constr. Links"
                                 if not (String in ['', ' ']) then begin
                                     TempRetailList.Choice := String;
                                     TempRetailList.Value := Format(TempRetailList.Number - 1);
-                                    TempRetailList.Insert;
+                                    TempRetailList.Insert();
                                 end;
                             end;
                             RetailListPage.SetMultipleChoiceMode(true);
                             RetailListPage.LookupMode(true);
                             RetailListPage.SetRec(TempRetailList);
-                            if RetailListPage.RunModal = ACTION::LookupOK then begin
+                            if RetailListPage.RunModal() = ACTION::LookupOK then begin
                                 "Filter Value" := '';
                                 RetailListPage.GetRec(TempRetailList);
                                 TempRetailList.SetRange(Chosen, true);
-                                if TempRetailList.FindSet then
+                                if TempRetailList.FindSet() then
                                     repeat
                                         if StrLen("Filter Value") > 0 then
                                             "Filter Value" += '|';
                                         "Filter Value" += TempRetailList.Value;
-                                    until TempRetailList.Next = 0;
+                                    until TempRetailList.Next() = 0;
                             end;
                         end;
                     else

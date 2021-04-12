@@ -15,7 +15,7 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := Choice;
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     [IntegrationEvent(false, false)]
@@ -38,9 +38,9 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
         AllObj: Record AllObj;
     begin
         AllObj.Get(AllObj."Object Type"::Codeunit, CODEUNIT::"NPR RP Aux: Event Publishers");
-        tmpAllObj.Init;
+        tmpAllObj.Init();
         tmpAllObj := AllObj;
-        tmpAllObj.Insert;
+        tmpAllObj.Insert();
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionList', '', false, false)]
@@ -66,7 +66,7 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
         Handled := true;
 
         RecRef := RecID.GetRecord();
-        RecRef.Find;
+        RecRef.Find();
         case RecRef.Number of
             DATABASE::"NPR POS Entry":
                 begin
@@ -77,13 +77,12 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
                 Error(ERROR_UNKNOWNTABLE, POSEntry.TableCaption);
         end;
 
-        with TemplateLine do
-            case FunctionName of
-                'RECEIPT_HEADER':
-                    OnSalesReceiptHeader(TemplateLine, ReceiptNo);
-                'RECEIPT_FOOTER':
-                    OnSalesReceiptFooter(TemplateLine, ReceiptNo);
-            end;
+        case FunctionName of
+            'RECEIPT_HEADER':
+                OnSalesReceiptHeader(TemplateLine, ReceiptNo);
+            'RECEIPT_FOOTER':
+                OnSalesReceiptFooter(TemplateLine, ReceiptNo);
+        end;
 
         Skip := true; //The actual template line does not need to print anything. The event subscribers might.
     end;

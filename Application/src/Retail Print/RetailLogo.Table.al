@@ -109,9 +109,9 @@ table 6014478 "NPR Retail Logo"
         RetailLogo2: Record "NPR Retail Logo";
     begin
         //-NPR5.29 [252253]
-        if RetailLogo2.FindLast then;
+        if RetailLogo2.FindLast() then;
         Sequence := RetailLogo2.Sequence + 1;
-        // IF RetailLogo2.FINDLAST AND (RetailLogo2.Sequence <> '') THEN
+        // IF RetailLogo2.FindLast() AND (RetailLogo2.Sequence <> '') THEN
         //  Sequence := INCSTR(RetailLogo2.Sequence)
         // ELSE
         //  Sequence := '1';

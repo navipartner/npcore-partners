@@ -31,15 +31,12 @@ table 6060106 "NPR Ean Box Event"
             TableRelation = "NPR POS Action";
 
             trigger OnValidate()
-            var
-                AllObj: Record AllObj;
-                POSAction: Record "NPR POS Action";
             begin
             end;
         }
         field(20; "Action Description"; Text[250])
         {
-            CalcFormula = Lookup ("NPR POS Action".Description WHERE(Code = FIELD("Action Code")));
+            CalcFormula = Lookup("NPR POS Action".Description WHERE(Code = FIELD("Action Code")));
             Caption = 'Action Description';
             Editable = false;
             FieldClass = FlowField;

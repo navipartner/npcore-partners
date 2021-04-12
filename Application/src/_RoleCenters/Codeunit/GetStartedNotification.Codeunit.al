@@ -2,10 +2,10 @@ codeunit 6014441 "NPR Get Started Notification"
 {
     local procedure SendOrRecallGetStartedNotification()
     begin
-        if not IsNotificationEnabled() then 
-            exit; 
-        
-            SendGetStartedNotification();
+        if not IsNotificationEnabled() then
+            exit;
+
+        SendGetStartedNotification();
     end;
 
     local procedure SendGetStartedNotification()
@@ -21,18 +21,18 @@ codeunit 6014441 "NPR Get Started Notification"
     end;
 
     procedure DisableNotificationAction(Notification: Notification)
-    var 
+    var
         MyNotifications: Record "My Notifications";
     begin
         MyNotifications.Disable(NotificationIDLbl);
     end;
 
     procedure GetStartedVideoAction(GettingStartedNotification: Notification)
-    begin 
+    begin
         PAGE.RunModal(PAGE::"NPR Getting Started");
     end;
 
-    [EventSubscriber(ObjectType::Page,Page::"NPR Setup Act - Scenarios", 'OnOpenPageEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup Act - Scenarios", 'OnOpenPageEvent', '', false, false)]
     local procedure SendNotificationOnEvent()
     begin
         SendOrRecallGetStartedNotification();
@@ -45,7 +45,7 @@ codeunit 6014441 "NPR Get Started Notification"
         exit(MyNotifications.IsEnabled(NotificationIDLbl));
     end;
 
-    [EventSubscriber(ObjectType::Page, Page:: "My Notifications", 'OnInitializingNotificationWithDefaultState', '', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"My Notifications", 'OnInitializingNotificationWithDefaultState', '', false, false)]
     local procedure "MyNotifications.OnInitializingNotificationWithDefaultState"()
     var
         MyNotifications: Record "My Notifications";
@@ -62,5 +62,5 @@ codeunit 6014441 "NPR Get Started Notification"
         GetStartedNotificationMsg: Label 'Welcome to NP Retail, here''s a quick quide on how to setup everything!';
         GetStartedNotificationActionTxt: Label 'Get Started!';
         GetStartedNotificationDescription: Label 'Show reminder to watch get started guide';
-        DontShowNotificationAgain: Label 'Don''t show me again'; 
+        DontShowNotificationAgain: Label 'Don''t show me again';
 }

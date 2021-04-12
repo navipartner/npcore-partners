@@ -69,23 +69,14 @@ table 6151560 "NPR NpXml Template History"
 
     procedure InsertHistory(XmlTemplate: Code[20]; TemplateVersionNo: Code[20]; EventType: Option New,Modification,Restore; VersionDescription: Text[250])
     var
-        NpXmlAttribute: Record "NPR NpXml Attribute";
-        NpXmlElement: Record "NPR NpXml Element";
-        NpXmlFilter: Record "NPR NpXml Filter";
-        NpXmlTemplate: Record "NPR NpXml Template";
-        NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
-        NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
-        NpXmlTemplateArchive: Record "NPR NpXml Template Arch.";
         TemplateHistory: Record "NPR NpXml Template History";
         TemplateHistory2: Record "NPR NpXml Template History";
-        EntryNo: Integer;
-        FieldRef: FieldRef;
     begin
         TemplateHistory2.SetRange("Template Code", XmlTemplate);
-        if TemplateHistory2.FindLast and (TemplateHistory2."Changed by" = UserId) and (TemplateHistory2."Event Type" = EventType) and (TemplateVersionNo = TemplateHistory2."Template Version No.") then
+        if TemplateHistory2.FindLast() and (TemplateHistory2."Changed by" = UserId) and (TemplateHistory2."Event Type" = EventType) and (TemplateVersionNo = TemplateHistory2."Template Version No.") then
             exit;
 
-        TemplateHistory.Init;
+        TemplateHistory.Init();
         TemplateHistory."Entry No." := 0;
         TemplateHistory."Template Code" := XmlTemplate;
         TemplateHistory."Template Version No." := TemplateVersionNo;
@@ -101,7 +92,7 @@ table 6151560 "NPR NpXml Template History"
         TemplateHistory."Event Type" := EventType;
         TemplateHistory."Changed by" := UserId;
         TemplateHistory."Change at" := CreateDateTime(Today, Time);
-        TemplateHistory.Insert;
+        TemplateHistory.Insert();
     end;
 }
 

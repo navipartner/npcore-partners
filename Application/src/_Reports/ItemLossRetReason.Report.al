@@ -155,7 +155,6 @@ report 6014544 "NPR Item Loss - Ret. Reason"
 
                 trigger OnAfterGetRecord()
                 begin
-                    IntY := 1;
                     if Integer.Number > 2 then
                         CurrReport.Skip();
                 end;
@@ -223,7 +222,6 @@ report 6014544 "NPR Item Loss - Ret. Reason"
         QtyTotal: Decimal;
         SalesAmount: Decimal;
         SalesAmountTotal: Decimal;
-        IntY: Integer;
         ReasonCodeCount: Integer;
         Cost_AmountCaptionLbl: Label 'Cost Amount';
         Item_DescriptionCaptionLbl: Label 'Description';
@@ -261,7 +259,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                 lValueEntryRec.Reset();
                 lValueEntryRec.SetCurrentKey("Item Ledger Entry No.");
                 lValueEntryRec.SetRange("Item Ledger Entry No.", lItemEntryRec."Entry No.");
-                if lValueEntryRec.FindFirst then
+                if lValueEntryRec.FindFirst() then
                     if (SourceCodeFilter = '') or ((SourceCodeFilter <> '') and (SourceCodeFilter = lValueEntryRec."Source Code")) then begin
                         if lValueEntryRec."Reason Code" <> '' then
                             if lReasonCodeRec.Get(lValueEntryRec."Reason Code") then

@@ -55,7 +55,7 @@ page 6059970 "NPR Variety Setup"
                 field("Barcode Type (Item Cross Ref.)"; Rec."Barcode Type (Item Cross Ref.)")
                 {
                     ApplicationArea = All;
-                    Editable = "Create Item Cross Ref. auto.";
+                    Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Barcode Type (Item Cross Ref.) field';
                 }
                 field("Item Cross Ref. No. Series (I)"; Rec."Item Cross Ref. No. Series (I)")
@@ -96,12 +96,12 @@ page 6059970 "NPR Variety Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External EAN No. Series field';
                 }
-                field("EAN-Internal"; "EAN-Internal")
+                field("EAN-Internal"; Rec."EAN-Internal")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the EAN-Internal field';
                 }
-                field("EAN-External"; "EAN-External")
+                field("EAN-External"; Rec."EAN-External")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the EAN-External field';
@@ -110,7 +110,7 @@ page 6059970 "NPR Variety Setup"
             group(View)
             {
                 Caption = 'View';
-                field("Hide Inactive Values"; "Hide Inactive Values")
+                field("Hide Inactive Values"; Rec."Hide Inactive Values")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Whether Inactive Values should be hidden in the Variant Matrix by default';

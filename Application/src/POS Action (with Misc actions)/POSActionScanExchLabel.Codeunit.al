@@ -11,22 +11,21 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
 
-                RegisterWorkflowStep('prompt', 'if (param.PromptForBarcode == true) { input(labels.InpTitle, labels.InpLead, labels.InpInstr, param.ExchLabelBarcode, true).respond().cancel() } else { respond() };');
+            Sender.RegisterWorkflowStep('prompt', 'if (param.PromptForBarcode == true) { input(labels.InpTitle, labels.InpLead, labels.InpInstr, param.ExchLabelBarcode, true).respond().cancel() } else { respond() };');
 
-                RegisterWorkflow(false);
-                RegisterDataBinding();
-                RegisterBooleanParameter('PromptForBarcode', false);
-                RegisterTextParameter('ExchLabelBarcode', '');
-            end;
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataBinding();
+            Sender.RegisterBooleanParameter('PromptForBarcode', false);
+            Sender.RegisterTextParameter('ExchLabelBarcode', '');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -39,7 +38,7 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
         InputExchLabelBarcode: Text;
         PromptForBarcode: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -67,13 +66,11 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
 
-        Captions.AddActionCaption(ActionCode, 'InpTitle', InpTitle);
-        Captions.AddActionCaption(ActionCode, 'InpLead', InpLead);
-        Captions.AddActionCaption(ActionCode, 'InpInstr', '');
+        Captions.AddActionCaption(ActionCode(), 'InpTitle', InpTitle);
+        Captions.AddActionCaption(ActionCode(), 'InpLead', InpLead);
+        Captions.AddActionCaption(ActionCode(), 'InpInstr', '');
     end;
 
     local procedure ActionCode(): Text
@@ -124,7 +121,7 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
         ExchangeLabel: Record "NPR Exchange Label";
     begin
         if not EanBoxEvent.Get(EventCodeExchLabel()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeExchLabel;
             EanBoxEvent."Module Name" := InpTitle;
             //EanBoxEvent.Description := ExchangeLabel.FIELDCAPTION(Barcode);
@@ -175,7 +172,6 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
     procedure BarCodeIsExchangeLabel(Barcode: Text): Boolean
     var
         ExchangeLabel: Record "NPR Exchange Label";
-        IComm: Record "NPR I-Comm";
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         ExchangeLabelManagement: Codeunit "NPR Exchange Label Mgt.";
     begin

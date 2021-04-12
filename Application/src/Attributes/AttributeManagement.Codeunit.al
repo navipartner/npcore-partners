@@ -1,4 +1,4 @@
-codeunit 6014555 "NPR Attribute Management"
+﻿codeunit 6014555 "NPR Attribute Management"
 {
     // Guide for implementation on entity:
     // Shortcut Attributes: Example on item page/form
@@ -89,11 +89,7 @@ codeunit 6014555 "NPR Attribute Management"
 
     procedure SetEntryAttributeValue(TableID: Integer; AttributeReference: Integer; PKCode: Integer; var TextValue: Text[250])
     var
-        Attribute: Record "NPR Attribute";
-        AttributeKey: Record "NPR Attribute Key";
         AttributeID: Record "NPR Attribute ID";
-        AttributeValue: Record "NPR Attribute Value Set";
-        NewValue: Boolean;
     begin
 
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::MASTERDATA, Format(PKCode, 0, '<integer>'), 0, 0, '', 0, TextValue);
@@ -101,11 +97,7 @@ codeunit 6014555 "NPR Attribute Management"
 
     procedure SetMasterDataAttributeValue(TableID: Integer; AttributeReference: Integer; PKCode: Code[20]; var TextValue: Text[250])
     var
-        Attribute: Record "NPR Attribute";
-        AttributeKey: Record "NPR Attribute Key";
         AttributeID: Record "NPR Attribute ID";
-        AttributeValue: Record "NPR Attribute Value Set";
-        NewValue: Boolean;
     begin
 
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::MASTERDATA, PKCode, 0, 0, '', 0, TextValue);
@@ -113,11 +105,7 @@ codeunit 6014555 "NPR Attribute Management"
 
     procedure SetDocumentAttributeValue(TableID: Integer; AttributeReference: Integer; PKOption: Option; PKCode: Code[20]; var TextValue: Text[250])
     var
-        Attribute: Record "NPR Attribute";
-        AttributeKey: Record "NPR Attribute Key";
         AttributeID: Record "NPR Attribute ID";
-        AttributeValue: Record "NPR Attribute Value Set";
-        NewValue: Boolean;
     begin
 
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::DOCUMENT, PKCode, 0, PKOption, '', 0, TextValue);
@@ -125,11 +113,7 @@ codeunit 6014555 "NPR Attribute Management"
 
     procedure SetDocumentLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKOption: Option; PKCode: Code[20]; PKLine: Integer; var TextValue: Text[250])
     var
-        Attribute: Record "NPR Attribute";
-        AttributeKey: Record "NPR Attribute Key";
         AttributeID: Record "NPR Attribute ID";
-        AttributeValue: Record "NPR Attribute Value Set";
-        NewValue: Boolean;
     begin
 
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::DOCUMENTLINE, PKCode, PKLine, PKOption, '', 0, TextValue);
@@ -137,11 +121,7 @@ codeunit 6014555 "NPR Attribute Management"
 
     procedure SetWorksheetLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; var TextValue: Text[250])
     var
-        Attribute: Record "NPR Attribute";
-        AttributeKey: Record "NPR Attribute Key";
         AttributeID: Record "NPR Attribute ID";
-        AttributeValue: Record "NPR Attribute Value Set";
-        NewValue: Boolean;
     begin
 
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::WORKSHEETLINE, PKTemplate, PKLine, 0, PKBatch, 0, TextValue);
@@ -149,11 +129,7 @@ codeunit 6014555 "NPR Attribute Management"
 
     procedure SetWorksheetSubLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; PKSubLine: Integer; var TextValue: Text[250])
     var
-        Attribute: Record "NPR Attribute";
-        AttributeKey: Record "NPR Attribute Key";
         AttributeID: Record "NPR Attribute ID";
-        AttributeValue: Record "NPR Attribute Value Set";
-        NewValue: Boolean;
     begin
 
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::WORKSHEETSUBLINE, PKTemplate, PKLine, 0, PKBatch, PKSubLine, TextValue);
@@ -219,7 +195,7 @@ codeunit 6014555 "NPR Attribute Management"
         if (TextValue = GetTextValue(Attribute, vAttributeValue)) then
             exit(false);
 
-        vAttributeValue.Init;
+        vAttributeValue.Init();
         vAttributeValue."Text Value" := TextValue;
 
         case Attribute."Value Datatype" of
@@ -272,48 +248,36 @@ codeunit 6014555 "NPR Attribute Management"
     end;
 
     procedure GetEntryAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKCode: Integer)
-    var
-        AttributeKey: Record "NPR Attribute Key";
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, Format(PKCode, 0, '<integer>'), 0, 0, '', 0);
     end;
 
     procedure GetMasterDataAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKCode: Code[20])
-    var
-        AttributeKey: Record "NPR Attribute Key";
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKCode, 0, 0, '', 0);
     end;
 
     procedure GetDocumentAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKOption: Option; PKCode: Code[20])
-    var
-        AttributeKey: Record "NPR Attribute Key";
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKCode, 0, PKOption, '', 0);
     end;
 
     procedure GetDocumentLineAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKOption: Option; PKCode: Code[20]; PKLine: Integer)
-    var
-        AttributeKey: Record "NPR Attribute Key";
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKCode, PKLine, PKOption, '', 0);
     end;
 
     procedure GetWorksheetLineAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer)
-    var
-        AttributeKey: Record "NPR Attribute Key";
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKTemplate, PKLine, 0, PKBatch, 0);
     end;
 
     procedure GetWorksheetSublineaAttributeValue(var TextArray: array[40] of Text[250]; TableID: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; PKSubline: Integer)
-    var
-        AttributeKey: Record "NPR Attribute Key";
     begin
 
         GetGenericAttributeValueWorker(TextArray, TableID, PKTemplate, PKLine, 0, PKBatch, PKSubline);
@@ -608,9 +572,6 @@ codeunit 6014555 "NPR Attribute Management"
     end;
 
     local procedure GetMDRKeyValue(KeyRef: KeyRef; var PrimaryKeyValue: Code[20]): Boolean
-    var
-        KeyFldRef: FieldRef;
-        "Field": Record "Field";
     begin
         if (KeyRef.FieldCount <> 1) then
             exit(false);
@@ -622,9 +583,6 @@ codeunit 6014555 "NPR Attribute Management"
     end;
 
     local procedure GetDocumentKeyValue(KeyRef: KeyRef; var OptionKeyValue: Option; var PrimaryKeyValue: Code[20]): Boolean
-    var
-        KeyFldRef: FieldRef;
-        "Field": Record "Field";
     begin
         if (KeyRef.FieldCount <> 2) then
             exit(false);
@@ -639,9 +597,6 @@ codeunit 6014555 "NPR Attribute Management"
     end;
 
     local procedure GetDocumentLineKeyValue(KeyRef: KeyRef; var OptionKeyValue: Option; var PrimaryKeyValue: Code[20]; var IntegerKeyValue: Integer): Boolean
-    var
-        KeyFldRef: FieldRef;
-        "Field": Record "Field";
     begin
         if (KeyRef.FieldCount <> 3) then
             exit(false);
@@ -659,9 +614,6 @@ codeunit 6014555 "NPR Attribute Management"
     end;
 
     local procedure GetWorksheetLineKeyValue(KeyRef: KeyRef; var PrimaryKeyValue: Code[20]; var Primary2KeyValue: Code[20]; var IntegerKeyValue: Integer): Boolean
-    var
-        KeyFldRef: FieldRef;
-        "Field": Record "Field";
     begin
         if (KeyRef.FieldCount <> 3) then
             exit(false);
@@ -679,9 +631,6 @@ codeunit 6014555 "NPR Attribute Management"
     end;
 
     local procedure GetWorksheetSubLineKeyValue(KeyRef: KeyRef; var PrimaryKeyValue: Code[20]; var Primary2KeyValue: Code[20]; var IntegerKeyValue: Integer; var Integer2KeyValue: Integer): Boolean
-    var
-        KeyFldRef: FieldRef;
-        "Field": Record "Field";
     begin
         if (KeyRef.FieldCount <> 4) then
             exit(false);
@@ -790,22 +739,21 @@ codeunit 6014555 "NPR Attribute Management"
                 FilterView := GetAttributeFilterViewWorksheetSubLine(NPRAttributeKeys, RecRef);
         end;
 
-        NPRAttributeKeys.Close;
+        NPRAttributeKeys.Close();
 
         exit(FilterView);
     end;
 
-    local procedure GetAttributeFilterViewMDR(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef) FilterView: Text
+    local procedure GetAttributeFilterViewMDR(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
     var
         FieldRefCode: FieldRef;
         KeyRef: KeyRef;
-        i: Integer;
         KeyFilterCode: Text;
     begin
         KeyRef := RecRef.KeyIndex(1);
         FieldRefCode := KeyRef.FieldIndex(1);
 
-        while NPRAttributeKeys.Read do begin
+        while NPRAttributeKeys.Read() do begin
             if KeyFilterCode <> '' then
                 KeyFilterCode += '|';
             KeyFilterCode += NPRAttributeKeys.MDR_Code_PK;
@@ -815,12 +763,11 @@ codeunit 6014555 "NPR Attribute Management"
         exit(RecRef.GetView);
     end;
 
-    local procedure GetAttributeFilterViewDocument(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef) FilterView: Text
+    local procedure GetAttributeFilterViewDocument(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
     var
         FieldRefCode: FieldRef;
         FieldRefOption: FieldRef;
         KeyRef: KeyRef;
-        i: Integer;
         KeyFilterCode: Text;
         KeyFilterOption: Text;
     begin
@@ -828,7 +775,7 @@ codeunit 6014555 "NPR Attribute Management"
         FieldRefOption := KeyRef.FieldIndex(1);
         FieldRefCode := KeyRef.FieldIndex(2);
 
-        while NPRAttributeKeys.Read do begin
+        while NPRAttributeKeys.Read() do begin
             if KeyFilterOption <> '' then
                 KeyFilterOption += '|';
             KeyFilterOption += Format(NPRAttributeKeys.MDR_Option_PK, 0, 2);
@@ -843,13 +790,12 @@ codeunit 6014555 "NPR Attribute Management"
         exit(RecRef.GetView);
     end;
 
-    local procedure GetAttributeFilterViewDocumentLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef) FilterView: Text
+    local procedure GetAttributeFilterViewDocumentLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
     var
         FieldRefCode: FieldRef;
         FieldRefLine: FieldRef;
         FieldRefOption: FieldRef;
         KeyRef: KeyRef;
-        i: Integer;
         KeyFilterCode: Text;
         KeyFilterLine: Text;
         KeyFilterOption: Text;
@@ -859,7 +805,7 @@ codeunit 6014555 "NPR Attribute Management"
         FieldRefCode := KeyRef.FieldIndex(2);
         FieldRefLine := KeyRef.FieldIndex(3);
 
-        while NPRAttributeKeys.Read do begin
+        while NPRAttributeKeys.Read() do begin
             if KeyFilterOption <> '' then
                 KeyFilterOption += '|';
             KeyFilterOption += Format(NPRAttributeKeys.MDR_Option_PK, 0, 2);
@@ -879,13 +825,12 @@ codeunit 6014555 "NPR Attribute Management"
         exit(RecRef.GetView);
     end;
 
-    local procedure GetAttributeFilterViewWorksheetLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef) FilterView: Text
+    local procedure GetAttributeFilterViewWorksheetLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
     var
         FieldRefCode: FieldRef;
         FieldRefCode2: FieldRef;
         FieldRefLine: FieldRef;
         KeyRef: KeyRef;
-        i: Integer;
         KeyFilterCode: Text;
         KeyFilterCode2: Text;
         KeyFilterLine: Text;
@@ -895,7 +840,7 @@ codeunit 6014555 "NPR Attribute Management"
         FieldRefCode2 := KeyRef.FieldIndex(2);
         FieldRefLine := KeyRef.FieldIndex(3);
 
-        while NPRAttributeKeys.Read do begin
+        while NPRAttributeKeys.Read() do begin
             if KeyFilterCode <> '' then
                 KeyFilterCode += '|';
             KeyFilterCode += NPRAttributeKeys.MDR_Code_PK;
@@ -915,14 +860,13 @@ codeunit 6014555 "NPR Attribute Management"
         exit(RecRef.GetView);
     end;
 
-    local procedure GetAttributeFilterViewWorksheetSubLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef) FilterView: Text
+    local procedure GetAttributeFilterViewWorksheetSubLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
     var
         FieldRefCode: FieldRef;
         FieldRefCode2: FieldRef;
         FieldRefLine: FieldRef;
         FieldRefLine2: FieldRef;
         KeyRef: KeyRef;
-        i: Integer;
         KeyFilterCode: Text;
         KeyFilterCode2: Text;
         KeyFilterLine: Text;
@@ -934,7 +878,7 @@ codeunit 6014555 "NPR Attribute Management"
         FieldRefLine := KeyRef.FieldIndex(3);
         FieldRefLine2 := KeyRef.FieldIndex(4);
 
-        while NPRAttributeKeys.Read do begin
+        while NPRAttributeKeys.Read() do begin
             if KeyFilterCode <> '' then
                 KeyFilterCode += '|';
             KeyFilterCode += NPRAttributeKeys.MDR_Code_PK;
@@ -1039,16 +983,16 @@ codeunit 6014555 "NPR Attribute Management"
         if not Document.SelectNodes('/ReportParameters/DataItems/DataItem', NodeList) then
             exit(false);
 
-        if NodeList.Count = 0 then
+        if NodeList.Count() = 0 then
             exit(false);
 
         foreach Node in NodeList do begin
-            AttributeColletion := Node.AsXmlElement.Attributes();
+            AttributeColletion := Node.AsXmlElement().Attributes();
             if AttributeColletion.Get('name', Attribute) then
                 IsNPRAttributeValueSet := Attribute.Value() = 'NPR Attribute Value Set';
 
             if IsNPRAttributeValueSet then begin
-                NPRAttributeValueSet.SetView(Node.AsXmlElement.InnerText());
+                NPRAttributeValueSet.SetView(Node.AsXmlElement().InnerText());
                 exit(true);
             end;
         end;
@@ -1115,7 +1059,7 @@ codeunit 6014555 "NPR Attribute Management"
             RecRef.Open(Attribute."LookUp Table Id");
             FieldRefValue := RecRef.Field(Attribute."LookUp Value Field Id");
             FieldRefValue.SetFilter('=%1', Text);
-            if RecRef.FindFirst then begin
+            if RecRef.FindFirst() then begin
                 exit(true);
             end else begin
                 exit(false);
@@ -1150,7 +1094,6 @@ codeunit 6014555 "NPR Attribute Management"
     procedure FillValueArray(var TextArray: array[40] of Text[250]; SetID: Integer; TableID: Integer)
     var
         AttributeValueSet: Record "NPR Attribute Value Set";
-        Text001: Label 'Caption not defined';
         Attribute: Record "NPR Attribute";
         AttributeID: Record "NPR Attribute ID";
     begin
@@ -1223,7 +1166,6 @@ codeunit 6014555 "NPR Attribute Management"
     local procedure IsAttributeTableActive(TableNumber: Integer; var KeyLayout: Option): Boolean
     var
         AttributeID: Record "NPR Attribute ID";
-        Attribute: Record "NPR Attribute";
     begin
         AttributeID.SetCurrentKey("Table ID");
         AttributeID.SetFilter("Table ID", '=%1', TableNumber);
@@ -1239,7 +1181,6 @@ codeunit 6014555 "NPR Attribute Management"
     procedure IGGetAttributeValue("Record": Variant; AttributeCode: Code[20]; Silent: Boolean) AttributeTextValue: Text
     var
         RecRef: RecordRef;
-        FieldRef: FieldRef;
         NPRAttribute: Record "NPR Attribute";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         TableId: Integer;
@@ -1250,7 +1191,6 @@ codeunit 6014555 "NPR Attribute Management"
         MDRCode2PK: Code[20];
         MDRLine2PK: Integer;
         AttributeKey: Record "NPR Attribute Key";
-        WithInsert: Boolean;
     begin
         if (AttributeCode = '') then exit('');
 
@@ -1279,7 +1219,6 @@ codeunit 6014555 "NPR Attribute Management"
         MDRCode2PK := '';
         MDRLine2PK := 0;
 
-        WithInsert := false;
         if not GetAttributeKey(TableId, MDRCodePK, MDRLinePK, MDROptionPK, MDRCode2PK, MDRLine2PK, AttributeKey, false) then begin
             if not Silent then begin
                 Error('Attribute key can not be found in function IGGetAttributeValue.');
@@ -1308,7 +1247,6 @@ codeunit 6014555 "NPR Attribute Management"
     procedure IGSetAttributeValue("Record": Variant; AttributeCode: Code[20]; AttributeValue: Text)
     var
         RecRef: RecordRef;
-        FieldRef: FieldRef;
         NPRAttribute: Record "NPR Attribute";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         TableId: Integer;
@@ -1341,15 +1279,15 @@ codeunit 6014555 "NPR Attribute Management"
 
 
         //Lets see if there is an attribute setup to use
-        NPRAttribute.Reset;
+        NPRAttribute.Reset();
         NPRAttribute.SetFilter(Blocked, '=%1', false);
         NPRAttribute.SetFilter(Code, '=%1', AttributeCode);
-        NPRAttribute.FindFirst;
+        NPRAttribute.FindFirst();
 
-        NPRAttributeID.Reset;
+        NPRAttributeID.Reset();
         NPRAttributeID.SetFilter("Attribute Code", '=%1', NPRAttribute.Code);
         NPRAttributeID.SetFilter("Table ID", '=%1', TableId);
-        NPRAttributeID.FindFirst;
+        NPRAttributeID.FindFirst();
 
         //Attribute exists in setup, lets see if value exist or else create it
         WithInsert := true;
@@ -1361,14 +1299,12 @@ codeunit 6014555 "NPR Attribute Management"
     procedure OnPageLookUp(TableID: Integer; AttributeReference: Integer; PKCode: Code[20]; var Value: Text)
     var
         Attribute: Record "NPR Attribute";
-        AttributeKey: Record "NPR Attribute Key";
         AttributeID: Record "NPR Attribute ID";
         NPRAttributeLookupValue: Record "NPR Attribute Lookup Value";
         RecRef: RecordRef;
         FieldRefValue: FieldRef;
         FieldRefDescription: FieldRef;
         TEMPNPRAttributeLookupValue: Record "NPR Attribute Lookup Value" temporary;
-        NPRAttributeValueLookup: Page "NPR Attribute Value Lookup";
         OrgValue: Text;
     begin
         OrgValue := Value;
@@ -1382,7 +1318,7 @@ codeunit 6014555 "NPR Attribute Management"
         if not (Attribute."On Validate" = Attribute."On Validate"::VALUE_LOOKUP) then exit;
 
         if not Attribute."LookUp Table" then begin
-            NPRAttributeLookupValue.Reset;
+            NPRAttributeLookupValue.Reset();
             NPRAttributeLookupValue.SetFilter("Attribute Code", Attribute.Code);
             if PAGE.RunModal(PAGE::"NPR Attribute Value Lookup", NPRAttributeLookupValue) = ACTION::LookupOK then begin
                 Value := NPRAttributeLookupValue."Attribute Value Code";
@@ -1391,13 +1327,13 @@ codeunit 6014555 "NPR Attribute Management"
             RecRef.Open(Attribute."LookUp Table Id");
             FieldRefValue := RecRef.Field(Attribute."LookUp Value Field Id");
             FieldRefDescription := RecRef.Field(Attribute."LookUp Description Field Id");
-            if RecRef.FindFirst then begin
+            if RecRef.FindFirst() then begin
                 repeat
-                    TEMPNPRAttributeLookupValue.Init;
+                    TEMPNPRAttributeLookupValue.Init();
                     TEMPNPRAttributeLookupValue."Attribute Code" := Attribute.Code;
                     TEMPNPRAttributeLookupValue."Attribute Value Code" := FieldRefValue.Value;
                     TEMPNPRAttributeLookupValue."Attribute Value Description" := FieldRefDescription.Value;
-                    TEMPNPRAttributeLookupValue.Insert;
+                    TEMPNPRAttributeLookupValue.Insert();
                 until (0 = RecRef.Next);
             end;
             if PAGE.RunModal(PAGE::"NPR Attribute Value Lookup", TEMPNPRAttributeLookupValue) = ACTION::LookupOK then begin
@@ -1466,9 +1402,9 @@ codeunit 6014555 "NPR Attribute Management"
             exit(0);
         case PartOfText of
             COPYSTR('TODAY', 1, STRLEN(PartOfText)), COPYSTR(TodayText, 1, STRLEN(PartOfText)):
-                Date := TODAY;
+                Date := Today();
             COPYSTR('WORKDATE', 1, STRLEN(PartOfText)), COPYSTR(WorkdateText, 1, STRLEN(PartOfText)):
-                Date := WORKDATE;
+                Date := WorkDate();
             else
                 exit(0);
         end;

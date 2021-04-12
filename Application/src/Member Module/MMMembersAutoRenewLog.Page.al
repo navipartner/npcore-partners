@@ -15,33 +15,33 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Membership Entry No."; "Membership Entry No.")
+                field("Membership Entry No."; Rec."Membership Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
                 }
-                field("External Membership No."; "External Membership No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Membership No. field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Response Status"; "Response Status")
+                field("Response Status"; Rec."Response Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response Status field';
                 }
-                field("Response Message"; "Response Message")
+                field("Response Message"; Rec."Response Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response Message field';
@@ -59,7 +59,7 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
                 Caption = 'Membership';
                 Image = CustomerList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";

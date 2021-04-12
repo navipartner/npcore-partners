@@ -1,8 +1,8 @@
 report 6151050 "NPR Add Hierachy Item"
 {
     Caption = 'Add Hierachy Item';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
 
     dataset

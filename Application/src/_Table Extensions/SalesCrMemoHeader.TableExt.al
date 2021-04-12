@@ -65,7 +65,7 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
         }
         field(6151400; "NPR Magento Payment Amount"; Decimal)
         {
-            CalcFormula = Sum ("NPR Magento Payment Line".Amount WHERE("Document Table No." = CONST(114),
+            CalcFormula = Sum("NPR Magento Payment Line".Amount WHERE("Document Table No." = CONST(114),
                                                                    "Document No." = FIELD("No.")));
             Caption = 'Payment Amount';
             Description = 'MAG2.12';
@@ -82,7 +82,7 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
         field(6151420; "NPR Magento Coupon"; Text[20])
         {
             Caption = 'Magento Coupon';
-            DataClassification = CustomerContent;           
+            DataClassification = CustomerContent;
         }
     }
 }

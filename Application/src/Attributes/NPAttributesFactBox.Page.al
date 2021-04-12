@@ -15,7 +15,7 @@ page 6014465 "NPR NP Attributes FactBox"
     {
         area(content)
         {
-            field("No."; "No.")
+            field("No."; Rec."No.")
             {
                 ApplicationArea = All;
                 Caption = 'Item No.';
@@ -36,7 +36,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 1, Rec."No.", NPRAttrTextArray[1]);
                 end;
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -49,7 +49,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 2, Rec."No.", NPRAttrTextArray[2]);
                 end;
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -62,7 +62,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 3, Rec."No.", NPRAttrTextArray[3]);
                 end;
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -75,7 +75,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 4, Rec."No.", NPRAttrTextArray[4]);
                 end;
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -88,7 +88,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 5, Rec."No.", NPRAttrTextArray[5]);
                 end;
             }
             field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -101,7 +101,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 6, Rec."No.", NPRAttrTextArray[6]);
                 end;
             }
             field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -114,7 +114,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 7, Rec."No.", NPRAttrTextArray[7]);
                 end;
             }
             field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -127,7 +127,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 8, Rec."No.", NPRAttrTextArray[8]);
                 end;
             }
             field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -140,7 +140,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 9, Rec."No.", NPRAttrTextArray[9]);
                 end;
             }
             field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -153,7 +153,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 10, Rec."No.", NPRAttrTextArray[10]);
                 end;
             }
         }
@@ -165,7 +165,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, "No.");
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Item, Rec."No.");
         NPRAttrEditable := CurrPage.Editable();
     end;
 

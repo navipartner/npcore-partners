@@ -20,12 +20,12 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
         {
             repeater(Group)
             {
-                field("Sales Document Type"; "Sales Document Type")
+                field("Sales Document Type"; Rec."Sales Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Document Type field';
                 }
-                field("Sales Document No"; "Sales Document No")
+                field("Sales Document No"; Rec."Sales Document No")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Document No field';
@@ -42,7 +42,7 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
                         PAGE.Run(Rec.GetCardpageID(), RecordVar);
                     end;
                 }
-                field("POS Entry Reference Type"; "POS Entry Reference Type")
+                field("POS Entry Reference Type"; Rec."POS Entry Reference Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Entry Reference Type field';

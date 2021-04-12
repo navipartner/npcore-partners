@@ -1,10 +1,10 @@
 table 6151382 "NPR CS Price Check Handl."
 {
-    
+
     Caption = 'CS Price Check Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -78,7 +78,7 @@ table 6151382 "NPR CS Price Check Handl."
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
 
-            
+
         }
         field(51; "Variant Code"; Code[10])
         {
@@ -178,6 +178,6 @@ table 6151382 "NPR CS Price Check Handl."
     {
     }
 
-    
+
 }
 

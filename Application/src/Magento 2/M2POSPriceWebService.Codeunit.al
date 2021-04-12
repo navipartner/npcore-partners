@@ -1,4 +1,4 @@
-codeunit 6151145 "NPR M2 POS Price WebService"
+﻿codeunit 6151145 "NPR M2 POS Price WebService"
 {
     trigger OnRun()
     begin
@@ -13,7 +13,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
     begin
         SelectLatestVersion();
 
-        POSPriceRequest.Import;
+        POSPriceRequest.Import();
         POSPriceRequest.GetRequest(TmpSalePOS, TmpSaleLinePOS);
 
         if (TryPosQuoteRequest(TmpSalePOS, TmpSaleLinePOS)) then begin
@@ -30,7 +30,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         VATBusPostingGroup: Code[20];
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        TmpDiscountPriority: Record "NPR Discount Priority" temporary;
         DiscountPriority: Record "NPR Discount Priority";
         TmpSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
@@ -92,8 +91,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
             until (TmpSaleLinePOS.Next() = 0);
         end;
 
-        TmpSaleLinePOS.FindFirst;
-        TmpSaleLinePOS2.FindFirst;
+        TmpSaleLinePOS.FindFirst();
+        TmpSaleLinePOS2.FindFirst();
 
         GeneralLedgerSetup.Get();
 
@@ -187,7 +186,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
     begin
         SelectLatestVersion();
 
-        ItemPriceRequest.Import;
+        ItemPriceRequest.Import();
         ItemPriceRequest.GetSalesPriceRequest(TmpSalesPriceRequest);
 
         if (TryItemPriceRequest(TmpSalesPriceRequest, TmpPriceBracketResponse, TmpDiscountBracketResponse, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode)) then begin
@@ -201,17 +200,14 @@ codeunit 6151145 "NPR M2 POS Price WebService"
     local procedure TryItemPriceRequest(var TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary; var TmpPriceBracket: Record "NPR M2 Price Calc. Buffer" temporary; var TmpDiscountBracket: Record "NPR M2 Price Calc. Buffer" temporary; var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary; var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; var ResponseMessage: Text; var ResponseCode: Code[10])
     var
         Item: Record Item;
-        ItemVariant: Record "Item Variant";
         Customer: Record Customer;
-        SalesPrice: Record "Sales Price";
-        SalesLineDiscount: Record "Sales Line Discount";
         Currency: Record Currency;
         CurrencyExchangeRate: Record "Currency Exchange Rate";
         ItemUnitofMeasure: Record "Item Unit of Measure";
         GeneralLedgerSetup: Record "General Ledger Setup";
         RequestLineErrorMessage: Text;
     begin
-        TmpSalesPriceRequest.Reset;
+        TmpSalesPriceRequest.Reset();
         if (not TmpSalesPriceRequest.FindSet()) then
             exit;
 
@@ -223,7 +219,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
             RequestLineErrorMessage := '';
 
             // Requires
-            TmpSalesPriceResponse.Init;
+            TmpSalesPriceResponse.Init();
             TmpSalesPriceResponse."Item No." := TmpSalesPriceRequest."Item No.";
             TmpSalesPriceResponse."Source Code" := TmpSalesPriceRequest."Source Code";
             TmpSalesPriceResponse."Request ID" := TmpSalesPriceRequest."Request ID";
@@ -237,7 +233,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
             TmpSalesPriceResponse."Price End Date" := TmpSalesPriceRequest."Price End Date";
             if (TmpSalesPriceResponse."Price End Date" < Today) then
-                TmpSalesPriceResponse."Price End Date" := Today;
+                TmpSalesPriceResponse."Price End Date" := Today();
 
             // Provide Defaults
             if (Item.Get(TmpSalesPriceRequest."Item No.")) then begin
@@ -300,7 +296,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         end;
 
         // Set the overall result
-        TmpSalesPriceResponse.Reset;
+        TmpSalesPriceResponse.Reset();
         TmpSalesPriceResponse.SetFilter("Response Message", '<>%1', '');
         if (not TmpSalesPriceResponse.IsEmpty()) then
             ResponseMessage += 'Partial resultset, result contains errors.';
@@ -318,7 +314,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
     local procedure FindPricePoints(var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary)
     var
         SalesPriceCalcMgt: Codeunit "Sales Price Calc. Mgt.";
-        TmpSalesPrice: Record "Sales Price" temporary;
         Customer: Record Customer;
         Item: Record Item;
         TmpSalesHeader: Record "Sales Header" temporary;
@@ -598,7 +593,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
     procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "NPR M2 Item Availab. By Period")
     begin
-        ItemAvailabilityByPeriod.Import;
+        ItemAvailabilityByPeriod.Import();
         ItemAvailabilityByPeriod.CalculateAvailability();
         // All logic in XML port to generate output on export
     end;

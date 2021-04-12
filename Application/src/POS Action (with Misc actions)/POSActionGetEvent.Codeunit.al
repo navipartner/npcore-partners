@@ -10,31 +10,29 @@ codeunit 6060160 "NPR POS Action: Get Event"
     var
         ActionDescription: Label 'Get event from Event Management module';
         EnterEventTxt: Label 'Enter Event No.';
-        JobIsNotEventErr: Label 'Job is not Event. Please specify another.';
         NothingToInvoiceErr: Label 'There''s nothing to invoice on that event.';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('textfield', 'if (param.DialogType == param.DialogType["TextField"]) {input(labels.prompt).respond();}');
-                RegisterWorkflowStep('list', 'if (param.DialogType == param.DialogType["List"]) {respond();}');
-                RegisterOptionParameter('DialogType', 'TextField,List', 'TextField');
-                RegisterWorkflow(false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('textfield', 'if (param.DialogType == param.DialogType["TextField"]) {input(labels.prompt).respond();}');
+            Sender.RegisterWorkflowStep('list', 'if (param.DialogType == param.DialogType["List"]) {respond();}');
+            Sender.RegisterOptionParameter('DialogType', 'TextField,List', 'TextField');
+            Sender.RegisterWorkflow(false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'prompt', EnterEventTxt);
+        Captions.AddActionCaption(ActionCode(), 'prompt', EnterEventTxt);
     end;
 
     local procedure ActionCode(): Text
@@ -54,7 +52,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
         EventNo: Code[20];
         ExecutingErr: Label 'executing %1';
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         case WorkflowStep of
@@ -85,7 +83,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
         Job.SetRange(Blocked, Job.Blocked::" ");
         EventList.SetTableView(Job);
         EventList.LookupMode := true;
-        if EventList.RunModal = ACTION::LookupOK then begin
+        if EventList.RunModal() = ACTION::LookupOK then begin
             EventList.GetRecord(Job);
             EventNo := Job."No.";
         end;
@@ -115,7 +113,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
         JobPlanningLine.SetFilter("Line Type", '>%1', JobPlanningLine."Line Type"::Budget);
         JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Item);
         JobPlanningLine.SetFilter("Qty. to Transfer to Invoice", '>0');
-        if not JobPlanningLine.FindSet then
+        if not JobPlanningLine.FindSet() then
             Error(NothingToInvoiceErr);
 
         POSSession.GetSale(POSSale);
@@ -125,7 +123,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
 
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Validate("Prices Including VAT", Customer."Prices Including VAT");
-        SalePOS.Modify;
+        SalePOS.Modify();
         repeat
             JobTask.Get(JobPlanningLine."Job No.", JobPlanningLine."Job Task No.");
             SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
@@ -144,7 +142,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
             SaleLinePOS."Discount Amount" := JobPlanningLine."Line Discount Amount";
             POSSaleLine.InsertLine(SaleLinePOS);
 
-            JobPlanningLineInvoice.Init;
+            JobPlanningLineInvoice.Init();
             JobPlanningLineInvoice."NPR POS Unit No." := SaleLinePOS."Register No.";
             JobPlanningLineInvoice."NPR POS Store Code" := SalePOS."POS Store Code";
             JobPlanningLineInvoice."Document Type" := JobPlanningLineInvoice."Document Type"::Invoice;
@@ -155,11 +153,11 @@ codeunit 6060160 "NPR POS Action: Get Event"
             JobPlanningLineInvoice."Job Planning Line No." := JobPlanningLine."Line No.";
             JobPlanningLineInvoice."Quantity Transferred" := JobPlanningLine."Qty. to Transfer to Invoice";
             JobPlanningLineInvoice."Transferred Date" := SaleLinePOS.Date;
-            JobPlanningLineInvoice.Insert;
+            JobPlanningLineInvoice.Insert();
 
             JobPlanningLine.UpdateQtyToTransfer();
-            JobPlanningLine.Modify;
-        until JobPlanningLine.Next = 0;
+            JobPlanningLine.Modify();
+        until JobPlanningLine.Next() = 0;
 
         POSSession.RequestRefreshData();
     end;

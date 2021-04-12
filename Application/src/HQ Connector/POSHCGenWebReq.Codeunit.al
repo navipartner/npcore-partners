@@ -40,12 +40,10 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         TmpHCGenericWebRequest."Parameter 4" := Parameters[4];
         TmpHCGenericWebRequest."Parameter 5" := Parameters[5];
         TmpHCGenericWebRequest."Parameter 6" := Parameters[6];
-        TmpHCGenericWebRequest.Insert;
+        TmpHCGenericWebRequest.Insert();
     end;
 
     local procedure BuildGenericRequest(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary; var SoapAction: Text; var XmlRequest: Text): Boolean
-    var
-        LineType: Option;
     begin
 
         SoapAction := 'urn:microsoft-dynamics-schemas/codeunit/hqconnector:GenericWebRequest';
@@ -121,7 +119,6 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
 
     procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; var XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseXmlText: Text): Boolean
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XMLDomManagement: Codeunit "XML DOM Management";
         Base64Convert: codeunit "Base64 Convert";
         B64Credential: Text[200];

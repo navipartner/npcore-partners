@@ -282,9 +282,6 @@ table 6150707 "NPR POS Setup"
         ActionMgt: Codeunit "NPR POS Action Management";
 
     procedure AssistEdit(ActionCode: Code[20]; "Field": Integer)
-    var
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
     begin
         //-NPR5.40 [306347]
         //RecRef.GETTABLE(Rec);

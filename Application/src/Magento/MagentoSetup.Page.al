@@ -936,8 +936,8 @@ page 6151401 "NPR Magento Setup"
 
     trigger OnOpenPage()
     begin
-        if not Rec.Get then
-            Rec.Insert;
+        if not Rec.Get() then
+            Rec.Insert();
 
         CurrPage.NpCsStoreCardWorkflows.PAGE.SetStoreCodeVisible(true);
     end;

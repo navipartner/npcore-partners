@@ -16,22 +16,22 @@ page 6151510 "NPR Nc Task Output List"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Last Modified at"; "Last Modified at")
+                field("Last Modified at"; Rec."Last Modified at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Modified at field';
                 }
-                field("Process Count"; "Process Count")
+                field("Process Count"; Rec."Process Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Process Count field';
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
@@ -158,7 +158,7 @@ page 6151510 "NPR Nc Task Output List"
                 Caption = 'Show Output';
                 Image = XMLFile;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -183,36 +183,31 @@ page 6151510 "NPR Nc Task Output List"
 
     local procedure ShowOutput()
     var
-        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         InStr: InStream;
         Path: Text;
-        Content: Text;
     begin
-        CalcFields(Data);
-        if not Data.HasValue then begin
+        Rec.CalcFields(Data);
+        if not Data.HasValue() then begin
             Message(Text000);
             exit;
         end;
 
         Data.CreateInStream(InStr, TEXTENCODING::UTF8);
-        Path := TemporaryPath + Name;
-        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.' + FileMgt.GetExtension(Name), Path);
+        Path := TemporaryPath + Rec.Name;
+        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.' + FileMgt.GetExtension(Rec.Name), Path);
         HyperLink(Path);
     end;
 
     local procedure UpdateResponseText()
     var
         InStream: InStream;
-        Line: Text;
-        LF: Char;
-        CR: Char;
         StreamReader: DotNet NPRNetStreamReader;
     begin
         ResponseText := '';
-        if not Response.HasValue then
+        if not Response.HasValue() then
             exit;
-        CalcFields(Response);
+        Rec.CalcFields(Response);
         Response.CreateInStream(InStream, TEXTENCODING::UTF8);
         StreamReader := StreamReader.StreamReader(InStream);
         ResponseText := StreamReader.ReadToEnd();

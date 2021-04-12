@@ -14,42 +14,42 @@ page 6150651 "NPR POS Period Register List"
             repeater(Control6014401)
             {
                 ShowCaption = false;
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Opening Entry No."; "Opening Entry No.")
+                field("Opening Entry No."; Rec."Opening Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the From Entry No. field';
                 }
-                field("Closing Entry No."; "Closing Entry No.")
+                field("Closing Entry No."; Rec."Closing Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the To Entry No. field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Posting Compression"; "Posting Compression")
+                field("Posting Compression"; Rec."Posting Compression")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Compression field';
@@ -67,7 +67,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = 'POS Entries';
                 Image = LedgerEntries;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";
@@ -112,7 +112,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = 'Post Ledger Register';
                 Image = Post;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -123,7 +123,7 @@ page 6150651 "NPR POS Period Register List"
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                     POSEntryToPost: Record "NPR POS Entry";
                 begin
-                    POSEntryToPost.SetRange("POS Period Register No.", "No.");
+                    POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
@@ -144,7 +144,7 @@ page 6150651 "NPR POS Period Register List"
                     POSEntryToPost: Record "NPR POS Entry";
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
-                    POSEntryToPost.SetRange("POS Period Register No.", "No.");
+                    POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
@@ -165,7 +165,7 @@ page 6150651 "NPR POS Period Register List"
                     POSEntryToPost: Record "NPR POS Entry";
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
-                    POSEntryToPost.SetRange("POS Period Register No.", "No.");
+                    POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
@@ -179,7 +179,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';
@@ -188,8 +188,8 @@ page 6150651 "NPR POS Period Register List"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc(DT2Date("End of Day Date"), "Document No.");
-                    Navigate.Run;
+                    Navigate.SetDoc(DT2Date(Rec."End of Day Date"), Rec."Document No.");
+                    Navigate.Run();
                 end;
             }
         }

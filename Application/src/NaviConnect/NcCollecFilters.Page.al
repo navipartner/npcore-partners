@@ -18,22 +18,22 @@ page 6151530 "NPR Nc Collec. Filters"
         {
             repeater(Group)
             {
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Filter Text"; "Filter Text")
+                field("Filter Text"; Rec."Filter Text")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Text field';
                 }
-                field("Collect When Modified"; "Collect When Modified")
+                field("Collect When Modified"; Rec."Collect When Modified")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Collect When Modified field';
@@ -60,9 +60,9 @@ page 6151530 "NPR Nc Collec. Filters"
     var
         NcCollector: Record "NPR Nc Collector";
     begin
-        if ("Collector Code" <> '') and ("Table No." = 0) then begin
-            if NcCollector.Get("Collector Code") then begin
-                "Table No." := NcCollector."Table No.";
+        if (Rec."Collector Code" <> '') and (Rec."Table No." = 0) then begin
+            if NcCollector.Get(Rec."Collector Code") then begin
+                Rec."Table No." := NcCollector."Table No.";
 
             end;
         end;

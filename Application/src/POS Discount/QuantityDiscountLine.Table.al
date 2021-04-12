@@ -97,17 +97,17 @@ table 6014415 "NPR Quantity Discount Line"
 
     trigger OnInsert()
     begin
-        "Created Date" := Today;
+        "Created Date" := Today();
     end;
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
     end;
 
     trigger OnRename()
     begin
-        "Created Date" := Today;
+        "Created Date" := Today();
     end;
 
     var
@@ -121,7 +121,7 @@ table 6014415 "NPR Quantity Discount Line"
         Vare: Record Item;
     begin
         QuantityDiscountLine.SetRange("Item No.", "Item No.");
-        if QuantityDiscountLine.FindSet then
+        if QuantityDiscountLine.FindSet() then
             repeat
                 if ("Unit Price" > QuantityDiscountLine."Unit Price") and (Quantity > QuantityDiscountLine.Quantity) then begin
                     Message(Text1060000 +
@@ -129,7 +129,7 @@ table 6014415 "NPR Quantity Discount Line"
                             Text1060002, QuantityDiscountLine."Item No.", QuantityDiscountLine.Quantity);
                     exit;
                 end;
-            until QuantityDiscountLine.Next = 0;
+            until QuantityDiscountLine.Next() = 0;
 
 
         Vare.Get("Item No.");

@@ -1,4 +1,4 @@
-codeunit 6150901 "NPR HC Post Audit Roll"
+﻿codeunit 6150901 "NPR HC Post Audit Roll"
 {
     TableNo = "NPR HC Audit Roll";
 
@@ -25,7 +25,7 @@ codeunit 6150901 "NPR HC Post Audit Roll"
     var
         TempPost: Record "NPR HC Audit Roll Posting" temporary;
     begin
-        if tRevisionsrulle.Count > 0 then begin
+        if tRevisionsrulle.Count() > 0 then begin
             HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(true));
 
             tRevisionsrulle.ModifyAll("Internal Posting No.", 0);
@@ -34,15 +34,15 @@ codeunit 6150901 "NPR HC Post Audit Roll"
                 repeat
                     HCPostTempAuditRoll.ClearStatusWindow();
                     tRevisionsrulle.SetRange("Sale Date", tRevisionsrulle."Sale Date");
-                    TempPost.Reset;
+                    TempPost.Reset();
                     TempPost.TransferFromTemp(TempPost, tRevisionsrulle);
                     HCPostTempAuditRoll.RunPost(TempPost);
                     tRevisionsrulle.Find('+');
                     tRevisionsrulle.SetRange("Sale Date");
-                    TempPost.Reset;
+                    TempPost.Reset();
                     HCPostTempAuditRoll.RunUpdateChanges(TempPost);
-                    TempPost.DeleteAll;
-                until tRevisionsrulle.Next = 0;
+                    TempPost.DeleteAll();
+                until tRevisionsrulle.Next() = 0;
             exit(true);
         end else
             exit(false);
@@ -52,23 +52,23 @@ codeunit 6150901 "NPR HC Post Audit Roll"
     var
         TempPost: Record "NPR HC Audit Roll Posting" temporary;
     begin
-        if tRevisionsrulle.Count > 0 then begin
+        if tRevisionsrulle.Count() > 0 then begin
             tRevisionsrulle.ModifyAll("Internal Posting No.", 0);
 
             if tRevisionsrulle.Find('-') then
                 repeat
                     HCPostTempAuditRoll.ClearStatusWindow();
                     tRevisionsrulle.SetRange("Sale Date", tRevisionsrulle."Sale Date");
-                    TempPost.Reset;
+                    TempPost.Reset();
                     TempPost.TransferFromTemp(TempPost, tRevisionsrulle);
                     HCPostTempAuditRoll.RunPostItemLedger(TempPost);
                     tRevisionsrulle.Find('+');
                     tRevisionsrulle.SetRange("Sale Date");
-                    TempPost.Reset;
+                    TempPost.Reset();
                     HCPostTempAuditRoll.RunUpdateChanges(TempPost);
-                    TempPost.DeleteAll;
+                    TempPost.DeleteAll();
 
-                until tRevisionsrulle.Next = 0;
+                until tRevisionsrulle.Next() = 0;
             exit(true);
         end else
             exit(false);
@@ -77,7 +77,6 @@ codeunit 6150901 "NPR HC Post Audit Roll"
     procedure RunCode(var Rec: Record "NPR HC Audit Roll")
     var
         Kasse: Record "NPR HC Register";
-        t001: Label 'Posting of audit roll is not possible in offline mode';
         Dummy: Record "NPR HC Audit Roll" temporary;
     begin
         HCRetailSetup.Get();
@@ -105,36 +104,36 @@ codeunit 6150901 "NPR HC Post Audit Roll"
                         HCPostTempAuditRoll.RunTransfer(tRevisionsrulle, Rec);
                         HCPostTempAuditRoll.RemoveSuspendedPayouts(tRevisionsrulle);
 
-                        tRevisionsrulle.Reset;
+                        tRevisionsrulle.Reset();
 
                         HCPostTempAuditRoll.RunTest(tRevisionsrulle);
 
                         PostPerRegisterTmp(Kasse);
-                        tRevisionsrulle.DeleteAll;
-                    until Kasse.Next = 0;
+                        tRevisionsrulle.DeleteAll();
+                    until Kasse.Next() = 0;
             end else begin
                 HCPostTempAuditRoll.SetProgressVis(ProgressVis);
 
                 HCPostTempAuditRoll.RunTransfer(tRevisionsrulle, Rec);
                 HCPostTempAuditRoll.RemoveSuspendedPayouts(tRevisionsrulle);
 
-                tRevisionsrulle.Reset;
+                tRevisionsrulle.Reset();
 
                 HCPostTempAuditRoll.RunTest(tRevisionsrulle);
 
                 PostPerRegisterTmp(Kasse);
-                tRevisionsrulle.DeleteAll;
+                tRevisionsrulle.DeleteAll();
 
             end;
         end;
 
         /* ITEM ENTRY POSTING */
         Clear(tRevisionsrulle);
-        tRevisionsrulle.DeleteAll;
+        tRevisionsrulle.DeleteAll();
         Rec.CopyFilters(Dummy);
-        Kasse.Reset;
+        Kasse.Reset();
         Kasse.SetFilter("Register No.", Rec.GetFilter("Register No."));
-        pRevisionsrulle.DeleteAll;
+        pRevisionsrulle.DeleteAll();
 
         if not SkipPostItem then begin
             Rec.SetRange(Posted);
@@ -149,17 +148,17 @@ codeunit 6150901 "NPR HC Post Audit Roll"
                         Rec.SetRange("Register No.", Kasse."Register No.");
                         HCPostTempAuditRoll.RunTransferItemLedger(tRevisionsrulle, Rec);
                         HCPostTempAuditRoll.RunTest(tRevisionsrulle);
-                        tRevisionsrulle.Reset;
+                        tRevisionsrulle.Reset();
                         PostPerRegisterTmpItemLedger(Kasse);
-                        tRevisionsrulle.DeleteAll;
-                    until Kasse.Next = 0;
+                        tRevisionsrulle.DeleteAll();
+                    until Kasse.Next() = 0;
             end else begin
                 HCPostTempAuditRoll.SetProgressVis(ProgressVis);
                 HCPostTempAuditRoll.RunTransferItemLedger(tRevisionsrulle, Rec);
                 HCPostTempAuditRoll.RunTest(tRevisionsrulle);
-                tRevisionsrulle.Reset;
+                tRevisionsrulle.Reset();
                 PostPerRegisterTmpItemLedger(Kasse);
-                tRevisionsrulle.DeleteAll;
+                tRevisionsrulle.DeleteAll();
             end;
         end;
 
@@ -185,14 +184,14 @@ codeunit 6150901 "NPR HC Post Audit Roll"
         HCAuditRollToSalesDocument.SetFilter("Sale Type", '=%1', HCAuditRollToSalesDocument."Sale Type"::Payment);
         HCAuditRollToSalesDocument.SetFilter("Amount Including VAT", '<>0');
         HCAuditRollToSalesDocument.SetRange(Posted, false);
-        if HCAuditRollToSalesDocument.FindSet then
+        if HCAuditRollToSalesDocument.FindSet() then
             repeat
                 HCPaymentTypePOS.Get(HCAuditRollToSalesDocument."No.");
                 if HCPaymentTypePOS."HQ Processing" > 0 then begin
                     ProcessToSalesDocument(HCAuditRollToSalesDocument, HCPaymentTypePOS);
                     MarkAllLinesAsPosted(HCAuditRollToSalesDocument);
                 end;
-            until HCAuditRollToSalesDocument.Next = 0;
+            until HCAuditRollToSalesDocument.Next() = 0;
     end;
 
     local procedure ProcessToSalesDocument(var HCAuditRoll: Record "NPR HC Audit Roll"; HCPaymentTypePOS: Record "NPR HC Payment Type POS")
@@ -211,7 +210,7 @@ codeunit 6150901 "NPR HC Post Audit Roll"
         HCPostSalesHeader: Codeunit "NPR HC Post S.Header";
     begin
         HCAuditRoll.TestField("Customer No.");
-        SalesHeader.Init;
+        SalesHeader.Init();
         case HCPaymentTypePOS."HQ Processing" of
             HCPaymentTypePOS."HQ Processing"::SalesInvoice:
                 if HCAuditRoll."Amount Including VAT" > 0 then
@@ -239,13 +238,13 @@ codeunit 6150901 "NPR HC Post Audit Roll"
         LineNo := 0;
         HCAuditRollToSalesDocument.SetRange("Sales Ticket No.", HCAuditRoll."Sales Ticket No.");
         HCAuditRollToSalesDocument.SetRange("Register No.", HCAuditRoll."Register No.");
-        if HCAuditRollToSalesDocument.FindSet then
+        if HCAuditRollToSalesDocument.FindSet() then
             repeat
                 //CreateLine
                 if HCAuditRollToSalesDocument."Sale Type" = HCAuditRollToSalesDocument."Sale Type"::Sale then begin
                     if HCAuditRollToSalesDocument.Type in [HCAuditRollToSalesDocument.Type::Item, HCAuditRollToSalesDocument.Type::"G/L"] then begin
                         LineNo := LineNo + 10000;
-                        SalesLine.Init;
+                        SalesLine.Init();
                         SalesLine.Validate("Document Type", SalesHeader."Document Type");
                         SalesLine.Validate("Document No.", SalesHeader."No.");
                         SalesLine."Line No." := LineNo;
@@ -265,12 +264,12 @@ codeunit 6150901 "NPR HC Post Audit Roll"
                         SalesLine.Modify(true);
                     end;
                 end;
-            until HCAuditRollToSalesDocument.Next = 0;
+            until HCAuditRollToSalesDocument.Next() = 0;
 
         OnAfterCreateSalesDoc(SalesHeader);
 
         if HCPaymentTypePOS."HQ Post Sales Document" then begin
-            Commit;
+            Commit();
             SuccessPosting := HCPostSalesHeader.Run(SalesHeader);
             OnAfterTryPostingSalesDoc(SalesHeader, SuccessPosting);
         end;
@@ -282,7 +281,7 @@ codeunit 6150901 "NPR HC Post Audit Roll"
                     PostPayment := false;
 
         if PostPayment then begin
-            HCAuditRoll.SetRecFilter;
+            HCAuditRoll.SetRecFilter();
             HCPostTempAuditRoll.RunTransfer(HCAuditRollPosting, HCAuditRoll);
             HCPostTempAuditRoll.PostTransaction(
                   HCAuditRoll."Customer No.",
@@ -329,11 +328,11 @@ codeunit 6150901 "NPR HC Post Audit Roll"
     begin
         HCAuditRollTomarkAsProcessed.SetRange("Sales Ticket No.", HCAuditRoll."Sales Ticket No.");
         HCAuditRollTomarkAsProcessed.SetRange("Register No.", HCAuditRoll."Register No.");
-        if HCAuditRollTomarkAsProcessed.FindSet then
+        if HCAuditRollTomarkAsProcessed.FindSet() then
             repeat
                 HCAuditRollTomarkAsProcessed.Posted := true;
-                HCAuditRollTomarkAsProcessed.Modify;
-            until HCAuditRollTomarkAsProcessed.Next = 0;
+                HCAuditRollTomarkAsProcessed.Modify();
+            until HCAuditRollTomarkAsProcessed.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

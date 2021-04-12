@@ -14,17 +14,17 @@ page 6014528 "NPR Payment Gateways WP"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Api Url"; "Api Url")
+                field("Api Url"; Rec."Api Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Url field';
                 }
-                field("Api Username"; "Api Username")
+                field("Api Username"; Rec."Api Username")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Username field';
@@ -42,22 +42,22 @@ page 6014528 "NPR Payment Gateways WP"
                         Commit();
                     end;
                 }
-                field("Merchant ID"; "Merchant ID")
+                field("Merchant ID"; Rec."Merchant ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Merchant Id field';
                 }
-                field("Merchant Name"; "Merchant Name")
+                field("Merchant Name"; Rec."Merchant Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Merchant Name field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Capture Codeunit Id"; "Capture Codeunit Id")
+                field("Capture Codeunit Id"; Rec."Capture Codeunit Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Capture codeunit-id field';
@@ -69,22 +69,22 @@ page 6014528 "NPR Payment Gateways WP"
                         AllObjects.LookupMode := true;
                         AllObjects.Editable := false;
 
-                        if "Capture Codeunit Id" = 0 then
+                        if Rec."Capture Codeunit Id" = 0 then
                             AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
                         if AllObj.FindSet() then;
                         AllObjects.SetRec(AllObj);
 
-                        if "Capture Codeunit Id" <> 0 then
-                            if AllObj.Get("Capture Codeunit Id") then
+                        if Rec."Capture Codeunit Id" <> 0 then
+                            if AllObj.Get(Rec."Capture Codeunit Id") then
                                 AllObjects.SetRecord(AllObj);
 
                         if AllObjects.RunModal() = Action::LookupOK then begin
                             AllObjects.GetRecord(AllObj);
-                            "Capture Codeunit Id" := AllObj."Object ID";
+                            Rec."Capture Codeunit Id" := AllObj."Object ID";
                         end;
                     end;
                 }
-                field("Refund Codeunit Id"; "Refund Codeunit Id")
+                field("Refund Codeunit Id"; Rec."Refund Codeunit Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Refund codeunit-id field';
@@ -96,22 +96,22 @@ page 6014528 "NPR Payment Gateways WP"
                         AllObjects.LookupMode := true;
                         AllObjects.Editable := false;
 
-                        if "Refund Codeunit Id" = 0 then
+                        if Rec."Refund Codeunit Id" = 0 then
                             AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
                         if AllObj.FindSet() then;
                         AllObjects.SetRec(AllObj);
 
-                        if "Refund Codeunit Id" <> 0 then
-                            if AllObj.Get("Refund Codeunit Id") then
+                        if Rec."Refund Codeunit Id" <> 0 then
+                            if AllObj.Get(Rec."Refund Codeunit Id") then
                                 AllObjects.SetRecord(AllObj);
 
                         if AllObjects.RunModal() = Action::LookupOK then begin
                             AllObjects.GetRecord(AllObj);
-                            "Refund Codeunit Id" := AllObj."Object ID";
+                            Rec."Refund Codeunit Id" := AllObj."Object ID";
                         end;
                     end;
                 }
-                field("Cancel Codeunit Id"; "Cancel Codeunit Id")
+                field("Cancel Codeunit Id"; Rec."Cancel Codeunit Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cancel Codeunit Id field';
@@ -123,18 +123,18 @@ page 6014528 "NPR Payment Gateways WP"
                         AllObjects.LookupMode := true;
                         AllObjects.Editable := false;
 
-                        if "Cancel Codeunit Id" = 0 then
+                        if Rec."Cancel Codeunit Id" = 0 then
                             AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
                         if AllObj.FindSet() then;
                         AllObjects.SetRec(AllObj);
 
-                        if "Cancel Codeunit Id" <> 0 then
-                            if AllObj.Get("Cancel Codeunit Id") then
+                        if Rec."Cancel Codeunit Id" <> 0 then
+                            if AllObj.Get(Rec."Cancel Codeunit Id") then
                                 AllObjects.SetRecord(AllObj);
 
                         if AllObjects.RunModal() = Action::LookupOK then begin
                             AllObjects.GetRecord(AllObj);
-                            "Cancel Codeunit Id" := AllObj."Object ID";
+                            Rec."Cancel Codeunit Id" := AllObj."Object ID";
                         end;
                     end;
                 }

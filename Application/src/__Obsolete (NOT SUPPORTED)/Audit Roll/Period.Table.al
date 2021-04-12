@@ -308,7 +308,7 @@ table 6014423 "NPR Period"
             trigger OnValidate()
             begin
                 ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-                Modify;
+                Modify();
             end;
         }
         field(103; "Shortcut Dimension 2 Code"; Code[20])
@@ -327,7 +327,7 @@ table 6014423 "NPR Period"
             trigger OnValidate()
             begin
                 ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
-                Modify;
+                Modify();
             end;
         }
         field(104; "Location Code"; Code[10])
@@ -515,14 +515,13 @@ table 6014423 "NPR Period"
     }
 
     var
-        Text1060000: Label 'Ending time for period %1 must be after %2 o''clock';
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         NPRDimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         NPRDimMgt.SaveDefaultDim(DATABASE::"NPR POS Unit", "Register No.", FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

@@ -13,57 +13,57 @@ page 6151170 "NPR NpGp Det. POS S. Entries"
         {
             repeater(Group)
             {
-                field("Entry Time"; "Entry Time")
+                field("Entry Time"; Rec."Entry Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Time field';
                 }
-                field("Entry Type"; "Entry Type")
+                field("Entry Type"; Rec."Entry Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open field';
                 }
-                field("Remaining Quantity"; "Remaining Quantity")
+                field("Remaining Quantity"; Rec."Remaining Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remaining Quantity field';
                 }
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Positive field';
                 }
-                field("Closed by Entry No."; "Closed by Entry No.")
+                field("Closed by Entry No."; Rec."Closed by Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closed by Entry No. field';
                 }
-                field("Applies to Store Code"; "Applies to Store Code")
+                field("Applies to Store Code"; Rec."Applies to Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Applies to Store Code field';
                 }
-                field("Cross Store Application"; "Cross Store Application")
+                field("Cross Store Application"; Rec."Cross Store Application")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cross Store Application field';
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';

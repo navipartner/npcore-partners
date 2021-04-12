@@ -1,4 +1,4 @@
-table 6150664 "NPR NPRE Flow Status"
+﻿table 6150664 "NPR NPRE Flow Status"
 {
     Caption = 'Status';
     DataClassification = CustomerContent;
@@ -108,29 +108,29 @@ table 6150664 "NPR NPRE Flow Status"
         PrintCategoryString: Text;
     begin
         //Return not assigned group filter for empty Code
-        PrintCategory.Reset;
+        PrintCategory.Reset();
         AssignedPrintCategory.SetRange("Table No.", DATABASE::"NPR NPRE Flow Status");
         if Code <> '' then
             AssignedPrintCategory.SetRange("Record ID", RecordId)
         else
             AssignedPrintCategory.SetFilter("Record ID", '<>%1', RecordId);
-        if AssignedPrintCategory.FindSet then
+        if AssignedPrintCategory.FindSet() then
             repeat
                 if PrintCategory.Get(AssignedPrintCategory."Print/Prod. Category Code") then
                     PrintCategory.Mark := true;
-            until AssignedPrintCategory.Next = 0;
+            until AssignedPrintCategory.Next() = 0;
 
         PrintCategoryString := '';
         if Code <> '' then
             PrintCategory.MarkedOnly(true);
-        if PrintCategory.FindSet then
+        if PrintCategory.FindSet() then
             repeat
                 if (Code <> '') or not PrintCategory.Mark then begin
                     if PrintCategoryString <> '' then
                         PrintCategoryString := PrintCategoryString + '|';
                     PrintCategoryString := PrintCategoryString + StrSubstNo(InQuotes, PrintCategory.Code);
                 end;
-            until PrintCategory.Next = 0;
+            until PrintCategory.Next() = 0;
 
         if (Code = '') and (PrintCategoryString <> '') and not PrintCategory.Get('') then
             PrintCategoryString := StrSubstNo('%1|%2', EmptyCodeINQuotes, PrintCategoryString);

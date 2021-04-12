@@ -85,7 +85,7 @@ table 6151170 "NPR NpGp POS Sales Setup"
 
         if not IsolatedStorage.Contains("Service Password", DataScope::Company) then begin
             "Service Password" := CreateGuid();
-            Modify;
+            Modify();
         end;
         IsolatedStorage.Set("Service Password", Password, DataScope::Company);
 

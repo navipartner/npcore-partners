@@ -32,17 +32,13 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         OutStr: OutStream;
         Response: Text;
         ServiceName: Text;
-        Base64Convert: Codeunit "Base64 Convert";
-        AuthText: Text;
-        InStrm: InStream;
-        TempBlob: Codeunit "Temp Blob";
         XmlText: Text;
     begin
         if NcTask.Type <> NcTask.Type::Insert then
             exit;
 
         POSEntry.SetPosition(NcTask."Record Position");
-        if not POSEntry.Find then
+        if not POSEntry.Find() then
             exit;
 
         if not POSUnit.Get(POSEntry."POS Unit No.") then
@@ -61,9 +57,9 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         NcTask."Data Output".CreateOutStream(OutStr, TEXTENCODING::UTF8);
         XmlDoc.WriteTo(OutStr);
 
-        NcTask.Modify;
+        NcTask.Modify();
 
-        Commit;
+        Commit();
 
         if not IsolatedStorage.Get(NpGpGlobalSalesSetup."Service Password", DataScope::Company, ServicePassword) then
             Error(ServicePasswordErr, NpGpPOSSalesSetupCard.Caption());
@@ -99,7 +95,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
 
         NcTask.Response.CreateOutStream(OutStr, TEXTENCODING::UTF8);
         OutStr.WriteText(NpXmlDomMgt.PrettyPrintXml(Response));
-        NcTask.Modify;
+        NcTask.Modify();
     end;
 
     local procedure InitReqBody(POSEntry: Record "NPR POS Entry"; ServiceName: Text; var XmlDoc: XmlDocument)
@@ -135,7 +131,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
                      '<sales_lines>';
 
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSSalesLine.FindSet then
+        if POSSalesLine.FindSet() then
             repeat
                 if RetailCrossReference.Get(POSSalesLine."Retail ID") then;
                 Xml +=
@@ -169,12 +165,12 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
                               '<global_reference>' + RetailCrossReference."Reference No." + '</global_reference>' +
                               '<extension_fields/>' +
                             '</sales_line>';
-            until POSSalesLine.Next = 0;
+            until POSSalesLine.Next() = 0;
         Xml +=
                      '</sales_lines>' +
                      '<pos_info_entries>';
         POSInfoPOSEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSInfoPOSEntry.FindSet then
+        if POSInfoPOSEntry.FindSet() then
             repeat
                 Xml +=
                             '<pos_info_entry pos_info_code="' + POSInfoPOSEntry."POS Info Code" + '" entry_no="' + Format(POSInfoPOSEntry."Entry No.", 0, 9) + '">' +
@@ -187,7 +183,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
                               '<gross_amount>' + Format(POSInfoPOSEntry."Gross Amount", 0, 9) + '</gross_amount>' +
                               '<discount_amount>' + Format(POSInfoPOSEntry."Discount Amount", 0, 9) + '</discount_amount>' +
                           '</pos_info_entry>';
-            until POSInfoPOSEntry.Next = 0;
+            until POSInfoPOSEntry.Next() = 0;
         Xml += '</pos_info_entries>' +
                    '</sales_entry>' +
                  '</sales_entries>' +
@@ -212,7 +208,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
             exit;
 
         if not WebService.Get(WebService."Object Type"::Codeunit, 'global_pos_sales_service') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Object ID" := GlobalPosSalesCodeunitId();
             WebService."Service Name" := 'global_pos_sales_service';
@@ -260,11 +256,9 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
     procedure TryGetGlobalPosSalesService(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     var
         ServicePassword: Text;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         WebRequest: HttpRequestMessage;
         WebResponse: HttpResponseMessage;
         WebClient: HttpClient;
-        Headers: HttpHeaders;
     begin
         NpGpPOSSalesSetup.TestField("Service Url");
 

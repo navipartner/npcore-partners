@@ -19,8 +19,6 @@ report 6060136 "NPR MM Membership Not Renewed"
                         DataItemLink = "Entry No." = FIELD("Member Entry No.");
 
                         trigger OnAfterGetRecord()
-                        var
-                            BarcodeLib: Codeunit "NPR Barcode Image Library";
                         begin
                             TempMembers.Init();
                             TempMembers.Template := "MM Membership Setup".Code;
@@ -46,13 +44,10 @@ report 6060136 "NPR MM Membership Not Renewed"
 
                 trigger OnAfterGetRecord()
                 var
-                    Item: Record Item;
                     MembershipEntry: Record "NPR MM Membership Entry";
                     MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-                    KeepMembership: Boolean;
                     ValidForReferenceDate: Boolean;
                     ValidForReferenceDate2: Boolean;
-                    NextRefDate: Date;
                 begin
                     ValidForReferenceDate := MembershipManagement.GetMembershipValidDate("MM Membership"."Entry No.", ReferenceDate, ValidFromDate, ValidUntilDate);
 
@@ -257,7 +252,7 @@ report 6060136 "NPR MM Membership Not Renewed"
     trigger OnInitReport()
     begin
 
-        ReferenceDate := Today;
+        ReferenceDate := Today();
         ReferenceDate2 := 0D;
     end;
 
@@ -271,11 +266,7 @@ report 6060136 "NPR MM Membership Not Renewed"
     end;
 
     var
-        CompanyInformation: Record "Company Information";
         MMMember2: Record "NPR MM Member";
-        MMMemberCard: Record "NPR MM Member Card";
-        MMMembershipEntry: Record "NPR MM Membership Entry";
-        ShowActiveMemberships: Boolean;
         ConvValidDate: Date;
         MemberDate: Date;
         MMMembershipIssueDate: Date;
@@ -283,7 +274,6 @@ report 6060136 "NPR MM Membership Not Renewed"
         ReferenceDate2: Date;
         ValidFromDate: Date;
         ValidUntilDate: Date;
-        DateFilterCaption: Label 'Date:';
         MemberEntryNoCaption: Label 'Entry No.';
         ExternalMemberNoCaption: Label 'Ext. Member No.';
         ExternalMembershipNoCaption: Label 'Ext. Membership No.';
@@ -296,7 +286,5 @@ report 6060136 "NPR MM Membership Not Renewed"
         MembershipStatus2: Option " ",Active,"Not Active",New,Renew,Upgrade,Extend;
         MembershipStatus: Option Active,"Not Active",New,Renew,Upgrade,Extend;
         Filters: Text;
-        MemberItem: Text;
-        MemberName: Text;
 }
 

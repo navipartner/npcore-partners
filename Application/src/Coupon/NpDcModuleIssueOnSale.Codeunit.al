@@ -1,4 +1,4 @@
-codeunit 6151600 "NPR NpDc Module Issue: OnSale"
+﻿codeunit 6151600 "NPR NpDc Module Issue: OnSale"
 {
     var
         Text000: Label 'Issue Coupon - Default';
@@ -18,11 +18,11 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         if not FindNewCoupons(SalePOS, NpDcSaleLinePOSNewCoupon) then
             exit;
 
-        NpDcSaleLinePOSNewCoupon.FindSet;
+        NpDcSaleLinePOSNewCoupon.FindSet();
         repeat
             IssueCoupon(NpDcSaleLinePOSNewCoupon, TempCoupon);
-        until NpDcSaleLinePOSNewCoupon.Next = 0;
-        NpDcSaleLinePOSNewCoupon.DeleteAll;
+        until NpDcSaleLinePOSNewCoupon.Next() = 0;
+        NpDcSaleLinePOSNewCoupon.DeleteAll();
 
         PrintCoupons(TempCoupon);
     end;
@@ -73,7 +73,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Coupon: Record "NPR NpDc Coupon";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
-        Coupon.Init;
+        Coupon.Init();
         Coupon.Validate("Coupon Type", NpDcSaleLinePOSNewCoupon."Coupon Type");
         Coupon."No." := '';
         Coupon."Starting Date" := NpDcSaleLinePOSNewCoupon."Starting Date";
@@ -87,9 +87,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
 
         CouponMgt.PostIssueCoupon2(Coupon, NpDcSaleLinePOSNewCoupon.Quantity, NpDcSaleLinePOSNewCoupon."Discount Type");
 
-        TempCoupon.Init;
+        TempCoupon.Init();
         TempCoupon := Coupon;
-        TempCoupon.Insert;
+        TempCoupon.Insert();
     end;
 
     local procedure PrintCoupons(var TempCoupon: Record "NPR NpDc Coupon" temporary)
@@ -97,14 +97,14 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Coupon: Record "NPR NpDc Coupon";
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
-        if not TempCoupon.FindSet then
+        if not TempCoupon.FindSet() then
             exit;
 
         repeat
             Coupon.Get(TempCoupon."No.");
             if Coupon."Print Template Code" <> '' then
                 NpDcCouponMgt.PrintCoupon(Coupon);
-        until TempCoupon.Next = 0;
+        until TempCoupon.Next() = 0;
     end;
 
     local procedure AddNewCoupons(SalePOS: Record "NPR POS Sale")
@@ -116,7 +116,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         if not FindActiveOnSaleCouponTypes(CouponType) then
             exit;
 
-        CouponType.FindSet;
+        CouponType.FindSet();
         repeat
             NewCouponQty := IssueOnSaleAchieved(SalePOS, CouponType);
             CouponQty := CountCouponQty(SalePOS, CouponType);
@@ -124,7 +124,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
                 InsertNewCoupons(SalePOS, CouponType, NewCouponQty - CouponQty);
             if NewCouponQty < CouponQty then
                 RemoveNewCoupons(SalePOS, CouponType, CouponQty - NewCouponQty);
-        until CouponType.Next = 0;
+        until CouponType.Next() = 0;
     end;
 
     local procedure InsertNewCoupons(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type"; NewCouponQty: Integer)
@@ -137,12 +137,12 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         SaleLinePOS.SetSkipCalcDiscount(true);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindLast then;
+        if SaleLinePOS.FindLast() then;
         LineNo := SaleLinePOS."Line No.";
 
         for i := 1 to NewCouponQty do begin
             LineNo += 10000;
-            SaleLinePOS.Init;
+            SaleLinePOS.Init();
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
             SaleLinePOS."Line No." := LineNo;
@@ -150,7 +150,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
             SaleLinePOS.Description := CopyStr(StrSubstNo(Text002, CouponType.Description), 1, MaxStrLen(SaleLinePOS.Description));
             SaleLinePOS.Insert(true);
 
-            NpDcSaleLinePOSNewCoupon.Init;
+            NpDcSaleLinePOSNewCoupon.Init();
             NpDcSaleLinePOSNewCoupon."Register No." := SaleLinePOS."Register No.";
             NpDcSaleLinePOSNewCoupon."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             NpDcSaleLinePOSNewCoupon."Sale Type" := SaleLinePOS."Sale Type";
@@ -181,7 +181,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         NpDcSaleLinePOSNewCoupon.SetRange("Register No.", SalePOS."Register No.");
         NpDcSaleLinePOSNewCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         NpDcSaleLinePOSNewCoupon.SetRange("Coupon Type", CouponType.Code);
-        if not NpDcSaleLinePOSNewCoupon.FindSet then
+        if not NpDcSaleLinePOSNewCoupon.FindSet() then
             exit;
 
         SaleLinePOS.SetSkipCalcDiscount(true);
@@ -190,8 +190,8 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
             if SaleLinePOS.Get(NpDcSaleLinePOSNewCoupon."Register No.", NpDcSaleLinePOSNewCoupon."Sales Ticket No.",
                                NpDcSaleLinePOSNewCoupon."Sale Date", NpDcSaleLinePOSNewCoupon."Sale Type", NpDcSaleLinePOSNewCoupon."Sale Line No.") then
                 SaleLinePOS.Delete(true);
-            NpDcSaleLinePOSNewCoupon.Delete;
-        until (NpDcSaleLinePOSNewCoupon.Next = 0) or (CouponQtyRemoved >= RemoveCouponQty);
+            NpDcSaleLinePOSNewCoupon.Delete();
+        until (NpDcSaleLinePOSNewCoupon.Next() = 0) or (CouponQtyRemoved >= RemoveCouponQty);
     end;
 
     local procedure RemoveNewCouponsSalesLinePOS(SaleLinePOS: Record "NPR POS Sale Line")
@@ -204,7 +204,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         if NpDcSaleLinePOSNewCoupon.IsEmpty then
             exit;
 
-        NpDcSaleLinePOSNewCoupon.DeleteAll;
+        NpDcSaleLinePOSNewCoupon.DeleteAll();
     end;
 
     local procedure IssueCouponActionCode(): Text
@@ -274,7 +274,6 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
 
     local procedure OnActionCouponTypeInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        CouponType: Record "NPR NpDc Coupon Type";
         CouponTypeCode: Text;
     begin
         if not SelectCouponType(CouponTypeCode) then
@@ -334,7 +333,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         NpDcSaleLinePOSNewCoupon.SetRange("Register No.", SalePOS."Register No.");
         NpDcSaleLinePOSNewCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         NpDcSaleLinePOSNewCoupon.SetRange("Coupon Type", CouponType.Code);
-        exit(NpDcSaleLinePOSNewCoupon.Count);
+        exit(NpDcSaleLinePOSNewCoupon.Count());
     end;
 
     local procedure FindActiveOnSaleCouponTypes(var CouponType: Record "NPR NpDc Coupon Type"): Boolean
@@ -348,7 +347,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         CouponType.SetFilter("Starting Date", '<=%1', CheckDT);
         CouponType.SetFilter("Ending Date", '>=%1|%2', CheckDT, 0DT);
         CouponType.SetFilter("Reference No. Pattern", '<>%1', '');
-        exit(CouponType.FindFirst);
+        exit(CouponType.FindFirst());
     end;
 
     local procedure FindNewCoupons(SalePOS: Record "NPR POS Sale"; var NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon"): Boolean
@@ -356,15 +355,13 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Clear(NpDcSaleLinePOSNewCoupon);
         NpDcSaleLinePOSNewCoupon.SetRange("Register No.", SalePOS."Register No.");
         NpDcSaleLinePOSNewCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        exit(NpDcSaleLinePOSNewCoupon.FindFirst);
+        exit(NpDcSaleLinePOSNewCoupon.FindFirst());
     end;
 
     local procedure IssueOnSaleAchieved(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type") NewCouponQty: Integer
     var
         NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup";
         NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary;
-        SalesAmount: Decimal;
-        ItemQty: Decimal;
     begin
         if not NpDcIssueOnSaleSetup.Get(CouponType.Code) then
             exit;
@@ -398,7 +395,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         NpDcIssueOnSaleSetupLine.SetRange("Coupon Type", NpDcIssueOnSaleSetup."Coupon Type");
         NpDcIssueOnSaleSetupLine.SetFilter("No.", '<>%1', '');
         NpDcIssueOnSaleSetupLine.SetFilter("Lot Quantity", '>%1', 0);
-        if not NpDcIssueOnSaleSetupLine.FindSet then
+        if not NpDcIssueOnSaleSetupLine.FindSet() then
             exit(0);
 
         repeat
@@ -420,8 +417,8 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
             if (LotQty = 0) or (LotLineQty < LotQty) then
                 LotQty := LotLineQty;
 
-            NpDcItemBuffer.DeleteAll;
-        until NpDcIssueOnSaleSetupLine.Next = 0;
+            NpDcItemBuffer.DeleteAll();
+        until NpDcIssueOnSaleSetupLine.Next() = 0;
 
         exit(LotQty);
     end;
@@ -431,11 +428,11 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         SaleLinePOS: Record "NPR POS Sale Line";
         NpDcIssueOnSaleSetupLine: Record "NPR NpDc Iss.OnSale Setup Line";
     begin
-        NpDcItemBuffer.DeleteAll;
+        NpDcItemBuffer.DeleteAll();
 
         NpDcIssueOnSaleSetupLine.SetRange("Coupon Type", CouponType.Code);
         NpDcIssueOnSaleSetupLine.SetFilter("No.", '<>%1', '');
-        if not NpDcIssueOnSaleSetupLine.FindSet then begin
+        if not NpDcIssueOnSaleSetupLine.FindSet() then begin
             SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
             SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
@@ -460,12 +457,12 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
                     SaleLinePOS.SetRange("Item Disc. Group", NpDcIssueOnSaleSetupLine."No.");
             end;
             SaleLinePOS2DiscBuffer(SaleLinePOS, NpDcItemBuffer);
-        until NpDcIssueOnSaleSetupLine.Next = 0;
+        until NpDcIssueOnSaleSetupLine.Next() = 0;
     end;
 
     local procedure SaleLinePOS2DiscBuffer(var SaleLinePOS: Record "NPR POS Sale Line"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary): Decimal
     begin
-        if not SaleLinePOS.FindSet then
+        if not SaleLinePOS.FindSet() then
             exit;
 
         repeat
@@ -474,9 +471,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
             then begin
                 NpDcItemBuffer.Quantity += SaleLinePOS.Quantity;
                 NpDcItemBuffer."Line Amount" += SaleLinePOS."Amount Including VAT";
-                NpDcItemBuffer.Modify;
+                NpDcItemBuffer.Modify();
             end else begin
-                NpDcItemBuffer.Init;
+                NpDcItemBuffer.Init();
                 NpDcItemBuffer."Item No." := SaleLinePOS."No.";
                 NpDcItemBuffer."Variant Code" := SaleLinePOS."Variant Code";
                 NpDcItemBuffer."Item Category Code" := SaleLinePOS."Item Category Code";
@@ -486,9 +483,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
                 NpDcItemBuffer."Discount Code" := '';
                 NpDcItemBuffer.Quantity := SaleLinePOS.Quantity;
                 NpDcItemBuffer."Line Amount" := SaleLinePOS."Amount Including VAT";
-                NpDcItemBuffer.Insert;
+                NpDcItemBuffer.Insert();
             end;
-        until SaleLinePOS.Next = 0;
+        until SaleLinePOS.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
@@ -497,7 +494,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         if CouponModule.Get(CouponModule.Type::"Issue Coupon", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Issue Coupon";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := Text000;
@@ -523,9 +520,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
             exit;
 
         if not NpDcIssueOnSaleSetup.Get(CouponType.Code) then begin
-            NpDcIssueOnSaleSetup.Init;
+            NpDcIssueOnSaleSetup.Init();
             NpDcIssueOnSaleSetup."Coupon Type" := CouponType.Code;
-            NpDcIssueOnSaleSetup.Insert;
+            NpDcIssueOnSaleSetup.Insert();
         end;
 
         PAGE.Run(PAGE::"NPR NpDc Iss.OnSale Setup", NpDcIssueOnSaleSetup);

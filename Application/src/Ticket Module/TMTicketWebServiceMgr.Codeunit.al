@@ -5,7 +5,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
     trigger OnRun()
     var
         XmlDoc: XmlDocument;
-        ImportType: Record "NPR Nc Import Type";
         FunctionName: Text[100];
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
@@ -45,13 +44,8 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Initialized: Boolean;
-        ITEM_NOT_FOUND: Label 'The sales item specified in external_id %1, was not found.';
-        CHANGE_NOT_ALLOWED: Label 'Confirmed tickets can''t be changed.';
-        TOKEN_NOT_FOUND: Label 'The token %1 was not found, or has incorrect state.';
-        TOKEN_EXPIRED: Label 'The token %1 has expired. Use PreConfirm to re-reserve tickets.';
         TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %1 state.';
         MISSING_CASE: Label 'No handler for %1 [%2].';
-        XML_NODE: Label '%1 not found (this is a programming error.)';
         MUST_BE_POSITIVE: Label 'Quantity must be positive.';
 
     local procedure ImportTicketReservations(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
@@ -123,10 +117,9 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             TicketRequestManager.DeleteReservationRequest(Token, false);
     end;
 
-    local procedure ImportTicketReservation(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportTicketReservation(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
 
         TicketReservationRequest.Init();
@@ -248,7 +241,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         Node: XmlNode;
         NReservation: Integer;
         Token: Text[100];
-        ResponseMessage: Text;
     begin
 
         if (not Document.GetRoot(Reservation)) then
@@ -461,13 +453,10 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         AdmissionNodeList: XmlNodeList;
         AdmissionNode: XmlNode;
         NToken: Integer;
-        TicketCreated: Boolean;
         ChangeRequestToken: Text[100];
         AdmissionCode: Code[20];
         ExtScheduleEntryOld: Integer;
         ExtScheduleEntryNew: Integer;
-        ResponseMessage: Text;
-        ResponseCode: Integer;
         WrongEntry: Label 'Schedule Entry %1 does not correspond to admission code %2.';
         InvalidEntry: Label 'Invalid schedule entry %1.';
         AlreadyConfirmed: Label 'Change request %1 has already been confirmed.';
@@ -598,7 +587,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketAttemptAction: Codeunit "NPR Ticket Attempt Create";
         ResponseMessage: Text;
-        ResponseCode: Integer;
     begin
 
         TicketReservationRequest."Expires Date Time" := CurrentDateTime() + TicketReservationResponse."Exires (Seconds)" * 1000;
@@ -668,7 +656,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
     local procedure InsertTicketReservation(Element: XmlElement; Token: Text[100]; var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
-        Member: Record "NPR MM Member";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ExternalItemType: Integer;
         WaitingListOptInAddress: Text[200];
@@ -710,26 +697,24 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         Initialize;
 
-        with TmpTicketReservationRequest do begin
-            Init();
-            TmpTicketReservationRequest."Entry No." := TmpTicketReservationRequest.Count() + 1;
-            "Session Token ID" := Token;
-            "Request Status" := "Request Status"::WIP;
-            "Created Date Time" := CurrentDateTime();
+        TmpTicketReservationRequest.Init();
+        TmpTicketReservationRequest."Entry No." := TmpTicketReservationRequest.Count() + 1;
+        TmpTicketReservationRequest."Session Token ID" := Token;
+        TmpTicketReservationRequest."Request Status" := TmpTicketReservationRequest."Request Status"::WIP;
+        TmpTicketReservationRequest."Created Date Time" := CurrentDateTime();
 
-            "External Item Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'external_id', true), 1, MaxStrLen("External Item Code"));
+        TmpTicketReservationRequest."External Item Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'external_id', true), 1, MaxStrLen(TmpTicketReservationRequest."External Item Code"));
 
-            TicketRequestManager.TranslateBarcodeToItemVariant("External Item Code", "Item No.", "Variant Code", ExternalItemType);
+        TicketRequestManager.TranslateBarcodeToItemVariant(TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code", ExternalItemType);
 
-            Evaluate(Quantity, NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'qty', true));
-            Evaluate("Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'line_no', true));
-            "External Member No." := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'member_number', false), 1, MaxStrLen("External Member No."));
-            "Admission Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'admission_code', false), 1, MaxStrLen("Admission Code"));
+        Evaluate(TmpTicketReservationRequest.Quantity, NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'qty', true));
+        Evaluate(TmpTicketReservationRequest."Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'line_no', true));
+        TmpTicketReservationRequest."External Member No." := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'member_number', false), 1, MaxStrLen(TmpTicketReservationRequest."External Member No."));
+        TmpTicketReservationRequest."Admission Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'admission_code', false), 1, MaxStrLen(TmpTicketReservationRequest."Admission Code"));
 
-            Evaluate("External Adm. Sch. Entry No.", NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'admission_schedule_entry', false));
+        Evaluate(TmpTicketReservationRequest."External Adm. Sch. Entry No.", NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'admission_schedule_entry', false));
 
-            Insert();
-        end;
+        TmpTicketReservationRequest.Insert();
 
     end;
 
@@ -739,7 +724,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         NPRAttributeID: Record "NPR Attribute ID";
         Admission: Record "NPR TM Admission";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TableId: Integer;
         NPRAttributeManagement: Codeunit "NPR Attribute Management";
         InvalidAttributeCode: Label 'Attribute %1 is not valid.';
@@ -787,7 +771,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         end;
     end;
 
-    local procedure GetWebServiceFunction(ImportTypeCode: Code[20]) FunctionName: Text[100]
+    local procedure GetWebServiceFunction(ImportTypeCode: Code[20]): Text[100]
     var
         ImportType: Record "NPR Nc Import Type";
     begin

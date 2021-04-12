@@ -1,4 +1,4 @@
-xmlport 6151400 "NPR Magento Avail. Inv. Exp."
+﻿xmlport 6151400 "NPR Magento Avail. Inv. Exp."
 {
     Caption = 'Magento Avail. InventoryExport';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/item_inventory';
@@ -85,7 +85,7 @@ xmlport 6151400 "NPR Magento Avail. Inv. Exp."
         j: Integer;
         String: Text;
     begin
-        TempItemVariant.DeleteAll;
+        TempItemVariant.DeleteAll();
         String := '';
         for i := 1 to StrLen(VariantFilter) do begin
             Ch := VariantFilter[i];
@@ -96,23 +96,23 @@ xmlport 6151400 "NPR Magento Avail. Inv. Exp."
         if VariantFilter <> '' then begin
             ItemVariant.SetFilter("Item No.", ItemFilter);
             ItemVariant.SetFilter(Code, VariantFilter);
-            if ItemVariant.FindSet then
+            if ItemVariant.FindSet() then
                 repeat
-                    TempItemVariant.Init;
+                    TempItemVariant.Init();
                     TempItemVariant := ItemVariant;
-                    TempItemVariant.Insert;
-                until ItemVariant.Next = 0;
+                    TempItemVariant.Insert();
+                until ItemVariant.Next() = 0;
             exit;
         end;
 
         Item.SetFilter("No.", ItemFilter);
-        if not Item.FindSet then
+        if not Item.FindSet() then
             exit;
 
         repeat
-            TempItemVariant.Init;
+            TempItemVariant.Init();
             TempItemVariant."Item No." := Item."No.";
-            TempItemVariant.Insert;
-        until Item.Next = 0;
+            TempItemVariant.Insert();
+        until Item.Next() = 0;
     end;
 }

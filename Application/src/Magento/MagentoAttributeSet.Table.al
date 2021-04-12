@@ -41,7 +41,7 @@ table 6151428 "NPR Magento Attribute Set"
             Error(Err001);
 
         MagentoAttributeSetValue.SetRange("Attribute Set ID", "Attribute Set ID");
-        MagentoAttributeSetValue.DeleteAll;
+        MagentoAttributeSetValue.DeleteAll();
     end;
 
     trigger OnInsert()

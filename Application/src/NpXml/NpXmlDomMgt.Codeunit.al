@@ -30,7 +30,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             exit;
 
         if AttributeValue <> '' then
-            Node.AsXmlElement.SetAttribute(AttributeName, AttributeValue);
+            Node.AsXmlElement().SetAttribute(AttributeName, AttributeValue);
     end;
 
     procedure AddAttribute(var Element: XmlElement; AttributeName: Text[260]; AttributeValue: Text[260])
@@ -77,8 +77,8 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             exit;
 
         if AttributeValue <> '' then begin
-            Node.AsXmlElement.Add(XmlAttribute.CreateNamespaceDeclaration(Prefix, NamespaceUri));
-            Node.AsXmlElement.Add(XmlAttribute.Create(AttributeName, NamespaceUri, AttributeValue));
+            Node.AsXmlElement().Add(XmlAttribute.CreateNamespaceDeclaration(Prefix, NamespaceUri));
+            Node.AsXmlElement().Add(XmlAttribute.Create(AttributeName, NamespaceUri, AttributeValue));
         end;
     end;
 
@@ -143,7 +143,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         if not Node.SelectSingleNode(NodePath, NodeChild) then
             exit(false);
 
-        exit(not NodeChild.AsXmlElement.IsEmpty());
+        exit(not NodeChild.AsXmlElement().IsEmpty());
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -158,7 +158,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     begin
         Node.SelectNodes('//' + NodePath, NodeList);
 
-        exit(not (NodeList.Count = 0));
+        exit(not (NodeList.Count() = 0));
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -207,12 +207,12 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         ChildNodesList: XmlNodeList;
         ChildNode: XmlNode;
     begin
-        if not Node.AsXmlElement.HasElements then
+        if not Node.AsXmlElement().HasElements then
             exit(true);
 
-        ChildNodesList := Node.AsXmlElement.GetChildElements();
+        ChildNodesList := Node.AsXmlElement().GetChildElements();
         foreach ChildNode in ChildNodesList do
-            if ChildNode.AsXmlElement.Name <> '#text' then
+            if ChildNode.AsXmlElement().Name <> '#text' then
                 exit(false);
 
         exit(true);
@@ -1008,7 +1008,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         MemoryStream := HttpWebRequest.GetRequestStream;
         XmlDoc.Save(MemoryStream);
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
 
         HttpWebResponse := HttpWebRequest.GetResponse;
@@ -1024,8 +1024,8 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         Stream := HttpWebRequest.GetRequestStream;
         StreamWriter := StreamWriter.StreamWriter(Stream);
         StreamWriter.Write(Request);
-        StreamWriter.Close;
-        Stream.Close;
+        StreamWriter.Close();
+        Stream.Close();
         HttpWebResponse := HttpWebRequest.GetResponse;
     end;
 
@@ -1040,7 +1040,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         StreamReader := StreamReader.StreamReader(Stream);
         ResponseText := StreamReader.ReadToEnd;
         Stream.Flush;
-        Stream.Close;
+        Stream.Close();
         Clear(Stream);
     end;
 

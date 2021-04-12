@@ -18,8 +18,6 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
-    var
-        MemberCommunity: Record "NPR MM Member Community";
     begin
 
         if ThisDataSource <> DataSourceName then
@@ -50,12 +48,9 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        DataType: Enum "NPR Data Type";
-        POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         Setup: Codeunit "NPR POS Setup";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        POSPaymentMethod2: Record "NPR POS Payment Method";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;

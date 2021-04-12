@@ -16,18 +16,18 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014442)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Code field';
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
                     }
-                    field("Discount Type"; "Discount Type")
+                    field("Discount Type"; Rec."Discount Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Discount Type field';
@@ -35,8 +35,8 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     group(Control6014439)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 0);
-                        field("Discount Amount"; "Discount Amount")
+                        Visible = (Rec."Discount Type" = 0);
+                        field("Discount Amount"; Rec."Discount Amount")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
@@ -46,20 +46,20 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     group(Control6014440)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 1);
-                        field("Discount %"; "Discount %")
+                        Visible = (Rec."Discount Type" = 1);
+                        field("Discount %"; Rec."Discount %")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the Discount % field';
                         }
-                        field("Max. Discount Amount"; "Max. Discount Amount")
+                        field("Max. Discount Amount"; Rec."Max. Discount Amount")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Max. Discount Amount per Sale';
                         }
                     }
-                    field(Enabled; Enabled)
+                    field(Enabled; Rec.Enabled)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Enabled field';
@@ -68,12 +68,12 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014443)
                 {
                     ShowCaption = false;
-                    field("Coupon Qty. (Open)"; "Coupon Qty. (Open)")
+                    field("Coupon Qty. (Open)"; Rec."Coupon Qty. (Open)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Coupon Qty. (Open) field';
                     }
-                    field("Arch. Coupon Qty."; "Arch. Coupon Qty.")
+                    field("Arch. Coupon Qty."; Rec."Arch. Coupon Qty.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';
@@ -86,7 +86,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("Issue Coupon Module"; "Issue Coupon Module")
+                    field("Issue Coupon Module"; Rec."Issue Coupon Module")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issue Coupon Module field';
@@ -100,24 +100,24 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014427)
                 {
                     ShowCaption = false;
-                    field("Reference No. Pattern"; "Reference No. Pattern")
+                    field("Reference No. Pattern"; Rec."Reference No. Pattern")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = '[S] ~ Coupon No. [AN] ~ Random Char [AN*3] ~ 3 Random Chars';
                     }
-                    field("Customer No."; "Customer No.")
+                    field("Customer No."; Rec."Customer No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Customer No.';
                         ToolTip = 'Specifies the value of the Customer No. field';
                     }
-                    field("Print Template Code"; "Print Template Code")
+                    field("Print Template Code"; Rec."Print Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Template Code field';
                     }
-                    field("Print on Issue"; "Print on Issue")
+                    field("Print on Issue"; Rec."Print on Issue")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print on Issue field';
@@ -130,7 +130,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014430)
                 {
                     ShowCaption = false;
-                    field("Validate Coupon Module"; "Validate Coupon Module")
+                    field("Validate Coupon Module"; Rec."Validate Coupon Module")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Validate Coupon Module field';
@@ -144,12 +144,12 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014431)
                 {
                     ShowCaption = false;
-                    field("Starting Date"; "Starting Date")
+                    field("Starting Date"; Rec."Starting Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Starting Date field';
                     }
-                    field("Ending Date"; "Ending Date")
+                    field("Ending Date"; Rec."Ending Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Ending Date field';
@@ -162,7 +162,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014432)
                 {
                     ShowCaption = false;
-                    field("Apply Discount Module"; "Apply Discount Module")
+                    field("Apply Discount Module"; Rec."Apply Discount Module")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Apply Discount Module field';
@@ -172,7 +172,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                             CurrPage.Update(true);
                         end;
                     }
-                    field("Application Sequence No."; "Application Sequence No.")
+                    field("Application Sequence No."; Rec."Application Sequence No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Application Sequence No. field';
@@ -181,17 +181,17 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 group(Control6014433)
                 {
                     ShowCaption = false;
-                    field("Max Use per Sale"; "Max Use per Sale")
+                    field("Max Use per Sale"; Rec."Max Use per Sale")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Max Use per Sale field';
                     }
-                    field("Multi-Use Coupon"; "Multi-Use Coupon")
+                    field("Multi-Use Coupon"; Rec."Multi-Use Coupon")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Multi-Use Coupon field';
                     }
-                    field("Multi-Use Qty."; "Multi-Use Qty.")
+                    field("Multi-Use Qty."; Rec."Multi-Use Qty.")
                     {
                         ApplicationArea = All;
                         Caption = 'Multi-Use Qty.';
@@ -211,7 +211,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 Caption = 'Issue Coupons';
                 Image = PostedVoucherGroup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -234,7 +234,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     Caption = 'Setup Issue Coupon';
                     Image = VoucherGroup;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasIssueCouponSetup;
@@ -253,7 +253,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     Caption = 'Setup Validate Coupon';
                     Image = RefreshVoucher;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasValidateCouponSetup;
@@ -272,7 +272,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     Caption = 'Setup Apply Discount';
                     Image = Voucher;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasApplyDiscountSetup;

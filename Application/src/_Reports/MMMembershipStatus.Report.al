@@ -23,8 +23,6 @@ report 6060132 "NPR MM Membership Status"
                         RequestFilterFields = "First Name", "Middle Name", "Last Name", "Country Code";
 
                         trigger OnAfterGetRecord()
-                        var
-                            BarcodeLib: Codeunit "NPR Barcode Image Library";
                         begin
                             TempMembers.Init();
                             TempMembers.Template := "MM Membership Setup".Code;
@@ -50,9 +48,7 @@ report 6060132 "NPR MM Membership Status"
 
                 trigger OnAfterGetRecord()
                 var
-                    Item: Record Item;
                     MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-                    KeepMembership: Boolean;
                     ValidForReferenceDate: Boolean;
                     NewRefDate: Date;
                 begin
@@ -260,7 +256,7 @@ report 6060132 "NPR MM Membership Status"
     trigger OnInitReport()
     begin
 
-        ReferenceDate := Today;
+        ReferenceDate := Today();
     end;
 
     trigger OnPreReport()
@@ -277,13 +273,9 @@ report 6060132 "NPR MM Membership Status"
     end;
 
     var
-        CompanyInformation: Record "Company Information";
         MMMember2: Record "NPR MM Member";
-        MMMemberCard: Record "NPR MM Member Card";
-        MMMembershipEntry: Record "NPR MM Membership Entry";
         ExpiresWithinDateformula: DateFormula;
         RenewedWithin: DateFormula;
-        ShowActiveMemberships: Boolean;
         ConvValidDate: Date;
         MemberDate: Date;
         MMMembershipIssueDate: Date;
@@ -309,7 +301,5 @@ report 6060132 "NPR MM Membership Status"
         Date2Caption: Label 'Until Date';
         MembershipStatus: Option Active,"Active and Renewed","Active and Not Renewed","Not Active";
         Filters: Text;
-        MemberItem: Text;
-        MemberName: Text;
 }
 

@@ -1,8 +1,8 @@
-report 6060040 "NPR Suggest Item Worksh. Lines"
+﻿report 6060040 "NPR Suggest Item Worksh. Lines"
 {
     Caption = 'Suggest Item Worksheet Lines';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -15,7 +15,7 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
                 trigger OnAfterGetRecord()
                 begin
                     LineNo := LineNo + 10000;
-                    ItemWorksheetLine.Reset;
+                    ItemWorksheetLine.Reset();
                     ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Worksheet"."Item Template Name");
                     ItemWorksheetLine.SetRange("Worksheet Name", "Item Worksheet".Name);
                     ItemWorksheetLine.SetRange("Existing Item No.", Item."No.");
@@ -44,7 +44,7 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
 
                         if (OptVariants <> OptVariants::None) then
                             ItemWorksheetLine.RefreshVariants(OptVariants, true);
-                        Commit;
+                        Commit();
                     end;
                 end;
             }
@@ -62,7 +62,7 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
 
             trigger OnPreDataItem()
             begin
-                if "Item Worksheet".Count > 1 then
+                if "Item Worksheet".Count() > 1 then
                     Error(SelectOneItemErr);
             end;
         }

@@ -102,56 +102,56 @@ table 6060131 "NPR MM Member Card"
         }
         field(100; "External Member No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'External Member No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(101; "Member Blocked"; Boolean)
         {
-            CalcFormula = Lookup ("NPR MM Member".Blocked WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member".Blocked WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'Member Blocked';
             Editable = false;
             FieldClass = FlowField;
         }
         field(102; "Display Name"; Text[100])
         {
-            CalcFormula = Lookup ("NPR MM Member"."Display Name" WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."Display Name" WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'Display Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(103; "E-Mail Address"; Text[80])
         {
-            CalcFormula = Lookup ("NPR MM Member"."E-Mail Address" WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."E-Mail Address" WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'E-Mail Address';
             Editable = false;
             FieldClass = FlowField;
         }
         field(110; "External Membership No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'External Membership No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(111; "Membership Blocked"; Boolean)
         {
-            CalcFormula = Lookup ("NPR MM Membership".Blocked WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership".Blocked WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Membership Blocked';
             Editable = false;
             FieldClass = FlowField;
         }
         field(112; "Company Name"; Text[50])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."Company Name" WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."Company Name" WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Company Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(113; "Membership Code"; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."Membership Code" WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."Membership Code" WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Membership Code';
             Editable = false;
             FieldClass = FlowField;

@@ -105,7 +105,7 @@ page 6150664 "NPR NPRE Seating List"
                         begin
                             CurrPage.SetSelectionFilter(NPRESeating);
                             DefaultDimMultiple.SetMultiRecord(NPRESeating, Rec.FieldNo(Code));
-                            DefaultDimMultiple.RunModal;
+                            DefaultDimMultiple.RunModal();
                         end;
                     }
                 }

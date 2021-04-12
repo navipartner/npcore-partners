@@ -17,199 +17,199 @@ page 6060124 "NPR MM Membership Setup"
             repeater(Group)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Membership Type"; "Membership Type")
+                field("Membership Type"; Rec."Membership Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Type field';
                 }
-                field("Loyalty Card"; "Loyalty Card")
+                field("Loyalty Card"; Rec."Loyalty Card")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Loyalty Card field';
                 }
-                field("Loyalty Code"; "Loyalty Code")
+                field("Loyalty Code"; Rec."Loyalty Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Loyalty Code field';
                 }
-                field("Customer Config. Template Code"; "Customer Config. Template Code")
+                field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Config. Template Code field';
                 }
-                field("Contact Config. Template Code"; "Contact Config. Template Code")
+                field("Contact Config. Template Code"; Rec."Contact Config. Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Config. Template Code field';
                 }
-                field("Membership Customer No."; "Membership Customer No.")
+                field("Membership Customer No."; Rec."Membership Customer No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Customer No. field';
                 }
-                field("Member Information"; "Member Information")
+                field("Member Information"; Rec."Member Information")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Information field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field(Perpetual; Perpetual)
+                field(Perpetual; Rec.Perpetual)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Perpetual field';
                 }
-                field("Member Role Assignment"; "Member Role Assignment")
+                field("Member Role Assignment"; Rec."Member Role Assignment")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Role Assignment field';
                 }
-                field("Create Welcome Notification"; "Create Welcome Notification")
+                field("Create Welcome Notification"; Rec."Create Welcome Notification")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Welcome Notification field';
                 }
-                field("Create Renewal Notifications"; "Create Renewal Notifications")
+                field("Create Renewal Notifications"; Rec."Create Renewal Notifications")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Renewal Notifications field';
                 }
-                field("Membership Member Cardinality"; "Membership Member Cardinality")
+                field("Membership Member Cardinality"; Rec."Membership Member Cardinality")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Member Cardinality field';
                 }
-                field("Anonymous Member Cardinality"; "Anonymous Member Cardinality")
+                field("Anonymous Member Cardinality"; Rec."Anonymous Member Cardinality")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Anonymous Member Cardinality field';
                 }
-                field("Community Code"; "Community Code")
+                field("Community Code"; Rec."Community Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Community Code field';
                 }
-                field("Allow Membership Delete"; "Allow Membership Delete")
+                field("Allow Membership Delete"; Rec."Allow Membership Delete")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow Membership Delete field';
                 }
-                field("Confirm Member On Card Scan"; "Confirm Member On Card Scan")
+                field("Confirm Member On Card Scan"; Rec."Confirm Member On Card Scan")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Confirm Member On Card Scan field';
                 }
-                field("Web Service Print Action"; "Web Service Print Action")
+                field("Web Service Print Action"; Rec."Web Service Print Action")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Web Service Print Action field';
                 }
-                field("POS Print Action"; "POS Print Action")
+                field("POS Print Action"; Rec."POS Print Action")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Print Action field';
                 }
-                field("Account Print Object Type"; "Account Print Object Type")
+                field("Account Print Object Type"; Rec."Account Print Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account Print Object Type field';
                 }
-                field("Account Print Template Code"; "Account Print Template Code")
+                field("Account Print Template Code"; Rec."Account Print Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account Print Template Code field';
                 }
-                field("Account Print Object ID"; "Account Print Object ID")
+                field("Account Print Object ID"; Rec."Account Print Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account Print Object ID field';
                 }
-                field("Receipt Print Object Type"; "Receipt Print Object Type")
+                field("Receipt Print Object Type"; Rec."Receipt Print Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Print Object Type field';
                 }
-                field("Receipt Print Template Code"; "Receipt Print Template Code")
+                field("Receipt Print Template Code"; Rec."Receipt Print Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Print Template Code field';
                 }
-                field("Receipt Print Object ID"; "Receipt Print Object ID")
+                field("Receipt Print Object ID"; Rec."Receipt Print Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Print Object ID field';
                 }
-                field("Card Number Scheme"; "Card Number Scheme")
+                field("Card Number Scheme"; Rec."Card Number Scheme")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Number Scheme field';
                 }
-                field("Card Number Prefix"; "Card Number Prefix")
+                field("Card Number Prefix"; Rec."Card Number Prefix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Number Prefix field';
                 }
-                field("Card Number Length"; "Card Number Length")
+                field("Card Number Length"; Rec."Card Number Length")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Number Length field';
                 }
-                field("Card Number Validation"; "Card Number Validation")
+                field("Card Number Validation"; Rec."Card Number Validation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Number Validation field';
                 }
-                field("Card Number No. Series"; "Card Number No. Series")
+                field("Card Number No. Series"; Rec."Card Number No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Number No. Series field';
                 }
-                field("Card Number Valid Until"; "Card Number Valid Until")
+                field("Card Number Valid Until"; Rec."Card Number Valid Until")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Number Valid Until field';
                 }
-                field("Card Number Pattern"; "Card Number Pattern")
+                field("Card Number Pattern"; Rec."Card Number Pattern")
                 {
                     ApplicationArea = All;
                     ToolTip = '<any text><[MA|MS|NS|N*x|A*x|X*x]><[...]><...>';
                 }
-                field("Card Print Object Type"; "Card Print Object Type")
+                field("Card Print Object Type"; Rec."Card Print Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Print Object Type field';
                 }
-                field("Card Print Template Code"; "Card Print Template Code")
+                field("Card Print Template Code"; Rec."Card Print Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Print Template Code field';
                 }
-                field("Card Print Object ID"; "Card Print Object ID")
+                field("Card Print Object ID"; Rec."Card Print Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Print Object ID field';
                 }
-                field("Card Expire Date Calculation"; "Card Expire Date Calculation")
+                field("Card Expire Date Calculation"; Rec."Card Expire Date Calculation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Expire Date Calculation field';
@@ -219,48 +219,48 @@ page 6060124 "NPR MM Membership Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Item Barcode field';
                 }
-                field("Ticket Print Model"; "Ticket Print Model")
+                field("Ticket Print Model"; Rec."Ticket Print Model")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Print Model field';
                 }
-                field("Ticket Print Object Type"; "Ticket Print Object Type")
+                field("Ticket Print Object Type"; Rec."Ticket Print Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Print Object Type field';
                 }
-                field("Ticket Print Object ID"; "Ticket Print Object ID")
+                field("Ticket Print Object ID"; Rec."Ticket Print Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Print Object ID field';
                 }
-                field("Ticket Print Template Code"; "Ticket Print Template Code")
+                field("Ticket Print Template Code"; Rec."Ticket Print Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Print Template Code field';
                 }
-                field("GDPR Mode"; "GDPR Mode")
+                field("GDPR Mode"; Rec."GDPR Mode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the GDPR Mode field';
                 }
-                field("GDPR Agreement No."; "GDPR Agreement No.")
+                field("GDPR Agreement No."; Rec."GDPR Agreement No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the GDPR Agreement No. field';
                 }
-                field("Enable NP Pass Integration"; "Enable NP Pass Integration")
+                field("Enable NP Pass Integration"; Rec."Enable NP Pass Integration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enable NP Pass Integration field';
                 }
-                field("Enable Age Verification"; "Enable Age Verification")
+                field("Enable Age Verification"; Rec."Enable Age Verification")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Enable Age Verification field';
                 }
-                field("Validate Age Against"; "Validate Age Against")
+                field("Validate Age Against"; Rec."Validate Age Against")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -572,7 +572,6 @@ page 6060124 "NPR MM Membership Setup"
     var
         MembershipRole: Record "NPR MM Membership Role";
         MembershipNotification: Record "NPR MM Membership Notific.";
-        MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
         MemberNotification: Codeunit "NPR MM Member Notification";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         EntryNo: Integer;

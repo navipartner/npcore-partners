@@ -27,7 +27,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     begin
                         TypeOnAfterValidate();
                         NoOnAfterValidate();
-                        TypeChosen := Type <> Type::" ";
+                        TypeChosen := Rec.Type <> Rec.Type::" ";
                         SetLocationCodeMandatory;
 
                         if xRec."No." <> '' then
@@ -44,7 +44,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         NoOnAfterValidate();
 
                         if xRec."No." <> '' then
@@ -646,7 +646,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
@@ -1220,8 +1220,6 @@ page 6014519 "NPR Sales Order Pick Subform"
         SalesPriceCalcMgt: Codeunit "Sales Price Calc. Mgt.";
         TransferExtendedText: Codeunit "Transfer Extended Text";
         InvDiscAmountEditable: Boolean;
-        [InDataSet]
-        ItemPanelVisible: Boolean;
         LocationCodeMandatory: Boolean;
         QtyToShipColor: Boolean;
         RefreshMessageEnabled: Boolean;
@@ -1254,7 +1252,7 @@ page 6014519 "NPR Sales Order Pick Subform"
         PurchHeader.SetRange("No.", Rec."Purchase Order No.");
         PurchOrder.SetTableView(PurchHeader);
         PurchOrder.Editable := false;
-        PurchOrder.Run;
+        PurchOrder.Run();
     end;
 
     procedure OpenSpecialPurchOrderForm()
@@ -1268,10 +1266,10 @@ page 6014519 "NPR Sales Order Pick Subform"
         if not PurchHeader.IsEmpty then begin
             PurchOrder.SetTableView(PurchHeader);
             PurchOrder.Editable := false;
-            PurchOrder.Run;
+            PurchOrder.Run();
         end else begin
             PurchRcptHeader.SetRange("Order No.", Rec."Special Order Purchase No.");
-            if PurchRcptHeader.Count = 1 then
+            if PurchRcptHeader.Count() = 1 then
                 PAGE.Run(PAGE::"Posted Purchase Receipt", PurchRcptHeader)
             else
                 PAGE.Run(PAGE::"Posted Purchase Receipts", PurchRcptHeader);
@@ -1337,12 +1335,11 @@ page 6014519 "NPR Sales Order Pick Subform"
 
         OrderPromisingLines.SetSourceType(OrderPromisingLine."Source Type"::Sales.AsInteger());
         OrderPromisingLines.SetTableView(OrderPromisingLine);
-        OrderPromisingLines.RunModal;
+        OrderPromisingLines.RunModal();
     end;
 
     local procedure TypeOnAfterValidate()
     begin
-        ItemPanelVisible := Rec.Type = Rec.Type::Item;
     end;
 
     local procedure NoOnAfterValidate()

@@ -1,4 +1,4 @@
-table 6060051 "NPR Item Worksh. Excel Column"
+﻿table 6060051 "NPR Item Worksh. Excel Column"
 {
     Caption = 'Item Worksheet Excel Column';
     DataClassification = CustomerContent;
@@ -205,10 +205,10 @@ table 6060051 "NPR Item Worksh. Excel Column"
 
             trigger OnValidate()
             begin
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Map to Table No.");
                 RecField.SetRange(FieldName, "Map to Field Name");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Map to Field Number", RecField."No.")
                 else
                     Validate("Map to Field Number", 0);
@@ -238,10 +238,10 @@ table 6060051 "NPR Item Worksh. Excel Column"
                         end;
                     "Process as"::Item, "Process as"::"Item Variant":
                         begin
-                            RecField.Reset;
+                            RecField.Reset();
                             RecField.SetRange(TableNo, "Map to Table No.");
                             RecField.SetRange("Field Caption", "Map to Caption");
-                            if RecField.FindFirst then
+                            if RecField.FindFirst() then
                                 Validate("Map to Field Number", RecField."No.")
                             else
                                 Validate("Map to Field Number", 0);
@@ -305,7 +305,6 @@ table 6060051 "NPR Item Worksh. Excel Column"
     local procedure LookupItemWorksheetField()
     var
         RecTempField: Record "Field" temporary;
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
         NPRAttributeIDs: Page "NPR Attribute IDs";
         FieldLookup: Page "NPR Field Lookup";
         I: Integer;
@@ -315,12 +314,12 @@ table 6060051 "NPR Item Worksh. Excel Column"
                 exit;
             "Process as"::"Item Attribute":
                 begin
-                    NPRAttributeID.Reset;
+                    NPRAttributeID.Reset();
                     NPRAttributeID.SetRange("Table ID", "Map to Table No.");
                     Clear(NPRAttributeIDs);
                     NPRAttributeIDs.SetTableView(NPRAttributeID);
                     NPRAttributeIDs.LookupMode := true;
-                    if NPRAttributeIDs.RunModal = ACTION::LookupOK then
+                    if NPRAttributeIDs.RunModal() = ACTION::LookupOK then
                         NPRAttributeIDs.GetRecord(NPRAttributeID)
                     else
                         exit;
@@ -328,13 +327,13 @@ table 6060051 "NPR Item Worksh. Excel Column"
                 end;
             "Process as"::Item, "Process as"::"Item Variant":
                 begin
-                    RecField.Reset;
+                    RecField.Reset();
                     RecField.SetRange(TableNo, "Map to Table No.");
                     Clear(FieldLookup);
                     FieldLookup.SetTableView(RecField);
                     if "Map to Field Number" <> 0 then begin
                         RecField.SetRange("No.", "Map to Field Number");
-                        if RecField.FindFirst then
+                        if RecField.FindFirst() then
                             FieldLookup.SetRecord(RecField);
                         RecField.SetRange("No.");
                     end;
@@ -342,14 +341,14 @@ table 6060051 "NPR Item Worksh. Excel Column"
                     FieldLookup.SetTableView(RecField);
                     if "Map to Field Number" <> 0 then begin
                         RecField.SetRange("No.", "Map to Field Number");
-                        if RecField.FindFirst then
+                        if RecField.FindFirst() then
                             FieldLookup.SetRecord(RecField);
                         RecField.SetRange("No.");
                     end;
                     RecField.SetRange(Class, RecField.Class::Normal);
                     FieldLookup.SetTableView(RecField);
                     FieldLookup.LookupMode := true;
-                    if FieldLookup.RunModal = ACTION::LookupOK then
+                    if FieldLookup.RunModal() = ACTION::LookupOK then
                         FieldLookup.GetRecord(RecField)
                     else
                         exit;
@@ -360,10 +359,10 @@ table 6060051 "NPR Item Worksh. Excel Column"
                     if RecTempField.IsTemporary then begin
                         I := 1;
                         repeat
-                            RecTempField.Init;
+                            RecTempField.Init();
                             RecTempField."No." := I;
                             RecTempField."Field Caption" := TempFieldName(I);
-                            RecTempField.Insert;
+                            RecTempField.Insert();
                             I := I + 1;
                         until TempFieldName(I) = '';
                         if PAGE.RunModal(6014547, RecTempField) = ACTION::LookupOK then
@@ -376,8 +375,6 @@ table 6060051 "NPR Item Worksh. Excel Column"
     end;
 
     local procedure TempFieldName(FieldNumber: Integer): Text
-    var
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
         case FieldNumber of
             1:

@@ -55,8 +55,6 @@ table 6059903 "NPR Task Queue"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                TaskQueue: Record "NPR Task Queue";
             begin
                 //-TQ1.11
                 UpdateTaskLine;
@@ -189,8 +187,6 @@ table 6059903 "NPR Task Queue"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                "Object": Record "Object";
             begin
             end;
         }
@@ -201,7 +197,7 @@ table 6059903 "NPR Task Queue"
         }
         field(61; "Last Executed Date"; DateTime)
         {
-            CalcFormula = Max ("NPR Task Log (Task)"."Ending Time" WHERE("Journal Template Name" = FIELD("Task Template"),
+            CalcFormula = Max("NPR Task Log (Task)"."Ending Time" WHERE("Journal Template Name" = FIELD("Task Template"),
                                                                      "Journal Batch Name" = FIELD("Task Batch"),
                                                                      "Line No." = FIELD("Task Line No.")));
             Caption = 'Last Executed Date';
@@ -291,7 +287,7 @@ table 6059903 "NPR Task Queue"
     begin
         //-TQ1.11
         TaskLine.ChangeCompany(Company);
-        TaskLine.LockTable;
+        TaskLine.LockTable();
         if not TaskLine.Get("Task Template", "Task Batch", "Task Line No.") then
             Error(Text001);
 
@@ -300,7 +296,7 @@ table 6059903 "NPR Task Queue"
             TaskLine.Enabled := Enabled;
         TaskLine.Priority := Priority;
         TaskLine."Task Worker Group" := "Task Worker Group";
-        TaskLine.Modify;
+        TaskLine.Modify();
         //+TQ1.11
     end;
 }

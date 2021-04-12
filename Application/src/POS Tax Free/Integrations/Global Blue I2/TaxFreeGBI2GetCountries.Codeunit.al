@@ -13,13 +13,13 @@ codeunit 6014617 "NPR TaxFree GBI2 GetCountries"
         if not FindValidTaxFreeUnit(TaxFreeUnit) then
             Error(Error_MissingParams);
 
-        TaxFreeRequest.Init;
+        TaxFreeRequest.Init();
         TaxFreeRequest."Request Type" := 'GET_COUNTRIES';
         TaxFreeRequest."POS Unit No." := TaxFreeUnit."POS Unit No.";
         TaxFreeRequest.Mode := TaxFreeUnit.Mode;
         TaxFreeRequest."Timeout (ms)" := 300 * 1000;
         TaxFreeRequest."Time Start" := Time;
-        TaxFreeRequest."Date Start" := Today;
+        TaxFreeRequest."Date Start" := Today();
 
         GlobalBlueHandler.InitializeHandler(TaxFreeRequest);
         GlobalBlueHandler.DownloadCountries(TaxFreeRequest);
@@ -30,19 +30,18 @@ codeunit 6014617 "NPR TaxFree GBI2 GetCountries"
 
     local procedure FindValidTaxFreeUnit(var TaxFreeUnit: Record "NPR Tax Free POS Unit"): Boolean
     var
-        GlobalBlueHandler: Codeunit "NPR Tax Free GB I2";
         GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
     begin
         TaxFreeUnit.SetRange("Handler ID Enum", TaxFreeUnit."Handler ID Enum"::GLOBALBLUE_I2);
-        TaxFreeUnit.FindSet;
+        TaxFreeUnit.FindSet();
         repeat
             GlobalBlueParameters.SetFilter("Shop ID", '<>%1', '');
             GlobalBlueParameters.SetFilter("Desk ID", '<>%1', '');
             GlobalBlueParameters.SetFilter("Shop Country Code", '<>%1', 0);
             GlobalBlueParameters.SetRange("Tax Free Unit", TaxFreeUnit."POS Unit No.");
-            if GlobalBlueParameters.FindFirst then
+            if GlobalBlueParameters.FindFirst() then
                 exit(true);
-        until TaxFreeUnit.Next = 0;
+        until TaxFreeUnit.Next() = 0;
     end;
 
     procedure IsScheduled(): Boolean

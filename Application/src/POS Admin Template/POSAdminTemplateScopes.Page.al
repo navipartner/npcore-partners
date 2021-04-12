@@ -15,12 +15,12 @@ page 6150742 "NPR POS Admin. Template Scopes"
         {
             repeater(Group)
             {
-                field("Applies To"; "Applies To")
+                field("Applies To"; Rec."Applies To")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Applies To field';
                 }
-                field("Applies To Code"; "Applies To Code")
+                field("Applies To Code"; Rec."Applies To Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Applies To Code field';

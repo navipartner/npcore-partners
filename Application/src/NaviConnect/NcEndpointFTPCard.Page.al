@@ -17,17 +17,17 @@ page 6151523 "NPR Nc Endpoint FTP Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
@@ -35,47 +35,47 @@ page 6151523 "NPR Nc Endpoint FTP Card"
             }
             group(FTP)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field(Server; Server)
+                field(Server; Rec.Server)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Server field';
                 }
-                field(Username; Username)
+                field(Username; Rec.Username)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Username field';
                 }
-                field(Password; Password)
+                field(Password; Rec.Password)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Password field';
                 }
-                field(Port; Port)
+                field(Port; Rec.Port)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Port field';
                 }
-                field(Passive; Passive)
+                field(Passive; Rec.Passive)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Passive field';
                 }
-                field(Directory; Directory)
+                field(Directory; Rec.Directory)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Directory field';
                 }
-                field(Filename; Filename)
+                field(Filename; Rec.Filename)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filename field';
                 }
-                field("File Encoding"; "File Encoding")
+                field("File Encoding"; Rec."File Encoding")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the File Encoding field';
@@ -97,7 +97,7 @@ page 6151523 "NPR Nc Endpoint FTP Card"
 
                 trigger OnAction()
                 begin
-                    ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks;
                 end;
             }
         }

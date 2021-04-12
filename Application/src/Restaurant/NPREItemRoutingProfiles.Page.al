@@ -66,7 +66,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     Enabled = RelatedInfoIsEnabled;
                     Image = CoupledOrderList;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -85,7 +85,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     Enabled = RelatedInfoIsEnabled;
                     Image = CoupledOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

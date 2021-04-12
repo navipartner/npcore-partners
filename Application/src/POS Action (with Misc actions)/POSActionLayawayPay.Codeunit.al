@@ -37,20 +37,18 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('PayLayawayInvoice', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('PayLayawayInvoice', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterTextParameter('OrderPaymentTermsFilter', '');
-                RegisterOptionParameter('SelectionMethod', 'NextDue,List', 'NextDue');
-                RegisterBooleanParameter('SelectCustomer', true);
-            end;
+            Sender.RegisterTextParameter('OrderPaymentTermsFilter', '');
+            Sender.RegisterOptionParameter('SelectionMethod', 'NextDue,List', 'NextDue');
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
         end;
     end;
 
@@ -66,7 +64,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -118,7 +116,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -139,16 +137,13 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
     end;
 
     local procedure SelectPrepaymentInvoice(SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; SelectionMethod: Integer): Boolean
-    var
-        CustLedgerEntry: Record "Cust. Ledger Entry";
-        InvoiceFilterString: Text;
     begin
         if SelectionMethod = 0 then begin
             GetNextDuePrepayment(SalesHeader, SalesInvoiceHeader, 0D, true);
             exit(true);
         end else begin
             SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-            SalesInvoiceHeader.FindSet;
+            SalesInvoiceHeader.FindSet();
             exit(PAGE.RunModal(PAGE::"NPR POS Prepaym. Invoices", SalesInvoiceHeader) = ACTION::LookupOK);
         end;
     end;
@@ -194,12 +189,12 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         Amount: Decimal;
     begin
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        SalesInvoiceHeader.FindSet;
+        SalesInvoiceHeader.FindSet();
         repeat
             if InvoiceFilterString <> '' then
                 InvoiceFilterString += '|';
             InvoiceFilterString += '''' + SalesInvoiceHeader."No." + '''';
-        until SalesInvoiceHeader.Next = 0;
+        until SalesInvoiceHeader.Next() = 0;
 
         CustLedgerEntry.SetAutoCalcFields("Remaining Amt. (LCY)");
         CustLedgerEntry.SetRange("Customer No.", SalesHeader."Bill-to Customer No.");
@@ -210,10 +205,10 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         if DueLaterThan <> 0D then
             CustLedgerEntry.SetFilter("Due Date", '>%1', DueLaterThan);
 
-        if CustLedgerEntry.FindSet then
+        if CustLedgerEntry.FindSet() then
             repeat
                 Amount += CustLedgerEntry."Remaining Amt. (LCY)";
-            until CustLedgerEntry.Next = 0;
+            until CustLedgerEntry.Next() = 0;
 
         exit(Amount);
     end;
@@ -225,12 +220,12 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         InvoiceFilterString: Text;
     begin
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        SalesInvoiceHeader.FindSet;
+        SalesInvoiceHeader.FindSet();
         repeat
             if InvoiceFilterString <> '' then
                 InvoiceFilterString += '|';
             InvoiceFilterString += '''' + SalesInvoiceHeader."No." + '''';
-        until SalesInvoiceHeader.Next = 0;
+        until SalesInvoiceHeader.Next() = 0;
 
         CustLedgerEntry.SetCurrentKey("Customer No.", Open, Positive, "Due Date", "Currency Code");
         CustLedgerEntry.SetRange("Customer No.", SalesHeader."Bill-to Customer No.");
@@ -243,7 +238,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         if WithError then
             CustLedgerEntry.FindFirst
         else begin
-            if not CustLedgerEntry.FindFirst then
+            if not CustLedgerEntry.FindFirst() then
                 exit(false);
         end;
 
@@ -270,11 +265,11 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
     begin
         //-NPR5.53 [373453]
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        if SalesInvoiceHeader.FindSet then
+        if SalesInvoiceHeader.FindSet() then
             repeat
                 POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
                 POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvoiceHeader."No.");
-                if POSEntrySalesDocLink.FindSet then
+                if POSEntrySalesDocLink.FindSet() then
                     repeat
                         POSEntry.Get(POSEntrySalesDocLink."POS Entry No.");
                         if POSEntry."Post Entry Status" <> POSEntry."Post Entry Status"::Posted then begin
@@ -286,15 +281,15 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
                               SalesHeader."Document Type"::Invoice,
                               SalesInvoiceHeader."No.");
                         end;
-                    until POSEntrySalesDocLink.Next = 0;
-            until SalesInvoiceHeader.Next = 0;
+                    until POSEntrySalesDocLink.Next() = 0;
+            until SalesInvoiceHeader.Next() = 0;
         //+NPR5.53 [373453]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -310,7 +305,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -326,7 +321,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -340,7 +335,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
     var
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -357,7 +352,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
     var
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

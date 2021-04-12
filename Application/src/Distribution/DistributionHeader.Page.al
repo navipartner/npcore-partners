@@ -15,22 +15,22 @@ page 6151057 "NPR Distribution Header"
         {
             repeater(Group)
             {
-                field("Distribution Group"; "Distribution Group")
+                field("Distribution Group"; Rec."Distribution Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Group field';
                 }
-                field("Item Hiearachy"; "Item Hiearachy")
+                field("Item Hiearachy"; Rec."Item Hiearachy")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Hiearachy field';
                 }
-                field("Distribution Type"; "Distribution Type")
+                field("Distribution Type"; Rec."Distribution Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

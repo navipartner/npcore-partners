@@ -51,7 +51,7 @@ page 6150639 "NPR POS Post. Profile Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tax Liable field';
-                }                
+                }
                 field("POS Period Register No. Series"; Rec."POS Period Register No. Series")
                 {
                     ApplicationArea = All;
@@ -66,7 +66,7 @@ page 6150639 "NPR POS Post. Profile Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Compression field';
-                }                
+                }
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';

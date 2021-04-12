@@ -176,8 +176,5 @@ report 6151598 "NPR Open/Archive Coupon Stat."
         Archived: Integer;
         GrandTotalCptn: Label 'Grand Total';
         CustomerFilter: Text;
-        FilterCustomer: Text;
-        FilterEndDate: Text;
-        FilterStartDate: Text;
 }
 

@@ -15,7 +15,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := Choice;
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     local procedure POSSalesLineUnitPriceInclVATExclDiscount(POSSalesLine: Record "NPR POS Entry Sales Line"): Decimal
@@ -31,9 +31,9 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         AllObj: Record AllObj;
     begin
         AllObj.Get(AllObj."Object Type"::Codeunit, CODEUNIT::"NPR RP Aux: SalesReceipt Calc.");
-        tmpAllObj.Init;
+        tmpAllObj.Init();
         tmpAllObj := AllObj;
-        tmpAllObj.Insert;
+        tmpAllObj.Insert();
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionList', '', false, false)]
@@ -49,7 +49,6 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
     [EventSubscriber(ObjectType::Table, 6014445, 'OnFunction', '', false, false)]
     local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
     var
-        UsePOSEntry: Boolean;
         RecRef: RecordRef;
         POSSalesLine: Record "NPR POS Entry Sales Line";
         FunctionTxt: Text;
@@ -67,7 +66,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
             DATABASE::"NPR POS Entry Sales Line":
                 begin
                     RecRef := RecID.GetRecord();
-                    RecRef.Find;
+                    RecRef.Find();
                     RecRef.SetTable(POSSalesLine);
                 end;
             else

@@ -1,4 +1,4 @@
-codeunit 6151019 "NPR NpRv Module Valid.: Global"
+﻿codeunit 6151019 "NPR NpRv Module Valid.: Global"
 {
     var
         Text000: Label 'Validate Global Voucher';
@@ -24,14 +24,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     begin
         NpRvVoucherType.SetRange("Partner Code", NpRvPartner.Code);
         NpRvVoucherType.SetRange("Validate Voucher Module", ModuleCode());
-        if not NpRvVoucherType.FindSet then
+        if not NpRvVoucherType.FindSet() then
             exit;
 
         repeat
             if NpRvGlobalVoucherSetup.Get(NpRvVoucherType.Code) then begin
                 if TryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup) then;
             end;
-        until NpRvVoucherType.Next = 0;
+        until NpRvVoucherType.Next() = 0;
     end;
 
     [TryFunction]
@@ -95,7 +95,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
         if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
             if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                ErrorMessage := Node.AsXmlElement.InnerText();
+                ErrorMessage := Node.AsXmlElement().InnerText();
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
         Error(CopyStr(ErrorMessage, 1, 1000));
@@ -107,7 +107,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         if VoucherModule.Get(VoucherModule.Type::"Validate Voucher", ModuleCode()) then
             exit;
 
-        VoucherModule.Init;
+        VoucherModule.Init();
         VoucherModule.Type := VoucherModule.Type::"Validate Voucher";
         VoucherModule.Code := ModuleCode();
         VoucherModule.Description := Text000;
@@ -134,13 +134,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
 
         VoucherType.TestField("Partner Code");
         if not NpRvGlobalVoucherSetup.Get(VoucherType.Code) then begin
-            NpRvGlobalVoucherSetup.Init;
+            NpRvGlobalVoucherSetup.Init();
             NpRvGlobalVoucherSetup."Voucher Type" := VoucherType.Code;
             NpRvGlobalVoucherSetup.Insert(true);
         end;
 
         NpRvGlobalVoucherSetup.FilterGroup(2);
-        NpRvGlobalVoucherSetup.SetRecFilter;
+        NpRvGlobalVoucherSetup.SetRecFilter();
         NpRvGlobalVoucherSetup.FilterGroup(0);
         PAGE.Run(PAGE::"NPR NpRv Global Voucher Setup", NpRvGlobalVoucherSetup);
     end;
@@ -172,7 +172,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        SaleLinePOSReference: Record "NPR NpRv Sales Line Ref.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDomManagement: Codeunit "XML DOM Management";
         Client: HttpClient;
@@ -180,7 +179,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ContentHeader: HttpHeaders;
         Response: HttpResponseMessage;
         Document: XmlDocument;
-        Node: XmlNode;
         RequestXmlText: Text;
         ErrorMessage: Text;
     begin
@@ -253,7 +251,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     VoucherEntry.SetRange("Voucher No.", Rec."Voucher No.");
                     VoucherEntry.SetFilter("Entry Type", '%1|%2', VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::"Partner Issue Voucher");
                     VoucherEntry.SetFilter("Partner Code", '<>%1', Rec."Partner Code");
-                    if not VoucherEntry.FindFirst then
+                    if not VoucherEntry.FindFirst() then
                         exit;
                     if not NpRvPartner.Get(VoucherEntry."Partner Code") then
                         exit;
@@ -278,7 +276,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ContentHeader: HttpHeaders;
         Response: HttpResponseMessage;
         Document: XmlDocument;
-        Node: XmlNode;
         RequestXmlText: Text;
         ErrorMessage: Text;
     begin
@@ -376,7 +373,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         Clear(Voucher);
         Voucher.SetRange("Reference No.", NpRvVoucherBuffer."Reference No.");
         Voucher.SetRange("Voucher Type", VoucherType.Code);
-        if Voucher.FindFirst then begin
+        if Voucher.FindFirst() then begin
             if Voucher.CalcInUseQty() > 0 then
                 Error(Text001);
         end;
@@ -427,14 +424,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             Clear(Voucher);
             Voucher.SetRange("Reference No.", ReferenceNo);
             Voucher.SetRange("Voucher Type", VoucherType.Code);
-            if not Voucher.FindLast then begin
-                Voucher.Init;
+            if not Voucher.FindLast() then begin
+                Voucher.Init();
                 Voucher."No." := '';
                 Voucher."Reference No." := ReferenceNo;
                 Voucher.Validate("Voucher Type", VoucherType.Code);
                 Voucher.Insert(true);
 
-                VoucherEntry.Init;
+                VoucherEntry.Init();
                 VoucherEntry."Entry No." := 0;
                 VoucherEntry."Voucher No." := Voucher."No.";
                 VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Partner Issue Voucher";
@@ -449,7 +446,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                 VoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(VoucherEntry."User ID"), false);
                 VoucherEntry."Closed by Entry No." := 0;
                 VoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(VoucherEntry."Partner Code"), false));
-                VoucherEntry.Insert;
+                VoucherEntry.Insert();
             end;
 
             Voucher.Description := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'description', MaxStrLen(Voucher.Description), false);
@@ -487,7 +484,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ContentHeader: HttpHeaders;
         Response: HttpResponseMessage;
         Document: XmlDocument;
-        Node: XmlNode;
         RequestXmlText: Text;
         ErrorMessage: Text;
     begin
@@ -556,7 +552,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ContentHeader: HttpHeaders;
         Response: HttpResponseMessage;
         Document: XmlDocument;
-        Node: XmlNode;
         RequestXmlText: Text;
         ErrorMessage: Text;
     begin
@@ -568,7 +563,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
 
         NpRvVoucherEntry2.SetRange("Voucher No.", NpRvVoucherEntry."Voucher No.");
         NpRvVoucherEntry2.SetFilter("Entry Type", '%1|%2', NpRvVoucherEntry2."Entry Type"::"Issue Voucher", NpRvVoucherEntry2."Entry Type"::"Partner Issue Voucher");
-        NpRvVoucherEntry2.FindFirst;
+        NpRvVoucherEntry2.FindFirst();
         if NpRvVoucherEntry."Partner Code" = NpRvVoucherEntry2."Partner Code" then
             exit;
         if not NpRvPartner.Get(NpRvVoucherEntry2."Partner Code") then

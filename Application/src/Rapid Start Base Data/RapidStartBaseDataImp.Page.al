@@ -129,16 +129,10 @@ page 6014615 "NPR RapidStart Base Data Imp."
 
     local procedure SetControls()
     begin
-        ActionBackAllowed := false;
-        ActionNextAllowed := false;
-        ActionFinishAllowed := package <> '';
 
     end;
 
     var
-        ActionBackAllowed: Boolean;
-        ActionFinishAllowed: Boolean;
-        ActionNextAllowed: Boolean;
         AdjustTableNames: Boolean;
         currentStep: Integer;
         package: Text;

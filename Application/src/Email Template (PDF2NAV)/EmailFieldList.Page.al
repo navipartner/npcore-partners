@@ -19,13 +19,13 @@ page 6059792 "NPR E-mail Field List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Field Caption"; "Field Caption")
+                field("Field Caption"; Rec."Field Caption")
                 {
                     ApplicationArea = All;
                     Caption = 'Field Name';
@@ -40,8 +40,6 @@ page 6059792 "NPR E-mail Field List"
     }
 
     trigger OnOpenPage()
-    var
-        tempTableNo: Integer;
     begin
     end;
 }

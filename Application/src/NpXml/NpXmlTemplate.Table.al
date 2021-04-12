@@ -1,4 +1,4 @@
-table 6151551 "NPR NpXml Template"
+﻿table 6151551 "NPR NpXml Template"
 {
     Caption = 'NpXml Template';
     DataClassification = CustomerContent;
@@ -149,7 +149,7 @@ table 6151551 "NPR NpXml Template"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Before Transfer Codeunit ID");
                 if "Before Transfer Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Before Transfer Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(4905; "Before Transfer Codeunit Name"; Text[50])
@@ -196,7 +196,7 @@ table 6151551 "NPR NpXml Template"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Before Transfer Codeunit ID");
                 if "Before Transfer Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Before Transfer Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(4990; "File Transfer"; Boolean)
@@ -210,8 +210,6 @@ table 6151551 "NPR NpXml Template"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                Valid: Boolean;
             begin
                 if "File Path" <> '' then begin
                     if "File Path"[StrLen("File Path")] = '\' then begin
@@ -439,25 +437,25 @@ table 6151551 "NPR NpXml Template"
         end;
 
         NpXmlElement.SetRange("Xml Template Code", Code);
-        NpXmlElement.DeleteAll;
+        NpXmlElement.DeleteAll();
 
         NpXmlFilter.SetRange("Xml Template Code", Code);
-        NpXmlFilter.DeleteAll;
+        NpXmlFilter.DeleteAll();
 
         NpXmlAttribute.SetRange("Xml Template Code", Code);
-        NpXmlAttribute.DeleteAll;
+        NpXmlAttribute.DeleteAll();
 
         NpXmlTemplateTrigger.SetRange("Xml Template Code", Code);
-        NpXmlTemplateTrigger.DeleteAll;
+        NpXmlTemplateTrigger.DeleteAll();
 
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", Code);
-        NpXmlTemplateTriggerLink.DeleteAll;
+        NpXmlTemplateTriggerLink.DeleteAll();
 
         NpXmlNamespace.SetRange("Xml Template Code", Code);
-        NpXmlNamespace.DeleteAll;
+        NpXmlNamespace.DeleteAll();
 
         NpXmlApiHeader.SetRange("Xml Template Code", Code);
-        NpXmlApiHeader.DeleteAll;
+        NpXmlApiHeader.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -473,8 +471,6 @@ table 6151551 "NPR NpXml Template"
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
-        NpXmlTemplateArchive: Record "NPR NpXml Template Arch.";
-        SaveTemplateDescription: Text;
     begin
         if "Table No." <> xRec."Table No." then begin
             NpXmlTemplateTrigger.SetRange("Xml Template Code", Code);
@@ -506,47 +502,47 @@ table 6151551 "NPR NpXml Template"
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
     begin
         NpXmlXmlFilter.SetRange("Xml Template Code", xRec.Code);
-        if NpXmlXmlFilter.FindSet then
+        if NpXmlXmlFilter.FindSet() then
             repeat
                 NewNpXmlXmlFilter := NpXmlXmlFilter;
                 NewNpXmlXmlFilter."Xml Template Code" := Code;
-                NewNpXmlXmlFilter.Insert;
-            until NpXmlXmlFilter.Next = 0;
-        NpXmlXmlFilter.DeleteAll;
+                NewNpXmlXmlFilter.Insert();
+            until NpXmlXmlFilter.Next() = 0;
+        NpXmlXmlFilter.DeleteAll();
         NpXmlTemplateTrigger.SetRange("Xml Template Code", xRec.Code);
-        if NpXmlTemplateTrigger.FindSet then
+        if NpXmlTemplateTrigger.FindSet() then
             repeat
                 NewNpXmlTemplateTrigger := NpXmlTemplateTrigger;
                 NewNpXmlTemplateTrigger."Xml Template Code" := Code;
-                NewNpXmlTemplateTrigger.Insert;
-            until NpXmlTemplateTrigger.Next = 0;
-        NpXmlTemplateTrigger.DeleteAll;
+                NewNpXmlTemplateTrigger.Insert();
+            until NpXmlTemplateTrigger.Next() = 0;
+        NpXmlTemplateTrigger.DeleteAll();
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", xRec.Code);
-        if NpXmlTemplateTriggerLink.FindSet then
+        if NpXmlTemplateTriggerLink.FindSet() then
             repeat
                 NewNpXmlTemplateTriggerLink := NpXmlTemplateTriggerLink;
                 NewNpXmlTemplateTriggerLink."Xml Template Code" := Code;
-                NewNpXmlTemplateTriggerLink.Insert;
-            until NpXmlTemplateTriggerLink.Next = 0;
-        NpXmlTemplateTriggerLink.DeleteAll;
+                NewNpXmlTemplateTriggerLink.Insert();
+            until NpXmlTemplateTriggerLink.Next() = 0;
+        NpXmlTemplateTriggerLink.DeleteAll();
 
         NpXmlNamespace.SetRange("Xml Template Code", xRec.Code);
-        if NpXmlNamespace.FindSet then
+        if NpXmlNamespace.FindSet() then
             repeat
                 NewNpXmlNamespace := NpXmlNamespace;
                 NewNpXmlNamespace."Xml Template Code" := Code;
-                NewNpXmlNamespace.Insert;
-            until NpXmlNamespace.Next = 0;
-        NpXmlNamespace.DeleteAll;
+                NewNpXmlNamespace.Insert();
+            until NpXmlNamespace.Next() = 0;
+        NpXmlNamespace.DeleteAll();
 
         NpXmlApiHeader.SetRange("Xml Template Code", xRec.Code);
-        if NpXmlApiHeader.FindSet then
+        if NpXmlApiHeader.FindSet() then
             repeat
                 NewNpXmlApiHeader := NpXmlApiHeader;
                 NewNpXmlApiHeader."Xml Template Code" := Code;
-                NewNpXmlApiHeader.Insert;
-            until NpXmlApiHeader.Next = 0;
-        NpXmlApiHeader.DeleteAll;
+                NewNpXmlApiHeader.Insert();
+            until NpXmlApiHeader.Next() = 0;
+        NpXmlApiHeader.DeleteAll();
     end;
 
     procedure GetApiUsername(): Text[250]
@@ -563,7 +559,6 @@ table 6151551 "NPR NpXml Template"
 
     procedure InitVersion()
     var
-        XMLTemplate: Record "NPR NpXml Template";
         NpXmlTemplateHistory: Record "NPR NpXml Template History";
     begin
         if not Archived then
@@ -582,12 +577,9 @@ table 6151551 "NPR NpXml Template"
     var
         NpXmlSetup: Record "NPR NpXml Setup";
         NpXmlTemplateArchive: Record "NPR NpXml Template Arch.";
-        DatabaseRecord: RecordRef;
-        NewTemplateVersion: Code[10];
-        CurrentTemplateTimestamp: DateTime;
         NextTemplateVersionNo: Code[10];
     begin
-        NpXmlSetup.Get;
+        NpXmlSetup.Get();
 
         if NpXmlSetup."Template Version Prefix" = '' then
             NpXmlSetup."Template Version Prefix" := 'NPK';
@@ -598,7 +590,7 @@ table 6151551 "NPR NpXml Template"
         NpXmlTemplate."Template Version" := NextTemplateVersionNo + '.00';
         NpXmlTemplateArchive.SetRange(Code, NpXmlTemplate.Code);
         NpXmlTemplateArchive.SetFilter("Template Version No.", '%1', NextTemplateVersionNo + '.??');
-        if NpXmlTemplateArchive.FindLast then
+        if NpXmlTemplateArchive.FindLast() then
             NpXmlTemplate."Template Version" := IncStr(NpXmlTemplateArchive."Template Version No.");
     end;
 
@@ -626,14 +618,14 @@ table 6151551 "NPR NpXml Template"
 
         NpXmlTemplateTrigger.SetRange("Xml Template Code", Code);
         NpXmlTemplateTrigger.SetFilter("Table No.", '<>%1', 0);
-        if NpXmlTemplateTrigger.FindSet then
+        if NpXmlTemplateTrigger.FindSet() then
             repeat
                 if NpXmlTemplateTrigger."Insert Trigger" or NpXmlTemplateTrigger."Modify Trigger" or NpXmlTemplateTrigger."Delete Trigger" then begin
                     NaviConnectTaskSetup.SetRange("Table No.", NpXmlTemplateTrigger."Table No.");
                     NaviConnectTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpXml Task Mgt.");
                     NaviConnectTaskSetup.SetRange("Task Processor Code", "Task Processor Code");
-                    if not NaviConnectTaskSetup.FindFirst then begin
-                        NaviConnectTaskSetup.Init;
+                    if not NaviConnectTaskSetup.FindFirst() then begin
+                        NaviConnectTaskSetup.Init();
                         NaviConnectTaskSetup."Entry No." := 0;
                         NaviConnectTaskSetup."Table No." := NpXmlTemplateTrigger."Table No.";
                         NaviConnectTaskSetup."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
@@ -642,7 +634,7 @@ table 6151551 "NPR NpXml Template"
                     end;
 
                     if not DataLogSetup.Get(NpXmlTemplateTrigger."Table No.") then begin
-                        DataLogSetup.Init;
+                        DataLogSetup.Init();
                         DataLogSetup."Table ID" := NpXmlTemplateTrigger."Table No.";
                         if NpXmlTemplateTrigger."Insert Trigger" then
                             DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
@@ -672,13 +664,13 @@ table 6151551 "NPR NpXml Template"
                     end;
 
                     if not DataLogSubscriber.Get("Task Processor Code", NpXmlTemplateTrigger."Table No.") then begin
-                        DataLogSubscriber.Init;
+                        DataLogSubscriber.Init();
                         DataLogSubscriber.Code := "Task Processor Code";
                         DataLogSubscriber."Table ID" := NpXmlTemplateTrigger."Table No.";
                         DataLogSubscriber.Insert(true);
                     end;
                 end;
-            until NpXmlTemplateTrigger.Next = 0;
+            until NpXmlTemplateTrigger.Next() = 0;
     end;
 
     procedure VersionArchived(): Boolean
@@ -687,7 +679,7 @@ table 6151551 "NPR NpXml Template"
     begin
         NpXmlTemplateArchive.SetRange(Code, Code);
         NpXmlTemplateArchive.SetRange("Template Version No.", "Template Version");
-        exit(NpXmlTemplateArchive.FindFirst);
+        exit(NpXmlTemplateArchive.FindFirst());
     end;
 }
 

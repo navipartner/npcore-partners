@@ -33,11 +33,11 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
         RecRef.SetTable(RetailJournalLineIn);
         RetailJournalLine.Copy(RetailJournalLineIn);
         RetailJournalLine.SetFilter("Quantity to Print", '>%1', 0);
-        if not RetailJournalLine.FindLast then
+        if not RetailJournalLine.FindLast() then
             exit;
         LineNo := RetailJournalLine."Line No.";
 
-        RetailJournalLine.FindSet;
+        RetailJournalLine.FindSet();
 
         SetOriginalRecord(RetailJournalLineIn);
 
@@ -49,20 +49,20 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
                 tmpRetailJournalLine."Quantity to Print" := 1;
                 tmpRetailJournalLine."RFID Tag Value" := RFIDMgt.GetNextRFIDValue();
                 RFIDMgt.CheckItemReference(tmpRetailJournalLine."RFID Tag Value");
-                tmpRetailJournalLine.Insert;
+                tmpRetailJournalLine.Insert();
             end;
-        until RetailJournalLine.Next = 0;
+        until RetailJournalLine.Next() = 0;
 
-        if tmpRetailJournalLine.FindSet then begin
+        if tmpRetailJournalLine.FindSet() then begin
             GlobalPrintBatchID := CreateGuid();
             repeat
                 RFIDMgt.OnBeforeSaveItemReferenceValue(tmpRetailJournalLine);
                 RFIDMgt.InsertItemReference(tmpRetailJournalLine."Item No.", tmpRetailJournalLine."Variant Code", tmpRetailJournalLine."RFID Tag Value");
                 RFIDMgt.LogRFIDPrint(tmpRetailJournalLine, GlobalPrintBatchID);
-            until tmpRetailJournalLine.Next = 0;
+            until tmpRetailJournalLine.Next() = 0;
         end;
 
-        RecRef.Close;
+        RecRef.Close();
         RecRef.GetTable(tmpRetailJournalLine);
     end;
 
@@ -95,7 +95,7 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
             exit;
 
         ConvertToBuffer(RecRef);
-        Commit;
+        Commit();
         //-NPR5.55 [407265]
         RFIDPrintLog.SetRange("Batch ID", GlobalPrintBatchID);
         PAGE.Run(PAGE::"NPR RFID Print Log", RFIDPrintLog);

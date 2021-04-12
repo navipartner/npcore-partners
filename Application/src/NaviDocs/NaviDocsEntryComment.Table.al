@@ -74,13 +74,11 @@ table 6059769 "NPR NaviDocs Entry Comment"
 
     trigger OnInsert()
     begin
-        "Insert Date" := Today;
+        "Insert Date" := Today();
         "Insert Time" := Time;
 
         "User ID" := UserId;
     end;
 
-    var
-        Resource: Record Resource;
 }
 

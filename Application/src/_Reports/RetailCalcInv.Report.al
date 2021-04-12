@@ -1,8 +1,8 @@
 report 6014663 "NPR Retail Calc. Inv."
 {
     Caption = 'Retail Calculate Inventory';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -61,7 +61,7 @@ report 6014663 "NPR Retail Calc. Inv."
                                             end;
                                             WhseEntry.Find('+');
                                             Item.CopyFilter("Bin Filter", WhseEntry."Bin Code");
-                                        until WhseEntry.Next = 0;
+                                        until WhseEntry.Next() = 0;
                                     end;
                             end;
                         end else
@@ -78,7 +78,7 @@ report 6014663 "NPR Retail Calc. Inv."
                     else
                         TempDimBufIn.SetRange("Table ID", DATABASE::"Item Ledger Entry");
                     TempDimBufIn.SetRange("Entry No.");
-                    TempDimBufIn.DeleteAll;
+                    TempDimBufIn.DeleteAll();
                 end;
             }
             dataitem("Warehouse Entry"; "Warehouse Entry")
@@ -97,7 +97,7 @@ report 6014663 "NPR Retail Calc. Inv."
                     GetLocation("Location Code");
                     if Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
                         QuantityOnHandBuffer."Bin Code" := "Bin Code";
-                    if not QuantityOnHandBuffer.Find then
+                    if not QuantityOnHandBuffer.Find() then
                         QuantityOnHandBuffer.Insert();   // Insert a zero quantity line.
                 end;
             }
@@ -138,7 +138,7 @@ report 6014663 "NPR Retail Calc. Inv."
                     if ItemJnlBatch."No. Series" <> '' then begin
                         ItemJnlLine.SetRange("Journal Template Name", ItemJnlLine."Journal Template Name");
                         ItemJnlLine.SetRange("Journal Batch Name", ItemJnlLine."Journal Batch Name");
-                        if not ItemJnlLine.FindFirst then
+                        if not ItemJnlLine.FindFirst() then
                             NextDocNo := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series", PostingDate, false);
                         ItemJnlLine.Init();
                     end;
@@ -233,7 +233,7 @@ report 6014663 "NPR Retail Calc. Inv."
         trigger OnOpenPage()
         begin
             if PostingDate = 0D then
-                PostingDate := WorkDate;
+                PostingDate := WorkDate();
             ValidatePostingDate();
             ColumnDim := DimSelectionBuf.GetDimSelectionText(3, REPORT::"NPR Retail Calc. Inv.", '');
         end;
@@ -320,13 +320,13 @@ report 6014663 "NPR Retail Calc. Inv."
         EntryType: Option "Negative Adjmt.","Positive Adjmt.";
     begin
         if NextLineNo = 0 then begin
-            ItemJnlLine.LockTable;
+            ItemJnlLine.LockTable();
             ItemJnlLine.SetRange("Journal Template Name", ItemJnlLine."Journal Template Name");
             ItemJnlLine.SetRange("Journal Batch Name", ItemJnlLine."Journal Batch Name");
-            if ItemJnlLine.FindLast then
+            if ItemJnlLine.FindLast() then
                 NextLineNo := ItemJnlLine."Line No.";
 
-            SourceCodeSetup.Get;
+            SourceCodeSetup.Get();
         end;
         NextLineNo := NextLineNo + 10000;
 
@@ -457,7 +457,7 @@ report 6014663 "NPR Retail Calc. Inv."
                         TempDimSetEntry."Dimension Code" := TempDimBufOut."Dimension Code";
                         TempDimSetEntry."Dimension Value Code" := TempDimBufOut."Dimension Value Code";
                         TempDimSetEntry."Dimension Value ID" := DimValue."Dimension Value ID";
-                        if TempDimSetEntry.Insert then;
+                        if TempDimSetEntry.Insert() then;
                         ItemJnlLine."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
                         DimMgt.UpdateGlobalDimFromDimSetID(ItemJnlLine."Dimension Set ID",
                           ItemJnlLine."Shortcut Dimension 1 Code", ItemJnlLine."Shortcut Dimension 2 Code");
@@ -555,8 +555,8 @@ report 6014663 "NPR Retail Calc. Inv."
                         repeat
                             PosQuantity := PosQuantity + 1;
                             NegQuantity := NegQuantity - 1;
-                            NoWhseEntry := WhseEntry.Next = 0;
-                            NoWhseEntry2 := WhseEntry2.Next = 0;
+                            NoWhseEntry := WhseEntry.Next() = 0;
+                            NoWhseEntry2 := WhseEntry2.Next() = 0;
                         until NoWhseEntry2 or NoWhseEntry
                     else
                         AdjustPosQty := true;
@@ -581,7 +581,7 @@ report 6014663 "NPR Retail Calc. Inv."
                     end;
                     WhseEntry.Find('+');
                     WhseEntry.SetRange("Lot No.");
-                until WhseEntry.Next = 0;
+                until WhseEntry.Next() = 0;
             if PosQuantity <> WhseQuantity then
                 PosQuantity := WhseQuantity - PosQuantity;
             if NegQuantity <> -WhseQuantity then
@@ -637,23 +637,21 @@ report 6014663 "NPR Retail Calc. Inv."
     var
         DimEntryNo: Integer;
     begin
-        with QuantityOnHandBuffer do begin
-            if not HasNewQuantity(NewQuantity) then
-                exit;
-            if BinCode = '' then begin
-                if ColumnDim <> '' then
-                    TempDimBufIn.SetRange("Entry No.", "Item Ledger Entry"."Dimension Set ID");
-                DimEntryNo := DimBufMgt.FindDimensions(TempDimBufIn);
-                if DimEntryNo = 0 then
-                    DimEntryNo := DimBufMgt.InsertDimensions(TempDimBufIn);
-            end;
-            if RetrieveBuffer(BinCode, DimEntryNo) then begin
-                Quantity := Quantity + NewQuantity;
-                Modify();
-            end else begin
-                Quantity := NewQuantity;
-                Insert();
-            end;
+        if not HasNewQuantity(NewQuantity) then
+            exit;
+        if BinCode = '' then begin
+            if ColumnDim <> '' then
+                TempDimBufIn.SetRange("Entry No.", "Item Ledger Entry"."Dimension Set ID");
+            DimEntryNo := DimBufMgt.FindDimensions(TempDimBufIn);
+            if DimEntryNo = 0 then
+                DimEntryNo := DimBufMgt.InsertDimensions(TempDimBufIn);
+        end;
+        if RetrieveBuffer(BinCode, DimEntryNo) then begin
+            QuantityOnHandBuffer.Quantity := QuantityOnHandBuffer.Quantity + NewQuantity;
+            QuantityOnHandBuffer.Modify();
+        end else begin
+            QuantityOnHandBuffer.Quantity := NewQuantity;
+            QuantityOnHandBuffer.Insert();
         end;
     end;
 
@@ -696,7 +694,7 @@ report 6014663 "NPR Retail Calc. Inv."
         if QuantityOnHandBuffer.IsEmpty() then begin
             Item.CopyFilter("Location Filter", Location.Code);
             Location.SetRange("Use As In-Transit", false);
-            if (Item.GetFilter("Location Filter") <> '') and Location.FindSet then
+            if (Item.GetFilter("Location Filter") <> '') and Location.FindSet() then
                 repeat
                     InsertQuantityOnHandBuffer(ItemNo, Location.Code);
                 until Location.Next() = 0
@@ -752,7 +750,7 @@ report 6014663 "NPR Retail Calc. Inv."
                     InsertItemJnlLine(
                       QuantityOnHandBuffer."Item No.", QuantityOnHandBuffer."Variant Code", QuantityOnHandBuffer."Dimension Entry No.",
                       QuantityOnHandBuffer."Bin Code", QuantityOnHandBuffer.Quantity, QuantityOnHandBuffer.Quantity);
-            until QuantityOnHandBuffer.Next = 0;
+            until QuantityOnHandBuffer.Next() = 0;
             QuantityOnHandBuffer.DeleteAll();
         end;
     end;
@@ -772,7 +770,7 @@ report 6014663 "NPR Retail Calc. Inv."
     begin
         DefaultDimension.SetRange("No.", QuantityOnHandBuffer."Item No.");
         DefaultDimension.SetRange("Table ID", DATABASE::Item);
-        if DefaultDimension.FindSet then
+        if DefaultDimension.FindSet() then
             repeat
                 InsertDim(DATABASE::Item, 0, DefaultDimension."Dimension Code", DefaultDimension."Dimension Value Code");
             until DefaultDimension.Next() = 0;

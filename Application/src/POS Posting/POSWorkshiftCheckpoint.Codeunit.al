@@ -1,4 +1,4 @@
-codeunit 6150627 "NPR POS Workshift Checkpoint"
+﻿codeunit 6150627 "NPR POS Workshift Checkpoint"
 {
     var
         MissingBin: Label 'No payment bin relation found for POS Unit %1.';
@@ -6,14 +6,13 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         POS_UNIT_SLAVE_STATUS: Label 'This POS manages other units for End-of-Day. The other units need to be in status closed, which is done with "Close Workshift" action. POS unit %1 has status %2.';
         EndOfDayUIOption: Option SUMMARY,BALANCING,"NONE";
         EodWorkshiftMode: Option XREPORT,ZREPORT,CLOSEWORKSHIFT;
-        POSTING_ERROR: Label 'While posting end-of-day, the following error occured:\\%1';
 
     procedure EndWorkshift(Mode: Option; UnitNo: Code[10]; DimensionSetId: Integer) PosEntryNo: Integer
     begin
         // Main function to end the workshift
         PosEntryNo := CloseWorkshiftWorker(Mode, UnitNo, DimensionSetId);
 
-        Commit;
+        Commit();
         OnAfterEndWorkshift(Mode, UnitNo, (PosEntryNo <> 0), PosEntryNo);
 
         exit(PosEntryNo);
@@ -30,8 +29,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     procedure BinTransfer(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10])
     var
-        POSUnit: Record "NPR POS Unit";
-        POSWorkshiftCheckpointPage: Page "NPR POS Workshift Checkp. Card";
         CheckPointEntryNo: Integer;
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
@@ -46,10 +43,10 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
         CheckPointEntryNo := POSCheckpointMgr.CreateEndWorkshiftCheckpoint_POSEntry(UnitNo);
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
-        Commit;
+        Commit();
 
         CreateBinCheckpoint(CheckPointEntryNo);
-        Commit;
+        Commit();
     end;
 
     procedure CreateBinCheckpoint(CheckPointEntryNo: Integer)
@@ -58,7 +55,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         UnittoBinRelation: Record "NPR POS Unit to Bin Relation";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSUnit: Record "NPR POS Unit";
-        EntrySourceMethod: Option;
     begin
 
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
@@ -215,7 +211,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
                 POSWorkshiftCheckpointPage.LookupMode(true);
                 PageAction := POSWorkshiftCheckpointPage.RunModal();
                 ConfirmEoD := (PageAction = ACTION::LookupOK);
-                Commit;
+                Commit();
             end else begin
                 // Nothing to balance
                 ConfirmEoD := true;
@@ -253,7 +249,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
                     end;
                 end;
 
-                Commit;
+                Commit();
             end else begin
                 // Nothing to show.
                 ConfirmEoD := true;
@@ -316,7 +312,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         if (IsManager) then
             AggregateWorkshifts(UnitNo, CheckPointEntryNo, Mode);
 
-        Commit;
+        Commit();
 
         exit(CheckPointEntryNo);
 
@@ -474,24 +470,21 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
     var
         POSUnit: Record "NPR POS Unit";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
-        POSEntry: Record "NPR POS Entry";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         SalePOS: Record "NPR POS Sale";
         POSAuditLog: Record "NPR POS Audit Log";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSEntryToPost: Record "NPR POS Entry";
-        POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         DimMgt: Codeunit DimensionManagement;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         NoSeriesManagement: Codeunit NoSeriesManagement;
-        PeriodEntryNo: Integer;
     begin
 
         POSUnit.Get(UnitNo);
 
         if (not POSEndofDayProfile.Get(POSUnit."POS End of Day Profile")) then
-            POSEndofDayProfile.Init;
+            POSEndofDayProfile.Init();
 
         POSPaymentBinCheckpoint.Reset();
         POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
@@ -502,7 +495,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
             // A Sale POS record is needed when creating POS Entry
             SalePOS."Register No." := POSUnit."No.";
             SalePOS."POS Store Code" := POSUnit."POS Store Code";
-            SalePOS.Date := Today;
+            SalePOS.Date := Today();
             SalePOS."Sales Ticket No." := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890'));
 
             if (Mode = EodWorkshiftMode::ZREPORT) and (POSEndofDayProfile."Z-Report Number Series" <> '') then
@@ -544,7 +537,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
                 POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
                 POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::WORKSHIFT_END, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
 
-                Commit;
+                Commit();
             end;
 
         end else begin
@@ -736,10 +729,10 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         LastPOSEntry: Record "NPR POS Entry";
     begin
 
-        LastPOSEntry.Reset;
-        LastPOSEntry.FindLast;
+        LastPOSEntry.Reset();
+        LastPOSEntry.FindLast();
 
-        POSPostingLog.Init;
+        POSPostingLog.Init();
         POSPostingLog."Entry No." := 0;
         POSPostingLog."User ID" := UserId;
         POSPostingLog."Posting Timestamp" := CurrentDateTime;
@@ -763,7 +756,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         if (PaymentTypeDetailed.IsEmpty()) then
             exit;
 
-        POSPaymentBinCheckpoint.Reset;
+        POSPaymentBinCheckpoint.Reset();
         POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftEntryNo);
         POSPaymentBinCheckpoint.SetFilter(Status, '=%1', POSPaymentBinCheckpoint.Status::TRANSFERED);
@@ -892,12 +885,12 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         POSEntry.SetFilter("Entry Type", '=%1', POSEntry."Entry Type"::"Credit Sale");
         POSEntry.SetFilter("System Entry", '=%1', false);
         POSWorkshiftCheckpoint."Credit Sales Count" := 0;
-        if POSEntry.FindSet then
+        if POSEntry.FindSet() then
             repeat
                 CheckIsPosted(POSEntry."Sales Document Type", POSEntry."Sales Document No.", DocDeleted);
                 if not DocDeleted then
                     POSWorkshiftCheckpoint."Credit Sales Count" += 1;
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
     end;
 
     local procedure CheckIsPosted(DocumentType: Enum "Sales Document Type"; DocmentNo: Code[20]; var DocDeleted: Boolean): Boolean
@@ -951,7 +944,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     local procedure GetTransferStatistics(var POSWorkshiftCheckpointOut: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
     var
-        POSEntry: Record "NPR POS Entry";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSBinEntry: Record "NPR POS Bin Entry";
@@ -1240,7 +1232,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         if (not ZReportWorkshiftCheckpoint.FindSet()) then
             exit(0);
 
-        PeriodWorkshiftCheckpoint.Init;
+        PeriodWorkshiftCheckpoint.Init();
         PeriodWorkshiftCheckpoint."Entry No." := 0;
 
         PeriodWorkshiftCheckpoint."POS Entry No." := POSEntryNo;

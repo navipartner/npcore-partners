@@ -62,7 +62,7 @@ page 6060046 "NPR Registered Item Worksh."
                 Caption = 'View Registered Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Regist. Item Worksh. Page";

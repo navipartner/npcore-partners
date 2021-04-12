@@ -364,7 +364,7 @@ table 6151202 "NPR NpCs Arch. Document"
         NpCsArchDocumentLogEntry: Record "NPR NpCs Arch. Doc. Log Entry";
     begin
         NpCsArchDocumentLogEntry.SetRange("Document Entry No.", "Entry No.");
-        NpCsArchDocumentLogEntry.DeleteAll;
+        NpCsArchDocumentLogEntry.DeleteAll();
     end;
 }
 

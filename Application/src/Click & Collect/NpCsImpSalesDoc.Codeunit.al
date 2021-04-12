@@ -1,4 +1,4 @@
-codeunit 6151200 "NPR NpCs Imp. Sales Doc."
+﻿codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 {
     TableNo = "NPR Nc Import Entry";
 
@@ -37,7 +37,6 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         SalesHeader: Record "Sales Header";
         NpCsExpirationMgt: Codeunit "NPR NpCs Expiration Mgt.";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
-        Element2: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
         LogMessage: Text;
@@ -59,7 +58,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
             NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
             NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
-            Commit;
+            Commit();
             NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
             if NpCsDocument."Processing expires at" > 0DT then
                 NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument, NpCsDocument."Processing expires at");
@@ -67,7 +66,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             exit;
         end;
         InsertDocumentMappings(Element);
-        Commit;
+        Commit();
 
         UpsertCustomer(Element, Customer);
         InsertSalesHeader(Element, Customer, SalesHeader);
@@ -81,7 +80,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
         NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
-        Commit;
+        Commit();
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
         if NpCsDocument."Processing expires at" > 0DT then
             NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument, NpCsDocument."Processing expires at");
@@ -96,7 +95,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         StoreCode := GetFromStoreCode(Element);
 
         if not NpCsStore.Get(StoreCode) then begin
-            NpCsStore.Init;
+            NpCsStore.Init();
             NpCsStore.Code := StoreCode;
             NpCsStore.Insert(true);
         end;
@@ -125,7 +124,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             exit;
 
         if not NpCsStore.Get(StoreCode) then begin
-            NpCsStore.Init;
+            NpCsStore.Init();
             NpCsStore.Code := StoreCode;
             NpCsStore."Local Store" := true;
             NpCsStore.Validate("Company Name", CompanyName);
@@ -179,7 +178,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             exit;
 
         if not NpCsDocumentMapping.Get(Type, FromStore, FromNo) then begin
-            NpCsDocumentMapping.Init;
+            NpCsDocumentMapping.Init();
             NpCsDocumentMapping.Type := Type;
             NpCsDocumentMapping."From Store Code" := FromStore;
             NpCsDocumentMapping."From No." := FromNo;
@@ -208,7 +207,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         PrevRec: Text;
     begin
         if not FindCustomer(Element, Customer) then begin
-            Customer.Init;
+            Customer.Init();
             Customer."No." := '';
             Customer.Insert(true);
         end;
@@ -269,11 +268,11 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             SalesLine.SetRange("Document Type", SalesHeader."Document Type");
             SalesLine.SetRange("Document No.", SalesHeader."No.");
             SalesLine.SetRange("Location Code", SalesHeader."Location Code");
-            if SalesLine.FindSet then
+            if SalesLine.FindSet() then
                 repeat
                     SalesLine.Validate("Location Code", NpCsStore."Location Code");
                     SalesLine.Modify(true);
-                until SalesLine.Next = 0;
+                until SalesLine.Next() = 0;
 
             SalesHeader.Validate("Location Code", NpCsStore."Location Code");
         end;
@@ -294,7 +293,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         DocNo := NpXmlDomMgt.GetAttributeCode(Element, '', 'document_no', MaxStrLen(SalesHeader."No."), true);
 
         SalesHeader.SetHideValidationDialog(true);
-        SalesHeader.Init;
+        SalesHeader.Init();
         SalesHeader."Document Type" := Enum::"Sales Document Type".FromInteger(NpXmlDomMgt.GetElementInt(Element, 'to_document_type', true));
         SalesHeader."No." := '';
         SalesHeader."External Document No." := CopyStr(DocNo, 1, MaxStrLen(SalesHeader."External Document No."));
@@ -322,7 +321,6 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         DocType: Integer;
         DocNo: Text;
         StoreCode: Code[20];
-        BillToCustNo: Code[20];
         OutStr: OutStream;
         ProcessingStatus: Integer;
     begin
@@ -331,7 +329,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         StoreCode := GetFromStoreCode(Element);
 
         Callback := GetCallback(Element);
-        NpCsDocument.Init;
+        NpCsDocument.Init();
         NpCsDocument.Type := NpCsDocument.Type::"Collect in Store";
         NpCsDocument."Document Type" := SalesHeader."Document Type";
         NpCsDocument."Document No." := SalesHeader."No.";
@@ -390,7 +388,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
         SalesLine.SetHideValidationDialog(true);
-        SalesLine.Init;
+        SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := NpXmlDomMgt.GetAttributeInt(Element, '', 'line_no', true);
@@ -482,13 +480,13 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
                 begin
                     Email := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
                     Customer.SetFilter("E-Mail", '%1&<>%2', Email, '');
-                    exit(Customer.FindFirst);
+                    exit(Customer.FindFirst());
                 end;
             NpCsWorkflow."Customer Mapping"::"Phone No.":
                 begin
                     PhoneNo := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
                     Customer.SetFilter("Phone No.", '%1&<>%2', PhoneNo, '');
-                    exit(Customer.FindFirst);
+                    exit(Customer.FindFirst());
                 end;
             NpCsWorkflow."Customer Mapping"::"E-mail AND Phone No.":
                 begin
@@ -496,19 +494,19 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
                     PhoneNo := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
                     Customer.SetFilter("E-Mail", '%1&<>%2', Email, '');
                     Customer.SetFilter("Phone No.", '%1&<>%2', PhoneNo, '');
-                    exit(Customer.FindFirst);
+                    exit(Customer.FindFirst());
                 end;
             NpCsWorkflow."Customer Mapping"::"E-mail OR Phone No.":
                 begin
                     Email := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
                     Customer.SetFilter("E-Mail", '%1&<>%2', Email, '');
-                    if Customer.FindFirst then
+                    if Customer.FindFirst() then
                         exit(true);
 
                     PhoneNo := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
                     Clear(Customer);
                     Customer.SetFilter("Phone No.", '%1&<>%2', PhoneNo, '');
-                    exit(Customer.FindFirst);
+                    exit(Customer.FindFirst());
                 end;
             NpCsWorkflow."Customer Mapping"::"Fixed Customer No.", NpCsWorkflow."Customer Mapping"::"Customer No. from Source":
                 begin
@@ -537,7 +535,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         NpCsDocument.SetRange("From Document Type", DocType);
         NpCsDocument.SetRange("From Document No.", DocNo);
         NpCsDocument.SetRange("From Store Code", StoreCode);
-        exit(NpCsDocument.FindFirst);
+        exit(NpCsDocument.FindFirst());
     end;
 
     local procedure FindSalesHeader(Element: XmlElement; var SalesHeader: Record "Sales Header")
@@ -545,7 +543,6 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         DocType: Integer;
         DocNo: Text;
-        StoreCode: Code[20];
     begin
         Clear(SalesHeader);
         DocType := NpXmlDomMgt.GetAttributeInt(Element, '', 'document_type', true);
@@ -577,10 +574,10 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         if NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Item Cross Reference No.", StoreCode, FromItemRefNo) and (NpCsDocumentMapping."To No." <> '') then begin
             ItemRef.SetRange("Reference No.", NpCsDocumentMapping."To No.");
             ItemRef.SetRange("Discontinue Bar Code", false);
-            if not ItemRef.FindFirst then
+            if not ItemRef.FindFirst() then
                 ItemRef.SetRange("Discontinue Bar Code");
 
-            if ItemRef.FindFirst then begin
+            if ItemRef.FindFirst() then begin
                 ItemVariant."Item No." := ItemRef."Item No.";
                 ItemVariant.Code := ItemRef."Variant Code";
                 exit;
@@ -616,10 +613,10 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 
         ItemRef.SetRange("Reference No.", FromItemNo);
         ItemRef.SetRange("Discontinue Bar Code", false);
-        if not ItemRef.FindFirst then
+        if not ItemRef.FindFirst() then
             ItemRef.SetRange("Discontinue Bar Code");
 
-        if ItemRef.FindFirst then begin
+        if ItemRef.FindFirst() then begin
             ItemVariant."Item No." := ItemRef."Item No.";
             ItemVariant.Code := ItemRef."Variant Code";
 
@@ -637,7 +634,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
     begin
     end;
 
-    local procedure GetItemRefNo(ItemVariant: Record "Item Variant") ItemRefNo: Code[50]
+    local procedure GetItemRefNo(ItemVariant: Record "Item Variant"): Code[50]
     var
         ItemRef: Record "Item Reference";
     begin
@@ -646,9 +643,9 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
         ItemRef.SetFilter("Reference No.", '<>%1', '');
         ItemRef.SetRange("Discontinue Bar Code", false);
-        if not ItemRef.FindFirst then
+        if not ItemRef.FindFirst() then
             ItemRef.SetRange("Discontinue Bar Code");
-        if ItemRef.FindFirst then
+        if ItemRef.FindFirst() then
             exit(ItemRef."Reference No.");
 
         exit('');

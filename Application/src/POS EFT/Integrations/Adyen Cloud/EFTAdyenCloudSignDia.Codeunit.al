@@ -15,7 +15,6 @@ codeunit 6184520 "NPR EFT Adyen Cloud Sign Dia."
         ActiveModelID: Guid;
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for EFT payment. ';
         TransactionEntryNo: Integer;
-        Done: Boolean;
         SignatureData: Text;
         SIGNATURE_VERIFICATION: Label 'Signature Verification';
         APPROVE: Label 'Approve';
@@ -31,7 +30,6 @@ codeunit 6184520 "NPR EFT Adyen Cloud Sign Dia."
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
     begin
         //This function depend on global state SignatureData being stored from transaction response.
         if EFTTransactionRequest."Entry No." <> TransactionEntryNo then

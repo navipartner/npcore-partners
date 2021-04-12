@@ -13,8 +13,6 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    var
-        NpRvVoucher: Record "NPR NpRv Voucher";
     begin
         if not Sender.DiscoverAction(
           ActionCode(),
@@ -99,7 +97,7 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
 
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         NpRvVoucherType.SetFilter(Code, POSParameterValue.Value);
-        NpRvVoucherType.FindFirst;
+        NpRvVoucherType.FindFirst();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
@@ -144,7 +142,7 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
 
         NpRvVoucher.SetFilter("Voucher Type", VoucherTypeFilter);
         NpRvVoucher.SetFilter("Reference No.", '=%1', ReferenceNo);
-        NpRvVoucher.FindFirst;
+        NpRvVoucher.FindFirst();
         if not NpRvVoucher."Allow Top-up" then
             Error(Text006, NpRvVoucher."Reference No.");
 

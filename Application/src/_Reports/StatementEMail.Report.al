@@ -209,7 +209,7 @@ report 6014550 "NPR Statement E-Mail"
                                 if not IsNaviDocsEnabled then begin
                                     Pdf2NavOutputMethod := Pdf2NavOutputMethod::"Send now";
                                     Message(NaviDocsDisabled);
-                                    RequestOptionsPage.Update;
+                                    RequestOptionsPage.Update();
                                 end;
 
                             ShowNaviDocsOption := Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send through NaviDocs";
@@ -283,7 +283,6 @@ report 6014550 "NPR Statement E-Mail"
         StartDate: Date;
         NaviDocsDelayUntil: DateTime;
         Counter: Integer;
-        "-- PN71.1.08": Integer;
         NaviDocsDisabled: Label 'NaviDocs is''t Enabled.';
         AttachmentDescription: Label 'Report parameters';
         Txt001: Label 'Statement sent to %1 customers.';
@@ -389,7 +388,7 @@ report 6014550 "NPR Statement E-Mail"
     var
         NaviDocsSetup: Record "NPR NaviDocs Setup";
     begin
-        exit(NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs");
+        exit(NaviDocsSetup.Get() and NaviDocsSetup."Enable NaviDocs");
     end;
 }
 

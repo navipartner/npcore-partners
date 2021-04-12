@@ -1,4 +1,4 @@
-codeunit 6059972 "NPR Variety Clone Data"
+﻿codeunit 6059972 "NPR Variety Clone Data"
 {
     trigger OnRun()
     begin
@@ -98,7 +98,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         if (Format(MRecref.RecordId) = Format(TMPVRTBuffer."Record ID (TMP)")) then
             MRecref.Get(TMPVRTBuffer."Record ID (TMP)");
 
-        TMPVRTBuffer.Modify;
+        TMPVRTBuffer.Modify();
     end;
 
     procedure SetupSalesLine(var MasterSalesLine: Record "Sales Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
@@ -178,7 +178,7 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         NewPurchLine := MasterPurchLine;
         NewPurchLine."Line No." := LineNo;
-        NewPurchLine.Insert;
+        NewPurchLine.Insert();
         NewPurchLine.Validate(Quantity, 0);
         NewPurchLine.Validate("Variant Code", ItemVariant.Code);
         //dimensions
@@ -209,7 +209,7 @@ codeunit 6059972 "NPR Variety Clone Data"
                                      VRTBuffer."Variety 4 Value") then
             Error('Variant already exists');
 
-        ItemVariant.Init;
+        ItemVariant.Init();
         ItemVariant."Item No." := Item."No.";
         ItemVariant.Code := GetNextVariantCode(Item."No.", VRTBuffer."Variety 1 Value", VRTBuffer."Variety 2 Value", VRTBuffer."Variety 3 Value", VRTBuffer."Variety 4 Value");
         ItemVariant."NPR Variety 1" := Item."NPR Variety 1";
@@ -319,7 +319,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         //check if a new line is needed (is variant code filled?)
         NewItemReplenishment := MasterItemReplenishment;
         NewItemReplenishment."Variant Code" := ItemVariant.Code;
-        NewItemReplenishment.Insert;
+        NewItemReplenishment.Insert();
 
         MasterLineMapMgt.CreateMap(Database::"NPR Item Repl. by Store", NewItemReplenishment.SystemId, MasterItemReplenishment.SystemId);
 
@@ -339,7 +339,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         if MasterItemJnlLine."Variant Code" = '' then begin
             //Variant Code is blank. Use this one for the current line
             MasterItemJnlLine.Validate("Variant Code", ItemVariant.Code);
-            MasterItemJnlLine.Modify;
+            MasterItemJnlLine.Modify();
             RecRef.GetTable(MasterItemJnlLine);
             exit(Format(RecRef.RecordId));
         end;
@@ -359,7 +359,7 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         NewItemJnlLine := MasterItemJnlLine;
         NewItemJnlLine."Line No." := LineNo;
-        NewItemJnlLine.Insert;
+        NewItemJnlLine.Insert();
         NewItemJnlLine.Validate(Quantity, 0);
         NewItemJnlLine.Validate("Variant Code", ItemVariant.Code);
         NewItemJnlLine.Modify();
@@ -500,7 +500,6 @@ codeunit 6059972 "NPR Variety Clone Data"
     var
         Item: Record Item;
         ItemRef: Record "Item Reference";
-        ItemVar: Record "Item Variant";
         DescriptionControl: Codeunit "NPR Description Control";
     begin
         if Item.Get(Barcode) then
@@ -508,10 +507,10 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         ItemRef.SetCurrentKey("Reference No.");
         ItemRef.SetRange("Reference No.", Barcode);
-        if ItemRef.FindFirst then
+        if ItemRef.FindFirst() then
             Error(Text003, ItemRef.TableCaption, Barcode, ItemRef."Item No.");
 
-        ItemRef.Init;
+        ItemRef.Init();
         ItemRef."Item No." := ItemNo;
         ItemRef."Variant Code" := VariantCode;
         ItemRef.Validate("Reference Type", CrossRefType);
@@ -520,7 +519,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemRef.Description := DescriptionControl.GetItemRefDescription(ItemNo, VariantCode);
         ItemRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
 
-        ItemRef.Insert;
+        ItemRef.Insert();
     end;
 
     procedure CreateBarcodeEAN13(RefNo: Code[20]) Barcode: Code[13]
@@ -544,7 +543,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         if VRTSetupFetched then
             exit(true);
 
-        VRTSetupFetched := VRTSetup.Get;
+        VRTSetupFetched := VRTSetup.Get();
         exit(VRTSetupFetched);
     end;
 
@@ -563,7 +562,7 @@ codeunit 6059972 "NPR Variety Clone Data"
                 NoSeries.Code := 'EAN13_INT';
                 NoSeries.Description := 'EAN13 Code Internal';
                 NoSeries."Default Nos." := true;
-                NoSeries.Insert;
+                NoSeries.Insert();
             end;
         end else begin
             Prefix := '57';
@@ -572,7 +571,7 @@ codeunit 6059972 "NPR Variety Clone Data"
             InputDialog.SetInput(1, Prefix, Text005);
             InputDialog.SetInput(2, CompNo, Text006);
             InputDialog.LookupMode(true);
-            if InputDialog.RunModal = ACTION::LookupOK then;
+            if InputDialog.RunModal() = ACTION::LookupOK then;
             InputDialog.InputCode(1, Prefix);
             InputDialog.InputCode(2, CompNo);
 
@@ -583,21 +582,21 @@ codeunit 6059972 "NPR Variety Clone Data"
                 NoSeries.Code := 'EAN13_EXT';
                 NoSeries.Description := 'EAN13 Code External';
                 NoSeries."Default Nos." := true;
-                NoSeries.Insert;
+                NoSeries.Insert();
             end;
         end;
 
         NoSeriesLine.SetRange("Series Code", NoSeries.Code);
-        if NoSeriesLine.FindLast then
+        if NoSeriesLine.FindLast() then
             LineNo := NoSeriesLine."Line No.";
 
-        NoSeriesLine.Init;
+        NoSeriesLine.Init();
         NoSeriesLine."Series Code" := NoSeries.Code;
         NoSeriesLine."Line No." := LineNo + 10000;
         NoSeriesLine.Validate("Starting No.", Prefix + CompNo + PadStr('', 12 - StrLen(Prefix) - StrLen(CompNo), '0'));
         NoSeriesLine.Validate("Ending No.", Prefix + CompNo + PadStr('', 12 - StrLen(Prefix) - StrLen(CompNo), '9'));
         NoSeriesLine.Open := true;
-        NoSeriesLine.Insert;
+        NoSeriesLine.Insert();
 
         Message(Text004, NoSeries.TableCaption, NoSeries.Code);
     end;
@@ -615,47 +614,47 @@ codeunit 6059972 "NPR Variety Clone Data"
                 begin
                     if VRTTable.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                     if VRTTable.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                     if VRTTable.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                     if VRTTable.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety1:
                 begin
                     if VRTTable.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety2:
                 begin
                     if VRTTable.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety3:
                 begin
                     if VRTTable.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety4:
                 begin
                     if VRTTable.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table") then begin
                         TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert;
+                        TMPVRTTable.Insert();
                     end;
                 end;
         end;
@@ -664,11 +663,11 @@ codeunit 6059972 "NPR Variety Clone Data"
         if ExcludeLockedTables then
             TMPVRTTable.SetRange("Lock Table", false);
 
-        case TMPVRTTable.Count of
+        case TMPVRTTable.Count() of
             0:
                 Error(Text007);
             1:
-                TMPVRTTable.FindFirst;
+                TMPVRTTable.FindFirst();
             else
                 if not (PAGE.RunModal(0, TMPVRTTable) = ACTION::LookupOK) then
                     exit;
@@ -723,12 +722,12 @@ codeunit 6059972 "NPR Variety Clone Data"
         Filler: array[3] of Text;
         NextNo: array[3] of Text;
     begin
-        VarietySetup.Get;
+        VarietySetup.Get();
         if VarietySetup."EAN-Internal" <> 0 then begin
             ItemRef1.SetCurrentKey("Reference Type", "Reference No.");
             ItemRef1.SetRange("Reference Type", ItemRef1."Reference Type"::"Bar Code");
             ItemRef1.SetFilter("Reference No.", '%1', Format(VarietySetup."EAN-Internal") + '*');
-            if ItemRef1.FindLast then;
+            if ItemRef1.FindLast() then;
             NextNo[1] := NoSeriesMgt.TryGetNextNo(VarietySetup."Internal EAN No. Series", Today);
             Filler[1] := PadStr('', 12 - StrLen(Format(VarietySetup."EAN-Internal")) - StrLen(NextNo[1]), '0')
         end;
@@ -736,7 +735,7 @@ codeunit 6059972 "NPR Variety Clone Data"
             ItemRef2.SetCurrentKey("Reference Type", "Reference No.");
             ItemRef2.SetRange("Reference Type", ItemRef2."Reference Type"::"Bar Code");
             ItemRef2.SetFilter("Reference No.", '%1', Format(VarietySetup."EAN-External") + '*');
-            if ItemRef2.FindLast then;
+            if ItemRef2.FindLast() then;
             NextNo[2] := NoSeriesMgt.TryGetNextNo(VarietySetup."External EAN No. Series", Today);
             Filler[2] := PadStr('', 12 - StrLen(Format(VarietySetup."EAN-External")) - StrLen(NextNo[2]), '0')
         end;
@@ -771,7 +770,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         end;
 
         ItemVar.SetRange("Item No.", Item."No.");
-        if ItemVar.FindSet then
+        if ItemVar.FindSet() then
             repeat
                 if (VRTSetup."Item Cross Ref. No. Series (V)" <> '') then begin
                     ItemRef.SetRange("Item No.", Item."No.");
@@ -780,7 +779,7 @@ codeunit 6059972 "NPR Variety Clone Data"
                     if ItemRef.IsEmpty then
                         AddItemRef(Item."No.", ItemVar.Code);
                 end;
-            until ItemVar.Next = 0;
+            until ItemVar.Next() = 0;
     end;
 
     procedure UpdateVariantDescriptions()
@@ -794,7 +793,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         if not Confirm(Text009, false, ItemVariant.TableCaption) then
             exit;
 
-        NoOfRecords := ItemVariant.Count;
+        NoOfRecords := ItemVariant.Count();
 
         if GuiAllowed then begin
             Dia.Open(Text010);
@@ -810,11 +809,11 @@ codeunit 6059972 "NPR Variety Clone Data"
                     if not Item.Get(ItemVariant."Item No.") then
                         Clear(Item);
                 FillDescription(ItemVariant, Item);
-                ItemVariant.Modify;
-            until ItemVariant.Next = 0;
+                ItemVariant.Modify();
+            until ItemVariant.Next() = 0;
 
         if GuiAllowed then
-            Dia.Close;
+            Dia.Close();
     end;
 
     procedure UpdateItemRefDescription()
@@ -830,7 +829,7 @@ codeunit 6059972 "NPR Variety Clone Data"
             exit;
         GetVRTSetup;
 
-        NoOfRecords := ItemRef.Count;
+        NoOfRecords := ItemRef.Count();
 
         if GuiAllowed then begin
             Dia.Open(Text010);
@@ -866,11 +865,11 @@ codeunit 6059972 "NPR Variety Clone Data"
                             ItemRef.Description := ItemVar."Description 2";
                     end;
                 end;
-                ItemRef.Modify;
-            until ItemRef.Next = 0;
+                ItemRef.Modify();
+            until ItemRef.Next() = 0;
 
         if GuiAllowed then
-            Dia.Close;
+            Dia.Close();
     end;
 
 
@@ -932,7 +931,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         if ItemVar.IsEmpty then
             exit(false);
 
-        ItemVar.FindFirst;
+        ItemVar.FindFirst();
         ItemVariant.Get(ItemVar."Item No.", ItemVar.Code);
         exit(true);
     end;

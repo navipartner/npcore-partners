@@ -34,10 +34,8 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        Context: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -50,13 +48,8 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        ObjectId: Integer;
-        ObjectType: Integer;
-        MenuFilterCode: Code[20];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         OnInvokeDevice(POSSession);
@@ -105,8 +98,6 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', true, true)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
-    var
-        FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         if (ActionName <> 'CK_MANAGEMENT') then
             exit;
@@ -121,7 +112,6 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
     local procedure CloseForm(Data: Text)
     var
         State: DotNet NPRNetState4;
-        FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         POSUnit: Record "NPR POS Unit";
         CashKeeperOverview: Record "NPR CashKeeper Overview";
@@ -138,7 +128,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
 
         if (State.MessageText = 'CKOVERVIEW') then begin
             if Evaluate(OverviewAmout, State.StatusText) then begin
-                CashKeeperOverview.Init;
+                CashKeeperOverview.Init();
                 CashKeeperOverview."CashKeeper IP" := State.IP;
                 CashKeeperOverview."Lookup Timestamp" := CurrentDateTime;
                 CashKeeperOverview."Register No." := POSUnit."No.";

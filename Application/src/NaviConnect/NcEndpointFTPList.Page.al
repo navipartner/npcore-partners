@@ -19,22 +19,22 @@ page 6151522 "NPR Nc Endpoint FTP List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field(Server; Server)
+                field(Server; Rec.Server)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Server field';
@@ -56,7 +56,7 @@ page 6151522 "NPR Nc Endpoint FTP List"
 
                 trigger OnAction()
                 begin
-                    ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks;
                 end;
             }
         }

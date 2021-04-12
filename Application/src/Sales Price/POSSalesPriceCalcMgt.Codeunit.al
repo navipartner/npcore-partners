@@ -178,7 +178,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
             TempSalesLineDisc, Customer."No.", '',
             SalePOS."Customer Disc. Group", '', SaleLinePOS."No.", Item."Item Disc. Group", SaleLinePOS."Variant Code", SaleLinePOS."Unit of Measure Code",
             '', SalePOS.Date, ShowAll);
-        exit(TempSalesLineDisc.FindFirst);
+        exit(TempSalesLineDisc.FindFirst());
     end;
 
     local procedure CalcBestUnitPrice(var SalesPrice: Record "Sales Price")

@@ -38,7 +38,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
             begin
                 if "Entry No." = 0 then begin
                     Clear(ShipmentDocument);
-                    if ShipmentDocument.FindLast then
+                    if ShipmentDocument.FindLast() then
                         "Entry No." := ShipmentDocument."Entry No." + 1
                     else
                         "Entry No." := 1;
@@ -150,8 +150,6 @@ table 6014452 "NPR Pacsoft Shipment Document"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                VATRegNoFormat: Record "VAT Registration No. Format";
             begin
             end;
         }
@@ -477,17 +475,15 @@ table 6014452 "NPR Pacsoft Shipment Document"
         TextNotActivated: Label 'The Pacsoft integration is not activated.';
         PacsoftSetup: Record "NPR Pacsoft Setup";
         CreateShipmentDocument: Page "NPR Pacsoft Shipment Document";
-        "//-PS1.01": Integer;
         ShippingAgentServicesCode: Code[10];
-        "//+PS1.01": Integer;
     begin
-        if not PacsoftSetup.Get then exit;
+        if not PacsoftSetup.Get() then exit;
         if (not PacsoftSetup."Use Pacsoft integration") and (not ShowWindow) then exit;
         if (not PacsoftSetup."Use Pacsoft integration") and (ShowWindow) then
             Error(TextNotActivated);
 
         Clear(ShipmentDocument);
-        ShipmentDocument.Init;
+        ShipmentDocument.Init();
         ShipmentDocument.Validate("Entry No.", 0);
         ShipmentDocument.Validate("Table No.", RecRef.Number);
         ShipmentDocument.Validate(RecordID, RecRef.RecordId);
@@ -498,343 +494,335 @@ table 6014452 "NPR Pacsoft Shipment Document"
             DATABASE::Customer:
                 begin
                     RecRef.SetTable(Customer);
-                    if Customer.Find then
-                        with Customer do begin
-                            ShipmentDocument."Receiver ID" := "No.";
-                            ShipmentDocument.Name := Name;
-                            ShipmentDocument.Address := Address;
-                            ShipmentDocument."Address 2" := "Address 2";
-                            ShipmentDocument."Post Code" := "Post Code";
-                            ShipmentDocument.City := City;
-                            ShipmentDocument.County := County;
-                            ShipmentDocument."Country/Region Code" := "Country/Region Code";
-                            ShipmentDocument.Contact := Contact;
-                            ShipmentDocument.Reference := '';
-                            ShipmentDocument."Shipment Date" := Today;
-                            ShipmentDocument."Phone No." := "Phone No.";
-                            ShipmentDocument."Fax No." := "Fax No.";
-                            ShipmentDocument."VAT Registration No." := "VAT Registration No.";
-                            ShipmentDocument."E-Mail" := "E-Mail";
-                            ShipmentDocument."SMS No." := "Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
-                        end;
+                    if Customer.Find() then begin
+                        ShipmentDocument."Receiver ID" := Customer."No.";
+                        ShipmentDocument.Name := Customer.Name;
+                        ShipmentDocument.Address := Customer.Address;
+                        ShipmentDocument."Address 2" := Customer."Address 2";
+                        ShipmentDocument."Post Code" := Customer."Post Code";
+                        ShipmentDocument.City := Customer.City;
+                        ShipmentDocument.County := Customer.County;
+                        ShipmentDocument."Country/Region Code" := Customer."Country/Region Code";
+                        ShipmentDocument.Contact := Customer.Contact;
+                        ShipmentDocument.Reference := '';
+                        ShipmentDocument."Shipment Date" := Today();
+                        ShipmentDocument."Phone No." := Customer."Phone No.";
+                        ShipmentDocument."Fax No." := Customer."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := Customer."E-Mail";
+                        ShipmentDocument."SMS No." := Customer."Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := Customer."Shipping Agent Code";
+                    end;
                 end;
             DATABASE::Vendor:
                 begin
                     RecRef.SetTable(Vendor);
-                    if Vendor.Find then
-                        with Vendor do begin
-                            ShipmentDocument."Receiver ID" := "No.";
-                            ShipmentDocument.Name := Name;
-                            ShipmentDocument.Address := Address;
-                            ShipmentDocument."Address 2" := "Address 2";
-                            ShipmentDocument."Post Code" := "Post Code";
-                            ShipmentDocument.City := City;
-                            ShipmentDocument.County := County;
-                            ShipmentDocument."Country/Region Code" := "Country/Region Code";
-                            ShipmentDocument.Contact := Contact;
-                            ShipmentDocument.Reference := '';
-                            ShipmentDocument."Shipment Date" := Today;
-                            ShipmentDocument."Phone No." := "Phone No.";
-                            ShipmentDocument."Fax No." := "Fax No.";
-                            ShipmentDocument."VAT Registration No." := "VAT Registration No.";
-                            ShipmentDocument."E-Mail" := "E-Mail";
-                            ShipmentDocument."SMS No." := "Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
-                        end;
+                    if Vendor.Find() then begin
+                        ShipmentDocument."Receiver ID" := Vendor."No.";
+                        ShipmentDocument.Name := Vendor.Name;
+                        ShipmentDocument.Address := Vendor.Address;
+                        ShipmentDocument."Address 2" := Vendor."Address 2";
+                        ShipmentDocument."Post Code" := Vendor."Post Code";
+                        ShipmentDocument.City := Vendor.City;
+                        ShipmentDocument.County := Vendor.County;
+                        ShipmentDocument."Country/Region Code" := Vendor."Country/Region Code";
+                        ShipmentDocument.Contact := Vendor.Contact;
+                        ShipmentDocument.Reference := '';
+                        ShipmentDocument."Shipment Date" := Today();
+                        ShipmentDocument."Phone No." := Vendor."Phone No.";
+                        ShipmentDocument."Fax No." := Vendor."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Vendor."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := Vendor."E-Mail";
+                        ShipmentDocument."SMS No." := Vendor."Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := Vendor."Shipping Agent Code";
+                    end;
                 end;
             DATABASE::"Sales Header":
                 begin
                     RecRef.SetTable(SalesHeader);
-                    if SalesHeader.Find then
-                        with SalesHeader do begin
-                            Customer.Get("Sell-to Customer No.");
-                            //-PS1.01
-                            ShippingAgentServicesCode := "Shipping Agent Service Code";
-                            //+PS1.01
+                    if SalesHeader.Find() then begin
+                        Customer.Get(SalesHeader."Sell-to Customer No.");
+                        //-PS1.01
+                        ShippingAgentServicesCode := SalesHeader."Shipping Agent Service Code";
+                        //+PS1.01
 
-                            Clear(ShipToAddress);
-                            if not ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code") then begin
-                                //-NPR5.34 [282595]
-                                //"Ship-to Code" := "Sell-to Customer No.";
-                                //+NPR5.34 [282595]
-                                ShipToAddress."Phone No." := Customer."Phone No.";
-                                ShipToAddress."Fax No." := Customer."Fax No.";
-                                ShipToAddress."E-Mail" := Customer."E-Mail";
-                            end;
-
+                        Clear(ShipToAddress);
+                        if not ShipToAddress.Get(SalesHeader."Sell-to Customer No.", SalesHeader."Ship-to Code") then begin
                             //-NPR5.34 [282595]
-                            //ShipmentDocument."Receiver ID" := "Ship-to Code";
-                            ShipmentDocument."Receiver ID" := "Sell-to Customer No.";
+                            //"Ship-to Code" := "Sell-to Customer No.";
                             //+NPR5.34 [282595]
-                            ShipmentDocument.Name := "Ship-to Name";
-                            ShipmentDocument.Address := "Ship-to Address";
-                            ShipmentDocument."Address 2" := "Ship-to Address 2";
-                            ShipmentDocument."Post Code" := "Ship-to Post Code";
-                            ShipmentDocument.City := "Ship-to City";
-                            ShipmentDocument.County := "Ship-to County";
-                            ShipmentDocument."Country/Region Code" := "Ship-to Country/Region Code";
-                            ShipmentDocument.Contact := "Ship-to Contact";
-                            ShipmentDocument.Reference := "Your Reference";
-                            ShipmentDocument."Shipment Date" := "Shipment Date";
-                            ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
-                            ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
-                            ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
-                            ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
-
-                            if "NPR Delivery Location" <> '' then begin
-                                ShipmentDocument.Name := "Bill-to Name";
-                                ShipmentDocument.Address := "Bill-to Address";
-                                ShipmentDocument."Address 2" := "Bill-to Address 2";
-                                ShipmentDocument."Post Code" := "Bill-to Post Code";
-                                ShipmentDocument.City := "Bill-to City";
-                                ShipmentDocument.County := "Bill-to County";
-                                ShipmentDocument."Country/Region Code" := "Bill-to Country/Region Code";
-                                ShipmentDocument.Contact := "Bill-to Contact";
-
-                                ShipmentDocument."Delivery Location" := "NPR Delivery Location";
-                                ShipmentDocument."Ship-to Name" := "Ship-to Name";
-                                ShipmentDocument."Ship-to Address" := "Ship-to Address";
-                                ShipmentDocument."Ship-to Address 2" := "Ship-to Address 2";
-                                ShipmentDocument."Ship-to Post Code" := "Ship-to Post Code";
-                                ShipmentDocument."Ship-to City" := "Ship-to City";
-                                ShipmentDocument."Ship-to County" := "Ship-to County";
-                                ShipmentDocument."Ship-to Country/Region Code" := "Ship-to Country/Region Code"
-                            end;
+                            ShipToAddress."Phone No." := Customer."Phone No.";
+                            ShipToAddress."Fax No." := Customer."Fax No.";
+                            ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
+
+                        //-NPR5.34 [282595]
+                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
+                        ShipmentDocument."Receiver ID" := SalesHeader."Sell-to Customer No.";
+                        //+NPR5.34 [282595]
+                        ShipmentDocument.Name := SalesHeader."Ship-to Name";
+                        ShipmentDocument.Address := SalesHeader."Ship-to Address";
+                        ShipmentDocument."Address 2" := SalesHeader."Ship-to Address 2";
+                        ShipmentDocument."Post Code" := SalesHeader."Ship-to Post Code";
+                        ShipmentDocument.City := SalesHeader."Ship-to City";
+                        ShipmentDocument.County := SalesHeader."Ship-to County";
+                        ShipmentDocument."Country/Region Code" := SalesHeader."Ship-to Country/Region Code";
+                        ShipmentDocument.Contact := SalesHeader."Ship-to Contact";
+                        ShipmentDocument.Reference := SalesHeader."Your Reference";
+                        ShipmentDocument."Shipment Date" := SalesHeader."Shipment Date";
+                        ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
+                        ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := SalesHeader."Shipping Agent Code";
+
+                        if SalesHeader."NPR Delivery Location" <> '' then begin
+                            ShipmentDocument.Name := SalesHeader."Bill-to Name";
+                            ShipmentDocument.Address := SalesHeader."Bill-to Address";
+                            ShipmentDocument."Address 2" := SalesHeader."Bill-to Address 2";
+                            ShipmentDocument."Post Code" := SalesHeader."Bill-to Post Code";
+                            ShipmentDocument.City := SalesHeader."Bill-to City";
+                            ShipmentDocument.County := SalesHeader."Bill-to County";
+                            ShipmentDocument."Country/Region Code" := SalesHeader."Bill-to Country/Region Code";
+                            ShipmentDocument.Contact := SalesHeader."Bill-to Contact";
+
+                            ShipmentDocument."Delivery Location" := SalesHeader."NPR Delivery Location";
+                            ShipmentDocument."Ship-to Name" := SalesHeader."Ship-to Name";
+                            ShipmentDocument."Ship-to Address" := SalesHeader."Ship-to Address";
+                            ShipmentDocument."Ship-to Address 2" := SalesHeader."Ship-to Address 2";
+                            ShipmentDocument."Ship-to Post Code" := SalesHeader."Ship-to Post Code";
+                            ShipmentDocument."Ship-to City" := SalesHeader."Ship-to City";
+                            ShipmentDocument."Ship-to County" := SalesHeader."Ship-to County";
+                            ShipmentDocument."Ship-to Country/Region Code" := SalesHeader."Ship-to Country/Region Code"
+                        end;
+                    end;
                 end;
             DATABASE::"Purchase Header":
                 begin
                     RecRef.SetTable(PurchHeader);
-                    if PurchHeader.Find then begin
+                    if PurchHeader.Find() then begin
                     end;
                 end;
             DATABASE::"Sales Shipment Header":
                 begin
                     RecRef.SetTable(SalesShipmentHeader);
-                    if SalesShipmentHeader.Find then
-                        with SalesShipmentHeader do begin
-                            Customer.Get("Sell-to Customer No.");
-                            //-PS1.01
-                            ShippingAgentServicesCode := "Shipping Agent Service Code";
-                            //+PS1.01
+                    if SalesShipmentHeader.Find() then begin
+                        Customer.Get(SalesShipmentHeader."Sell-to Customer No.");
+                        //-PS1.01
+                        ShippingAgentServicesCode := SalesShipmentHeader."Shipping Agent Service Code";
+                        //+PS1.01
 
-                            Clear(ShipToAddress);
-                            if not ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code") then begin
-                                //-NPR5.34 [282595]
-                                //"Ship-to Code" := "Sell-to Customer No.";
-                                //+NPR5.34 [282595]
-                                ShipToAddress."Phone No." := Customer."Phone No.";
-                                ShipToAddress."Fax No." := Customer."Fax No.";
-                                ShipToAddress."E-Mail" := Customer."E-Mail";
-                            end;
-
+                        Clear(ShipToAddress);
+                        if not ShipToAddress.Get(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code") then begin
                             //-NPR5.34 [282595]
-                            //ShipmentDocument."Receiver ID" := "Ship-to Code";
-                            ShipmentDocument."Receiver ID" := "Sell-to Customer No.";
+                            //"Ship-to Code" := "Sell-to Customer No.";
                             //+NPR5.34 [282595]
-                            ShipmentDocument.Name := "Ship-to Name";
-                            ShipmentDocument.Address := "Ship-to Address";
-                            ShipmentDocument."Address 2" := "Ship-to Address 2";
-                            ShipmentDocument."Post Code" := "Ship-to Post Code";
-                            ShipmentDocument.City := "Ship-to City";
-                            ShipmentDocument.County := "Ship-to County";
-                            ShipmentDocument."Country/Region Code" := "Ship-to Country/Region Code";
-                            ShipmentDocument.Contact := "Ship-to Contact";
-                            ShipmentDocument.Reference := "Your Reference";
-                            ShipmentDocument."Shipment Date" := "Shipment Date";
-                            ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
-                            ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
-                            ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
-                            ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
-
-                            if "NPR Delivery Location" <> '' then begin
-                                ShipmentDocument.Name := "Bill-to Name";
-                                ShipmentDocument.Address := "Bill-to Address";
-                                ShipmentDocument."Address 2" := "Bill-to Address 2";
-                                ShipmentDocument."Post Code" := "Bill-to Post Code";
-                                ShipmentDocument.City := "Bill-to City";
-                                ShipmentDocument.County := "Bill-to County";
-                                ShipmentDocument."Country/Region Code" := "Bill-to Country/Region Code";
-                                ShipmentDocument.Contact := "Bill-to Contact";
-
-                                ShipmentDocument."Delivery Location" := "NPR Delivery Location";
-                                ShipmentDocument."Ship-to Name" := "Ship-to Name";
-                                ShipmentDocument."Ship-to Address" := "Ship-to Address";
-                                ShipmentDocument."Ship-to Address 2" := "Ship-to Address 2";
-                                ShipmentDocument."Ship-to Post Code" := "Ship-to Post Code";
-                                ShipmentDocument."Ship-to City" := "Ship-to City";
-                                ShipmentDocument."Ship-to County" := "Ship-to County";
-                                ShipmentDocument."Ship-to Country/Region Code" := "Ship-to Country/Region Code"
-                            end;
-
-                            if PacsoftSetup."Order No. to Reference" then
-                                if "Order No." <> '' then
-                                    ShipmentDocument.Reference := CopyStr("Order No.", 1,
-                                                                          MaxStrLen(ShipmentDocument.Reference));
+                            ShipToAddress."Phone No." := Customer."Phone No.";
+                            ShipToAddress."Fax No." := Customer."Fax No.";
+                            ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
+
+                        //-NPR5.34 [282595]
+                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
+                        ShipmentDocument."Receiver ID" := SalesShipmentHeader."Sell-to Customer No.";
+                        //+NPR5.34 [282595]
+                        ShipmentDocument.Name := SalesShipmentHeader."Ship-to Name";
+                        ShipmentDocument.Address := SalesShipmentHeader."Ship-to Address";
+                        ShipmentDocument."Address 2" := SalesShipmentHeader."Ship-to Address 2";
+                        ShipmentDocument."Post Code" := SalesShipmentHeader."Ship-to Post Code";
+                        ShipmentDocument.City := SalesShipmentHeader."Ship-to City";
+                        ShipmentDocument.County := SalesShipmentHeader."Ship-to County";
+                        ShipmentDocument."Country/Region Code" := SalesShipmentHeader."Ship-to Country/Region Code";
+                        ShipmentDocument.Contact := SalesShipmentHeader."Ship-to Contact";
+                        ShipmentDocument.Reference := SalesShipmentHeader."Your Reference";
+                        ShipmentDocument."Shipment Date" := SalesShipmentHeader."Shipment Date";
+                        ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
+                        ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := SalesShipmentHeader."Shipping Agent Code";
+
+                        if SalesShipmentHeader."NPR Delivery Location" <> '' then begin
+                            ShipmentDocument.Name := SalesShipmentHeader."Bill-to Name";
+                            ShipmentDocument.Address := SalesShipmentHeader."Bill-to Address";
+                            ShipmentDocument."Address 2" := SalesShipmentHeader."Bill-to Address 2";
+                            ShipmentDocument."Post Code" := SalesShipmentHeader."Bill-to Post Code";
+                            ShipmentDocument.City := SalesShipmentHeader."Bill-to City";
+                            ShipmentDocument.County := SalesShipmentHeader."Bill-to County";
+                            ShipmentDocument."Country/Region Code" := SalesShipmentHeader."Bill-to Country/Region Code";
+                            ShipmentDocument.Contact := SalesShipmentHeader."Bill-to Contact";
+
+                            ShipmentDocument."Delivery Location" := SalesShipmentHeader."NPR Delivery Location";
+                            ShipmentDocument."Ship-to Name" := SalesShipmentHeader."Ship-to Name";
+                            ShipmentDocument."Ship-to Address" := SalesShipmentHeader."Ship-to Address";
+                            ShipmentDocument."Ship-to Address 2" := SalesShipmentHeader."Ship-to Address 2";
+                            ShipmentDocument."Ship-to Post Code" := SalesShipmentHeader."Ship-to Post Code";
+                            ShipmentDocument."Ship-to City" := SalesShipmentHeader."Ship-to City";
+                            ShipmentDocument."Ship-to County" := SalesShipmentHeader."Ship-to County";
+                            ShipmentDocument."Ship-to Country/Region Code" := SalesShipmentHeader."Ship-to Country/Region Code"
+                        end;
+
+                        if PacsoftSetup."Order No. to Reference" then
+                            if SalesShipmentHeader."Order No." <> '' then
+                                ShipmentDocument.Reference := CopyStr(SalesShipmentHeader."Order No.", 1,
+                                                                      MaxStrLen(ShipmentDocument.Reference));
+                    end;
                 end;
             DATABASE::"Sales Invoice Header":
                 begin
                     RecRef.SetTable(SalesInvoiceHeader);
-                    if SalesInvoiceHeader.Find then
-                        with SalesInvoiceHeader do begin
-                            Customer.Get("Sell-to Customer No.");
-                            //-PS1.01
-                            ShippingAgentServicesCode := "NPR Ship. Agent Serv. Code";
-                            //+PS1.01
+                    if SalesInvoiceHeader.Find() then begin
+                        Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
+                        //-PS1.01
+                        ShippingAgentServicesCode := SalesInvoiceHeader."NPR Ship. Agent Serv. Code";
+                        //+PS1.01
 
-                            Clear(ShipToAddress);
-                            if not ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code") then begin
-                                //-NPR5.34 [282595]
-                                //"Ship-to Code" := "Sell-to Customer No.";
-                                //+NPR5.34 [282595]
-                                ShipToAddress."Phone No." := Customer."Phone No.";
-                                ShipToAddress."Fax No." := Customer."Fax No.";
-                                ShipToAddress."E-Mail" := Customer."E-Mail";
-                            end;
-
+                        Clear(ShipToAddress);
+                        if not ShipToAddress.Get(SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."Ship-to Code") then begin
                             //-NPR5.34 [282595]
-                            //ShipmentDocument."Receiver ID" := "Ship-to Code";
-                            ShipmentDocument."Receiver ID" := "Sell-to Customer No.";
+                            //"Ship-to Code" := "Sell-to Customer No.";
                             //+NPR5.34 [282595]
-                            ShipmentDocument.Name := "Ship-to Name";
-                            ShipmentDocument.Address := "Ship-to Address";
-                            ShipmentDocument."Address 2" := "Ship-to Address 2";
-                            ShipmentDocument."Post Code" := "Ship-to Post Code";
-                            ShipmentDocument.City := "Ship-to City";
-                            ShipmentDocument.County := "Ship-to County";
-                            ShipmentDocument."Country/Region Code" := "Ship-to Country/Region Code";
-                            ShipmentDocument.Contact := "Ship-to Contact";
-                            ShipmentDocument.Reference := "Your Reference";
-                            ShipmentDocument."Shipment Date" := "Shipment Date";
-                            ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
-                            ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
-                            ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
-                            ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
+                            ShipToAddress."Phone No." := Customer."Phone No.";
+                            ShipToAddress."Fax No." := Customer."Fax No.";
+                            ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
+
+                        //-NPR5.34 [282595]
+                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
+                        ShipmentDocument."Receiver ID" := SalesInvoiceHeader."Sell-to Customer No.";
+                        //+NPR5.34 [282595]
+                        ShipmentDocument.Name := SalesInvoiceHeader."Ship-to Name";
+                        ShipmentDocument.Address := SalesInvoiceHeader."Ship-to Address";
+                        ShipmentDocument."Address 2" := SalesInvoiceHeader."Ship-to Address 2";
+                        ShipmentDocument."Post Code" := SalesInvoiceHeader."Ship-to Post Code";
+                        ShipmentDocument.City := SalesInvoiceHeader."Ship-to City";
+                        ShipmentDocument.County := SalesInvoiceHeader."Ship-to County";
+                        ShipmentDocument."Country/Region Code" := SalesInvoiceHeader."Ship-to Country/Region Code";
+                        ShipmentDocument.Contact := SalesInvoiceHeader."Ship-to Contact";
+                        ShipmentDocument.Reference := SalesInvoiceHeader."Your Reference";
+                        ShipmentDocument."Shipment Date" := SalesInvoiceHeader."Shipment Date";
+                        ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
+                        ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := SalesInvoiceHeader."Shipping Agent Code";
+                    end;
                 end;
             DATABASE::"Sales Cr.Memo Header":
                 begin
                     RecRef.SetTable(SalesCrMemoHeader);
-                    if SalesCrMemoHeader.Find then
-                        with SalesCrMemoHeader do begin
-                            Customer.Get("Sell-to Customer No.");
+                    if SalesCrMemoHeader.Find() then begin
+                        Customer.Get(SalesCrMemoHeader."Sell-to Customer No.");
 
-                            Clear(ShipToAddress);
-                            if not ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code") then begin
-                                //-NPR5.34 [282595]
-                                //"Ship-to Code" := "Sell-to Customer No.";
-                                //+NPR5.34 [282595]
-                                ShipToAddress."Phone No." := Customer."Phone No.";
-                                ShipToAddress."Fax No." := Customer."Fax No.";
-                                ShipToAddress."E-Mail" := Customer."E-Mail";
-                            end;
-
+                        Clear(ShipToAddress);
+                        if not ShipToAddress.Get(SalesCrMemoHeader."Sell-to Customer No.", SalesCrMemoHeader."Ship-to Code") then begin
                             //-NPR5.34 [282595]
-                            //ShipmentDocument."Receiver ID" := "Ship-to Code";
-                            ShipmentDocument."Receiver ID" := "Sell-to Customer No.";
+                            //"Ship-to Code" := "Sell-to Customer No.";
                             //+NPR5.34 [282595]
-                            ShipmentDocument.Name := "Ship-to Name";
-                            ShipmentDocument.Address := "Ship-to Address";
-                            ShipmentDocument."Address 2" := "Ship-to Address 2";
-                            ShipmentDocument."Post Code" := "Ship-to Post Code";
-                            ShipmentDocument.City := "Ship-to City";
-                            ShipmentDocument.County := "Ship-to County";
-                            ShipmentDocument."Country/Region Code" := "Ship-to Country/Region Code";
-                            ShipmentDocument.Contact := "Ship-to Contact";
-                            ShipmentDocument.Reference := "Your Reference";
-                            ShipmentDocument."Shipment Date" := "Shipment Date";
-                            ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
-                            ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
-                            ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
-                            ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
+                            ShipToAddress."Phone No." := Customer."Phone No.";
+                            ShipToAddress."Fax No." := Customer."Fax No.";
+                            ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
+
+                        //-NPR5.34 [282595]
+                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
+                        ShipmentDocument."Receiver ID" := SalesCrMemoHeader."Sell-to Customer No.";
+                        //+NPR5.34 [282595]
+                        ShipmentDocument.Name := SalesCrMemoHeader."Ship-to Name";
+                        ShipmentDocument.Address := SalesCrMemoHeader."Ship-to Address";
+                        ShipmentDocument."Address 2" := SalesCrMemoHeader."Ship-to Address 2";
+                        ShipmentDocument."Post Code" := SalesCrMemoHeader."Ship-to Post Code";
+                        ShipmentDocument.City := SalesCrMemoHeader."Ship-to City";
+                        ShipmentDocument.County := SalesCrMemoHeader."Ship-to County";
+                        ShipmentDocument."Country/Region Code" := SalesCrMemoHeader."Ship-to Country/Region Code";
+                        ShipmentDocument.Contact := SalesCrMemoHeader."Ship-to Contact";
+                        ShipmentDocument.Reference := SalesCrMemoHeader."Your Reference";
+                        ShipmentDocument."Shipment Date" := SalesCrMemoHeader."Shipment Date";
+                        ShipmentDocument."Phone No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Fax No." := ShipToAddress."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
+                        ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := SalesCrMemoHeader."Shipping Agent Code";
+                    end;
                 end;
             DATABASE::"Purch. Rcpt. Header":
                 begin
                     RecRef.SetTable(PurchRcptHeader);
-                    if PurchRcptHeader.Find then begin
+                    if PurchRcptHeader.Find() then begin
                     end;
                 end;
             DATABASE::"Purch. Inv. Header":
                 begin
                     RecRef.SetTable(PurchInvHeader);
-                    if PurchInvHeader.Find then begin
+                    if PurchInvHeader.Find() then begin
                     end;
                 end;
             DATABASE::"Purch. Cr. Memo Hdr.":
                 begin
                     RecRef.SetTable(PurchCrMemoHeader);
-                    if PurchCrMemoHeader.Find then begin
+                    if PurchCrMemoHeader.Find() then begin
                     end;
                 end;
             DATABASE::Job:
                 begin
                     RecRef.SetTable(Job);
-                    if Job.Find then
-                        with Job do begin
-                            ShipmentDocument."Receiver ID" := "Bill-to Customer No.";
-                            ShipmentDocument.Name := "Bill-to Name";
-                            ShipmentDocument.Address := "Bill-to Address";
-                            ShipmentDocument."Address 2" := "Address 2";
-                            ShipmentDocument."Post Code" := "Bill-to Post Code";
-                            ShipmentDocument.City := "Bill-to City";
-                            ShipmentDocument.County := '';
-                            ShipmentDocument."Country/Region Code" := "Bill-to Country/Region Code";
-                            ShipmentDocument.Contact := "Bill-to Contact";
-                            ShipmentDocument.Reference := '';
-                            ShipmentDocument."Shipment Date" := Today;
-                            Customer.Get("Bill-to Customer No.");
-                            ShipmentDocument."Phone No." := Customer."Phone No.";
-                            ShipmentDocument."Fax No." := Customer."Fax No.";
-                            ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
-                            ShipmentDocument."E-Mail" := Customer."E-Mail";
-                            ShipmentDocument."SMS No." := Customer."Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := Customer."Shipping Agent Code";
-                        end;
+                    if Job.Find() then begin
+                        ShipmentDocument."Receiver ID" := Job."Bill-to Customer No.";
+                        ShipmentDocument.Name := Job."Bill-to Name";
+                        ShipmentDocument.Address := Job."Bill-to Address";
+                        ShipmentDocument."Address 2" := "Address 2";
+                        ShipmentDocument."Post Code" := Job."Bill-to Post Code";
+                        ShipmentDocument.City := Job."Bill-to City";
+                        ShipmentDocument.County := '';
+                        ShipmentDocument."Country/Region Code" := Job."Bill-to Country/Region Code";
+                        ShipmentDocument.Contact := Job."Bill-to Contact";
+                        ShipmentDocument.Reference := '';
+                        ShipmentDocument."Shipment Date" := Today();
+                        Customer.Get(Job."Bill-to Customer No.");
+                        ShipmentDocument."Phone No." := Customer."Phone No.";
+                        ShipmentDocument."Fax No." := Customer."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Customer."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := Customer."E-Mail";
+                        ShipmentDocument."SMS No." := Customer."Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := Customer."Shipping Agent Code";
+                    end;
                 end;
             DATABASE::Contact:
                 begin
                     RecRef.SetTable(Contact);
-                    if Contact.Find then
-                        with Contact do begin
-                            ShipmentDocument."Receiver ID" := "No.";
-                            ShipmentDocument.Name := "Company Name";
-                            ShipmentDocument.Address := Address;
-                            ShipmentDocument."Address 2" := "Address 2";
-                            ShipmentDocument."Post Code" := "Post Code";
-                            ShipmentDocument.City := City;
-                            ShipmentDocument.County := County;
-                            ShipmentDocument."Country/Region Code" := "Country/Region Code";
-                            if Contact.Type = Contact.Type::Person then
-                                ShipmentDocument.Contact := Name;
-                            ShipmentDocument.Reference := '';
-                            ShipmentDocument."Shipment Date" := Today;
-                            ShipmentDocument."Phone No." := "Phone No.";
-                            ShipmentDocument."Fax No." := "Fax No.";
-                            ShipmentDocument."VAT Registration No." := "VAT Registration No.";
-                            ShipmentDocument."E-Mail" := "E-Mail";
-                            ShipmentDocument."SMS No." := "Mobile Phone No.";
-                            ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
-                        end;
+                    if Contact.Find() then begin
+                        ShipmentDocument."Receiver ID" := Contact."No.";
+                        ShipmentDocument.Name := Contact."Company Name";
+                        ShipmentDocument.Address := Contact.Address;
+                        ShipmentDocument."Address 2" := Contact."Address 2";
+                        ShipmentDocument."Post Code" := Contact."Post Code";
+                        ShipmentDocument.City := Contact.City;
+                        ShipmentDocument.County := Contact.County;
+                        ShipmentDocument."Country/Region Code" := Contact."Country/Region Code";
+                        if Contact.Type = Contact.Type::Person then
+                            ShipmentDocument.Contact := Contact.Name;
+                        ShipmentDocument.Reference := '';
+                        ShipmentDocument."Shipment Date" := Today();
+                        ShipmentDocument."Phone No." := Contact."Phone No.";
+                        ShipmentDocument."Fax No." := Contact."Fax No.";
+                        ShipmentDocument."VAT Registration No." := Contact."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := Contact."E-Mail";
+                        ShipmentDocument."SMS No." := Contact."Mobile Phone No.";
+                        ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
+                    end;
                 end;
         end;
 
-        CompanyInfo.Get;
+        CompanyInfo.Get();
         ShipmentDocument."Sender VAT Reg. No" := CompanyInfo."VAT Registration No.";
         if ShipmentDocument."Country/Region Code" = '' then
             ShipmentDocument."Country/Region Code" := CompanyInfo."Country/Region Code";
         if ShipmentDocument."Shipment Date" < Today then
-            ShipmentDocument."Shipment Date" := Today;
+            ShipmentDocument."Shipment Date" := Today();
 
         ShipmentDocument.Modify(true);
 
@@ -843,14 +831,14 @@ table 6014452 "NPR Pacsoft Shipment Document"
             ShippingAgentServices.SetCurrentKey("Shipping Agent Code");
             ShippingAgentServices.SetRange("Shipping Agent Code", ShipmentDocument."Shipping Agent Code");
             ShippingAgentServices.SetRange("NPR Default Option", true);
-            if ShippingAgentServices.FindSet then begin
+            if ShippingAgentServices.FindSet() then begin
                 repeat
                     Clear(ShipmentDocServices);
                     ShipmentDocServices.Validate("Entry No.", ShipmentDocument."Entry No.");
                     ShipmentDocServices.Validate("Shipping Agent Code", ShippingAgentServices."Shipping Agent Code");
                     ShipmentDocServices.Validate("Shipping Agent Service Code", ShippingAgentServices.Code);
                     ShipmentDocServices.Insert(true);
-                until ShippingAgentServices.Next = 0;
+                until ShippingAgentServices.Next() = 0;
                 //-PS1.01
             end
             else begin
@@ -860,14 +848,14 @@ table 6014452 "NPR Pacsoft Shipment Document"
                     ShippingAgentServices.SetRange("Shipping Agent Code", ShipmentDocument."Shipping Agent Code");
                     ShippingAgentServices.SetRange(Code, ShippingAgentServicesCode);
                     ShippingAgentServices.SetRange("NPR Default Option", false);
-                    if ShippingAgentServices.FindSet then
+                    if ShippingAgentServices.FindSet() then
                         repeat
                             Clear(ShipmentDocServices);
                             ShipmentDocServices.Validate("Entry No.", ShipmentDocument."Entry No.");
                             ShipmentDocServices.Validate("Shipping Agent Code", ShippingAgentServices."Shipping Agent Code");
                             ShipmentDocServices.Validate("Shipping Agent Service Code", ShippingAgentServices.Code);
                             ShipmentDocServices.Insert(true);
-                        until ShippingAgentServices.Next = 0;
+                        until ShippingAgentServices.Next() = 0;
                 end;
             end;
             //+PS1.01
@@ -889,12 +877,12 @@ table 6014452 "NPR Pacsoft Shipment Document"
             end;
 
         if ShowWindow then begin
-            Commit;
-            ShipmentDocument.SetRecFilter;
+            Commit();
+            ShipmentDocument.SetRecFilter();
             Clear(CreateShipmentDocument);
             CreateShipmentDocument.LookupMode(false);
             CreateShipmentDocument.SetRecord(ShipmentDocument);
-            CreateShipmentDocument.RunModal;
+            CreateShipmentDocument.RunModal();
             if CreateShipmentDocument.OKButtonWasPressed then begin
                 CreateShipmentDocument.GetRecord(ShipmentDocument);
                 ShipmentDocument.Modify(true);
@@ -925,7 +913,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
             Clear(ShipmentDocServices);
             ShipmentDocServices.SetCurrentKey("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
             ShipmentDocServices.SetRange("Entry No.", pShipmentDocument."Entry No.");
-            if not ShipmentDocServices.FindFirst then
+            if not ShipmentDocServices.FindFirst() then
                 WithDialog := false
         end;
 
@@ -948,20 +936,18 @@ table 6014452 "NPR Pacsoft Shipment Document"
 
         if pShipmentDocument."Entry No." = 0 then exit;
 
-        PacsoftSetup.Get;
+        PacsoftSetup.Get();
 
-        with pShipmentDocument do begin
-            TestField("Shipping Agent Code");
-            ShippingAgent.Get("Shipping Agent Code");
-            ShippingAgent.TestField("Internet Address");
-            //-NPR5.51 [361583]
-            if pShipmentDocument."Response Package No." <> '' then
-                TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", pShipmentDocument."Response Package No.")
-            else
-                //+NPR5.51 [361583]
-                TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", PacsoftSetup.User, "Entry No.");
-            HyperLink(TrackingInternetAddr);
-        end;
+        pShipmentDocument.TestField("Shipping Agent Code");
+        ShippingAgent.Get(pShipmentDocument."Shipping Agent Code");
+        ShippingAgent.TestField("Internet Address");
+        //-NPR5.51 [361583]
+        if pShipmentDocument."Response Package No." <> '' then
+            TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", pShipmentDocument."Response Package No.")
+        else
+            //+NPR5.51 [361583]
+            TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", PacsoftSetup.User, pShipmentDocument."Entry No.");
+        HyperLink(TrackingInternetAddr);
     end;
 }
 

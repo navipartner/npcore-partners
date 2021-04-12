@@ -18,13 +18,13 @@ page 6150727 "NPR POS Param. Values Temp."
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -32,7 +32,7 @@ page 6150727 "NPR POS Param. Values Temp."
                     StyleExpr = ParameterIsNotDefault;
                     ToolTip = 'Specifies the value of the Data Type field';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     Style = StandardAccent;
@@ -52,7 +52,7 @@ page 6150727 "NPR POS Param. Values Temp."
                 Caption = 'Reset Values';
                 Image = UpdateDescription;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -78,29 +78,29 @@ page 6150727 "NPR POS Param. Values Temp."
     procedure GetEditedData(var TempParam: Record "NPR POS Parameter Value" temporary)
     begin
         TempParam.DeleteAll();
-        if Rec.FindSet then
+        if Rec.FindSet() then
             repeat
                 TempParam := Rec;
                 TempParam.Insert();
-            until Rec.Next = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure SetDataToEdit(var TempParam: Record "NPR POS Parameter Value" temporary)
     begin
         Rec.DeleteAll();
-        if TempParam.FindSet then
+        if TempParam.FindSet() then
             repeat
                 Rec := TempParam;
                 Rec.Insert();
-            until TempParam.Next = 0;
+            until TempParam.Next() = 0;
     end;
 
     local procedure IsDefault(): Boolean
     var
         POSActionParameter: Record "NPR POS Action Parameter";
     begin
-        if POSActionParameter.Get("Action Code", Name) then
-            exit(POSActionParameter."Default Value" = Value);
+        if POSActionParameter.Get(Rec."Action Code", Rec.Name) then
+            exit(POSActionParameter."Default Value" = Rec.Value);
         exit(false);
     end;
 }

@@ -133,7 +133,7 @@ table 6014404 "NPR Report Selection Retail"
     procedure NewRecord()
     begin
         ReportSelectionRetail2.SetRange("Report Type", "Report Type");
-        if ReportSelectionRetail2.FindLast and (ReportSelectionRetail2.Sequence <> '') then
+        if ReportSelectionRetail2.FindLast() and (ReportSelectionRetail2.Sequence <> '') then
             Sequence := IncStr(ReportSelectionRetail2.Sequence)
         else
             Sequence := '1';

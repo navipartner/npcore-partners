@@ -1,4 +1,4 @@
-codeunit 6014476 "NPR Retail Price Log Mgt."
+﻿codeunit 6014476 "NPR Retail Price Log Mgt."
 {
     trigger OnRun()
     begin
@@ -54,7 +54,6 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
 
     local procedure EnablePeriodDiscountLog()
     var
-        PeriodDiscount: Record "NPR Period Discount";
         PeriodDiscountLine: Record "NPR Period Discount Line";
     begin
         EnableChangeLogSetupField(DATABASE::"NPR Period Discount Line", PeriodDiscountLine.FieldNo("Campaign Unit Price"));
@@ -68,27 +67,26 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         TaskQueue: Record "NPR Task Queue";
         TaskWorkerGroup: Record "NPR Task Worker Group";
         LineNo: Integer;
-        PrevRec: Text;
     begin
         TaskLine.SetRange("Object Type", TaskLine."Object Type"::Codeunit);
         TaskLine.SetRange("Object No.", CODEUNIT::"NPR Retail Price Log Mgt.");
-        if TaskLine.FindFirst then
+        if TaskLine.FindFirst() then
             exit;
 
         TaskWorkerGroup.SetFilter("Max. Concurrent Threads", '>%1', 0);
-        if not TaskWorkerGroup.FindFirst then
+        if not TaskWorkerGroup.FindFirst() then
             exit;
 
-        if not TaskBatch.FindFirst then
+        if not TaskBatch.FindFirst() then
             exit;
 
-        TaskLine.Reset;
+        TaskLine.Reset();
         TaskLine.SetRange("Journal Template Name", TaskBatch."Journal Template Name");
         TaskLine.SetRange("Journal Batch Name", TaskBatch.Name);
-        if TaskLine.FindLast then;
+        if TaskLine.FindLast() then;
         LineNo := TaskLine."Line No." + 10000;
 
-        TaskLine.Init;
+        TaskLine.Init();
         TaskLine."Journal Template Name" := TaskBatch."Journal Template Name";
         TaskLine."Journal Batch Name" := TaskBatch.Name;
         TaskLine."Line No." := LineNo;
@@ -115,10 +113,10 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         if not TaskQueue.Get(CompanyName, TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.") then begin
             TaskQueue.SetupNewLine(TaskLine, false);
             TaskQueue."Next Run time" := CurrentDateTime;
-            TaskQueue.Insert;
+            TaskQueue.Insert();
         end else begin
             TaskQueue."Next Run time" := CurrentDateTime;
-            TaskQueue.Modify;
+            TaskQueue.Modify();
         end;
     end;
 
@@ -131,10 +129,10 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         ChangeLogSetup: Record "Change Log Setup";
         PrevRec: Text;
     begin
-        if not ChangeLogSetup.Get then begin
-            ChangeLogSetup.Init;
+        if not ChangeLogSetup.Get() then begin
+            ChangeLogSetup.Init();
             ChangeLogSetup."Change Log Activated" := true;
-            ChangeLogSetup.Insert;
+            ChangeLogSetup.Insert();
         end;
 
         PrevRec := Format(ChangeLogSetup);
@@ -142,7 +140,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         ChangeLogSetup."Change Log Activated" := true;
 
         if PrevRec <> Format(ChangeLogSetup) then
-            ChangeLogSetup.Modify;
+            ChangeLogSetup.Modify();
     end;
 
     local procedure EnableChangeLogSetupField(TableNo: Integer; FieldNo: Integer)
@@ -151,12 +149,12 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         PrevRec: Text;
     begin
         if not ChangeLogSetupField.Get(TableNo, FieldNo) then begin
-            ChangeLogSetupField.Init;
+            ChangeLogSetupField.Init();
             ChangeLogSetupField."Table No." := TableNo;
             ChangeLogSetupField."Field No." := FieldNo;
             ChangeLogSetupField."Log Insertion" := true;
             ChangeLogSetupField."Log Modification" := true;
-            ChangeLogSetupField.Insert;
+            ChangeLogSetupField.Insert();
         end;
 
         PrevRec := Format(ChangeLogSetupField);
@@ -165,7 +163,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         ChangeLogSetupField."Log Modification" := true;
 
         if PrevRec <> Format(ChangeLogSetupField) then
-            ChangeLogSetupField.Modify;
+            ChangeLogSetupField.Modify();
     end;
 
     local procedure EnableChangeLogSetupTable(TableNo: Integer)
@@ -174,11 +172,11 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         PrevRec: Text;
     begin
         if not ChangeLogSetupTable.Get(TableNo) then begin
-            ChangeLogSetupTable.Init;
+            ChangeLogSetupTable.Init();
             ChangeLogSetupTable."Table No." := TableNo;
             ChangeLogSetupTable."Log Insertion" := ChangeLogSetupTable."Log Insertion"::"Some Fields";
             ChangeLogSetupTable."Log Modification" := ChangeLogSetupTable."Log Modification"::"Some Fields";
-            ChangeLogSetupTable.Insert;
+            ChangeLogSetupTable.Insert();
         end;
 
         PrevRec := Format(ChangeLogSetupTable);
@@ -189,7 +187,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
             ChangeLogSetupTable."Log Modification" := ChangeLogSetupTable."Log Modification"::"Some Fields";
 
         if PrevRec <> Format(ChangeLogSetupTable) then
-            ChangeLogSetupTable.Modify;
+            ChangeLogSetupTable.Modify();
     end;
 
     local procedure "--- Price Log"()
@@ -210,30 +208,29 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         repeat
             RetailPriceLogEntry.SetRange("Change Log Entry No.", TempRetailPriceLogEntry."Change Log Entry No.");
             if RetailPriceLogEntry.IsEmpty then begin
-                RetailPriceLogEntry.Init;
+                RetailPriceLogEntry.Init();
                 RetailPriceLogEntry := TempRetailPriceLogEntry;
                 RetailPriceLogEntry."Entry No." := 0;
-                RetailPriceLogEntry.Insert;
+                RetailPriceLogEntry.Insert();
             end;
-        until TempRetailPriceLogEntry.Next = 0;
+        until TempRetailPriceLogEntry.Next() = 0;
     end;
 
     local procedure CleanPriceLog()
     var
         RetailPriceLogEntry: Record "NPR Retail Price Log Entry";
-        FilterDate: Date;
     begin
         RetailPriceLogEntry.SetCurrentKey("Date and Time");
         RetailPriceLogEntry.SetFilter("Date and Time", '<%1', GetDeleteLogAfter());
-        if RetailPriceLogEntry.FindFirst then
-            RetailPriceLogEntry.DeleteAll;
+        if RetailPriceLogEntry.FindFirst() then
+            RetailPriceLogEntry.DeleteAll();
     end;
 
     local procedure GetDeleteLogAfter() DeleteLogAfter: DateTime
     var
         RetailPriceLogSetup: Record "NPR Retail Price Log Setup";
     begin
-        if RetailPriceLogSetup.Get then;
+        if RetailPriceLogSetup.Get() then;
         if RetailPriceLogSetup."Delete Price Log Entries after" = 0 then
             RetailPriceLogSetup."Delete Price Log Entries after" := CreateDateTime(CalcDate('<+90D>', Today), 0T) - CreateDateTime(Today, 0T);
 
@@ -245,7 +242,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
     var
         RetailPriceLogSetup: Record "NPR Retail Price Log Setup";
     begin
-        if not RetailPriceLogSetup.Get then
+        if not RetailPriceLogSetup.Get() then
             exit(false);
         if not RetailPriceLogSetup."Price Log Activated" then
             exit(false);
@@ -270,7 +267,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         ChangeLogEntry.SetFilter("Field No.", FieldNoFilter);
         ChangeLogEntry.SetFilter("Type of Change", '%1|%2', ChangeLogEntry."Type of Change"::Insertion, ChangeLogEntry."Type of Change"::Modification);
         ChangeLogEntry.SetFilter("Date and Time", '>=%1', GetDeleteLogAfter());
-        exit(ChangeLogEntry.FindFirst);
+        exit(ChangeLogEntry.FindFirst());
     end;
 
     local procedure FindNewItemUnitPriceLogEntries(var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
@@ -283,7 +280,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         i: Integer;
     begin
         Clear(TempRetailPriceLogEntry);
-        if TempRetailPriceLogEntry.FindLast then;
+        if TempRetailPriceLogEntry.FindLast() then;
         i := TempRetailPriceLogEntry."Entry No.";
 
         TableNoFilter := Format(DATABASE::Item);
@@ -292,19 +289,19 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         if not SetChangeLogEntryFilter(LastChangeLogEntryNo, TableNoFilter, FieldNoFilter, ChangeLogEntry) then
             exit;
 
-        ChangeLogEntry.FindSet;
+        ChangeLogEntry.FindSet();
         repeat
             i += 1;
 
-            TempRetailPriceLogEntry.Init;
+            TempRetailPriceLogEntry.Init();
             TempRetailPriceLogEntry."Entry No." := i;
             ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
             TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 1 Value";
             TempRetailPriceLogEntry."Variant Code" := '';
             if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
             if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
-            TempRetailPriceLogEntry.Insert;
-        until ChangeLogEntry.Next = 0;
+            TempRetailPriceLogEntry.Insert();
+        until ChangeLogEntry.Next() = 0;
     end;
 
     local procedure FindNewSalesPriceLogEntries(var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
@@ -317,7 +314,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         i: Integer;
     begin
         Clear(TempRetailPriceLogEntry);
-        if TempRetailPriceLogEntry.FindLast then;
+        if TempRetailPriceLogEntry.FindLast() then;
         i := TempRetailPriceLogEntry."Entry No.";
 
         TableNoFilter := Format(DATABASE::"Sales Price");
@@ -326,22 +323,22 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         if not SetChangeLogEntryFilter(LastChangeLogEntryNo, TableNoFilter, FieldNoFilter, ChangeLogEntry) then
             exit;
 
-        ChangeLogEntry.FindSet;
+        ChangeLogEntry.FindSet();
         repeat
             i += 1;
 
             SalesPrice.SetPosition(ChangeLogEntry."Primary Key");
             if SalesPrice."Sales Type" = SalesPrice."Sales Type"::"All Customers" then begin
-                TempRetailPriceLogEntry.Init;
+                TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
                 TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 1 Value";
                 TempRetailPriceLogEntry."Variant Code" := '';
                 if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
                 if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
-                TempRetailPriceLogEntry.Insert;
+                TempRetailPriceLogEntry.Insert();
             end;
-        until ChangeLogEntry.Next = 0;
+        until ChangeLogEntry.Next() = 0;
     end;
 
     local procedure FindNewSalesLineDiscountLogEntries(var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
@@ -354,7 +351,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         i: Integer;
     begin
         Clear(TempRetailPriceLogEntry);
-        if TempRetailPriceLogEntry.FindLast then;
+        if TempRetailPriceLogEntry.FindLast() then;
         i := TempRetailPriceLogEntry."Entry No.";
 
         TableNoFilter := Format(DATABASE::"Sales Line Discount");
@@ -363,22 +360,22 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         if not SetChangeLogEntryFilter(LastChangeLogEntryNo, TableNoFilter, FieldNoFilter, ChangeLogEntry) then
             exit;
 
-        ChangeLogEntry.FindSet;
+        ChangeLogEntry.FindSet();
         repeat
             i += 1;
 
             SalesLineDiscount.SetPosition(ChangeLogEntry."Primary Key");
             if (SalesLineDiscount.Type = SalesLineDiscount.Type::Item) and (SalesLineDiscount."Sales Type" = SalesLineDiscount."Sales Type"::"All Customers") then begin
-                TempRetailPriceLogEntry.Init;
+                TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
                 TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 2 Value";
                 TempRetailPriceLogEntry."Variant Code" := '';
                 if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
                 if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
-                TempRetailPriceLogEntry.Insert;
+                TempRetailPriceLogEntry.Insert();
             end;
-        until ChangeLogEntry.Next = 0;
+        until ChangeLogEntry.Next() = 0;
     end;
 
     local procedure FindNewPeriodDiscountLogEntries(var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
@@ -391,7 +388,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         i: Integer;
     begin
         Clear(TempRetailPriceLogEntry);
-        if TempRetailPriceLogEntry.FindLast then;
+        if TempRetailPriceLogEntry.FindLast() then;
         i := TempRetailPriceLogEntry."Entry No.";
 
         TableNoFilter := Format(DATABASE::"NPR Period Discount Line");
@@ -400,19 +397,19 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         if not SetChangeLogEntryFilter(LastChangeLogEntryNo, TableNoFilter, FieldNoFilter, ChangeLogEntry) then
             exit;
 
-        ChangeLogEntry.FindSet;
+        ChangeLogEntry.FindSet();
         repeat
             i += 1;
 
-            TempRetailPriceLogEntry.Init;
+            TempRetailPriceLogEntry.Init();
             TempRetailPriceLogEntry."Entry No." := i;
             ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
             TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 2 Value";
             TempRetailPriceLogEntry."Variant Code" := '';
             if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
             if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
-            TempRetailPriceLogEntry.Insert;
-        until ChangeLogEntry.Next = 0;
+            TempRetailPriceLogEntry.Insert();
+        until ChangeLogEntry.Next() = 0;
     end;
 
     local procedure ChangeLogEnty2PriceLogEntry(ChangeLogEntry: Record "Change Log Entry"; var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
@@ -433,7 +430,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         RetailPriceLogEntry.SetCurrentKey("Table No.", "Field No.", "Change Log Entry No.");
         RetailPriceLogEntry.SetFilter("Table No.", TableNoFilter);
         RetailPriceLogEntry.SetFilter("Field No.", FieldNoFilter);
-        if RetailPriceLogEntry.FindLast then;
+        if RetailPriceLogEntry.FindLast() then;
 
         exit(RetailPriceLogEntry."Change Log Entry No.");
     end;
@@ -452,19 +449,19 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
             exit;
 
         RetailJnlLine.SetRange("No.", RetailJnlHeader."No.");
-        if RetailJnlLine.FindLast then;
+        if RetailJnlLine.FindLast() then;
         LineNo := RetailJnlLine."Line No.";
 
-        TempItem.FindSet;
+        TempItem.FindSet();
         repeat
             LineNo += 10000;
 
-            RetailJnlLine.Init;
+            RetailJnlLine.Init();
             RetailJnlLine.Validate("No.", RetailJnlHeader."No.");
             RetailJnlLine."Line No." := LineNo;
             RetailJnlLine.Validate("Item No.", TempItem."No.");
             RetailJnlLine.Insert(true);
-        until TempItem.Next = 0;
+        until TempItem.Next() = 0;
     end;
 
     local procedure QueryPriceLog(RetailJnlHeader: Record "NPR Retail Journal Header"; var TempItem: Record Item temporary): Boolean
@@ -488,23 +485,22 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
 
         RetailPriceLogEntry.SetCurrentKey("Item No.", "Variant Code");
         RetailPriceLogEntry.FilterGroup(40);
-        Item.FindSet;
+        Item.FindSet();
         repeat
             RetailPriceLogEntry.SetRange("Item No.", Item."No.");
             RetailPriceLogEntry.SetFilter("Variant Code", Item.GetFilter("Variant Filter"));
-            if RetailPriceLogEntry.FindFirst then begin
-                TempItem.Init;
+            if RetailPriceLogEntry.FindFirst() then begin
+                TempItem.Init();
                 TempItem := Item;
-                TempItem.Insert;
+                TempItem.Insert();
             end;
-        until Item.Next = 0;
+        until Item.Next() = 0;
 
-        exit(TempItem.FindFirst);
+        exit(TempItem.FindFirst());
     end;
 
     local procedure RunDynamicRequestPage(var Item: Record Item; var RetailPriceLogEntry: Record "NPR Retail Price Log Entry"): Boolean
     var
-        RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
         FilterName: Text;
         FilterName2: Text;
@@ -543,7 +539,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         FilterPageBuilder.ADdField(FilterName2, RetailPriceLogEntry."Date and Time");
         FilterPageBuilder.ADdField(FilterName2, RetailPriceLogEntry."Table No.");
 
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         SaveViewFromDynamicRequestPage(FilterPageBuilder);
@@ -570,7 +566,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
     begin
         if not FindQueryPriceLogView(PageDataPersonalization) then
             exit(false);
-        if not PageDataPersonalization.Value.HasValue then
+        if not PageDataPersonalization.Value.HasValue() then
             exit(false);
 
         PageDataPersonalization.CalcFields(Value);
@@ -619,23 +615,23 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
 
         if not FindQueryPriceLogView(PageDataPersonalization) then begin
             User.SetRange("User Name", UserId);
-            if not User.FindFirst then
+            if not User.FindFirst() then
                 exit;
 
-            PageDataPersonalization.Init;
+            PageDataPersonalization.Init();
             PageDataPersonalization."User SID" := User."User Security ID";
             PageDataPersonalization."Object Type" := PageDataPersonalization."Object Type"::Page;
             PageDataPersonalization."Object ID" := PAGE::"NPR Retail Journal Header";
             PageDataPersonalization.ValueName := QueryPriceLogViewName();
             PageDataPersonalization.Insert(true);
-            Commit;
+            Commit();
         end;
 
         Clear(PageDataPersonalization.Value);
         PageDataPersonalization.Value.CreateOutStream(OStream);
         XmlDoc.WriteTo(OStream);
         PageDataPersonalization.Modify(true);
-        Commit;
+        Commit();
     end;
 
     local procedure FindQueryPriceLogView(var PageDataPersonalization: Record "Page Data Personalization"): Boolean
@@ -645,7 +641,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         PageDataPersonalization.SetRange("Object Type", PageDataPersonalization."Object Type"::Page);
         PageDataPersonalization.SetRange("Object ID", PAGE::"NPR Retail Journal Header");
         PageDataPersonalization.SetRange(ValueName, QueryPriceLogViewName());
-        exit(PageDataPersonalization.FindLast);
+        exit(PageDataPersonalization.FindLast());
     end;
 
     local procedure QueryPriceLogViewName(): Code[40]

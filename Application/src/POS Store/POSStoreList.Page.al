@@ -15,52 +15,52 @@ page 6150614 "NPR POS Store List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Post Code"; "Post Code")
+                field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Code field';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the City field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field("Store Group Code"; "Store Group Code")
+                field("Store Group Code"; Rec."Store Group Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Group Code field';
                 }
-                field("Store Category Code"; "Store Category Code")
+                field("Store Category Code"; Rec."Store Category Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Category Code field';
                 }
-                field("Store Locality Code"; "Store Locality Code")
+                field("Store Locality Code"; Rec."Store Locality Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Locality Code field';
@@ -106,8 +106,8 @@ page 6150614 "NPR POS Store List"
                         begin
                             //-NPR5.53 [371956]
                             CurrPage.SetSelectionFilter(POSStore);
-                            DefaultDimMultiple.SetMultiRecord(POSStore, FieldNo(Code));
-                            DefaultDimMultiple.RunModal;
+                            DefaultDimMultiple.SetMultiRecord(POSStore, Rec.FieldNo(Code));
+                            DefaultDimMultiple.RunModal();
                             //-NPR5.53 [371956]
                         end;
                     }

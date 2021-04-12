@@ -1,4 +1,4 @@
-codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
+﻿codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
 {
     var
         Text000: Label 'This action Issues Retail Vouchers.';
@@ -15,11 +15,6 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    var
-        FunctionOptionString: Text;
-        JSArr: Text;
-        OptionName: Text;
-        N: Integer;
     begin
         DiscoverIssueVoucherAction(Sender);
     end;
@@ -142,7 +137,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         if not NpRvVoucherType.Get(POSParameterValue.Value) then begin
             NpRvVoucherType.SetFilter(Code, '%1', POSParameterValue.Value + '*');
-            if NpRvVoucherType.FindFirst then
+            if NpRvVoucherType.FindFirst() then
                 POSParameterValue.Value := NpRvVoucherType.Code;
         end;
 
@@ -198,13 +193,13 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         NpRvSalesLine.SetRange("Sale Type", SaleLinePOS."Sale Type");
         NpRvSalesLine.SetRange("Sale Date", SaleLinePOS.Date);
         NpRvSalesLine.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-        if not NpRvSalesLine.FindSet then
+        if not NpRvSalesLine.FindSet() then
             exit;
 
         repeat
             PAGE.RunModal(PAGE::"NPR NpRv Sales Line Card", NpRvSalesLine);
-            Commit;
-        until NpRvSalesLine.Next = 0;
+            Commit();
+        until NpRvSalesLine.Next() = 0;
     end;
 
     local procedure IssueVoucher(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
@@ -269,8 +264,8 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         SaleLinePOS.Modify(true);
         POSSession.RequestRefreshData();
 
-        NpRvSalesLine.Init;
-        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
         NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
@@ -306,12 +301,12 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         JSON.SetScopeRoot();
         if JSON.SetScope('$send_method_sms') then
             NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
-        NpRvSalesLine.Insert;
+        NpRvSalesLine.Insert();
 
         NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
         if NpRvSalesLineReference.IsEmpty then begin
-            NpRvSalesLineReference.Init;
-            NpRvSalesLineReference.Id := CreateGuid;
+            NpRvSalesLineReference.Init();
+            NpRvSalesLineReference.Id := CreateGuid();
             NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
             NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
             NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
@@ -323,7 +318,6 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
     local procedure ScanReferenceNos(SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal)
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvSalesLineReferences: Page "NPR NpRv Sales Line Ref.";
     begin
         if not GuiAllowed then
@@ -331,11 +325,11 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
 
         NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
-        if not NpRvSalesLine.FindFirst then
+        if not NpRvSalesLine.FindFirst() then
             exit;
 
         NpRvSalesLineReferences.SetNpRvSalesLine(NpRvSalesLine, Quantity);
-        NpRvSalesLineReferences.RunModal;
+        NpRvSalesLineReferences.RunModal();
     end;
 
     local procedure SelectSendMethod(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -388,7 +382,6 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
 
     local procedure VoucherTypeInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        VoucherType: Record "NPR NpRv Voucher Type";
         VoucherTypeCode: Text;
     begin
         if not SelectVoucherType(VoucherTypeCode) then

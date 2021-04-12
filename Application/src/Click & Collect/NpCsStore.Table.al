@@ -309,12 +309,12 @@ table 6151195 "NPR NpCs Store"
         NpCsStoreWorkflowRelation: Record "NPR NpCs Store Workflow Rel.";
     begin
         NpCsStoreWorkflowRelation.SetRange("Store Code", Code);
-        if NpCsStoreWorkflowRelation.FindFirst then
-            NpCsStoreWorkflowRelation.DeleteAll;
+        if NpCsStoreWorkflowRelation.FindFirst() then
+            NpCsStoreWorkflowRelation.DeleteAll();
 
         NpCsStorePOSRelation.SetRange("Store Code", Code);
-        if NpCsStorePOSRelation.FindFirst then
-            NpCsStorePOSRelation.DeleteAll;
+        if NpCsStorePOSRelation.FindFirst() then
+            NpCsStorePOSRelation.DeleteAll();
     end;
 
     procedure GetServiceName() ServiceName: Text

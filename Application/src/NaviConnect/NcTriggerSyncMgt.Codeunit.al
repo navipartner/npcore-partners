@@ -6,7 +6,6 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
     var
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcTriggerScheduler: Codeunit "NPR Nc Trigger Scheduler";
-        DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         NcTrigger: Record "NPR Nc Trigger";
         TriggerCode: Code[20];
         RecRef: RecordRef;
@@ -61,7 +60,7 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
         PreviousResponse: Text;
     begin
         NcTask.CalcFields(Response);
-        if NcTask.Response.HasValue then begin
+        if NcTask.Response.HasValue() then begin
             NcTask.Response.CreateInStream(StreamIn, TextEncoding::UTF8);
             StreamIn.Read(PreviousResponse);
         end else

@@ -15,27 +15,27 @@ page 6059971 "NPR Variety"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Use in Variant Description"; "Use in Variant Description")
+                field("Use in Variant Description"; Rec."Use in Variant Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Use in Variant Description field';
                 }
-                field("Pre tag In Variant Description"; "Pre tag In Variant Description")
+                field("Pre tag In Variant Description"; Rec."Pre tag In Variant Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pre tag In Variant Description field';
                 }
-                field("Use Description field"; "Use Description field")
+                field("Use Description field"; Rec."Use Description field")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Use Description field field';
@@ -53,7 +53,7 @@ page 6059971 "NPR Variety"
                 Caption = 'Variety Tabel';
                 Image = "Table";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Variety Table";

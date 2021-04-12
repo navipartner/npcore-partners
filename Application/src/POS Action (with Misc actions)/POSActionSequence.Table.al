@@ -91,11 +91,11 @@ table 6150726 "NPR POS Action Sequence"
 
     procedure SetActionsForValidation(var TempAction: Record "NPR POS Action" temporary)
     begin
-        if TempAction.FindSet then
+        if TempAction.FindSet() then
             repeat
                 TempActionForValidation := TempAction;
                 TempActionForValidation.Insert();
-            until TempAction.Next = 0;
+            until TempAction.Next() = 0;
         HasActionsForValidation := true;
     end;
 
@@ -118,13 +118,13 @@ table 6150726 "NPR POS Action Sequence"
         Sequence: Record "NPR POS Action Sequence";
         ParameterValue: Record "NPR POS Parameter Value";
     begin
-        TempRec.DeleteAll;
+        TempRec.DeleteAll();
         Sequence.SetRange("Source Type", "Source Type"::Discovery);
         if Sequence.FindSet() then
             repeat
                 TempRec := Sequence;
                 TempRec.Insert();
-            until Sequence.Next = 0;
+            until Sequence.Next() = 0;
 
         OnDiscoverActionSequence();
 
@@ -137,7 +137,7 @@ table 6150726 "NPR POS Action Sequence"
                     ParameterValue.DeleteAll();
                     Sequence.Delete();
                 end;
-            until TempRec.Next = 0;
+            until TempRec.Next() = 0;
 
         CheckAllSequences();
     end;
@@ -150,7 +150,7 @@ table 6150726 "NPR POS Action Sequence"
             Error(Text003, ReferenceActionCode, ReferenceType);
 
         if not Get(ReferenceType, ReferenceActionCode, ActionCode) then begin
-            Init;
+            Init();
             "Reference Type" := ReferenceType;
             Validate("Reference POS Action Code", ReferenceActionCode);
             Validate("POS Action Code", ActionCode);
@@ -181,13 +181,12 @@ table 6150726 "NPR POS Action Sequence"
             repeat
                 if not SimulateAction(Sequence."Reference POS Action Code") then
                     Error(Text002, Sequence."POS Action Code", Sequence."Reference Type", Sequence."Reference POS Action Code");
-            until Sequence.Next = 0;
+            until Sequence.Next() = 0;
     end;
 
     local procedure SimulateAction(ReferenceActionCode: Code[20]): Boolean
     var
         TempToDo: Record "NPR POS Action" temporary;
-        TempDone: Record "NPR POS Action" temporary;
     begin
         if not SimulateBeforeAction(TempToDo, ReferenceActionCode) then
             exit(false);
@@ -209,11 +208,11 @@ table 6150726 "NPR POS Action Sequence"
 
         Sequence.SetRange("Reference POS Action Code", ReferenceActionCode);
         Sequence.SetRange("Reference Type", "Reference Type"::Before);
-        if Sequence.FindSet then
+        if Sequence.FindSet() then
             repeat
                 TempSequence := Sequence;
                 TempSequence.Insert();
-            until Sequence.Next = 0;
+            until Sequence.Next() = 0;
         if Rec."Reference POS Action Code" = ReferenceActionCode then begin
             TempSequence := Rec;
             if TempSequence.Insert() then;
@@ -226,7 +225,7 @@ table 6150726 "NPR POS Action Sequence"
 
                 if not SimulateAfterAction(TempToDo, TempSequence."POS Action Code") then
                     exit(false);
-            until TempSequence.Next = 0;
+            until TempSequence.Next() = 0;
 
         TempToDo.Code := ReferenceActionCode;
         TempToDo.Find('=');
@@ -246,11 +245,11 @@ table 6150726 "NPR POS Action Sequence"
 
         Sequence.SetRange("Reference POS Action Code", ReferenceActionCode);
         Sequence.SetRange("Reference Type", "Reference Type"::After);
-        if Sequence.FindSet then
+        if Sequence.FindSet() then
             repeat
                 TempSequence := Sequence;
                 TempSequence.Insert();
-            until Sequence.Next = 0;
+            until Sequence.Next() = 0;
         if Rec."Reference POS Action Code" = ReferenceActionCode then begin
             TempSequence := Rec;
             if TempSequence.Insert() then;
@@ -263,7 +262,7 @@ table 6150726 "NPR POS Action Sequence"
 
                 if not SimulateAfterAction(TempToDo, TempSequence."POS Action Code") then
                     exit(false);
-            until TempSequence.Next = 0;
+            until TempSequence.Next() = 0;
 
         TempToDo.Code := ReferenceActionCode;
         TempToDo.Find('=');

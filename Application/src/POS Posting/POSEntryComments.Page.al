@@ -16,18 +16,18 @@ page 6150723 "NPR POS Entry Comments"
         {
             repeater(Group)
             {
-                field("POS Entry No."; "POS Entry No.")
+                field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the POS Entry No. field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field';

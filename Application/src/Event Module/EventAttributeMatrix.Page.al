@@ -41,25 +41,25 @@ page 6060155 "NPR Event Attribute Matrix"
             repeater(Group)
             {
                 FreezeColumn = Formula;
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field(Formula; Formula)
+                field(Formula; Rec.Formula)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -245,9 +245,9 @@ page 6060155 "NPR Event Attribute Matrix"
         EventAttrTemplate.Get(TemplateName);
         EventAttrTemplate.TestField("Row Template Name");
         EventAttrTemplate.TestField("Column Template Name");
-        FilterGroup := 2;
-        SetRange("Template Name", EventAttrTemplate."Row Template Name");
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Template Name", EventAttrTemplate."Row Template Name");
+        Rec.FilterGroup := 0;
     end;
 
     procedure SetJob(JobNo2: Code[20])
@@ -280,10 +280,10 @@ page 6060155 "NPR Event Attribute Matrix"
             AttrColumnVisible[i] := false;
             AttrColumnLineNo[i] := 0;
             if i = 1 then begin
-                AttrColumnVisible[i] := EventAttrColValue.FindSet;
+                AttrColumnVisible[i] := EventAttrColValue.FindSet();
                 FirstColumnLineNoFetched := EventAttrColValue."Line No.";
             end else
-                AttrColumnVisible[i] := EventAttrColValue.Next <> 0;
+                AttrColumnVisible[i] := EventAttrColValue.Next() <> 0;
             if AttrColumnVisible[i] then begin
                 AttrColumnCaption[i] := EventAttrColValue.Description;
                 AttrColumnLineNo[i] := EventAttrColValue."Line No.";
@@ -292,9 +292,9 @@ page 6060155 "NPR Event Attribute Matrix"
         LastColumnLineNoFetched := EventAttrColValue."Line No.";
 
         EventAttrColValue.SetFilter("Line No.", '>%1', LastColumnLineNoFetched);
-        NextColumnSetExists := not EventAttrColValue.IsEmpty;
+        NextColumnSetExists := not EventAttrColValue.IsEmpty();
         EventAttrColValue.SetFilter("Line No.", '<%1', FirstColumnLineNoFetched);
-        PreviousColumnSetExists := not EventAttrColValue.IsEmpty;
+        PreviousColumnSetExists := not EventAttrColValue.IsEmpty();
         SetColumnCaption();
         SetColumnVisibility();
     end;
@@ -318,10 +318,8 @@ page 6060155 "NPR Event Attribute Matrix"
     end;
 
     local procedure SetColumnEditable()
-    var
-        CollumnNo: Integer;
     begin
-        AttrColumnEditable := (Type = Type::" ") or FilterMode;
+        AttrColumnEditable := (Rec.Type = Rec.Type::" ") or FilterMode;
     end;
 
     local procedure ReadEventAttributes()
@@ -333,8 +331,6 @@ page 6060155 "NPR Event Attribute Matrix"
     end;
 
     local procedure CheckAndUpdate(ColumnNo: Integer)
-    var
-        ActionHere: Integer;
     begin
         EventAttrMgt.CheckAndUpdate(TemplateName, JobNo, Rec."Line No.", AttrColumnLineNo[ColumnNo], AttrColumnCaption[ColumnNo], AttrColumnValue[ColumnNo], FilterMode, FilterName);
         CurrPage.Update(false);

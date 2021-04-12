@@ -25,7 +25,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                 begin
                     IsChartAddInReady := true;
                     MembershipBurndownMgt.OnPageOpen(MembershipBurndownSetup);
-                    UpdateStatus;
+                    UpdateStatus();
                     if IsChartDataReady then
                         UpdateChart;
                 end;
@@ -47,12 +47,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Enabled = TypeOfSales;
                     ApplicationArea = All;
                     ToolTip = 'Filters by membership sales type';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         MembershipBurndownSetup.SetShowMemberships(MembershipBurndownSetup."Show Memberships"::SALES_TYPE);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(OrdersUntilToday)
@@ -62,12 +62,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Visible = false;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Orders Until Today action';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         MembershipBurndownSetup.SetShowMemberships(MembershipBurndownSetup."Show Memberships"::BY_COMMUNITY);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(DelayedOrders)
@@ -77,12 +77,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Visible = false;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Delayed Orders action';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         MembershipBurndownSetup.SetShowMemberships(MembershipBurndownSetup."Show Memberships"::BY_MEMBERSHIP);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
             }
@@ -96,12 +96,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Enabled = MonthEnabled;
                     ApplicationArea = All;
                     ToolTip = 'Filters by month';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         MembershipBurndownSetup.SetPeriodLength(MembershipBurndownSetup."Period Length"::Month);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(Quarter)
@@ -115,7 +115,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     trigger OnAction()
                     begin
                         MembershipBurndownSetup.SetPeriodLength(MembershipBurndownSetup."Period Length"::Quarter);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
             }
@@ -133,12 +133,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Enabled = MembershipValueEnabled;
                         ApplicationArea = All;
                         ToolTip = 'Filters by amount';
-                        Image = Filter; 
+                        Image = Filter;
 
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetValueToCalcuate(MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_VALUE);
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(NoofMemberships)
@@ -147,12 +147,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Enabled = MembershipCountEnabled;
                         ApplicationArea = All;
                         ToolTip = 'Filters by membership count';
-                        Image = Filter; 
+                        Image = Filter;
 
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetValueToCalcuate(MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_COUNT);
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                 }
@@ -166,12 +166,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Enabled = AccumulatePeriodValue;
                         ApplicationArea = All;
                         ToolTip = 'Filters by accumulated value';
-                        Image = Filter; 
+                        Image = Filter;
 
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetPeriodType(MembershipBurndownSetup."Show Change As"::ACK);
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(NetChange)
@@ -180,12 +180,12 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Enabled = NetChangePeriodValue;
                         ApplicationArea = All;
                         ToolTip = 'Filters by net change';
-                        Image = Filter; 
+                        Image = Filter;
 
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetPeriodType(MembershipBurndownSetup."Show Change As"::NET);
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                 }
@@ -204,7 +204,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetChartType(MembershipBurndownSetup."Chart Type"::"Stacked Area");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(StackedAreaPct)
@@ -218,7 +218,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetChartType(MembershipBurndownSetup."Chart Type"::"Stacked Area (%)");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(StackedColumn)
@@ -232,7 +232,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetChartType(MembershipBurndownSetup."Chart Type"::"Stacked Column");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(StackedColumnPct)
@@ -246,7 +246,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         trigger OnAction()
                         begin
                             MembershipBurndownSetup.SetChartType(MembershipBurndownSetup."Chart Type"::"Stacked Column (%)");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                 }
@@ -264,7 +264,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                 trigger OnAction()
                 begin
                     NeedsUpdate := true;
-                    UpdateStatus;
+                    UpdateStatus();
                 end;
             }
             separator(Separator27)
@@ -339,8 +339,8 @@ page 6060148 "NPR RC Members. Burndown Chart"
         if not IsChartAddInReady then
             exit;
         MembershipBurndownMgt.UpdateData(Rec);
-        Update(CurrPage.BusinessChart);
-        UpdateStatus;
+        Rec.Update(CurrPage.BusinessChart);
+        UpdateStatus();
         NeedsUpdate := false;
     end;
 
@@ -367,7 +367,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
     begin
         PAGE.RunModal(PAGE::"NPR RC Members. Burndown Setup", MembershipBurndownSetup);
         MembershipBurndownSetup.Get(UserId);
-        UpdateStatus;
+        UpdateStatus();
     end;
 
     procedure SetActionsEnabled()

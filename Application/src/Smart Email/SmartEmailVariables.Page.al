@@ -29,14 +29,13 @@ page 6059823 "NPR Smart Email Variables"
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         "Field": Record "Field";
-                        TableFilter: Record "Table Filter";
                         FieldsLookup: Page "Fields Lookup";
                     begin
                         Field.SetRange(TableNo, Rec."Merge Table ID");
                         FieldsLookup.SetTableView(Field);
                         FieldsLookup.LookupMode(true);
 
-                        if FieldsLookup.RunModal = ACTION::LookupOK then begin
+                        if FieldsLookup.RunModal() = ACTION::LookupOK then begin
                             FieldsLookup.GetRecord(Field);
                             Rec.Validate("Field No.", Field."No.");
                         end;

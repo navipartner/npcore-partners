@@ -59,7 +59,7 @@ page 6151416 "NPR Magento Categories"
                 Caption = 'Setup Categories';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupCategories;
@@ -92,7 +92,7 @@ page 6151416 "NPR Magento Categories"
                 begin
                     MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::"Item Group");
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
-                    MagentoDisplayConfigPage.Run;
+                    MagentoDisplayConfigPage.Run();
                 end;
             }
             action(Items)
@@ -129,6 +129,6 @@ page 6151416 "NPR Magento Categories"
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        DisplayConfigVisible := MagentoSetup.Get and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
+        DisplayConfigVisible := MagentoSetup.Get() and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
     end;
 }

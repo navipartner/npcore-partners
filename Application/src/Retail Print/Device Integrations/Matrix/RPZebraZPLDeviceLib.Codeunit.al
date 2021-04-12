@@ -21,7 +21,6 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         ESC: Codeunit "NPR RP Escape Code Library";
         HashTable: Record "NPR TEMP Buffer" temporary;
         PrintBuffer: Text;
-        err0001: Label 'Unsupported Font';
         err0002: Label 'Barcode does not exist.';
         Error_InvalidDeviceSetting: Label 'Invalid device setting: %1';
         SETTING_LABELHOME: Label 'Set label home position - syntax: x[0-32000],y[0-32000]';
@@ -70,8 +69,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
-        with POSPrintBuffer do
-            PrintData(Text, Font, Align, Rotation, Height, Width, X, Y);
+        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnLookupFont', '', false, false)]
@@ -131,7 +129,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         tmpRetailList.Number += 1;
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     procedure "// ShortHandFunctions"()
@@ -147,7 +145,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
 
         AddToBuffer('^XA'); // Ref sheet 372
 
-        if DeviceSettings.FindSet then
+        if DeviceSettings.FindSet() then
             repeat
                 case DeviceSettings.Name of
                     'PRINT_RATE':
@@ -181,7 +179,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
                     else
                         Error(Error_InvalidDeviceSetting, DeviceSettings.Name);
                 end;
-            until DeviceSettings.Next = 0;
+            until DeviceSettings.Next() = 0;
 
         SetEncoding(CustomEncoding);
     end;
@@ -629,8 +627,6 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         StrLength: Integer;
         Justify: Text[1];
         Rotation: Text[1];
-        MaxLength: Integer;
-        CharLength: Integer;
         HorzStart: Integer;
     begin
         //For use with the scaleable font 0
@@ -946,7 +942,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         RetailList.SetShowValue(true);
         RetailList.SetRec(tmpRetailList);
         RetailList.LookupMode(true);
-        if RetailList.RunModal = ACTION::LookupOK then begin
+        if RetailList.RunModal() = ACTION::LookupOK then begin
             RetailList.GetRec(tmpRetailList);
             tmpDeviceSetting.Name := tmpRetailList.Value;
             case tmpDeviceSetting.Name of
@@ -1081,7 +1077,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         RetailList.Number += 1;
         RetailList.Choice := Choice;
         RetailList.Value := Value;
-        RetailList.Insert;
+        RetailList.Insert();
     end;
 
     procedure ConstructHashTable()
@@ -1120,13 +1116,13 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
     begin
         HashTable.Template := Name;
         HashTable."Code 1" := Value;
-        HashTable.Insert;
+        HashTable.Insert();
     end;
 
     procedure GetLineHashTable(Name: Code[50]) Value: Code[50]
     begin
         HashTable.SetRange(HashTable.Template, Name);
-        if HashTable.FindFirst then
+        if HashTable.FindFirst() then
             exit(HashTable."Code 1")
         else
             Error(err0002);

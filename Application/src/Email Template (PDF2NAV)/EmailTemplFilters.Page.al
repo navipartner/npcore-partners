@@ -13,17 +13,17 @@ page 6059794 "NPR E-mail Templ. Filters"
         {
             repeater(Group)
             {
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value field';

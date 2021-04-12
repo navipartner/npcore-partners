@@ -12,17 +12,17 @@ page 6014444 "NPR Quantity Discount Line"
         {
             repeater(Group)
             {
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field(Total; Total)
+                field(Total; Rec.Total)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Total field';
@@ -37,16 +37,13 @@ page 6014444 "NPR Quantity Discount Line"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CalcFields("Price Includes VAT");
+        Rec.CalcFields("Price Includes VAT");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Price Includes VAT");
+        Rec.CalcFields("Price Includes VAT");
     end;
 
-    var
-        Text10600000: Label 'You must enter an amount in the unit price!';
-        Text10600001: Label 'You must enter the unit cost to Item %1 on the item card!';
 }
 

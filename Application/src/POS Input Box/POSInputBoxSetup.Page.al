@@ -12,17 +12,17 @@ page 6060100 "NPR POS Input Box Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("POS View"; "POS View")
+                field("POS View"; Rec."POS View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View field';
@@ -40,8 +40,5 @@ page 6060100 "NPR POS Input Box Setup"
     {
     }
 
-    var
-        ShowDeleteFields: Boolean;
-        ShowRenameFields: Boolean;
 }
 

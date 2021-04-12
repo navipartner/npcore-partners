@@ -80,21 +80,21 @@ table 6151138 "NPR TM Ticket Wait. List"
         }
         field(1000; "Notification Count"; Integer)
         {
-            CalcFormula = Count ("NPR TM Waiting List Entry" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR TM Waiting List Entry" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
             Caption = 'Notification Count';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1010; "Notified At"; DateTime)
         {
-            CalcFormula = Max ("NPR TM Waiting List Entry"."Created At" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
+            CalcFormula = Max("NPR TM Waiting List Entry"."Created At" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
             Caption = 'Notified At';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1020; "Notification Expires At"; DateTime)
         {
-            CalcFormula = Max ("NPR TM Waiting List Entry"."Expires At" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
+            CalcFormula = Max("NPR TM Waiting List Entry"."Expires At" WHERE("Ticket Waiting List Entry No." = FIELD("Entry No.")));
             Caption = 'Notification Expires At';
             Editable = false;
             FieldClass = FlowField;

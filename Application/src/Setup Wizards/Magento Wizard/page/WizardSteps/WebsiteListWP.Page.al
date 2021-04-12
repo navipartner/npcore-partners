@@ -14,22 +14,22 @@ page 6014520 "NPR Website List WP"
         {
             repeater(Websites)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Default Website"; "Default Website")
+                field("Default Website"; Rec."Default Website")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Std. Website field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
@@ -40,20 +40,20 @@ page 6014520 "NPR Website List WP"
                     begin
                         GlobalDimensions.LookupMode := true;
 
-                        IF "Global Dimension 1 Code" <> '' then begin
+                        IF Rec."Global Dimension 1 Code" <> '' then begin
                             GlobalDimension1.SetRange("Global Dimension No.", 1);
-                            GlobalDimension1.SetRange(Code, "Global Dimension 1 Code");
+                            GlobalDimension1.SetRange(Code, Rec."Global Dimension 1 Code");
                             if GlobalDimension1.FindFirst() then
                                 GlobalDimensions.SetRecord(GlobalDimension1);
                         end;
 
                         if GlobalDimensions.RunModal() = Action::LookupOK then begin
                             GlobalDimensions.GetRecord(GlobalDimension1);
-                            "Global Dimension 1 Code" := GlobalDimension1.Code;
+                            Rec."Global Dimension 1 Code" := GlobalDimension1.Code;
                         end;
                     end;
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -67,16 +67,16 @@ page 6014520 "NPR Website List WP"
                         GlobalDimensions.LookupMode := true;
                         GlobalDimensions.Editable := false;
 
-                        IF "Global Dimension 2 Code" <> '' then begin
+                        IF Rec."Global Dimension 2 Code" <> '' then begin
                             GlobalDimension2.SetRange("Global Dimension No.", 2);
-                            GlobalDimension2.SetRange(Code, "Global Dimension 2 Code");
+                            GlobalDimension2.SetRange(Code, Rec."Global Dimension 2 Code");
                             if GlobalDimension2.FindFirst() then
                                 GlobalDimensions.SetRecord(GlobalDimension2);
                         end;
 
                         if GlobalDimensions.RunModal() = Action::LookupOK then begin
                             GlobalDimensions.GetRecord(GlobalDimension2);
-                            "Global Dimension 2 Code" := GlobalDimension2.Code;
+                            Rec."Global Dimension 2 Code" := GlobalDimension2.Code;
                         end;
                     end;
                 }

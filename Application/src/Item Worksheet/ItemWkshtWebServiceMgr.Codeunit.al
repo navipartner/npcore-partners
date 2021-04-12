@@ -1,10 +1,9 @@
-codeunit 6060049 "NPR Item Wksht. WebService Mgr"
+﻿codeunit 6060049 "NPR Item Wksht. WebService Mgr"
 {
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
-        ImportType: Record "NPR Nc Import Type";
         XmlDoc: XmlDocument;
         FunctionName: Text[100];
     begin
@@ -25,7 +24,7 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
             Initialized := true;
     end;
 
-    local procedure CreateItemWorksheetLine(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]) Imported: Boolean
+    local procedure CreateItemWorksheetLine(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]): Boolean
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
@@ -41,11 +40,9 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
 
     local procedure CreateItemWorksheetLines(XmlDoc: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
     var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Element: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
-        i: Integer;
         Token: Text[50];
     begin
         if not XmlDoc.GetRoot(Element) then
@@ -72,7 +69,7 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
             Element := Node.AsXmlElement();
             CreateItemWorksheetLine(Element, Token, DocumentID);
         end;
-        Commit;
+        Commit();
     end;
 
     local procedure FindWorksheetLine(VendorNo: Code[20]; VendorVATRegNo: Text; ItemNo: Code[20]; var ItemWorksheetTemplateCode: Code[10]; var ItemWorksheetCode: Code[10]; var ItemWorksheetLineNo: Integer)
@@ -86,20 +83,20 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
         if not Vendor.Get(VendorNo) then
             if VendorVATRegNo <> '' then begin
                 Vendor.SetRange(Vendor."VAT Registration No.", VendorVATRegNo);
-                if not Vendor.FindFirst then begin
-                    Vendor.Init;
+                if not Vendor.FindFirst() then begin
+                    Vendor.Init();
                     Vendor."No." := '';
                 end;
             end;
 
         //Set Template
         ItemWorksheetTemplate.SetRange("Allow Web Service Update", true);
-        if not ItemWorksheetTemplate.FindFirst then begin
-            ItemWorksheetTemplate2.Reset;
-            if ItemWorksheetTemplate2.FindFirst then begin
+        if not ItemWorksheetTemplate.FindFirst() then begin
+            ItemWorksheetTemplate2.Reset();
+            if ItemWorksheetTemplate2.FindFirst() then begin
                 ItemWorksheetTemplate := ItemWorksheetTemplate2;
             end else begin
-                ItemWorksheetTemplate.Init;
+                ItemWorksheetTemplate.Init();
                 ItemWorksheetTemplate.Validate(Name, 'WEBSERV');
             end;
             ItemWorksheetTemplate.Validate("Allow Web Service Update", true);
@@ -110,10 +107,10 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
         //Set Worksheet
         ItemWorksheet.SetRange("Item Template Name", ItemWorksheetTemplate.Name);
         ItemWorksheet.SetRange("Vendor No.", Vendor."No.");
-        if not ItemWorksheet.FindFirst then begin
+        if not ItemWorksheet.FindFirst() then begin
             ItemWorksheet.SetFilter("Vendor No.", '');
-            if not ItemWorksheet.FindFirst then begin
-                ItemWorksheet.Init;
+            if not ItemWorksheet.FindFirst() then begin
+                ItemWorksheet.Init();
                 ItemWorksheet.Validate(ItemWorksheet."Item Template Name", ItemWorksheetTemplate.Name);
                 ItemWorksheet.Validate(Name, 'WEBSERV');
                 ItemWorksheet.Insert(true);
@@ -124,11 +121,11 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
         //Set Line
         ItemWorksheetLine.SetRange("Worksheet Template Name", ItemWorksheetTemplateCode);
         ItemWorksheetLine.SetRange("Worksheet Name", ItemWorksheetCode);
-        if ItemWorksheetLine.FindLast then begin
+        if ItemWorksheetLine.FindLast() then begin
             LastItemWorksheetLine := ItemWorksheetLine;
             ItemWorksheetLineNo := ItemWorksheetLine."Line No." + 10000
         end else begin
-            LastItemWorksheetLine.Init;
+            LastItemWorksheetLine.Init();
             ItemWorksheetLineNo := 10000;
         end;
     end;
@@ -137,7 +134,7 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
     begin
     end;
 
-    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]) FunctionName: Text[100]
+    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text[100]
     var
         ImportType: Record "NPR Nc Import Type";
     begin
@@ -148,11 +145,6 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
     end;
 
     local procedure InsertWorksheetline(var ItemWorksheetLine: Record "NPR Item Worksheet Line"): Boolean
-    var
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ResponseCode: Integer;
-        ResponseMessage: Text;
     begin
         ItemWorksheetLine.Init();
     end;
@@ -160,7 +152,6 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
     local procedure ReadItemWorksheetLine(Element: XmlElement; Token: Text[100]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
-        VarietyValue: Record "NPR Variety Value";
         ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
         TempDateFormula: DateFormula;
         TempBool: Boolean;
@@ -861,7 +852,7 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
             exit;
 
         if AttributeValue."Attribute Set ID" <> 0 then begin
-            AttributeValue.Modify;
+            AttributeValue.Modify();
             exit;
         end;
 
@@ -870,7 +861,7 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
             ItemWorksheetLine."Line No.", 0, ItemWorksheetLine."Worksheet Name",
             0, AttributeKey, true);
         AttributeValue."Attribute Set ID" := AttributeKey."Attribute Set ID";
-        AttributeValue.Insert;
+        AttributeValue.Insert();
     end;
 
     local procedure ReadWkshLineAttributes(ItemWorksheetLine: Record "NPR Item Worksheet Line"; Element: XmlElement)
@@ -878,7 +869,6 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
         Element2: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
-        i: Integer;
     begin
         if Element.IsEmpty() then
             exit;

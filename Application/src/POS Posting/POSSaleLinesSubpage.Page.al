@@ -13,47 +13,47 @@ page 6150748 "NPR POS Sale Lines Subpage"
         {
             repeater(Group)
             {
-                field("Sale Type"; "Sale Type")
+                field("Sale Type"; Rec."Sale Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sale Type field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Amount Including VAT"; "Amount Including VAT")
+                field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
@@ -71,7 +71,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 Caption = 'Show Document';
                 Image = ViewDetails;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -81,7 +81,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 var
                     SalePOS: Record "NPR POS Sale";
                 begin
-                    SalePOS.Get("Register No.", "Sales Ticket No.");
+                    SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.");
                     PAGE.Run(PAGE::"NPR Unfinished POS Sale Trx", SalePOS);
                 end;
             }

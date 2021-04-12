@@ -28,8 +28,6 @@ xmlport 6014414 "NPR Import from ScannerFilePO"
                 }
 
                 trigger OnBeforeInsertRecord()
-                var
-                    RecRef: RecordRef;
                 begin
                     ImportPurchaseLine(PurchaseHeader);
                 end;
@@ -71,12 +69,12 @@ xmlport 6014414 "NPR Import from ScannerFilePO"
     begin
         PurchaseLine.SetRange("Document Type", PurchHeader."Document Type");
         PurchaseLine.SetRange("Document No.", PurchHeader."No.");
-        if PurchaseLine.FindLast then
+        if PurchaseLine.FindLast() then
             NextLineNo := PurchaseLine."Line No." + 10000
         else
             NextLineNo := 10000;
 
-        PurchaseLine.Init;
+        PurchaseLine.Init();
         PurchaseLine."Document Type" := PurchHeader."Document Type";
         PurchaseLine."Document No." := PurchHeader."No.";
         PurchaseLine."Line No." := NextLineNo;
@@ -86,6 +84,6 @@ xmlport 6014414 "NPR Import from ScannerFilePO"
         PurchaseLine.Validate("Item Reference No.", scanned_item_code);
         Evaluate(PurchaseLine.Quantity, quantity);
         PurchaseLine.Validate(Quantity);
-        PurchaseLine.Insert;
+        PurchaseLine.Insert();
     end;
 }

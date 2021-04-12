@@ -29,9 +29,7 @@ codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Int
     procedure GetRequestXml(CleanCashTransactionRequest: Record "NPR CleanCash Trans. Request"; var XmlDoc: XmlDocument) Success: Boolean;
     var
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
-        DebugText: Text;
         XmlNs: Text;
-        Declaration: XmlDeclaration;
         Data: XmlElement;
         Envelope: XmlElement;
         StatusRequest: XmlElement;
@@ -63,7 +61,6 @@ codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Int
     var
         CleanCashResponse: Record "NPR CleanCash Trans. Response";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
-        DebugText: Text;
         EnumAsText: Text;
         DataElement: XmlElement;
         Element: XmlElement;

@@ -32,7 +32,7 @@ codeunit 6150684 "NPR NPRE RVA: Set WPad Status"
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         NewStatusCode: Code[10];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -42,16 +42,16 @@ codeunit 6150684 "NPR NPRE RVA: Set WPad Status"
         if NewStatusCode = '' then
             exit;
 
-        WaiterPad.Find;
+        WaiterPad.Find();
 
         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPad, FlowStatus."Status Object"::WaiterPadLineMealFlow);
         FlowStatus.SetRange(Code, NewStatusCode);
-        FlowStatus.FindFirst;
+        FlowStatus.FindFirst();
         if FlowStatus."Status Object" = FlowStatus."Status Object"::WaiterPadLineMealFlow then
             RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, NewStatusCode)
         else begin
             WaiterPad.Status := NewStatusCode;
-            WaiterPad.Modify;
+            WaiterPad.Modify();
         end;
     end;
 }

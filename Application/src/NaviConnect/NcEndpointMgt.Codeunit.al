@@ -48,8 +48,6 @@ codeunit 6151519 "NPR Nc Endpoint Mgt."
     end;
 
     procedure RunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint"; var Response: Text) Success: Boolean
-    var
-        OutStream: OutStream;
     begin
         if TryRunEndpoint(NcTaskOutput, NcEndpoint) then begin
             Response := NcEndpoint."Setup Summary" + ': ' + NcTaskOutput.Name;

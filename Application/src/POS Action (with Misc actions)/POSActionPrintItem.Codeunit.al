@@ -19,29 +19,28 @@ codeunit 6150789 "NPR POS Action: Print Item"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Button,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'if (param.LineSetting == param.LineSetting["Selected Line"]) { intpad({ title: labels.title, caption: labels.caption, value: 1, notBlank: true}, "value").respond() } else { respond() };');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Button,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'if (param.LineSetting == param.LineSetting["Selected Line"]) { intpad({ title: labels.title, caption: labels.caption, value: 1, notBlank: true}, "value").respond() } else { respond() };');
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('LineSetting', 'All Lines,Selected Line', 'Selected Line');
-                RegisterOptionParameter('PrintType', 'Price,Shelf,Sign', 'Price');
+            Sender.RegisterOptionParameter('LineSetting', 'All Lines,Selected Line', 'Selected Line');
+            Sender.RegisterOptionParameter('PrintType', 'Price,Shelf,Sign', 'Price');
 
-                RegisterDataBinding();
-            end;
+            Sender.RegisterDataBinding();
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'caption', PrintQuantity);
+        Captions.AddActionCaption(ActionCode(), 'title', Title);
+        Captions.AddActionCaption(ActionCode(), 'caption', PrintQuantity);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -51,7 +50,7 @@ codeunit 6150789 "NPR POS Action: Print Item"
         LineSetting: Option "All Lines","Selected Line";
         PrintType: Integer;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -84,23 +83,21 @@ codeunit 6150789 "NPR POS Action: Print Item"
 
         GUID := CreateGuid();
 
-        with SaleLinePOS2 do begin
-            SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-            SetRange(Type, SaleLinePOS2.Type::Item);
+        SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        SaleLinePOS2.SetRange(Type, SaleLinePOS2.Type::Item);
 
-            if FindSet then
-                repeat
-                    LabelLibrary.ItemToRetailJnlLine("No.", "Variant Code", Round(Abs(Quantity), 1, '>'), GUID, RetailJnlLine);
-                until Next = 0;
-        end;
+        if SaleLinePOS2.FindSet() then
+            repeat
+                LabelLibrary.ItemToRetailJnlLine(SaleLinePOS2."No.", SaleLinePOS2."Variant Code", Round(Abs(SaleLinePOS2.Quantity), 1, '>'), GUID, RetailJnlLine);
+            until SaleLinePOS2.Next() = 0;
 
         RetailJnlLine.SetRange("No.", GUID);
-        if not RetailJnlLine.FindSet then
+        if not RetailJnlLine.FindSet() then
             exit;
 
         PrintRJL(RetailJnlLine, PrintType);
 
-        RetailJnlLine.DeleteAll;
+        RetailJnlLine.DeleteAll();
     end;
 
     local procedure PrintSelectedLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; PrintType: Integer)
@@ -125,12 +122,12 @@ codeunit 6150789 "NPR POS Action: Print Item"
         LabelLibrary.ItemToRetailJnlLine(SaleLinePOS."No.", SaleLinePOS."Variant Code", QuantityInput, GUID, RetailJnlLine);
 
         RetailJnlLine.SetRange("No.", GUID);
-        if not RetailJnlLine.FindFirst then
+        if not RetailJnlLine.FindFirst() then
             exit;
 
         PrintRJL(RetailJnlLine, PrintType);
 
-        RetailJnlLine.DeleteAll;
+        RetailJnlLine.DeleteAll();
     end;
 
     local procedure PrintRJL(var RetailJnlLine: Record "NPR Retail Journal Line"; PrintType: Option Price,Shelf,Sign)
@@ -147,7 +144,7 @@ codeunit 6150789 "NPR POS Action: Print Item"
                 ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::Sign;
         end;
 
-        Commit;
+        Commit();
 
         LabelLibrary.PrintRetailJournal(RetailJnlLine, ReportSelectionRetail."Report Type");
     end;

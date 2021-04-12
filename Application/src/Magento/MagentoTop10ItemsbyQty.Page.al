@@ -61,7 +61,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Week)
@@ -74,7 +74,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Week;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Month)
@@ -87,7 +87,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Month;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Quarter)
@@ -100,7 +100,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Quarter;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Year)
@@ -113,7 +113,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Year;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
             }
@@ -123,8 +123,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
     trigger OnOpenPage()
     begin
         PeriodType := PeriodType::Year;
-        CurrDate := Today;
-        UpdateList;
+        CurrDate := Today();
+        UpdateList();
     end;
 
     var
@@ -137,24 +137,24 @@ page 6151484 "NPR Magento Top10 Items by Qty"
 
     local procedure UpdateList()
     begin
-        Rec.DeleteAll;
+        Rec.DeleteAll();
         Setdate;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
-        Query1.Open;
-        while Query1.Read do begin
+        Query1.Open();
+        while Query1.Read() do begin
             if Item.Get(Query1.Item_No) then begin
                 Rec.TransferFields(Item);
-                if Rec.Insert then
+                if Rec.Insert() then
                     Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
 
                 Rec.CalcFields("Sales (Qty.)");
                 Rec."Low-Level Code" := Round(Rec."Sales (Qty.)", 0.01) * 100;
-                Rec.Modify;
+                Rec.Modify();
             end;
 
         end;
-        Query1.Close;
+        Query1.Close();
     end;
 
     local procedure Setdate()

@@ -1,4 +1,4 @@
-page 6014404 "NPR SMS Setup"
+﻿page 6014404 "NPR SMS Setup"
 {
     Caption = 'SMS Setup';
     PageType = Card;
@@ -98,9 +98,9 @@ page 6014404 "NPR SMS Setup"
                 Caption = 'Send SMS Job';
                 ToolTip = 'Run send SMS Job';
                 Image = ExecuteAndPostBatch;
-                Promoted = true; 
-                PromotedOnly = true; 
-                PromotedCategory = Process; 
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
                 ApplicationArea = All;
                 trigger OnAction()
                 var
@@ -113,22 +113,22 @@ page 6014404 "NPR SMS Setup"
             {
                 Caption = 'SMS Log Page';
                 ToolTip = 'Run SMS log Page';
-                Image = ListPage; 
-                Promoted = true; 
-                PromotedOnly = true; 
+                Image = ListPage;
+                Promoted = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All; 
-                RunObject = page "NPR SMS Log"; 
+                ApplicationArea = All;
+                RunObject = page "NPR SMS Log";
 
             }
         }
     }
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
         SetVisible();
     end;

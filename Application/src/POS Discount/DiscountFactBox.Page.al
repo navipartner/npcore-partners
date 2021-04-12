@@ -1,4 +1,4 @@
-page 6014614 "NPR Discount FactBox"
+﻿page 6014614 "NPR Discount FactBox"
 {
 
     Caption = 'Discount FactBox';
@@ -24,10 +24,10 @@ page 6014614 "NPR Discount FactBox"
                     MixedDiscountLine: Record "NPR Mixed Discount Line";
                 begin
                     MixedDiscountLines.Editable(false);
-                    MixedDiscountLine.Reset;
-                    MixedDiscountLine.SetRange("No.", "No.");
+                    MixedDiscountLine.Reset();
+                    MixedDiscountLine.SetRange("No.", Rec."No.");
                     MixedDiscountLines.SetTableView(MixedDiscountLine);
-                    MixedDiscountLines.RunModal;
+                    MixedDiscountLines.RunModal();
                 end;
             }
             field("Period Discount"; PeriodDiscount)
@@ -42,10 +42,10 @@ page 6014614 "NPR Discount FactBox"
                     PeriodDiscountLine: Record "NPR Period Discount Line";
                 begin
                     CampaignDiscountLines.Editable(false);
-                    PeriodDiscountLine.Reset;
-                    PeriodDiscountLine.SetRange("Item No.", "No.");
+                    PeriodDiscountLine.Reset();
+                    PeriodDiscountLine.SetRange("Item No.", Rec."No.");
                     CampaignDiscountLines.SetTableView(PeriodDiscountLine);
-                    CampaignDiscountLines.RunModal;
+                    CampaignDiscountLines.RunModal();
                 end;
             }
             field("Multiple Unit Price"; MultipleUnitPrice)
@@ -60,10 +60,10 @@ page 6014614 "NPR Discount FactBox"
                     QuantityDiscountCard: Page "NPR Quantity Discount Card";
                 begin
                     QuantityDiscountCard.Editable(false);
-                    QuantityDiscountHeader.Reset;
-                    QuantityDiscountHeader.SetFilter("Item No.", "No.");
+                    QuantityDiscountHeader.Reset();
+                    QuantityDiscountHeader.SetFilter("Item No.", Rec."No.");
                     QuantityDiscountCard.SetTableView(QuantityDiscountHeader);
-                    QuantityDiscountCard.RunModal;
+                    QuantityDiscountCard.RunModal();
                 end;
             }
         }
@@ -95,39 +95,39 @@ page 6014614 "NPR Discount FactBox"
         PeriodDiscountLine.SetRange(PeriodDiscountLine.Status, PeriodDiscountLine.Status::Active);
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '<=%1', Today);
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Ending Date", '>=%1', Today);
-        PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", "No.");
-        if PeriodDiscountLine.FindFirst then
+        PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", Rec."No.");
+        if PeriodDiscountLine.FindFirst() then
             PeriodDiscount := true;
 
-        PeriodDiscountLine.Reset;
+        PeriodDiscountLine.Reset();
         PeriodDiscountLine.SetRange(PeriodDiscountLine.Status, PeriodDiscountLine.Status::Active);
         PeriodDiscountLine.SetFilter(PeriodDiscountLine."Starting Date", '>%1', Today);
-        PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", "No.");
-        if PeriodDiscountLine.FindFirst then
+        PeriodDiscountLine.SetFilter(PeriodDiscountLine."Item No.", Rec."No.");
+        if PeriodDiscountLine.FindFirst() then
             PeriodDiscount := true;
 
-        MixDiscountLine.Reset;
-        MixDiscountLine.SetFilter(MixDiscountLine."No.", "No.");
-        if MixDiscountLine.FindFirst then
+        MixDiscountLine.Reset();
+        MixDiscountLine.SetFilter(MixDiscountLine."No.", Rec."No.");
+        if MixDiscountLine.FindFirst() then
             repeat
-                MixDiscountHeader.Reset;
+                MixDiscountHeader.Reset();
                 if MixDiscountHeader.Get(MixDiscountLine.Code) and ((MixDiscountHeader."Starting date" <= Today) and
                   (MixDiscountHeader."Ending date" >= Today)) and (MixDiscountHeader.Status = MixDiscountHeader.Status::Active) then begin
                     MixDiscount := true;
                 end;
-            until MixDiscountLine.Next = 0;
+            until MixDiscountLine.Next() = 0;
 
         if not MixDiscount then begin
-            MixDiscountLine.Reset;
-            MixDiscountLine.SetFilter(MixDiscountLine."No.", "No.");
-            if MixDiscountLine.FindFirst then
+            MixDiscountLine.Reset();
+            MixDiscountLine.SetFilter(MixDiscountLine."No.", Rec."No.");
+            if MixDiscountLine.FindFirst() then
                 repeat
-                    MixDiscountHeader.Reset;
+                    MixDiscountHeader.Reset();
                     if MixDiscountHeader.Get(MixDiscountLine.Code) and (MixDiscountHeader."Starting date" > Today) and
                       (MixDiscountHeader.Status = MixDiscountHeader.Status::Active) then begin
                         MixDiscount := true;
                     end;
-                until MixDiscountLine.Next = 0;
+                until MixDiscountLine.Next() = 0;
         end;
     end;
 
@@ -136,9 +136,9 @@ page 6014614 "NPR Discount FactBox"
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
     begin
         MultipleUnitPrice := false;
-        QuantityDiscountHeader.SetFilter("Item No.", "No.");
+        QuantityDiscountHeader.SetFilter("Item No.", Rec."No.");
         QuantityDiscountHeader.SetRange(Status, QuantityDiscountHeader.Status::Active);
-        if QuantityDiscountHeader.FindFirst then
+        if QuantityDiscountHeader.FindFirst() then
             MultipleUnitPrice := true;
     end;
 }

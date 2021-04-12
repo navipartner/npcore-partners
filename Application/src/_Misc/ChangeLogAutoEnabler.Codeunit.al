@@ -22,7 +22,6 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
     procedure SetChangeLogSetup()
     var
         ChangeLogSetup: Record "Change Log Setup";
-        ChangeLogSetupTable: Record "Change Log Setup (Table)";
     begin
         if not ChangeLogSetup.Get() then begin
             ChangeLogSetup.Init();

@@ -1,4 +1,4 @@
-page 6059790 "NPR Pdf2Nav Posting Setup"
+﻿page 6059790 "NPR Pdf2Nav Posting Setup"
 {
     Caption = 'Pdf2Nav Posting Setup';
     PageType = Card;
@@ -12,7 +12,7 @@ page 6059790 "NPR Pdf2Nav Posting Setup"
         {
             group(General)
             {
-                field("Post and Send"; "Post and Send")
+                field("Post and Send"; Rec."Post and Send")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post and Send field';
@@ -20,12 +20,12 @@ page 6059790 "NPR Pdf2Nav Posting Setup"
                 group("When posting with Pdf2Nav:")
                 {
                     Caption = 'When posting with Pdf2Nav:';
-                    field("Always Print Ship"; "Always Print Ship")
+                    field("Always Print Ship"; Rec."Always Print Ship")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Always Print Sales Shipment field';
                     }
-                    field("Always Print Receive"; "Always Print Receive")
+                    field("Always Print Receive"; Rec."Always Print Receive")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Always Print Sales Return Receipt field';
@@ -41,9 +41,9 @@ page 6059790 "NPR Pdf2Nav Posting Setup"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then
-            Insert;
+        Rec.Reset();
+        if not Rec.Get() then
+            Rec.Insert();
     end;
 }
 

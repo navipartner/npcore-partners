@@ -95,7 +95,7 @@ table 6059781 "NPR Sales Price Maint. Setup"
         }
         field(19; "Exclude Item Groups"; Integer)
         {
-            CalcFormula = Count ("NPR Sales Price Maint. Groups" WHERE(Id = FIELD(Id)));
+            CalcFormula = Count("NPR Sales Price Maint. Groups" WHERE(Id = FIELD(Id)));
             Caption = 'Exclude Item Groups';
             FieldClass = FlowField;
         }

@@ -1,4 +1,4 @@
-codeunit 6151017 "NPR NpRv Module Pay.: Default"
+﻿codeunit 6151017 "NPR NpRv Module Pay.: Default"
 {
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
@@ -10,7 +10,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
         VoucherType2: Record "NPR NpRv Voucher Type";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSSale: Codeunit "NPR POS Sale";
         ReturnPOSActionMgt: Codeunit "NPR NpRv Ret. POSAction Mgt.";
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -76,7 +75,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         NpRvSalesLineNew.SetRange("Parent Id", NpRvSalesLine.Id);
         NpRvSalesLineNew.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLineNew.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
-        if NpRvSalesLineNew.FindFirst then begin
+        if NpRvSalesLineNew.FindFirst() then begin
             ReturnLineExists := true;
             MagentoPaymentLineNew.Get(DATABASE::"Sales Header", NpRvSalesLineNew."Document Type",
               NpRvSalesLineNew."Document No.", NpRvSalesLineNew."Document Line No.");
@@ -115,10 +114,10 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         MagentoPaymentLineNew.SetRange("Document Table No.", DATABASE::"Sales Header");
         MagentoPaymentLineNew.SetRange("Document Type", SalesHeader."Document Type");
         MagentoPaymentLineNew.SetRange("Document No.", SalesHeader."No.");
-        if MagentoPaymentLineNew.FindLast then;
+        if MagentoPaymentLineNew.FindLast() then;
         LineNo := MagentoPaymentLineNew."Line No." + 10000;
 
-        MagentoPaymentLineNew.Init;
+        MagentoPaymentLineNew.Init();
         MagentoPaymentLineNew."Document Table No." := DATABASE::"Sales Header";
         MagentoPaymentLineNew."Document Type" := SalesHeader."Document Type";
         MagentoPaymentLineNew."Document No." := SalesHeader."No.";
@@ -135,8 +134,8 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         MagentoPaymentLineNew."Posting Date" := SalesHeader."Posting Date";
         MagentoPaymentLineNew.Insert(true);
 
-        NpRvSalesLineNew.Init;
-        NpRvSalesLineNew.Id := CreateGuid;
+        NpRvSalesLineNew.Init();
+        NpRvSalesLineNew.Id := CreateGuid();
         NpRvSalesLineNew."Parent Id" := NpRvSalesLine.Id;
         NpRvSalesLineNew."Document Source" := NpRvSalesLineNew."Document Source"::"Payment Line";
         NpRvSalesLineNew."Document Type" := MagentoPaymentLineNew."Document Type";
@@ -153,8 +152,8 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
             NpRvSalesLineNew."Send via E-mail" := true;
         NpRvSalesLineNew.Insert(true);
 
-        NpRvSalesLineReference.Init;
-        NpRvSalesLineReference.Id := CreateGuid;
+        NpRvSalesLineReference.Init();
+        NpRvSalesLineReference.Id := CreateGuid();
         NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
         NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
         NpRvSalesLineReference."Sales Line Id" := NpRvSalesLineNew.Id;
@@ -169,15 +168,15 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         NpRvSalesLine.SetRange("Parent Id", NpRvSalesLineParent.Id);
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
-        if NpRvSalesLine.FindSet then
+        if NpRvSalesLine.FindSet() then
             repeat
                 if MagentoPaymentLine.Get(DATABASE::"Sales Header", NpRvSalesLine."Document Type",
                   NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.")
                 then
-                    MagentoPaymentLine.Delete;
+                    MagentoPaymentLine.Delete();
 
                 NpRvSalesLine.Delete(true);
-            until NpRvSalesLine.Next = 0;
+            until NpRvSalesLine.Next() = 0;
     end;
 
     //--- Voucher Interface ---
@@ -187,7 +186,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         if VoucherModule.Get(VoucherModule.Type::"Apply Payment", ModuleCode()) then
             exit;
 
-        VoucherModule.Init;
+        VoucherModule.Init();
         VoucherModule.Type := VoucherModule.Type::"Apply Payment";
         VoucherModule.Code := ModuleCode();
         VoucherModule.Description := Text000;
@@ -213,7 +212,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
             exit;
 
         if not ReturnVoucherType.Get(VoucherType.Code) then begin
-            ReturnVoucherType.Init;
+            ReturnVoucherType.Init();
             ReturnVoucherType."Voucher Type" := VoucherType.Code;
             ReturnVoucherType.Insert(true);
         end;

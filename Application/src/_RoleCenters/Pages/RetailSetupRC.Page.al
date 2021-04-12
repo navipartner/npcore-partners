@@ -375,9 +375,9 @@ page 6151245 "NPR Retail Setup RC"
                 }
                 action("Smart Email List")
                 {
-                    Caption = 'Smart Email List'; 
+                    Caption = 'Smart Email List';
                     RunObject = Page "NPR Smart Email List";
-                    ApplicationArea = All; 
+                    ApplicationArea = All;
                     ToolTip = 'Open the Smart Email List page';
                 }
 
@@ -393,7 +393,7 @@ page 6151245 "NPR Retail Setup RC"
                 {
                     Caption = 'Exchange Label Setup';
                     RunObject = Page "NPR Exchange Label Setup";
-                    RunPageMode = Create; 
+                    RunPageMode = Create;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Exchange Label Setup action';
                 }
@@ -469,10 +469,10 @@ page 6151245 "NPR Retail Setup RC"
                 {
                     Caption = 'Retention Policy Setup List';
                     RunObject = page "Retention Policy Setup List";
-                    ApplicationArea = All; 
+                    ApplicationArea = All;
                     ToolTip = 'Executes the Retention Policy Setup List action';
                 }
-                action ("SMS Setup")
+                action("SMS Setup")
                 {
                     Caption = 'SMS Setup';
                     RunObject = page "NPR SMS Setup";

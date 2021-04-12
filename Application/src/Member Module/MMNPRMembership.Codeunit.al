@@ -1,7 +1,6 @@
 codeunit 6060147 "NPR MM NPR Membership"
 {
     var
-        NotSupportedVersion: Label 'A request for %1 was made for %2, %3 with message version %4. That version is not handled in %5 %6.';
         InvalidXml: Label 'An invalid XML was returned:\%1';
         MemberCardValidation: Label 'Service %1 at %2 could not validate membercard %3.';
 
@@ -128,9 +127,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
-        CustomerNumber: Text[30];
-        CardNumber: Text[30];
-        CustomerName: Text[50];
     begin
 
         NPRRemoteEndpointSetup.SetFilter("Community Code", '=%1', CommunityCode);
@@ -149,7 +145,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     procedure IsForeignMembershipCommunity(MembershipCode: Code[20]): Boolean
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        MemberCommunity: Record "NPR MM Member Community";
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
     begin
 
@@ -220,10 +215,8 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     local procedure ValidateForeignMemberCard(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; ForeignMemberCardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text)
     var
-        ForeignMembershipNumber: Code[20];
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         RemoteInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipSetup: Record "NPR MM Membership Setup";
         Prefix: Code[10];
     begin
 
@@ -329,7 +322,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(IsValid);
     end;
 
-    local procedure CreateLocalMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; NotValidReason: Text) Success: Boolean
+    local procedure CreateLocalMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"; NotValidReason: Text): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
@@ -338,8 +331,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         MembershipSalesSetup."Membership Code" := MemberInfoCapture."Membership Code";
 
         MembershipSalesSetup."Valid From Base" := MembershipSalesSetup."Valid From Base"::SALESDATE;
-        MemberInfoCapture."Document Date" := Today;
-        MemberInfoCapture."Valid Until" := Today;
+        MemberInfoCapture."Document Date" := Today();
+        MemberInfoCapture."Valid Until" := Today();
         MembershipSalesSetup."Valid Until Calculation" := MembershipSalesSetup."Valid Until Calculation"::DATEFORMULA;
         Evaluate(MembershipSalesSetup."Duration Formula", '<+0D>');
 
@@ -425,7 +418,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     [TryFunction]
     internal procedure TryWebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: XmlDocument; var XmlDocOut: XmlDocument)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         WebRequest: HttpRequestMessage;
         WebResponse: HttpResponseMessage;
         WebClient: HttpClient;
@@ -495,11 +487,10 @@ codeunit 6060147 "NPR MM NPR Membership"
         XmlDocument.ReadFrom(XmlRequest, XmlDoc);
     end;
 
-    local procedure MemberCardNumberValidationResponse(Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
+    local procedure MemberCardNumberValidationResponse(Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Element: XmlElement;
-        PayloadBody: Text;
         TextOk: Text;
         XmlText: Text;
         XmlDomMgt: Codeunit "XML DOM Management";
@@ -524,7 +515,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     local procedure GetMembershipRequest(ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
 
         SoapAction := 'GetMembership';
@@ -553,11 +543,10 @@ codeunit 6060147 "NPR MM NPR Membership"
         XmlDocument.ReadFrom(XmlRequest, XmlDoc);
     end;
 
-    local procedure GetMembershipResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
+    local procedure GetMembershipResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Element: XmlElement;
-        PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
         XmlText: Text;
@@ -610,7 +599,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     local procedure GetMembershipMemberRequest(ExternalMembershipNumber: Code[20]; ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
 
         SoapAction := 'GetMembershipMembers';
@@ -641,7 +629,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Element: XmlElement;
-        PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
         XmlText: Text;
@@ -709,7 +696,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     local procedure GetLoyaltyPointRequest(ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
         SoapAction := 'GetLoyaltyPoints';
         XmlRequest :=
@@ -733,11 +719,10 @@ codeunit 6060147 "NPR MM NPR Membership"
         XmlDocument.ReadFrom(XmlRequest, XmlDoc);
     end;
 
-    local procedure GetLoyaltyPointResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
+    local procedure GetLoyaltyPointResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Element: XmlElement;
-        PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
         Points: Text;
@@ -848,7 +833,7 @@ codeunit 6060147 "NPR MM NPR Membership"
             '</createmembership>';
     end;
 
-    local procedure EvaluateCreateMembershipSoapXmlResponse(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text; var XmlDoc: XmlDocument) IsValid: Boolean
+    local procedure EvaluateCreateMembershipSoapXmlResponse(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text; var XmlDoc: XmlDocument): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Element: XmlElement;

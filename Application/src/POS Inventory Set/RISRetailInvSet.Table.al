@@ -32,7 +32,7 @@ table 6151085 "NPR RIS Retail Inv. Set"
         RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry";
     begin
         RetailInventorySetEntry.SetRange("Set Code", Code);
-        if RetailInventorySetEntry.FindFirst then
-            RetailInventorySetEntry.DeleteAll;
+        if RetailInventorySetEntry.FindFirst() then
+            RetailInventorySetEntry.DeleteAll();
     end;
 }

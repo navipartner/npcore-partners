@@ -1,12 +1,10 @@
 codeunit 6150742 "NPR POS Cancel Sale Key Bind"
 {
-    var
-        Text000: Label 'Sale was canceled %1';
 
     [EventSubscriber(ObjectType::Codeunit, 6150744, 'OnDiscoverKeyboardBindings', '', true, true)]
     local procedure Discover(var POSKeyboardBindingSetup: Record "NPR POS Keyboard Bind. Setup")
     begin
-        POSKeyboardBindingSetup.Init;
+        POSKeyboardBindingSetup.Init();
         POSKeyboardBindingSetup."Action Code" := GetActionCode();
         POSKeyboardBindingSetup."Key Bind" := GetKeyCode();
         POSKeyboardBindingSetup.Description := GetKeyDescription();

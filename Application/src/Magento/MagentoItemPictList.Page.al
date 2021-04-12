@@ -1,4 +1,4 @@
-page 6151413 "NPR Magento Item Pict. List"
+﻿page 6151413 "NPR Magento Item Pict. List"
 {
     Caption = 'Item Pictures';
     DeleteAllowed = false;
@@ -142,18 +142,18 @@ page 6151413 "NPR Magento Item Pict. List"
 
     local procedure SetupSourceTable()
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if Item.Get(ItemNo) then;
 
         if ItemNo = '' then
             Error(Text000);
 
         HasVariants := false;
-        Rec.Init;
+        Rec.Init();
         Rec."Item No." := '';
         Rec.Code := '';
         Rec.Description := Text001;
-        Rec.Insert;
+        Rec.Insert();
 
         case MagentoSetup."Variant System" of
             MagentoSetup."Variant System"::Variety:
@@ -187,7 +187,7 @@ page 6151413 "NPR Magento Item Pict. List"
                 end;
         end;
 
-        HasVariants := Rec.Count > 1;
+        HasVariants := Rec.Count() > 1;
     end;
 
     local procedure SetupVarietyFixed()
@@ -249,7 +249,7 @@ page 6151413 "NPR Magento Item Pict. List"
 
         VarietyValue.SetRange(Type, Item."NPR Variety 1");
         VarietyValue.SetRange(Table, Item."NPR Variety 1 Table");
-        if not VarietyValue.FindSet then
+        if not VarietyValue.FindSet() then
             exit;
 
         repeat
@@ -258,8 +258,8 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Variety 1 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 1 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst then begin
-                Rec.Init;
+            if ItemVariant.FindFirst() then begin
+                Rec.Init();
                 if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
                     Error(VarietyTooLongErr)
                 else
@@ -268,9 +268,9 @@ page 6151413 "NPR Magento Item Pict. List"
                 Rec."NPR Variety 1" := VarietyValue.Type;
                 Rec."NPR Variety 1 Table" := VarietyValue.Table;
                 Rec."NPR Variety 1 Value" := VarietyValue.Value;
-                Rec.Insert;
+                Rec.Insert();
             end;
-        until VarietyValue.Next = 0;
+        until VarietyValue.Next() = 0;
     end;
 
     local procedure SetupVariety2()
@@ -285,7 +285,7 @@ page 6151413 "NPR Magento Item Pict. List"
 
         VarietyValue.SetRange(Type, Item."NPR Variety 2");
         VarietyValue.SetRange(Table, Item."NPR Variety 2 Table");
-        if not VarietyValue.FindSet then
+        if not VarietyValue.FindSet() then
             exit;
 
         repeat
@@ -294,8 +294,8 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Variety 2 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 2 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst then begin
-                Rec.Init;
+            if ItemVariant.FindFirst() then begin
+                Rec.Init();
                 if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
                     Error(VarietyTooLongErr)
                 else
@@ -304,9 +304,9 @@ page 6151413 "NPR Magento Item Pict. List"
                 Rec."NPR Variety 2" := VarietyValue.Type;
                 Rec."NPR Variety 2 Table" := VarietyValue.Table;
                 Rec."NPR Variety 2 Value" := VarietyValue.Value;
-                Rec.Insert;
+                Rec.Insert();
             end;
-        until VarietyValue.Next = 0;
+        until VarietyValue.Next() = 0;
     end;
 
     local procedure SetupVariety3()
@@ -321,7 +321,7 @@ page 6151413 "NPR Magento Item Pict. List"
 
         VarietyValue.SetRange(Type, Item."NPR Variety 3");
         VarietyValue.SetRange(Table, Item."NPR Variety 3 Table");
-        if not VarietyValue.FindSet then
+        if not VarietyValue.FindSet() then
             exit;
 
         repeat
@@ -330,8 +330,8 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Variety 3 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 3 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst then begin
-                Rec.Init;
+            if ItemVariant.FindFirst() then begin
+                Rec.Init();
                 if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
                     Error(VarietyTooLongErr)
                 else
@@ -340,9 +340,9 @@ page 6151413 "NPR Magento Item Pict. List"
                 Rec."NPR Variety 3" := VarietyValue.Type;
                 Rec."NPR Variety 3 Table" := VarietyValue.Table;
                 Rec."NPR Variety 3 Value" := VarietyValue.Value;
-                Rec.Insert;
+                Rec.Insert();
             end;
-        until VarietyValue.Next = 0;
+        until VarietyValue.Next() = 0;
     end;
 
     local procedure SetupVariety4()
@@ -357,7 +357,7 @@ page 6151413 "NPR Magento Item Pict. List"
 
         VarietyValue.SetRange(Type, Item."NPR Variety 4");
         VarietyValue.SetRange(Table, Item."NPR Variety 4 Table");
-        if not VarietyValue.FindSet then
+        if not VarietyValue.FindSet() then
             exit;
 
         repeat
@@ -366,8 +366,8 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Variety 4 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 4 Value", VarietyValue.Value);
             ItemVariant.SetRange("NPR Blocked", false);
-            if ItemVariant.FindFirst then begin
-                Rec.Init;
+            if ItemVariant.FindFirst() then begin
+                Rec.Init();
                 if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
                     Error(VarietyTooLongErr)
                 else
@@ -376,8 +376,8 @@ page 6151413 "NPR Magento Item Pict. List"
                 Rec."NPR Variety 4" := VarietyValue.Type;
                 Rec."NPR Variety 4 Table" := VarietyValue.Table;
                 Rec."NPR Variety 4 Value" := VarietyValue.Value;
-                Rec.Insert;
+                Rec.Insert();
             end;
-        until VarietyValue.Next = 0;
+        until VarietyValue.Next() = 0;
     end;
 }

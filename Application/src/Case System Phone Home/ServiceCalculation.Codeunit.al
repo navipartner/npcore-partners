@@ -1,4 +1,4 @@
-codeunit 6014482 "NPR Service Calculation"
+﻿codeunit 6014482 "NPR Service Calculation"
 {
 
     trigger OnRun()
@@ -27,7 +27,7 @@ codeunit 6014482 "NPR Service Calculation"
     procedure useService(service: Text[30]): Boolean
     begin
         result := false;
-        tempRetailList.Init;
+        tempRetailList.Init();
         tempRetailList.Choice := service;
 
         /*
@@ -48,7 +48,7 @@ codeunit 6014482 "NPR Service Calculation"
     procedure useServiceAmount(service: Text[30]; p_amount: Decimal): Boolean
     begin
         result := false;
-        tempRetailList.Init;
+        tempRetailList.Init();
         tempRetailList.Choice := service;
         tempRetailList.Value := Format(Round(p_amount, 0.01) * 100, 0, 1);
 

@@ -1,4 +1,4 @@
-codeunit 6184487 "NPR Pepper Library TSD"
+﻿codeunit 6184487 "NPR Pepper Library TSD"
 {
     var
         POSSession: Codeunit "NPR POS Session";
@@ -43,50 +43,47 @@ codeunit 6184487 "NPR Pepper Library TSD"
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
         // This function will make an out-of-transaction request that can't be rollbacked
-        Commit;
+        Commit();
 
-        with EFTTransactionRequest do begin
+        if (PepperTerminal."Open Automatically") then
+            if (AutomaticallyBeginWorkshift(EFTTransactionRequest)) then
+                exit(true);
 
-            if (PepperTerminal."Open Automatically") then
-                if (AutomaticallyBeginWorkshift(EFTTransactionRequest)) then
-                    exit(true);
+        case EFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::OPEN:
+                BeginWorkshift(EFTTransactionRequest, true);
 
-            case "Processing Type" of
-                "Processing Type"::OPEN:
-                    BeginWorkshift(EFTTransactionRequest, true);
+            EFTTransactionRequest."Processing Type"::PAYMENT,
+          EFTTransactionRequest."Processing Type"::REFUND,
+          EFTTransactionRequest."Processing Type"::OTHER:
+                case EFTTransactionRequest."Pepper Trans. Subtype Code" of
+                    '0':
+                        TrxRecoverTransaction(EFTTransactionRequest);
+                    '10':
+                        TrxPaymentOfGoods(EFTTransactionRequest, '');
+                    '20':
+                        TrxVoidPaymentOfGoods(EFTTransactionRequest);
+                    '60':
+                        TrxRefund(EFTTransactionRequest);
+                    else
+                        exit(false);
+                end;
 
-                "Processing Type"::PAYMENT,
-              "Processing Type"::REFUND,
-              "Processing Type"::OTHER:
-                    case "Pepper Trans. Subtype Code" of
-                        '0':
-                            TrxRecoverTransaction(EFTTransactionRequest);
-                        '10':
-                            TrxPaymentOfGoods(EFTTransactionRequest, '');
-                        '20':
-                            TrxVoidPaymentOfGoods(EFTTransactionRequest);
-                        '60':
-                            TrxRefund(EFTTransactionRequest);
-                        else
-                            exit(false);
-                    end;
+            EFTTransactionRequest."Processing Type"::AUXILIARY:
+                case EFTTransactionRequest."Pepper Transaction Type Code" of
+                    PepperConfiguration."Transaction Type Auxilary Code":
+                        AuxFunctionRequest(EFTTransactionRequest);
+                    PepperConfiguration."Transaction Type Install Code":
+                        InstallPepperRequest(EFTTransactionRequest);
+                    else
+                        exit(false);
+                end;
 
-                "Processing Type"::AUXILIARY:
-                    case EFTTransactionRequest."Pepper Transaction Type Code" of
-                        PepperConfiguration."Transaction Type Auxilary Code":
-                            AuxFunctionRequest(EFTTransactionRequest);
-                        PepperConfiguration."Transaction Type Install Code":
-                            InstallPepperRequest(EFTTransactionRequest);
-                        else
-                            exit(false);
-                    end;
+            EFTTransactionRequest."Processing Type"::CLOSE:
+                EndWorkshift(EFTTransactionRequest);
 
-                "Processing Type"::CLOSE:
-                    EndWorkshift(EFTTransactionRequest);
-
-                else
-                    exit(false);
-            end;
+            else
+                exit(false);
         end;
 
         exit(true);
@@ -210,23 +207,21 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
-        with EFTTransactionRequest do begin
-            "Result Code" := PepperBeginWorkshift.GetPOP_ResultCode();
-            "Result Description" := GetResultCodeDescription("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
+        EFTTransactionRequest."Result Code" := PepperBeginWorkshift.GetPOP_ResultCode();
+        EFTTransactionRequest."Result Description" := GetResultCodeDescription(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
 
-            AddReceipt(EFTTransactionRequest, PepperBeginWorkshift.GetPOP_OpenReceipt());
-            Successful := IsSuccessfulResultCode("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
+        AddReceipt(EFTTransactionRequest, PepperBeginWorkshift.GetPOP_OpenReceipt());
+        EFTTransactionRequest.Successful := IsSuccessfulResultCode(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
 
-            Finished := CurrentDateTime;
-            "Number of Attempts" += 1;
+        EFTTransactionRequest.Finished := CurrentDateTime;
+        EFTTransactionRequest."Number of Attempts" += 1;
 
-            if (Successful) then begin
-                PepperTerminal.Validate(Status, PepperTerminal.Status::Open);
-                PepperTerminal.Modify(true);
-            end;
-
-            UpdateEftTransactionRequestCommentBatch("Entry No.");
+        if (EFTTransactionRequest.Successful) then begin
+            PepperTerminal.Validate(Status, PepperTerminal.Status::Open);
+            PepperTerminal.Modify(true);
         end;
+
+        UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
         EFTTransactionRequest.Modify();
         ReadyReceiptsForPrint(EFTTransactionRequest);
 
@@ -265,7 +260,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
             end;
         end;
 
-        Commit;
+        Commit();
         EFTTransactionRequest.PrintReceipts(false);
 
         if (POSSession.IsActiveSession(FrontEnd)) then
@@ -275,13 +270,11 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure BeginWorkshiftResponse_MOCK(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     begin
 
-        with EFTTransactionRequest do begin
-            "Result Code" := 10;
-            Successful := true;
-            Finished := CurrentDateTime;
+        EFTTransactionRequest."Result Code" := 10;
+        EFTTransactionRequest.Successful := true;
+        EFTTransactionRequest.Finished := CurrentDateTime;
 
-            AddReceipt(EFTTransactionRequest, '**** This is a DEMO Open Receipt ****');
-        end;
+        AddReceipt(EFTTransactionRequest, '**** This is a DEMO Open Receipt ****');
         EFTTransactionRequest.Modify();
         ReadyReceiptsForPrint(EFTTransactionRequest);
 
@@ -329,30 +322,26 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
-        with EFTTransactionRequest do begin
+        EFTTransactionRequest."Result Code" := PepperEndWorkshift.GetResultCode();
+        EFTTransactionRequest."Result Description" := GetResultCodeDescription(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
+        EFTTransactionRequest.Successful := IsSuccessfulResultCode(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
 
-            "Result Code" := PepperEndWorkshift.GetResultCode();
-            "Result Description" := GetResultCodeDescription("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
-            Successful := IsSuccessfulResultCode("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
+        AddReceipt(EFTTransactionRequest, PepperEndWorkshift.GetCloseReceipt());
+        AddReceipt(EFTTransactionRequest, PepperEndWorkshift.GetEndOfDayReceipt());
 
-            AddReceipt(EFTTransactionRequest, PepperEndWorkshift.GetCloseReceipt());
-            AddReceipt(EFTTransactionRequest, PepperEndWorkshift.GetEndOfDayReceipt());
+        EFTTransactionRequest.Finished := CurrentDateTime;
+        EFTTransactionRequest."Number of Attempts" += 1;
 
-            Finished := CurrentDateTime;
-            "Number of Attempts" += 1;
-
-            if (Successful) then begin
-                PepperTerminal.Validate(Status, PepperTerminal.Status::Closed);
-                PepperTerminal.Modify(true);
-            end;
-
-            UpdateEftTransactionRequestCommentBatch("Entry No.");
-
+        if (EFTTransactionRequest.Successful) then begin
+            PepperTerminal.Validate(Status, PepperTerminal.Status::Closed);
+            PepperTerminal.Modify(true);
         end;
+
+        UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
         EFTTransactionRequest.Modify();
         ReadyReceiptsForPrint(EFTTransactionRequest);
 
-        Commit;
+        Commit();
         EFTTransactionRequest.PrintReceipts(false);
 
         if (POSSession.IsActiveSession(FrontEnd)) then
@@ -362,13 +351,11 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure EndWorkshiftResponse_MOCK(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     begin
 
-        with EFTTransactionRequest do begin
-            "Result Code" := 10;
-            Successful := true;
-            Finished := CurrentDateTime;
-            AddReceipt(EFTTransactionRequest, '**** This is a DEMO Close Receipt ****');
-            AddReceipt(EFTTransactionRequest, '**** This is a DEMO End of Day Receipt ****');
-        end;
+        EFTTransactionRequest."Result Code" := 10;
+        EFTTransactionRequest.Successful := true;
+        EFTTransactionRequest.Finished := CurrentDateTime;
+        AddReceipt(EFTTransactionRequest, '**** This is a DEMO Close Receipt ****');
+        AddReceipt(EFTTransactionRequest, '**** This is a DEMO End of Day Receipt ****');
         EFTTransactionRequest.Modify();
         ReadyReceiptsForPrint(EFTTransactionRequest);
 
@@ -382,22 +369,17 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure TrxRecoverTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         PepperTrxTransaction: Codeunit "NPR Pepper Transaction TSD";
-        ActivateOffline: Boolean;
-        ResultCode: Integer;
     begin
 
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
-        with EFTTransactionRequest do begin
-            PepperTrxTransaction.InitializeProtocol();
-            PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
-            PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
-            PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Recover Code"));
-            ActivateOffline := (PepperTerminal.Status = PepperTerminal.Status::ActiveOffline);
+        PepperTrxTransaction.InitializeProtocol();
+        PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
+        PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
+        PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Recover Code"));
 
-            "Result Code" := PepperTrxTransaction.SetRecovery();
-        end;
+        EFTTransactionRequest."Result Code" := PepperTrxTransaction.SetRecovery();
 
         EFTTransactionRequest.Modify();
 
@@ -414,29 +396,26 @@ codeunit 6184487 "NPR Pepper Library TSD"
     var
         PepperTrxTransaction: Codeunit "NPR Pepper Transaction TSD";
         ActivateOffline: Boolean;
-        ResultCode: Integer;
     begin
 
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
-        with EFTTransactionRequest do begin
-            PepperTrxTransaction.InitializeProtocol();
-            PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
-            PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
-            PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Payment Code"));
-            ActivateOffline := (PepperTerminal.Status = PepperTerminal.Status::ActiveOffline);
+        PepperTrxTransaction.InitializeProtocol();
+        PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
+        PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
+        PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Payment Code"));
+        ActivateOffline := (PepperTerminal.Status = PepperTerminal.Status::ActiveOffline);
 
-            "Result Code" := PepperTrxTransaction.SetPaymentOfGoods("Amount Input",
-              CalcAmountInCents("Amount Input", "Currency Code"),
-              CalcAmountInCents("Cashback Amount", "Currency Code"),
-              "Currency Code",
-              "Track Presence Input",
-              "Card Information Input",
-              "Reference Number Input",
-              MbxPosReference,
-              ActivateOffline);
-        end;
+        EFTTransactionRequest."Result Code" := PepperTrxTransaction.SetPaymentOfGoods(EFTTransactionRequest."Amount Input",
+          CalcAmountInCents(EFTTransactionRequest."Amount Input", EFTTransactionRequest."Currency Code"),
+          CalcAmountInCents(EFTTransactionRequest."Cashback Amount", EFTTransactionRequest."Currency Code"),
+          EFTTransactionRequest."Currency Code",
+          EFTTransactionRequest."Track Presence Input",
+          EFTTransactionRequest."Card Information Input",
+          EFTTransactionRequest."Reference Number Input",
+          MbxPosReference,
+          ActivateOffline);
         EFTTransactionRequest.Modify();
 
         if (CheckTestMode(PepperConfiguration)) then begin
@@ -451,25 +430,20 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure TrxVoidPaymentOfGoods(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         PepperTrxTransaction: Codeunit "NPR Pepper Transaction TSD";
-        ActivateOffline: Boolean;
-        ResultCode: Integer;
     begin
 
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
-        with EFTTransactionRequest do begin
-            PepperTrxTransaction.InitializeProtocol();
-            PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
-            PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
-            PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Refund Code"));
-            ActivateOffline := (PepperTerminal.Status = PepperTerminal.Status::ActiveOffline);
+        PepperTrxTransaction.InitializeProtocol();
+        PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
+        PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
+        PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Refund Code"));
 
-            "Result Code" := PepperTrxTransaction.SetVoidPaymentOfGoods("Amount Input",
-              CalcAmountInCents("Amount Input", "Currency Code"),
-              "Currency Code",
-              "Reference Number Input")
-        end;
+        EFTTransactionRequest."Result Code" := PepperTrxTransaction.SetVoidPaymentOfGoods(EFTTransactionRequest."Amount Input",
+          CalcAmountInCents(EFTTransactionRequest."Amount Input", EFTTransactionRequest."Currency Code"),
+          EFTTransactionRequest."Currency Code",
+          EFTTransactionRequest."Reference Number Input");
 
         EFTTransactionRequest.Modify();
 
@@ -485,25 +459,20 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure TrxRefund(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         PepperTrxTransaction: Codeunit "NPR Pepper Transaction TSD";
-        ActivateOffline: Boolean;
-        ResultCode: Integer;
     begin
 
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
-        with EFTTransactionRequest do begin
-            PepperTrxTransaction.InitializeProtocol();
-            PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
-            PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
-            PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Refund Code"));
-            ActivateOffline := (PepperTerminal.Status = PepperTerminal.Status::ActiveOffline);
+        PepperTrxTransaction.InitializeProtocol();
+        PepperTrxTransaction.SetTransactionEntryNo(EFTTransactionRequest."Entry No.");
+        PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(PepperTerminal), GetNavReceiptEncoding(PepperTerminal));
+        PepperTrxTransaction.SetTimout(GetTimeout(PepperConfiguration.Code, PepperConfiguration."Transaction Type Refund Code"));
 
-            "Result Code" := PepperTrxTransaction.SetRefund("Amount Input",
-              CalcAmountInCents("Amount Input", "Currency Code"),
-              "Currency Code",
-              "Reference Number Input")
-        end;
+        EFTTransactionRequest."Result Code" := PepperTrxTransaction.SetRefund(EFTTransactionRequest."Amount Input",
+          CalcAmountInCents(EFTTransactionRequest."Amount Input", EFTTransactionRequest."Currency Code"),
+          EFTTransactionRequest."Currency Code",
+          EFTTransactionRequest."Reference Number Input");
 
         EFTTransactionRequest.Modify();
 
@@ -529,58 +498,55 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         InitializePepperSetup(EFTTransactionRequest."Register No.");
 
-        with EFTTransactionRequest do begin
-
-            if (PepperTrxTransaction.GetTrx_AbandonedTransaction()) then begin
-                SetTrxProcessingType("Pepper Trans. Subtype Code", "Register No.", EFTTransactionRequest);
-                AddToCommentBatch('This Transaction Request was recreated since user abandoned the original request.');
-            end;
-
-            "Result Code" := PepperTrxTransaction.GetTrx_ResultCode();
-            "Result Description" := GetResultCodeDescription("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
-            Successful := IsSuccessfulResultCode("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
-            if (Successful) then
-                "Amount Output" := CalcAmountInCurrency(PepperTrxTransaction.GetTrx_Amount(), "Currency Code");
-
-            if ("Processing Type" = "Processing Type"::PAYMENT) then
-                "Result Amount" := Abs("Amount Output");
-
-            if ("Processing Type" = "Processing Type"::REFUND) then
-                "Result Amount" := Abs("Amount Output") * -1;
-
-            "Number of Attempts" += 1;
-
-            // State machine error will not have correct data in some of these fields
-            if ("Result Code" <> -50) then begin
-                PepperTrxTransaction.GetTrx_CardInformation("Card Type", "Card Name", "Card Number", "Card Expiry Date");
-                CheckCardInformation("Card Type", "Card Name", "Card Number", "Card Expiry Date");
-
-                PepperTrxTransaction.GetTrx_AuthorizationInfo("Reference Number Output",
-                  TransactionDateText,
-                  TransactionTimeText,
-                  "Authorisation Number",
-                  "Hardware ID",
-                  "Authentication Method",
-                  "Bookkeeping Period");
-
-                "Transaction Date" := GetTransactionDate(TransactionDateText);
-                "Transaction Time" := GetTransactionTime(TransactionTimeText);
-
-                AddReceipt(EFTTransactionRequest, PepperTrxTransaction.GetTrx_CustomerReceipt());
-                AddReceipt(EFTTransactionRequest, PepperTrxTransaction.GetTrx_MerchantReceipt());
-
-                PaymentType := GetPaymentTypePOS("Card Type");
-                if PaymentType <> '' then
-                    "POS Payment Type Code" := PaymentType;
-
-                "Result Display Text" := CopyStr(PepperTrxTransaction.GetTrx_DisplayText(), 1, MaxStrLen("Result Display Text"));
-                "POS Description" := GetPOSDescription(EFTTransactionRequest);
-            end;
-
-            Finished := CurrentDateTime;
-
-            UpdateEftTransactionRequestCommentBatch("Entry No.");
+        if (PepperTrxTransaction.GetTrx_AbandonedTransaction()) then begin
+            SetTrxProcessingType(EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Register No.", EFTTransactionRequest);
+            AddToCommentBatch('This Transaction Request was recreated since user abandoned the original request.');
         end;
+
+        EFTTransactionRequest."Result Code" := PepperTrxTransaction.GetTrx_ResultCode();
+        EFTTransactionRequest."Result Description" := GetResultCodeDescription(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
+        EFTTransactionRequest.Successful := IsSuccessfulResultCode(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
+        if (EFTTransactionRequest.Successful) then
+            EFTTransactionRequest."Amount Output" := CalcAmountInCurrency(PepperTrxTransaction.GetTrx_Amount(), EFTTransactionRequest."Currency Code");
+
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT) then
+            EFTTransactionRequest."Result Amount" := Abs(EFTTransactionRequest."Amount Output");
+
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::REFUND) then
+            EFTTransactionRequest."Result Amount" := Abs(EFTTransactionRequest."Amount Output") * -1;
+
+        EFTTransactionRequest."Number of Attempts" += 1;
+
+        // State machine error will not have correct data in some of these fields
+        if (EFTTransactionRequest."Result Code" <> -50) then begin
+            PepperTrxTransaction.GetTrx_CardInformation(EFTTransactionRequest."Card Type", EFTTransactionRequest."Card Name", EFTTransactionRequest."Card Number", EFTTransactionRequest."Card Expiry Date");
+            CheckCardInformation(EFTTransactionRequest."Card Type", EFTTransactionRequest."Card Name", EFTTransactionRequest."Card Number", EFTTransactionRequest."Card Expiry Date");
+
+            PepperTrxTransaction.GetTrx_AuthorizationInfo(EFTTransactionRequest."Reference Number Output",
+              TransactionDateText,
+              TransactionTimeText,
+              EFTTransactionRequest."Authorisation Number",
+              EFTTransactionRequest."Hardware ID",
+              EFTTransactionRequest."Authentication Method",
+              EFTTransactionRequest."Bookkeeping Period");
+
+            EFTTransactionRequest."Transaction Date" := GetTransactionDate(TransactionDateText);
+            EFTTransactionRequest."Transaction Time" := GetTransactionTime(TransactionTimeText);
+
+            AddReceipt(EFTTransactionRequest, PepperTrxTransaction.GetTrx_CustomerReceipt());
+            AddReceipt(EFTTransactionRequest, PepperTrxTransaction.GetTrx_MerchantReceipt());
+
+            PaymentType := GetPaymentTypePOS(EFTTransactionRequest."Card Type");
+            if PaymentType <> '' then
+                EFTTransactionRequest."POS Payment Type Code" := PaymentType;
+
+            EFTTransactionRequest."Result Display Text" := CopyStr(PepperTrxTransaction.GetTrx_DisplayText(), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
+            EFTTransactionRequest."POS Description" := GetPOSDescription(EFTTransactionRequest);
+        end;
+
+        EFTTransactionRequest.Finished := CurrentDateTime;
+
+        UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
         EFTTransactionRequest.Modify();
         ReadyReceiptsForPrint(EFTTransactionRequest);
 
@@ -635,36 +601,34 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure TrxResponse_MOCK(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     begin
 
-        with EFTTransactionRequest do begin
-            "Result Code" := 10;
-            Successful := true;
+        EFTTransactionRequest."Result Code" := 10;
+        EFTTransactionRequest.Successful := true;
 
-            "Card Type" := '9999';
-            "Card Name" := 'DEMO Card Name';
-            "Card Number" := '555444333222';
-            "Card Expiry Date" := '1220';
-            CheckCardInformation("Card Type", "Card Name", "Card Number", "Card Expiry Date");
+        EFTTransactionRequest."Card Type" := '9999';
+        EFTTransactionRequest."Card Name" := 'DEMO Card Name';
+        EFTTransactionRequest."Card Number" := '555444333222';
+        EFTTransactionRequest."Card Expiry Date" := '1220';
+        CheckCardInformation(EFTTransactionRequest."Card Type", EFTTransactionRequest."Card Name", EFTTransactionRequest."Card Number", EFTTransactionRequest."Card Expiry Date");
 
-            "Reference Number Output" := IncStr("Reference Number Input");
-            "Authorisation Number" := '9999';
-            "Hardware ID" := '9999';
-            "Transaction Date" := Today;
-            "Transaction Time" := Time;
-            "Authentication Method" := 1;
+        EFTTransactionRequest."Reference Number Output" := IncStr(EFTTransactionRequest."Reference Number Input");
+        EFTTransactionRequest."Authorisation Number" := '9999';
+        EFTTransactionRequest."Hardware ID" := '9999';
+        EFTTransactionRequest."Transaction Date" := Today();
+        EFTTransactionRequest."Transaction Time" := Time;
+        EFTTransactionRequest."Authentication Method" := 1;
 
-            AddReceipt(EFTTransactionRequest, '**** This is a DEMO Customer Receipt ****');
-            AddReceipt(EFTTransactionRequest, '**** This is a DEMO Merchant Receipt ****');
+        AddReceipt(EFTTransactionRequest, '**** This is a DEMO Customer Receipt ****');
+        AddReceipt(EFTTransactionRequest, '**** This is a DEMO Merchant Receipt ****');
 
-            "Amount Output" := "Amount Input";
+        EFTTransactionRequest."Amount Output" := EFTTransactionRequest."Amount Input";
 
-            if ("Processing Type" = "Processing Type"::PAYMENT) then
-                "Result Amount" := Abs("Amount Output");
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT) then
+            EFTTransactionRequest."Result Amount" := Abs(EFTTransactionRequest."Amount Output");
 
-            if ("Processing Type" = "Processing Type"::REFUND) then
-                "Result Amount" := Abs("Amount Output") * -1;
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::REFUND) then
+            EFTTransactionRequest."Result Amount" := Abs(EFTTransactionRequest."Amount Output") * -1;
 
-            Finished := CurrentDateTime;
-        end;
+        EFTTransactionRequest.Finished := CurrentDateTime;
         EFTTransactionRequest.Modify();
         ReadyReceiptsForPrint(EFTTransactionRequest);
 
@@ -677,40 +641,36 @@ codeunit 6184487 "NPR Pepper Library TSD"
         EftRefundTransaction: Record "NPR EFT Transaction Request";
     begin
         // Handle RECOVERY scenarioes
-        with EFTTransactionRequest do begin
+        // When recovered transaction was successful and we have a receipt - refund that transaction
+        if (EFTTransactionRequest."Pepper Trans. Subtype Code" = '0') and (EFTTransactionRequest.Successful) then begin
 
-            // When recovered transaction was successful and we have a receipt - refund that transaction
-            if ("Pepper Trans. Subtype Code" = '0') and (Successful) then begin
+            if (EFTTransactionRequest."Result Code" = -10) then; // Recovered transaction "Not Paid", recovery was successful
 
-                if ("Result Code" = -10) then; // Recovered transaction "Not Paid", recovery was successful
+            if ((EFTTransactionRequest."Result Code" = 30) and (EFTTransactionRequest."Receipt 1".HasValue())) then begin // Recovered Transaction was paid, recovery was successful, attempt a refund
+                                                                                                                          // CreateRefundRequest ("Register No.", "Sales Ticket No.", "Currency Code", "Amount Output", "Reference Number Output", EftRefundTransaction);
+                CreateVoidPaymentOfGoodsRequest(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Currency Code", EFTTransactionRequest."Amount Output", EFTTransactionRequest."Reference Number Output", EftRefundTransaction);
 
-                if (("Result Code" = 30) and ("Receipt 1".HasValue())) then begin // Recovered Transaction was paid, recovery was successful, attempt a refund
-                                                                                  // CreateRefundRequest ("Register No.", "Sales Ticket No.", "Currency Code", "Amount Output", "Reference Number Output", EftRefundTransaction);
-                    CreateVoidPaymentOfGoodsRequest("Register No.", "Sales Ticket No.", "Currency Code", "Amount Output", "Reference Number Output", EftRefundTransaction);
+                EftRefundTransaction."Initiated from Entry No." := EFTTransactionRequest."Entry No.";
+                if (EFTTransactionRequest."Initiated from Entry No." <> 0) then
+                    EftRefundTransaction."Initiated from Entry No." := EFTTransactionRequest."Initiated from Entry No.";
+                EftRefundTransaction.Modify();
 
-                    EftRefundTransaction."Initiated from Entry No." := "Entry No.";
-                    if ("Initiated from Entry No." <> 0) then
-                        EftRefundTransaction."Initiated from Entry No." := "Initiated from Entry No.";
-                    EftRefundTransaction.Modify();
-
-                    MakeDeviceRequest(EftRefundTransaction);
-                    exit(true);
-                end;
-
+                MakeDeviceRequest(EftRefundTransaction);
+                exit(true);
             end;
 
-            // Protocol require at least 3 recovery attempts
-            if ("Pepper Trans. Subtype Code" = '0') and (not EFTTransactionRequest.Successful) then begin
-                if ("Number of Attempts" < 3) then begin
-                    "Entry No." := 0;
-                    Started := CurrentDateTime;
-                    Insert();
+        end;
 
-                    MakeDeviceRequest(EFTTransactionRequest);
-                    exit(true);
-                end;
+        // Protocol require at least 3 recovery attempts
+        if (EFTTransactionRequest."Pepper Trans. Subtype Code" = '0') and (not EFTTransactionRequest.Successful) then begin
+            if (EFTTransactionRequest."Number of Attempts" < 3) then begin
+                EFTTransactionRequest."Entry No." := 0;
+                EFTTransactionRequest.Started := CurrentDateTime;
+                EFTTransactionRequest.Insert();
+
+                MakeDeviceRequest(EFTTransactionRequest);
+                exit(true);
             end;
-
         end;
 
         exit(false);
@@ -772,38 +732,34 @@ codeunit 6184487 "NPR Pepper Library TSD"
         EftBeginWorkshiftTransaction: Record "NPR EFT Transaction Request";
     begin
 
-        with EFTTransactionRequest do begin
+        EFTTransactionRequest."Result Code" := PepperAuxFunctions.GetResultCode();
+        EFTTransactionRequest."Result Description" := GetResultCodeDescription(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
+        EFTTransactionRequest.Successful := IsSuccessfulResultCode(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
 
-            "Result Code" := PepperAuxFunctions.GetResultCode();
-            "Result Description" := GetResultCodeDescription("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
-            Successful := IsSuccessfulResultCode("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
+        Evaluate(AuxFunction, EFTTransactionRequest."Pepper Trans. Subtype Code");
+        case AuxFunction of
+            SupportedAuxFunction::DIAGNOSTICS,
+            SupportedAuxFunction::SUMMARYREPORT,
+            SupportedAuxFunction::SYSTEMINFO,
+            SupportedAuxFunction::TICKETREPRINT:
+                begin
+                    AddReceipt(EFTTransactionRequest, PepperAuxFunctions.GetClientReceipt());
+                    AddReceipt(EFTTransactionRequest, PepperAuxFunctions.GetMerchantReceipt());
+                end;
 
-            Evaluate(AuxFunction, EFTTransactionRequest."Pepper Trans. Subtype Code");
-            case AuxFunction of
-                SupportedAuxFunction::DIAGNOSTICS,
-                SupportedAuxFunction::SUMMARYREPORT,
-                SupportedAuxFunction::SYSTEMINFO,
-                SupportedAuxFunction::TICKETREPRINT:
-                    begin
-                        AddReceipt(EFTTransactionRequest, PepperAuxFunctions.GetClientReceipt());
-                        AddReceipt(EFTTransactionRequest, PepperAuxFunctions.GetMerchantReceipt());
-                    end;
-
-                SupportedAuxFunction::TINAACTIVATION,
-                SupportedAuxFunction::TINADEACTIVATION,
-                SupportedAuxFunction::TINAQUERY:
-                    begin
-                        Message('%1', PepperAuxFunctions.GetXmlResponse());
-                        AddToCommentBatch(PepperAuxFunctions.GetXmlResponse());
-                    end;
-                else
+            SupportedAuxFunction::TINAACTIVATION,
+            SupportedAuxFunction::TINADEACTIVATION,
+            SupportedAuxFunction::TINAQUERY:
+                begin
+                    Message('%1', PepperAuxFunctions.GetXmlResponse());
                     AddToCommentBatch(PepperAuxFunctions.GetXmlResponse());
-            end;
-
-            Finished := CurrentDateTime;
-            UpdateEftTransactionRequestCommentBatch("Entry No.");
-
+                end;
+            else
+                AddToCommentBatch(PepperAuxFunctions.GetXmlResponse());
         end;
+
+        EFTTransactionRequest.Finished := CurrentDateTime;
+        UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
         EFTTransactionRequest.Modify();
         ReadyReceiptsForPrint(EFTTransactionRequest);
 
@@ -819,7 +775,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
             end;
         end;
 
-        Commit;
+        Commit();
         EFTTransactionRequest.PrintReceipts(false);
 
         // Get us back to our calling workflow, we are done!
@@ -830,7 +786,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure InstallPepperRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         PepperFileMgmtFunctions: Codeunit "NPR Pepper FileMgmt. Func. TSD";
-        AuxFunction: Option;
     begin
 
         PepperFileMgmtFunctions.InitializeProtocol();
@@ -850,23 +805,19 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperFileMgmtFunctions: Codeunit "NPR Pepper FileMgmt. Func. TSD";
     begin
 
-        with EFTTransactionRequest do begin
+        EFTTransactionRequest."Result Code" := PepperFileMgmtFunctions.GetResultCode();
+        EFTTransactionRequest."Result Description" := GetResultCodeDescription(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
+        EFTTransactionRequest.Successful := IsSuccessfulResultCode(EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code");
 
-            "Result Code" := PepperFileMgmtFunctions.GetResultCode();
-            "Result Description" := GetResultCodeDescription("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
-            Successful := IsSuccessfulResultCode("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
+        EFTTransactionRequest.Finished := CurrentDateTime;
 
-            Finished := CurrentDateTime;
+        if (not EFTTransactionRequest.Successful) then
+            AddToCommentBatch(StrSubstNo(Text003, PepperFileMgmtFunctions.GetExceptionText));
 
-            if (not Successful) then
-                AddToCommentBatch(StrSubstNo(Text003, PepperFileMgmtFunctions.GetExceptionText));
+        AddToCommentBatch(StrSubstNo(Text001, PepperFileMgmtFunctions.GetInstalledVersion()));
+        AddToCommentBatch(StrSubstNo(Text002, PepperFileMgmtFunctions.GetPreviousVersion()));
 
-            AddToCommentBatch(StrSubstNo(Text001, PepperFileMgmtFunctions.GetInstalledVersion()));
-            AddToCommentBatch(StrSubstNo(Text002, PepperFileMgmtFunctions.GetPreviousVersion()));
-
-            UpdateEftTransactionRequestCommentBatch("Entry No.");
-
-        end;
+        UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
         EFTTransactionRequest.Modify();
 
         // Get us back to our calling workflow, we are done!
@@ -893,10 +844,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperVersion.TestField("Codeunit Begin Workshift");
         PepperConfiguration.TestField("Transaction Type Open Code");
 
-        with EFTTransactionRequest do begin
-            "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Open Code";
-            "Processing Type" := EFTTransactionRequest."Processing Type"::OPEN;
-        end;
+        EFTTransactionRequest."Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Open Code";
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::OPEN;
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -909,13 +858,11 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperVersion.TestField("Codeunit End Workshift");
         PepperConfiguration.TestField("Transaction Type Close Code");
 
-        with EFTTransactionRequest do begin
-            "Sales Ticket No." := SalesReceiptNo;
-            "Reference Number Input" := SalesReceiptNo;
+        EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
+        EFTTransactionRequest."Reference Number Input" := SalesReceiptNo;
 
-            "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Close Code";
-            "Processing Type" := EFTTransactionRequest."Processing Type"::CLOSE;
-        end;
+        EFTTransactionRequest."Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Close Code";
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::CLOSE;
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -930,20 +877,17 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperConfiguration.TestField("Transaction Type Payment Code");
 
         if (CurrencyCode = '') then begin
-            GLSetup.Get;
+            GLSetup.Get();
             CurrencyCode := GLSetup."LCY Code";
         end;
 
-        with EFTTransactionRequest do begin
-            "Sales Ticket No." := SalesReceiptNo;
-            "Reference Number Input" := SalesReceiptNo;
+        EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
+        EFTTransactionRequest."Reference Number Input" := SalesReceiptNo;
 
-            "Currency Code" := CurrencyCode;
-            "Amount Input" := Amount;
-            SetTrxProcessingType('10', RegisterNo, EFTTransactionRequest);
-            "Auto Voidable" := true;
-
-        end;
+        EFTTransactionRequest."Currency Code" := CurrencyCode;
+        EFTTransactionRequest."Amount Input" := Amount;
+        SetTrxProcessingType('10', RegisterNo, EFTTransactionRequest);
+        EFTTransactionRequest."Auto Voidable" := true;
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -959,17 +903,14 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperConfiguration.TestField("Transaction Type Recover Code");
 
         if (CurrencyCode = '') then begin
-            GLSetup.Get;
+            GLSetup.Get();
             CurrencyCode := GLSetup."LCY Code";
         end;
 
-        with EFTTransactionRequest do begin
-            "Sales Ticket No." := SalesReceiptNo;
-            "Reference Number Input" := SalesReceiptNo;
+        EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
+        EFTTransactionRequest."Reference Number Input" := SalesReceiptNo;
 
-            SetTrxProcessingType('0', RegisterNo, EFTTransactionRequest);
-
-        end;
+        SetTrxProcessingType('0', RegisterNo, EFTTransactionRequest);
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -984,19 +925,16 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperConfiguration.TestField("Transaction Type Refund Code");
 
         if (CurrencyCode = '') then begin
-            GLSetup.Get;
+            GLSetup.Get();
             CurrencyCode := GLSetup."LCY Code";
         end;
 
-        with EFTTransactionRequest do begin
-            "Sales Ticket No." := SalesReceiptNo;
-            "Reference Number Input" := ReferenceNumber;
-            "Currency Code" := CurrencyCode;
-            "Amount Input" := Abs(Amount); // Amount should be positiv
+        EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
+        EFTTransactionRequest."Reference Number Input" := ReferenceNumber;
+        EFTTransactionRequest."Currency Code" := CurrencyCode;
+        EFTTransactionRequest."Amount Input" := Abs(Amount); // Amount should be positiv
 
-            SetTrxProcessingType('60', RegisterNo, EFTTransactionRequest);
-
-        end;
+        SetTrxProcessingType('60', RegisterNo, EFTTransactionRequest);
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -1012,20 +950,17 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperConfiguration.TestField("Transaction Type Refund Code");
 
         if (CurrencyCode = '') then begin
-            GLSetup.Get;
+            GLSetup.Get();
             CurrencyCode := GLSetup."LCY Code";
         end;
 
-        with EFTTransactionRequest do begin
-            "Sales Ticket No." := SalesReceiptNo;
-            "Reference Number Input" := ReferenceNumber;
+        EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
+        EFTTransactionRequest."Reference Number Input" := ReferenceNumber;
 
-            "Currency Code" := CurrencyCode;
-            "Amount Input" := Amount;
+        EFTTransactionRequest."Currency Code" := CurrencyCode;
+        EFTTransactionRequest."Amount Input" := Amount;
 
-            SetTrxProcessingType('20', RegisterNo, EFTTransactionRequest);
-
-        end;
+        SetTrxProcessingType('20', RegisterNo, EFTTransactionRequest);
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -1044,14 +979,10 @@ codeunit 6184487 "NPR Pepper Library TSD"
                 Error('Aborted.');
         end;
 
-        with EFTTransactionRequest do begin
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
+        EFTTransactionRequest."Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Auxilary Code";
 
-            "Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
-            "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Auxilary Code";
-
-            "Pepper Trans. Subtype Code" := Format(AuxFunction);
-
-        end;
+        EFTTransactionRequest."Pepper Trans. Subtype Code" := Format(AuxFunction);
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -1064,14 +995,10 @@ codeunit 6184487 "NPR Pepper Library TSD"
         PepperVersion.TestField("Codeunit Auxiliary Functions");
         PepperConfiguration.TestField("Transaction Type Install Code");
 
-        with EFTTransactionRequest do begin
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
+        EFTTransactionRequest."Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Install Code";
 
-            "Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
-            "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Install Code";
-
-            "Pepper Trans. Subtype Code" := PepperVersion.Code;
-
-        end;
+        EFTTransactionRequest."Pepper Trans. Subtype Code" := PepperVersion.Code;
         exit(EFTTransactionRequest.Insert());
     end;
 
@@ -1080,24 +1007,22 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         InitializePepperSetup(RegisterNo);
 
-        with EFTTransactionRequest do begin
-            "Result Code" := -900; // Request created
-            "Result Description" := 'PENDING...';
-            "Register No." := RegisterNo;
+        EFTTransactionRequest."Result Code" := -900; // Request created
+        EFTTransactionRequest."Result Description" := 'PENDING...';
+        EFTTransactionRequest."Register No." := RegisterNo;
 
-            Token := CreateGuid();
-            Mode := PepperConfiguration.Mode;
+        EFTTransactionRequest.Token := CreateGuid();
+        EFTTransactionRequest.Mode := PepperConfiguration.Mode;
 
-            "Track Presence Input" := "Track Presence Input"::"From EFT";
-            "Card Information Input" := '';
+        EFTTransactionRequest."Track Presence Input" := EFTTransactionRequest."Track Presence Input"::"From EFT";
+        EFTTransactionRequest."Card Information Input" := '';
 
-            "Integration Type" := GetIntegrationType();
-            "Pepper Terminal Code" := PepperTerminal.Code;
-            "Integration Version Code" := PepperConfiguration.Version;
+        EFTTransactionRequest."Integration Type" := GetIntegrationType();
+        EFTTransactionRequest."Pepper Terminal Code" := PepperTerminal.Code;
+        EFTTransactionRequest."Integration Version Code" := PepperConfiguration.Version;
 
-            Started := CurrentDateTime;
-            "User ID" := UserId;
-        end;
+        EFTTransactionRequest.Started := CurrentDateTime;
+        EFTTransactionRequest."User ID" := UserId;
     end;
 
     local procedure "--*** Supporting Functions"()
@@ -1109,40 +1034,38 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         InitializePepperSetup(RegisterNo);
 
-        with EFTTransactionRequest do begin
-            "Pepper Trans. Subtype Code" := TransactionSubtypeCode;
-            "Processing Type" := "Processing Type"::OTHER;
-            "Pepper Transaction Type Code" := '';
+        EFTTransactionRequest."Pepper Trans. Subtype Code" := TransactionSubtypeCode;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::OTHER;
+        EFTTransactionRequest."Pepper Transaction Type Code" := '';
 
-            case TransactionSubtypeCode of
-                '0':
-                    begin
-                        "Processing Type" := EFTTransactionRequest."Processing Type"::OTHER;
-                        "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Recover Code";
-                    end;
-                '10':
-                    begin
-                        "Processing Type" := EFTTransactionRequest."Processing Type"::PAYMENT;
-                        "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Payment Code";
-                    end;
-                '20', '60':
-                    begin
-                        "Processing Type" := EFTTransactionRequest."Processing Type"::REFUND;
-                        "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Refund Code";
-                    end;
-                else
-                    Error('The "Transaction Subtype Code" %1 has not been handled in function SetTrxProcessingType.');
-            end;
+        case TransactionSubtypeCode of
+            '0':
+                begin
+                    EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::OTHER;
+                    EFTTransactionRequest."Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Recover Code";
+                end;
+            '10':
+                begin
+                    EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::PAYMENT;
+                    EFTTransactionRequest."Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Payment Code";
+                end;
+            '20', '60':
+                begin
+                    EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::REFUND;
+                    EFTTransactionRequest."Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Refund Code";
+                end;
+            else
+                Error('The "Transaction Subtype Code" %1 has not been handled in function SetTrxProcessingType.');
         end;
     end;
 
     local procedure FindTerminalSetupFromRegister(RegisterNo: Code[10]; var VarPepperTerminal: Record "NPR Pepper Terminal"; var VarPepperInstance: Record "NPR Pepper Instance"; var VarPepperConfiguration: Record "NPR Pepper Config."; var VarPepperVersion: Record "NPR Pepper Version"; var VarEFTSetup: Record "NPR EFT Setup"): Boolean
     begin
 
-        VarPepperTerminal.Reset;
+        VarPepperTerminal.Reset();
         VarPepperTerminal.SetRange("Register No.", RegisterNo);
 
-        if (VarPepperTerminal.Count > 1) then
+        if (VarPepperTerminal.Count() > 1) then
             Error(ErrorText001, RegisterNo);
 
         if (not VarPepperTerminal.FindFirst()) then
@@ -1158,9 +1081,9 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         VarEFTSetup.SetRange("EFT Integration Type", GetIntegrationType());
         VarEFTSetup.SetRange("POS Unit No.", RegisterNo);
-        if not VarEFTSetup.FindFirst then begin
+        if not VarEFTSetup.FindFirst() then begin
             VarEFTSetup.SetRange("POS Unit No.", '');
-            VarEFTSetup.FindFirst;
+            VarEFTSetup.FindFirst();
         end;
 
         exit(true);
@@ -1170,7 +1093,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
     var
         Currency: Record Currency;
         GeneralLedgerSetup: Record "General Ledger Setup";
-        DecimalPlaces: Integer;
         CentFactor: Integer;
         AmountInCents: Integer;
     begin
@@ -1179,7 +1101,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         if Currency.Get(ParCurrencyCode) then begin
             CentFactor := CalcCentFactor(Currency."Amount Decimal Places");
         end else begin
-            GeneralLedgerSetup.Get;
+            GeneralLedgerSetup.Get();
             CentFactor := CalcCentFactor(GeneralLedgerSetup."Amount Decimal Places");
         end;
         if Evaluate(AmountInCents, Format(Round(CentFactor * ParDecimalAmount, 1))) then
@@ -1199,7 +1121,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         if Currency.Get(ParCurrencyCode) then begin
             CentFactor := CalcCentFactor(Currency."Amount Decimal Places");
         end else begin
-            GeneralLedgerSetup.Get;
+            GeneralLedgerSetup.Get();
             CentFactor := CalcCentFactor(GeneralLedgerSetup."Amount Decimal Places");
         end;
         exit(ParAmountInCents / CentFactor);
@@ -1208,7 +1130,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure CalcCentFactor(TextFormat: Text): Integer
     var
         DecimalPlaces: Integer;
-        I: Integer;
     begin
         if StrPos(TextFormat, ':') > 0 then
             if StrLen(TextFormat) > StrPos(TextFormat, ':') then
@@ -1317,7 +1238,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
             exit(UpperCase(Format(PepperTerminal."NAV Receipt Encoding", 0)));
     end;
 
-    local procedure GetResultCodeDescription(ParTransactionType: Code[10]; ParTransactionSubtypeCode: Code[10]; ParResultCode: Integer) Description: Text
+    local procedure GetResultCodeDescription(ParTransactionType: Code[10]; ParTransactionSubtypeCode: Code[10]; ParResultCode: Integer): Text
     var
         PepperResultCode: Record "NPR Pepper EFT Result Code";
     begin
@@ -1355,7 +1276,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
             AddToCommentBatch(StrSubstNo(Text002, DateText));
 
         if (TDate = 0D) then
-            TDate := Today;
+            TDate := Today();
 
         exit(TDate);
     end;
@@ -1381,7 +1302,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
         Day: Integer;
         Month: Integer;
         Year: Integer;
-        FifthandSixthPos: Integer;
     begin
         if DateText = '' then
             exit(0D);
@@ -1423,24 +1343,20 @@ codeunit 6184487 "NPR Pepper Library TSD"
         TextUnknown: Label 'Card: %1';
     begin
 
-        with EFTTransactionRequest do begin
+        if (EFTTransactionRequest."Card Name" <> '') then begin
+            if (StrLen(EFTTransactionRequest."Card Number") > 8) then
+                exit(StrSubstNo(TextDescription, CopyStr(EFTTransactionRequest."Card Name", 1, 8), CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
+            else
+                exit(StrSubstNo(EFTTransactionRequest."Card Name"));
 
-            if ("Card Name" <> '') then begin
-                if (StrLen("Card Number") > 8) then
-                    exit(StrSubstNo(TextDescription, CopyStr("Card Name", 1, 8), CopyStr("Card Number", StrLen("Card Number") - 7)))
+        end else begin
+            if PepperCardType.Get(EFTTransactionRequest."Card Type") then
+                if (PepperCardType.Description <> '') and (StrLen(EFTTransactionRequest."Card Number") > 8) then
+                    exit(StrSubstNo(TextDescription, CopyStr(EFTTransactionRequest."Card Name", 1, 8), CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
                 else
-                    exit(StrSubstNo("Card Name"));
-
-            end else begin
-                if PepperCardType.Get("Card Type") then
-                    if (PepperCardType.Description <> '') and (StrLen("Card Number") > 8) then
-                        exit(StrSubstNo(TextDescription, CopyStr("Card Name", 1, 8), CopyStr("Card Number", StrLen("Card Number") - 7)))
-                    else
-                        exit(StrSubstNo(TextUnknown, PepperCardType.Description))
-                else
-                    exit(StrSubstNo(TextUnknown, "Card Number"));
-
-            end;
+                    exit(StrSubstNo(TextUnknown, PepperCardType.Description))
+            else
+                exit(StrSubstNo(TextUnknown, EFTTransactionRequest."Card Number"));
 
         end;
     end;
@@ -1483,9 +1399,9 @@ codeunit 6184487 "NPR Pepper Library TSD"
             exit;
 
         EFTTransactReqComment.SetFilter("Entry No.", '=%1', EftRequestEntryNo);
-        if (EFTTransactReqComment.FindLast) then;
+        if (EFTTransactReqComment.FindLast()) then;
 
-        EFTTransactReqComment.Init;
+        EFTTransactReqComment.Init();
         EFTTransactReqComment."Entry No." := EftRequestEntryNo;
         EFTTransactReqComment."Line No." := EFTTransactReqComment."Line No." + 1;
         EFTTransactReqComment.Comment := Comment;
@@ -1518,9 +1434,9 @@ codeunit 6184487 "NPR Pepper Library TSD"
     begin
         I := 0;
 
-        EFTTransactReqComment.Reset;
+        EFTTransactReqComment.Reset();
         EFTTransactReqComment.SetFilter("Entry No.", '=%1', EftRequestEntryNo);
-        if EFTTransactReqComment.FindLast then
+        if EFTTransactReqComment.FindLast() then
             LastLine := EFTTransactReqComment."Line No."
         else
             LastLine := 0;
@@ -1530,7 +1446,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         repeat
             I := I + 1;
             if CommentText[I] <> '' then begin
-                EFTTransactReqComment.Init;
+                EFTTransactReqComment.Init();
                 EFTTransactReqComment."Entry No." := EftRequestEntryNo;
                 EFTTransactReqComment."Line No." := I + LastLine;
                 EFTTransactReqComment.Comment := CommentText[I];
@@ -1568,19 +1484,16 @@ codeunit 6184487 "NPR Pepper Library TSD"
         EFTResultCode: Record "NPR Pepper EFT Result Code";
     begin
 
-        with EFTTransactionRequest do begin
-            if (Successful) then
-                exit(false);
+        if (EFTTransactionRequest.Successful) then
+            exit(false);
 
-            if ("Offline mode") then
-                exit(false);
+        if (EFTTransactionRequest."Offline mode") then
+            exit(false);
 
-            if (not EFTResultCode.Get("Integration Type", "Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", "Result Code")) then
-                exit(false);
+        if (not EFTResultCode.Get(EFTTransactionRequest."Integration Type", EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code")) then
+            exit(false);
 
-            exit(EFTResultCode."Open Terminal and Retry");
-
-        end;
+        exit(EFTResultCode."Open Terminal and Retry");
     end;
 
     local procedure "--***Printing"()
@@ -1605,11 +1518,11 @@ codeunit 6184487 "NPR Pepper Library TSD"
             if (EFTTransactionType."Suppress Receipt Print") then
                 exit;
 
-        CreditCardTransaction.Reset;
+        CreditCardTransaction.Reset();
         CreditCardTransaction.SetRange("Register No.", EFTTransactionRequest."Register No.");
         CreditCardTransaction.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
 
-        if (CreditCardTransaction.FindLast) then
+        if (CreditCardTransaction.FindLast()) then
             EntryNo := CreditCardTransaction."Entry No.";
 
         EFTTransactionRequest.CalcFields("Receipt 1", "Receipt 2");
@@ -1632,7 +1545,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
         Utility: Codeunit "NPR Receipt Footer Mgt.";
         TicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         ReceiptLineText: Text;
-        Encoding: TextEncoding;
         I: Integer;
         TextDot: Label '______________________________';
         TextSig: Label 'Customer Signature';
@@ -1641,7 +1553,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
         CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
-        CreditCardTransaction.Date := Today;
+        CreditCardTransaction.Date := Today();
         CreditCardTransaction."Transaction Time" := Time;
         CreditCardTransaction."EFT Trans. Request Entry No." := EFTTransactionRequest."Entry No.";
         if (EFTTransactionRequest."Initiated from Entry No." <> 0) then
@@ -1709,7 +1621,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
                     end;
                     PepperTerminal.Validate(Status, PepperTerminal.Status::ActiveOffline);
                     PepperTerminal.Modify(true);
-                    Commit;
+                    Commit();
                 end;
             CommandType::Deactivate:
                 begin
@@ -1721,7 +1633,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
                     end;
                     PepperTerminal.Validate(Status, PepperTerminal.Status::Open);
                     PepperTerminal.Modify(true);
-                    Commit;
+                    Commit();
                 end;
         end;
         exit(true);
@@ -1764,8 +1676,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         if not EftTransactionRequest.IsType(GetIntegrationType()) then
             exit;
 
-        with EftTransactionRequest do
-            Handled := CreatePaymentOfGoodsRequest("Register No.", "Sales Ticket No.", "Currency Code", EftTransactionRequest."Amount Input", EftTransactionRequest);
+        Handled := CreatePaymentOfGoodsRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Currency Code", EftTransactionRequest."Amount Input", EftTransactionRequest);
 
     end;
 
@@ -1780,8 +1691,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         if (OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.")) then;
 
-        with EftTransactionRequest do
-            Handled := CreateRefundRequest("Register No.", "Sales Ticket No.", "Currency Code", "Amount Input", OriginalTransactionRequest."Reference Number Output", EftTransactionRequest);
+        Handled := CreateRefundRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Currency Code", EftTransactionRequest."Amount Input", OriginalTransactionRequest."Reference Number Output", EftTransactionRequest);
 
         if (Handled) then begin
             if (OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.")) then begin
@@ -1805,8 +1715,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         if OriginalTransactionRequest."Processing Type" <> OriginalTransactionRequest."Processing Type"::PAYMENT then
             exit;
 
-        with OriginalTransactionRequest do
-            Handled := CreateVoidPaymentOfGoodsRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", "Currency Code", "Amount Output", "Reference Number Output", EftTransactionRequest);
+        Handled := CreateVoidPaymentOfGoodsRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", OriginalTransactionRequest."Currency Code", OriginalTransactionRequest."Amount Output", OriginalTransactionRequest."Reference Number Output", EftTransactionRequest);
 
         if (Handled) then begin
             if (OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.")) then begin
@@ -1841,8 +1750,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
-    var
-        AlternativeTransactionRequest: Record "NPR EFT Transaction Request";
     begin
 
         if not EftTransactionRequest.IsType(GetIntegrationType()) then
@@ -1896,14 +1803,14 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", GetIntegrationType());
-        if not EFTSetup.FindFirst then begin
+        if not EFTSetup.FindFirst() then begin
             EFTSetup.SetRange("POS Unit No.", '');
-            if not EFTSetup.FindFirst then
+            if not EFTSetup.FindFirst() then
                 exit;
         end;
 
         tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert;
+        tmpEFTSetup.Insert();
 
     end;
 
@@ -1936,7 +1843,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         if (EFTTransactionRequest."Initiated from Entry No." <> 0) then
             CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', EFTTransactionRequest."Initiated from Entry No.");
 
-        if not CreditCardTransaction.FindSet then
+        if not CreditCardTransaction.FindSet() then
             exit;
 
         CreditCardTransaction.PrintTerminalReceipt();
@@ -1950,7 +1857,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         tmpEFTIntegrationType.Code := GetIntegrationType();
         tmpEFTIntegrationType.Description := StrSubstNo('%1 %2 %3', 'Treibauf', 'Pepper', PepperDescription);
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR Pepper Library TSD";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
 
     end;
 
@@ -1962,55 +1869,55 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         tmpEFTAuxOperation."Auxiliary ID" := 0;
         tmpEFTAuxOperation.Description := 'StrMenu';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 1;
         tmpEFTAuxOperation.Description := 'Abort';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 2;
         tmpEFTAuxOperation.Description := 'PAN Suppression ON';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 3;
         tmpEFTAuxOperation.Description := 'PAN Suppression OFF';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 4;
         tmpEFTAuxOperation.Description := 'Custom Menu';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 5;
         tmpEFTAuxOperation.Description := 'Ticket Reprint';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 6;
         tmpEFTAuxOperation.Description := 'Summary Report';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 7;
         tmpEFTAuxOperation.Description := 'Diagnostics';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 8;
         tmpEFTAuxOperation.Description := 'System Info';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 9;
         tmpEFTAuxOperation.Description := 'Display with Num Input';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 10;
         tmpEFTAuxOperation.Description := 'TINA Activation';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 11;
         tmpEFTAuxOperation.Description := 'TINA Query';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation."Auxiliary ID" := 12;
         tmpEFTAuxOperation.Description := 'Show Custom Menu';
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
     end;
 

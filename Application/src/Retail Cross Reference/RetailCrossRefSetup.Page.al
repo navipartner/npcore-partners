@@ -27,7 +27,7 @@ page 6151181 "NPR Retail Cross Ref. Setup"
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Pattern Guide:                                                                                                                                                                                                                                                                                 field';
                     }
-                    field("Pattern Guide"; "Pattern Guide")
+                    field("Pattern Guide"; Rec."Pattern Guide")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -39,12 +39,12 @@ page 6151181 "NPR Retail Cross Ref. Setup"
             }
             repeater(Group)
             {
-                field("Table ID"; "Table ID")
+                field("Table ID"; Rec."Table ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table ID field';
                 }
-                field("Reference No. Pattern"; "Reference No. Pattern")
+                field("Reference No. Pattern"; Rec."Reference No. Pattern")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;

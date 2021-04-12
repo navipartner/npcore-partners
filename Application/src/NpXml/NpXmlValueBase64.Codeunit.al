@@ -14,17 +14,17 @@ codeunit 6151560 "NPR NpXml Value Base64"
         Clear(RecRef);
         RecRef.Open("Table No.");
         RecRef.SetPosition("Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
 
         CustomValue := Format(GetBase64(RecRef, NpXmlElement."Field No."), 0, 9);
-        RecRef.Close;
+        RecRef.Close();
 
         Clear(RecRef);
 
         Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Modify();
     end;
 
     local procedure GetBase64(RecRef: RecordRef; FieldNo: Integer) Value: Text

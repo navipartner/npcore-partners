@@ -364,7 +364,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
     trigger OnAfterGetRecord()
     begin
-        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Customer, "No.");
+        NPRAttrManagement.GetMasterDataAttributeValue(NPRAttrTextArray, DATABASE::Customer, Rec."No.");
         NPRAttrEditable := CurrPage.Editable();
 
         if UserSetup.Get(UserId) then
@@ -408,7 +408,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit;
 
         case MagentoSetup."Magento Version" of

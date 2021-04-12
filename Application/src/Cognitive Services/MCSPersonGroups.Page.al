@@ -42,7 +42,7 @@ page 6059957 "NPR MCS Person Groups"
                 trigger OnAction()
                 begin
                     MCSFaceServiceAPI.GetPersonGroups;
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
         }

@@ -54,13 +54,13 @@ page 6151174 "NPR NpGp User Sale Return"
             }
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -93,10 +93,10 @@ page 6151174 "NPR NpGp User Sale Return"
                         if QuantityToReturn > OriginalQuantity - QuantityReturned then
                             QuantityToReturn := OriginalQuantity - QuantityReturned;
 
-                        Quantity := -QuantityToReturn;
+                        Rec.Quantity := -QuantityToReturn;
                     end;
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -113,10 +113,9 @@ page 6151174 "NPR NpGp User Sale Return"
     trigger OnAfterGetRecord()
     var
         RetailCrossReference: Record "NPR Retail Cross Reference";
-        HasReference: Boolean;
     begin
         if GetLastErrorCode > '' then begin
-            ClearMarks;
+            Rec.ClearMarks;
             ClearLastError;
         end;
 
@@ -124,26 +123,26 @@ page 6151174 "NPR NpGp User Sale Return"
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
 
-        RetailCrossReference.SetRange("Reference No.", "Global Reference");
-        if RetailCrossReference.FindSet then
+        RetailCrossReference.SetRange("Reference No.", Rec."Global Reference");
+        if RetailCrossReference.FindSet() then
             repeat
                 SaleLinePOS.SetRange("Retail ID", RetailCrossReference."Retail ID");
                 SaleLinePOS.SetFilter(Quantity, '<0');
-                if SaleLinePOS.FindFirst and not SaleLinePOS.Mark then begin
-                    Quantity += SaleLinePOS.Quantity;
+                if SaleLinePOS.FindFirst() and not SaleLinePOS.Mark then begin
+                    Rec.Quantity += SaleLinePOS.Quantity;
                     SaleLinePOS.Mark(true);
                 end;
-            until RetailCrossReference.Next = 0;
+            until RetailCrossReference.Next() = 0;
 
-        if not Mark then begin
-            OriginalQuantity := "Quantity (Base)" / "Qty. per Unit of Measure";
-            QuantityReturned := OriginalQuantity - Quantity;
-            Mark(true);
+        if not Rec.Mark then begin
+            OriginalQuantity := Rec."Quantity (Base)" / Rec."Qty. per Unit of Measure";
+            QuantityReturned := OriginalQuantity - Rec.Quantity;
+            Rec.Mark(true);
         end;
 
-        QuantityToReturn := Abs(Quantity);
-        Quantity := -Abs(Quantity);
-        Modify;
+        QuantityToReturn := Abs(Rec.Quantity);
+        Rec.Quantity := -Abs(Rec.Quantity);
+        Rec.Modify();
     end;
 
     trigger OnOpenPage()
@@ -167,16 +166,16 @@ page 6151174 "NPR NpGp User Sale Return"
         if not pTempNpGpPOSSalesLine.IsEmpty then
             repeat
                 Rec := pTempNpGpPOSSalesLine;
-                Insert;
-            until pTempNpGpPOSSalesLine.Next = 0;
+                Rec.Insert();
+            until pTempNpGpPOSSalesLine.Next() = 0;
 
-        FindSet;
+        Rec.FindSet();
     end;
 
     procedure GetLines(var pTempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
     begin
         pTempNpGpPOSSalesLine.Copy(Rec, true);
-        pTempNpGpPOSSalesLine.FindSet;
+        pTempNpGpPOSSalesLine.FindSet();
     end;
 }
 

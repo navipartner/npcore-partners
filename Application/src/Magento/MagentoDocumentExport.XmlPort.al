@@ -1,4 +1,4 @@
-xmlport 6151402 "NPR Magento Document Export"
+﻿xmlport 6151402 "NPR Magento Document Export"
 {
     Caption = 'Magento Document Export';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/naviconnect/documents';
@@ -863,7 +863,7 @@ xmlport 6151402 "NPR Magento Document Export"
                         SalesQuote."Currency Code" := GeneralLedgerSetup."LCY Code";
 
                     if (SalesQuote."Due Date" < Today) then
-                        currXMLport.Skip;
+                        currXMLport.Skip();
                 end;
 
                 trigger OnPreXmlItem()
@@ -967,7 +967,7 @@ xmlport 6151402 "NPR Magento Document Export"
         LocalOrder.SetFilter("No.", '=%1', DocumentNumber);
         if (LocalOrder.FindSet()) then begin
             repeat
-                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult.Init();
                 TmpDocumentSearchResult."Doc. Type" := 10;
                 TmpDocumentSearchResult."Doc. No." := LocalOrder."No.";
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
@@ -978,14 +978,14 @@ xmlport 6151402 "NPR Magento Document Export"
         LocalSalesShipmentHeader.SetFilter("Order No.", '=%1', DocumentNumber);
         if (LocalSalesShipmentHeader.FindSet()) then begin
             repeat
-                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult.Init();
                 TmpDocumentSearchResult."Doc. Type" := 20;
                 TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
                 TmpDocumentSearchResult.Description := CopyStr(LocalSalesShipmentHeader."Package Tracking No.", 1, MaxStrLen(TmpDocumentSearchResult.Description));
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
                     if (TmpDocumentSearchResult.Insert()) then;
 
-                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult.Init();
                 TmpDocumentSearchResult."Doc. Type" := 120;
                 TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
                 TmpDocumentSearchResult.Description := CopyStr(LocalSalesShipmentHeader."Shipment Method Code", 1, MaxStrLen(TmpDocumentSearchResult.Description));
@@ -998,7 +998,7 @@ xmlport 6151402 "NPR Magento Document Export"
         LocalSalesInvoiceHeader.SetFilter("Order No.", '=%1', DocumentNumber);
         if (LocalSalesInvoiceHeader.FindSet()) then begin
             repeat
-                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult.Init();
                 TmpDocumentSearchResult."Doc. Type" := 30;
                 TmpDocumentSearchResult."Doc. No." := LocalSalesInvoiceHeader."No.";
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
@@ -1009,7 +1009,7 @@ xmlport 6151402 "NPR Magento Document Export"
         LocalSalesCrMemoHeader.SetFilter("Return Order No.", '=%1', DocumentNumber);
         if (LocalSalesCrMemoHeader.FindSet()) then begin
             repeat
-                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult.Init();
                 TmpDocumentSearchResult."Doc. Type" := 40;
                 TmpDocumentSearchResult."Doc. No." := LocalSalesCrMemoHeader."No.";
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then

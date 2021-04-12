@@ -1,4 +1,4 @@
-codeunit 6151526 "NPR Nc Endpoint File Mgt."
+﻿codeunit 6151526 "NPR Nc Endpoint File Mgt."
 {
     // NC2.01/BR  /20160829  CASE 248630 NaviConnect
     // NC2.01/BR  /20161003  CASE 248630 Auto add directory implemented.
@@ -18,11 +18,9 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         TextFileExistsOverwitten: Label 'The file was exported, overwriting the file %1 that already existed.';
         TextFileExistsAppendedSuffix: Label 'The file was exported to %1 with an appended Timestamp in the filename because the file already existed.';
         TextFileExported: Label 'The file was exported to %1.';
-        TextFileNotExported: Label 'The file could not be exported to %1.';
 
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text)
     var
-        NcTrigger: Record "NPR Nc Trigger";
         NcEndpoint: Record "NPR Nc Endpoint";
         NcEndpointFile: Record "NPR Nc Endpoint File";
         NcEndpointTriggerLink: Record "NPR Nc Endpoint Trigger Link";
@@ -30,9 +28,9 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         case NcTask."Table No." of
             DATABASE::"NPR Nc Trigger":
                 begin
-                    NcEndpointTriggerLink.Reset;
+                    NcEndpointTriggerLink.Reset();
                     NcEndpointTriggerLink.SetRange("Trigger Code", NcTriggerCode);
-                    if NcEndpointTriggerLink.FindSet then
+                    if NcEndpointTriggerLink.FindSet() then
                         repeat
                             if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
                                 if NcEndpoint."Endpoint Type" = NcEndpointFile.GetEndpointTypeCode then begin
@@ -41,7 +39,7 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
                                     end;
                                 end;
                             end;
-                        until NcEndpointTriggerLink.Next = 0;
+                        until NcEndpointTriggerLink.Next() = 0;
                 end;
             DATABASE::"NPR Nc Endpoint File":
                 begin
@@ -49,9 +47,9 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
                     NcEndpointFile.SetPosition(NcTask."Record Position");
                     NcEndpointFile.SetRange(Code, NcEndpointFile.Code);
                     NcEndpointFile.SetRange(Enabled, true);
-                    if NcEndpointFile.FindFirst then begin
+                    if NcEndpointFile.FindFirst() then begin
                         ProcessEndPointTask(NcEndpointFile, NcTask, Output, Filename);
-                        NcTask.Modify;
+                        NcTask.Modify();
                     end;
                 end;
         end;
@@ -67,11 +65,11 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         if not NcTrigger."Split Trigger and Endpoint" then begin
             //Process Trigger Task Directly
             FileProcess(NcTask, NcEndpointFile, Output, Filename);
-            NcTask.Modify;
+            NcTask.Modify();
         end else begin
             //Insert New Task per Endpoint
             InsertEndpointTask(NcEndpointFile, NcTask, Filename);
-            NcTask.Modify;
+            NcTask.Modify();
         end;
     end;
 
@@ -87,7 +85,7 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         RecRef.Get(NcEndpointFile.RecordId);
         NcTriggerSyncMgt.InsertTask(RecRef, TaskEntryNo);
         NewTask.Get(TaskEntryNo);
-        TempNcEndPointFile.Init;
+        TempNcEndPointFile.Init();
         TempNcEndPointFile.Copy(NcEndpointFile);
         TempNcEndPointFile."Output Nc Task Entry No." := NcTask."Entry No.";
         if Filename <> '' then
@@ -122,8 +120,6 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         ExportFile: File;
         DirectoryPathfromFile: Text;
         FullName: Text;
-        ResponseDescriptionText: Text;
-        ResponseCodeText: Text;
         ToFile: Text;
     begin
         NcEndpointFile.TestField(Path);
@@ -179,7 +175,7 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
             NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExported, FullName), '\', '/'));
         end;
         ExportFile.Create(FullName);
-        ExportFile.Close;
+        ExportFile.Close();
         //-NC2.12 [#254072]
         case NcEndpointFile."File Encoding" of
             NcEndpointFile."File Encoding"::ANSI:
@@ -192,7 +188,7 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         StreamWriter := StreamWriter.StreamWriter(FullName, true, Encoding);
         StreamWriter.Write(OutputText);
         StreamWriter.Flush;
-        StreamWriter.Close;
+        StreamWriter.Close();
         //+NC2.12 [#254072]
 
         //-NC2.12 [313362]
@@ -204,7 +200,7 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         //  ExportFile.OPEN(FullName);
         //  //+NC2.12 [#254072]
         //  FileMgt.DownloadToFile(ExportFile.NAME +'.file', ToFile);
-        //  ExportFile.CLOSE;
+        //  ExportFile.Close();
         //  ERASE(FullName);
         //  //-NC2.12 [#254072]
         //  NcTriggerSyncMgt.AddResponse(NcTask,NewLine() + STRSUBSTNO(TextFileDownloaded,CONVERTSTR(ToFile,'\','/')));
@@ -216,7 +212,7 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
             FileMgt.CopyServerFile(FullName, FullName + '.file', true);
             ExportFile.Open(FullName);
             FileMgt.DownloadToFile(ExportFile.Name + '.file', ToFile);
-            ExportFile.Close;
+            ExportFile.Close();
             Erase(FullName);
             NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + StrSubstNo(TextFileDownloaded, ConvertStr(ToFile, '\', '/')));
         end;
@@ -225,10 +221,8 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
 
     local procedure FileProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFile: Record "NPR Nc Endpoint File")
     var
-        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         Encoding: DotNet NPRNetEncoding;
-        StreamReader: DotNet NPRNetStreamReader;
         StreamWriter: DotNet NPRNetStreamWriter;
         Tempfile: File;
         ExportFile: File;
@@ -236,7 +230,6 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         DirectoryPathfromFile: Text;
         FullName: Text;
         ToFile: Text;
-        ReturnValue: Boolean;
     begin
         //-NC2.12 [308107]
         NcEndpointFile.TestField(Path);
@@ -288,12 +281,12 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         //  FileMgt.CopyServerFile(FullName,FullName+'.file', TRUE);
         //  ExportFile.OPEN(FullName);
         //  FileMgt.DownloadToFile(ExportFile.NAME +'.file', ToFile);
-        //  ExportFile.CLOSE;
+        //  ExportFile.Close();
         //  ERASE(FullName);
         // END;
         NcTaskOutput.Data.CreateInStream(InStream);
         ExportFile.Create(FullName);
-        ExportFile.Close;
+        ExportFile.Close();
         case NcEndpointFile."File Encoding" of
             NcEndpointFile."File Encoding"::ANSI:
                 Encoding := Encoding.GetEncoding('windows-1252');
@@ -305,14 +298,14 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         StreamWriter := StreamWriter.StreamWriter(FullName, true, Encoding);
         CopyStream(StreamWriter.BaseStream, InStream);
         StreamWriter.Flush;
-        StreamWriter.Close;
+        StreamWriter.Close();
 
         if NcEndpointFile."Client Path" then begin
             ToFile := NcEndpointFile.Path + NcTaskOutput.Name;
             FileMgt.CopyServerFile(FullName, FullName + '.file', true);
             ExportFile.Open(FullName);
             FileMgt.DownloadToFile(ExportFile.Name + '.file', ToFile);
-            ExportFile.Close;
+            ExportFile.Close();
             Erase(FullName);
         end;
         //+NC2.12 [313362]
@@ -347,9 +340,9 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         NcEndpointType: Record "NPR Nc Endpoint Type";
     begin
         if not NcEndpointType.Get(NcEndpointFile.GetEndpointTypeCode) then begin
-            NcEndpointType.Init;
+            NcEndpointType.Init();
             NcEndpointType.Code := NcEndpointFile.GetEndpointTypeCode;
-            NcEndpointType.Insert;
+            NcEndpointType.Insert();
         end;
     end;
 
@@ -363,10 +356,10 @@ codeunit 6151526 "NPR Nc Endpoint File Mgt."
         if Sender."Endpoint Type" <> NcEndpointFile.GetEndpointTypeCode then
             exit;
         if not NcEndpointFile.Get(Sender.Code) then begin
-            NcEndpointFile.Init;
+            NcEndpointFile.Init();
             NcEndpointFile.Validate(Code, Sender.Code);
             NcEndpointFile.Description := Sender.Description;
-            NcEndpointFile.Insert;
+            NcEndpointFile.Insert();
         end else begin
             if NcEndpointFile.Description <> Sender.Description then begin
                 NcEndpointFile.Description := Sender.Description;

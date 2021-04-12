@@ -1,4 +1,4 @@
-xmlport 6151405 "NPR Magento Store Inv."
+﻿xmlport 6151405 "NPR Magento Store Inv."
 {
     Caption = 'Collect Store Inventory';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/magento_collect_store_inventory';
@@ -97,14 +97,14 @@ xmlport 6151405 "NPR Magento Store Inv."
                         trigger OnBeforeInsertRecord()
                         begin
                             if TempNpCsStore.Code = MagentoSetup."NpCs From Store Code" then
-                                currXMLport.Skip;
+                                currXMLport.Skip();
                         end;
                     }
                 }
 
                 trigger OnBeforePassVariable()
                 begin
-                    currXMLport.Skip;
+                    currXMLport.Skip();
                 end;
             }
             textelement(collect_response)
@@ -151,7 +151,7 @@ xmlport 6151405 "NPR Magento Store Inv."
                                     trigger OnBeforePassField()
                                     begin
                                         if TempItem2."Description 2" = '' then
-                                            currXMLport.Skip;
+                                            currXMLport.Skip();
                                     end;
                                 }
                                 textelement(iteminventory)
@@ -174,12 +174,12 @@ xmlport 6151405 "NPR Magento Store Inv."
                                         StockStatusFilter::"In Stock":
                                             begin
                                                 if not NpCsStoreInventoryBuffer."In Stock" then
-                                                    currXMLport.Skip;
+                                                    currXMLport.Skip();
                                             end;
                                         StockStatusFilter::"Out of Stock":
                                             begin
                                                 if NpCsStoreInventoryBuffer."In Stock" then
-                                                    currXMLport.Skip;
+                                                    currXMLport.Skip();
                                             end;
                                     end;
                                 end;
@@ -194,7 +194,7 @@ xmlport 6151405 "NPR Magento Store Inv."
                         trigger OnAfterGetRecord()
                         begin
                             if not HasItems(TempNpCsStore2) then
-                                currXMLport.Skip;
+                                currXMLport.Skip();
                         end;
                     }
                 }
@@ -212,10 +212,10 @@ xmlport 6151405 "NPR Magento Store Inv."
                         InitAllItems();
 
                     Clear(TempNpCsStore);
-                    if TempNpCsStore.FindSet then
+                    if TempNpCsStore.FindSet() then
                         repeat
                             Store2InventoryBuffer();
-                        until TempNpCsStore.Next = 0;
+                        until TempNpCsStore.Next() = 0;
 
                     NpCsStoreMgt.SetBufferInventory(NpCsStoreInventoryBuffer);
                     TempNpCsStore2.Copy(TempNpCsStore, true);
@@ -223,7 +223,7 @@ xmlport 6151405 "NPR Magento Store Inv."
 
                 trigger OnAfterAssignVariable()
                 begin
-                    currXMLport.Skip;
+                    currXMLport.Skip();
                 end;
             }
         }
@@ -231,7 +231,7 @@ xmlport 6151405 "NPR Magento Store Inv."
 
     trigger OnPreXmlPort()
     begin
-        if MagentoSetup.Get then;
+        if MagentoSetup.Get() then;
     end;
 
     var
@@ -242,16 +242,16 @@ xmlport 6151405 "NPR Magento Store Inv."
 
     local procedure Store2InventoryBuffer()
     begin
-        TempItem.FindSet;
+        TempItem.FindSet();
         repeat
             if not NpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Search Description") then begin
-                NpCsStoreInventoryBuffer.Init;
+                NpCsStoreInventoryBuffer.Init();
                 NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
                 NpCsStoreInventoryBuffer.Sku := TempItem."Search Description";
                 NpCsStoreInventoryBuffer.Quantity := TempItem."Reorder Quantity";
-                NpCsStoreInventoryBuffer.Insert;
+                NpCsStoreInventoryBuffer.Insert();
             end;
-        until TempItem.Next = 0;
+        until TempItem.Next() = 0;
     end;
 
     local procedure InitAllStores()
@@ -259,12 +259,12 @@ xmlport 6151405 "NPR Magento Store Inv."
         NpCsStore: Record "NPR NpCs Store";
     begin
         NpCsStore.SetFilter(Code, '<>%1', MagentoSetup."NpCs From Store Code");
-        if NpCsStore.FindSet then
+        if NpCsStore.FindSet() then
             repeat
-                TempNpCsStore.Init;
+                TempNpCsStore.Init();
                 TempNpCsStore := NpCsStore;
-                TempNpCsStore.Insert;
-            until NpCsStore.Next = 0;
+                TempNpCsStore.Insert();
+            until NpCsStore.Next() = 0;
     end;
 
     local procedure InitAllItems()
@@ -278,34 +278,34 @@ xmlport 6151405 "NPR Magento Store Inv."
 
         Item.SetRange("NPR Magento Item", true);
         Item.SetRange(Blocked, false);
-        if Item.FindSet then
+        if Item.FindSet() then
             repeat
                 ItemVariant.SetRange("Item No.", Item."No.");
                 ItemVariant.SetRange("NPR Blocked", false);
-                if ItemVariant.FindSet then begin
+                if ItemVariant.FindSet() then begin
                     repeat
                         Sku := ItemVariant."Item No." + '_' + ItemVariant.Code;
                         ItemNo := IncStr(ItemNo);
-                        TempItem.Init;
+                        TempItem.Init();
                         TempItem."No." := ItemNo;
                         TempItem."Search Description" := Sku;
                         TempItem.Description := ItemVariant."Item No.";
                         TempItem."Description 2" := ItemVariant.Code;
                         TempItem."Reorder Quantity" := 1;
-                        TempItem.Insert;
-                    until ItemVariant.Next = 0;
+                        TempItem.Insert();
+                    until ItemVariant.Next() = 0;
                 end else begin
                     Sku := Item."No.";
                     ItemNo := IncStr(ItemNo);
-                    TempItem.Init;
+                    TempItem.Init();
                     TempItem."No." := ItemNo;
                     TempItem."Search Description" := Sku;
                     TempItem.Description := Item."No.";
                     TempItem."Description 2" := '';
                     TempItem."Reorder Quantity" := 1;
-                    TempItem.Insert;
+                    TempItem.Insert();
                 end;
-            until Item.Next = 0;
+            until Item.Next() = 0;
     end;
 
     local procedure HasItems(NpCsStore: Record "NPR NpCs Store"): Boolean
@@ -323,7 +323,7 @@ xmlport 6151405 "NPR Magento Store Inv."
                 end;
         end;
 
-        exit(NpCsStoreInventoryBuffer.FindFirst);
+        exit(NpCsStoreInventoryBuffer.FindFirst());
     end;
 
     local procedure AllProductsInStock(NpCsStore: Record "NPR NpCs Store"): Boolean
@@ -331,6 +331,6 @@ xmlport 6151405 "NPR Magento Store Inv."
         Clear(NpCsStoreInventoryBuffer);
         NpCsStoreInventoryBuffer.SetRange("Store Code", NpCsStore.Code);
         NpCsStoreInventoryBuffer.SetRange("In Stock", false);
-        exit(NpCsStoreInventoryBuffer.IsEmpty);
+        exit(NpCsStoreInventoryBuffer.IsEmpty());
     end;
 }

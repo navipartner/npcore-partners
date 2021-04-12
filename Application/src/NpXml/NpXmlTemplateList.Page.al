@@ -19,59 +19,59 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Xml Templates';
                 repeater(Group)
                 {
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Code field';
                     }
-                    field("Task Processor Code"; "Task Processor Code")
+                    field("Task Processor Code"; Rec."Task Processor Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Task Processor Code field';
                     }
-                    field("Xml Root Name"; "Xml Root Name")
+                    field("Xml Root Name"; Rec."Xml Root Name")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Xml Root Name field';
                     }
-                    field("Table No."; "Table No.")
+                    field("Table No."; Rec."Table No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Table No. field';
                     }
-                    field("Template Version"; "Template Version")
+                    field("Template Version"; Rec."Template Version")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Version field';
                     }
-                    field("Transaction Task"; "Transaction Task")
+                    field("Transaction Task"; Rec."Transaction Task")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Transaction Task field';
                     }
-                    field("Batch Task"; "Batch Task")
+                    field("Batch Task"; Rec."Batch Task")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Batch Task field';
                     }
-                    field("File Transfer"; "File Transfer")
+                    field("File Transfer"; Rec."File Transfer")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the File Transfer field';
                     }
-                    field("FTP Transfer"; "FTP Transfer")
+                    field("FTP Transfer"; Rec."FTP Transfer")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the FTP Transfer field';
                     }
-                    field("API Transfer"; "API Transfer")
+                    field("API Transfer"; Rec."API Transfer")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -98,7 +98,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Edit Field Mapping';
                 Image = EditLines;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Elements";
@@ -112,7 +112,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'View Field Mapping';
                 Image = Grid;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Elements";
@@ -129,7 +129,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Run Batch';
                 Image = Start;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Run Batch action';
@@ -148,7 +148,7 @@ page 6151552 "NPR NpXml Template List"
 
                 trigger OnAction()
                 begin
-                    NpXmlTemplateMgt.ExportNpXmlTemplate(Code);
+                    NpXmlTemplateMgt.ExportNpXmlTemplate(Rec.Code);
                 end;
             }
             action("Import Template")

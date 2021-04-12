@@ -62,8 +62,8 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
     var
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
     begin
-        Captions.AddActionCaption(ActionCode, 'confirmTitle', ConfirmTitle);
-        Captions.AddActionCaption(ActionCode, 'confirmLead', StrSubstNo(ConfirmLead, VATBusinessPostingGroup.TableCaption));
+        Captions.AddActionCaption(ActionCode(), 'confirmTitle', ConfirmTitle);
+        Captions.AddActionCaption(ActionCode(), 'confirmLead', StrSubstNo(ConfirmLead, VATBusinessPostingGroup.TableCaption));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -165,7 +165,7 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         //-NPR5.48 [333938]
         //SaleLinePOS.SETFILTER("VAT Bus. Posting Group", '<>%1', VATBusinessPostingGroup.Code);
         //+NPR5.48 [333938]
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 OldVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
                 //-NPR5.48 [333938]
@@ -180,9 +180,9 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
                 SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
                 //+NPR5.45 [323705]
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
-                SaleLinePOS.Modify;
+                SaleLinePOS.Modify();
                 NewVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
         //-NPR5.48 [333938]
         if (NewGenBusPostingGroup <> '') and (SalePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
             SalePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);

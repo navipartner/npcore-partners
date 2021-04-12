@@ -73,6 +73,6 @@ table 6151423 "NPR Magento Custom Optn. Value"
     begin
         ItemCustomOptValue.SetRange("Custom Option No.", "Custom Option No.");
         ItemCustomOptValue.SetRange("Custom Option Value Line No.", "Line No.");
-        ItemCustomOptValue.DeleteAll;
+        ItemCustomOptValue.DeleteAll();
     end;
 }

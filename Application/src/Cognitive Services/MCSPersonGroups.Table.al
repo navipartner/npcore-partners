@@ -34,7 +34,7 @@ table 6059957 "NPR MCS Person Groups"
     trigger OnInsert()
     begin
         Id := 10000;
-        if PersonGroups.FindLast then
+        if PersonGroups.FindLast() then
             Id += PersonGroups.Id;
 
         TestField(Name);

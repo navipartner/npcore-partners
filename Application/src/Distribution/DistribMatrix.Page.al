@@ -15,26 +15,26 @@ page 6151061 "NPR Distrib. Matrix"
         {
             repeater(Control26)
             {
-                IndentationColumn = "Item Hierarchy Level";
+                IndentationColumn = Rec."Item Hierarchy Level";
                 IndentationControls = "Item Hierachy Description";
                 ShowAsTree = true;
                 ShowCaption = false;
-                field("Item Hierachy Description"; "Item Hierachy Description")
+                field("Item Hierachy Description"; Rec."Item Hierachy Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Hierachy Description field';
                 }
-                field("Item Hierarchy Level"; "Item Hierarchy Level")
+                field("Item Hierarchy Level"; Rec."Item Hierarchy Level")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Hierarchy Level field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Item Desc."; "Item Desc.")
+                field("Item Desc."; Rec."Item Desc.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Desciption field';
@@ -233,17 +233,16 @@ page 6151061 "NPR Distrib. Matrix"
 
     trigger OnAfterGetRecord()
     var
-        MatrixDistributionLines: array[12] of Record "NPR Distribution Lines";
         Item: Record Item;
         RetaiReplDemandLine: Record "NPR Retail Repl. Demand Line";
     begin
         i := 0;
         TotalToDistribuate := 0;
         DistributionGroupMembersGV.SetRange("Distribution Group", DistributionHeadersGV."Distribution Group");
-        if DistributionGroupMembersGV.FindSet then begin
+        if DistributionGroupMembersGV.FindSet() then begin
             repeat
                 //display Available for take
-                Item.SetRange("No.", "Item No.");
+                Item.SetRange("No.", Rec."Item No.");
                 Item.SetFilter("Date Filter", '..%1', DistributionHeadersGV."Required Date");
                 //location FILTER ??
                 Item.CalcFields(Inventory, "Qty. on Purch. Order", "Qty. on Sales Order");
@@ -260,39 +259,32 @@ page 6151061 "NPR Distrib. Matrix"
                 //display Distributions
                 i := i + 1;
                 DistributionLinesGV.SetRange("Distribution Id", DistributionHeadersGV."Distribution Id");
-                DistributionLinesGV.SetRange("Distribution Item", "Item No.");
+                DistributionLinesGV.SetRange("Distribution Item", Rec."Item No.");
                 //fix int issue
                 DistributionLinesGV.SetRange("Distribution Group Member", Format(DistributionGroupMembersGV."Distribution Member Id"));
                 DistributionLinesGV.CalcSums("Distribution Quantity", "Org. Distribution Quantity");
-                if DistributionLinesGV.FindSet then begin
+                if DistributionLinesGV.FindSet() then begin
                     MATRIX_CellData[i] := Format(DistributionLinesGV."Avaliable Quantity") + '/' + Format(DistributionLinesGV."Demanded Quantity") + '/' + Format(DistributionLinesGV."Distribution Quantity");
                 end else
                     MATRIX_CellData[i] := 'N/A';
-                if "Item No." = '' then
+                if Rec."Item No." = '' then
                     MATRIX_CellData[i] := '';
                 //
                 TotalToDistribuate += DistributionLinesGV."Distribution Quantity";
-            until DistributionGroupMembersGV.Next = 0;
+            until DistributionGroupMembersGV.Next() = 0;
         end;
     end;
 
     var
-        MatrixMgt: Codeunit "Matrix Management";
-        MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[500] of Text[30];
         MATRIX_CaptionSet: array[500] of Text[80];
         MATRIX_CaptionSetShown: array[12] of Text[80];
-        MatrixHeader: Text[50];
-        Emphasize: Text;
-        FieldVisible: array[500] of Boolean;
-        ShowColumnName: Boolean;
         i: Integer;
         MATRIX_CurrentColumnOrdinal: array[500] of Integer;
         DistributionGroupMembersGV: Record "NPR Distrib. Group Members";
         DistributionLinesGV: Record "NPR Distribution Lines";
         DistributionHeadersGV: Record "NPR Distribution Headers";
         DistributionID: Integer;
-        ColumnTextHeaderDistAvail: Label 'Distribute / Avaliable';
         TotalToDistribuate: Decimal;
         LastColumnShown: Integer;
         NewLastColumnShown: Integer;
@@ -311,19 +303,19 @@ page 6151061 "NPR Distrib. Matrix"
         DistributionLinesPage: Page "NPR Distribution Lines";
     begin
         DistributionLines.SetRange("Distribution Id", DistributionHeadersGV."Distribution Id");
-        DistributionLines.SetRange("Distribution Item", "Item No.");
+        DistributionLines.SetRange("Distribution Item", Rec."Item No.");
 
         //Fix int issue
         DistributionLines.SetRange("Distribution Group Member", Format(MATRIX_CurrentColumnOrdinal[INT]));
-        if DistributionLines.FindSet then begin
+        if DistributionLines.FindSet() then begin
             DistributionLinesPage.SetTableView(DistributionLines);
             DistributionLinesPage.RunModal();
         end;
 
         // IF "Item No." <> '' THEN
-        //  FOR i := 1 TO DistributionGroupMembers.COUNT DO
+        //  FOR i := 1 TO DistributionGroupMembers.Count() DO
         //    MATRIX_CellData[i] := FORMAT(DistributionLines."Distribution Quantity") +'/'+ FORMAT(DistributionLines."Avaliable Quantity");
-        // CurrPage.UPDATE;
+        // CurrPage.Update();
     end;
 
     local procedure MATRIX_OnAfterGetRecord(MATRIX_ColumnOrdinal: Integer)
@@ -333,13 +325,13 @@ page 6151061 "NPR Distrib. Matrix"
 
 
         DistributionLines.SetRange(DistributionLines."Distribution Id", DistributionID);
-        DistributionLines.SetRange("Distribution Item", "Item No.");
+        DistributionLines.SetRange("Distribution Item", Rec."Item No.");
         //fix int issue
         DistributionLines.SetRange(DistributionLines."Distribution Group Member", Format(DistributionGroupMembersGV."Distribution Member Id"));
-        if DistributionLines.FindSet then begin
+        if DistributionLines.FindSet() then begin
             repeat
                 MATRIX_CellData[MATRIX_ColumnOrdinal] := Format(DistributionLines."Distribution Quantity" + MATRIX_ColumnOrdinal);
-            until DistributionLines.Next = 0;
+            until DistributionLines.Next() = 0;
         end;
 
 
@@ -360,22 +352,20 @@ page 6151061 "NPR Distrib. Matrix"
 
     procedure Load(var DistributionHeaders: Record "NPR Distribution Headers")
     var
-        DistributionGroups: Record "NPR Distrib. Group";
         DistributionGroupMembers: Record "NPR Distrib. Group Members";
-        DistributionLines: Record "NPR Distribution Lines";
     begin
         NewLastColumnShown := GetLastColumnShown;
         LastColumnShown := NewLastColumnShown;
         i := 0;
         //IF DistributionHeaders.GET(DistributionID) THEN;
         DistributionGroupMembers.SetRange(DistributionGroupMembers."Distribution Group", DistributionHeaders."Distribution Group");
-        if DistributionGroupMembers.FindSet then begin
+        if DistributionGroupMembers.FindSet() then begin
             repeat
                 i := i + 1;
                 //MATRIX_CaptionSet[i] := FORMAT(DistributionGroupMembers."Distribution Member Id");
                 MATRIX_CaptionSet[i] := 'Store:' + Format(DistributionGroupMembers.Store) + ' Loc.:' + Format(DistributionGroupMembers.Location) + ' ' + 'Avail.\Demand\Dist.';
                 MATRIX_CurrentColumnOrdinal[i] := DistributionGroupMembers."Distribution Member Id";
-            until DistributionGroupMembers.Next = 0;
+            until DistributionGroupMembers.Next() = 0;
         end;
 
         for i := 1 to 12 do begin

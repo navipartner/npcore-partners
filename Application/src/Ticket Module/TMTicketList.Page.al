@@ -109,7 +109,7 @@ page 6059785 "NPR TM Ticket List"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the POS Reciept No. field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Line No. field';
@@ -342,7 +342,7 @@ page 6059785 "NPR TM Ticket List"
                     Ticket.FindSet();
                     repeat
                         Ticket2.Get(Ticket."No.");
-                        Ticket2.SetRecFilter;
+                        Ticket2.SetRecFilter();
                         TicketManagement.PrintSingleTicket(Ticket2);
                     until (Ticket.Next() = 0);
                 end;
@@ -399,7 +399,6 @@ page 6059785 "NPR TM Ticket List"
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
-        SuggestNotificationMethod: Option NA,EMAIL,SMS;
     begin
 
         TicketReservationRequest.Get(Rec."Ticket Reservation Entry No.");
@@ -441,7 +440,6 @@ page 6059785 "NPR TM Ticket List"
         Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketCount: Integer;
-        ResponseMessage: Text;
         AmountToReverse: Decimal;
         QtyToReverse: Integer;
         Token: Text[100];
@@ -503,14 +501,14 @@ page 6059785 "NPR TM Ticket List"
         CurrPage.SETSELECTIONFILTER(Ticket);
         Ticket.FINDFIRST();
 
-        TicketReservationRequest.GET("Ticket Reservation Entry No.");
+        TicketReservationRequest.GET(Rec."Ticket Reservation Entry No.");
         if (NOT TicketRequestManager.CreateChangeRequest(Ticket."External Ticket No.",
                   TicketReservationRequest."Authorization Code", RequestToken, ResponseMessage)) then
             ERROR(ResponseMessage);
 
         COMMIT();
 
-        RESET();
+        Rec.RESET();
         TicketMakeReservationPage.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
         TicketMakeReservationPage.LoadTicketRequest(RequestToken);
         TicketMakeReservationPage.LOOKUPMODE(TRUE);

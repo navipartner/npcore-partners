@@ -47,8 +47,6 @@ xmlport 6060144 "NPR MM Get Member GDPR Roles"
                             XmlName = 'role';
 
                             trigger OnBeforePassVariable()
-                            var
-                                MembershipRole: Record "NPR MM Membership Role";
                             begin
                                 MemberRole := Format(TmpMembershipRole."Member Role");
                             end;
@@ -88,10 +86,8 @@ xmlport 6060144 "NPR MM Get Member GDPR Roles"
                             XmlName = 'gdpr_approval';
 
                             trigger OnBeforePassVariable()
-                            var
-                                MembershipRole: Record "NPR MM Membership Role";
                             begin
-                                // MembershipRole.GET (tmpMemberInfoResponse."Membership Entry No.", tmpMemberInfoResponse."Member Entry No");
+                                // MembershipRole.Get() (tmpMemberInfoResponse."Membership Entry No.", tmpMemberInfoResponse."Member Entry No");
                                 TmpMembershipRole.CalcFields("GDPR Approval");
                                 ApprovalText := Format(TmpMembershipRole."GDPR Approval");
                             end;
@@ -164,10 +160,8 @@ xmlport 6060144 "NPR MM Get Member GDPR Roles"
 
     procedure AddResponse(MemberEntryNo: Integer)
     var
-        Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
-        MemberCard: Record "NPR MM Member Card";
     begin
 
         errordescription := '';

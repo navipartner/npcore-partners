@@ -36,7 +36,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
 
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBOM.SetFilter("Publish Ticket URL", '>=%1', TicketBOM."Publish Ticket URL"::PUBLISH);
-        exit(not TicketBOM.IsEmpty);
+        exit(not TicketBOM.IsEmpty());
     end;
 
     procedure PublishTicketUrl(TicketNo: Code[20]; var ResponseMessage: Text): Boolean
@@ -62,7 +62,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
 
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBOM.SetFilter("Publish Ticket URL", '=%1', TicketBOM."Publish Ticket URL"::SEND);
-        exit(not TicketBOM.IsEmpty);
+        exit(not TicketBOM.IsEmpty());
 
     end;
 
@@ -219,8 +219,6 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         ContentTypeTok: Label 'Content-Type', Locked = true;
         ContentTypeTxt: Label 'navision/xml', Locked = true;
         AuthorizationTok: Label 'Authorization', Locked = true;
-        InvalidConnectStringErr: Label 'The URL is expected to contain user and password such as "http://<username>:<password>@online.cleancash.se:8081/xccsp", but url is: %1';
-        ConnectionErr: Label 'Ticket server connection error. (reason: %1)';
         UnexpectedResponseCodeErr: Label 'Ticket service did not return with a HTTP 200 return code (return code was: %1)';
         InvalidXmlErr: Label 'Ticket server did not respond with a valid XML document: (response was %1)';
         XmlErrorTxt: Label '<response><error><code>%1</code><message>%2 - %3</message></error></response>', Locked = true;
@@ -301,7 +299,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
             exit(false);
 
         TicketTicketServerRequest.SetDestination(OutStr);
-        TicketTicketServerRequest.Export;
+        TicketTicketServerRequest.Export();
 
         if (not TempBlob.HasValue()) then
             Error(TicketRequestMessageFailure, Token);
@@ -324,7 +322,6 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlRoot: XmlElement;
-        XmlTextString: Text;
         CodePath: Label '//response/error/code', Locked = true;
         MessagePath: Label '//response/error/message', Locked = true;
     begin

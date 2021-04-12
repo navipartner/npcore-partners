@@ -1,10 +1,9 @@
-codeunit 6060146 "NPR MM POS Action: Member Loy."
+﻿codeunit 6060146 "NPR MM POS Action: Member Loy."
 {
     var
         ActionDescription: Label 'This action is capable of redeeming member points and applying them as a coupon.';
         LoyaltyWindowTitle: Label '%1 - Membership Loyalty.';
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
-        LoyaltyCalcOnEOS: Label 'Calculates loyalty points when POS ends the sale, as opposed to when G/L is posted.';
         MemberCardPrompt: Label 'Member Card No.';
         NO_MEMBER: Label 'No member/customer specified.';
         MULTIPLE_MEMBERSHIPS: Label 'Customer number %1 resolves to more than one membership. Before redeeming points for this customer, this issue needs to be corrected. One possible solution is to block the incorrect memberships for this customer.';
@@ -61,15 +60,14 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'LoyaltyWindowTitle', LoyaltyWindowTitle);
-        Captions.AddActionCaption(ActionCode, 'MemberCardPrompt', MemberCardPrompt);
+        Captions.AddActionCaption(ActionCode(), 'LoyaltyWindowTitle', LoyaltyWindowTitle);
+        Captions.AddActionCaption(ActionCode(), 'MemberCardPrompt', MemberCardPrompt);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "NPR POS JSON Management";
-        JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
     begin
@@ -95,8 +93,6 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         JSON: Codeunit "NPR POS JSON Management";
         FunctionId: Integer;
         MemberCardNumber: Text[50];
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
-        DefaultValue: Text;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -190,9 +186,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
 
     local procedure RedeemPoints(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; MemberCardNumber: Text[50])
     var
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
         POSSale: Codeunit "NPR POS Sale";
-        POSActionTextEnter: Codeunit "NPR POS Action: Text Enter";
         LoyaltyPointMgr: Codeunit "NPR MM Loyalty Point Mgt.";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -206,8 +200,6 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
-        CouponAmount: Decimal;
-        PointsToRedeem: Integer;
         EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
     begin
 
@@ -233,7 +225,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         //IF (LoyaltyPointMgr.GetCouponToRedeem (MembershipEntryNo, TmpLoyaltyPointsSetup)) THEN BEGIN
         if (LoyaltyPointMgr.GetCouponToRedeemPOS(MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal)) then begin
 
-            TmpLoyaltyPointsSetup.Reset;
+            TmpLoyaltyPointsSetup.Reset();
             TmpLoyaltyPointsSetup.FindSet();
             repeat
 
@@ -277,7 +269,6 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         PageAction: Action;
-        POSActionTextEnter: Codeunit "NPR POS Action: Text Enter";
         EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
     begin
 
@@ -398,7 +389,6 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        DataType: Enum "NPR Data Type";
         POSSale: Codeunit "NPR POS Sale";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         SalePOS: Record "NPR POS Sale";
@@ -451,13 +441,11 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
-        MMMember: Record "NPR MM Member";
         MMMemberCard: Record "NPR MM Member Card";
-        MMMembership: Record "NPR MM Membership";
     begin
 
         if (not EanBoxEvent.Get(EventCodeMemberSelect())) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeMemberSelect();
             EanBoxEvent."Module Name" := 'Membership Loyalty';
 

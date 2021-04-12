@@ -79,7 +79,7 @@ table 6151101 "NPR NpRi Reimbursement Templ."
         NpRiReimbursement: Record "NPR NpRi Reimbursement";
     begin
         NpRiReimbursement.SetRange("Template Code", Code);
-        if NpRiReimbursement.FindFirst then
+        if NpRiReimbursement.FindFirst() then
             Error(Text000);
     end;
 

@@ -47,28 +47,28 @@ table 6059907 "NPR Task Worker"
         }
         field(25; "Current Task Company"; Text[30])
         {
-            CalcFormula = Lookup ("NPR Task Queue".Company WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
+            CalcFormula = Lookup("NPR Task Queue".Company WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
                                                              "Assigned to Session ID" = FIELD("Session ID")));
             Caption = 'Current Task Company';
             FieldClass = FlowField;
         }
         field(26; "Current Task Template"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Task Queue"."Task Template" WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
+            CalcFormula = Lookup("NPR Task Queue"."Task Template" WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
                                                                      "Assigned to Session ID" = FIELD("Session ID")));
             Caption = 'Current Task Template';
             FieldClass = FlowField;
         }
         field(27; "Current Task Batch"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Task Queue"."Task Batch" WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
+            CalcFormula = Lookup("NPR Task Queue"."Task Batch" WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
                                                                   "Assigned to Session ID" = FIELD("Session ID")));
             Caption = 'Current Task Batch';
             FieldClass = FlowField;
         }
         field(28; "Current Task Line No."; Integer)
         {
-            CalcFormula = Lookup ("NPR Task Queue"."Task Line No." WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
+            CalcFormula = Lookup("NPR Task Queue"."Task Line No." WHERE("Assigned to Service Inst.ID" = FIELD("Server Instance ID"),
                                                                      "Assigned to Session ID" = FIELD("Session ID")));
             Caption = 'Current Task Line no.';
             FieldClass = FlowField;

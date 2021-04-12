@@ -21,6 +21,6 @@ codeunit 6151452 "NPR Magento NpXml Stock Status"
 
         Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Rec.Modify;
+        Rec.Modify();
     end;
 }

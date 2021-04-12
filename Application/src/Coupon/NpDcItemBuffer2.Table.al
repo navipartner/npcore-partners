@@ -1,4 +1,4 @@
-﻿table 6014502 "NPR NpDc Item Buffer 2"
+table 6014502 "NPR NpDc Item Buffer 2"
 {
     Caption = 'Discount Item Buffer';
     DataClassification = CustomerContent;

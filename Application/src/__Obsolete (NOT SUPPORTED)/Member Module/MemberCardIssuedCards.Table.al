@@ -75,8 +75,6 @@ table 6059774 "NPR Member Card Issued Cards"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                "TestBel¢b": Decimal;
             begin
             end;
         }

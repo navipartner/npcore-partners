@@ -1,4 +1,4 @@
-codeunit 6150723 "NPR POS Action: Insert Item"
+﻿codeunit 6150723 "NPR POS Action: Insert Item"
 {
     var
         ActionDescription: Label 'This is a built-in action for inserting an item line into the current transaction';
@@ -12,10 +12,8 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         TEXTWrongSerial_Instr: Label ' \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
         UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
         UnitPriceTitle: Label 'Unit price is required';
-        TEXTeditDesc_lead: Label 'Line description';
         TEXTeditDesc_title: Label 'Add or change description.';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
-        COMMENT_UNKNOWN_TAG: Label 'Unknown RFID Tag %1';
         SerialSelectionFromList: Boolean;
         ReadingErr: Label 'reading in %1 of %2';
         SettingScopeErr: Label 'setting scope in %1';
@@ -32,13 +30,11 @@ codeunit 6150723 "NPR POS Action: Insert Item"
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    var
-        itemTrackingCode: Text;
     begin
         if Sender.DiscoverAction(
           ActionCode,
           ActionDescription,
-          ActionVersion,
+          ActionVersion(),
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Single)
         then begin
@@ -66,27 +62,20 @@ codeunit 6150723 "NPR POS Action: Insert Item"
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'itemTracking_title', TEXTitemTracking_title);
-        Captions.AddActionCaption(ActionCode, 'itemTracking_lead', TEXTitemTracking_lead);
-        Captions.AddActionCaption(ActionCode, 'UnitpriceTitle', UnitPriceTitle);
-        Captions.AddActionCaption(ActionCode, 'UnitpriceCaption', UnitPriceCaption);
-        Captions.AddActionCaption(ActionCode, 'editDesc_title', TEXTeditDesc_title);
-        Captions.AddActionCaption(ActionCode, 'editDesc_lead', TEXTeditDesc_title);
+        Captions.AddActionCaption(ActionCode(), 'itemTracking_title', TEXTitemTracking_title);
+        Captions.AddActionCaption(ActionCode(), 'itemTracking_lead', TEXTitemTracking_lead);
+        Captions.AddActionCaption(ActionCode(), 'UnitpriceTitle', UnitPriceTitle);
+        Captions.AddActionCaption(ActionCode(), 'UnitpriceCaption', UnitPriceCaption);
+        Captions.AddActionCaption(ActionCode(), 'editDesc_title', TEXTeditDesc_title);
+        Captions.AddActionCaption(ActionCode(), 'editDesc_lead', TEXTeditDesc_title);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        ControlId: Text;
-        Value: Text;
-        DoNotClearTextBox: Boolean;
     begin
 
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         case WorkflowStep of
@@ -148,7 +137,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
             end;
 
             if DialogPrompt then begin
-                FrontEnd.SetActionContext(ActionCode, DialogContext);
+                FrontEnd.SetActionContext(ActionCode(), DialogContext);
                 FrontEnd.ContinueAtStep('promptContextDialogs');
                 exit;
             end;
@@ -189,9 +178,6 @@ codeunit 6150723 "NPR POS Action: Insert Item"
     var
         JSON: Codeunit "NPR POS JSON Management";
         SerialNumberInput: Text;
-        SpecificTracking: Boolean;
-        OKInput: Boolean;
-        SerialNoUsedOnPOSSaleLine: Boolean;
         UserInformationErrorWarning: Text;
         Item: Record Item;
         ItemReference: Record "Item Reference";
@@ -228,7 +214,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
                 JSON.InitializeJObjectParser(Context, FrontEnd);
                 JSON.SetScopeRoot();
                 JSON.SetContext('itemTracking_instructions', UserInformationErrorWarning);
-                FrontEnd.SetActionContext(ActionCode, JSON);
+                FrontEnd.SetActionContext(ActionCode(), JSON);
                 FrontEnd.ContinueAtStep('itemTrackingForce');
                 exit;
             end;
@@ -240,7 +226,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         JSON.SetContext('validatedSerialNumber', SerialNumberInput);
         JSON.SetContext('validatedVariantCode', ItemReference."Variant Code");
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        FrontEnd.SetActionContext(ActionCode, JSON);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
         exit;
 
         POSSession.RequestRefreshData();
@@ -261,9 +247,9 @@ codeunit 6150723 "NPR POS Action: Insert Item"
                     ItemReference.SetFilter("Reference No.", '=%1', CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
                     ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
-                    ItemReference.FindFirst;
+                    ItemReference.FindFirst();
                     FirstRec := Format(ItemReference);
-                    ItemReference.FindLast;
+                    ItemReference.FindLast();
                     if FirstRec <> Format(ItemReference) then begin
                         if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
                             Error('');
@@ -285,9 +271,9 @@ codeunit 6150723 "NPR POS Action: Insert Item"
                     ItemReference.SetFilter("Reference No.", '=%1', CopyStr(TagId, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Retail Serial No.");
                     ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
-                    ItemReference.FindFirst;
+                    ItemReference.FindFirst();
                     FirstRec := Format(ItemReference);
-                    ItemReference.FindLast;
+                    ItemReference.FindLast();
                     if FirstRec <> Format(ItemReference) then begin
                         if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
                             Error('');
@@ -309,59 +295,57 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         if ItemQuantity = 0 then
             ItemQuantity := 1;
 
-        with Line do begin
-            Type := Type::Item;
-            Quantity := ItemQuantity;
+        Line.Type := Line.Type::Item;
+        Line.Quantity := ItemQuantity;
 
-            case ItemIdentifierType of
-                ItemIdentifierType::ItemSearch,
-                ItemIdentifierType::ItemNo:
-                    begin
-                        "No." := Item."No.";
-                        "Variant Code" := ItemReference."Variant Code";
-                    end;
+        case ItemIdentifierType of
+            ItemIdentifierType::ItemSearch,
+            ItemIdentifierType::ItemNo:
+                begin
+                    Line."No." := Item."No.";
+                    Line."Variant Code" := ItemReference."Variant Code";
+                end;
 
-                ItemIdentifierType::ItemCrossReference:
-                    begin
-                        "No." := ItemReference."Item No.";
-                        "Variant Code" := ItemReference."Variant Code";
-                        "Unit of Measure Code" := ItemReference."Unit of Measure";
-                        if (ItemReference."Reference Type" = ItemReference."Reference Type"::"Retail Serial No.") then
-                            "Serial No. not Created" := ItemReference."Reference No.";
+            ItemIdentifierType::ItemCrossReference:
+                begin
+                    Line."No." := ItemReference."Item No.";
+                    Line."Variant Code" := ItemReference."Variant Code";
+                    Line."Unit of Measure Code" := ItemReference."Unit of Measure";
+                    if (ItemReference."Reference Type" = ItemReference."Reference Type"::"Retail Serial No.") then
+                        Line."Serial No. not Created" := ItemReference."Reference No.";
 
-                    end;
+                end;
 
-                ItemIdentifierType::SerialNoItemCrossReference:
-                    begin
+            ItemIdentifierType::SerialNoItemCrossReference:
+                begin
 
-                        SaleLinePOS.Reset;
-                        SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
-                        SaleLinePOS.SetFilter("Serial No. not Created", '=%1', ItemReference."Reference No.");
-                        if not SaleLinePOS.IsEmpty then
-                            exit;
+                    SaleLinePOS.Reset();
+                    SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
+                    SaleLinePOS.SetFilter("Serial No. not Created", '=%1', ItemReference."Reference No.");
+                    if not SaleLinePOS.IsEmpty then
+                        exit;
 
-                        "No." := ItemReference."Item No.";
-                        "Variant Code" := ItemReference."Variant Code";
-                        "Unit of Measure Code" := ItemReference."Unit of Measure";
-                        if (ItemReference."Reference Type" = ItemReference."Reference Type"::"Retail Serial No.") then
-                            "Serial No. not Created" := ItemReference."Reference No.";
-                    end;
-            end;
+                    Line."No." := ItemReference."Item No.";
+                    Line."Variant Code" := ItemReference."Variant Code";
+                    Line."Unit of Measure Code" := ItemReference."Unit of Measure";
+                    if (ItemReference."Reference Type" = ItemReference."Reference Type"::"Retail Serial No.") then
+                        Line."Serial No. not Created" := ItemReference."Reference No.";
+                end;
+        end;
 
-            if (UseSpecificTracking and (ValidatedSerialNumber <> '')) then
-                Validate("Serial No.", ValidatedSerialNumber);
-            if (not UseSpecificTracking and (InputSerial <> '')) then
-                Validate("Serial No.", InputSerial);
+        if (UseSpecificTracking and (ValidatedSerialNumber <> '')) then
+            Line.Validate("Serial No.", ValidatedSerialNumber);
+        if (not UseSpecificTracking and (InputSerial <> '')) then
+            Line.Validate("Serial No.", InputSerial);
 
-            if CustomDescription <> '' then
-                Description := CustomDescription;
+        if CustomDescription <> '' then
+            Line.Description := CustomDescription;
 
-            if SetUnitPrice then begin
-                "Unit Price" := UnitPrice;
+        if SetUnitPrice then begin
+            Line."Unit Price" := UnitPrice;
 
-                if (Type = Type::Item) then
-                    "Initial Group Sale Price" := UnitPrice;
-            end;
+            if (Line.Type = Line.Type::Item) then
+                Line."Initial Group Sale Price" := UnitPrice;
         end;
 
         POSSession.GetSaleLine(SaleLine);
@@ -494,7 +478,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
     begin
     end;
 
-    local procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean) SerialNoRequired: Boolean
+    local procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean): Boolean
     var
         ItemTrackingCode: Record "Item Tracking Code";
     begin
@@ -524,7 +508,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         if not ItemTrackingCode."SN Specific Tracking" then begin
             CanBeUsed := true;
         end else begin
-            ItemLedgerEntry.Reset;
+            ItemLedgerEntry.Reset();
             if ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.") then;
             ItemLedgerEntry.SetRange(Open, true);
             ItemLedgerEntry.SetRange(Positive, true);
@@ -532,7 +516,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
             ItemLedgerEntry.SetRange("Item No.", ItemRef."Item No.");
             if ItemRef."Variant Code" <> '' then
                 ItemLedgerEntry.SetRange("Variant Code", ItemRef."Variant Code");
-            if not ItemLedgerEntry.FindSet then begin
+            if not ItemLedgerEntry.FindSet() then begin
                 CanBeUsed := false;
                 UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnILE, SerialNumber, Item."No.", Item.Description, TEXTitemTracking_instructions);  //NPR5.55 [398263]
             end else begin
@@ -542,21 +526,21 @@ codeunit 6150723 "NPR POS Action: Insert Item"
             //Check if serial number exists in saved/active pos sale line
             //TO DO: check pos saved sales?
             if CanBeUsed then begin
-                SaleLinePOS.Reset;
+                SaleLinePOS.Reset();
                 SaleLinePOS.SetCurrentKey("Serial No.");
                 SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
                 SaleLinePOS.SetRange("No.", ItemRef."Item No.");
                 SaleLinePOS.SetFilter("Serial No.", '=%1', SerialNumber);
                 repeat
                     SaleLinePOS.SetRange("Variant Code", ItemLedgerEntry."Variant Code");
-                    CanBeUsed := SaleLinePOS.IsEmpty;
+                    CanBeUsed := SaleLinePOS.IsEmpty();
                     if CanBeUsed then
                         ItemRef."Variant Code" := ItemLedgerEntry."Variant Code";
-                until (ItemLedgerEntry.Next = 0) or CanBeUsed;
+                until (ItemLedgerEntry.Next() = 0) or CanBeUsed;
 
                 if not CanBeUsed then begin
                     //Create user information message
-                    SaleLinePOS.FindFirst;
+                    SaleLinePOS.FindFirst();
                     "Sale POS".Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
                     if "Sale POS"."Saved Sale" then begin
                         TextActiveSaved := TEXTSaved;
@@ -579,7 +563,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         TrackingSpecification: Record "Tracking Specification" temporary;
         ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection";
     begin
-        SaleLinePOS.Init;
+        SaleLinePOS.Init();
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
         SaleLinePOS."No." := ItemRef."Item No.";
@@ -599,7 +583,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         ItemRef: Record "Item Reference";
     begin
         if not EanBoxEvent.Get(EventCodeItemNo()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemNo();
             EanBoxEvent."Module Name" := Item.TableCaption;
             EanBoxEvent.Description := CopyStr(ItemRef.FieldCaption("Item No."), 1, MaxStrLen(EanBoxEvent.Description));
@@ -610,7 +594,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         end;
 
         if not EanBoxEvent.Get(EventCodeItemRef()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemRef();
             EanBoxEvent."Module Name" := Item.TableCaption;
             EanBoxEvent.Description := CopyStr(ItemRef.TableCaption, 1, MaxStrLen(EanBoxEvent.Description));
@@ -621,7 +605,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         end;
 
         if not EanBoxEvent.Get(EventCodeItemSearch()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemSearch();
             EanBoxEvent."Module Name" := Item.TableCaption;
             EanBoxEvent.Description := CopyStr(Item.FieldCaption("Search Description"), 1, MaxStrLen(EanBoxEvent.Description));
@@ -632,7 +616,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         end;
 
         if not EanBoxEvent.Get(EventCodeSerialNoItemRef()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeSerialNoItemRef();
             EanBoxEvent."Module Name" := Item.TableCaption;
             EanBoxEvent.Description := CopyStr(ItemRef.TableCaption, 1, MaxStrLen(EanBoxEvent.Description));
@@ -697,7 +681,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         ItemReference.SetRange("Reference No.", UpperCase(EanBoxValue));
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
         ItemReference.SetRange("Discontinue Bar Code", false);
-        if ItemReference.FindFirst then
+        if ItemReference.FindFirst() then
             InScope := true;
     end;
 
@@ -710,7 +694,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
             exit;
 
         SetItemSearchFilter(EanBoxValue, Item);
-        if Item.FindFirst then
+        if Item.FindFirst() then
             InScope := true;
     end;
 
@@ -739,24 +723,23 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         exit('SERIALNOITEMCROSSREF');
     end;
 
-    local procedure GetItemFromItemSearch(var ItemIdentifierString: Text) ItemFound: Boolean
+    local procedure GetItemFromItemSearch(var ItemIdentifierString: Text): Boolean
     var
         Item: Record Item;
         ItemList: Page "Item List";
-        ItemNo: Code[20];
     begin
         SetItemSearchFilter(ItemIdentifierString, Item);
-        if not Item.FindFirst then
+        if not Item.FindFirst() then
             exit(false);
 
         ItemIdentifierString := Item."No.";
-        Item.FindLast;
+        Item.FindLast();
         if ItemIdentifierString = Item."No." then
             exit(true);
         ItemList.Editable(false);
         ItemList.LookupMode(true);
         ItemList.SetTableView(Item);
-        if ItemList.RunModal = ACTION::LookupOK then begin
+        if ItemList.RunModal() = ACTION::LookupOK then begin
             ItemList.GetRecord(Item);
             ItemIdentifierString := Item."No.";
             exit(true);

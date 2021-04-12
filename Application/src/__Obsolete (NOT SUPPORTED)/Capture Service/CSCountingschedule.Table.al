@@ -1,10 +1,10 @@
 table 6151399 "NPR CS Counting schedule"
 {
-   
+
     Caption = 'CS Counting schedule';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields
@@ -21,7 +21,7 @@ table 6151399 "NPR CS Counting schedule"
             Caption = 'Earliest Start Date/Time';
             DataClassification = CustomerContent;
 
-           
+
         }
         field(12; "Job Queue Entry ID"; Guid)
         {
@@ -42,7 +42,7 @@ table 6151399 "NPR CS Counting schedule"
             Caption = 'Expiration Date/Time';
             DataClassification = CustomerContent;
 
-            
+
         }
         field(15; "Recurring Job"; Boolean)
         {
@@ -54,65 +54,65 @@ table 6151399 "NPR CS Counting schedule"
             Caption = 'Run on Mondays';
             DataClassification = CustomerContent;
 
-            
+
         }
         field(17; "Run on Tuesdays"; Boolean)
         {
             Caption = 'Run on Tuesdays';
             DataClassification = CustomerContent;
 
-           
+
         }
         field(18; "Run on Wednesdays"; Boolean)
         {
             Caption = 'Run on Wednesdays';
             DataClassification = CustomerContent;
 
-           
+
         }
         field(19; "Run on Thursdays"; Boolean)
         {
             Caption = 'Run on Thursdays';
             DataClassification = CustomerContent;
 
-           
+
         }
         field(20; "Run on Fridays"; Boolean)
         {
             Caption = 'Run on Fridays';
             DataClassification = CustomerContent;
 
-           
+
         }
         field(21; "Run on Saturdays"; Boolean)
         {
             Caption = 'Run on Saturdays';
             DataClassification = CustomerContent;
 
-            
+
         }
         field(22; "Run on Sundays"; Boolean)
         {
             Caption = 'Run on Sundays';
             DataClassification = CustomerContent;
 
-           
+
         }
         field(23; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
             DataClassification = CustomerContent;
 
-           
+
         }
         field(24; "Ending Time"; Time)
         {
             Caption = 'Ending Time';
             DataClassification = CustomerContent;
 
-           
+
         }
-        
+
         field(26; "Job Queue Created"; Boolean)
         {
             Caption = 'Job Queue Created';
@@ -124,7 +124,7 @@ table 6151399 "NPR CS Counting schedule"
             Caption = 'No. of Minutes between Runs';
             DataClassification = CustomerContent;
 
-            
+
         }
         field(28; Status; Option)
         {
@@ -134,7 +134,7 @@ table 6151399 "NPR CS Counting schedule"
             OptionCaption = ' ,Scheduled,Error,Running';
             OptionMembers = " ",Scheduled,Error,Running;
 
-           
+
         }
         field(29; "Last Executed"; DateTime)
         {
@@ -142,7 +142,7 @@ table 6151399 "NPR CS Counting schedule"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        
+
     }
 
     keys
@@ -156,9 +156,9 @@ table 6151399 "NPR CS Counting schedule"
     {
     }
 
-   
-       
 
-   
+
+
+
 }
 

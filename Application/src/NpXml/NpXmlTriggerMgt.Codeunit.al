@@ -1,4 +1,4 @@
-codeunit 6151553 "NPR NpXml Trigger Mgt."
+﻿codeunit 6151553 "NPR NpXml Trigger Mgt."
 {
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
@@ -9,13 +9,13 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
     var
         RecRef2: RecordRef;
     begin
-        RecRef2 := RecRef.Duplicate;
-        RecRef2.SetRecFilter;
+        RecRef2 := RecRef.Duplicate();
+        RecRef2.SetRecFilter();
         NpXmlMgt.Initialize(NpXmlTemplate, RecRef2, NpXmlValueMgt.GetPrimaryKeyValue(RecRef2), true);
         ClearLastError;
         ProcessComplete := NpXmlMgt.Run() and ProcessComplete;
 
-        Commit;
+        Commit();
     end;
 
     local procedure RunTrigger(TaskProcessor: Record "NPR Nc Task Processor"; NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; PrevRecRef: RecordRef; RecRef: RecordRef; Insert: Boolean; Modify: Boolean; Delete: Boolean; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary)
@@ -33,7 +33,7 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
 
         if NpXmlTemplateTrigger."Parent Line No." = 0 then begin
             repeat
-                NewUniqueTaskBuffer.Init;
+                NewUniqueTaskBuffer.Init();
                 NewUniqueTaskBuffer."Table No." := RecRef2.Number;
                 NewUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
                 NewUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
@@ -41,18 +41,18 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                 NewUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
                 if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
                     RunTemplate(NpXmlTemplate, RecRef2);
-            until RecRef2.Next = 0;
+            until RecRef2.Next() = 0;
             exit;
         end;
 
         if NpXmlTemplateTrigger2.Get(NpXmlTemplateTrigger."Xml Template Code", NpXmlTemplateTrigger."Parent Line No.") then
             repeat
                 if TriggerToTemplate(TaskProcessor, false, false, false, NpXmlTemplateTrigger2, NpXmlTemplate) then begin
-                    RecRef := RecRef2.Duplicate;
-                    PrevRecRef := RecRef2.Duplicate;
+                    RecRef := RecRef2.Duplicate();
+                    PrevRecRef := RecRef2.Duplicate();
                     RunTrigger(TaskProcessor, NpXmlTemplateTrigger2, PrevRecRef, RecRef, false, false, false, UniqueTaskBuffer);
                 end;
-            until RecRef2.Next = 0;
+            until RecRef2.Next() = 0;
     end;
 
     procedure RunTriggers(TaskProcessor: Record "NPR Nc Task Processor"; PrevRecRef: RecordRef; RecRef: RecordRef; Task: Record "NPR Nc Task"; Insert: Boolean; Modify: Boolean; Delete: Boolean; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary)
@@ -62,10 +62,10 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         ProcessComplete := true;
         Clear(NpXmlTemplateTrigger);
         NpXmlTemplateTrigger.SetRange("Table No.", RecRef.Number);
-        if NpXmlTemplateTrigger.FindSet then
+        if NpXmlTemplateTrigger.FindSet() then
             repeat
                 RunTrigger(TaskProcessor, NpXmlTemplateTrigger, PrevRecRef, RecRef, Insert, Modify, Delete, UniqueTaskBuffer);
-            until NpXmlTemplateTrigger.Next = 0;
+            until NpXmlTemplateTrigger.Next() = 0;
     end;
 
     procedure TriggerToTemplate(TaskProcessor: Record "NPR Nc Task Processor"; Insert: Boolean; Modify: Boolean; Delete: Boolean; NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; var NpXmlTemplate: Record "NPR NpXml Template"): Boolean
@@ -90,7 +90,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         RecRef2: RecordRef;
         FieldRef: FieldRef;
         PrevFieldRef: FieldRef;
-        IntBuffer: Integer;
         BoolBuffer: Boolean;
         i: Integer;
     begin
@@ -101,7 +100,7 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
         NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
         NpXmlTemplateTriggerLink.SetRange("Link Type", NpXmlTemplateTriggerLink."Link Type"::Constant);
-        if NpXmlTemplateTriggerLink.FindSet then
+        if NpXmlTemplateTriggerLink.FindSet() then
             repeat
                 FieldRef := RecRef.Field(NpXmlTemplateTriggerLink."Field No.");
                 if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
@@ -123,10 +122,10 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                         if Format(FieldRef.Value, 0, 9) <> NpXmlTemplateTriggerLink."Filter Value" then
                             exit(false);
                 end;
-            until NpXmlTemplateTriggerLink.Next = 0;
+            until NpXmlTemplateTriggerLink.Next() = 0;
 
         NpXmlTemplateTriggerLink.SetRange("Link Type", NpXmlTemplateTriggerLink."Link Type"::PreviousConstant);
-        if NpXmlTemplateTriggerLink.FindSet then
+        if NpXmlTemplateTriggerLink.FindSet() then
             repeat
                 PrevFieldRef := PrevRecRef.Field(NpXmlTemplateTriggerLink."Field No.");
                 if LowerCase(Format(PrevFieldRef.Class)) = 'flowfield' then
@@ -148,12 +147,12 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                         if Format(PrevFieldRef.Value, 0, 9) <> NpXmlTemplateTriggerLink."Previous Filter Value" then
                             exit(false);
                 end;
-            until NpXmlTemplateTriggerLink.Next = 0;
+            until NpXmlTemplateTriggerLink.Next() = 0;
 
         NpXmlTemplateTriggerLink.SetRange("Link Type", NpXmlTemplateTriggerLink."Link Type"::Filter);
-        if NpXmlTemplateTriggerLink.FindSet then begin
-            RecRef2 := RecRef.Duplicate;
-            RecRef2.SetRecFilter;
+        if NpXmlTemplateTriggerLink.FindSet() then begin
+            RecRef2 := RecRef.Duplicate();
+            RecRef2.SetRecFilter();
 
             i := 40;
             repeat
@@ -161,9 +160,9 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                 RecRef2.FilterGroup(i);
                 FieldRef := RecRef2.Field(NpXmlTemplateTriggerLink."Field No.");
                 FieldRef.SetFilter(NpXmlTemplateTriggerLink."Filter Value");
-            until NpXmlTemplateTriggerLink.Next = 0;
+            until NpXmlTemplateTriggerLink.Next() = 0;
 
-            if not RecRef2.FindFirst then
+            if not RecRef2.FindFirst() then
                 exit(false);
         end;
 
@@ -202,16 +201,16 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         if (not Handled) or (NpXmlTemplateTrigger."Generic Parent Codeunit ID" = 0) then begin
             RecRef2.Open(NpXmlTemplateTrigger."Parent Table No.");
             if RecRef.Number = NpXmlTemplateTrigger."Parent Table No." then
-                RecRef2 := RecRef.Duplicate;
+                RecRef2 := RecRef.Duplicate();
         end;
         if RecRef.Number = NpXmlTemplateTrigger."Parent Table No." then
-            RecRef2.SetRecFilter;
+            RecRef2.SetRecFilter();
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
         NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
         NpXmlTemplateTriggerLink.SetFilter("Link Type", '%1|%2|%3|%4', NpXmlTemplateTriggerLink."Link Type"::TableLink,
           NpXmlTemplateTriggerLink."Link Type"::ParentConstant, NpXmlTemplateTriggerLink."Link Type"::ParentFilter,
           NpXmlTemplateTriggerLink."Link Type"::PreviousTableLink);
-        if NpXmlTemplateTriggerLink.FindSet then
+        if NpXmlTemplateTriggerLink.FindSet() then
             repeat
                 FieldRef2 := RecRef2.Field(NpXmlTemplateTriggerLink."Parent Field No.");
                 case NpXmlTemplateTriggerLink."Link Type" of
@@ -255,12 +254,11 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                             FieldRef2.SetFilter('=%1', FieldRef.Value);
                         end;
                 end;
-            until NpXmlTemplateTriggerLink.Next = 0;
+            until NpXmlTemplateTriggerLink.Next() = 0;
     end;
 
     procedure IsUniqueTask(TaskProcessor: Record "NPR Nc Task Processor"; Insert: Boolean; Modify: Boolean; Delete: Boolean; PrevRecRef: RecordRef; RecRef: RecordRef; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary) IsUnique: Boolean
     var
-        Item: Record Item;
         NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         NpXmlTemplate: Record "NPR NpXml Template";
@@ -270,7 +268,7 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         Clear(NpXmlTemplateTrigger);
         NpXmlTemplateTrigger.SetRange("Table No.", RecRef.Number);
 
-        if not NpXmlTemplateTrigger.FindSet then
+        if not NpXmlTemplateTrigger.FindSet() then
             exit(false);
 
         repeat
@@ -278,7 +276,7 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
               SetLinkFilter(NpXmlTemplateTrigger, PrevRecRef, RecRef, Delete, RecRef2)
             then
                 repeat
-                    NewUniqueTaskBuffer.Init;
+                    NewUniqueTaskBuffer.Init();
                     NewUniqueTaskBuffer."Table No." := RecRef2.Number;
                     NewUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
                     NewUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
@@ -286,8 +284,8 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                     NewUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
                     if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
                         IsUnique := true;
-                until RecRef2.Next = 0;
-        until NpXmlTemplateTrigger.Next = 0;
+                until RecRef2.Next() = 0;
+        until NpXmlTemplateTrigger.Next() = 0;
 
         exit(IsUnique);
     end;

@@ -1,4 +1,4 @@
-table 6151524 "NPR Nc Endpoint File"
+﻿table 6151524 "NPR Nc Endpoint File"
 {
     // NC2.01/BR  /20160829  CASE 248630 NaviConnect
     // NC2.12/MHA /20180502  CASE 313362 Added field 105 "Client Path"
@@ -119,11 +119,11 @@ table 6151524 "NPR Nc Endpoint File"
         NcEndpointTriggerLinks: Page "NPR Nc Endpoint Trigger Links";
     begin
         Clear(NcEndpointTriggerLinks);
-        NcEndpointTriggerLink.Reset;
+        NcEndpointTriggerLink.Reset();
         //NcEndpointTriggerLink.SETRANGE("Endpoint Type Code",GetEndpointTypeCode);
         NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
         NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
-        NcEndpointTriggerLinks.RunModal;
+        NcEndpointTriggerLinks.RunModal();
     end;
 
     local procedure UpdateNcEndpoint()
@@ -134,10 +134,10 @@ table 6151524 "NPR Nc Endpoint File"
     begin
         ToBeUpdated := false;
         if not NcEndpoint.Get(Code) then begin
-            NcEndpoint.Init;
+            NcEndpoint.Init();
             NcEndpoint.Validate(Code, Code);
             NcEndpoint.Validate("Endpoint Type", GetEndpointTypeCode);
-            NcEndpoint.Insert;
+            NcEndpoint.Insert();
         end;
         if Description <> NcEndpoint.Description then begin
             NcEndpoint.Description := Description;

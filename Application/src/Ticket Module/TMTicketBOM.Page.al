@@ -296,14 +296,12 @@ page 6060121 "NPR TM Ticket BOM"
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
         EXPORT_TO_EXCEL: Label 'Do you want to export generated tickets to excel?';
         OFFLINE_VALIDATION: Label 'Do you want to create offline ticket validation entries to be able to create admissions.';
-        CustomizedCalEntry: Record "Customized Calendar Entry";
         CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 
     local procedure MakeTickets(PaymentType: Option)
     var
         Ticket: Record "NPR TM Ticket";
-        TicketSetup: Record "NPR TM Ticket Setup";
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -312,7 +310,6 @@ page 6060121 "NPR TM Ticket BOM"
         Token: Text;
         ResponseMessage: Text;
         ImportReferenceNo: Integer;
-        ShowPrompt: Boolean;
     begin
 
         Token := TicketRequestManager.GetNewToken();
@@ -373,7 +370,6 @@ page 6060121 "NPR TM Ticket BOM"
     local procedure CreateTicketRequest(PaymentType: Option; Token: Text; ItemNo: Code[20]; VariantCode: Code[10]): Text
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketSetup: Record "NPR TM Ticket Setup";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Admission: Record "NPR TM Admission";
@@ -410,7 +406,6 @@ page 6060121 "NPR TM Ticket BOM"
         DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         ResponseMessage: Text;
         PageAction: Action;
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
 
         repeat

@@ -30,7 +30,7 @@ table 6059981 "NPR Item Repair Action"
         }
         field(20; "Item Ledger Entry Qty."; Integer)
         {
-            CalcFormula = Count ("Item Ledger Entry" WHERE("Item No." = FIELD("Item No.")));
+            CalcFormula = Count("Item Ledger Entry" WHERE("Item No." = FIELD("Item No.")));
             Caption = 'Item Ledger Entry Qty.';
             Editable = false;
             FieldClass = FlowField;

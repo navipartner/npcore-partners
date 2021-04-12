@@ -1,4 +1,4 @@
-codeunit 6151530 "NPR Nc Collector NpXml Value"
+﻿codeunit 6151530 "NPR Nc Collector NpXml Value"
 {
     // NC2.01/BR  /20160912  CASE 250447 NaviConnect: Object created
     // NC2.13/MHA /20180530  CASE 312958 Added functions CollectionLine2Item(),IsElementSubscriber()
@@ -9,7 +9,6 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
     trigger OnRun()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
-        NpXmlElement: Record "NPR NpXml Element";
     begin
         NpXmlTemplate.Get("Xml Template Code");
         if NpXmlTemplate."Table No." = DATABASE::"NPR Nc Collection" then begin
@@ -27,14 +26,14 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
         Clear(RecRef);
         RecRef.Open(NpXmlCustomValueBuffer."Table No.");
         RecRef.SetPosition(NpXmlCustomValueBuffer."Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
         RecRef.SetTable(NcCollection);
-        if NcCollection.Find then begin
+        if NcCollection.Find() then begin
             if NcCollection.Status = NcCollection.Status::"Ready to Send" then begin
                 NcCollection.Validate(Status, NcCollection.Status::Sent);
                 NcCollection.Modify(true);
-                Commit;
+                Commit();
             end;
         end;
     end;
@@ -46,7 +45,6 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
     [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
     local procedure OnGetXMLValueMarkAsProcessed(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
-        NpXmlTemplate: Record "NPR NpXml Template";
         NcCollection: Record "NPR Nc Collection";
     begin
         if Handled then
@@ -58,11 +56,11 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
 
         if RecRef.Number = DATABASE::"NPR Nc Collection" then begin
             RecRef.SetTable(NcCollection);
-            if NcCollection.Find then begin
+            if NcCollection.Find() then begin
                 if NcCollection.Status = NcCollection.Status::"Ready to Send" then begin
                     NcCollection.Validate(Status, NcCollection.Status::Sent);
                     NcCollection.Modify(true);
-                    Commit;
+                    Commit();
                 end;
             end;
         end;
@@ -81,7 +79,6 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
         TempItem: Record Item temporary;
         RecRef: RecordRef;
         FieldRef: FieldRef;
-        ItemNo: Text;
     begin
         //-NC2.13 [312958]
         if Handled then
@@ -95,16 +92,16 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
         if ParentRecRef.Number <> DATABASE::"NPR Nc Collection Line" then
             exit;
         ParentRecRef.SetTable(NcCollectionLine);
-        if not NcCollectionLine.Find then
+        if not NcCollectionLine.Find() then
             exit;
 
         case NcCollectionLine."Table No." of
             DATABASE::Item, DATABASE::"Item Variant", DATABASE::"Item Reference", DATABASE::"Item Unit of Measure":
                 begin
                     if Item.Get(NcCollectionLine."PK Code 1") then begin
-                        TempItem.Init;
+                        TempItem.Init();
                         TempItem := Item;
-                        TempItem.Insert;
+                        TempItem.Insert();
                     end;
                 end;
             6014555, 6014556:
@@ -112,7 +109,7 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
                     RecRef.Open(6014556);
                     FieldRef := RecRef.Field(1);
                     FieldRef.SetFilter('%1', NcCollectionLine."PK Line 1");
-                    if not RecRef.Find then
+                    if not RecRef.Find() then
                         exit;
                     if not Field.Get(RecRef.Number, 10) then
                         exit;
@@ -125,9 +122,9 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
                     if not Item.Get(Format(FieldRef.Value)) then
                         exit;
 
-                    TempItem.Init;
+                    TempItem.Init();
                     TempItem := Item;
-                    TempItem.Insert;
+                    TempItem.Insert();
                 end;
         //+NC2.14 [312958]
         end;

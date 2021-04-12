@@ -1,8 +1,8 @@
 report 6014474 "NPR Item/Sales Person Top"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Item/Sales Person Top';
 
@@ -110,7 +110,7 @@ report 6014474 "NPR Item/Sales Person Top"
                 trigger OnAfterGetRecord()
                 begin
                     if Number = 1 then begin
-                        if not ItemAmount.FindFirst then
+                        if not ItemAmount.FindFirst() then
                             CurrReport.Break();
                     end else
                         if ItemAmount.Next() = 0 then

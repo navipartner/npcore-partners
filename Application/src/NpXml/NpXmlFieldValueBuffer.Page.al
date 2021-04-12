@@ -12,7 +12,7 @@ page 6151561 "NPR NpXml Field Value Buffer"
         {
             repeater(Group)
             {
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

@@ -17,7 +17,7 @@ page 6151589 "NPR Event Task Lines"
                 IndentationColumn = DescriptionIndent;
                 IndentationControls = Description;
                 ShowCaption = false;
-                field("Job No."; "Job No.")
+                field("Job No."; Rec."Job No.")
                 {
                     ApplicationArea = All;
                     Style = Strong;
@@ -25,56 +25,56 @@ page 6151589 "NPR Event Task Lines"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Job No. field';
                 }
-                field("Job Task No."; "Job Task No.")
+                field("Job Task No."; Rec."Job Task No.")
                 {
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = StyleIsStrong;
                     ToolTip = 'Specifies the value of the Job Task No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = StyleIsStrong;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Job Task Type"; "Job Task Type")
+                field("Job Task Type"; Rec."Job Task Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Job Task Type field';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Totaling field';
                 }
-                field("Job Posting Group"; "Job Posting Group")
+                field("Job Posting Group"; Rec."Job Posting Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Job Posting Group field';
                 }
-                field("WIP-Total"; "WIP-Total")
+                field("WIP-Total"; Rec."WIP-Total")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the WIP-Total field';
                 }
-                field("WIP Method"; "WIP Method")
+                field("WIP Method"; Rec."WIP Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the WIP Method field';
                 }
-                field("Start Date"; "Start Date")
+                field("Start Date"; Rec."Start Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Date field';
                 }
-                field("End Date"; "End Date")
+                field("End Date"; Rec."End Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End Date field';
                 }
-                field("Schedule (Total Cost)"; "Schedule (Total Cost)")
+                field("Schedule (Total Cost)"; Rec."Schedule (Total Cost)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Schedule (Total Cost) field';
@@ -87,7 +87,7 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.Run(PAGE::"NPR Event Planning Lines", JobPlanningLine, JobPlanningLine."Total Cost (LCY)");
                     end;
                 }
-                field("Schedule (Total Price)"; "Schedule (Total Price)")
+                field("Schedule (Total Price)"; Rec."Schedule (Total Price)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Schedule (Total Price) field';
@@ -100,17 +100,17 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.Run(PAGE::"NPR Event Planning Lines", JobPlanningLine, JobPlanningLine."Line Amount (LCY)");
                     end;
                 }
-                field("Usage (Total Cost)"; "Usage (Total Cost)")
+                field("Usage (Total Cost)"; Rec."Usage (Total Cost)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Usage (Total Cost) field';
                 }
-                field("Usage (Total Price)"; "Usage (Total Price)")
+                field("Usage (Total Price)"; Rec."Usage (Total Price)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Usage (Total Price) field';
                 }
-                field("Contract (Total Cost)"; "Contract (Total Cost)")
+                field("Contract (Total Cost)"; Rec."Contract (Total Cost)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contract (Total Cost) field';
@@ -123,7 +123,7 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.Run(PAGE::"NPR Event Planning Lines", JobPlanningLine, JobPlanningLine."Total Cost (LCY)");
                     end;
                 }
-                field("Contract (Total Price)"; "Contract (Total Price)")
+                field("Contract (Total Price)"; Rec."Contract (Total Price)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contract (Total Price) field';
@@ -136,17 +136,17 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.Run(PAGE::"NPR Event Planning Lines", JobPlanningLine, JobPlanningLine."Line Amount (LCY)");
                     end;
                 }
-                field("Contract (Invoiced Cost)"; "Contract (Invoiced Cost)")
+                field("Contract (Invoiced Cost)"; Rec."Contract (Invoiced Cost)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contract (Invoiced Cost) field';
                 }
-                field("Contract (Invoiced Price)"; "Contract (Invoiced Price)")
+                field("Contract (Invoiced Price)"; Rec."Contract (Invoiced Price)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contract (Invoiced Price) field';
                 }
-                field("Remaining (Total Cost)"; "Remaining (Total Cost)")
+                field("Remaining (Total Cost)"; Rec."Remaining (Total Cost)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remaining (Total Cost) field';
@@ -159,7 +159,7 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.Run(PAGE::"NPR Event Planning Lines", JobPlanningLine, JobPlanningLine."Remaining Total Cost (LCY)");
                     end;
                 }
-                field("Remaining (Total Price)"; "Remaining (Total Price)")
+                field("Remaining (Total Price)"; Rec."Remaining (Total Price)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remaining (Total Price) field';
@@ -172,31 +172,31 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.Run(PAGE::"NPR Event Planning Lines", JobPlanningLine, JobPlanningLine."Remaining Line Amount (LCY)");
                     end;
                 }
-                field("EAC (Total Cost)"; CalcEACTotalCost)
+                field("EAC (Total Cost)"; Rec.CalcEACTotalCost)
                 {
                     ApplicationArea = All;
                     Caption = 'EAC (Total Cost)';
                     ToolTip = 'Specifies the value of the EAC (Total Cost) field';
                 }
-                field("EAC (Total Price)"; CalcEACTotalPrice)
+                field("EAC (Total Price)"; Rec.CalcEACTotalPrice)
                 {
                     ApplicationArea = All;
                     Caption = 'EAC (Total Price)';
                     ToolTip = 'Specifies the value of the EAC (Total Price) field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Outstanding Orders"; "Outstanding Orders")
+                field("Outstanding Orders"; Rec."Outstanding Orders")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -212,7 +212,7 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.RunModal(PAGE::"Purchase Lines", PurchLine);
                     end;
                 }
-                field("Amt. Rcd. Not Invoiced"; "Amt. Rcd. Not Invoiced")
+                field("Amt. Rcd. Not Invoiced"; Rec."Amt. Rcd. Not Invoiced")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -258,7 +258,7 @@ page 6151589 "NPR Event Task Lines"
                     Caption = 'Event &Planning Lines';
                     Image = JobLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+P';
@@ -270,17 +270,17 @@ page 6151589 "NPR Event Task Lines"
                         JobPlanningLine: Record "Job Planning Line";
                         EventPlanningLines: Page "NPR Event Planning Lines";
                     begin
-                        TestField("Job Task Type", "Job Task Type"::Posting);
-                        TestField("Job No.");
-                        TestField("Job Task No.");
+                        Rec.TestField("Job Task Type", Rec."Job Task Type"::Posting);
+                        Rec.TestField("Job No.");
+                        Rec.TestField("Job Task No.");
                         JobPlanningLine.FilterGroup(2);
-                        JobPlanningLine.SetRange("Job No.", "Job No.");
-                        JobPlanningLine.SetRange("Job Task No.", "Job Task No.");
+                        JobPlanningLine.SetRange("Job No.", Rec."Job No.");
+                        JobPlanningLine.SetRange("Job Task No.", Rec."Job Task No.");
                         JobPlanningLine.FilterGroup(0);
                         EventPlanningLines.SetJobTaskNoVisible(false);
-                        EventPlanningLines.SetJobNo("Job No.");
+                        EventPlanningLines.SetJobNo(Rec."Job No.");
                         EventPlanningLines.SetTableView(JobPlanningLine);
-                        EventPlanningLines.Run;
+                        EventPlanningLines.Run();
                     end;
                 }
                 action(JobTaskStatistics)
@@ -339,7 +339,7 @@ page 6151589 "NPR Event Task Lines"
                         begin
                             CurrPage.SetSelectionFilter(JobTask);
                             JobTaskDimensionsMultiple.SetMultiJobTask(JobTask);
-                            JobTaskDimensionsMultiple.RunModal;
+                            JobTaskDimensionsMultiple.RunModal();
                         end;
                     }
                 }
@@ -353,7 +353,7 @@ page 6151589 "NPR Event Task Lines"
                     Caption = 'Sales &Documents';
                     Image = GetSourceDoc;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sales &Documents action';
@@ -363,7 +363,7 @@ page 6151589 "NPR Event Task Lines"
                         EventInvoices: Page "NPR Event Invoices";
                     begin
                         EventInvoices.SetPrJobTask(Rec);
-                        EventInvoices.RunModal;
+                        EventInvoices.RunModal();
                     end;
                 }
             }
@@ -429,14 +429,14 @@ page 6151589 "NPR Event Task Lines"
                         Job: Record Job;
                         JobTask: Record "Job Task";
                     begin
-                        TestField("Job No.");
-                        Job.Get("Job No.");
+                        Rec.TestField("Job No.");
+                        Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
                             Job.TestBlocked;
 
                         JobTask.SetRange("Job No.", Job."No.");
-                        if "Job Task No." <> '' then
-                            JobTask.SetRange("Job Task No.", "Job Task No.");
+                        if Rec."Job Task No." <> '' then
+                            JobTask.SetRange("Job Task No.", Rec."Job Task No.");
 
                         REPORT.RunModal(REPORT::"Job Create Sales Invoice", true, false, JobTask);
                     end;
@@ -452,7 +452,7 @@ page 6151589 "NPR Event Task Lines"
                     Ellipsis = true;
                     Image = Splitlines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Split &Planning Lines action';
@@ -462,14 +462,14 @@ page 6151589 "NPR Event Task Lines"
                         Job: Record Job;
                         JobTask: Record "Job Task";
                     begin
-                        TestField("Job No.");
-                        Job.Get("Job No.");
+                        Rec.TestField("Job No.");
+                        Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
                             Job.TestBlocked;
 
-                        TestField("Job Task No.");
+                        Rec.TestField("Job Task No.");
                         JobTask.SetRange("Job No.", Job."No.");
-                        JobTask.SetRange("Job Task No.", "Job Task No.");
+                        JobTask.SetRange("Job Task No.", Rec."Job Task No.");
 
                         REPORT.RunModal(REPORT::"Job Split Planning Line", true, false, JobTask);
                     end;
@@ -487,14 +487,14 @@ page 6151589 "NPR Event Task Lines"
                         Job: Record Job;
                         JobTask: Record "Job Task";
                     begin
-                        TestField("Job No.");
-                        Job.Get("Job No.");
+                        Rec.TestField("Job No.");
+                        Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
                             Job.TestBlocked;
 
                         JobTask.SetRange("Job No.", Job."No.");
-                        if "Job Task No." <> '' then
-                            JobTask.SetRange("Job Task No.", "Job Task No.");
+                        if Rec."Job Task No." <> '' then
+                            JobTask.SetRange("Job Task No.", Rec."Job Task No.");
 
                         REPORT.RunModal(REPORT::"Change Job Dates", true, false, JobTask);
                     end;
@@ -517,7 +517,7 @@ page 6151589 "NPR Event Task Lines"
                         Ellipsis = true;
                         Image = CopyToTask;
                         Promoted = true;
-				        PromotedOnly = true;
+                        PromotedOnly = true;
                         PromotedCategory = Process;
                         ApplicationArea = All;
                         ToolTip = 'Executes the Copy Job Planning Lines &from... action';
@@ -526,9 +526,9 @@ page 6151589 "NPR Event Task Lines"
                         var
                             CopyJobPlanningLines: Page "Copy Job Planning Lines";
                         begin
-                            TestField("Job Task Type", "Job Task Type"::Posting);
+                            Rec.TestField("Job Task Type", Rec."Job Task Type"::Posting);
                             CopyJobPlanningLines.SetToJobTask(Rec);
-                            CopyJobPlanningLines.RunModal;
+                            CopyJobPlanningLines.RunModal();
                         end;
                     }
                     action("Copy Job Planning Lines &to...")
@@ -537,7 +537,7 @@ page 6151589 "NPR Event Task Lines"
                         Ellipsis = true;
                         Image = CopyFromTask;
                         Promoted = true;
-				        PromotedOnly = true;
+                        PromotedOnly = true;
                         PromotedCategory = Process;
                         ApplicationArea = All;
                         ToolTip = 'Executes the Copy Job Planning Lines &to... action';
@@ -546,9 +546,9 @@ page 6151589 "NPR Event Task Lines"
                         var
                             CopyJobPlanningLines: Page "Copy Job Planning Lines";
                         begin
-                            TestField("Job Task Type", "Job Task Type"::Posting);
+                            Rec.TestField("Job Task Type", Rec."Job Task Type"::Posting);
                             CopyJobPlanningLines.SetFromJobTask(Rec);
-                            CopyJobPlanningLines.RunModal;
+                            CopyJobPlanningLines.RunModal();
                         end;
                     }
                 }
@@ -568,8 +568,8 @@ page 6151589 "NPR Event Task Lines"
                         var
                             Job: Record Job;
                         begin
-                            TestField("Job No.");
-                            Job.Get("Job No.");
+                            Rec.TestField("Job No.");
+                            Job.Get(Rec."Job No.");
                             Job.SetRange("No.", Job."No.");
                             REPORT.RunModal(REPORT::"Job Calculate WIP", true, false, Job);
                         end;
@@ -587,8 +587,8 @@ page 6151589 "NPR Event Task Lines"
                         var
                             Job: Record Job;
                         begin
-                            TestField("Job No.");
-                            Job.Get("Job No.");
+                            Rec.TestField("Job No.");
+                            Job.Get(Rec."Job No.");
                             Job.SetRange("No.", Job."No.");
                             REPORT.RunModal(REPORT::"Job Post WIP to G/L", true, false, Job);
                         end;
@@ -600,13 +600,13 @@ page 6151589 "NPR Event Task Lines"
 
     trigger OnAfterGetRecord()
     begin
-        DescriptionIndent := Indentation;
-        StyleIsStrong := "Job Task Type" <> "Job Task Type"::Posting;
+        DescriptionIndent := Rec.Indentation;
+        StyleIsStrong := Rec."Job Task Type" <> Rec."Job Task Type"::Posting;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        ClearTempDim;
+        Rec.ClearTempDim;
     end;
 
     var
@@ -619,11 +619,11 @@ page 6151589 "NPR Event Task Lines"
     begin
         PurchLine.SetCurrentKey("Document Type", "Job No.", "Job Task No.");
         PurchLine.SetRange("Document Type", PurchLine."Document Type"::Order);
-        PurchLine.SetRange("Job No.", "Job No.");
-        if "Job Task Type" in ["Job Task Type"::Total, "Job Task Type"::"End-Total"] then
-            PurchLine.SetFilter("Job Task No.", Totaling)
+        PurchLine.SetRange("Job No.", Rec."Job No.");
+        if Rec."Job Task Type" in [Rec."Job Task Type"::Total, Rec."Job Task Type"::"End-Total"] then
+            PurchLine.SetFilter("Job Task No.", Rec.Totaling)
         else
-            PurchLine.SetRange("Job Task No.", "Job Task No.");
+            PurchLine.SetRange("Job Task No.", Rec."Job Task No.");
     end;
 
     local procedure SetDrillDownFilter(SetContractLineFilter: Boolean; ContractLine: Boolean; SetScheduleLineFilter: Boolean; ScheduleLine: Boolean; var JobPlanningLine: Record "Job Planning Line")

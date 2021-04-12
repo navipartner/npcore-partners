@@ -70,7 +70,7 @@ page 6014645 "NPR Tax Free Requests"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Code field';
                 }
-                field("Error Message"; "Error Message")
+                field("Error Message"; Rec."Error Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Message field';
@@ -117,7 +117,7 @@ page 6014645 "NPR Tax Free Requests"
                     InStream: InStream;
                     Filename: Variant;
                 begin
-                    if not Request.HasValue then
+                    if not Request.HasValue() then
                         exit;
                     Rec.CalcFields(Request);
                     TempBLOB.FromRecord(Rec, Rec.FieldNo(Request));
@@ -143,7 +143,7 @@ page 6014645 "NPR Tax Free Requests"
                     InStream: InStream;
                     Filename: Variant;
                 begin
-                    if not Rec.Response.HasValue then
+                    if not Rec.Response.HasValue() then
                         exit;
                     Rec.CalcFields(Response);
                     TempBlob.FromRecord(Rec, Rec.FieldNo(Response));

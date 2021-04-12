@@ -64,7 +64,6 @@ xmlport 6151500 "NPR Nc Import Entry"
     }
 
     var
-        XmlPortVariant: Variant;
         EntryNo: Integer;
 
     procedure CopySourceTable(var TempNcImportEntryCopy: Record "NPR Nc Import Entry" temporary)

@@ -41,7 +41,7 @@ page 6151410 "NPR Magento VAT Prod. Groups"
                 Caption = 'Setup VAT Product Posting Groups';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

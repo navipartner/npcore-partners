@@ -108,7 +108,7 @@ xmlport 6151138 "NPR M2 Estimate Delivery Date"
                 if (Customer."Location Code" <> '') then begin
                     TmpItemResponse.TransferFields(TmpItemRequest);
                     if (TmpItemResponse.Date = 0D) then
-                        TmpItemResponse.Date := Today;
+                        TmpItemResponse.Date := Today();
                     TmpItemResponse.Insert();
                 end;
             end;

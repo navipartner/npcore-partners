@@ -17,19 +17,19 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
         {
             group(General)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     Lookup = true;
                     TableRelation = Object.ID WHERE(Type = CONST(Table));
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table View"; "Table View")
+                field("Table View"; Rec."Table View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table View field';
@@ -51,7 +51,7 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
 
                 trigger OnAction()
                 begin
-                    CurrPage.Close;
+                    CurrPage.Close();
                 end;
             }
         }
@@ -61,15 +61,15 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
     var
         TextConfirmCreate: Label 'Would you like to create this Outgoing Collector Request?';
     begin
-        if (Name <> '') and ("Table No." <> 0) then
+        if (Rec.Name <> '') and (Rec."Table No." <> 0) then
             if Confirm(TextConfirmCreate) then
                 CreateCollectorRequest;
     end;
 
     trigger OnOpenPage()
     begin
-        "No." := 1;
-        Insert;
+        Rec."No." := 1;
+        Rec.Insert();
     end;
 
     var
@@ -80,15 +80,15 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
     var
         NcCollectorRequest: Record "NPR Nc Collector Request";
     begin
-        TestField(Name);
-        TestField("Table No.");
-        NcCollectorRequest.Init;
+        Rec.TestField(Name);
+        Rec.TestField("Table No.");
+        NcCollectorRequest.Init();
         NcCollectorRequest.Insert(true);
         NcCollectorRequest.Validate(Direction, NcCollectorRequest.Direction::Outgoing);
-        NcCollectorRequest.Validate(Name, Name);
-        NcCollectorRequest.Validate("Collector Code", "Collector Code");
-        NcCollectorRequest.Validate("Table No.", "Table No.");
-        NcCollectorRequest.Validate("Table View", "Table View");
+        NcCollectorRequest.Validate(Name, Rec.Name);
+        NcCollectorRequest.Validate("Collector Code", Rec."Collector Code");
+        NcCollectorRequest.Validate("Table No.", Rec."Table No.");
+        NcCollectorRequest.Validate("Table View", Rec."Table View");
         NcCollectorRequest.Modify(true);
         Message(TextCreated, NcCollectorRequest."No.");
     end;

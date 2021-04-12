@@ -253,7 +253,6 @@ table 6060126 "NPR MM Member"
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipRole: Record "NPR MM Membership Role";
-        Member: Record "NPR MM Member";
     begin
         "Display Name" := StrSubstNo('%1 %2', "First Name", "Last Name");
 

@@ -1,4 +1,4 @@
-page 6060073 "NPR MM Members. Alteration Jnl"
+﻿page 6060073 "NPR MM Members. Alteration Jnl"
 {
 
     Caption = 'Membership Alteration Journal';
@@ -14,7 +14,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -27,7 +27,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                     OptionCaption = ' ,Regret,Renew,Upgrade,Extend,Cancel';
                     ToolTip = 'Specifies the value of the AlterationOption field';
                 }
-                field("External Membership No."; "External Membership No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Membership No. field';
@@ -41,16 +41,16 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                     trigger OnValidate()
                     begin
 
-                        SetExternalMembershipNo("External Membership No.", Rec);
+                        SetExternalMembershipNo(Rec."External Membership No.", Rec);
                     end;
                 }
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
@@ -64,20 +64,20 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                     trigger OnValidate()
                     begin
 
-                        SetItemNo("Item No.", Rec);
+                        SetItemNo(Rec."Item No.", Rec);
                     end;
                 }
-                field("Document Date"; "Document Date")
+                field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Date field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Response Status"; "Response Status")
+                field("Response Status"; Rec."Response Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response Status field';
@@ -85,10 +85,10 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                     trigger OnValidate()
                     begin
 
-                        "Response Message" := '';
+                        Rec."Response Message" := '';
                     end;
                 }
-                field("Response Message"; "Response Message")
+                field("Response Message"; Rec."Response Message")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -107,7 +107,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Check';
                 Image = TestReport;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -125,7 +125,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Ellipsis = true;
                 Image = PostBatch;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -190,7 +190,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Membership Setup';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Setup";
                 RunPageLink = Code = FIELD("Membership Code");
@@ -202,7 +202,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Membership Card';
                 Image = Customer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
@@ -215,16 +215,16 @@ page 6060073 "NPR MM Members. Alteration Jnl"
     trigger OnAfterGetRecord()
     begin
 
-        case "Information Context" of
-            "Information Context"::REGRET:
+        case Rec."Information Context" of
+            Rec."Information Context"::REGRET:
                 AlterationOption := AlterationOption::REGRET;
-            "Information Context"::RENEW:
+            Rec."Information Context"::RENEW:
                 AlterationOption := AlterationOption::RENEW;
-            "Information Context"::UPGRADE:
+            Rec."Information Context"::UPGRADE:
                 AlterationOption := AlterationOption::UPGRADE;
-            "Information Context"::EXTEND:
+            Rec."Information Context"::EXTEND:
                 AlterationOption := AlterationOption::EXTEND;
-            "Information Context"::CANCEL:
+            Rec."Information Context"::CANCEL:
                 AlterationOption := AlterationOption::CANCEL;
         end;
     end;
@@ -243,8 +243,8 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Source Type" := "Source Type"::ALTERATION_JNL;
-        "Document Date" := WorkDate;
+        Rec."Source Type" := Rec."Source Type"::ALTERATION_JNL;
+        Rec."Document Date" := WorkDate();
     end;
 
     var
@@ -314,8 +314,8 @@ page 6060073 "NPR MM Members. Alteration Jnl"
     begin
 
         MembershipAlterationSetup.SetFilter("Alteration Type", '=%1', GetAlterationType(AlterationOption));
-        TestField("Membership Code");
-        MembershipAlterationSetup.SetFilter("From Membership Code", '=%1', "Membership Code");
+        Rec.TestField("Membership Code");
+        MembershipAlterationSetup.SetFilter("From Membership Code", '=%1', Rec."Membership Code");
         MembershipAlterationPage.SetTableView(MembershipAlterationSetup);
         MembershipAlterationPage.LookupMode(true);
         PageAction := MembershipAlterationPage.RunModal();
@@ -341,16 +341,16 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         end;
 
         Membership.SetFilter("External Membership No.", '=%1', pExternalMembershipNo);
-        //Membership.FindFirst ();
+        //Membership.FindFirst() ();
         if (not Membership.FindFirst()) then begin
             Membership.Reset();
             Membership.SetFilter("Customer No.", '=%1', pExternalMembershipNo);
             Membership.SetFilter(Blocked, '=%1', false);
             if not (Membership.FindFirst()) then begin
-                Membership.Reset;
+                Membership.Reset();
                 Membership.SetFilter("External Membership No.", '=%1', pExternalMembershipNo);
 
-                //Membership.FindFirst ();
+                //Membership.FindFirst() ();
                 if (not Membership.FindFirst()) then begin
                     MemberInfoCapture."External Member No" := pExternalMembershipNo;
                     MemberInfoCapture."Response Message" := 'Invalid reference.';
@@ -433,7 +433,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
             repeat
 
-                if (MemberInfoCapture."Response Status" in ["Response Status"::REGISTERED, "Response Status"::FAILED]) then begin
+                if (MemberInfoCapture."Response Status" in [Rec."Response Status"::REGISTERED, Rec."Response Status"::FAILED]) then begin
                     MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::REGISTERED;
                     AlterationJnlMgmt.AlterMembership(MemberInfoCapture);
                     MemberInfoCapture.Modify();
@@ -513,7 +513,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Fileline: Text;
         Window: Dialog;
-        LowEntryNo: Integer;
     begin
 
         REQUIRED := 1;
@@ -526,7 +525,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         TxtFile.CreateInStream(IStream);
 
         if (not MemberInfoCapture.FindLast()) then;
-        LowEntryNo := MemberInfoCapture."Entry No." + 1;
 
         if GuiAllowed then
             Window.Open(IMPORT_MESSAGE_DIALOG);
@@ -568,10 +566,10 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         FldAlterationItemNo := nextField(CsvLine);
         FldAlterationDate := nextField(CsvLine);
 
-        validateTextField(FldAlterationType, 20, REQUIRED, FieldCaption("Information Context"));
-        validateTextField(FldExternalNumber, MaxStrLen("External Membership No."), REQUIRED, FieldCaption("External Membership No."));
-        validateTextField(FldAlterationItemNo, MaxStrLen("Item No."), OPTIONAL, FieldCaption("Item No."));
-        validateDateField(FldAlterationDate, GDateMask, OPTIONAL, FieldCaption("Document Date"));
+        validateTextField(FldAlterationType, 20, REQUIRED, Rec.FieldCaption("Information Context"));
+        validateTextField(FldExternalNumber, MaxStrLen(Rec."External Membership No."), REQUIRED, Rec.FieldCaption("External Membership No."));
+        validateTextField(FldAlterationItemNo, MaxStrLen(Rec."Item No."), OPTIONAL, Rec.FieldCaption("Item No."));
+        validateDateField(FldAlterationDate, GDateMask, OPTIONAL, Rec.FieldCaption("Document Date"));
 
     end;
 
@@ -604,14 +602,14 @@ page 6060073 "NPR MM Members. Alteration Jnl"
             SetExternalMembershipNo(FldExternalNumber, MemberInfoCapture);
 
         if (MemberInfoCapture."Item No." = '') then
-            validateTextField(FldAlterationItemNo, MaxStrLen("Item No."), REQUIRED, FieldCaption("Item No."));
+            validateTextField(FldAlterationItemNo, MaxStrLen(Rec."Item No."), REQUIRED, Rec.FieldCaption("Item No."));
 
         if (FldAlterationItemNo <> '') then
             SetItemNo(FldAlterationItemNo, MemberInfoCapture);
 
-        MemberInfoCapture."Document Date" := Today;
+        MemberInfoCapture."Document Date" := Today();
         if (FldAlterationDate <> '') then
-            MemberInfoCapture."Document Date" := validateDateField(FldAlterationDate, GDateMask, REQUIRED, FieldCaption("Document Date"));
+            MemberInfoCapture."Document Date" := validateDateField(FldAlterationDate, GDateMask, REQUIRED, Rec.FieldCaption("Document Date"));
 
         MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::REGISTERED;
         MemberInfoCapture."Originates From File Import" := true;
@@ -682,7 +680,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
     end;
 
-    local procedure nextField(var VarLineOfText: Text[1024]) rField: Text[1024]
+    local procedure nextField(var VarLineOfText: Text[1024]): Text[1024]
     begin
 
         exit(forwardTokenizer(VarLineOfText, ';', '"'));
@@ -691,8 +689,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
     local procedure forwardTokenizer(var VarText: Text[1024]; PSeparator: Char; PQuote: Char) RField: Text[1024]
     var
-        Separator: Char;
-        Quote: Char;
         IsQuoted: Boolean;
         InputText: Text[1024];
         NextFieldPos: Integer;

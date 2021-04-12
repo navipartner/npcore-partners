@@ -78,16 +78,16 @@ page 6151257 "NPR Retail Headline EFT RC"
     var
         Uninitialized: Boolean;
     begin
-        if not Rec.Get then
+        if not Rec.Get() then
             if Rec.WritePermission then begin
-                Rec.Init;
-                Rec.Insert;
+                Rec.Init();
+                Rec.Insert();
             end else
                 Uninitialized := true;
 
         if not Uninitialized and Rec.WritePermission then begin
-            Rec."User workdate" := WorkDate;
-            Rec.Modify;
+            Rec."User workdate" := WorkDate();
+            Rec.Modify();
             HeadlineManagement.ScheduleTask(Codeunit::"Headlines");
         end;
 
@@ -108,7 +108,7 @@ page 6151257 "NPR Retail Headline EFT RC"
             // table is uninitialized because of permission issues. OnAfterGetRecord won't be called
             ComputeDefaultFieldsVisibility;
 
-        Commit; // not to mess up the other page parts that may do IF CODEUNIT.RUN()
+        Commit(); // not to mess up the other page parts that may do IF CODEUNIT.RUN()
     end;
 
     var
@@ -121,8 +121,6 @@ page 6151257 "NPR Retail Headline EFT RC"
         UserGreetingVisible: Boolean;
         MyPickText: Text[250];
         AwayPickText: Text[250];
-        HighestSalesTxt: Label 'Highest Sales Today is';
-        TopSalesPersonTxt: Label 'Top Sales person today is ';
 
     local procedure ComputeDefaultFieldsVisibility()
     var

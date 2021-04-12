@@ -170,11 +170,11 @@ table 6150703 "NPR POS Action"
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text002, Action, ActionInDiscovery));
 
         DiscoveredAction.Code := Action;
-        if DiscoveredAction.Find then begin
+        if DiscoveredAction.Find() then begin
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, Action));
             exit;
         end;
-        DiscoveredAction.Insert;
+        DiscoveredAction.Insert();
     end;
 
     procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
@@ -207,7 +207,7 @@ table 6150703 "NPR POS Action"
         if not Insert then;
 
         if (ActionInRefresh = Code) then
-            Modify;
+            Modify();
 
         if Rec.Type <> Rec.Type::BackEnd then begin
             Clear(WorkflowObj);
@@ -251,7 +251,7 @@ table 6150703 "NPR POS Action"
         if not Insert then;
 
         if (ActionInRefresh = Code) then
-            Modify;
+            Modify();
 
         if Rec.Type <> Rec.Type::BackEnd then begin
             Clear(WorkflowObj);
@@ -275,21 +275,19 @@ table 6150703 "NPR POS Action"
         POSAction.SetRange(Version, Version);
         if POSAction.IsEmpty then begin
             tmpUpdatedActions.Code := Code;
-            tmpUpdatedActions.Insert;
+            tmpUpdatedActions.Insert();
             exit(true);
         end;
     end;
 
     local procedure HandleActionUpdates()
-    var
-        POSAction: Record "NPR POS Action";
     begin
         tmpUpdatedActions.SetAutoCalcFields(Workflow);
         tmpUpdatedActions.SetAutoCalcFields("Custom JavaScript Logic");
-        if tmpUpdatedActions.FindSet then
+        if tmpUpdatedActions.FindSet() then
             repeat
                 OnAfterActionUpdated(tmpUpdatedActions);
-            until tmpUpdatedActions.Next = 0;
+            until tmpUpdatedActions.Next() = 0;
     end;
 
     procedure RegisterWorkflowStep(Label: Text; "Code": Text)
@@ -402,13 +400,13 @@ table 6150703 "NPR POS Action"
         if not IsTemporary then
             Param.Validate("Default Value");
 
-        Param.Insert;
+        Param.Insert();
     end;
 
     procedure RegisterDataBinding()
     begin
         "Bound to DataSource" := true;
-        Modify;
+        Modify();
         UpdateActionBuffers();
     end;
 
@@ -416,20 +414,17 @@ table 6150703 "NPR POS Action"
     begin
         "Bound to DataSource" := true;
         "Data Source Name" := DataSource;
-        Modify;
+        Modify();
         UpdateActionBuffers();
     end;
 
     procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
         Json: JsonObject;
-        MemStr: DotNet NPRNetMemoryStream;
-        StreamWriter: DotNet NPRNetStreamWriter;
-        OutStr: OutStream;
     begin
         if not IsTemporary then
             CalcFields("Custom JavaScript Logic");
-        if "Custom JavaScript Logic".HasValue then begin
+        if "Custom JavaScript Logic".HasValue() then begin
             Json := GetCustomJavaScriptLogic();
             if Json.Contains(Method) then
                 Json.Remove(Method);
@@ -479,17 +474,15 @@ table 6150703 "NPR POS Action"
 
         if tmpUpdatedActions.Get(Rec.Code) then begin
             tmpUpdatedActions := Rec;
-            tmpUpdatedActions.Modify;
+            tmpUpdatedActions.Modify();
         end;
     end;
 
     procedure RefreshWorkflow()
-    var
-        "Action": Record "NPR POS Action";
     begin
         ActionInRefresh := Code;
         OnDiscoverActions();
-        if tmpUpdatedActions.Find then
+        if tmpUpdatedActions.Find() then
             OnAfterActionUpdated(tmpUpdatedActions);
     end;
 
@@ -657,7 +650,7 @@ table 6150703 "NPR POS Action"
         if POSAction.Get(Code) then
             if POSAction.Description <> Description then begin
                 POSAction.Description := Description;
-                POSAction.Modify;
+                POSAction.Modify();
             end;
     end;
 }

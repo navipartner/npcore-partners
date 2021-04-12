@@ -3,7 +3,7 @@ report 6151014 "NPR NpRv Voucher 2"
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 2.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher 2.docx';
     Caption = 'NpRv Voucher';
-    UsageCategory = None; 
+    UsageCategory = None;
     DefaultLayout = Word;
     dataset
     {

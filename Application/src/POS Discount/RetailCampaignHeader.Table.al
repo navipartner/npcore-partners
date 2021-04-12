@@ -59,8 +59,5 @@ table 6014610 "NPR Retail Campaign Header"
     {
     }
 
-    var
-        DimMgt: Codeunit DimensionManagement;
-        Text000: Label 'You may have changed a dimension.\\Do you want to update the lines?';
 }
 

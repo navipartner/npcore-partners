@@ -1,8 +1,8 @@
 report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 {
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Rdlc.rdlc';
-    Caption = 'Sales Ticket A4 - POS Rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    Caption = 'Sales Ticket A4 - POS Rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     DefaultLayout = RDLC;
     PreviewMode = PrintLayout;

@@ -41,7 +41,7 @@ table 6059822 "NPR Smart Email"
                 TransactionalEmailVariable: Record "NPR Smart Email Variable";
             begin
                 TransactionalEmailVariable.SetRange("Transactional Email Code", Code);
-                if TransactionalEmailVariable.FindSet then
+                if TransactionalEmailVariable.FindSet() then
                     repeat
                         if TransactionalEmailVariable."Merge Table ID" <> "Merge Table ID" then begin
                             TransactionalEmailVariable."Merge Table ID" := "Merge Table ID";
@@ -49,7 +49,7 @@ table 6059822 "NPR Smart Email"
                             TransactionalEmailVariable."Field Name" := '';
                             TransactionalEmailVariable.Modify(true);
                         end;
-                    until TransactionalEmailVariable.Next = 0;
+                    until TransactionalEmailVariable.Next() = 0;
             end;
         }
         field(60; "Table Caption"; Text[80])

@@ -101,9 +101,9 @@ page 6060051 "NPR Item Worksheet FactBox"
 
     trigger OnAfterGetCurrRecord()
     begin
-        RecExItem.Init;
-        if "Existing Item No." <> '' then
-            if RecExItem.Get("Existing Item No.") then
+        RecExItem.Init();
+        if Rec."Existing Item No." <> '' then
+            if RecExItem.Get(Rec."Existing Item No.") then
                 RecTempItem := RecExItem;
         RecExItem.CalcFields(Inventory);
         BuildCaptions;
@@ -119,7 +119,6 @@ page 6060051 "NPR Item Worksheet FactBox"
     var
         RecExItem: Record Item;
         RecTempItem: Record Item temporary;
-        ItemWorksheetLine: Record "NPR Item Worksheet Line" temporary;
         ExItemDescription: Text;
         ExItemUnitCost: Text;
         ExItemUnitPrice: Text;
@@ -137,28 +136,28 @@ page 6060051 "NPR Item Worksheet FactBox"
         ExItemDescription := '';
         ExItemUnitPrice := '';
         ExItemUnitCost := '';
-        CalcFields("No. of Changes", "No. of Warnings");
+        Rec.CalcFields("No. of Changes", "No. of Warnings");
         ExNoOfChanges := '';
         ExNoOfWarnings := '';
-        if ("Existing Item No." <> '') then begin
-            if Description <> RecTempItem.Description then
+        if (Rec."Existing Item No." <> '') then begin
+            if Rec.Description <> RecTempItem.Description then
                 ExItemDescription := DescriptionLbl
             else
                 RecTempItem.Description := '';
-            if "Sales Price" <> RecTempItem."Unit Price" then
+            if Rec."Sales Price" <> RecTempItem."Unit Price" then
                 ExItemUnitPrice := UnitPriceLbl
             else
                 RecTempItem."Unit Price" := 0;
-            if "Direct Unit Cost" <> RecTempItem."Last Direct Cost" then
+            if Rec."Direct Unit Cost" <> RecTempItem."Last Direct Cost" then
                 ExItemUnitCost := UnitCostLbl
             else
                 RecTempItem."Last Direct Cost" := 0;
-            CalcFields("No. of Changes", "No. of Warnings");
-            if "No. of Changes" <> 0 then begin
-                ExNoOfChanges := FieldCaption("No. of Changes");
+            Rec.CalcFields("No. of Changes", "No. of Warnings");
+            if Rec."No. of Changes" <> 0 then begin
+                ExNoOfChanges := Rec.FieldCaption("No. of Changes");
             end;
-            if "No. of Warnings" <> 0 then begin
-                ExNoOfWarnings := FieldCaption("No. of Warnings");
+            if Rec."No. of Warnings" <> 0 then begin
+                ExNoOfWarnings := Rec.FieldCaption("No. of Warnings");
             end;
         end;
     end;

@@ -1,4 +1,4 @@
-codeunit 6059979 "NPR Variety Calculations"
+﻿codeunit 6059979 "NPR Variety Calculations"
 {
 
     trigger OnRun()
@@ -34,22 +34,22 @@ codeunit 6059979 "NPR Variety Calculations"
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
-                TMPInvBuffer.Init;
+                TMPInvBuffer.Init();
                 TMPInvBuffer."Item No." := TMPVrtBuffer."Item No.";
                 TMPInvBuffer."Variant Code" := TMPVrtBuffer."Variant Code";
                 TMPInvBuffer."Location Code" := Location.Code;
                 TMPInvBuffer.Quantity := Item."Net Change";
-                TMPInvBuffer.Insert;
-            until Location.Next = 0;
+                TMPInvBuffer.Insert();
+            until Location.Next() = 0;
         Item.SetFilter("Location Filter", '');
         Item.CalcFields("Net Change");
         if Item."Net Change" <> 0 then begin
-            TMPInvBuffer.Init;
+            TMPInvBuffer.Init();
             TMPInvBuffer."Item No." := TMPVrtBuffer."Item No.";
             TMPInvBuffer."Variant Code" := TMPVrtBuffer."Variant Code";
             TMPInvBuffer."Location Code" := BlankLocation;
             TMPInvBuffer.Quantity := Item."Net Change";
-            TMPInvBuffer.Insert;
+            TMPInvBuffer.Insert();
         end;
 
         if UseReturnValue(CalledFrom, VrtFieldSetup) then begin
@@ -68,7 +68,7 @@ codeunit 6059979 "NPR Variety Calculations"
             exit;
 
         Location.SetRange(Code, FieldValue);
-        if Location.FindFirst then;
+        if Location.FindFirst() then;
         Location.SetRange(Code);
 
         if UseReturnValue(CalledFrom, VrtFieldSetup) then begin
@@ -87,7 +87,7 @@ codeunit 6059979 "NPR Variety Calculations"
             exit;
 
         ItemReference.SetRange("Reference No.", FieldValue);
-        if ItemReference.FindFirst then;
+        if ItemReference.FindFirst() then;
         ItemReference.SetRange("Reference No.");
 
         if UseReturnValue(CalledFrom, VrtFieldSetup) then begin
@@ -160,7 +160,6 @@ codeunit 6059979 "NPR Variety Calculations"
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupAvailabilityByTimeLine(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
-        ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         Item: Record Item;
         ItemAvailByTimeline: Page "Item Availability by Timeline";
     begin
@@ -171,7 +170,7 @@ codeunit 6059979 "NPR Variety Calculations"
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
         ItemAvailByTimeline.SetItem(Item);
-        ItemAvailByTimeline.Run;
+        ItemAvailByTimeline.Run();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
@@ -185,14 +184,12 @@ codeunit 6059979 "NPR Variety Calculations"
         ItemRef.SetRange("Item No.", TMPVrtBuffer."Item No.");
         ItemRef.SetRange("Variant Code", TMPVrtBuffer."Variant Code");
         ItemRef.SetRange("Discontinue Bar Code", false);
-        if ItemRef.FindFirst then
+        if ItemRef.FindFirst() then
             FieldValue := ItemRef."Reference No.";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetQuantityAvailable(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        Item: Record Item;
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetQuantityAvailable') then
             exit;
@@ -204,8 +201,6 @@ codeunit 6059979 "NPR Variety Calculations"
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetExpectedInventory(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        Item: Record Item;
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetExpectedInventory') then
             exit;
@@ -217,8 +212,6 @@ codeunit 6059979 "NPR Variety Calculations"
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetProjAvailableBalance(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        Item: Record Item;
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetProjAvailableBalance') then
             exit;
@@ -230,8 +223,6 @@ codeunit 6059979 "NPR Variety Calculations"
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetPlannedOrderReleases(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        Item: Record Item;
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetPlannedOrderReleases') then
             exit;
@@ -243,8 +234,6 @@ codeunit 6059979 "NPR Variety Calculations"
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetScheduledRcpt(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        Item: Record Item;
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetScheduledRcpt') then
             exit;
@@ -256,8 +245,6 @@ codeunit 6059979 "NPR Variety Calculations"
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetPlannedOrderRcpt(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        Item: Record Item;
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetPlannedOrderRcpt') then
             exit;
@@ -269,8 +256,6 @@ codeunit 6059979 "NPR Variety Calculations"
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetGrossRequirement(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        Item: Record Item;
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetGrossRequirement') then
             exit;
@@ -293,9 +278,9 @@ codeunit 6059979 "NPR Variety Calculations"
             exit;
 
         Item.Get(ItemFilters."No.");
-        Item.Reset;
+        Item.Reset();
         if ItemFilters.GetFilter("Date Filter") = '' then
-            Item.SetRange("Date Filter", 0D, WorkDate)
+            Item.SetRange("Date Filter", 0D, WorkDate())
         else
             Item.SetRange("Date Filter", 0D, ItemFilters.GetRangeMax("Date Filter"));
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
@@ -355,10 +340,6 @@ codeunit 6059979 "NPR Variety Calculations"
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         Item2: Record Item;
-        AvailableToPromise: Codeunit "Available to Promise";
-        PeriodType: Option Day,Week,Month,Quarter,Year;
-        AvailabilityDate: Date;
-        LookaheadDateformula: DateFormula;
     begin
         if ((CalculatedForItem = Item."No.") and (CalculatedForVariant = VariantCode)) then
             exit;
@@ -368,9 +349,9 @@ codeunit 6059979 "NPR Variety Calculations"
         /*
         EVALUATE(LookaheadDateformula, '<+1Y>');
         Item2.GET(Item."No.");
-        Item2.RESET;
+        Item2.Reset();
         IF Item.GETFILTER("Date Filter") = '' THEN
-          Item2.SETRANGE("Date Filter",0D, WORKDATE)
+          Item2.SETRANGE("Date Filter",0D, WorkDate())
         ELSE
           Item2.SETRANGE("Date Filter",0D, Item.GETRANGEMAX("Date Filter"));
         Item2.SETRANGE("Variant Filter", VariantCode);

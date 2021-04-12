@@ -162,7 +162,7 @@ page 6151258 "NPR Top 10 Vendors"
     trigger OnOpenPage()
     begin
         PeriodType := PeriodType::Year;
-        CurrDate := Today;
+        CurrDate := Today();
         UpdateList();
     end;
 
@@ -172,7 +172,6 @@ page 6151258 "NPR Top 10 Vendors"
         CurrDate: Date;
         Enddate: Date;
         StartDate: Date;
-        sales: Decimal;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
 
     local procedure UpdateList()
@@ -203,8 +202,6 @@ page 6151258 "NPR Top 10 Vendors"
     end;
 
     local procedure Setdate()
-    var
-        DatePeriod: Record Date;
     begin
         case PeriodType of
             PeriodType::Day:

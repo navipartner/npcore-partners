@@ -6,7 +6,7 @@ codeunit 6184851 "NPR FR Audit Arch. Workshifts"
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
-        FRCertificationSetup.Get;
+        FRCertificationSetup.Get();
         FRCertificationSetup.TestField("Auto Archive URL");
         FRCertificationSetup.TestField("Auto Archive API Key");
         FRCertificationSetup.TestField("Auto Archive SAS");
@@ -14,15 +14,15 @@ codeunit 6184851 "NPR FR Audit Arch. Workshifts"
         POSWorkshiftCheckpoint.SetFilter("Entry No.", '>%1', FRCertificationSetup."Last Auto Archived Workshift");
         POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::PREPORT);
         POSWorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
-        if POSWorkshiftCheckpoint.FindSet then
+        if POSWorkshiftCheckpoint.FindSet() then
             repeat
                 FRCertificationSetup."Last Auto Archived Workshift" := POSWorkshiftCheckpoint."Entry No.";
-                FRCertificationSetup.Modify;
+                FRCertificationSetup.Modify();
 
                 ArchiveWorkshift(POSWorkshiftCheckpoint);
 
-                Commit;
-            until POSWorkshiftCheckpoint.Next = 0;
+                Commit();
+            until POSWorkshiftCheckpoint.Next() = 0;
     end;
 
     var
@@ -41,10 +41,9 @@ codeunit 6184851 "NPR FR Audit Arch. Workshifts"
         ResponseMessage: HttpResponseMessage;
         XmlLine: Text;
         XmlFile: Text;
-        ResponseMsg: Text;
         StatusMessage: Text;
     begin
-        POSWorkshiftCheckpoint.SetRecFilter;
+        POSWorkshiftCheckpoint.SetRecFilter();
         TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
         FRPeriodArchive.SetDestination(OutStream);
         FRPeriodArchive.SetTableView(POSWorkshiftCheckpoint);
@@ -67,7 +66,7 @@ codeunit 6184851 "NPR FR Audit Arch. Workshifts"
         Headers.Add('Ocp-Apim-Subscription-Key', FRCertificationSetup."Auto Archive API Key");
         RequestMessage.Content(Content);
         RequestMessage.Method('PUT');
-        RequestMessage.SetRequestUri(StrSubstNo('%1/%2?%3', FRCertificationSetup."Auto Archive URL", Format(CreateGuid), FRCertificationSetup."Auto Archive SAS"));
+        RequestMessage.SetRequestUri(StrSubstNo('%1/%2?%3', FRCertificationSetup."Auto Archive URL", Format(CreateGuid()), FRCertificationSetup."Auto Archive SAS"));
 
         Client.Timeout(60000); //1min
         Client.Send(RequestMessage, ResponseMessage);

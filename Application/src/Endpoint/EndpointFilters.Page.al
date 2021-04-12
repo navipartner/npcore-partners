@@ -17,17 +17,17 @@ page 6014676 "NPR Endpoint Filters"
         {
             repeater(Group)
             {
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Filter Text"; "Filter Text")
+                field("Filter Text"; Rec."Filter Text")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Text field';
@@ -54,9 +54,9 @@ page 6014676 "NPR Endpoint Filters"
     var
         Endpoint: Record "NPR Endpoint";
     begin
-        if ("Endpoint Code" <> '') and ("Table No." = 0) then begin
-            if Endpoint.Get("Endpoint Code") then begin
-                "Table No." := Endpoint."Table No.";
+        if (Rec."Endpoint Code" <> '') and (Rec."Table No." = 0) then begin
+            if Endpoint.Get(Rec."Endpoint Code") then begin
+                Rec."Table No." := Endpoint."Table No.";
 
             end;
         end;

@@ -150,7 +150,6 @@ report 6060133 "NPR MM Visiting Report"
 
     var
         AdmSet: Record "NPR MM Members. Admis. Setup";
-        TickResReq: Record "NPR TM Ticket Reservation Req.";
         Temp: Code[100];
         NumberOfVisits: Integer;
         Qty: Integer;
@@ -160,6 +159,5 @@ report 6060133 "NPR MM Visiting Report"
         Guests_Lbl: Label 'Guests';
         MembershipCode_Lbl: Label 'Membership Code';
         TicketCode_Lbl: Label 'Ticket Type Code';
-        MemberName: Text;
 }
 

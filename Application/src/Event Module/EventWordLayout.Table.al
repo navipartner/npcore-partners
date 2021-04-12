@@ -43,7 +43,7 @@ table 6060151 "NPR Event Word Layout"
 
             trigger OnValidate()
             begin
-                if ("Basic Layout Code" <> xRec."Basic Layout Code") and Layout.HasValue then
+                if ("Basic Layout Code" <> xRec."Basic Layout Code") and Layout.HasValue() then
                     if not Confirm(StrSubstNo(ConfirmLayoutChange, FieldCaption("Basic Layout Code"))) then
                         Error('');
 
@@ -52,11 +52,11 @@ table 6060151 "NPR Event Word Layout"
                     Clear("XML Part");
                 end else begin
                     CustomReportLayout.Get("Basic Layout Code");
-                    if CustomReportLayout.Layout.HasValue then begin
+                    if CustomReportLayout.Layout.HasValue() then begin
                         CustomReportLayout.CalcFields(Layout);
                         Layout := CustomReportLayout.Layout;
                     end;
-                    if CustomReportLayout."Custom XML Part".HasValue then begin
+                    if CustomReportLayout."Custom XML Part".HasValue() then begin
                         CustomReportLayout.CalcFields("Custom XML Part");
                         "XML Part" := CustomReportLayout."Custom XML Part";
                     end;
@@ -156,7 +156,7 @@ table 6060151 "NPR Event Word Layout"
         TestField(Usage);
         GetJobFromRecID(Job);
         EventCopy.SetFromEvent(Job."No.", Usage);
-        EventCopy.RunModal;
+        EventCopy.RunModal();
     end;
 
     procedure GetJobFromRecID(var Job: Record Job)
@@ -222,7 +222,7 @@ table 6060151 "NPR Event Word Layout"
 
         InsertCustomXmlPart(Rec);
         Modify(true);
-        Commit;
+        Commit();
 
         if ErrorMessage <> '' then
             Message(ErrorMessage);
@@ -235,7 +235,7 @@ table 6060151 "NPR Event Word Layout"
     begin
         UpdateLayout(true, false);
 
-        if not Layout.HasValue then
+        if not Layout.HasValue() then
             exit;
 
         if DefaultFileName = '' then
@@ -249,11 +249,10 @@ table 6060151 "NPR Event Word Layout"
     var
         DocumentReportMgt: Codeunit "Document Report Mgt.";
         DocumentInStream: InStream;
-        ValidationErrorFormat: Text;
     begin
         TestField("Report ID");
         CalcFields(Layout);
-        if not Layout.HasValue then
+        if not Layout.HasValue() then
             exit;
         Layout.CreateInStream(DocumentInStream);
         exit(DocumentReportMgt.ValidateWordLayout("Report ID", DocumentInStream, useConfirm, UpdateContext));
@@ -289,7 +288,7 @@ table 6060151 "NPR Event Word Layout"
         RecRef: RecordRef;
     begin
         CalcFields(Layout);
-        if not Layout.HasValue then
+        if not Layout.HasValue() then
             exit('');
 
         CalcFields("XML Part");
@@ -305,14 +304,14 @@ table 6060151 "NPR Event Word Layout"
         Clear("XML Part");
         "XML Part".CreateOutStream(PartStream, TEXTENCODING::UTF16);
         PartStream.Write(WordXmlPart);
-        if TempBlob.HasValue then begin
+        if TempBlob.HasValue() then begin
             Clear(Layout);
 
             RecRef.GetTable(Rec);
             TempBlob.ToRecordRef(RecRef, FieldNo("Layout"));
             RecRef.SetTable(Rec);
         end;
-        Modify;
+        Modify();
 
         exit(ErrorMessage);
     end;
@@ -333,7 +332,7 @@ table 6060151 "NPR Event Word Layout"
         InStr: InStream;
     begin
         CalcFields("XML Part");
-        if not "XML Part".HasValue then
+        if not "XML Part".HasValue() then
             exit;
 
         "XML Part".CreateInStream(InStr, TEXTENCODING::UTF16);
@@ -341,8 +340,6 @@ table 6060151 "NPR Event Word Layout"
     end;
 
     procedure PreviewReport()
-    var
-        ReportLayoutSelection: Record "Report Layout Selection";
     begin
         TestField(Usage);
 
@@ -356,7 +353,7 @@ table 6060151 "NPR Event Word Layout"
         Parameters: Text;
         NewParameters: Text;
     begin
-        if "Request Page Parameters".HasValue then begin
+        if "Request Page Parameters".HasValue() then begin
             CalcFields("Request Page Parameters");
             "Request Page Parameters".CreateInStream(InStr, TextEncoding::UTF8);
             InStr.ReadText(Parameters);

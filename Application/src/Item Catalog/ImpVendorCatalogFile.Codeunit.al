@@ -1,4 +1,4 @@
-codeunit 6060061 "NPR Imp. Vendor Catalog File"
+﻿codeunit 6060061 "NPR Imp. Vendor Catalog File"
 {
     trigger OnRun()
     var
@@ -26,7 +26,7 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
     begin
         Clear(Vendor);
         VendorList.LookupMode := true;
-        if VendorList.RunModal = ACTION::LookupOK then
+        if VendorList.RunModal() = ACTION::LookupOK then
             VendorList.GetRecord(Vendor);
         exit(Vendor."No.");
     end;
@@ -62,16 +62,15 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
             if not EOF then
                 ProcessLine(VendorNo, FieldArray, SkipUnmappedVendors);
         until (EOF = true);
-        FileToImport.Close;
+        FileToImport.Close();
         if GuiAllowed then
-            DiaWindow.Close;
+            DiaWindow.Close();
         if not IsOnClient then
             FileManagement.DeleteServerFile(ServerFileName);
     end;
 
     local procedure ReadLine(var FileToImport: File; var FieldArray: array[200] of Text): Boolean
     var
-        Utility: Codeunit "NPR Receipt Footer Mgt.";
         FieldNo: Integer;
         CharsRead: Integer;
         FieldSep: Char;
@@ -140,121 +139,119 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
         NPRAttribute: Record "NPR Attribute";
         CatalogNonstockManagement: Codeunit "NPR Catalog Nonstock Mgt.";
     begin
-        with NonstockItem do begin
-            Init;
-            "Entry No." := '';
-            Validate("Vendor No.", VendorNo);
-            //-NPR5.42
-            /*
-            IF NOT ItemCategory.GET(FieldArray[40]) THEN BEGIN
-              ItemCategory.INIT;
-              ItemCategory.Code := FieldArray[40];
-              ItemCategory.INSERT;
-            END;
-            VALIDATE("Item Template Code",FieldArray[40]); //NAV2018
-            IF NOT Manufacturer.GET(FieldArray[5]) THEN BEGIN
-              Manufacturer.INIT;
-              Manufacturer.Code := FieldArray[5];
-              Manufacturer.INSERT;
-            END;
-            VALIDATE("Manufacturer Code",Manufacturer.Code);
-            Description := COPYSTR(FieldArray[12],1,MAXSTRLEN(Description));
-            IF NOT UnitofMeasure.GET(FieldArray[13]) THEN BEGIN
-              UnitofMeasure.INIT;
-              UnitofMeasure.VALIDATE(Code,FieldArray[13]);
-              UnitofMeasure.INSERT(TRUE);
-            END;
-            VALIDATE("Unit of Measure",UnitofMeasure.Code);
-            VALIDATE("Vendor Item No.",FieldArray[6]);
-            IF EVALUATE(TempDec,FieldArray[22]) THEN
-              VALIDATE("Published Cost",TempDec);
-            IF EVALUATE(TempDec,FieldArray[21]) THEN
-              VALIDATE("Net Weight",TempDec);
-            VALIDATE("Bar Code",FieldArray[7]);
-            */
-            if not ItemCategory.Get(FieldArray[38]) then begin
-                ItemCategory.Init;
-                ItemCategory.Code := FieldArray[38];
-                ItemCategory.Insert;
-            end;
-
-            //-NPR5.48
-            if not ConfigTemplateHeader.Get(FieldArray[38]) then begin
-                ConfigTemplateHeader.Init;
-                ConfigTemplateHeader.Code := FieldArray[38];
-                ConfigTemplateHeader.Description := 'Created from Nordic Item Database';
-                ConfigTemplateHeader."Table ID" := 27;
-                ConfigTemplateHeader.Enabled := true;
-                ConfigTemplateHeader.Insert;
-            end;
-
-            ConfigTemplateLine.SetRange("Data Template Code", FieldArray[38]);
-            ConfigTemplateLine.SetRange(Type, ConfigTemplateLine.Type::Field);
-            ConfigTemplateLine.SetRange("Field ID", 5702);
-            ConfigTemplateLine.SetRange("Table ID", 27);
-            ConfigTemplateLine.SetRange("Default Value", FieldArray[38]);
-            if not ConfigTemplateLine.FindFirst then begin
-                ConfigTemplateLine.Init;
-                ConfigTemplateLine.Validate("Data Template Code", FieldArray[38]);
-                ConfigTemplateLine."Line No." := GetNextConfigTemplateLineNo(FieldArray[38]);
-                ConfigTemplateLine.Validate("Table ID", 27);
-                ConfigTemplateLine.Validate("Field ID", 5702);
-                ConfigTemplateLine.Mandatory := true;
-                ConfigTemplateLine."Language ID" := 1033;
-                ConfigTemplateLine."Default Value" := FieldArray[38];
-                ConfigTemplateLine.Insert;
-            end;
-            //VALIDATE("Item Category Code",FieldArray[38]);
-            Validate("Item Template Code", FieldArray[38]);
-            //+NPR5.48
-
-            if not Manufacturer.Get(FieldArray[3]) then begin
-                Manufacturer.Init;
-                Manufacturer.Code := FieldArray[3];
-                Manufacturer.Insert;
-            end;
-            Validate("Manufacturer Code", Manufacturer.Code);
-            Description := CopyStr(FieldArray[10], 1, MaxStrLen(Description));
-            if not UnitofMeasure.Get(FieldArray[11]) then begin
-                UnitofMeasure.Init;
-                UnitofMeasure.Validate(Code, FieldArray[11]);
-                UnitofMeasure.Insert(true);
-            end;
-            Validate("Unit of Measure", UnitofMeasure.Code);
-            Validate("Vendor Item No.", FieldArray[4]);
-            if Evaluate(TempDec, FieldArray[20]) then
-                //-NPR5.45
-                //VALIDATE("Published Cost",TempDec);
-                if TempDec <> 0 then
-                    Validate("Published Cost", TempDec / 10);
-            //+NPR5.45
-            if Evaluate(TempDec, FieldArray[18]) then
-                Validate("Net Weight", TempDec);
-            Validate("Bar Code", FieldArray[5]);
-            if Evaluate(TempDec, FieldArray[25]) then
-                //-NPR5.45
-                //VALIDATE("Unit Price", TempDec);
-                if TempDec <> 0 then
-                    Validate("Unit Price", TempDec / 10);
-            //+NPR5.45
-
-            //+NPR5.42
-            Insert(true);
-            NPRAttribute.Reset;
-            NPRAttribute.SetFilter("Import File Column No.", '>0');
-            if NPRAttribute.FindSet then
-                repeat
-                    CatalogNonstockManagement.UpdateItemAttribute(1, "Entry No.", NPRAttribute.Code, FieldArray[NPRAttribute."Import File Column No."]);
-                until NPRAttribute.Next = 0;
-            //-NPR5.45
-            NonstockItemMaterial."Nonstock Item Entry No." := "Entry No.";
-            NonstockItemMaterial."Item Material" := FieldArray[44];
-            //-NPR5.45
-            NonstockItemMaterial."Item Material Density" := FieldArray[45];
-            //+NPR5.45
-            NonstockItemMaterial.Insert;
-            //+NPR5.45
+        NonstockItem.Init();
+        NonstockItem."Entry No." := '';
+        NonstockItem.Validate("Vendor No.", VendorNo);
+        //-NPR5.42
+        /*
+        IF NOT ItemCategory.GET(FieldArray[40]) THEN BEGIN
+          ItemCategory.Init();
+          ItemCategory.Code := FieldArray[40];
+          ItemCategory.Insert();
+        END;
+        VALIDATE("Item Template Code",FieldArray[40]); //NAV2018
+        IF NOT Manufacturer.GET(FieldArray[5]) THEN BEGIN
+          Manufacturer.Init();
+          Manufacturer.Code := FieldArray[5];
+          Manufacturer.Insert();
+        END;
+        VALIDATE("Manufacturer Code",Manufacturer.Code);
+        Description := COPYSTR(FieldArray[12],1,MAXSTRLEN(Description));
+        IF NOT UnitofMeasure.GET(FieldArray[13]) THEN BEGIN
+          UnitofMeasure.Init();
+          UnitofMeasure.VALIDATE(Code,FieldArray[13]);
+          UnitofMeasure.INSERT(TRUE);
+        END;
+        VALIDATE("Unit of Measure",UnitofMeasure.Code);
+        VALIDATE("Vendor Item No.",FieldArray[6]);
+        IF EVALUATE(TempDec,FieldArray[22]) THEN
+          VALIDATE("Published Cost",TempDec);
+        IF EVALUATE(TempDec,FieldArray[21]) THEN
+          VALIDATE("Net Weight",TempDec);
+        VALIDATE("Bar Code",FieldArray[7]);
+        */
+        if not ItemCategory.Get(FieldArray[38]) then begin
+            ItemCategory.Init();
+            ItemCategory.Code := FieldArray[38];
+            ItemCategory.Insert();
         end;
+
+        //-NPR5.48
+        if not ConfigTemplateHeader.Get(FieldArray[38]) then begin
+            ConfigTemplateHeader.Init();
+            ConfigTemplateHeader.Code := FieldArray[38];
+            ConfigTemplateHeader.Description := 'Created from Nordic Item Database';
+            ConfigTemplateHeader."Table ID" := 27;
+            ConfigTemplateHeader.Enabled := true;
+            ConfigTemplateHeader.Insert();
+        end;
+
+        ConfigTemplateLine.SetRange("Data Template Code", FieldArray[38]);
+        ConfigTemplateLine.SetRange(Type, ConfigTemplateLine.Type::Field);
+        ConfigTemplateLine.SetRange("Field ID", 5702);
+        ConfigTemplateLine.SetRange("Table ID", 27);
+        ConfigTemplateLine.SetRange("Default Value", FieldArray[38]);
+        if not ConfigTemplateLine.FindFirst() then begin
+            ConfigTemplateLine.Init();
+            ConfigTemplateLine.Validate("Data Template Code", FieldArray[38]);
+            ConfigTemplateLine."Line No." := GetNextConfigTemplateLineNo(FieldArray[38]);
+            ConfigTemplateLine.Validate("Table ID", 27);
+            ConfigTemplateLine.Validate("Field ID", 5702);
+            ConfigTemplateLine.Mandatory := true;
+            ConfigTemplateLine."Language ID" := 1033;
+            ConfigTemplateLine."Default Value" := FieldArray[38];
+            ConfigTemplateLine.Insert();
+        end;
+        //VALIDATE("Item Category Code",FieldArray[38]);
+        NonstockItem.Validate("Item Template Code", FieldArray[38]);
+        //+NPR5.48
+
+        if not Manufacturer.Get(FieldArray[3]) then begin
+            Manufacturer.Init();
+            Manufacturer.Code := FieldArray[3];
+            Manufacturer.Insert();
+        end;
+        NonstockItem.Validate("Manufacturer Code", Manufacturer.Code);
+        NonstockItem.Description := CopyStr(FieldArray[10], 1, MaxStrLen(NonstockItem.Description));
+        if not UnitofMeasure.Get(FieldArray[11]) then begin
+            UnitofMeasure.Init();
+            UnitofMeasure.Validate(Code, FieldArray[11]);
+            UnitofMeasure.Insert(true);
+        end;
+        NonstockItem.Validate("Unit of Measure", UnitofMeasure.Code);
+        NonstockItem.Validate("Vendor Item No.", FieldArray[4]);
+        if Evaluate(TempDec, FieldArray[20]) then
+            //-NPR5.45
+            //VALIDATE("Published Cost",TempDec);
+            if TempDec <> 0 then
+                NonstockItem.Validate("Published Cost", TempDec / 10);
+        //+NPR5.45
+        if Evaluate(TempDec, FieldArray[18]) then
+            NonstockItem.Validate("Net Weight", TempDec);
+        NonstockItem.Validate("Bar Code", FieldArray[5]);
+        if Evaluate(TempDec, FieldArray[25]) then
+            //-NPR5.45
+            //VALIDATE("Unit Price", TempDec);
+            if TempDec <> 0 then
+                NonstockItem.Validate("Unit Price", TempDec / 10);
+        //+NPR5.45
+
+        //+NPR5.42
+        NonstockItem.Insert(true);
+        NPRAttribute.Reset();
+        NPRAttribute.SetFilter("Import File Column No.", '>0');
+        if NPRAttribute.FindSet() then
+            repeat
+                CatalogNonstockManagement.UpdateItemAttribute(1, NonstockItem."Entry No.", NPRAttribute.Code, FieldArray[NPRAttribute."Import File Column No."]);
+            until NPRAttribute.Next() = 0;
+        //-NPR5.45
+        NonstockItemMaterial."Nonstock Item Entry No." := NonstockItem."Entry No.";
+        NonstockItemMaterial."Item Material" := FieldArray[44];
+        //-NPR5.45
+        NonstockItemMaterial."Item Material Density" := FieldArray[45];
+        //+NPR5.45
+        NonstockItemMaterial.Insert();
+        //+NPR5.45
 
     end;
 
@@ -263,16 +260,14 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
         NPRAttribute: Record "NPR Attribute";
         CatalogNonstockManagement: Codeunit "NPR Catalog Nonstock Mgt.";
     begin
-        with Item do begin
-            NPRAttribute.Reset;
-            NPRAttribute.SetFilter("Import File Column No.", '>0');
-            if NPRAttribute.FindSet then
-                repeat
-                    CatalogNonstockManagement.UpdateItemAttribute(0, "No.", NPRAttribute.Code, FieldArray[NPRAttribute."Import File Column No."]);
-                until NPRAttribute.Next = 0;
+        NPRAttribute.Reset();
+        NPRAttribute.SetFilter("Import File Column No.", '>0');
+        if NPRAttribute.FindSet() then
+            repeat
+                CatalogNonstockManagement.UpdateItemAttribute(0, Item."No.", NPRAttribute.Code, FieldArray[NPRAttribute."Import File Column No."]);
+            until NPRAttribute.Next() = 0;
 
-            Modify;
-        end;
+        Item.Modify();
     end;
 
     local procedure IdentifyItem(VendorNo: Code[20]; var FieldArray: array[200] of Text; var Item: Record Item): Boolean
@@ -282,12 +277,12 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
         if VendorNo <> '' then
             Item.SetRange("Vendor No.", VendorNo);
         Item.SetFilter("Vendor Item No.", '=%1', FieldArray[4]);
-        if Item.FindFirst then
+        if Item.FindFirst() then
             exit(true);
-        ItemReference.Reset;
+        ItemReference.Reset();
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
         ItemReference.SetRange("Reference No.", FieldArray[5]);
-        if ItemReference.FindFirst then begin
+        if ItemReference.FindFirst() then begin
             Item.Get(ItemReference."Item No.");
             exit(true);
         end;
@@ -296,7 +291,6 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
 
     local procedure FindVendor(var FieldArray: array[200] of Text; SkipUnmappedVendors: Boolean): Code[20]
     var
-        ItemReference: Record "Item Reference";
         CatalogSupplier: Record "NPR Catalog Supplier";
     begin
         if SkipUnmappedVendors then begin
@@ -308,13 +302,11 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
     end;
 
     local procedure IdentifyNonStockItem(VendorNo: Code[20]; var FieldArray: array[200] of Text; var NonstockItem: Record "Nonstock Item"): Boolean
-    var
-        ItemReference: Record "Item Reference";
     begin
         if VendorNo <> '' then
             NonstockItem.SetRange("Vendor No.", VendorNo);
         NonstockItem.SetFilter("Vendor Item No.", '=%1', FieldArray[4]);
-        if NonstockItem.FindFirst then
+        if NonstockItem.FindFirst() then
             exit(true);
     end;
 
@@ -337,7 +329,7 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
     begin
         //-NPR5.48
         ConfigTemplateLine.SetRange("Data Template Code", TemplateCode);
-        if ConfigTemplateLine.FindLast then
+        if ConfigTemplateLine.FindLast() then
             exit(ConfigTemplateLine."Line No." + 1000)
         else
             exit(1000);

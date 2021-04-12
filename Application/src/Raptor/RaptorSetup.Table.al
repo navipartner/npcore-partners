@@ -109,8 +109,6 @@ table 6151491 "NPR Raptor Setup"
         RaptorMgt: Codeunit "NPR Raptor Management";
 
     procedure InitUrls(Force: Boolean)
-    var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         if ("Base Url" = '') or Force then
             "Base Url" := 'https://api.raptorsmartadvisor.com';

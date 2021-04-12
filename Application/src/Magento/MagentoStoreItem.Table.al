@@ -315,14 +315,14 @@ table 6151420 "NPR Magento Store Item"
         RecRef.GetTable(MagentoStoreItem);
         FieldRef2 := RecRef.Field(FieldRef.Number);
         FieldRef2.SetFilter('<>%1', FieldRef.Value);
-        if not RecRef.FindSet then
+        if not RecRef.FindSet() then
             exit;
 
         repeat
             FieldRef2 := RecRef.Field(FieldRef.Number);
             FieldRef2.Value := FieldRef.Value;
-            RecRef.Modify;
-        until RecRef.Next = 0;
+            RecRef.Modify();
+        until RecRef.Next() = 0;
     end;
 
     local procedure UpdateWebsiteFields()
@@ -372,22 +372,22 @@ table 6151420 "NPR Magento Store Item"
             MagentoStoreItem.SetFilter("Store Code", '<>%1', "Store Code");
             MagentoStoreItem.SetRange("Website Code", "Website Code");
             MagentoStoreItem.SetRange(Enabled, true);
-            if MagentoStoreItem.FindFirst then
+            if MagentoStoreItem.FindFirst() then
                 exit;
 
             MagentoWebsiteLink.SetRange("Website Code", "Website Code");
             MagentoWebsiteLink.SetRange("Item No.", "Item No.");
-            MagentoWebsiteLink.DeleteAll;
+            MagentoWebsiteLink.DeleteAll();
             exit;
         end;
 
         if MagentoWebsiteLink.Get("Website Code", "Item No.", '') then
             exit;
 
-        MagentoWebsiteLink.Init;
+        MagentoWebsiteLink.Init();
         MagentoWebsiteLink."Website Code" := "Website Code";
         MagentoWebsiteLink."Item No." := "Item No.";
         MagentoWebsiteLink."Variant Code" := '';
-        MagentoWebsiteLink.Insert;
+        MagentoWebsiteLink.Insert();
     end;
 }

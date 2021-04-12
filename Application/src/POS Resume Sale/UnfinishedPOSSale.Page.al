@@ -116,6 +116,6 @@ page 6150746 "NPR Unfinished POS Sale"
         Clear(UnfinishedPOSSaleTransact);
         UnfinishedPOSSaleTransact.SetRecord(Rec);
         UnfinishedPOSSaleTransact.SetTableView(Rec);
-        UnfinishedPOSSaleTransact.RunModal;
+        UnfinishedPOSSaleTransact.RunModal();
     end;
 }

@@ -38,7 +38,7 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
         }
         field(10; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             Editable = false;
@@ -64,7 +64,7 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
         }
         field(1000; "Package Code"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Nc RapidConnect Setup"."Package Code" WHERE(Code = FIELD("Setup Code")));
+            CalcFormula = Lookup("NPR Nc RapidConnect Setup"."Package Code" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Package Code';
             Editable = false;
             FieldClass = FlowField;
@@ -72,14 +72,14 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
         }
         field(1005; "Export Enabled"; Boolean)
         {
-            CalcFormula = Lookup ("NPR Nc RapidConnect Setup"."Export Enabled" WHERE(Code = FIELD("Setup Code")));
+            CalcFormula = Lookup("NPR Nc RapidConnect Setup"."Export Enabled" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Export Enabled';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1010; "Task Processor Code"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Nc RapidConnect Setup"."Task Processor Code" WHERE(Code = FIELD("Setup Code")));
+            CalcFormula = Lookup("NPR Nc RapidConnect Setup"."Task Processor Code" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Task Processor Code';
             Editable = false;
             FieldClass = FlowField;
@@ -87,7 +87,7 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
         }
         field(1015; "Trigger Fields"; Integer)
         {
-            CalcFormula = Count ("NPR Nc RapidConnect Trig.Field" WHERE("Setup Code" = FIELD("Setup Code"),
+            CalcFormula = Count("NPR Nc RapidConnect Trig.Field" WHERE("Setup Code" = FIELD("Setup Code"),
                                                                        "Table ID" = FIELD("Table ID")));
             Caption = 'Trigger Fields';
             Description = 'NC2.14';

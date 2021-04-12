@@ -37,70 +37,70 @@ page 6014403 "NPR Retail ItemReclass.Journal"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("Document Date"; "Document Date")
+                field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Date field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnValidate()
                     begin
-                        RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
-                        ShowShortcutDimCode(ShortcutDimCode);
-                        ShowNewShortcutDimCode(NewShortcutDimCode);
+                        RetailItemJnlMgt.GetItem(Rec."Item No.", ItemDescription);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowNewShortcutDimCode(NewShortcutDimCode);
                     end;
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Cross-Reference No."; "Item Reference No.")
+                field("Cross-Reference No."; Rec."Item Reference No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
-                field("New Shortcut Dimension 1 Code"; "New Shortcut Dimension 1 Code")
+                field("New Shortcut Dimension 1 Code"; Rec."New Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Shortcut Dimension 1 Code field';
                 }
-                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
                 }
-                field("New Shortcut Dimension 2 Code"; "New Shortcut Dimension 2 Code")
+                field("New Shortcut Dimension 2 Code"; Rec."New Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -119,7 +119,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("NewShortcutDimCode[3]"; NewShortcutDimCode[3])
@@ -132,13 +132,13 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupNewShortcutDimCode(3, NewShortcutDimCode[3]);
+                        Rec.LookupNewShortcutDimCode(3, NewShortcutDimCode[3]);
                     end;
 
                     trigger OnValidate()
                     begin
-                        TestField("Entry Type", "Entry Type"::Transfer);
-                        ValidateNewShortcutDimCode(3, NewShortcutDimCode[3]);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
+                        Rec.ValidateNewShortcutDimCode(3, NewShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
@@ -154,7 +154,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("NewShortcutDimCode[4]"; NewShortcutDimCode[4])
@@ -167,13 +167,13 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupNewShortcutDimCode(4, NewShortcutDimCode[4]);
+                        Rec.LookupNewShortcutDimCode(4, NewShortcutDimCode[4]);
                     end;
 
                     trigger OnValidate()
                     begin
-                        TestField("Entry Type", "Entry Type"::Transfer);
-                        ValidateNewShortcutDimCode(4, NewShortcutDimCode[4]);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
+                        Rec.ValidateNewShortcutDimCode(4, NewShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
@@ -189,7 +189,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("NewShortcutDimCode[5]"; NewShortcutDimCode[5])
@@ -202,13 +202,13 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupNewShortcutDimCode(5, NewShortcutDimCode[5]);
+                        Rec.LookupNewShortcutDimCode(5, NewShortcutDimCode[5]);
                     end;
 
                     trigger OnValidate()
                     begin
-                        TestField("Entry Type", "Entry Type"::Transfer);
-                        ValidateNewShortcutDimCode(5, NewShortcutDimCode[5]);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
+                        Rec.ValidateNewShortcutDimCode(5, NewShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
@@ -224,7 +224,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("NewShortcutDimCode[6]"; NewShortcutDimCode[6])
@@ -237,13 +237,13 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupNewShortcutDimCode(6, NewShortcutDimCode[6]);
+                        Rec.LookupNewShortcutDimCode(6, NewShortcutDimCode[6]);
                     end;
 
                     trigger OnValidate()
                     begin
-                        TestField("Entry Type", "Entry Type"::Transfer);
-                        ValidateNewShortcutDimCode(6, NewShortcutDimCode[6]);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
+                        Rec.ValidateNewShortcutDimCode(6, NewShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
@@ -259,7 +259,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("NewShortcutDimCode[7]"; NewShortcutDimCode[7])
@@ -272,13 +272,13 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupNewShortcutDimCode(7, NewShortcutDimCode[7]);
+                        Rec.LookupNewShortcutDimCode(7, NewShortcutDimCode[7]);
                     end;
 
                     trigger OnValidate()
                     begin
-                        TestField("Entry Type", "Entry Type"::Transfer);
-                        ValidateNewShortcutDimCode(7, NewShortcutDimCode[7]);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
+                        Rec.ValidateNewShortcutDimCode(7, NewShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
@@ -294,7 +294,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
                 field("NewShortcutDimCode[8]"; NewShortcutDimCode[8])
@@ -307,16 +307,16 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupNewShortcutDimCode(8, NewShortcutDimCode[8]);
+                        Rec.LookupNewShortcutDimCode(8, NewShortcutDimCode[8]);
                     end;
 
                     trigger OnValidate()
                     begin
-                        TestField("Entry Type", "Entry Type"::Transfer);
-                        ValidateNewShortcutDimCode(8, NewShortcutDimCode[8]);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
+                        Rec.ValidateNewShortcutDimCode(8, NewShortcutDimCode[8]);
                     end;
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     Visible = true;
@@ -329,13 +329,13 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         WMSManagement.CheckItemJnlLineLocation(Rec, xRec);
                     end;
                 }
-                field("Bin Code"; "Bin Code")
+                field("Bin Code"; Rec."Bin Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Bin Code field';
                 }
-                field("New Location Code"; "New Location Code")
+                field("New Location Code"; Rec."New Location Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -348,70 +348,70 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         WMSManagement.CheckItemJnlLineLocation(Rec, xRec);
                     end;
                 }
-                field("New Bin Code"; "New Bin Code")
+                field("New Bin Code"; Rec."New Bin Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Bin Code field';
                 }
-                field("Salespers./Purch. Code"; "Salespers./Purch. Code")
+                field("Salespers./Purch. Code"; Rec."Salespers./Purch. Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Salespers./Purch. Code field';
                 }
-                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
                 }
-                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Unit Amount"; "Unit Amount")
+                field("Unit Amount"; Rec."Unit Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit Amount field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Indirect Cost %"; "Indirect Cost %")
+                field("Indirect Cost %"; Rec."Indirect Cost %")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Indirect Cost % field';
                 }
-                field("Unit Cost"; "Unit Cost")
+                field("Unit Cost"; Rec."Unit Cost")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit Cost field';
                 }
-                field("Applies-to Entry"; "Applies-to Entry")
+                field("Applies-to Entry"; Rec."Applies-to Entry")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Applies-to Entry field';
                 }
-                field("Reason Code"; "Reason Code")
+                field("Reason Code"; Rec."Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -472,7 +472,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnAction()
                     begin
-                        ShowReclasDimensions;
+                        Rec.ShowReclasDimensions;
                         CurrPage.SaveRecord;
                     end;
                 }
@@ -486,7 +486,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines(true);
+                        Rec.OpenItemTrackingLines(true);
                     end;
                 }
                 action("Bin Contents")
@@ -629,10 +629,10 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         BinContent: Record "Bin Content";
                         GetBinContent: Report "Whse. Get Bin Content";
                     begin
-                        BinContent.SetRange("Location Code", "Location Code");
+                        BinContent.SetRange("Location Code", Rec."Location Code");
                         GetBinContent.SetTableView(BinContent);
                         GetBinContent.InitializeItemJournalLine(Rec);
-                        GetBinContent.RunModal;
+                        GetBinContent.RunModal();
                         CurrPage.Update(false);
                     end;
                 }
@@ -659,7 +659,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'P&ost';
                     Image = PostOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -669,7 +669,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -678,7 +678,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Post and &Print';
                     Image = PostPrint;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -688,7 +688,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post+Print", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -699,7 +699,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 Ellipsis = true;
                 Image = Print;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Print action';
@@ -709,8 +709,8 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+                    ItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+                    ItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
                     REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
                 end;
             }
@@ -721,21 +721,21 @@ page 6014403 "NPR Retail ItemReclass.Journal"
     begin
         //-NPR5.30 [267424]
         //ItemJnlMgt.GetItem("Item No.",ItemDescription);
-        RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
+        RetailItemJnlMgt.GetItem(Rec."Item No.", ItemDescription);
         //+NPR5.30 [267424]
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
-        ShowNewShortcutDimCode(NewShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowNewShortcutDimCode(NewShortcutDimCode);
     end;
 
     trigger OnDeleteRecord(): Boolean
     var
         ReserveItemJnlLine: Codeunit "Item Jnl. Line-Reserve";
     begin
-        Commit;
+        Commit();
         if not ReserveItemJnlLine.DeleteLineConfirm(Rec) then
             exit(false);
         ReserveItemJnlLine.DeleteLine(Rec);
@@ -743,18 +743,18 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
         Clear(ShortcutDimCode);
         Clear(NewShortcutDimCode);
-        "Entry Type" := "Entry Type"::Transfer;
+        Rec."Entry Type" := Rec."Entry Type"::Transfer;
     end;
 
     trigger OnOpenPage()
     var
         JnlSelected: Boolean;
     begin
-        if IsOpenedFromBatch then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
         end;

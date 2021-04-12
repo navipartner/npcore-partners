@@ -105,7 +105,7 @@ page 6151222 "NPR PrintNode Printer Settings"
             {
                 ApplicationArea = All;
                 ToolTip = 'Executes the ActionName action';
-                Image = Action; 
+                Image = Action;
 
                 trigger OnAction()
                 begin
@@ -124,7 +124,6 @@ page 6151222 "NPR PrintNode Printer Settings"
     procedure GetSettings(): Text;
     var
         SettingsJson: Text;
-        BooleanValue: Boolean;
     begin
         if Tray <> '' then
             SettingsJson += TrayJson + ',';
@@ -236,16 +235,16 @@ page 6151222 "NPR PrintNode Printer Settings"
         TempRetailList.Number := 1;
         TempRetailList.Choice := SelectStr(1, DuplexOptionTxt);
         TempRetailList.Value := SelectStr(1, DuplexValueText);
-        TempRetailList.Insert;
+        TempRetailList.Insert();
         if GetBoolean(JObject, Attribute) then begin
             TempRetailList.Number := 2;
             TempRetailList.Choice := SelectStr(2, DuplexOptionTxt);
             TempRetailList.Value := SelectStr(2, DuplexValueText);
-            TempRetailList.Insert;
+            TempRetailList.Insert();
             TempRetailList.Number := 3;
             TempRetailList.Choice := SelectStr(3, DuplexOptionTxt);
             TempRetailList.Value := SelectStr(3, DuplexValueText);
-            TempRetailList.Insert;
+            TempRetailList.Insert();
         end;
 
     end;
@@ -255,15 +254,15 @@ page 6151222 "NPR PrintNode Printer Settings"
         TempRetailList.Number := 1;
         TempRetailList.Choice := SelectStr(1, RotateOptionTxt);
         TempRetailList.Value := SelectStr(1, RotateValueText);
-        TempRetailList.Insert;
+        TempRetailList.Insert();
         TempRetailList.Number := 2;
         TempRetailList.Choice := SelectStr(2, RotateOptionTxt);
         TempRetailList.Value := SelectStr(2, RotateValueText);
-        TempRetailList.Insert;
+        TempRetailList.Insert();
         TempRetailList.Number := 3;
         TempRetailList.Choice := SelectStr(3, RotateOptionTxt);
         TempRetailList.Value := SelectStr(3, RotateValueText);
-        TempRetailList.Insert;
+        TempRetailList.Insert();
 
     end;
 
@@ -286,7 +285,7 @@ page 6151222 "NPR PrintNode Printer Settings"
         TempRetailList.Insert();
         if JToken.IsArray then begin
             JArray := JToken.AsArray();
-            for I := 0 to JArray.Count - 1 do begin
+            for I := 0 to JArray.Count() - 1 do begin
                 JArray.Get(I, JToken);
                 TempRetailList.Number := I;
                 TempRetailList.Choice := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(TempRetailList.Choice));
