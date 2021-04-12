@@ -71,7 +71,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         Context: Codeunit "NPR POS JSON Management";
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -90,7 +90,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSSalesInfo: Record "NPR MM POS Sales Info";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         JSON: Codeunit "NPR POS JSON Management";
         FunctionId: Integer;
@@ -194,8 +194,8 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         POSSale: Codeunit "NPR POS Sale";
         POSActionTextEnter: Codeunit "NPR POS Action: Text Enter";
         LoyaltyPointMgr: Codeunit "NPR MM Loyalty Point Mgt.";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         Membership: Record "NPR MM Membership";
         TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
         MembershipEntryNo: Integer;
@@ -275,7 +275,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         CouponsPage: Page "NPR NpDc Coupons";
         Coupon: Record "NPR NpDc Coupon";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         PageAction: Action;
         POSActionTextEnter: Codeunit "NPR POS Action: Text Enter";
         EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
@@ -313,7 +313,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     var
         POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
 
         POSSession.GetSale(POSSale);
@@ -401,7 +401,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         DataType: Enum "NPR Data Type";
         POSSale: Codeunit "NPR POS Sale";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSalesInfo: Record "NPR MM POS Sales Info";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";

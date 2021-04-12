@@ -35,9 +35,9 @@ codeunit 6150629 "NPR POS Entry Management"
 
     procedure RecalculatePOSEntry(var POSEntry: Record "NPR POS Entry"; var EntryModified: Boolean)
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
         CalcItemSalesAmount: Decimal;
         CalcDiscountAmount: Decimal;

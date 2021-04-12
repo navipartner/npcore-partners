@@ -72,8 +72,8 @@ codeunit 6150789 "NPR POS Action: Print Item"
 
     local procedure PrintAllLines(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; PrintType: Integer)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SaleLinePOS2: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS2: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         RetailJnlLine: Record "NPR Retail Journal Line";
         GUID: Guid;
@@ -107,7 +107,7 @@ codeunit 6150789 "NPR POS Action: Print Item"
     var
         GUID: Guid;
         JSON: Codeunit "NPR POS JSON Management";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         QuantityInput: Integer;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         RetailJnlLine: Record "NPR Retail Journal Line";

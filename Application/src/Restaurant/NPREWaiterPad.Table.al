@@ -88,7 +88,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         }
         field(42; "No. of Guests on POS Sales"; Integer)
         {
-            CalcFormula = Sum("NPR Sale POS"."NPRE Number of Guests" WHERE("NPRE Pre-Set Waiter Pad No." = FIELD("No.")));
+            CalcFormula = Sum("NPR POS Sale"."NPRE Number of Guests" WHERE("NPRE Pre-Set Waiter Pad No." = FIELD("No.")));
             Caption = 'No. of Guests on POS Sales';
             Editable = false;
             FieldClass = FlowField;

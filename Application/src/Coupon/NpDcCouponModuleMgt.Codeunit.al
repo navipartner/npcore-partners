@@ -31,7 +31,7 @@ codeunit 6151591 "NPR NpDc Coupon Module Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRunValidateCoupon(SalePOS: Record "NPR Sale POS"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
+    procedure OnRunValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
     begin
     end;
 

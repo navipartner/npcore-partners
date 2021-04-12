@@ -190,8 +190,8 @@ table 6150717 "NPR POS Menu Filter"
         FilterRecVariant: Variant;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         FilterCount: Integer;
     begin

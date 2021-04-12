@@ -207,7 +207,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeEndSale', '', true, true)]
-    local procedure OnBeforeEndSale(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR Sale POS")
+    local procedure OnBeforeEndSale(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR POS Sale")
     var
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -218,7 +218,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
-    local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR Sale POS")
+    local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";

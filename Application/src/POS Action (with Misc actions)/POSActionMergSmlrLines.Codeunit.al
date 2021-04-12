@@ -41,7 +41,7 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -66,10 +66,10 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
     begin
     end;
 
-    local procedure ColapseSaleLines(SalePOS: Record "NPR Sale POS")
+    local procedure ColapseSaleLines(SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
     begin
         with SaleLinePOS do begin
             SetCurrentKey("No.");

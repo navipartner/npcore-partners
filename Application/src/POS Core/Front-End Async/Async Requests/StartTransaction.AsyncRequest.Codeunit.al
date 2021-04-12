@@ -6,7 +6,7 @@ codeunit 6150762 "NPR Front-End: StartTrans." implements "NPR Front-End Async Re
         _salesPerson: Text;
         _register: Text;
 
-    procedure Initialize(Sale: Record "NPR Sale POS")
+    procedure Initialize(Sale: Record "NPR POS Sale")
     begin
         _transactionNo := Sale."Sales Ticket No.";
         _salesPerson := Sale."Salesperson Code";

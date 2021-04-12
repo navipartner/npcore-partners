@@ -114,7 +114,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         NPRESeating: Record "NPR NPRE Seating";
         NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
@@ -195,7 +195,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
     var
         NPRESeating: Record "NPR NPRE Seating";
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         WaiterPadNo: Code[20];

@@ -1216,7 +1216,7 @@ codeunit 6060136 "NPR MM Member Notification"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
 
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then

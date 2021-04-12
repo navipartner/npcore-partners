@@ -45,7 +45,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
@@ -166,8 +166,8 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
     local procedure PerformAdjustInventory(POSSession: Codeunit "NPR POS Session"; Quantity: Decimal; ReturnReasonCode: Code[10])
     var
         TempItemJnlLine: Record "Item Journal Line" temporary;
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
@@ -185,7 +185,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         Message(Text005, Quantity);
     end;
 
-    local procedure ConfirmAdjustInventory(SaleLinePOS: Record "NPR Sale Line POS"; Quantity: Decimal) PerformAdjustInventory: Boolean
+    local procedure ConfirmAdjustInventory(SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal) PerformAdjustInventory: Boolean
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -202,7 +202,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         exit(PerformAdjustInventory);
     end;
 
-    local procedure CreateItemJnlLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; Quantity: Decimal; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary)
+    local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary)
     begin
         TempItemJnlLine.Init;
         TempItemJnlLine.Validate("Item No.", SaleLinePOS."No.");

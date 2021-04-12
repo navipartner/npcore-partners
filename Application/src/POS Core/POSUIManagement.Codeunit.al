@@ -523,7 +523,7 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('Payment_Paid', CaptionPayment_Paid);
         Captions.Add('Payment_Balance', CaptionPayment_Balance);
 
-        RecRef.Open(DATABASE::"NPR Sale Line POS");
+        RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
             FieldRef := RecRef.FieldIndex(i);
             Captions.Add(StrSubstNo('Global_Record_%1_Field_%2', RecRef.Number, FieldRef.Number), FieldRef.Caption);

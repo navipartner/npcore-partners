@@ -80,7 +80,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
 
     // The methods subscribes to event posted during end of sale
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure CreateDeFiskalyOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure CreateDeFiskalyOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
         DEAuditSetup: Record "NPR DE Audit Setup";
@@ -136,7 +136,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
 
     local procedure GetVatRates(EntryNo: Integer) TaxArray: JsonArray
     var
-        TaxAmountLine: Record "NPR POS Tax Amount Line";
+        TaxAmountLine: Record "NPR POS Entry Tax Line";
         TaxMapper: Record "NPR VAT Prod Post Group Mapper";
         TaxJsonObject: JsonObject;
     begin
@@ -153,7 +153,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
 
     local procedure GetPaymentTypes(EntryNo: Integer) PaymentArray: JsonArray
     var
-        PaymentLine: Record "NPR POS Payment Line";
+        PaymentLine: Record "NPR POS Entry Payment Line";
         PaymentMapper: Record "NPR Payment Method Mapper";
         PaymentJsonObject: JsonObject;
     begin
@@ -219,7 +219,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
-    local procedure OnBeforeLogin(SaleHeader: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnBeforeLogin(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
         POSSession: Codeunit "NPR POS Session";

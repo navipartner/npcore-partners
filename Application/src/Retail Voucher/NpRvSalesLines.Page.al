@@ -123,7 +123,7 @@ page 6151017 "NPR NpRv Sales Lines"
                 trigger OnAction()
                 var
                     SalesLine: Record "Sales Line";
-                    SaleLinePOS: Record "NPR Sale Line POS";
+                    SaleLinePOS: Record "NPR POS Sale Line";
                     NpRvSalesLineReferences: Page "NPR NpRv Sales Line Ref.";
                     Qty: Decimal;
                 begin

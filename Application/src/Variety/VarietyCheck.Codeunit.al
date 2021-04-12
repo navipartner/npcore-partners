@@ -13,7 +13,7 @@ codeunit 6059974 "NPR Variety Check"
         SalesLine: Record "Sales Line";
         PurchLine: Record "Purchase Line";
         ItemJnlLine: Record "Item Journal Line";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         p: Record "NPR POS Entry";
     begin
         p."Amount Incl. Tax" := 1;
@@ -88,7 +88,7 @@ codeunit 6059974 "NPR Variety Check"
 
     procedure CheckItemVariantDeleteAllowed(ItemVar: Record "Item Variant")
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
         POSSalesLine.SetRange("No.", ItemVar."Item No.");

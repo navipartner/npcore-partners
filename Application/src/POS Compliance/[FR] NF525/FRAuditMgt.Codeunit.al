@@ -725,9 +725,9 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure GetSaleTaxBreakdownString(POSEntry: Record "NPR POS Entry"; OnlyIncludeItems: Boolean) TaxBreakdown: Text
     var
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
-        POSTaxAmountLine2: Record "NPR POS Tax Amount Line";
-        tmpPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
+        POSTaxAmountLine2: Record "NPR POS Entry Tax Line";
+        tmpPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
     begin
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if OnlyIncludeItems then begin
@@ -984,7 +984,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         AddInfo: Text;
         Amount: Decimal;
     begin
@@ -1001,7 +1001,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure IsFullRMA(POSEntry: Record "NPR POS Entry"): Boolean
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         POSRMALine: Record "NPR POS RMA Line";
     begin
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
@@ -1277,7 +1277,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeInitSale', '', false, false)]
-    local procedure OnBeforeLogin(SaleHeader: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnBeforeLogin(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
         POSAuditLog: Record "NPR POS Audit Log";

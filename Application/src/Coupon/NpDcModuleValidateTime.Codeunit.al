@@ -4,7 +4,7 @@ codeunit 6151599 "NPR NpDc Module Validate: Time"
         Text000: Label 'Validate Coupon - Time Interval';
         Text001: Label 'Coupon is invalid during this Time';
 
-    procedure ValidateCoupon(SalePOS: Record "NPR Sale POS"; Coupon: Record "NPR NpDc Coupon")
+    procedure ValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon")
     var
         NpDcValidTimeInterval: Record "NPR NpDc Valid Time Interval";
         NpDcModuleValidateDefault: Codeunit "NPR NpDc ModuleValid.: Defa.";
@@ -107,7 +107,7 @@ codeunit 6151599 "NPR NpDc Module Validate: Time"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunValidateCoupon', '', true, true)]
-    local procedure OnRunValidateCoupon(SalePOS: Record "NPR Sale POS"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
+    local procedure OnRunValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
     begin
         if Handled then
             exit;

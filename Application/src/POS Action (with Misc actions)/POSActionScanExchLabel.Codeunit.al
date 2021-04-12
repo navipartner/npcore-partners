@@ -34,7 +34,7 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
     var
         JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ExchLabelBarcode: Text;
         InputExchLabelBarcode: Text;
         PromptForBarcode: Boolean;
@@ -93,7 +93,7 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
     local procedure HandleExchangeLabelBarcode(iBarcode: Text; var POSSession: Codeunit "NPR POS Session")
     var
         ExchangeLabelManagement: Codeunit "NPR Exchange Label Mgt.";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         CodeBarcode: Code[20];
         POSSaleLine: Codeunit "NPR POS Sale Line";

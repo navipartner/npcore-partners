@@ -490,12 +490,12 @@ codeunit 6060150 "NPR Event Management"
     end;
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
-    local procedure SaleLinePOSOnAfterDelete(var Rec: Record "NPR Sale Line POS"; RunTrigger: Boolean)
+    local procedure SaleLinePOSOnAfterDelete(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         JobPlanningLine: Record "Job Planning Line";
-        SalePOS: Record "NPR Sale POS";
-        POSQuoteEntry: Record "NPR POS Quote Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
         if not RunTrigger then
             exit;
@@ -523,7 +523,7 @@ codeunit 6060150 "NPR Event Management"
     var
         POSEntry2: Record "NPR POS Entry";
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
         SkipThisEntry: Boolean;
     begin
@@ -540,7 +540,7 @@ codeunit 6060150 "NPR Event Management"
                 if not SkipThisEntry then begin
                     JobPlanningLineInvoice.SetRange("NPR POS Unit No.", POSEntry2."POS Unit No.");
                     JobPlanningLineInvoice.SetRange("NPR POS Store Code", POSEntry2."POS Store Code");
-                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", Enum::"Sales Document Type".FromInteger(0), POSEntry2."Document No.", JobPlanningLineInvoice, PostedDocType);
+                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR POS Sale", Enum::"Sales Document Type".FromInteger(0), POSEntry2."Document No.", JobPlanningLineInvoice, PostedDocType);
                 end;
                 POSEntryNo := POSEntry2."Entry No.";
                 POSDocPostType := POSDocPostType::"POS Entry";
@@ -550,7 +550,7 @@ codeunit 6060150 "NPR Event Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
-    local procedure POSActionLoadFromQuoteOnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Quote Entry"; var SalePOS: Record "NPR Sale POS")
+    local procedure POSActionLoadFromQuoteOnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
@@ -559,7 +559,7 @@ codeunit 6060150 "NPR Event Management"
         with JobPlanningLineInvoice do begin
             SetRange("NPR POS Unit No.", POSQuoteEntry."Register No.");
             SetRange("NPR POS Store Code", SalePOS."POS Store Code");
-            if not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", Enum::"Sales Document Type".FromInteger(0), POSQuoteEntry."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
+            if not JobPlanningLineInvoiceExists(DATABASE::"NPR POS Sale", Enum::"Sales Document Type".FromInteger(0), POSQuoteEntry."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
                 exit;
             if FindSet then
                 repeat
@@ -1242,7 +1242,7 @@ codeunit 6060150 "NPR Event Management"
                             PostedDocType := JobPlanningLineInvoice."Document Type"::"Posted Credit Memo";
                         end;
                 end;
-            DATABASE::"NPR Sale POS":
+            DATABASE::"NPR POS Sale":
                 begin
                     JobPlanInvLineDocType := JobPlanningLineInvoice."Document Type"::Invoice;
                     PostedDocType := JobPlanningLineInvoice."Document Type"::"Posted Invoice";
@@ -1336,7 +1336,7 @@ codeunit 6060150 "NPR Event Management"
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         SourceCodeSetup: Record "Source Code Setup";
         Item: Record Item;
         DocumentDate: Date;
@@ -1942,7 +1942,7 @@ codeunit 6060150 "NPR Event Management"
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        POSQuoteEntry: Record "NPR POS Quote Entry";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
         with JobPlanningLineInvoice do
             case "Document Type" of

@@ -211,7 +211,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
         TmpRegisterSalesLines: Record "NPR MM Reg. Sales Buffer" temporary;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
         EFTTransactionRequest2: Record "NPR EFT Transaction Request";
         LoyaltyPointsPSPClient: Codeunit "NPR MM Loy. Point PSP (Client)";
@@ -288,7 +288,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
 
@@ -846,7 +846,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         '</Authorization>';
     end;
 
-    procedure CreateRegisterSalesEftTransaction(IntegrationName: Code[20]; SalePOS: Record "NPR Sale POS"; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    procedure CreateRegisterSalesEftTransaction(IntegrationName: Code[20]; SalePOS: Record "NPR POS Sale"; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
         with EFTTransactionRequest do begin

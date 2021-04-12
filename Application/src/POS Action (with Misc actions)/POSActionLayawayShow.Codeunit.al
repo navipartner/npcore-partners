@@ -51,7 +51,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
         SelectCustomer: Boolean;
         SalesInvoiceHeader: Record "Sales Invoice Header";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -82,7 +82,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
     local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
         POSSession.GetSale(POSSale);

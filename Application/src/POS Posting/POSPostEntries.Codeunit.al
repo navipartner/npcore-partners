@@ -52,10 +52,10 @@ codeunit 6150615 "NPR POS Post Entries"
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
         TempPOSPostingBuffer: Record "NPR POS Posting Buffer" temporary;
-        TempPOSSalesLineToPost: Record "NPR POS Sales Line" temporary;
-        POSSalesLine: Record "NPR POS Sales Line";
-        TempPOSPaymentLinetoPost: Record "NPR POS Payment Line" temporary;
-        POSPaymentLine: Record "NPR POS Payment Line";
+        TempPOSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary;
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        TempPOSPaymentLinetoPost: Record "NPR POS Entry Payment Line" temporary;
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         POSEntryTemp: Record "NPR POS Entry" temporary;
@@ -175,10 +175,10 @@ codeunit 6150615 "NPR POS Post Entries"
         Code(POSEntry);
     end;
 
-    local procedure CreateTempRecordsToPost(var POSEntry: Record "NPR POS Entry"; var POSSalesLineToPost: Record "NPR POS Sales Line" temporary; var POSPaymentLineToPost: Record "NPR POS Payment Line" temporary)
+    local procedure CreateTempRecordsToPost(var POSEntry: Record "NPR POS Entry"; var POSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary; var POSPaymentLineToPost: Record "NPR POS Entry Payment Line" temporary)
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSPeriodRegister: Record "NPR POS Period Register";
         LineCount: Integer;
         NoOfRecords: Integer;
@@ -708,10 +708,10 @@ codeunit 6150615 "NPR POS Post Entries"
     [TryFunction]
     local procedure TryCheckPOSTaxAmountLines(var POSEntry: Record "NPR POS Entry")
     var
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
-        TempPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
-        POSSalesLine: Record "NPR POS Sales Line";
-        TempPOSSalesLine: Record "NPR POS Sales Line" temporary;
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
+        TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        TempPOSSalesLine: Record "NPR POS Entry Sales Line" temporary;
         Currency: Record Currency;
         SalesAmountIncludingTax: Decimal;
         TaxAmountSalesLines: Decimal;
@@ -764,7 +764,7 @@ codeunit 6150615 "NPR POS Post Entries"
             Error(TextSalesTaxDiscrepancy, TempPOSTaxAmountLine.FieldCaption("Tax Base Amount"), TempPOSSalesLine."Amount Excl. VAT", TempPOSTaxAmountLine."Tax Base Amount");
     end;
 
-    local procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
+    local procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -891,7 +891,7 @@ codeunit 6150615 "NPR POS Post Entries"
             until POSSalesLineToBeCompressed.Next = 0;
     end;
 
-    local procedure CreatePostingBufferLinesFromPOSSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
+    local procedure CreatePostingBufferLinesFromPOSSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -1369,8 +1369,8 @@ codeunit 6150615 "NPR POS Post Entries"
         TaxJurisdiction: Record "Tax Jurisdiction";
         CurrExchRate: Record "Currency Exchange Rate";
         CustPostingGr: Record "Customer Posting Group";
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
-        TempPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
+        TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         Currency: Record Currency;
         GLSetup: Record "General Ledger Setup";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1537,7 +1537,7 @@ codeunit 6150615 "NPR POS Post Entries"
         TaxJurisdiction: Record "Tax Jurisdiction";
         CurrExchRate: Record "Currency Exchange Rate";
         CustPostingGr: Record "Customer Posting Group";
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
         TempGenJnlLine: Record "Gen. Journal Line" temporary;
         Currency: Record Currency;
         GLSetup: Record "General Ledger Setup";

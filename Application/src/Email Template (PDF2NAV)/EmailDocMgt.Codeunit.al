@@ -858,7 +858,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure EmailReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure EmailReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
         EmailManagement: Codeunit "NPR E-mail Management";

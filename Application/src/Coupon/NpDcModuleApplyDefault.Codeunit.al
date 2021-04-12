@@ -6,7 +6,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
     procedure ApplyDiscount(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         DiscountAmt: Decimal;
         AppliedDiscountAmt: Decimal;
         TotalAmt: Decimal;
@@ -39,7 +39,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         end;
     end;
 
-    procedure ApplyDiscountLine(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; TotalAmt: Decimal; SaleLinePOS: Record "NPR Sale Line POS"; var AppliedDiscountAmt: Decimal)
+    procedure ApplyDiscountLine(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; TotalAmt: Decimal; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedDiscountAmt: Decimal)
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
         LineNo: Integer;
@@ -79,7 +79,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         AppliedDiscountAmt += LineDiscountAmt;
     end;
 
-    local procedure ApplyDiscountAdjustment(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; SaleLinePOS: Record "NPR Sale Line POS"; var AppliedDiscountAmt: Decimal)
+    local procedure ApplyDiscountAdjustment(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedDiscountAmt: Decimal)
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
         AdjustmentAmount: Decimal;
@@ -124,7 +124,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         exit(SaleLinePOSCouponApply."Discount Amount");
     end;
 
-    local procedure CalcAppliedDiscount(SaleLinePOS: Record "NPR Sale Line POS"): Decimal
+    local procedure CalcAppliedDiscount(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
     begin
@@ -163,7 +163,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         exit(0);
     end;
 
-    local procedure FindSaleLinePOSItems(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOS: Record "NPR Sale Line POS"): Boolean
+    local procedure FindSaleLinePOSItems(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     begin
         Clear(SaleLinePOS);
         SaleLinePOS.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
@@ -191,7 +191,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         exit(SaleLinePOSCouponApply.FindFirst);
     end;
 
-    local procedure FindSaleLinePOSCouponApply2(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; SaleLinePOS: Record "NPR Sale Line POS"; var SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon"): Boolean
+    local procedure FindSaleLinePOSCouponApply2(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; SaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon"): Boolean
     begin
         Clear(SaleLinePOSCouponApply);
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOS."Register No.");
@@ -208,7 +208,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         exit(SaleLinePOSCouponApply.FindFirst);
     end;
 
-    local procedure GetNextLineNo(SaleLinePOS: Record "NPR Sale Line POS"): Integer
+    local procedure GetNextLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
     begin

@@ -89,7 +89,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         NumberText: Text[100];
         DecimalNumber: Decimal;
         IntegerNumber: Integer;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
 
         if Element.IsEmpty then begin

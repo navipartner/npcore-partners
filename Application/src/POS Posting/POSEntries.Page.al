@@ -119,7 +119,7 @@ page 6150650 "NPR POS Entries"
             {
                 Caption = 'Sales Lines';
                 Image = Sales;
-                RunObject = Page "NPR POS Sales Line List";
+                RunObject = Page "NPR POS Entry Sales Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Sales Lines action';
@@ -128,7 +128,7 @@ page 6150650 "NPR POS Entries"
             {
                 Caption = 'Payment Lines';
                 Image = Payment;
-                RunObject = Page "NPR POS Payment Line List";
+                RunObject = Page "NPR POS Entry Pmt. Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Payment Lines action';

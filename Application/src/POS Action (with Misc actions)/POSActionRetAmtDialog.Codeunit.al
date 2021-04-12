@@ -82,7 +82,7 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
         EftType: Text;
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         AuxId: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
@@ -111,7 +111,7 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure ShowReturnAmountDialog(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure ShowReturnAmountDialog(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         MPOSProfile: Record "NPR MPOS Profile";
         POSUnit: Record "NPR POS Unit";

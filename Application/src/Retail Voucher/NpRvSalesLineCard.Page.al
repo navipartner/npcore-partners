@@ -249,7 +249,7 @@ page 6151018 "NPR NpRv Sales Line Card"
                 trigger OnAction()
                 var
                     SalesLine: Record "Sales Line";
-                    SaleLinePOS: Record "NPR Sale Line POS";
+                    SaleLinePOS: Record "NPR POS Sale Line";
                     NpRvSalesLineReferences: Page "NPR NpRv Sales Line Ref.";
                     Qty: Decimal;
                 begin

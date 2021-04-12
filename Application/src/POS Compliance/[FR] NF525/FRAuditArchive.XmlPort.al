@@ -197,7 +197,7 @@ xmlport 6184850 "NPR FR Audit Archive"
                     }
                     textelement(SalesLines)
                     {
-                        tableelement("POS Sales Line"; "NPR POS Sales Line")
+                        tableelement("POS Sales Line"; "NPR POS Entry Sales Line")
                         {
                             LinkFields = "POS Entry No." = FIELD("Entry No.");
                             LinkTable = "POS Entry";
@@ -252,7 +252,7 @@ xmlport 6184850 "NPR FR Audit Archive"
                     }
                     textelement(TaxLines)
                     {
-                        tableelement("POS Tax Amount Line"; "NPR POS Tax Amount Line")
+                        tableelement("POS Tax Amount Line"; "NPR POS Entry Tax Line")
                         {
                             LinkFields = "POS Entry No." = FIELD("Entry No.");
                             LinkTable = "POS Entry";
@@ -319,7 +319,7 @@ xmlport 6184850 "NPR FR Audit Archive"
                     }
                     textelement(PaymentLines)
                     {
-                        tableelement("POS Payment Line"; "NPR POS Payment Line")
+                        tableelement("POS Payment Line"; "NPR POS Entry Payment Line")
                         {
                             LinkFields = "POS Entry No." = FIELD("Entry No.");
                             LinkTable = "POS Entry";

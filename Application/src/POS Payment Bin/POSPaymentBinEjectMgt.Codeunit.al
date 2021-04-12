@@ -3,7 +3,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     var
         WORKFLOW_STEP: Label 'Eject Payment Bin';
 
-    procedure EjectDrawer(POSPaymentBin: Record "NPR POS Payment Bin"; SalePOS: Record "NPR Sale POS"): Boolean
+    procedure EjectDrawer(POSPaymentBin: Record "NPR POS Payment Bin"; SalePOS: Record "NPR POS Sale"): Boolean
     var
         Ejected: Boolean;
         POSCreateEntry: Codeunit "NPR POS Create Entry";
@@ -97,10 +97,10 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     end;
 
 
-    local procedure IsDrawerOpenRequiredPOSEntry(SalePOS: Record "NPR Sale POS"): Boolean
+    local procedure IsDrawerOpenRequiredPOSEntry(SalePOS: Record "NPR POS Sale"): Boolean
     var
         POSEntry: Record "NPR POS Entry";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         FilterString: Text;
@@ -125,7 +125,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         exit(not POSPaymentLine.IsEmpty);
     end;
 
-    local procedure CarryOutPaymentBinEject(SalePOS: Record "NPR Sale POS"; Force: Boolean)
+    local procedure CarryOutPaymentBinEject(SalePOS: Record "NPR POS Sale"; Force: Boolean)
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
@@ -157,7 +157,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure EjectPaymentBin(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure EjectPaymentBin(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Payment Bin Eject Mgt." then
             exit;
@@ -181,7 +181,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale', '', true, true)]
-    local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         OpenDrawer: Boolean;
         POSPaymentBin: Record "NPR POS Payment Bin";

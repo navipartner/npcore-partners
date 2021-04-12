@@ -58,8 +58,8 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
         JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
-        LinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        LinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         CurrentView: Codeunit "NPR POS View";
         POSInventoryOverview: Page "NPR POS Inventory Overview";

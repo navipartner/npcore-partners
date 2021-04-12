@@ -1,6 +1,6 @@
 codeunit 6150636 "NPR POS Rounding"
 {
-    procedure InsertRounding(SalePOS: Record "NPR Sale POS"; RoundAmount: Decimal) InsertedRounding: Decimal
+    procedure InsertRounding(SalePOS: Record "NPR POS Sale"; RoundAmount: Decimal) InsertedRounding: Decimal
     var
         GLAccount: Record "G/L Account";
         POSUnit: Record "NPR POS Unit";
@@ -20,9 +20,9 @@ codeunit 6150636 "NPR POS Rounding"
         exit(RoundAmount);
     end;
 
-    local procedure GetLastLineNo(SalePOS: Record "NPR Sale POS"): Integer
+    local procedure GetLastLineNo(SalePOS: Record "NPR POS Sale"): Integer
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -31,9 +31,9 @@ codeunit 6150636 "NPR POS Rounding"
         exit(SaleLinePOS."Line No.");
     end;
 
-    local procedure InsertLine(SalePOS: Record "NPR Sale POS"; GLAccount: Record "G/L Account"; Amount: Decimal)
+    local procedure InsertLine(SalePOS: Record "NPR POS Sale"; GLAccount: Record "G/L Account"; Amount: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Init;
         SaleLinePOS."Register No." := SalePOS."Register No.";

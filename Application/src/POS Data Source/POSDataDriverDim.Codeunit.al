@@ -78,7 +78,7 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
         Setup: Codeunit "NPR POS Setup";
         DimensionManagement: Codeunit DimensionManagement;
         DimSetEntryTmp: Record "Dimension Set Entry" temporary;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 

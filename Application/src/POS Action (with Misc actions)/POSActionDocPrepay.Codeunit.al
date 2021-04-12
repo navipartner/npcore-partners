@@ -110,7 +110,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
         POSSession.GetSale(POSSale);
@@ -138,7 +138,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

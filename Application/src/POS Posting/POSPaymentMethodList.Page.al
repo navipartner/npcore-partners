@@ -113,7 +113,7 @@ page 6150618 "NPR POS Payment Method List"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    RunObject = Page "NPR POS Payment Line List";
+                    RunObject = Page "NPR POS Entry Pmt. Line List";
                     RunPageLink = "POS Payment Method Code" = FIELD(Code);
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Payment Lines action';

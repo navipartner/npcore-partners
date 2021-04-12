@@ -763,13 +763,13 @@ page 6151241 "NPR Retail Manager RC"
 
                 action(POSQuotes)
                 {
-                    Caption = 'POS Quotes';
+                    Caption = 'POS Saved Sales';
                     Image = RegisteredDocs;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    RunObject = page "NPR POS Quotes";
-                    ToolTip = 'View POS Quotes that have been done.';
+                    RunObject = page "NPR POS Saved Sales";
+                    ToolTip = 'View POS Saved Sales that have been done.';
                     ApplicationArea = All;
 
                 }

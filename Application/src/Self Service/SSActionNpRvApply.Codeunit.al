@@ -145,8 +145,8 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSPaymentLine: Codeunit "NPR POS Payment Line";

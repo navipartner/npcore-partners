@@ -34,7 +34,7 @@ codeunit 6014571 "NPR TM Report - Ticket"
         Admission: Record "NPR TM Admission";
         TMTicketType: Record "NPR TM Ticket Type";
         PosEntry: Record "NPR POS Entry";
-        PosEntrySalesLine: Record "NPR POS Sales Line";
+        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
         Printer.SetFont('Control');
         Printer.AddLine('h');

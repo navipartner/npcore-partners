@@ -8,7 +8,7 @@ page 6150653 "NPR POS Sale Line Subpage"
     PageType = ListPart;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR POS Sales Line";
+    SourceTable = "NPR POS Entry Sales Line";
     SourceTableView = ORDER(Descending);
 
     layout

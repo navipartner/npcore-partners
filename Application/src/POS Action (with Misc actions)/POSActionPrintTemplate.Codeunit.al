@@ -41,8 +41,8 @@ codeunit 6150834 "NPR POS Action: Print Template"
         "Record": Variant;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
         if not Action.IsThisAction(ActionCode) then

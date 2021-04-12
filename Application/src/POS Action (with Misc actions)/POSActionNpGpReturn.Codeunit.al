@@ -168,7 +168,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         ObjectMetadata: Record "Object Metadata";
         POSUnit: Record "NPR POS Unit";
         ServicePassword: Text;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpGpUserSaleReturn: Page "NPR NpGp User Sale Return";
         NpGpPOSSalesSetupCard: Page "NPR NpGp POS Sales Setup Card";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -353,8 +353,8 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
 
     local procedure CreateGlobalReverseSale(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry")
     var
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         RetailCrossReference: Record "NPR Retail Cross Reference";
         Item: Record Item;
         JSON: Codeunit "NPR POS JSON Management";
@@ -430,7 +430,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
                 RetailCrossReference.Insert;
 
                 RetailCrossReference."Reference No." := TempNpGpPOSSalesLine."Global Reference";
-                RetailCrossReference."Table ID" := DATABASE::"NPR Sale Line POS";
+                RetailCrossReference."Table ID" := DATABASE::"NPR POS Sale Line";
                 RetailCrossReference."Record Value" := SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No.");
                 RetailCrossReference.Modify;
             until not FullSale or (TempNpGpPOSSalesLine.Next = 0);
@@ -439,9 +439,9 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         POSSale.RefreshCurrent;
     end;
 
-    local procedure UpdateLineNos(SalePOS: Record "NPR Sale POS"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
+    local procedure UpdateLineNos(SalePOS: Record "NPR POS Sale"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TempNumber: Record "Integer" temporary;
         LineNo: Integer;
         i: Integer;
@@ -487,13 +487,13 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
             Error(NotFoundErr, ReferenceNumber);
     end;
 
-    local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR Sale POS"; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
+    local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR POS Sale"; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
     var
         POSSale: Codeunit "NPR POS Sale";
         Customer: Record Customer;
         Contact: Record Contact;
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSEntry.SetRange("POS Unit No.", TempNpGpPOSSalesEntry."POS Unit No.");
         POSEntry.SetRange("Document No.", TempNpGpPOSSalesEntry."Document No.");
@@ -517,10 +517,10 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         POSSale.Modify(true, false);
     end;
 
-    local procedure TestQuantity(var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; SalePOS: Record "NPR Sale POS")
+    local procedure TestQuantity(var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; SalePOS: Record "NPR POS Sale")
     var
         RetailCrossReference: Record "NPR Retail Cross Reference";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if TempNpGpPOSSalesLine.Quantity > 0 then
             with SaleLinePOS do begin

@@ -45,7 +45,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm."
     local procedure InputPosCommentLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);

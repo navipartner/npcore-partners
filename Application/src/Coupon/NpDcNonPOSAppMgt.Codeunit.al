@@ -13,12 +13,12 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
     end;
 
     var
-        TempSalePOS: Record "NPR Sale POS" temporary;
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSalePOS: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
         FunctionToRun: Option " ","Apply Discount";
 
-    procedure ApplyDiscount(var TempSalePOSIn: Record "NPR Sale POS" temporary; var TempSaleLinePOSIn: Record "NPR Sale Line POS" temporary; var TempNpDcExtCouponBufferIn: Record "NPR NpDc Ext. Coupon Buffer" temporary; Self: Codeunit "NPR NpDc Non-POS App. Mgt.")
+    procedure ApplyDiscount(var TempSalePOSIn: Record "NPR POS Sale" temporary; var TempSaleLinePOSIn: Record "NPR POS Sale Line" temporary; var TempNpDcExtCouponBufferIn: Record "NPR NpDc Ext. Coupon Buffer" temporary; Self: Codeunit "NPR NpDc Non-POS App. Mgt.")
     begin
         FunctionToRun := FunctionToRun::"Apply Discount";
         TempSalePOS.Copy(TempSalePOSIn, true);
@@ -34,7 +34,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 
     local procedure ApplyDiscount_OnRun()
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         InsertPOSSale(TempSalePOS, TempSaleLinePOS, SalePOS);
 
@@ -78,7 +78,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         RemoveCouponReservations(TempNpDcExtCouponBuffer);
     end;
 
-    local procedure InsertPOSSale(var TempSalePOS: Record "NPR Sale POS" temporary; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; var SalePOS: Record "NPR Sale POS")
+    local procedure InsertPOSSale(var TempSalePOS: Record "NPR POS Sale" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var SalePOS: Record "NPR POS Sale")
     begin
         TempSalePOS.FindFirst;
         InsertSalePOS(TempSalePOS, SalePOS);
@@ -89,7 +89,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         until TempSaleLinePOS.Next = 0;
     end;
 
-    local procedure InsertSalePOS(TempSalePOS: Record "NPR Sale POS" temporary; var SalePOS: Record "NPR Sale POS")
+    local procedure InsertSalePOS(TempSalePOS: Record "NPR POS Sale" temporary; var SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
@@ -124,10 +124,10 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         SalePOS.Insert();
     end;
 
-    local procedure InsertSaleLinePOS(SalePOS: Record "NPR Sale POS"; TempSaleLinePOS: Record "NPR Sale Line POS" temporary)
+    local procedure InsertSaleLinePOS(SalePOS: Record "NPR POS Sale"; TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         Item: Record Item;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         UOMMgt: Codeunit "Unit of Measure Management";
     begin
         SaleLinePOS.Init;
@@ -167,7 +167,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         NpDcCouponType: Record "NPR NpDc Coupon Type";
         NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv.";
         TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpDcModuleValidateDefault: Codeunit "NPR NpDc ModuleValid.: Defa.";
         LineNo: Integer;
     begin
@@ -228,7 +228,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         TempNpDcExtCouponBuffer.Copy(TempNpDcExtCouponBuffer2, true);
     end;
 
-    local procedure ScanCoupons(SalePOS: Record "NPR Sale POS"; var TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary)
+    local procedure ScanCoupons(SalePOS: Record "NPR POS Sale"; var TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary)
     var
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
         POSSale: Codeunit "NPR POS Sale";
@@ -247,9 +247,9 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         until TempNpDcExtCouponBuffer.Next = 0;
     end;
 
-    local procedure TransferPOSSalesLines(SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary)
+    local procedure TransferPOSSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(TempSaleLinePOS);
         TempSaleLinePOS.DeleteAll;

@@ -344,7 +344,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
 
     procedure IsValidTerminalIIN(TaxFreeUnit: Record "NPR Tax Free POS Unit"; MaskedCardNo: Text): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Handled: Boolean;
         Valid: Boolean;
         TaxFreeRequest: Record "NPR Tax Free Request";
@@ -363,7 +363,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
 
     procedure IsActiveSaleEligible(TaxFreeUnit: Record "NPR Tax Free POS Unit"; SalesTicketNo: Code[20]): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TaxFreeRequest: Record "NPR Tax Free Request";
         Eligible: Boolean;
         Handled: Boolean;
@@ -571,7 +571,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure IssueTaxFreeVoucherOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure IssueTaxFreeVoucherOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";

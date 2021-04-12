@@ -36,7 +36,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPad2: Record "NPR NPRE Waiter Pad";
         JSON: Codeunit "NPR POS JSON Management";

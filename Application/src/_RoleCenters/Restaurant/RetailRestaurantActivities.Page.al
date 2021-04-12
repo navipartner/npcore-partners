@@ -303,7 +303,7 @@ page 6151335 "NPR Restaurant Activities"
     local procedure RecalculateCues()
     var
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         POSEntryQry: Query "NPR POS Entry with Sales Lines";
         SeatingWPLinkQry: Query "NPR NPRE Seating - W/Pad Link";
     begin

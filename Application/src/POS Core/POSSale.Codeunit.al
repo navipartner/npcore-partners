@@ -1,7 +1,7 @@
 codeunit 6150705 "NPR POS Sale"
 {
     var
-        Rec: Record "NPR Sale POS";
+        Rec: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
         This: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
@@ -118,7 +118,7 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        TempRec: Record "NPR Sale POS" temporary;
+        TempRec: Record "NPR POS Sale" temporary;
         DataMgt: Codeunit "NPR POS Data Management";
     begin
         if not Initialized then begin
@@ -137,7 +137,7 @@ codeunit 6150705 "NPR POS Sale"
         exit(Rec.Find);
     end;
 
-    procedure GetCurrentSale(var SalePOS: Record "NPR Sale POS")
+    procedure GetCurrentSale(var SalePOS: Record "NPR POS Sale")
     begin
         SalePOS.Copy(Rec);
     end;
@@ -145,8 +145,8 @@ codeunit 6150705 "NPR POS Sale"
     procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
     var
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
     begin
         if not LastSaleRetrieved then begin
             POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
@@ -214,7 +214,7 @@ codeunit 6150705 "NPR POS Sale"
         end;
     end;
 
-    procedure Refresh(var SalePOS: Record "NPR Sale POS")
+    procedure Refresh(var SalePOS: Record "NPR POS Sale")
     begin
         Rec.Copy(SalePOS);
         OnRefresh(Rec);
@@ -222,7 +222,7 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure RefreshCurrent()
     var
-        LocalSaleLinePOS: Record "NPR Sale Line POS";
+        LocalSaleLinePOS: Record "NPR POS Sale Line";
     begin
         Rec.Get(Rec."Register No.", Rec."Sales Ticket No.");
         OnRefresh(Rec);
@@ -344,7 +344,7 @@ codeunit 6150705 "NPR POS Sale"
 
     local procedure EndSale(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -353,7 +353,7 @@ codeunit 6150705 "NPR POS Sale"
         StartTime: DateTime;
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
@@ -419,10 +419,10 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
 
-    procedure ValidateSaleBeforeEnd(var Sale: Record "NPR Sale POS")
+    procedure ValidateSaleBeforeEnd(var Sale: Record "NPR POS Sale")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         ServiceItemGrp: Record "Service Item Group";
@@ -565,9 +565,9 @@ codeunit 6150705 "NPR POS Sale"
         POSInfoManagement.PostPOSInfo(Sale);
     end;
 
-    procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR Sale POS"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
+    procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         Initialized := true;
 
@@ -586,9 +586,9 @@ codeunit 6150705 "NPR POS Sale"
         FrontEnd.StartTransaction(Rec);
     end;
 
-    local procedure ResumeSale(SalePOS_ToResume: Record "NPR Sale POS")
+    local procedure ResumeSale(SalePOS_ToResume: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
     begin
         Rec := SalePOS_ToResume;
@@ -626,7 +626,7 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure ResumeFromPOSQuote(POSQuoteNo: Integer): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
         Ok: Boolean;
     begin
@@ -644,7 +644,7 @@ codeunit 6150705 "NPR POS Sale"
         exit(Ok);
     end;
 
-    local procedure UpdateSaleDeviceID(var SalePOS: Record "NPR Sale POS")
+    local procedure UpdateSaleDeviceID(var SalePOS: Record "NPR POS Sale")
     var
         POSUnitIdentity: Record "NPR POS Unit Identity";
     begin
@@ -657,7 +657,7 @@ codeunit 6150705 "NPR POS Sale"
         SalePOS."User ID" := POSUnitIdentity."User ID";
     end;
 
-    local procedure RunAfterEndSale_OnRun(xRec: Record "NPR Sale POS") Success: Boolean;
+    local procedure RunAfterEndSale_OnRun(xRec: Record "NPR POS Sale") Success: Boolean;
     var
         POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
     begin
@@ -670,7 +670,7 @@ codeunit 6150705 "NPR POS Sale"
         POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
     end;
 
-    local procedure RunAfterEndSale(xRec: Record "NPR Sale POS")
+    local procedure RunAfterEndSale(xRec: Record "NPR POS Sale")
     var
         Success: Boolean;
     begin
@@ -700,12 +700,12 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitSale(SaleHeader: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnBeforeInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInitSale(SaleHeader: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnAfterInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
@@ -720,32 +720,32 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeResumeSale(SalePOS: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnBeforeResumeSale(SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterResumeSale(SalePOS: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnAfterResumeSale(SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnBeforeEndSale(SaleHeader: Record "NPR Sale POS")
+    local procedure OnBeforeEndSale(SaleHeader: Record "NPR POS Sale")
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnAfterEndSale(SalePOS: Record "NPR Sale POS")
+    procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnAttemptEndSale(SalePOS: Record "NPR Sale POS")
+    local procedure OnAttemptEndSale(SalePOS: Record "NPR POS Sale")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRefresh(var SalePOS: Record "NPR Sale POS")
+    procedure OnRefresh(var SalePOS: Record "NPR POS Sale")
     begin
     end;
     #endregion
@@ -781,7 +781,7 @@ codeunit 6150705 "NPR POS Sale"
         POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
     end;
 
-    procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR Sale POS")
+    procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -807,7 +807,7 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
     end;
 

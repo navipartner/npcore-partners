@@ -60,7 +60,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NewCardNumber: Text;
     begin
 
@@ -94,7 +94,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         PaymentNo: Code[10];
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         State: DotNet NPRNetState6;
         ConfirmFee: Boolean;
         EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";

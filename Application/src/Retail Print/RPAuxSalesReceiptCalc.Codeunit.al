@@ -18,7 +18,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         tmpRetailList.Insert;
     end;
 
-    local procedure POSSalesLineUnitPriceInclVATExclDiscount(POSSalesLine: Record "NPR POS Sales Line"): Decimal
+    local procedure POSSalesLineUnitPriceInclVATExclDiscount(POSSalesLine: Record "NPR POS Entry Sales Line"): Decimal
     begin
         if POSSalesLine.Quantity = 0 then
             exit(0);
@@ -51,7 +51,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
     var
         UsePOSEntry: Boolean;
         RecRef: RecordRef;
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         FunctionTxt: Text;
         Parameters: Text;
         MinDecimals: Integer;
@@ -64,7 +64,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         Handled := true;
 
         case RecID.TableNo of
-            DATABASE::"NPR POS Sales Line":
+            DATABASE::"NPR POS Entry Sales Line":
                 begin
                     RecRef := RecID.GetRecord();
                     RecRef.Find;
@@ -82,7 +82,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         case FunctionTxt of
             'UNITPRICEINCLVATEXCLDISC':
                 case RecID.TableNo of
-                    DATABASE::"NPR POS Sales Line":
+                    DATABASE::"NPR POS Entry Sales Line":
                         Result := POSSalesLineUnitPriceInclVATExclDiscount(POSSalesLine);
                 end;
             else

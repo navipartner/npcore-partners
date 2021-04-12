@@ -76,7 +76,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         TotalVATOnSale: Decimal;
         NPRPOSPaymentMethod: Record "NPR POS Payment Method";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -112,12 +112,12 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
     local procedure OnDoRefussion(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaymentLinePOS: Record "NPR Sale Line POS";
+        PaymentLinePOS: Record "NPR POS Sale Line";
         TotalVATOnSale: Decimal;
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -140,12 +140,12 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         POSSession.RequestRefreshData();
     end;
 
-    local procedure CalcVATFromSale(SalePOS: Record "NPR Sale POS") VATAmount: Decimal
+    local procedure CalcVATFromSale(SalePOS: Record "NPR POS Sale") VATAmount: Decimal
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TotalVAT: Decimal;
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaymentLinePOS: Record "NPR Sale Line POS";
+        PaymentLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Reset;
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");

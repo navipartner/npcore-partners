@@ -25,8 +25,8 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         NewWaiterPad: Record "NPR NPRE Waiter Pad";
         TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         ChoosenWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         DeleteWPLine: Boolean;
@@ -121,9 +121,9 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         end;
     end;
 
-    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR Sale POS"; WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean)
+    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         TouchedWaiterPadLineTmp: Record "NPR NPRE Waiter Pad Line" temporary;
         NPHHospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
@@ -183,7 +183,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         NPHHospitalityPrint.LinesAddedToWaiterPad(WaiterPad);
     end;
 
-    procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     var
         WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
         NewLine: Boolean;
@@ -250,8 +250,8 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 
     procedure GetSaleFromWaiterPadToPOS(WaiterPad: Record "NPR NPRE Waiter Pad"; POSSession: Codeunit "NPR POS Session")
     var
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -286,7 +286,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", false);
     end;
 
-    local procedure GetSaleLineFromWaiterPadToPOS(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    local procedure GetSaleLineFromWaiterPadToPOS(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var POSSaleLine: Codeunit "NPR POS Sale Line")
     begin
         SaleLinePOS.Silent := true;
 
@@ -615,7 +615,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         exit(true);
     end;
 
-    local procedure CopyPOSInfo(SaleLinePOS: Record "NPR Sale Line POS"; WaiterPadNo: Code[20]; WaiterPadLineNo: Integer; ToWaiterPad: Boolean)
+    local procedure CopyPOSInfo(SaleLinePOS: Record "NPR POS Sale Line"; WaiterPadNo: Code[20]; WaiterPadLineNo: Integer; ToWaiterPad: Boolean)
     var
         POSInfoWaiterPadLink: Record "NPR POS Info NPRE Waiter Pad";
         POSInfoTransaction: Record "NPR POS Info Transaction";
@@ -665,7 +665,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 
     local procedure CopySaleHdrPOSInfo(RegisterNo: Code[10]; SalesTicketNo: Code[20]; WaiterPadNo: Code[20]; ToWaiterPad: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS."Register No." := RegisterNo;
         SaleLinePOS."Sales Ticket No." := SalesTicketNo;
@@ -690,7 +690,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
             until POSInfoWaiterPadLink.Next = 0;
     end;
 
-    procedure ClearSaleHdrNPREPresetFields(var SalePOS: Record "NPR Sale POS"; ModifyRec: Boolean)
+    procedure ClearSaleHdrNPREPresetFields(var SalePOS: Record "NPR POS Sale"; ModifyRec: Boolean)
     begin
         SalePOS."NPRE Number of Guests" := 0;
         SalePOS."NPRE Pre-Set Seating Code" := '';
@@ -709,7 +709,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         exit(NullGuid);
     end;
 
-    local procedure ClearWPLineSaleHdrLinks(SalePOS: Record "NPR Sale POS")
+    local procedure ClearWPLineSaleHdrLinks(SalePOS: Record "NPR POS Sale")
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
@@ -719,7 +719,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
     end;
 
-    local procedure ClearWPLineSaleLineLinks(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure ClearWPLineSaleLineLinks(SaleLinePOS: Record "NPR POS Sale Line")
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
@@ -729,15 +729,15 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Sale POS", 'OnAfterDeleteEvent', '', true, false)]
-    local procedure ClearWPadLinksOnSaleHdrDelete(var Rec: Record "NPR Sale POS"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure ClearWPadLinksOnSaleHdrDelete(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
     begin
         if not Rec.IsTemporary then
             ClearWPLineSaleHdrLinks(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Sale Line POS", 'OnAfterDeleteEvent', '', true, false)]
-    local procedure ClearWPadLinksOnSaleLineDelete(var Rec: Record "NPR Sale Line POS"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure ClearWPadLinksOnSaleLineDelete(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     begin
         if not Rec.IsTemporary then
             ClearWPLineSaleLineLinks(Rec);
@@ -755,7 +755,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, false)]
-    local procedure UpdateBilledQtyOnPOSSalePost(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure UpdateBilledQtyOnPOSSalePost(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
@@ -777,15 +777,15 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: SavePOSQuote", 'OnBeforeSaveAsQuote', '', true, false)]
-    local procedure OnBeforeSaveAsPOSQuote(var SalePOS: Record "NPR Sale POS")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: SavePOSSvSl", 'OnBeforeSaveAsQuote', '', true, false)]
+    local procedure OnBeforeSaveAsPOSQuote(var SalePOS: Record "NPR POS Sale")
     begin
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then
             Error(CannotParkWPSale);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Load POS Quote", 'OnBeforeLoadFromPOSQuote', '', true, false)]
-    local procedure OnBeforeLoadPOSQuote(var SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: XmlDocument)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl", 'OnBeforeLoadFromPOSQuote', '', true, false)]
+    local procedure OnBeforeLoadPOSQuote(var SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var XmlDoc: XmlDocument)
     begin
         ClearSaleHdrNPREPresetFields(SalePOS, true);
     end;

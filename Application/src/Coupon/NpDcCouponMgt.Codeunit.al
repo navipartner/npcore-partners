@@ -64,7 +64,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
     procedure ValidateCoupon(POSSession: Codeunit "NPR POS Session"; ReferenceNo: Text; var Coupon: Record "NPR NpDc Coupon")
     var
         CouponType: Record "NPR NpDc Coupon Type";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
         NpDcModuleValidateDefault: Codeunit "NPR NpDc ModuleValid.: Defa.";
         SaleOut: Codeunit "NPR POS Sale";
@@ -91,9 +91,9 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
     #endregion Validate Coupon
     #region Apply Discount
 
-    procedure ApplyDiscount(SalePOS: Record "NPR Sale POS")
+    procedure ApplyDiscount(SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         SaleLinePOSCoupon2: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcModuleApplyDefault: Codeunit "NPR NpDc Module Apply: Default";
@@ -167,9 +167,9 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         until SaleLinePOS.Next = 0;
     end;
 
-    procedure RemoveDiscount(SalePOS: Record "NPR Sale POS")
+    procedure RemoveDiscount(SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcModuleApplyDefault: Codeunit "NPR NpDc Module Apply: Default";
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
@@ -418,7 +418,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         ArchiveClosedCoupon(Coupon);
     end;
 
-    local procedure PostSaleLinePOS(var SaleLinePos: Record "NPR Sale Line POS")
+    local procedure PostSaleLinePOS(var SaleLinePos: Record "NPR POS Sale Line")
     var
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
     begin
@@ -743,11 +743,11 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         ScanCoupon(POSSession, CouponReferenceNo);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Sale Line POS", 'OnBeforeDeleteEvent', '', true, true)]
-    local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "NPR Sale Line POS"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
         Coupon: Record "NPR NpDc Coupon";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
     begin
@@ -785,10 +785,10 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         if (Rec.Find()) then;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Sale Line POS", 'OnAfterDeleteEvent', '', true, true)]
-    local procedure OnAfterDeletePOSSaleLine(var Rec: Record "NPR Sale Line POS"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
+    local procedure OnAfterDeletePOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
     begin
         if Rec.IsTemporary then
@@ -802,7 +802,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, false)]
-    local procedure OnAfterInsertPOSSalesLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure OnAfterInsertPOSSalesLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
         SaleLinePos.CalcFields("Coupon Qty.");
         if SaleLinePos."Coupon Qty." <= 0 then
@@ -814,7 +814,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
     procedure ScanCoupon(POSSession: Codeunit "NPR POS Session"; CouponReferenceNo: Text)
     var
         Coupon: Record "NPR NpDc Coupon";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         SaleLineOut: Codeunit "NPR POS Sale Line";

@@ -11,7 +11,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
         {
             DataItemTableView = SORTING("Entry No.");
             RequestFilterFields = "POS Unit No.", "Posting Date";
-            dataitem("POS Sales Line"; "NPR POS Sales Line")
+            dataitem("POS Sales Line"; "NPR POS Entry Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
                 DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = CONST(Item));
@@ -40,7 +40,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                 TempDimBuf: Record "Dimension Buffer" temporary;
                 DimSetEntry: Record "Dimension Set Entry";
                 POSEntry2: Record "NPR POS Entry";
-                POSSalesLine2: Record "NPR POS Sales Line";
+                POSSalesLine2: Record "NPR POS Entry Sales Line";
                 POSEntryQry: Query "NPR POS Entry with Sales Lines";
                 DimensionBufferID: Integer;
             begin
@@ -66,7 +66,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                     if TempSelectedDim.FindSet() then
                         repeat
                             TempDimBuf.Init();
-                            TempDimBuf."Table ID" := DATABASE::"NPR POS Sales Line";
+                            TempDimBuf."Table ID" := DATABASE::"NPR POS Entry Sales Line";
                             TempDimBuf."Dimension Code" := TempSelectedDim."Dimension Code";
                             if DimSetEntry.Get(POSSalesLine2."Dimension Set ID", TempSelectedDim."Dimension Code") then
                                 TempDimBuf."Dimension Value Code" := DimSetEntry."Dimension Value Code";
@@ -133,7 +133,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                 SetRange(Number, 1, AppliedFilterBuffer.Count);
             end;
         }
-        dataitem(POSSalesLineCons; "NPR POS Sales Line")
+        dataitem(POSSalesLineCons; "NPR POS Entry Sales Line")
         {
             DataItemTableView = SORTING("POS Entry No.", "Line No.");
             UseTemporary = true;
@@ -377,7 +377,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                 if not (
                   ((RecRef.Number = DATABASE::"NPR POS Entry") and
                    (FldRef.Number in ["POS Entry".FieldNo("Posting Date"), "POS Entry".FieldNo("POS Unit No.")])) or
-                  ((RecRef.Number = DATABASE::"NPR POS Sales Line") and
+                  ((RecRef.Number = DATABASE::"NPR POS Entry Sales Line") and
                    (FldRef.Number in ["POS Sales Line".FieldNo("No."), "POS Sales Line".FieldNo("Location Code")])))
                 then
                     Error(FilterIsNotSupported, FldRef.Caption, RecRef.Caption);

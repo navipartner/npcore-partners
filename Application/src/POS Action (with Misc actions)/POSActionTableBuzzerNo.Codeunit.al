@@ -47,7 +47,7 @@ codeunit 6150780 "NPR POS Action: TableBuzzerNo"
     local procedure InputPosCommentLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
         CommentTextPattern: Text;
     begin

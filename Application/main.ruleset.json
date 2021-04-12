@@ -526,6 +526,11 @@
             "id": "AA0470",
             "action":"None",
             "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AS0006",
+            "action": "Warning",
+            "justification": "Temporarily disabled for PR 53324."
         }     
     ]
 }

@@ -1,6 +1,6 @@
-table 6014405 "NPR Sale POS"
+table 6014405 "NPR POS Sale"
 {
-    Caption = 'Sale';
+    Caption = 'POS Sale';
     DataClassification = CustomerContent;
 
     fields
@@ -71,7 +71,7 @@ table 6014405 "NPR Sale POS"
 
             trigger OnValidate()
             var
-                SaleLinePOS: Record "NPR Sale Line POS";
+                SaleLinePOS: Record "NPR POS Sale Line";
                 Item: Record Item;
                 Contact: Record Contact;
                 POSPricingProfile: Record "NPR POS Pricing Profile";
@@ -80,7 +80,7 @@ table 6014405 "NPR Sale POS"
                 DoCreate: Boolean;
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-                xSaleLinePOS: Record "NPR Sale Line POS";
+                xSaleLinePOS: Record "NPR POS Sale Line";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
                 FoundPostingProfile: Boolean;
             begin
@@ -446,8 +446,8 @@ table 6014405 "NPR Sale POS"
 
             trigger OnValidate()
             var
-                SaleLinePOS: Record "NPR Sale Line POS";
-                xSaleLinePOS: Record "NPR Sale Line POS";
+                SaleLinePOS: Record "NPR POS Sale Line";
+                xSaleLinePOS: Record "NPR POS Sale Line";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
             begin
                 if "Prices Including VAT" = xRec."Prices Including VAT" then
@@ -599,7 +599,7 @@ table 6014405 "NPR Sale POS"
         field(300; Amount; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("NPR Sale Line POS".Amount WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR POS Sale Line".Amount WHERE("Register No." = FIELD("Register No."),
                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                             Type = FILTER(<> Comment & <> "Open/Close")));
@@ -617,7 +617,7 @@ table 6014405 "NPR Sale POS"
         field(310; "Amount Including VAT"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR POS Sale Line"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                                             Type = FILTER(<> Comment & <> "Open/Close")));
@@ -629,7 +629,7 @@ table 6014405 "NPR Sale POS"
         field(320; "Payment Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR POS Sale Line"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                             "Sale Type" = FILTER(Payment | "Out payment"),
                                                                             Type = FILTER(<> Comment & <> "Open/Close")));
@@ -667,8 +667,8 @@ table 6014405 "NPR Sale POS"
 
             trigger OnValidate()
             var
-                SaleLinePOS: Record "NPR Sale Line POS";
-                SaleLinePOS2: Record "NPR Sale Line POS";
+                SaleLinePOS: Record "NPR POS Sale Line";
+                SaleLinePOS2: Record "NPR POS Sale Line";
             begin
                 SaleLinePOS.SetRange("Register No.", "Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
@@ -720,7 +720,7 @@ table 6014405 "NPR Sale POS"
 
     trigger OnDelete()
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
@@ -835,7 +835,7 @@ table 6014405 "NPR Sale POS"
 
     procedure UpdateAllLineDim(NewParentDimSetID: Integer; OldParentDimSetID: Integer)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NewDimSetID: Integer;
     begin
         // Update all lines with changed dimensions.
@@ -861,7 +861,7 @@ table 6014405 "NPR Sale POS"
 
     procedure SalesLinesExist(): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");

@@ -43,7 +43,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         StartTime: DateTime;
         POSSale: Codeunit "NPR POS Sale";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -92,7 +92,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         StartTime: DateTime;
         POSSale: Codeunit "NPR POS Sale";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -143,7 +143,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
     local procedure TestItemInventory(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         ErrorMessage: Text;
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
@@ -160,7 +160,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         Error(ErrorMessage);
     end;
 
-    local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR Sale Line POS" temporary): Boolean
+    local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     begin
         if not TempSaleLinePOS.FindSet then
             exit(false);
@@ -176,7 +176,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         exit(TempSaleLinePOS.FindFirst);
     end;
 
-    local procedure CalcInventory(var TempSaleLinePOS: Record "NPR Sale Line POS" temporary): Decimal
+    local procedure CalcInventory(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Decimal
     var
         Item: Record Item;
     begin
@@ -189,10 +189,10 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         exit(Item.Inventory);
     end;
 
-    local procedure SetupSalesItems(var POSSession: Codeunit "NPR POS Session"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary): Boolean
+    local procedure SetupSalesItems(var POSSession: Codeunit "NPR POS Session"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     var
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
     begin
         if not TempSaleLinePOS.IsTemporary then
@@ -219,7 +219,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         exit(TempSaleLinePOS.FindFirst);
     end;
 
-    local procedure SetupSalesItem(SaleLinePOS: Record "NPR Sale Line POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary)
+    local procedure SetupSalesItem(SaleLinePOS: Record "NPR POS Sale Line"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         Item: Record Item;
     begin
@@ -246,7 +246,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         end;
     end;
 
-    local procedure GetInventoryErrorMessage(var TempSaleLinePOS: Record "NPR Sale Line POS" temporary) ErrorMessage: Text
+    local procedure GetInventoryErrorMessage(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) ErrorMessage: Text
     begin
         ErrorMessage := Text002;
         if TempSaleLinePOS.FindSet then

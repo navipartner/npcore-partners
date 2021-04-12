@@ -108,7 +108,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         Item: Record Item;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ItemNo: Code[20];
         ItemView: Text;
         LocationFilterOption: Integer;
@@ -207,7 +207,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         Setup: Codeunit "NPR POS Setup";
-        NewSaleLinePOS: Record "NPR Sale Line POS";
+        NewSaleLinePOS: Record "NPR POS Sale Line";
         POSSetup: Record "NPR POS Setup";
         POSAction: Record "NPR POS Action";
     begin

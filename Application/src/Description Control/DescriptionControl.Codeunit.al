@@ -74,7 +74,7 @@ codeunit 6059969 "NPR Description Control"
         end;
     end;
 
-    procedure GetDescriptionPOS(var Rec: Record "NPR Sale Line POS"; XRec: Record "NPR Sale Line POS"; Item: Record Item)
+    procedure GetDescriptionPOS(var Rec: Record "NPR POS Sale Line"; XRec: Record "NPR POS Sale Line"; Item: Record Item)
     var
         Vendor: Record Vendor;
         Pos: Integer;

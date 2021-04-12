@@ -29,7 +29,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     #region Workflow V1
 
-    procedure StartPayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR Sale POS"): Integer
+    procedure StartPayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
@@ -52,7 +52,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartVoid(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS"; RequestEntryNoToVoid: Integer; IsManualVoid: Boolean): Integer
+    procedure StartVoid(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; RequestEntryNoToVoid: Integer; IsManualVoid: Boolean): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -73,7 +73,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartReferencedRefund(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS"; CurrencyCode: Code[10]; AmountToRefund: Decimal; OriginalRequestEntryNo: Integer): Integer
+    procedure StartReferencedRefund(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; CurrencyCode: Code[10]; AmountToRefund: Decimal; OriginalRequestEntryNo: Integer): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -92,7 +92,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartGiftCardLoad(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR Sale POS"): Integer
+    procedure StartGiftCardLoad(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -111,7 +111,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartLookup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS"; EntryNoToLookup: Integer): Integer
+    procedure StartLookup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EntryNoToLookup: Integer): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -126,7 +126,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartBeginWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS"): Integer
+    procedure StartBeginWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -139,7 +139,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS"): Integer
+    procedure StartEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -152,7 +152,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartVerifySetup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS"): Integer
+    procedure StartVerifySetup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -165,7 +165,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure StartAuxOperation(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS"; AuxFunction: Integer): Integer
+    procedure StartAuxOperation(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; AuxFunction: Integer): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -182,7 +182,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
 
     #region Workflow V2
-    procedure PreparePayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR Sale POS"; var IntegrationWorkflowOut: Text): Integer
+    procedure PreparePayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"; var IntegrationWorkflowOut: Text): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request";
@@ -264,7 +264,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure EftLookupResponseReceived(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
         EFTInterface: Codeunit "NPR EFT Interface";
         OldRecoveryRequest: Record "NPR EFT Transaction Request";
@@ -314,7 +314,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure EftVoidResponseReceived(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
         EFTInterface: Codeunit "NPR EFT Interface";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -373,7 +373,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure InsertPaymentLine(POSSession: Codeunit "NPR POS Session"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSLine: Record "NPR Sale Line POS";
+        POSLine: Record "NPR POS Sale Line";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(POSLine);
@@ -398,7 +398,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure HandleSurcharge(POSSession: Codeunit "NPR POS Session"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         OriginalProcessingType: Integer;
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -430,7 +430,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure HandleTip(POSSession: Codeunit "NPR POS Session"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         OriginalProcessingType: Integer;
@@ -462,7 +462,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure InsertServiceItemLine(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Amount: Decimal; DescriptionPostFix: Text; Qty: Integer) LineRetailID: Guid
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
     begin
         Item.Get(ItemNo);
@@ -501,7 +501,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     local procedure InsertSaleVoucherLine(POSSession: Codeunit "NPR POS Session"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LineAmount: Decimal;
@@ -538,7 +538,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         POSSession.RequestRefreshData();
     end;
 
-    local procedure PerformRecoveryInstead(SalePOS: Record "NPR Sale POS"; IntegrationType: Text; var EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request"): Boolean
+    local procedure PerformRecoveryInstead(SalePOS: Record "NPR POS Sale"; IntegrationType: Text; var EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request"): Boolean
     var
         EFTInterface: Codeunit "NPR EFT Interface";
         Skip: Boolean;
@@ -690,7 +690,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     end;
 
-    local procedure CheckIfTrxCanBeVoided(EntryNo: Integer; SalePOS: Record "NPR Sale POS")
+    local procedure CheckIfTrxCanBeVoided(EntryNo: Integer; SalePOS: Record "NPR POS Sale")
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
@@ -767,7 +767,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     local procedure LookupOutOfSyncAndSaleIsParked(EFTTransactionRequest: Record "NPR EFT Transaction Request"; OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
-        POSQuoteEntry: Record "NPR POS Quote Entry";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
         if (EFTTransactionRequest."Result Amount" <> 0) then begin
             POSQuoteEntry.SetRange("Retail ID", OriginalEFTTransactionRequest."Sales ID");
@@ -800,7 +800,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     local procedure LookupOutOfSyncAndSaleIsOnAnotherUnit(EFTTransactionRequest: Record "NPR EFT Transaction Request"; OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if (EFTTransactionRequest."Result Amount" <> 0) and (EFTTransactionRequest."Sales ID" <> OriginalEFTTransactionRequest."Sales ID") then begin
             SalePOS.SetRange("Retail ID", OriginalEFTTransactionRequest."Sales ID");

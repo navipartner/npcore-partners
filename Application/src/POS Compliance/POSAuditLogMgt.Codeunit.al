@@ -64,7 +64,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
     begin
         POSAuditLog.Init;

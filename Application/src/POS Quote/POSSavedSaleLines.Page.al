@@ -1,11 +1,11 @@
-page 6151005 "NPR POS Quote Lines"
+page 6151005 "NPR POS Saved Sale Lines"
 {
-    Caption = 'POS Quote Lines';
+    Caption = 'POS Saved Sale Lines';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR POS Quote Line";
+    SourceTable = "NPR POS Saved Sale Line";
 
     layout
     {
@@ -215,7 +215,7 @@ page 6151005 "NPR POS Quote Lines"
     end;
 
     var
-        POSQuoteEntry: Record "NPR POS Quote Entry";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
 
     local procedure FindPOSEntry()
     var

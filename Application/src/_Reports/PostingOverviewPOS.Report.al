@@ -65,7 +65,7 @@ report 6150614 "NPR Posting Overview POS"
             column(NoFilter; NoFilter)
             {
             }
-            dataitem(POS_Sales_Line; "NPR POS Sales Line")
+            dataitem(POS_Sales_Line; "NPR POS Entry Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
                 DataItemTableView = SORTING("POS Entry No.", "Line No.");
@@ -76,7 +76,7 @@ report 6150614 "NPR Posting Overview POS"
                 column(LineNo_POS_Sales_Line; "Line No.")
                 {
                 }
-                dataitem(POS_Sales_Item_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Item_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Item));
@@ -125,7 +125,7 @@ report 6150614 "NPR Posting Overview POS"
                         TotalAmountInclTax += "Amount Incl. VAT";
                     end;
                 }
-                dataitem(POS_Sales_GLAccount_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_GLAccount_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER("G/L Account"));
@@ -148,7 +148,7 @@ report 6150614 "NPR Posting Overview POS"
                         TotalAmountInclTax += "Amount Incl. VAT";
                     end;
                 }
-                dataitem(POS_Sales_Comment_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Comment_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Comment));
@@ -162,7 +162,7 @@ report 6150614 "NPR Posting Overview POS"
                     {
                     }
                 }
-                dataitem(POS_Sales_Customer_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Customer_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Customer));
@@ -184,7 +184,7 @@ report 6150614 "NPR Posting Overview POS"
                         TotalAmountInclTax += "Amount Incl. VAT";
                     end;
                 }
-                dataitem(POS_Sales_Voucher_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Voucher_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Voucher));
@@ -206,7 +206,7 @@ report 6150614 "NPR Posting Overview POS"
                         TotalAmountInclTax += "Amount Incl. VAT";
                     end;
                 }
-                dataitem(POS_Sales_Payout_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Payout_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Payout));
@@ -228,7 +228,7 @@ report 6150614 "NPR Posting Overview POS"
                         TotalAmountInclTax += "Amount Incl. VAT";
                     end;
                 }
-                dataitem(POS_Sales_Rounding_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Rounding_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Rounding));

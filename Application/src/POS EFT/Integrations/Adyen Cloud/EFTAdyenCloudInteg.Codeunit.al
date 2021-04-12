@@ -579,7 +579,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]) then
             exit(false);
@@ -631,7 +631,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         EFTSetup: Record "NPR EFT Setup";
     begin
@@ -803,7 +803,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     local procedure DetectShopperSilent(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSSale: Codeunit "NPR POS Sale"): Boolean
     var
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if EftTransactionRequest."External Customer ID" = '' then
             exit(false);

@@ -63,8 +63,8 @@ codeunit 6150829 "NPR POS Action: POS Info"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSInfoManagement: Codeunit "NPR POS Info Management";
-        SalePOS: Record "NPR Sale POS";
-        LinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        LinePOS: Record "NPR POS Sale Line";
         CurrentView: Codeunit "NPR POS View";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);

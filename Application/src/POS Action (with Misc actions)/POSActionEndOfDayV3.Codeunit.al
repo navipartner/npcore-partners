@@ -64,7 +64,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSSetup: Codeunit "NPR POS Setup";
         POSSale: Codeunit "NPR POS Sale";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EftHandled: Boolean;
@@ -194,8 +194,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]): Boolean
     var
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
-        POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
+        SalePOS: Record "NPR POS Sale";
+        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
     begin
 
         if (SalesTicketNo = '') then
@@ -354,7 +354,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
         EFTInterface: Codeunit "NPR EFT Interface";
         SkipPause: Boolean;
@@ -392,7 +392,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         NextWorkflowStep := NextWorkflowStep::EFT_CLOSE;
     end;
 
-    local procedure OpenDrawer(CashDrawerNo: Code[10]; POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR Sale POS")
+    local procedure OpenDrawer(CashDrawerNo: Code[10]; POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR POS Sale")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
@@ -411,9 +411,9 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     end;
 
 
-    procedure LineExists(var SalePOS: Record "NPR Sale POS"): Boolean
+    procedure LineExists(var SalePOS: Record "NPR POS Sale"): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");

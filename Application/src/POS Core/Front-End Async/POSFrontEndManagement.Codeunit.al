@@ -894,7 +894,7 @@ codeunit 6150704 "NPR POS Front End Management"
 
     #endregion
 
-    procedure StartTransaction(Sale: Record "NPR Sale POS")
+    procedure StartTransaction(Sale: Record "NPR POS Sale")
     var
         Request: Codeunit "NPR Front-End: StartTrans.";
     begin

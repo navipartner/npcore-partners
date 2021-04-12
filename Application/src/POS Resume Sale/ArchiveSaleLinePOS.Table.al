@@ -237,7 +237,7 @@ table 6014419 "NPR Archive Sale Line POS"
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT");
+            CalcFormula = Sum("NPR POS Sale Line"."Amount Including VAT");
             Caption = 'Sales Order Amount';
             Editable = false;
             FieldClass = FlowField;

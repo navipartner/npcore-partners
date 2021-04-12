@@ -601,7 +601,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         Text012: Label 'The application was successfully posted.';
         Text013: Label 'The %1 entered must not be before the %1 on the %2.';
         Text019: Label 'Post application process has been canceled.';
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         BalancePOSLine: Boolean;
 
     procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
@@ -1174,7 +1174,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         OK := true;
     end;
 
-    procedure SetSalesLine(NewGenJnlLine: Record "NPR Sale Line POS"; ApplnTypeSelect: Integer)
+    procedure SetSalesLine(NewGenJnlLine: Record "NPR POS Sale Line"; ApplnTypeSelect: Integer)
     begin
             SaleLinePOS := NewGenJnlLine;
             BalancePOSLine := true;

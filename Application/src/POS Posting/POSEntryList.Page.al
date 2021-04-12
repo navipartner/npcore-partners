@@ -288,7 +288,7 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Sales Lines';
                 Image = Sales;
-                RunObject = Page "NPR POS Sales Line List";
+                RunObject = Page "NPR POS Entry Sales Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Sales Lines action';
@@ -297,7 +297,7 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Payment Lines';
                 Image = Payment;
-                RunObject = Page "NPR POS Payment Line List";
+                RunObject = Page "NPR POS Entry Pmt. Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Payment Lines action';
@@ -306,7 +306,7 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Tax Lines';
                 Image = TaxDetail;
-                RunObject = Page "NPR POS Tax Line List";
+                RunObject = Page "NPR POS Entry Tax Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Tax Lines action';
@@ -533,7 +533,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    RunObject = Page "NPR POS Sales Line List";
+                    RunObject = Page "NPR POS Entry Sales Line List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sales Line List action';
                 }
@@ -545,7 +545,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    RunObject = Page "NPR POS Payment Line List";
+                    RunObject = Page "NPR POS Entry Pmt. Line List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Payment Line List action';
                 }
@@ -557,7 +557,7 @@ page 6150652 "NPR POS Entry List"
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    RunObject = Page "NPR POS Tax Line List";
+                    RunObject = Page "NPR POS Entry Tax Line List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Tax Line List action';
                 }

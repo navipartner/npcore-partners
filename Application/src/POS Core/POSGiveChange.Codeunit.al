@@ -5,7 +5,7 @@ codeunit 6150634 "NPR POS Give Change"
         TextChange: Label 'Change';
         POSSetup: Codeunit "NPR POS Setup";
 
-    procedure InsertChange(SalePOS: Record "NPR Sale POS"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; Balance: Decimal) ChangeToGive: Decimal
+    procedure InsertChange(SalePOS: Record "NPR POS Sale"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; Balance: Decimal) ChangeToGive: Decimal
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         RoundedBalance: Decimal;
@@ -20,9 +20,9 @@ codeunit 6150634 "NPR POS Give Change"
         exit(ChangeToGive);
     end;
 
-    procedure CalcAndInsertChange(var SalePOS: Record "NPR Sale POS") ChangeToGive: Decimal
+    procedure CalcAndInsertChange(var SalePOS: Record "NPR POS Sale") ChangeToGive: Decimal
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         GLAccount: Record "G/L Account";
         SaleAmount: Decimal;
         PaymentAmount: Decimal;
@@ -42,9 +42,9 @@ codeunit 6150634 "NPR POS Give Change"
         exit((PaymentAmount - SaleAmount - RoundingAmount));
     end;
 
-    local procedure InsertOutPaymentLine(var SalePOS: Record "NPR Sale POS"; AmountIn: Decimal; NoIn: Code[10]; DescriptionIn: Text)
+    local procedure InsertOutPaymentLine(var SalePOS: Record "NPR POS Sale"; AmountIn: Decimal; NoIn: Code[10]; DescriptionIn: Text)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Init();
         SaleLinePOS."Register No." := SalePOS."Register No.";
@@ -65,7 +65,7 @@ codeunit 6150634 "NPR POS Give Change"
         SaleLinePOS.Modify(true);
     end;
 
-    local procedure GetReturnPaymentType(SalePOS: Record "NPR Sale POS"): Code[10]
+    local procedure GetReturnPaymentType(SalePOS: Record "NPR POS Sale"): Code[10]
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -79,7 +79,7 @@ codeunit 6150634 "NPR POS Give Change"
         Error(TextNoReturnPaymentType, POSPaymentMethod.TableCaption());
     end;
 
-    local procedure GetRoundingAmount(SalePOS: Record "NPR Sale POS"; ChangeAmount: Decimal): Decimal
+    local procedure GetRoundingAmount(SalePOS: Record "NPR POS Sale"; ChangeAmount: Decimal): Decimal
     begin
         SetPOSSetupPOSUnitContext(SalePOS."POS Store Code");
         if (POSSetup.AmountRoundingPrecision() = 0) or (POSSetup.RoundingAccount(false) = '') then
@@ -87,9 +87,9 @@ codeunit 6150634 "NPR POS Give Change"
         exit(ChangeAmount - Round(ChangeAmount, POSSetup.AmountRoundingPrecision, POSSetup.AmountRoundingDirection));
     end;
 
-    local procedure GetLastLineNo(SalePOS: Record "NPR Sale POS"): Integer
+    local procedure GetLastLineNo(SalePOS: Record "NPR POS Sale"): Integer
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -98,9 +98,9 @@ codeunit 6150634 "NPR POS Give Change"
         exit(SaleLinePOS."Line No.");
     end;
 
-    local procedure GetSaleAmountInclTax(SalePOS: Record "NPR Sale POS"): Decimal
+    local procedure GetSaleAmountInclTax(SalePOS: Record "NPR POS Sale"): Decimal
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TotalAmount: Decimal;
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -126,9 +126,9 @@ codeunit 6150634 "NPR POS Give Change"
         exit(TotalAmount);
     end;
 
-    local procedure GetPaymentAmount(SalePOS: Record "NPR Sale POS"): Decimal
+    local procedure GetPaymentAmount(SalePOS: Record "NPR POS Sale"): Decimal
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TotalAmount: Decimal;
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");

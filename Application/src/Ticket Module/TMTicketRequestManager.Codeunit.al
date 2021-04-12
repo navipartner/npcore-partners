@@ -1338,7 +1338,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         exit(ExternalNo);
     end;
 
-    procedure POS_OnModifyQuantity(SaleLinePOS: Record "NPR Sale Line POS")
+    procedure POS_OnModifyQuantity(SaleLinePOS: Record "NPR POS Sale Line")
     var
         Token: Text[100];
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -1404,7 +1404,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         end;
     end;
 
-    procedure OnDeleteSaleLinePos(SaleLinePOS: Record "NPR Sale Line POS")
+    procedure OnDeleteSaleLinePos(SaleLinePOS: Record "NPR POS Sale Line")
     var
         Token: Text[100];
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";

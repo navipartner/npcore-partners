@@ -68,8 +68,8 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
     var
         Item: Record Item;
         NpIaItemAddOn: Record "NPR NpIa Item AddOn";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -126,7 +126,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
 
     local procedure Approve(JsonText: Text; FrontEnd: Codeunit "NPR POS Front End Management"; OnlyFixedQtyLines: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
@@ -156,7 +156,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
 
     //--- Aux ---
 
-    local procedure FindAppliesToLineNo(SaleLinePOS: Record "NPR Sale Line POS"): Integer
+    local procedure FindAppliesToLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
         NpIaSaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
     begin

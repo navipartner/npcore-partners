@@ -1,6 +1,6 @@
 codeunit 6014451 "NPR Set Dimension POS"
 {
-    TableNo = "NPR Sale POS";
+    TableNo = "NPR POS Sale";
 
     trigger OnRun()
     begin
@@ -12,7 +12,7 @@ codeunit 6014451 "NPR Set Dimension POS"
         Text002: Label 'Dimension %1 does not exist';
         Text003: Label 'Dimension Value %1 does not exist for demension %2';
 
-    local procedure SetDimension(var Sale: Record "NPR Sale POS")
+    local procedure SetDimension(var Sale: Record "NPR POS Sale")
     var
         Dim: Record Dimension;
         DimVal: Record "Dimension Value";

@@ -1,6 +1,6 @@
 ﻿codeunit 85025 "NPR Library - POS Post Mock"
 {
-    TableNo = "NPR Sale POS";
+    TableNo = "NPR POS Sale";
 
     trigger OnRun()
     begin
@@ -19,7 +19,7 @@
         POSPost := _POSPost;
     end;
 
-    local procedure PostPOSEntry(SalePOS: Record "NPR Sale POS")
+    local procedure PostPOSEntry(SalePOS: Record "NPR POS Sale")
     var
         POSPostingControl: Codeunit "NPR POS Posting Control";
         POSEntry: Record "NPR POS Entry";

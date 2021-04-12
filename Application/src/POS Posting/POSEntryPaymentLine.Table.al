@@ -1,9 +1,9 @@
-table 6150623 "NPR POS Payment Line"
+table 6150623 "NPR POS Entry Payment Line"
 {
-    Caption = 'POS Payment Line';
+    Caption = 'POS Entry Payment Line';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Payment Line List";
-    LookupPageID = "NPR POS Payment Line List";
+    DrillDownPageID = "NPR POS Entry Pmt. Line List";
+    LookupPageID = "NPR POS Entry Pmt. Line List";
 
     fields
     {

@@ -9,8 +9,8 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         CouponType: Record "NPR NpDc Coupon Type";
         ExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         SaleLineOut: Codeunit "NPR POS Sale Line";
         POSSetup: Codeunit "NPR POS Setup";
@@ -84,7 +84,7 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         SaleLinePOSCouponApply.Insert;
     end;
 
-    procedure CalcDiscountAmount(SaleLinePOS: Record "NPR Sale Line POS"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon") DiscountAmount: Decimal
+    procedure CalcDiscountAmount(SaleLinePOS: Record "NPR POS Sale Line"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon") DiscountAmount: Decimal
     var
         Coupon: Record "NPR NpDc Coupon";
         CouponType: Record "NPR NpDc Coupon Type";
@@ -207,7 +207,7 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         exit(ExtraCouponItem.Get(CouponType.Code, 10000));
     end;
 
-    local procedure FindSaleLinePOSCouponApply(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOS: Record "NPR Sale Line POS"): Boolean
+    local procedure FindSaleLinePOSCouponApply(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     begin
         Clear(SaleLinePOSCouponApply);
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
@@ -229,7 +229,7 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
 
     local procedure GetNextLineNo(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"): Integer
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");

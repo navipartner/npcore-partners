@@ -152,7 +152,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
     local procedure CreateTransaction(POSSession: Codeunit "NPR POS Session"; AmountToCapture: Decimal; PaymentTypeNo: Code[10]; NumpadAmount: Decimal): Boolean
     var
-        POSLine: Record "NPR Sale Line POS";
+        POSLine: Record "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         Handled: Boolean;
         tmpVariant: Variant;
@@ -162,7 +162,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         SubTotal: Decimal;
         CashKeeperTransaction: Record "NPR CashKeeper Transaction";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
@@ -313,7 +313,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         AlternativTransactionRequest: Record "NPR EFT Transaction Request";
-        POSLine: Record "NPR Sale Line POS";
+        POSLine: Record "NPR POS Sale Line";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;

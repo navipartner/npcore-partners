@@ -122,7 +122,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 
     local procedure VoucherPayment(FrontEnd: Codeunit "NPR POS Front End Management"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         VoucherType: Text;
         VoucherTypeCode: Code[20];
@@ -130,7 +130,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         Handled: Boolean;
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        POSLine: Record "NPR Sale Line POS";
+        POSLine: Record "NPR POS Sale Line";
     begin
         JSON.SetScopeParameters(ObjectIdentifier());
         VoucherType := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ObjectIdentifier())));

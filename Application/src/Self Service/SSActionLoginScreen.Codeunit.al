@@ -69,8 +69,8 @@ codeunit 6151283 "NPR SS Action: Login Screen"
 
     procedure ChangeToLoginScreen(POSSession: Codeunit "NPR POS Session"; var WorkflowResponseJson: Text)
     var
-        SalePOS: Record "NPR Sale POS";
-        POSQuoteEntry: Record "NPR POS Quote Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
@@ -119,7 +119,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
     begin
 
         POSSession.GetSale(POSSale);

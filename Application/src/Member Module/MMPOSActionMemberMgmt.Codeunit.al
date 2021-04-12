@@ -167,7 +167,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateMembershipOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure UpdateMembershipOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         ReturnCode: Integer;
@@ -189,7 +189,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeDeletePOSSaleLine', '', true, true)]
-    local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
     begin
@@ -202,7 +202,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, true)]
-    local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR Sale Line POS"; var NewQuantity: Decimal)
+    local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
@@ -244,7 +244,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -306,8 +306,8 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         POSSale: Codeunit "NPR POS Sale";
         ItemNo: Code[20];
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
     begin
 
         POSSession.GetSale(POSSale);
@@ -337,7 +337,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
@@ -364,7 +364,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
@@ -400,7 +400,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
@@ -427,7 +427,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
@@ -454,7 +454,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
@@ -510,7 +510,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         end;
     end;
 
-    local procedure AssignPOSMembership(var SalePOS: Record "NPR Sale POS"; var ExternalMemberCardNo: Text[100]): Boolean
+    local procedure AssignPOSMembership(var SalePOS: Record "NPR POS Sale"; var ExternalMemberCardNo: Text[100]): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         ReasonNotFound: Text;
@@ -530,7 +530,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure AssignPOSMember(var SalePOS: Record "NPR Sale POS"; var ExternalMemberNo: Code[20]): Boolean
+    local procedure AssignPOSMember(var SalePOS: Record "NPR POS Sale"; var ExternalMemberNo: Code[20]): Boolean
     var
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
@@ -555,7 +555,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR Sale POS"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
+    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Membership: Record "NPR MM Membership";
@@ -599,7 +599,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure UpdatePOSSalesInfo(var SaleLinePOS: Record "NPR Sale Line POS"; MembershipEntryNo: Integer; MemberEntryNo: Integer; MembercardEntryNo: Integer; ScannedCardData: Text[200])
+    local procedure UpdatePOSSalesInfo(var SaleLinePOS: Record "NPR POS Sale Line"; MembershipEntryNo: Integer; MemberEntryNo: Integer; MembercardEntryNo: Integer; ScannedCardData: Text[200])
     var
         POSSalesInfo: Record "NPR MM POS Sales Info";
     begin
@@ -625,7 +625,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
@@ -653,7 +653,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     local procedure EditActiveMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Membership: Record "NPR MM Membership";
     begin
 
@@ -699,9 +699,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         exit(JSON.GetString('input'));
     end;
 
-    local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[50]; Description: Text[100]; Description2: Text[100]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[50]; Description: Text[100]; Description2: Text[100]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR POS Sale Line")
     var
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         ItemNo: Code[20];
@@ -745,7 +745,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         POSSession.RequestRefreshData();
     end;
 
-    local procedure DeleteMemberInfoCapture(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DeleteMemberInfoCapture(SaleLinePOS: Record "NPR POS Sale Line")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
@@ -981,7 +981,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
-    local procedure OnBeforeLoadSavedSaleSubscriber(POSQuoteEntry: Record "NPR POS Quote Entry"; var SalePOS: Record "NPR Sale POS")
+    local procedure OnBeforeLoadSavedSaleSubscriber(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberInfoCapture2: Record "NPR MM Member Info Capture";
@@ -1056,8 +1056,8 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnAfterLogin', '', true, true)]
     local procedure OnAfterLogin_SelectMemberRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         Member: Record "NPR MM Member";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";

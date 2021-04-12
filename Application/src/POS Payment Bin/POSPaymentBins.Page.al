@@ -145,7 +145,7 @@ page 6150620 "NPR POS Payment Bins"
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         PageAction: Action;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
 
         //-NPR5.40 [307267]

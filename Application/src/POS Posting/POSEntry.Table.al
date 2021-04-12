@@ -343,7 +343,7 @@ table 6150621 "NPR POS Entry"
         }
         field(600; "Sale Lines"; Integer)
         {
-            CalcFormula = Count("NPR POS Sales Line" WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR POS Entry Sales Line" WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Sale Lines';
             Description = 'NPR5.53';
             Editable = false;
@@ -351,7 +351,7 @@ table 6150621 "NPR POS Entry"
         }
         field(610; "Payment Lines"; Integer)
         {
-            CalcFormula = Count("NPR POS Payment Line" WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR POS Entry Payment Line" WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Payment Lines';
             Description = 'NPR5.53';
             Editable = false;
@@ -359,7 +359,7 @@ table 6150621 "NPR POS Entry"
         }
         field(620; "Tax Lines"; Integer)
         {
-            CalcFormula = Count("NPR POS Tax Amount Line" WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR POS Entry Tax Line" WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Tax Lines';
             Description = 'NPR5.53';
             Editable = false;
@@ -367,7 +367,7 @@ table 6150621 "NPR POS Entry"
         }
         field(630; "Customer Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum("NPR POS Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
                                                                          Type = FILTER(Customer)));
             Caption = 'Customer Sales (LCY)';
             Description = 'NPR5.53';
@@ -376,7 +376,7 @@ table 6150621 "NPR POS Entry"
         }
         field(640; "G/L Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum("NPR POS Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
                                                                          Type = FILTER("G/L Account")));
             Caption = 'G/L Sales (LCY)';
             Description = 'NPR5.53';
@@ -385,7 +385,7 @@ table 6150621 "NPR POS Entry"
         }
         field(650; "Payment Amount"; Decimal)
         {
-            CalcFormula = Sum("NPR POS Payment Line".Amount WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Sum("NPR POS Entry Payment Line".Amount WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Payment Amount';
             Description = 'NPR5.53';
             Editable = false;
@@ -439,11 +439,11 @@ table 6150621 "NPR POS Entry"
 
     trigger OnDelete()
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         POSSalesLine.SetRange("POS Entry No.", "Entry No.");
         POSSalesLine.DeleteAll;

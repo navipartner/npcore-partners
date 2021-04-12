@@ -22,7 +22,7 @@ codeunit 6014428 "NPR POS After Sale Execution"
         end;
     end;
 
-    procedure RecSet(RecPar: Record "NPR Sale POS")
+    procedure RecSet(RecPar: Record "NPR POS Sale")
     begin
         Rec.Copy(RecPar);
     end;
@@ -32,7 +32,7 @@ codeunit 6014428 "NPR POS After Sale Execution"
         PosSaleCodeunit := PosSalePar;
     end;
 
-    procedure OnRunXRecSet(XRecPar: Record "NPR Sale POS")
+    procedure OnRunXRecSet(XRecPar: Record "NPR POS Sale")
     begin
         OnRunXRec := XRecPar;
     end;
@@ -48,9 +48,9 @@ codeunit 6014428 "NPR POS After Sale Execution"
     end;
 
     var
-        Rec: Record "NPR Sale POS";
+        Rec: Record "NPR POS Sale";
         OnRunPOSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
-        OnRunXRec: Record "NPR Sale POS";
+        OnRunXRec: Record "NPR POS Sale";
         PosSaleCodeunit: Codeunit "NPR POS Sale";
         OnRunType: Enum "NPR POS Sale OnRunType";
 }

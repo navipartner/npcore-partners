@@ -125,7 +125,7 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
     begin
         //-NPR5.54 [364658]
         if not CancelSale(POSSession) then
@@ -141,7 +141,7 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
     begin
         //-NPR5.54 [364658]
         POSSession.GetSaleLine(POSSaleLine);

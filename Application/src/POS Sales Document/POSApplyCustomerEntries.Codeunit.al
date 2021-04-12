@@ -1,7 +1,7 @@
 codeunit 6014410 "NPR POS Apply Customer Entries"
 {
     Permissions = TableData "Cust. Ledger Entry" = rimd;
-    TableNo = "NPR Sale Line POS";
+    TableNo = "NPR POS Sale Line";
 
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -13,7 +13,7 @@ codeunit 6014410 "NPR POS Apply Customer Entries"
         CONFIRM_BALANCE: Label 'Do you wish to apply %1 %2 for customer %3?';
         BALANCING_OF: Label 'Balancing of %1';
 
-    procedure DeleteExistingLines(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure DeleteExistingLines(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
@@ -21,7 +21,7 @@ codeunit 6014410 "NPR POS Apply Customer Entries"
         SaleLinePOS.DeleteAll;
     end;
 
-    procedure GetLineNo(var SaleLinePOS: Record "NPR Sale Line POS") LineNo: Integer
+    procedure GetLineNo(var SaleLinePOS: Record "NPR POS Sale Line") LineNo: Integer
     begin
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
@@ -118,8 +118,8 @@ codeunit 6014410 "NPR POS Apply Customer Entries"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         CustLedgEntry: Record "Cust. Ledger Entry";
         POSApplyCustomerEntries: Page "NPR POS Apply Cust. Entries";
     begin
@@ -162,12 +162,12 @@ codeunit 6014410 "NPR POS Apply Customer Entries"
     var
         Customer: Record Customer;
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        SaleLinePOSCheck: Record "NPR Sale Line POS";
+        SaleLinePOSCheck: Record "NPR POS Sale Line";
         LineAmount: Decimal;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
     begin
         if DocumentNo = '' then
             exit;
@@ -204,7 +204,7 @@ codeunit 6014410 "NPR POS Apply Customer Entries"
 
     local procedure CreateApplyingPOSSaleLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; CustLedgerEntry: Record "Cust. Ledger Entry")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         LineAmount: Decimal;
     begin
         POSSaleLine.GetNewSaleLine(SaleLinePOS);

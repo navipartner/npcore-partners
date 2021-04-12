@@ -2,7 +2,7 @@ page 6014410 "NPR Sale POS - Statistics"
 {
     UsageCategory = None;
     Caption = 'Sales Statistics';
-    SourceTable = "NPR Sale POS";
+    SourceTable = "NPR POS Sale";
 
     layout
     {
@@ -16,7 +16,7 @@ page 6014410 "NPR Sale POS - Statistics"
     }
 
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         InsuranceCompanyCode: Code[50];
         RegisterNo: Code[20];
         DG: Decimal;
@@ -61,9 +61,9 @@ page 6014410 "NPR Sale POS - Statistics"
             DG := 0;
     end;
 
-    procedure CalculatePotentialInvoiceDiscount(var SalePOS: Record "NPR Sale POS")
+    procedure CalculatePotentialInvoiceDiscount(var SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS2: Record "NPR Sale Line POS";
+        SaleLinePOS2: Record "NPR POS Sale Line";
         Customer: Record Customer;
         CustInvoiceDisc: Record "Cust. Invoice Disc.";
         Currency: Record Currency;

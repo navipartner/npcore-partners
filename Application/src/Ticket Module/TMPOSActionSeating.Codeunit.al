@@ -77,7 +77,7 @@ codeunit 6151132 "NPR TM POS Action - Seating"
 
     local procedure ShowSeating(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SeatingUI: Codeunit "NPR TM Seating UI";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";

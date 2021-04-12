@@ -124,7 +124,7 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
 
     local procedure InsertComment(POSSaleLine: Codeunit "NPR POS Sale Line"; VATAmountDifference: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
 
@@ -142,9 +142,9 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
     local procedure ChangeSaleVATBusPostingGroup(POSSession: Codeunit "NPR POS Session"; NewGenBusPostingGroup: Text; NewVATBusPostingGroup: Text; AddCommentLine: Boolean)
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         GenBusinessPostingGroup: Record "Gen. Business Posting Group";
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
         OldVATTotal: Decimal;

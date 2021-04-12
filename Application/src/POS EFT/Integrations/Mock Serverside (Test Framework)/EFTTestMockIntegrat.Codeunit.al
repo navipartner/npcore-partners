@@ -257,7 +257,7 @@ codeunit 6184543 "NPR EFT Test Mock Integrat."
         EFTSetup: Record "NPR EFT Setup";
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         case PaymentConfirmationMode of
             PaymentConfirmationMode::APPROVE:

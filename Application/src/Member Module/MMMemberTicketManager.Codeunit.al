@@ -158,7 +158,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         PageAction: Action;
         ResponseMessage: Text;
         ResponseCode: Integer;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Token: Code[100];
         MembershipEntryNo: Integer;
         MemberEntryNo: Integer;

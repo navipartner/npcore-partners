@@ -11,7 +11,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
     {
         textelement(coupon_application)
         {
-            tableelement(tempsaleposreq; "NPR Sale POS")
+            tableelement(tempsaleposreq; "NPR POS Sale")
             {
                 MaxOccurs = Once;
                 MinOccurs = Zero;
@@ -25,7 +25,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                 {
                     MaxOccurs = Once;
                     XmlName = 'pos_sales_lines';
-                    tableelement(tempsalelineposreq; "NPR Sale Line POS")
+                    tableelement(tempsalelineposreq; "NPR POS Sale Line")
                     {
                         XmlName = 'pos_sales_line';
                         UseTemporary = true;
@@ -132,7 +132,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                     currXMLport.Break;
                 end;
             }
-            tableelement(tempsaleposres; "NPR Sale POS")
+            tableelement(tempsaleposres; "NPR POS Sale")
             {
                 MaxOccurs = Once;
                 MinOccurs = Zero;
@@ -151,7 +151,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                 {
                     MaxOccurs = Once;
                     XmlName = 'pos_sales_lines';
-                    tableelement(tempsalelineposres; "NPR Sale Line POS")
+                    tableelement(tempsalelineposres; "NPR POS Sale Line")
                     {
                         MaxOccurs = Unbounded;
                         MinOccurs = Zero;
@@ -215,14 +215,14 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
     var
         CouponLineNo: Integer;
 
-    procedure GetRequest(var TempSalePOSReq2: Record "NPR Sale POS" temporary; var TempSaleLinePOSReq2: Record "NPR Sale Line POS" temporary; var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
+    procedure GetRequest(var TempSalePOSReq2: Record "NPR POS Sale" temporary; var TempSaleLinePOSReq2: Record "NPR POS Sale Line" temporary; var TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary)
     begin
         TempSalePOSReq2.Copy(TempSalePOSReq, true);
         TempSaleLinePOSReq2.Copy(TempSaleLinePOSReq, true);
         TempNpDcExtCouponBuffer2.Copy(TempNpDcExtCouponBuffer, true);
     end;
 
-    procedure SetResponse(var TempSalePOSRes2: Record "NPR Sale POS" temporary; var TempSaleLinePOSRes2: Record "NPR Sale Line POS" temporary)
+    procedure SetResponse(var TempSalePOSRes2: Record "NPR POS Sale" temporary; var TempSaleLinePOSRes2: Record "NPR POS Sale Line" temporary)
     begin
         TempSalePOSRes.Copy(TempSalePOSRes2, true);
         TempSaleLinePOSRes.Copy(TempSaleLinePOSRes2, true);

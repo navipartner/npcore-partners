@@ -81,7 +81,7 @@ page 6150651 "NPR POS Period Register List"
             {
                 Caption = 'Sales Lines';
                 Image = Sales;
-                RunObject = Page "NPR POS Sales Line List";
+                RunObject = Page "NPR POS Entry Sales Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Sales Lines action';
@@ -90,7 +90,7 @@ page 6150651 "NPR POS Period Register List"
             {
                 Caption = 'Payment Lines';
                 Image = Payment;
-                RunObject = Page "NPR POS Payment Line List";
+                RunObject = Page "NPR POS Entry Pmt. Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
                 ApplicationArea = All;
                 ToolTip = 'Executes the Payment Lines action';

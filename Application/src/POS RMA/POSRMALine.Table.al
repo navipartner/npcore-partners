@@ -46,7 +46,7 @@ table 6150639 "NPR POS RMA Line"
         }
         field(1000; "FF Total Qty Sold"; Decimal)
         {
-            CalcFormula = Sum("NPR POS Sales Line".Quantity WHERE("Document No." = FIELD("Sales Ticket No."),
+            CalcFormula = Sum("NPR POS Entry Sales Line".Quantity WHERE("Document No." = FIELD("Sales Ticket No."),
                                                            Type = CONST(Item),
                                                            "No." = FIELD("Returned Item No."),
                                                            "Line No." = FIELD("Line No. Filter")));

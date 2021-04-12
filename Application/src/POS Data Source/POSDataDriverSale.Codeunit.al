@@ -10,7 +10,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        Sale: Record "NPR Sale POS";
+        Sale: Record "NPR POS Sale";
         DataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
@@ -19,7 +19,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
 
         DataSource.Constructor();
         DataSource.SetId(Name);
-        DataSource.SetTableNo(DATABASE::"NPR Sale POS");
+        DataSource.SetTableNo(DATABASE::"NPR POS Sale");
         DataSource.SetPerSession(true);
 
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Register No."), false);
@@ -80,7 +80,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         LastSaleDateText: Text;
         LastSaleReturnAmount: Decimal;
         LastReceiptNo: Text;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Customer: Record Customer;
         Contact: Record Contact;

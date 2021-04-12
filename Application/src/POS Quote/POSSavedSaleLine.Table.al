@@ -1,9 +1,9 @@
-table 6151003 "NPR POS Quote Line"
+table 6151003 "NPR POS Saved Sale Line"
 {
-    Caption = 'POS Quote Line';
+    Caption = 'POS Saved Sale Line';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Quote Lines";
-    LookupPageID = "NPR POS Quote Lines";
+    DrillDownPageID = "NPR POS Saved Sale Lines";
+    LookupPageID = "NPR POS Saved Sale Lines";
 
     fields
     {
@@ -12,7 +12,7 @@ table 6151003 "NPR POS Quote Line"
             Caption = 'Quote Entry No.';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = "NPR POS Quote Entry";
+            TableRelation = "NPR POS Saved Sale Entry";
         }
         field(5; "Line No."; Integer)
         {
@@ -35,7 +35,7 @@ table 6151003 "NPR POS Quote Line"
             ELSE
             IF (Type = CONST("Item Group")) "Item Category".Code
             ELSE
-            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE( "Block POS Payment"= const(false))
+            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
             IF (Type = CONST(Customer)) Customer."No."
             ELSE

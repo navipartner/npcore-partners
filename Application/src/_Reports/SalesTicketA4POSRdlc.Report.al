@@ -247,7 +247,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                 {
                 }
             }
-            dataitem(POS_Sales_Line; "NPR POS Sales Line")
+            dataitem(POS_Sales_Line; "NPR POS Entry Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
                 DataItemTableView = SORTING("POS Entry No.", "Line No.");
@@ -257,7 +257,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                 column(LineNo_POS_Sales_Line; "Line No.")
                 {
                 }
-                dataitem(POS_Sales_Item_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Item_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Item));
@@ -305,7 +305,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                             CurrReport.Skip();
                     end;
                 }
-                dataitem(POS_Sales_GLAccount_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_GLAccount_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER("G/L Account"));
@@ -323,7 +323,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                     {
                     }
                 }
-                dataitem(POS_Sales_Comment_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Comment_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Comment));
@@ -338,7 +338,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                     {
                     }
                 }
-                dataitem(POS_Sales_Customer_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Customer_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Customer));
@@ -356,7 +356,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                     {
                     }
                 }
-                dataitem(POS_Sales_Voucher_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Voucher_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Voucher));
@@ -374,7 +374,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                     {
                     }
                 }
-                dataitem(POS_Sales_Payout_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Payout_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Payout));
@@ -392,7 +392,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                     {
                     }
                 }
-                dataitem(POS_Sales_Rounding_Line; "NPR POS Sales Line")
+                dataitem(POS_Sales_Rounding_Line; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Rounding));
@@ -411,7 +411,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                     }
                 }
             }
-            dataitem(POS_Payment_Line; "NPR POS Payment Line")
+            dataitem(POS_Payment_Line; "NPR POS Entry Payment Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
                 DataItemTableView = SORTING("POS Entry No.", "Line No.");
@@ -442,7 +442,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                     IncludeCaption = true;
                 }
             }
-            dataitem(POS_Tax_Amount_Line; "NPR POS Tax Amount Line")
+            dataitem(POS_Tax_Amount_Line; "NPR POS Entry Tax Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
                 DataItemTableView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive);
@@ -489,7 +489,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 
             trigger OnAfterGetRecord()
             var
-                POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+                POSTaxAmountLine: Record "NPR POS Entry Tax Line";
             begin
                 TotalTaxText := GetVATText("Entry No.");
                 CompanyInformation.CalcFields(Picture);
@@ -529,7 +529,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 
     local procedure GetVATText(EntryNo: Integer): Text
     var
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         POSTaxAmountLine.SetRange("POS Entry No.", EntryNo);
         if POSTaxAmountLine.Count() > 1 then

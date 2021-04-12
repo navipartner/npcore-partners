@@ -55,7 +55,7 @@ codeunit 6151140 "NPR POS Action: Change UOM"
 
     local procedure ChangeUOM(var POSSession: Codeunit "NPR POS Session")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         UnitofMeasure: Record "Unit of Measure";
         UnitsofMeasure: Page "Units of Measure";
         POSSaleLine: Codeunit "NPR POS Sale Line";

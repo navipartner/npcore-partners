@@ -30,7 +30,7 @@ codeunit 6060107 "NPR POS Input Box Evt Handler"
 
     local procedure FindEanBoxSetup(POSSession: Codeunit "NPR POS Session"; var EanBoxSetup: Record "NPR Ean Box Setup"): Boolean
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
         EanBoxSetupMgt: Codeunit "NPR POS Input Box Setup Mgt.";
         POSSale: Codeunit "NPR POS Sale";

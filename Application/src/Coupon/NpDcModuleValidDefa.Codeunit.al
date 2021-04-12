@@ -7,7 +7,7 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
         Text003: Label 'Coupon has already been used';
         Text004: Label 'Validate Coupon - Default';
 
-    procedure ValidateCoupon(SalePOS: Record "NPR Sale POS"; Coupon: Record "NPR NpDc Coupon")
+    procedure ValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon")
     var
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv.";
@@ -79,7 +79,7 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunValidateCoupon', '', true, true)]
-    local procedure OnRunValidateCoupon(SalePOS: Record "NPR Sale POS"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
+    local procedure OnRunValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
     begin
         if Handled then
             exit;

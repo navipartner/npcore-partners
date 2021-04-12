@@ -19,8 +19,8 @@ codeunit 85020 "NPR POS End of Day"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -152,8 +152,8 @@ codeunit 85020 "NPR POS End of Day"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -285,8 +285,8 @@ codeunit 85020 "NPR POS End of Day"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -384,8 +384,8 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         EFTTest: Codeunit "NPR EFT Tests";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -464,8 +464,8 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         EFTTest: Codeunit "NPR EFT Tests";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -545,8 +545,8 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         EFTTest: Codeunit "NPR EFT Tests";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -624,8 +624,8 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         EFTTest: Codeunit "NPR EFT Tests";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -706,8 +706,8 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         EFTTest: Codeunit "NPR EFT Tests";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -888,7 +888,7 @@ codeunit 85020 "NPR POS End of Day"
 
     local procedure CreateVoucherInPOSTransaction(var NpRvVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";

@@ -102,8 +102,8 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
     local procedure OnActionInsertAddOns(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         NpIaItemAddOn: Record "NPR NpIa Item AddOn";
-        SalePOS: Record "NPR Sale POS";
-        AppliesToSaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        AppliesToSaleLinePOS: Record "NPR POS Sale Line";
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         AddOnNo: Code[20];
@@ -123,7 +123,7 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
         ActiveModelID := FrontEnd.ShowModel(Model);
     end;
 
-    local procedure FindBaseLine(POSSession: Codeunit "NPR POS Session"; var AppliesToSaleLinePOS: Record "NPR Sale Line POS")
+    local procedure FindBaseLine(POSSession: Codeunit "NPR POS Session"; var AppliesToSaleLinePOS: Record "NPR POS Sale Line")
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
@@ -162,7 +162,7 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
 
     local procedure Approve(JsonText: Text; FrontEnd: Codeunit "NPR POS Front End Management"; OnlyFixedQtyLines: Boolean)
     var
-        AppliesToSaleLinePOS: Record "NPR Sale Line POS";
+        AppliesToSaleLinePOS: Record "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSJavaScriptInterface: Codeunit "NPR POS JavaScript Interface";

@@ -60,8 +60,8 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
     var
         Item: Record Item;
         ItemAddOn: Record "NPR NpIa Item AddOn";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
@@ -86,11 +86,11 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         exit(JsonText);
     end;
 
-    local procedure GenerateAddonConfigJson(POSSale: Codeunit "NPR POS Sale"; MasterSaleLinePOS: Record "NPR Sale Line POS"; ItemAddOn: Record "NPR NpIa Item AddOn") JsonString: Text
+    local procedure GenerateAddonConfigJson(POSSale: Codeunit "NPR POS Sale"; MasterSaleLinePOS: Record "NPR POS Sale Line"; ItemAddOn: Record "NPR NpIa Item AddOn") JsonString: Text
     var
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         CommentText: Text;
         Quantity: Decimal;
         Value: Text;
@@ -186,8 +186,8 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         ItemAddOn: Record "NPR NpIa Item AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         UserValue: Text;
         POSSale: Codeunit "NPR POS Sale";
@@ -238,7 +238,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
 
     local procedure ApplyUserQuantity(Value: Text; ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; MasterLineNumber: Integer; POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         DecVal: Decimal;
         BooleanValue: Boolean;
     begin
@@ -287,7 +287,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
 
     local procedure ApplyUserItem(Value: Text; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; MasterLineNumber: Integer; POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
         SelectionValue: JsonToken;
         ItemNo: Code[20];
@@ -346,7 +346,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         EntryNo: Integer;
     begin
 
@@ -395,9 +395,9 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         end;
     end;
 
-    local procedure FindSaleLine(POSSale: Codeunit "NPR POS Sale"; AppliesToLineNo: Integer; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var SaleLinePOS: Record "NPR Sale Line POS"): Boolean
+    local procedure FindSaleLine(POSSale: Codeunit "NPR POS Sale"; AppliesToLineNo: Integer; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
     begin
 
@@ -418,7 +418,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
                                SaleLinePOSAddOn."Sale Line No."));
     end;
 
-    local procedure InsertAddOn(SaleLinePOS: Record "NPR Sale Line POS"; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; AppliesToLineNo: Integer)
+    local procedure InsertAddOn(SaleLinePOS: Record "NPR POS Sale Line"; NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; AppliesToLineNo: Integer)
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
     begin

@@ -64,7 +64,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
@@ -73,7 +73,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
 
         if not Action.IsThisAction(ActionCode()) then
@@ -194,7 +194,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         PaymentMethodCode: Code[20];
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
@@ -336,13 +336,13 @@ codeunit 6150725 "NPR POS Action: Payment"
     procedure CapturePayment(POSPaymentMethod: Record "NPR POS Payment Method"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AmountToCapture: Decimal; VoucherNo: Text; var Handled: Boolean)
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSLine: Record "NPR Sale Line POS";
+        POSLine: Record "NPR POS Sale Line";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
         POSSetup: Codeunit "NPR POS Setup";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
 
@@ -377,7 +377,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
     end;
 
-    local procedure CaptureCashPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    local procedure CaptureCashPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         AmountToCapture: Decimal;
     begin
@@ -398,7 +398,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure CapturePayoutPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    local procedure CapturePayoutPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         AmountToCapture: Decimal;
     begin
@@ -415,7 +415,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure CaptureCustomerPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    local procedure CaptureCustomerPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         AmountToCapture: Decimal;
     begin
@@ -432,7 +432,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure CaptureVoucherPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"; VoucherNumber: Text; SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure CaptureVoucherPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"; VoucherNumber: Text; SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         AmountToCapture: Decimal;
         VoucherStatusMsg: Text;
@@ -456,14 +456,14 @@ codeunit 6150725 "NPR POS Action: Payment"
     end;
 
 
-    local procedure CaptureEftPayment(AmountToCapture: Decimal; POSSession: Codeunit "NPR POS Session"; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure CaptureEftPayment(AmountToCapture: Decimal; POSSession: Codeunit "NPR POS Session"; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         Handled: Boolean;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSSale: Codeunit "NPR POS Sale";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         EFTSetup: Record "NPR EFT Setup";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCapture);
 
@@ -615,12 +615,12 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
     end;
 
-    local procedure ApplyCreditVoucherToPaymentLine(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCaptureLCY: Decimal; AmountToCapture: Decimal; SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure ApplyCreditVoucherToPaymentLine(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCaptureLCY: Decimal; AmountToCapture: Decimal; SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        POSLine: Record "NPR Sale Line POS";
+        POSLine: Record "NPR POS Sale Line";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(POSLine);

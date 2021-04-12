@@ -278,8 +278,8 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
     var
         FromNpCsStore: Record "NPR NpCs Store";
         NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
-        SalePOS: Record "NPR Sale POS";
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        SalePOS: Record "NPR POS Sale";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempNpCsStore: Record "NPR NpCs Store" temporary;
         ToNpCsStore: Record "NPR NpCs Store";
         NpCsStoreMgt: Codeunit "NPR NpCs Store Mgt.";
@@ -363,9 +363,9 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure FindItemPosLines(SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary)
+    local procedure FindItemPosLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Sku: Text;
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -435,7 +435,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 
     local procedure OnActionSelectCustomer(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         JSON: Codeunit "NPR POS JSON Management";
         Customer: Record Customer;
     begin
@@ -458,7 +458,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         ToNpCsStore: Record "NPR NpCs Store";
         NpCsWorkflow: Record "NPR NpCs Workflow";
         SalesHeader: Record "Sales Header";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
@@ -501,7 +501,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 
     local procedure ExportToDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         CustomerNo: Text;
@@ -554,7 +554,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         RetailSalesDocMgt.SetDocumentTypeOrder();
     end;
 
-    local procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR Sale POS")
+    local procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR POS Sale")
     var
         HandlePrepmtCU: Codeunit "NPR NpCs Cr.Ord: Handle Prepmt";
     begin

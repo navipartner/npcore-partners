@@ -61,7 +61,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         JSON: Codeunit "NPR POS JSON Management";
         DepositType: Option ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance,CrMemoNoPrompt;
         CustomerEntryView: Text;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -95,7 +95,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Amount: Decimal;
     begin
         SelectCustomer(POSSession);
@@ -122,11 +122,11 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     local procedure DocumentNoPrompt(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         InvoiceNo: Text;
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         InvoiceNo := GetInput(JSON, 'Prompt');
@@ -140,11 +140,11 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     local procedure CrMemoNoPrompt(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         CrMemoNo: Text;
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         CrMemoNo := GetInput(JSON, 'Prompt');
@@ -159,7 +159,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
         SelectCustomer(POSSession);
@@ -177,9 +177,9 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         InsertDepositLine(POSSaleLine, SalePOS, Customer."Balance (LCY)");
     end;
 
-    local procedure InsertDepositLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; SalePOS: Record "NPR Sale POS"; Amount: Decimal)
+    local procedure InsertDepositLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale"; Amount: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
@@ -197,7 +197,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     local procedure SelectCustomer(POSSession: Codeunit "NPR POS Session"): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
         POSSession.GetSale(POSSale);

@@ -240,7 +240,7 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
     local procedure CalcRowData(FromDate: Date; ToDate: Date; var NetAmount: Decimal; var CostOfSalesAmount: Decimal; var ProfitAmount: Decimal;
         var ProfitPct: Decimal)
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         POSTurnoverQuery: Query "NPR POS Turnover";
     begin
         NetAmount := 0;

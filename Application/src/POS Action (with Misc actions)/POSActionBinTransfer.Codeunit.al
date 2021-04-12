@@ -73,7 +73,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         PageAction: Action;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         FromBinNo: Code[10];
         POSPostEntries: Codeunit "NPR POS Post Entries";

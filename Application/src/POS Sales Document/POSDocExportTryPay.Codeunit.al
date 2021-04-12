@@ -16,7 +16,7 @@ codeunit 6014417 "NPR POS Doc. Export Try Pay"
     var
         Success: Boolean;
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
     begin

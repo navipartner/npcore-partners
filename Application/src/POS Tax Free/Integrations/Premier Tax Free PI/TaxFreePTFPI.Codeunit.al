@@ -273,25 +273,25 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     local procedure GetSaleInfo(RecRef: RecordRef; Parameter: Text): Text
     var
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        SalePOS: Record "NPR Sale POS";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
         Quantity: Decimal;
         DateTime: DateTime;
     begin
         case RecRef.Number of
-            DATABASE::"NPR Sale POS":
+            DATABASE::"NPR POS Sale":
                 RecRef.SetTable(SalePOS);
             DATABASE::"Sales Header":
                 RecRef.SetTable(SalesHeader);
-            Database::"NPR POS Sales Line":
+            Database::"NPR POS Entry Sales Line":
                 RecRef.SetTable(POSSalesLine);
         end;
 
         case Parameter of
             'operator_id':
                 case RecRef.Number of
-                    Database::"NPR POS Sales Line":
+                    Database::"NPR POS Entry Sales Line":
                         begin
                             POSEntry.Get(POSSalesLine."POS Entry No.");
                             exit(ReplaceSpecialChars(POSEntry."Salesperson Code"));
@@ -301,7 +301,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                 exit('1');
             'transaction_date':
                 case RecRef.Number of
-                    Database::"NPR POS Sales Line":
+                    Database::"NPR POS Entry Sales Line":
                         begin
                             POSSalesLine.CalcFields("Entry Date");
                             exit(Format(POSSalesLine."Entry Date"));
@@ -310,7 +310,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                 end;
             'transaction_time':
                 case RecRef.Number of
-                    Database::"NPR POS Sales Line":
+                    Database::"NPR POS Entry Sales Line":
                         begin
                             POSSalesLine.CalcFields("Ending Time");
                             exit(Format(POSSalesLine."Ending Time"));
@@ -320,12 +320,12 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
             'invoice_number',
           'barcode_data':
                 case RecRef.Number of
-                    Database::"NPR POS Sales Line":
+                    Database::"NPR POS Entry Sales Line":
                         exit(ReplaceSpecialChars(POSSalesLine."Document No."))
                 end;
             'number_of_items':
                 case RecRef.Number of
-                    Database::"NPR POS Sales Line":
+                    Database::"NPR POS Entry Sales Line":
                         begin
                             POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
                             exit(Format(POSSalesLine.Count));
@@ -344,8 +344,8 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure GetSaleItemInfo(var RecRef: RecordRef): Text
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        SalePOS: Record "NPR Sale POS";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
         ItemNo: Integer;
         ItemDesc: Text;
@@ -359,7 +359,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         ItemXML: Text;
     begin
         case RecRef.Number of
-            Database::"NPR POS Sales Line":
+            Database::"NPR POS Entry Sales Line":
                 begin
                     RecRef.SetTable(POSSalesLine);
                     POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
@@ -392,7 +392,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
                         until POSSalesLine.Next = 0;
                 end;
-            DATABASE::"NPR Sale POS":
+            DATABASE::"NPR POS Sale":
                 begin
                     RecRef.SetTable(SalePOS);
                 end;
@@ -407,9 +407,9 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure GetSalePaymentInfo(var RecRef: RecordRef): Text
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
-        SalePOS: Record "NPR Sale POS";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
+        SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
         PaymentMethod: Text;
         PaymentAmount: Text;
@@ -421,7 +421,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         //See page 51 of doc. for payment methods
 
         case RecRef.Number of
-            Database::"NPR POS Sales Line":
+            Database::"NPR POS Entry Sales Line":
                 begin
                     RecRef.SetTable(POSSalesLine);
                     POSPaymentLine.SetRange("POS Entry No.", POSSalesLine."POS Entry No.");
@@ -448,7 +448,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                             end;
                         until POSPaymentLine.Next = 0;
                 end;
-            DATABASE::"NPR Sale POS":
+            DATABASE::"NPR POS Sale":
                 RecRef.SetTable(SalePOS);
             DATABASE::"Sales Header":
                 RecRef.SetTable(SalesHeader);
@@ -459,8 +459,8 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure GetSaleTotals(var RecRef: RecordRef): Text
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        SalePOS: Record "NPR Sale POS";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
         TotalNetAmount: Decimal;
         TotalGrossAmount: Decimal;
@@ -468,7 +468,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         TotalsXML: Text;
     begin
         case RecRef.Number of
-            DATABASE::"NPR POS Sales Line":
+            DATABASE::"NPR POS Entry Sales Line":
                 begin
                     RecRef.SetTable(POSSalesLine);
                     POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
@@ -484,7 +484,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                                  '<transaction_gross_amount>' + Format(TotalGrossAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_gross_amount>' +
                                  '<transaction_vat_amount>' + Format(TotalVATAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_vat_amount>';
                 end;
-            DATABASE::"NPR Sale POS":
+            DATABASE::"NPR POS Sale":
                 RecRef.SetTable(SalePOS);
             DATABASE::"Sales Header":
                 RecRef.SetTable(SalesHeader);
@@ -509,7 +509,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure IsStoredSaleEligible(SalesTicketNo: Text): Boolean
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
@@ -522,7 +522,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure IsActiveSaleEligible(SalesTicketNo: Text): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
@@ -968,7 +968,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var SkipRecordHandling: Boolean)
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         RecRef: RecordRef;
     begin
         InitializeHandler(TaxFreeRequest);

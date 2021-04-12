@@ -301,10 +301,10 @@ codeunit 6150723 "NPR POS Action: Insert Item"
 
     procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; SetUnitPrice: Boolean; CustomDescription: Text; InputSerial: Text; UseSpecificTracking: Boolean; ValidatedSerialNumber: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
         JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if ItemQuantity = 0 then
             ItemQuantity := 1;
@@ -376,7 +376,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         BOMComponent: Record "BOM Component";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Level: Integer;
     begin
         if not Item."NPR Explode BOM auto" then
@@ -415,8 +415,8 @@ codeunit 6150723 "NPR POS Action: Insert Item"
 
     local procedure AddAccessoryForItem(Item: Record Item; GroupAccessory: Boolean; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        MainSaleLinePOS: Record "NPR Sale Line POS";
-        AccessorySaleLinePOS: Record "NPR Sale Line POS";
+        MainSaleLinePOS: Record "NPR POS Sale Line";
+        AccessorySaleLinePOS: Record "NPR POS Sale Line";
         AccessorySparePart: Record "NPR Accessory/Spare Part";
     begin
 
@@ -511,8 +511,8 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
         ItemLedgerEntry: Record "Item Ledger Entry";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        "Sale POS": Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        "Sale POS": Record "NPR POS Sale";
         TextActiveSaved: Text;
     begin
         if not Item.Get(ItemRef."Item No.") then exit(false);
@@ -540,7 +540,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
             end;
 
             //Check if serial number exists in saved/active pos sale line
-            //TO DO: check pos quotes?
+            //TO DO: check pos saved sales?
             if CanBeUsed then begin
                 SaleLinePOS.Reset;
                 SaleLinePOS.SetCurrentKey("Serial No.");
@@ -575,7 +575,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
 
     local procedure SelectSerialNoFromList(var ItemRef: Record "Item Reference"; LocationCode: Code[10]; Qty: Decimal; InsertIsBlocked: Boolean; var SerialNo: Text)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TrackingSpecification: Record "Tracking Specification" temporary;
         ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection";
     begin

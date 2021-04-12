@@ -169,12 +169,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         CustomerCreditCheck := Set;
     end;
 
-    procedure ProcessPOSSale(var SalePOS: Record "NPR Sale POS")
+    procedure ProcessPOSSale(var SalePOS: Record "NPR POS Sale")
     var
         SalesHeaderQoute: Record "Sales Header";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesPost: Codeunit "Sales-Post";
         SalesPostYesNo: Codeunit "Sales-Post (Yes/No)";
         SalesPostAndPrint: Codeunit "Sales-Post + Print";
@@ -277,7 +277,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Commit;
     end;
 
-    procedure CreateSalesHeader(var SalePOS: Record "NPR Sale POS"; var SalesHeader: Record "Sales Header")
+    procedure CreateSalesHeader(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
         GLSetup: Record "General Ledger Setup";
@@ -339,12 +339,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalesHeader.Modify;
     end;
 
-    procedure CopySaleCommentLines(var SalePOS: Record "NPR Sale POS"; var SalesHeader: Record "Sales Header")
+    procedure CopySaleCommentLines(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
     var
         SalesCommentLine: Record "Sales Comment Line";
         RetailComment: Record "NPR Retail Comment";
     begin
-        RetailComment.SetRange("Table ID", DATABASE::"NPR Sale POS");
+        RetailComment.SetRange("Table ID", DATABASE::"NPR POS Sale");
         RetailComment.SetRange("No.", SalePOS."Register No.");
         RetailComment.SetRange("No. 2", SalePOS."Sales Ticket No.");
         if RetailComment.FindSet then
@@ -360,7 +360,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             until RetailComment.Next = 0;
     end;
 
-    procedure CopySalesLines(var SaleLinePOS: Record "NPR Sale Line POS"; var SalesHeader: Record "Sales Header")
+    procedure CopySalesLines(var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         SalesLine: Record "Sales Line";
@@ -468,7 +468,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             until SaleLinePOS.Next = 0;
     end;
 
-    procedure TestSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure TestSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then
             Error(Text000010);
@@ -487,9 +487,9 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             Error(Text000003);
     end;
 
-    procedure OpenSalesDoc(var SalePOS: Record "NPR Sale POS")
+    procedure OpenSalesDoc(var SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesDocNo: Code[20];
         SalesHeader: Record "Sales Header";
         SalesOrder: Page "Sales Order";
@@ -539,9 +539,9 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         end;
     end;
 
-    procedure TestSalePOS(var SalePOS: Record "NPR Sale POS")
+    procedure TestSalePOS(var SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -552,10 +552,10 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             until SaleLinePOS.Next = 0;
     end;
 
-    local procedure TransferInfoFromSalePOS(var SalePOS: Record "NPR Sale POS"; var SalesHeader: Record "Sales Header")
+    local procedure TransferInfoFromSalePOS(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if TransferSalesPerson then begin
             if SalePOS."Salesperson Code" <> '' then
@@ -598,7 +598,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         end;
     end;
 
-    local procedure TransferInfoFromSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS"; var SalesLine: Record "Sales Line")
+    local procedure TransferInfoFromSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line")
     begin
         if TransferPostingSetup then begin
             if SaleLinePOS."Posting Group" <> '' then
@@ -714,7 +714,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         exit(FullyReservedLine);
     end;
 
-    local procedure PrintRetailReceipt(SalePOS: Record "NPR Sale POS")
+    local procedure PrintRetailReceipt(SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
@@ -742,7 +742,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         CreatedSalesHeaderOut := CreatedSalesHeader;
     end;
 
-    local procedure PostPrepaymentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure PostPrepaymentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         SalesLine: Record "Sales Line";
@@ -793,7 +793,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         end;
     end;
 
-    local procedure PostPrepaymentRefundBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure PostPrepaymentRefundBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         DeleteAfter: Boolean;
@@ -842,7 +842,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         end;
     end;
 
-    local procedure PostDocumentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure PostDocumentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalesPost: Codeunit "Sales-Post";
         ReportSelections: Record "Report Selections";
@@ -945,8 +945,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         PrepaymentAmount: Decimal;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
         if ValueIsAmount then begin
@@ -998,8 +998,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         PrepaymentRefundAmount: Decimal;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
         POSSession.GetSale(POSSale);
@@ -1031,8 +1031,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     var
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
     begin
         //Error in this subscriber will block end-of-sale, but if we have several associated sales docs, some of them might post with commit before an error.
@@ -1068,7 +1068,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         POSSaleLine.RefreshCurrent();
     end;
 
-    local procedure OpenSalesDocCardAndSyncChangesBackToPOSSale(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR Sale POS")
+    local procedure OpenSalesDocCardAndSyncChangesBackToPOSSale(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
     var
         SalesHeader2: Record "Sales Header";
         ApplySalespersontoDocument: Codeunit "NPR Apply Salesperson to Doc.";
@@ -1088,7 +1088,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         UpdateActiveSaleWithDocumentChanges(SalesHeader, SalePOS);
     end;
 
-    local procedure UpdateActiveSaleWithDocumentChanges(SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR Sale POS")
+    local procedure UpdateActiveSaleWithDocumentChanges(SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
@@ -1102,7 +1102,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalePOS.Get(SalePOS."Register No.", SalePOS."Sales Ticket No.");
     end;
 
-    local procedure GetLocationCode(SalePOS: Record "NPR Sale POS"): Code[10]
+    local procedure GetLocationCode(SalePOS: Record "NPR POS Sale"): Code[10]
     var
         POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
@@ -1175,7 +1175,7 @@ then
         exit(CODEUNIT::"NPR Sales Doc. Exp. Mgt.");
     end;
 
-    local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR Sale POS")
+    local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -1202,7 +1202,7 @@ then
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean)
+    local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     begin
     end;
 }

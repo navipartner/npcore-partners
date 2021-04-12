@@ -72,19 +72,19 @@ codeunit 6150637 "NPR POS Posting Control"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', false, false)]
-    local procedure CheckDimOnAfterInsertPOSEntry(var SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry")
+    local procedure CheckDimOnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
     begin
         CheckGlobalDimAndDimSetConsistency(POSEntry.RecordId(), POSEntry."Shortcut Dimension 1 Code", POSEntry."Shortcut Dimension 2 Code", POSEntry."Dimension Set ID", 1);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSPaymentLine', '', false, false)]
-    local procedure CheckDimOnAfterInsertPOSPmtLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Payment Line")
+    local procedure CheckDimOnAfterInsertPOSPmtLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Entry Payment Line")
     begin
         CheckGlobalDimAndDimSetConsistency(POSPaymentLine.RecordId(), POSPaymentLine."Shortcut Dimension 1 Code", POSPaymentLine."Shortcut Dimension 2 Code", POSPaymentLine."Dimension Set ID", 1);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', false, false)]
-    local procedure CheckDimOnAfterInsertPOSSalesLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure CheckDimOnAfterInsertPOSSalesLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
         CheckGlobalDimAndDimSetConsistency(POSSalesLine.RecordId(), POSSalesLine."Shortcut Dimension 1 Code", POSSalesLine."Shortcut Dimension 2 Code", POSSalesLine."Dimension Set ID", 1);
     end;

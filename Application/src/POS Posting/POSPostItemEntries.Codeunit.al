@@ -6,7 +6,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
     var
         POSStore: Record "NPR POS Store";
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         TempItemToAdjust: Record Item temporary;
         AdjustCostItemEntries: Report "Adjust Cost - Item Entries";
         PostInventoryCosttoGL: Report "Post Inventory Cost to G/L";
@@ -84,7 +84,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
         end;
     end;
 
-    local procedure PostItemJnlLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line"): Integer
+    local procedure PostItemJnlLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"): Integer
     var
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -261,7 +261,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
         exit(false);
     end;
 
-    local procedure CheckAndCreateAssemblyOrder(FailOnError: Boolean; POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Sales Line"): Boolean
+    local procedure CheckAndCreateAssemblyOrder(FailOnError: Boolean; POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line"): Boolean
     var
         Item: Record Item;
         AssemblyHeader: Record "Assembly Header";
@@ -353,7 +353,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
         exit(false);
     end;
 
-    local procedure CheckAndCreateServiceItemPos(POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Sales Line")
+    local procedure CheckAndCreateServiceItemPos(POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         ServItem: Record "Service Item";
         ServMgtSetup: Record "Service Mgt. Setup";
@@ -536,7 +536,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
             Currency."Unit-Amount Rounding Precision"));
     end;
 
-    local procedure HandleRetailSerialNo(POSSalesLine: Record "NPR POS Sales Line")
+    local procedure HandleRetailSerialNo(POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         ItemReference: Record "Item Reference";
     begin
@@ -555,7 +555,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
 
     procedure PostAssemblyOrders(POSEntry: Record "NPR POS Entry"; FailOnError: Boolean): Boolean
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         if not PostToEntries(POSEntry) then
             exit;
@@ -586,12 +586,12 @@ codeunit 6150616 "NPR POS Post Item Entries"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostPOSSalesLineItemJnl(var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure OnBeforePostPOSSalesLineItemJnl(var POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateItemJournalLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line"; var ItemJournalLine: Record "Item Journal Line")
+    local procedure OnAfterCreateItemJournalLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 

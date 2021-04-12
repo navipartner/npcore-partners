@@ -4,7 +4,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
     begin
     end;
 
-    procedure ApplyQuantityDiscounts(SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; Rec: Record "NPR Sale Line POS"; RecalculateAllLines: Boolean): Boolean
+    procedure ApplyQuantityDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; RecalculateAllLines: Boolean): Boolean
     var
         TempQuantityDiscountLine: Record "NPR Quantity Discount Line" temporary;
         TempQuantityDiscountHeader: Record "NPR Quantity Discount Header" temporary;
@@ -74,7 +74,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         until TempQuantityDiscountHeader.Next = 0;
     end;
 
-    procedure GetQuantityDiscounts(var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; var TempQuantityDiscountHeader: Record "NPR Quantity Discount Header" temporary; var TempQuantityDiscountLine: Record "NPR Quantity Discount Line")
+    procedure GetQuantityDiscounts(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempQuantityDiscountHeader: Record "NPR Quantity Discount Header" temporary; var TempQuantityDiscountLine: Record "NPR Quantity Discount Line")
     var
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
@@ -152,7 +152,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'ApplyDiscount', '', true, true)]
-    local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     begin
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
@@ -161,7 +161,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'OnFindActiveSaleLineDiscounts', '', false, false)]
-    local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete)
+    local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     var
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
         IsActive: Boolean;
@@ -186,9 +186,9 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         end;
     end;
 
-    local procedure IsValidLineOperation(Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete): Boolean
+    local procedure IsValidLineOperation(Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         exit(true);
     end;

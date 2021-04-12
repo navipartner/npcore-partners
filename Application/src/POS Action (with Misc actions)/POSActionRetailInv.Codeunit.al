@@ -56,7 +56,7 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
     var
         RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
         RetailInventorySet: Record "NPR RIS Retail Inv. Set";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         RetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
     begin

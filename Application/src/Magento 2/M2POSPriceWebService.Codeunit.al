@@ -6,10 +6,10 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         // TEST_SOAP_ItemPrice ();
     end;
 
-    procedure POSQuote(var POSPriceRequest: XMLport "NPR M2 POS Quote Price Req.")
+    procedure POSQuote(var POSPriceRequest: XMLport "NPR M2 POS Sv. Sale Price Req.")
     var
-        TmpSalePOS: Record "NPR Sale POS" temporary;
-        TmpSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TmpSalePOS: Record "NPR POS Sale" temporary;
+        TmpSaleLinePOS: Record "NPR POS Sale Line" temporary;
     begin
         SelectLatestVersion();
 
@@ -24,7 +24,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
     end;
 
     [TryFunction]
-    local procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR Sale POS" temporary; var TmpSaleLinePOS: Record "NPR Sale Line POS" temporary)
+    local procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         Customer: Record Customer;
         VATBusPostingGroup: Code[20];
@@ -32,7 +32,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         GeneralLedgerSetup: Record "General Ledger Setup";
         TmpDiscountPriority: Record "NPR Discount Priority" temporary;
         DiscountPriority: Record "NPR Discount Priority";
-        TmpSaleLinePOS2: Record "NPR Sale Line POS" temporary;
+        TmpSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         Item: Record Item;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
@@ -127,13 +127,13 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
     local procedure TEST_SOAP_PosPrice()
     var
-        M2POSQuotePriceRequest: XMLport "NPR M2 POS Quote Price Req.";
+        M2POSQuotePriceRequest: XMLport "NPR M2 POS Sv. Sale Price Req.";
         xmltext: Text;
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         iStream: InStream;
         oStream: OutStream;
-        TmpSalePOS: Record "NPR Sale POS" temporary;
-        TmpSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TmpSalePOS: Record "NPR POS Sale" temporary;
+        TmpSaleLinePOS: Record "NPR POS Sale Line" temporary;
     begin
 
         xmltext :=

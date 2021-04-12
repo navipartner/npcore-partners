@@ -1,9 +1,9 @@
-table 6150622 "NPR POS Sales Line"
+table 6150622 "NPR POS Entry Sales Line"
 {
-    Caption = 'POS Sales Line';
+    Caption = 'POS Entry Sales Line';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Sales Line List";
-    LookupPageID = "NPR POS Sales Line List";
+    DrillDownPageID = "NPR POS Entry Sales Line List";
+    LookupPageID = "NPR POS Entry Sales Line List";
 
     fields
     {
