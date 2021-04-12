@@ -534,6 +534,9 @@ table 6184495 "NPR EFT Transaction Request"
         key(Key6; "Hardware ID")
         {
         }
+        key(key7; "Integration Type", "Processing Type", "External Result Known")
+        {
+        }
     }
 
     fieldgroups
