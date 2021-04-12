@@ -142,8 +142,8 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesTicketNo: Code[20];
         ReturnReasonCode: Code[20];
     begin
@@ -190,14 +190,14 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         POSSale.RefreshCurrent();
     end;
 
-    procedure ReverseSalesTicket(var SalePOS: Record "NPR Sale POS"; SalesTicketNo: Code[20]; ReturnReasonCode: Code[20])
+    procedure ReverseSalesTicket(var SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20]; ReturnReasonCode: Code[20])
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SaleLinePOS2: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS2: Record "NPR POS Sale Line";
         VoucherNo: Text[100];
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymnetLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymnetLine: Record "NPR POS Entry Payment Line";
     begin
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
@@ -225,7 +225,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
             until POSSalesLine.Next = 0;
     end;
 
-    procedure ReverseAuditInfoToSalesLine(var SaleLinePOS: Record "NPR Sale Line POS"; POSSalesLine: Record "NPR POS Sales Line")
+    procedure ReverseAuditInfoToSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         FromNPRLineDim: Record "NPR Line Dimension";
@@ -275,7 +275,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         Error(ReasonRequired);
     end;
 
-    local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR Sale POS"; SalesTicketNo: Code[20])
+    local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20])
     var
         CustomerNo: Code[20];
         POSSale: Codeunit "NPR POS Sale";
@@ -312,7 +312,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     var
         TmpPosRmaLine: Record "NPR POS RMA Line";
         PosRmaLine: Record "NPR POS RMA Line";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         ItemQty: Decimal;
     begin
         PosRmaLine.SetFilter("Sales Ticket No.", '=%1', SalesTicketNo);
@@ -335,9 +335,9 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         exit(ItemQty <= 0);
     end;
 
-    local procedure ApplyMaxReturnQty(CurrentSalePOS: Record "NPR Sale POS"; OriginalSalesTicketNo: Code[20]): Boolean
+    local procedure ApplyMaxReturnQty(CurrentSalePOS: Record "NPR POS Sale"; OriginalSalesTicketNo: Code[20]): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         AdjustedQty: Decimal;
         QtyIsAdjusted: Boolean;
     begin
@@ -360,7 +360,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 
     local procedure GetRemainingQtyToReturn(SalesTicketNo: Code[20]; OriginalQty: Decimal; LineNo: Integer) MaxQuantity: Decimal
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         PosRmaLine: Record "NPR POS RMA Line";
     begin
         POSSalesLine.SetFilter("Document No.", '=%1', SalesTicketNo);
@@ -386,7 +386,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
             MaxQuantity := 0;
     end;
 
-    local procedure CopyDimensions(var CurrentSalePOS: Record "NPR Sale POS"; OriginalSalesTicketNo: Code[20]): Boolean
+    local procedure CopyDimensions(var CurrentSalePOS: Record "NPR POS Sale"; OriginalSalesTicketNo: Code[20]): Boolean
     var
         POSEntry: Record "NPR POS Entry";
         OldDimSetID: Integer;
@@ -413,10 +413,10 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, true)]
-    local procedure OnBeforeSetQuantityOnReverseSales(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS"; var NewQuantity: Decimal)
+    local procedure OnBeforeSetQuantityOnReverseSales(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         PosRmaLine: Record "NPR POS RMA Line";
-        SaleLinePOSCopy: Record "NPR Sale Line POS";
+        SaleLinePOSCopy: Record "NPR POS Sale Line";
     begin
         // Publisher in Codeunit POS Sale Line
         // This subscriber is intended to prevent returning more items them originally sold

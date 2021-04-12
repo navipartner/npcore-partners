@@ -7,7 +7,7 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
         Text004: Label 'None of the Coupon Items have been added to the Sale';
         Text005: Label 'Not all required Coupon Items have been added to the Sale';
 
-    procedure ValidateCoupon(SalePOS: Record "NPR Sale POS"; Coupon: Record "NPR NpDc Coupon")
+    procedure ValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon")
     var
         NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
         NpDcCouponListItemTotal: Record "NPR NpDc Coupon List Item";
@@ -34,7 +34,7 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
         ValidateCouponExists(SalePOS, NpDcCouponListItem);
     end;
 
-    local procedure ValidateCouponLot(SalePOS: Record "NPR Sale POS"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item")
+    local procedure ValidateCouponLot(SalePOS: Record "NPR POS Sale"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item")
     var
         LineQty: Decimal;
     begin
@@ -46,7 +46,7 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
         until NpDcCouponListItem.Next = 0;
     end;
 
-    local procedure ValidateCouponQuantity(SalePOS: Record "NPR Sale POS"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var ValidationQty: Decimal)
+    local procedure ValidateCouponQuantity(SalePOS: Record "NPR POS Sale"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var ValidationQty: Decimal)
     var
         TotalQty: Decimal;
     begin
@@ -60,7 +60,7 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
             Error(Text005);
     end;
 
-    local procedure ValidateCouponExists(SalePOS: Record "NPR Sale POS"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item")
+    local procedure ValidateCouponExists(SalePOS: Record "NPR POS Sale"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item")
     begin
         NpDcCouponListItem.FindSet;
         repeat
@@ -111,7 +111,7 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnRunValidateCoupon', '', true, true)]
-    local procedure OnRunValidateCoupon(SalePOS: Record "NPR Sale POS"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
+    local procedure OnRunValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
     begin
         if Handled then
             exit;
@@ -130,7 +130,7 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
 
     local procedure FindCouponListItems(Coupon: Record "NPR NpDc Coupon"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", Coupon."Coupon Type");
@@ -138,9 +138,9 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
         exit(NpDcCouponListItem.FindFirst);
     end;
 
-    local procedure SaleLinePOSItemExists(SalePOS: Record "NPR Sale POS"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
+    local procedure SaleLinePOSItemExists(SalePOS: Record "NPR POS Sale"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(SaleLinePOS);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -173,9 +173,9 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
         exit(SaleLinePOS.FindFirst);
     end;
 
-    local procedure CalcSaleLinePOSItemQty(SalePOS: Record "NPR Sale POS"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Decimal
+    local procedure CalcSaleLinePOSItemQty(SalePOS: Record "NPR POS Sale"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Decimal
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(SaleLinePOS);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");

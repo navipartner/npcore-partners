@@ -41,7 +41,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
-        SaleHeader: Record "NPR Sale POS";
+        SaleHeader: Record "NPR POS Sale";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
         CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
@@ -58,7 +58,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitSale', '', true, true)]
-    local procedure CU6150705OnAfterInitSale(SaleHeader: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure CU6150705OnAfterInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
         TextValue: Text;
@@ -78,7 +78,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         TextValue: Text;
@@ -109,14 +109,14 @@ codeunit 6151002 "NPR POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterDeletePOSSaleLine', '', true, true)]
-    local procedure CU6150706OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure CU6150706OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
-        SaleHeader: Record "NPR Sale POS";
+        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -144,7 +144,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnUpdateLine', '', true, true)]
-    local procedure CU6150706OnUpdateLine(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure CU6150706OnUpdateLine(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         TextValue: Text;
@@ -170,7 +170,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantity', '', true, true)]
-    local procedure CU6150706OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure CU6150706OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         TextValue: Text;
@@ -196,14 +196,14 @@ codeunit 6151002 "NPR POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Line", 'OnAfterDeleteLine', '', true, true)]
-    local procedure CU6150707OnAfterDeleteLine(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure CU6150707OnAfterDeleteLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
-        SaleHeader: Record "NPR Sale POS";
+        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -231,7 +231,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Line", 'OnAfterInsertPaymentLine', '', true, true)]
-    local procedure CU6150707OnAfterInsertPaymentLine(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure CU6150707OnAfterInsertPaymentLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         TextValue: Text;
@@ -241,7 +241,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
-        SaleHeader: Record "NPR Sale POS";
+        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -271,8 +271,8 @@ codeunit 6151002 "NPR POS Proxy - Display"
         POSUnit: Record "NPR POS Unit";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SaleHeader: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -302,13 +302,13 @@ codeunit 6151002 "NPR POS Proxy - Display"
     local procedure CU6150725OnBeforeActionWorkflow(POSPaymentMethod: Record "NPR POS Payment Method"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSUnit: Record "NPR POS Unit";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         CurrencyAmount: Decimal;
         Line1: Text;
         Line2: Text;
-        SaleHeader: Record "NPR Sale POS";
+        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -338,7 +338,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         end;
     end;
 
-    local procedure UpdateDisplayFromSaleLinePOS(var Rec: Record "NPR Sale Line POS")
+    local procedure UpdateDisplayFromSaleLinePOS(var Rec: Record "NPR POS Sale Line")
     var
         Sign: Integer;
         Total: Text[30];
@@ -377,7 +377,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         UpdateDisplay(Line1, Line2);
     end;
 
-    local procedure UpdateDisplayFromSalePOS(SalePOS: Record "NPR Sale POS"; POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; TextValue2: Text[30]): Boolean
+    local procedure UpdateDisplayFromSalePOS(SalePOS: Record "NPR POS Sale"; POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; TextValue2: Text[30]): Boolean
     var
         Line1: Text;
         Line2: Text;
@@ -448,11 +448,11 @@ codeunit 6151002 "NPR POS Proxy - Display"
         PrintToDisplay.Run();
     end;
 
-    procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var SalePOS: Record "NPR Sale POS"; var POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; NewQuantity: Decimal): Boolean
+    procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var SalePOS: Record "NPR POS Sale"; var POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; NewQuantity: Decimal): Boolean
     var
         Line1: Text;
         Line2: Text;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if not HideReceiptIsActivated then begin
             Clear(Line1);
@@ -500,13 +500,13 @@ codeunit 6151002 "NPR POS Proxy - Display"
         end;
     end;
 
-    local procedure Update2ndDisplayFromSaleLinePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var Rec: Record "NPR Sale Line POS"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; NewQuantity: Decimal)
+    local procedure Update2ndDisplayFromSaleLinePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var Rec: Record "NPR POS Sale Line"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; NewQuantity: Decimal)
     var
         Sign: Integer;
         Total: Text[30];
         Line1: Text;
         Line2: Text;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ShowLine: Boolean;
         ReceiptText: Text;
         GrandTotal: Decimal;
@@ -694,9 +694,9 @@ codeunit 6151002 "NPR POS Proxy - Display"
         end;
     end;
 
-    local procedure CalculateTotals(var Rec: Record "NPR Sale Line POS"; var GrandTotal: Decimal; var Payment: Decimal; var Change: Decimal)
+    local procedure CalculateTotals(var Rec: Record "NPR POS Sale Line"; var GrandTotal: Decimal; var Payment: Decimal; var Change: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Reset;
         SaleLinePOS.SetRange("Register No.", Rec."Register No.");

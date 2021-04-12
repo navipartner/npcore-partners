@@ -105,7 +105,7 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         JSON: Codeunit "NPR POS JSON Management";
     begin
@@ -152,7 +152,7 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionShowVoucherCard(JSON: Codeunit "NPR POS JSON Management"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnActionShowVoucherCard(JSON: Codeunit "NPR POS JSON Management"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         VoucherNo: Text;

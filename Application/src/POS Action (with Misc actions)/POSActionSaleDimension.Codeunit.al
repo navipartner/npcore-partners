@@ -98,7 +98,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
     var
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         DimensionCode: Code[20];
         DimensionValue: Code[20];
         StrMessage: Text;
@@ -194,7 +194,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
 
     local procedure SetDimensionValue(JSON: Codeunit "NPR POS JSON Management"; var POSSale: Codeunit "NPR POS Sale"; DimSource: Option; WithCreate: Boolean; DimensionValue: Code[20]) StrMessage: Text
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         DimensionCode: Code[20];
         OldValue: Code[20];
     begin

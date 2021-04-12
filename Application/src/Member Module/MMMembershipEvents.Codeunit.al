@@ -7,7 +7,7 @@ codeunit 6014485 "NPR MM Membership Events"
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforePOSMemberArrival(SaleLinePOS: Record "NPR Sale Line POS"; CommunityCode: Code[20]; MembershipCode: Code[20]; MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; ScannedCardNumber: Text[100])
+    internal procedure OnBeforePOSMemberArrival(SaleLinePOS: Record "NPR POS Sale Line"; CommunityCode: Code[20]; MembershipCode: Code[20]; MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; ScannedCardNumber: Text[100])
     begin
     end;
 

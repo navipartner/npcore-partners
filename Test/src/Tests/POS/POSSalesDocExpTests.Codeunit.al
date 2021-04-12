@@ -18,9 +18,9 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
@@ -77,9 +77,9 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";

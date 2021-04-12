@@ -38,7 +38,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         PageAction: Action;
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSPostEntries: Codeunit "NPR POS Post Entries";
         POSEntryToPost: Record "NPR POS Entry";
         EntryNo: Integer;
@@ -92,7 +92,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         PageAction: Action;
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSPostEntries: Codeunit "NPR POS Post Entries";
         POSEntryToPost: Record "NPR POS Entry";
         EntryNo: Integer;
@@ -476,7 +476,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         POSEntry: Record "NPR POS Entry";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSAuditLog: Record "NPR POS Audit Log";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSEntryToPost: Record "NPR POS Entry";
@@ -833,8 +833,8 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     local procedure CalculateWorkshiftSummary(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntry: Record "NPR POS Entry";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
@@ -991,7 +991,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         until (POSWorkshiftCheckpoint.Next() = 0);
     end;
 
-    local procedure SetTurnoverAndProfit(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Sales Line"; POSEntry: Record "NPR POS Entry")
+    local procedure SetTurnoverAndProfit(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
     var
         DocDeleted: Boolean;
     begin
@@ -1121,7 +1121,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         end;
     end;
 
-    local procedure SetDiscounts(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Sales Line")
+    local procedure SetDiscounts(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
 
         POSWorkshiftCheckpoint."Total Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
@@ -1145,7 +1145,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         end;
     end;
 
-    local procedure SetPayments(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSPaymentLine: Record "NPR POS Payment Line"; LCYCode: Code[10])
+    local procedure SetPayments(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSPaymentLine: Record "NPR POS Entry Payment Line"; LCYCode: Code[10])
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         IsLCY: Boolean;
@@ -1379,7 +1379,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
     local procedure AggregateVat_PE(WorkshiftCheckpointEntryNo: Integer; PosUnitNo: Code[10]; var FromPosEntryNo: Integer)
     var
         TmpPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
         POSEntry: Record "NPR POS Entry";
         TempEntryNo: Integer;

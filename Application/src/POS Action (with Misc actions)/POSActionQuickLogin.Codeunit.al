@@ -66,7 +66,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
     local procedure OnActionLookupSalespersonCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
@@ -85,7 +85,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
 
     local procedure ApplySalespersonCode(SalespersonCode: Code[20]; var POSSession: Codeunit "NPR POS Session")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);

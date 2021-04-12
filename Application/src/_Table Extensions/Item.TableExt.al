@@ -456,7 +456,7 @@ tableextension 6014427 "NPR Item" extends Item
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         PeriodDiscountLine: Record "NPR Period Discount Line";
-        SalesLinePOS: Record "NPR Sale Line POS";
+        SalesLinePOS: Record "NPR POS Sale Line";
         POSEntry: Record "NPR POS Entry";
         MixDiscLineNotEmptyErr: Label 'You can''t delete %1 %2 as it''s contained in one or more mixed discount lines.';
         PerDiscLineNotEmptyErr: Label 'You can''t delete %1 %2 as it''s contained in one or more period discount lines.';

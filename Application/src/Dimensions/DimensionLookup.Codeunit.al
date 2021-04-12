@@ -1,6 +1,6 @@
 codeunit 6014606 "NPR Dimension Lookup"
 {
-    TableNo = "NPR Sale POS";
+    TableNo = "NPR POS Sale";
 
     trigger OnRun()
     begin
@@ -11,7 +11,7 @@ codeunit 6014606 "NPR Dimension Lookup"
         Text001: Label 'There are no dimension values defined for %1 %2.';
         Text002: Label '%1 %2 does not exist. Please define it first.';
 
-    local procedure LookupDimension(var Sale: Record "NPR Sale POS")
+    local procedure LookupDimension(var Sale: Record "NPR POS Sale")
     var
         Dim: Record Dimension;
         DimVal: Record "Dimension Value";

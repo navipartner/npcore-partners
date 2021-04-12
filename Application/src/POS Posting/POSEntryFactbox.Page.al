@@ -118,7 +118,7 @@ page 6150671 "NPR POS Entry Factbox"
 
     local procedure TaxDetail()
     var
-        TaxAmountLine: Record "NPR POS Tax Amount Line";
+        TaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         TaxAmountLine.Reset;
         TaxAmountLine.SetRange("POS Entry No.", "Entry No.");
@@ -127,7 +127,7 @@ page 6150671 "NPR POS Entry Factbox"
 
     local procedure SaleDetail(Type: Integer)
     var
-        SalesLine: Record "NPR POS Sales Line";
+        SalesLine: Record "NPR POS Entry Sales Line";
     begin
         SalesLine.Reset;
         SalesLine.SetRange("POS Entry No.", "Entry No.");
@@ -140,7 +140,7 @@ page 6150671 "NPR POS Entry Factbox"
 
     local procedure UpdateDiscountAmt()
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSSalesLine.Reset;
         POSSalesLine.SetRange("POS Entry No.", "Entry No.");

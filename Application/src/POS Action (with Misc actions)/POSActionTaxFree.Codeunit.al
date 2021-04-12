@@ -80,7 +80,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
     local procedure ToggleTaxFree(POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -148,7 +148,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
     var
         DataType: Enum "NPR Data Type";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
 
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
@@ -169,7 +169,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAttemptEndSale', '', false, false)]
-    local procedure OnAttemptEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR Sale POS")
+    local procedure OnAttemptEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";

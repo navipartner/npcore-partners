@@ -46,7 +46,7 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         JSON: Codeunit "NPR POS JSON Management";
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
         POSSetup: Codeunit "NPR POS Setup";
@@ -89,10 +89,10 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
     begin
     end;
 
-    local procedure RunModalPage(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line"; SingleLine: Boolean)
+    local procedure RunModalPage(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"; SingleLine: Boolean)
     var
         POSEntries: Page "NPR POS Entries";
-        POSSalesLineList: Page "NPR POS Sales Line List";
+        POSSalesLineList: Page "NPR POS Entry Sales Line List";
     begin
         POSEntries.LookupMode(true);
         POSEntries.Caption(ChooseDocumentCaption);

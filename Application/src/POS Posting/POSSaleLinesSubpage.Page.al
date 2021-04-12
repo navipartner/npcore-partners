@@ -5,7 +5,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
     PageType = ListPart;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR Sale Line POS";
+    SourceTable = "NPR POS Sale Line";
 
     layout
     {
@@ -79,7 +79,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
 
                 trigger OnAction()
                 var
-                    SalePOS: Record "NPR Sale POS";
+                    SalePOS: Record "NPR POS Sale";
                 begin
                     SalePOS.Get("Register No.", "Sales Ticket No.");
                     PAGE.Run(PAGE::"NPR Unfinished POS Sale Trx", SalePOS);

@@ -50,7 +50,7 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
     var
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
         POSPaymentMethod: Record "NPR POS Payment Method";
         IntegrationWorkflow: Text;

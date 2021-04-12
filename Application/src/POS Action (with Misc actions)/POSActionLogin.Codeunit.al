@@ -186,7 +186,7 @@ codeunit 6150721 "NPR POS Action - Login"
 
     local procedure StartPOS(POSSession: Codeunit "NPR POS Session"): Integer
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSAction: Record "NPR POS Action";
         POSViewProfile: Record "NPR POS View Profile";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";

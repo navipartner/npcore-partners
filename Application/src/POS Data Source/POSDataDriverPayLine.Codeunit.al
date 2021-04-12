@@ -11,7 +11,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        SaleLine: Record "NPR Sale Line POS";
+        SaleLine: Record "NPR POS Sale Line";
         DataMgt: Codeunit "NPR POS Data Management";
     begin
         //-NPR5.36 [287688]
@@ -22,7 +22,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
 
         DataSource.Constructor();
         DataSource.SetId(Name);
-        DataSource.SetTableNo(DATABASE::"NPR Sale Line POS");
+        DataSource.SetTableNo(DATABASE::"NPR POS Sale Line");
 
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Currency Amount"), true);

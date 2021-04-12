@@ -8,7 +8,7 @@ codeunit 6184508 "NPR EFT Try Add Shopper"
     var
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetSale(POSSale);

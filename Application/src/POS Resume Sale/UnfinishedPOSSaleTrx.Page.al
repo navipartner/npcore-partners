@@ -7,7 +7,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
     UsageCategory = Administration;
     ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,Filter';
-    SourceTable = "NPR Sale POS";
+    SourceTable = "NPR POS Sale";
 
     layout
     {
@@ -183,7 +183,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
 
                     trigger OnAction()
                     var
-                        SalePOS: Record "NPR Sale POS";
+                        SalePOS: Record "NPR POS Sale";
                     begin
                         SalePOS.Copy(Rec);
                         Rec.Reset;

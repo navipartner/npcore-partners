@@ -6,7 +6,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
     // NPR5.53/MMV /20191219 CASE 377510 Support for importing document silently to sync with document changes.
     // NPR5.53/MMV /20191220 CASE 375290 Calculate amount to be invoiced correctly. Support split posting in SalesDocumentAmountToPOS()
 
-    TableNo = "NPR Sale POS";
+    TableNo = "NPR POS Sale";
 
     trigger OnRun()
     var
@@ -89,10 +89,10 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         DOCUMENT_FULL_AMOUNT: Label 'Remaining Amount for %1 %2';
         DOCUMENT_SPLIT_AMOUNT: Label 'Amount for %1 %2';
 
-    procedure SalesDocumentToPOSLegacy(var SalePOS: Record "NPR Sale POS"; DocumentTypeIn: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order")
+    procedure SalesDocumentToPOSLegacy(var SalePOS: Record "NPR POS Sale"; DocumentTypeIn: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order")
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesLine: Record "Sales Line";
         SalesHeader: Record "Sales Header";
         SalesList: Page "Sales List";
@@ -235,10 +235,10 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         //+NPR5.32 [268218]
     end;
 
-    procedure SalesDocumentAmountToPOSLegacy(var SalePOS: Record "NPR Sale POS"; DocumentTypeIn: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order")
+    procedure SalesDocumentAmountToPOSLegacy(var SalePOS: Record "NPR POS Sale"; DocumentTypeIn: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order")
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesLine: Record "Sales Line";
         SalesHeader: Record "Sales Header";
         SalesList: Page "Sales List";
@@ -247,7 +247,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         txtDeposit: Label 'Deposit';
         ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
         PrepaymentAmount: Decimal;
-        ReceivedFromSaleLinePOS: Record "NPR Sale Line POS";
+        ReceivedFromSaleLinePOS: Record "NPR POS Sale Line";
     begin
         //-NPR4.14
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
@@ -396,13 +396,13 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 
     procedure SalesDocumentToPOSCustom(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; DeleteDocument: Boolean; ShowSuccessMessage: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesLine: Record "Sales Line";
         txtDeposit: Label 'Deposit';
         ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         //-NPR5.53 [377510]
         POSSession.GetSale(POSSale);
@@ -497,8 +497,8 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         SalesLine: Record "Sales Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
         POSSession.GetSale(POSSale);
@@ -603,9 +603,9 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         //+NPR5.48 [300557]
     end;
 
-    procedure DocumentIsAttachedToPOSSale(SalePOS: Record "NPR Sale POS"): Boolean
+    procedure DocumentIsAttachedToPOSSale(SalePOS: Record "NPR POS Sale"): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         //-NPR5.48 [300557]
         if SalePOS."Sales Document No." <> '' then
@@ -685,7 +685,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         //+NPR5.53 [375290]
     end;
 
-    local procedure SynchronizePOSSaleWithDocument(SalePOS: Record "NPR Sale POS")
+    local procedure SynchronizePOSSaleWithDocument(SalePOS: Record "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
         POSSession: Codeunit "NPR POS Session";

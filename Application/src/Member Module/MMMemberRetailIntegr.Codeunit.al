@@ -508,7 +508,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         exit(0);
     end;
 
-    procedure NewMemberSalesInfoCapture(SaleLinePOS: Record "NPR Sale Line POS") ReturnCode: Integer
+    procedure NewMemberSalesInfoCapture(SaleLinePOS: Record "NPR POS Sale Line") ReturnCode: Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Item: Record Item;
@@ -660,7 +660,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         exit(-1102);
     end;
 
-    procedure DisplayMemberInfoCaptureDialog(SaleLinePOS: Record "NPR Sale Line POS") LookupOK: Boolean
+    procedure DisplayMemberInfoCaptureDialog(SaleLinePOS: Record "NPR POS Sale Line") LookupOK: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
@@ -688,7 +688,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     end;
 
     [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, true)]
-    local procedure IssueMembersFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure IssueMembersFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
@@ -887,7 +887,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure PrintMembershipsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure PrintMembershipsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
     begin
@@ -942,7 +942,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
-    local procedure OnAfterDebitSalePostSubscriber(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean)
+    local procedure OnAfterDebitSalePostSubscriber(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     begin
 
         if (SalePOS."Sales Ticket No." = '') then

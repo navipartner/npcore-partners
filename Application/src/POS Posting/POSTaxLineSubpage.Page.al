@@ -5,7 +5,7 @@ page 6150722 "NPR POS Tax Line Subpage"
     PageType = ListPart;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR POS Tax Amount Line";
+    SourceTable = "NPR POS Entry Tax Line";
 
     layout
     {

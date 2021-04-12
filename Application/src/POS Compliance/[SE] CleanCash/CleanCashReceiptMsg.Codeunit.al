@@ -25,7 +25,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
 
     local procedure GetReceiptVat(PosEntry: Record "NPR POS Entry"; Positive: Boolean; var TotalAmount: Decimal; var TmpVat: Record "NPR CleanCash Trans. VAT" temporary)
     var
-        PosSalesLine: Record "NPR POS Sales Line";
+        PosSalesLine: Record "NPR POS Entry Sales Line";
         VatClassId: Integer;
     begin
         PosSalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");

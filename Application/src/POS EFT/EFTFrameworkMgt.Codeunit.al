@@ -303,7 +303,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
             Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::LOOK_UP));
@@ -330,7 +330,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
             Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::VOID));
@@ -357,7 +357,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
             Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::REFUND));
@@ -437,7 +437,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
 
     local procedure InitGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Text; SalesReceiptNo: Text)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         EFTSetup.TestField("EFT Integration Type");
         EFTSetup.TestField("Payment Type POS");
@@ -508,7 +508,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     procedure IsFromMostRecentSaleOnPOSUnit(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         POSEntry: Record "NPR POS Entry";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         with EFTTransactionRequest do begin
             if "Sales Ticket No." = '' then

@@ -452,7 +452,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
 
     local procedure NewTransactionPartialPay(TransactionAmount: Decimal; PaymentAmount: Decimal; ExpectedSuggestion: Decimal)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -494,9 +494,9 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
 
     local procedure NewTransactionFinish(TransactionAmount: Decimal; PaymentAmount: Decimal; ReturnAmount: Decimal; RoundingAmount: Decimal)
     var
-        SalePOS: Record "NPR Sale POS";
-        POSPaymentLine: Record "NPR POS Payment Line";
-        POSSalesLine: Record "NPR POS Sales Line";
+        SalePOS: Record "NPR POS Sale";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -543,7 +543,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
 
     local procedure NewTransactionPartialPayForeign(TransactionAmount: Decimal; PaymentAmount: Decimal; ExpectedSubtotal: Decimal)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -592,9 +592,9 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
 
     local procedure NewTransactionFinishForeign(TransactionAmount: Decimal; PaymentAmount: Decimal; ReturnAmount: Decimal; RoundingAmount: Decimal)
     var
-        SalePOS: Record "NPR Sale POS";
-        POSPaymentLine: Record "NPR POS Payment Line";
-        POSSalesLine: Record "NPR POS Sales Line";
+        SalePOS: Record "NPR POS Sale";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";

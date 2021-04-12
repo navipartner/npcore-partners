@@ -84,7 +84,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
         POSSession.GetSale(POSSale);
@@ -112,7 +112,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -135,7 +135,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     var
         JSON: Codeunit "NPR POS JSON Management";
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         DocumentType: Option Quote,"Order",Invoice,CreditMemo,BlanketOrder,ReturnOrder;
         OrderType: Option NotSet,"Order",Lending;

@@ -8,7 +8,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -80,7 +80,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -153,7 +153,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -224,7 +224,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -293,7 +293,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -362,7 +362,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -436,7 +436,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -517,7 +517,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -665,7 +665,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -741,7 +741,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -818,7 +818,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -893,7 +893,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -966,7 +966,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -1039,7 +1039,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -1116,7 +1116,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -1195,7 +1195,7 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         Item: Record Item;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
@@ -1382,7 +1382,7 @@ NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
 
     procedure AssertPaymentLine(LineRetailID: Guid; Amount: Decimal; ShouldExist: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Retail ID", LineRetailID);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);

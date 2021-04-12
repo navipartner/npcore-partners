@@ -1,4 +1,4 @@
-xmlport 6151145 "NPR M2 POS Quote Price Req."
+xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
 {
     Caption = 'POS Price Quote';
     Encoding = UTF8;
@@ -12,7 +12,7 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
             textelement(Request)
             {
                 MaxOccurs = Once;
-                tableelement(tmpsaleposrequest; "NPR Sale POS")
+                tableelement(tmpsaleposrequest; "NPR POS Sale")
                 {
                     MaxOccurs = Once;
                     XmlName = 'Customer';
@@ -24,7 +24,7 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
                     {
                         Occurrence = Optional;
                     }
-                    tableelement(tmpsalelineposrequest; "NPR Sale Line POS")
+                    tableelement(tmpsalelineposrequest; "NPR POS Sale Line")
                     {
                         XmlName = 'Line';
                         UseTemporary = true;
@@ -80,7 +80,7 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
                     {
                     }
                 }
-                tableelement(tmpsalesheaderresponse; "NPR Sale POS")
+                tableelement(tmpsalesheaderresponse; "NPR POS Sale")
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
@@ -96,7 +96,7 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
                     fieldattribute(OrderDate; TmpSalesHeaderResponse.Date)
                     {
                     }
-                    tableelement(tmpsaleslineresponse; "NPR Sale Line POS")
+                    tableelement(tmpsaleslineresponse; "NPR POS Sale Line")
                     {
                         MaxOccurs = Unbounded;
                         MinOccurs = Zero;
@@ -163,7 +163,7 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
         TicketNumber: Code[20];
         StartTime: Time;
 
-    procedure GetRequest(var TmpSalesHeader: Record "NPR Sale POS" temporary; var TmpSalesLine: Record "NPR Sale Line POS" temporary)
+    procedure GetRequest(var TmpSalesHeader: Record "NPR POS Sale" temporary; var TmpSalesLine: Record "NPR POS Sale Line" temporary)
     begin
 
         TmpSalePOSRequest.FindFirst();
@@ -183,7 +183,7 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
         StartTime := Time;
     end;
 
-    procedure SetResponse(var TmpSalePOS: Record "NPR Sale POS" temporary; var TmpSaleLinePOS: Record "NPR Sale Line POS" temporary)
+    procedure SetResponse(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
     begin
 
         ExecutionTime := StrSubstNo('%1 (ms)', Format((Time - StartTime), 0, 9));

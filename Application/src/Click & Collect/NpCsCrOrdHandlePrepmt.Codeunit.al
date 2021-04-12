@@ -6,13 +6,13 @@ codeunit 6151213 "NPR NpCs Cr.Ord: Handle Prepmt"
     end;
 
     var
-        PreviousSalePOS: Record "NPR Sale POS";
+        PreviousSalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         PrepaymentPct: Decimal;
         PrintPrepaymentInvoice: Boolean;
 
-    procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session"; RetailSalesDocMgtIn: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPctIn: Decimal; PrintPrepaymentInvoiceIn: Boolean; PreviousSalePOSIn: Record "NPR Sale POS")
+    procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session"; RetailSalesDocMgtIn: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPctIn: Decimal; PrintPrepaymentInvoiceIn: Boolean; PreviousSalePOSIn: Record "NPR POS Sale")
     begin
         POSSession := POSSessionIn;
         RetailSalesDocMgt := RetailSalesDocMgtIn;
@@ -24,7 +24,7 @@ codeunit 6151213 "NPR NpCs Cr.Ord: Handle Prepmt"
     local procedure HandlePrepayment()
     var
         SalesHeader: Record "Sales Header";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);

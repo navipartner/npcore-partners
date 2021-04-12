@@ -9,8 +9,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         tabledata "NPR Data Log Record" = rd,
         tabledata "NPR Data Log Field" = rd,
         tabledata "NPR Tax Free Voucher" = rd,
-        tabledata "NPR POS Quote Entry" = rd,
-        tabledata "NPR POS Quote Line" = rd,
+        tabledata "NPR POS Saved Sale Entry" = rd,
+        tabledata "NPR POS Saved Sale Line" = rd,
         tabledata "NPR NpCs Arch. Document" = rd,
         tabledata "NPR Nc Task" = rd,
         tabledata "NPR Exchange Label" = rd,
@@ -19,10 +19,10 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         tabledata "NPR Nc Import Entry" = rd,
         tabledata "NPR POS Period Register" = rd,
         tabledata "NPR POS Entry" = rd,
-        tabledata "NPR POS Sales Line" = rd,
-        tabledata "NPR POS Payment Line" = rd,
+        tabledata "NPR POS Entry Sales Line" = rd,
+        tabledata "NPR POS Entry Payment Line" = rd,
         tabledata "NPR POS Balancing Line" = rd,
-        tabledata "NPR POS Tax Amount Line" = rd,
+        tabledata "NPR POS Entry Tax Line" = rd,
         tabledata "NPR POS Posting Log" = rd,
         tabledata "NPR EFT Transaction Request" = rd,
         tabledata "NPR Aux. Value Entry" = rd,
@@ -55,8 +55,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
 
         AddAllowedTable(Database::"NPR POS Posting Log", RtnPeriodEnum::"6 Months");
 
-        AddAllowedTable(Database::"NPR POS Quote Entry", RtnPeriodEnum::"1 Year");
-        AddAllowedTable(Database::"NPR POS Quote Line", RtnPeriodEnum::"1 Year");
+        AddAllowedTable(Database::"NPR POS Saved Sale Entry", RtnPeriodEnum::"1 Year");
+        AddAllowedTable(Database::"NPR POS Saved Sale Line", RtnPeriodEnum::"1 Year");
         AddAllowedTable(Database::"NPR NpCs Arch. Document", RtnPeriodEnum::"1 Year");
 
         AddAllowedTable(Database::"NPR Exchange Label", RtnPeriodEnum::"5 Years");
@@ -65,10 +65,10 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         AddAllowedTable(Database::"NPR Tax Free Voucher", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Entry", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR Audit Roll", RtnPeriodEnum::"5 Years");
-        AddAllowedTable(Database::"NPR POS Tax Amount Line", RtnPeriodEnum::"5 Years");
+        AddAllowedTable(Database::"NPR POS Entry Tax Line", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Period Register", RtnPeriodEnum::"5 Years");
-        AddAllowedTable(Database::"NPR POS Sales Line", RtnPeriodEnum::"5 Years");
-        AddAllowedTable(Database::"NPR POS Payment Line", RtnPeriodEnum::"5 Years");
+        AddAllowedTable(Database::"NPR POS Entry Sales Line", RtnPeriodEnum::"5 Years");
+        AddAllowedTable(Database::"NPR POS Entry Payment Line", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Balancing Line", RtnPeriodEnum::"5 Years");
 
         // do not forget to add table to DeleteRecordsWithIndirectPermissionsOnApplyRetentionPolicyIndirectPermissionRequired below
@@ -170,8 +170,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
             Database::"NPR Data Log Record",
             Database::"NPR Data Log Field",
             Database::"NPR Tax Free Voucher",
-            Database::"NPR POS Quote Entry",
-            Database::"NPR POS Quote Line",
+            Database::"NPR POS Saved Sale Entry",
+            Database::"NPR POS Saved Sale Line",
             Database::"NPR NpCs Arch. Document",
             Database::"NPR Nc Task",
             Database::"NPR Exchange Label",
@@ -180,10 +180,10 @@ codeunit 6014496 "NPR Reten. Pol. Install"
             Database::"NPR Nc Import Entry",
             Database::"NPR POS Period Register",
             Database::"NPR POS Entry",
-            Database::"NPR POS Sales Line",
-            Database::"NPR POS Payment Line",
+            Database::"NPR POS Entry Sales Line",
+            Database::"NPR POS Entry Payment Line",
             Database::"NPR POS Balancing Line",
-            Database::"NPR POS Tax Amount Line",
+            Database::"NPR POS Entry Tax Line",
             Database::"NPR POS Posting Log",
             Database::"NPR EFT Transaction Request",
             Database::"NPR Aux. Value Entry",

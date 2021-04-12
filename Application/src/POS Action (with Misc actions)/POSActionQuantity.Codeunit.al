@@ -109,7 +109,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -120,7 +120,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         ReturnReasonCode: Code[20];
         NegativeInput: Boolean;
         QtyCheck: Boolean;
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -217,7 +217,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if not EanBoxEvent.Get(EventCodeQtyStar()) then begin
             EanBoxEvent.Init;

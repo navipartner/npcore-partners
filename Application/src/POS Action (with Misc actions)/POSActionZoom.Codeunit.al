@@ -36,7 +36,7 @@ codeunit 6150803 "NPR POSAction: Zoom"
     local procedure ZoomLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
         CurrentView: Codeunit "NPR POS View";
     begin

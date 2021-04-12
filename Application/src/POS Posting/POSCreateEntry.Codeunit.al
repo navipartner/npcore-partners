@@ -1,6 +1,6 @@
 codeunit 6150614 "NPR POS Create Entry"
 {
-    TableNo = "NPR Sale POS";
+    TableNo = "NPR POS Sale";
 
     trigger OnRun()
     var
@@ -53,11 +53,11 @@ codeunit 6150614 "NPR POS Create Entry"
         TXT_CANCEL_SALE_END: Label 'POS Sale Cancelled';
         CANCEL_SALE: Label 'Sale was cancelled';
 
-    local procedure CreateLines(var POSEntry: Record "NPR POS Entry"; var SalePOS: Record "NPR Sale POS")
+    local procedure CreateLines(var POSEntry: Record "NPR POS Entry"; var SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -86,7 +86,7 @@ codeunit 6150614 "NPR POS Create Entry"
         end;
     end;
 
-    procedure CreatePOSEntryForCreatedSalesDocument(var SalePOS: Record "NPR Sale POS"; var SalesHeader: Record "Sales Header"; Posted: Boolean)
+    procedure CreatePOSEntryForCreatedSalesDocument(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -124,11 +124,11 @@ codeunit 6150614 "NPR POS Create Entry"
         OnAfterInsertPOSEntry(SalePOS, POSEntry);
     end;
 
-    local procedure InsertPOSEntry(var POSPeriodRegister: Record "NPR POS Period Register"; var SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry"; EntryType: Option)
+    local procedure InsertPOSEntry(var POSPeriodRegister: Record "NPR POS Period Register"; var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry"; EntryType: Option)
     var
         Contact: Record Contact;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSEntry.Init;
         POSEntry."Entry No." := 0; //Autoincrement;
@@ -194,9 +194,9 @@ codeunit 6150614 "NPR POS Create Entry"
         POSEntry.Insert;
     end;
 
-    local procedure InsertPOSSaleLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure InsertPOSSaleLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
-        POSSalesLine2: Record "NPR POS Sales Line";
+        POSSalesLine2: Record "NPR POS Entry Sales Line";
         PricesIncludeTax: Boolean;
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
@@ -367,7 +367,7 @@ codeunit 6150614 "NPR POS Create Entry"
         OnAfterInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
     end;
 
-    local procedure InsertPOSPaymentLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Payment Line")
+    local procedure InsertPOSPaymentLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Entry Payment Line")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -808,7 +808,7 @@ codeunit 6150614 "NPR POS Create Entry"
         exit(POSEntry."Entry No.");
     end;
 
-    local procedure CreatePaymentLineBinEntry(POSPaymentLine: Record "NPR POS Payment Line")
+    local procedure CreatePaymentLineBinEntry(POSPaymentLine: Record "NPR POS Entry Payment Line")
     var
         POSBinEntry: Record "NPR POS Bin Entry";
     begin
@@ -881,7 +881,7 @@ codeunit 6150614 "NPR POS Create Entry"
         //                                               1 / CurrExchRate.ExchangeRate (TransactionDate, CurrencyCode))));
     end;
 
-    local procedure GetPOSPeriodRegister(var SalePOS: Record "NPR Sale POS"; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
+    local procedure GetPOSPeriodRegister(var SalePOS: Record "NPR POS Sale"; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
     begin
         exit(GetPOSPeriodRegisterForPOSUnit(SalePOS."Register No.", POSPeriodRegister, CheckOpen));
     end;
@@ -900,7 +900,7 @@ codeunit 6150614 "NPR POS Create Entry"
         exit(true);
     end;
 
-    procedure CreateBalancingEntryAndLines(var SalePOS: Record "NPR Sale POS"; IntermediateEndOfDay: Boolean; WorkshiftEntryNo: Integer) EntryNo: Integer
+    procedure CreateBalancingEntryAndLines(var SalePOS: Record "NPR POS Sale"; IntermediateEndOfDay: Boolean; WorkshiftEntryNo: Integer) EntryNo: Integer
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
@@ -991,7 +991,7 @@ codeunit 6150614 "NPR POS Create Entry"
         exit(POSEntry."Entry No.");
     end;
 
-    local procedure CreateRMAEntry(POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure CreateRMAEntry(POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         PosRmaLine: Record "NPR POS RMA Line";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
@@ -1052,9 +1052,9 @@ codeunit 6150614 "NPR POS Create Entry"
         exit(POSUnit."Default POS Payment Bin");
     end;
 
-    local procedure IsCancelledSale(SalePOS: Record "NPR Sale POS"): Boolean
+    local procedure IsCancelledSale(SalePOS: Record "NPR POS Sale"): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
 
         if SalePOS."Sale type" = SalePOS."Sale type"::Annullment then
@@ -1069,7 +1069,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
     end;
 
-    local procedure IsUniqueDocumentNo(SalePOS: Record "NPR Sale POS"): Boolean
+    local procedure IsUniqueDocumentNo(SalePOS: Record "NPR POS Sale"): Boolean
     var
         POSEntry: Record "NPR POS Entry";
     begin
@@ -1077,7 +1077,7 @@ codeunit 6150614 "NPR POS Create Entry"
         exit(POSEntry.IsEmpty);
     end;
 
-    local procedure ValidateSaleHeader(SalePOS: Record "NPR Sale POS")
+    local procedure ValidateSaleHeader(SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
     begin
@@ -1086,7 +1086,7 @@ codeunit 6150614 "NPR POS Create Entry"
             Error(ERR_DOCUMENT_NO_CLASH, POSEntry.FieldCaption("Document No."), SalePOS."Sales Ticket No.", POSEntry.TableCaption);
     end;
 
-    local procedure FiscalNoCheck(var POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR Sale POS")
+    local procedure FiscalNoCheck(var POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -1199,7 +1199,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
     end;
 
-    procedure ExcludeFromPosting(SaleLinePOS: Record "NPR Sale Line POS"): Boolean
+    procedure ExcludeFromPosting(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     begin
         if SaleLinePOS.Type in [SaleLinePOS.Type::Comment] then
             exit(true);
@@ -1212,37 +1212,37 @@ codeunit 6150614 "NPR POS Create Entry"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreatePOSEntry(var SalePOS: Record "NPR Sale POS")
+    local procedure OnBeforeCreatePOSEntry(var SalePOS: Record "NPR POS Sale")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertPOSEntry(var SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry")
+    local procedure OnBeforeInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry")
+    local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertPOSSalesLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure OnBeforeInsertPOSSalesLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertPOSSalesLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure OnAfterInsertPOSSalesLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertPOSPaymentLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Payment Line")
+    local procedure OnBeforeInsertPOSPaymentLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Entry Payment Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertPOSPaymentLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Payment Line")
+    local procedure OnAfterInsertPOSPaymentLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Entry Payment Line")
     begin
     end;
 
@@ -1252,7 +1252,7 @@ codeunit 6150614 "NPR POS Create Entry"
     end;
 
     [IntegrationEvent(FALSE, FALSE)]
-    local procedure OnAfterInsertRmaEntry(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnAfterInsertRmaEntry(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 

@@ -22,7 +22,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherInPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction - check NpRv Sales Line
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -46,7 +46,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -78,7 +78,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueMultiplePartialVouchersFinishPOSTransaction()
     // [SCENARIO] Issue Multiple Vouchers In POS Transaction pay with cash - check Retail Voucher exist with correct count
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -112,7 +112,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherScanVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -142,7 +142,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherScanVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -173,7 +173,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherScanVoucherIn2TransactionsEnd()
     // [SCENARIO] Issue Voucher - fully use voucher end 2 transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -207,7 +207,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherScanVoucherIn2TransactionsDontEnd()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -241,7 +241,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherScanVoucherIn2TransactionsDontEndPayWithCash()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction with voucher but with cash
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -284,7 +284,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherTryScanArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -314,7 +314,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherPayWithVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -344,7 +344,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherPayWithVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -372,7 +372,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsEnd()
     // [SCENARIO] Issue Voucher - fully use voucher end 2 transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -406,7 +406,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsDontEnd()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -440,7 +440,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsDontEndPayWithCash()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction with voucher but with cash
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -483,7 +483,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherTryPayWithArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -513,7 +513,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherDiscountAmtFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -548,7 +548,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssuePartialVoucherDiscountPctFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -583,7 +583,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherInPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction - check NpRv Sales Line
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -607,7 +607,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -640,7 +640,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherScanVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -670,7 +670,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherScanVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -707,7 +707,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherTryScanArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -736,7 +736,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherPayWithVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -766,7 +766,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherPayWithVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -825,7 +825,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherDiscountAmtFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -860,7 +860,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     procedure IssueDefaultVoucherDiscountPctFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -950,7 +950,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
 
     local procedure CreateVoucherInPOSTransaction(var NpRvVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal; VoucherTypeCode: Code[20])
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";

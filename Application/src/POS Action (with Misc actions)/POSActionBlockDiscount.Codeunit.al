@@ -89,7 +89,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150853, 'OnGetLineStyle', '', false, false)]
-    local procedure OnGetStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR Sale Line POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnGetStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
         if (SaleLinePOS."Custom Disc Blocked") then begin
             Color := 'blue';
@@ -120,7 +120,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     local procedure ToggleBlockState(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
 
         POSSession.GetSaleLine(POSSaleLine);

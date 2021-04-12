@@ -309,8 +309,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     local procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UsePresetUnitPrice: Boolean; PresetUnitPrice: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        Line: Record "NPR Sale Line POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
         SetUnitPrice: Boolean;
         UseSpecificTracking: Boolean;
@@ -407,8 +407,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     procedure AddQuantityToItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyIncrease: Codeunit "NPR SS Action - Qty Increase";
@@ -433,8 +433,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     procedure RemoveQuantityFromItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionDeletePOSLine: Codeunit "NPR SS Action: Delete POS Line";
@@ -463,8 +463,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     procedure SetQuantityToItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyIncrease: Codeunit "NPR SS Action - Qty Increase";
@@ -492,7 +492,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         BOMComponent: Record "BOM Component";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Level: Integer;
     begin
         if not Item."NPR Explode BOM auto" then
@@ -532,8 +532,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     local procedure AddAccessoryForItem(Item: Record Item; GroupAccessory: Boolean; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        MainSaleLinePOS: Record "NPR Sale Line POS";
-        AccessorySaleLinePOS: Record "NPR Sale Line POS";
+        MainSaleLinePOS: Record "NPR POS Sale Line";
+        AccessorySaleLinePOS: Record "NPR POS Sale Line";
         AccessorySparePart: Record "NPR Accessory/Spare Part";
     begin
         AccessorySparePart.SetFilter(Type, '=%1', AccessorySparePart.Type::Accessory);
@@ -621,8 +621,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
         ItemLedgerEntry: Record "Item Ledger Entry";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        "Sale POS": Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        "Sale POS": Record "NPR POS Sale";
         TextActiveSaved: Text;
     begin
         //Global

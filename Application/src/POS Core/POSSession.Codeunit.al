@@ -298,7 +298,7 @@ codeunit 6150700 "NPR POS Session"
         Sale.InitializeNewSale(POSUnit, FrontEnd, Setup, Sale);
     end;
 
-    procedure ResumeTransaction(SalePOS: Record "NPR Sale POS")
+    procedure ResumeTransaction(SalePOS: Record "NPR POS Sale")
     begin
         Clear(Sale);
         Sale.ResumeExistingSale(SalePOS, POSUnit, FrontEnd, Setup, Sale);

@@ -39,8 +39,8 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         xAuditRoll: Record "NPR Audit Roll";
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSUnit: Record "NPR POS Unit";
         POSLedgerRegister: Record "NPR POS Period Register";
@@ -48,7 +48,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         HasOpenPOSLedgerRegister: Boolean;
         i: Integer;
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         /*
         AuditRoll.SetCurrentKey("Clustered Key");
@@ -193,7 +193,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             until AuditRolltoPOSEntryLink.Next = 0;
     end;
 
-    local procedure InsertPOSSaleLine(var AuditRoll: Record "NPR Audit Roll"; var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure InsertPOSSaleLine(var AuditRoll: Record "NPR Audit Roll"; var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
         IUoM: Record "Item Unit of Measure";
@@ -373,7 +373,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         end;
     end;
 
-    local procedure InsertPOSPaymentLine(var AuditRoll: Record "NPR Audit Roll"; var POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Payment Line")
+    local procedure InsertPOSPaymentLine(var AuditRoll: Record "NPR Audit Roll"; var POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Entry Payment Line")
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
     begin
@@ -500,12 +500,12 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
     local procedure InitDatamodel()
     var
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSLedgerRegister: Record "NPR POS Period Register";
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         if (not POSEntry.IsEmpty) or
            (not POSSalesLine.IsEmpty) or
@@ -598,8 +598,8 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         xAuditRoll: Record "NPR Audit Roll";
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSUnit: Record "NPR POS Unit";
         POSLedgerRegister: Record "NPR POS Period Register";
@@ -1005,7 +1005,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
 
     local procedure PersistVATAmountLines(var POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line")
     var
-        PersistentPOSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        PersistentPOSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         if VATAmountLine.FindSet then
             repeat
@@ -1031,7 +1031,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             until VATAmountLine.Next = 0;
     end;
 
-    procedure CalcVATAmountLines(POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line"; POSSalesLine: Record "NPR POS Sales Line")
+    procedure CalcVATAmountLines(POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line"; POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         PrevVatAmountLine: Record "VAT Amount Line";
         Currency: Record Currency;

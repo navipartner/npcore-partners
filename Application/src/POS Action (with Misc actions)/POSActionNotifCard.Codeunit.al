@@ -61,7 +61,7 @@ codeunit 6150831 "NPR POS Action: Notif. Card"
     var
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NotificationDialog: Page "NPR Notification Dialog";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);

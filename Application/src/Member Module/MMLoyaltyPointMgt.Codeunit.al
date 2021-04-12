@@ -148,10 +148,10 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure PointAssignmentOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure PointAssignmentOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
-        PosEntrySalesLine: Record "NPR POS Sales Line";
+        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
 
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
@@ -1868,11 +1868,11 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertRmaEntry', '', true, true)]
-    local procedure OnReturnSale(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnReturnSale(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         RMALine: Record "NPR POS RMA Line";
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
-        OriginalPOSSalesLine: Record "NPR POS Sales Line";
+        OriginalPOSSalesLine: Record "NPR POS Entry Sales Line";
         OriginalPOSEntry: Record "NPR POS Entry";
         TotalPoints: Integer;
         Amount: Decimal;

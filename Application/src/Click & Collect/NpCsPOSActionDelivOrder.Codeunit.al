@@ -218,7 +218,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
 
     local procedure InsertDocumentReference(JSON: Codeunit "NPR POS JSON Management"; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line"; var NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         DeliveryText: Text;
     begin
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -256,7 +256,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
     local procedure DeliverPrepaymentLine(NpCsDocument: Record "NPR NpCs Document"; NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref."; PrepaidText: Text; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         NpCsSaleLinePOSReference2: Record "NPR NpCs Sale Line POS Ref.";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if not NpCsDocument."Store Stock" then
             exit;
@@ -293,7 +293,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
     local procedure DeliverSalesLine(NpCsDocument: Record "NPR NpCs Document"; SalesLine: Record "Sales Line"; NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref."; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         NpCsSaleLinePOSReference2: Record "NPR NpCs Sale Line POS Ref.";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         case SalesLine.Type of
             SalesLine.Type::" ":
@@ -326,7 +326,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         NpCsSaleLinePOSReference2.Insert;
     end;
 
-    local procedure DeliverSalesLineComment(SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DeliverSalesLineComment(SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS.Init;
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
@@ -336,7 +336,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSSaleLine.InsertLine(SaleLinePOS);
     end;
 
-    local procedure DeliverSalesLineGLAccount(NpCsDocument: Record "NPR NpCs Document"; SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DeliverSalesLineGLAccount(NpCsDocument: Record "NPR NpCs Document"; SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
@@ -355,7 +355,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSSaleLine.InsertLine(SaleLinePOS);
     end;
 
-    local procedure DeliverSalesLineItem(NpCsDocument: Record "NPR NpCs Document"; SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DeliverSalesLineItem(NpCsDocument: Record "NPR NpCs Document"; SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
@@ -377,7 +377,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
     local procedure DeliverSalesInvLine(NpCsDocument: Record "NPR NpCs Document"; SalesInvLine: Record "Sales Invoice Line"; NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref."; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         NpCsSaleLinePOSReference2: Record "NPR NpCs Sale Line POS Ref.";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         case SalesInvLine.Type of
             SalesInvLine.Type::" ":
@@ -410,7 +410,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         NpCsSaleLinePOSReference2.Insert;
     end;
 
-    local procedure DeliverSalesInvLineComment(SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DeliverSalesInvLineComment(SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS.Init;
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
@@ -420,7 +420,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSSaleLine.InsertLine(SaleLinePOS);
     end;
 
-    local procedure DeliverSalesInvLineGLAccount(NpCsDocument: Record "NPR NpCs Document"; SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DeliverSalesInvLineGLAccount(NpCsDocument: Record "NPR NpCs Document"; SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
@@ -439,7 +439,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSSaleLine.InsertLine(SaleLinePOS);
     end;
 
-    local procedure DeliverSalesInvLineItem(NpCsDocument: Record "NPR NpCs Document"; SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DeliverSalesInvLineItem(NpCsDocument: Record "NPR NpCs Document"; SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
@@ -596,7 +596,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSStore: Record "NPR POS Store";
         POSMenuButton: Record "NPR POS Menu Button";
         POSParameterValue: Record "NPR POS Parameter Value";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);

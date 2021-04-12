@@ -2,8 +2,8 @@ codeunit 6150635 "NPR POS Entry Navigation"
 {
     local procedure OpenPOSSalesLineListFromItem(Item: Record Item)
     var
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSSalesLineList: Page "NPR POS Sales Line List";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSSalesLineList: Page "NPR POS Entry Sales Line List";
     begin
         Clear(POSSalesLineList);
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);

@@ -73,7 +73,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
     procedure AttachContact(var POSSession: Codeunit "NPR POS Session"; ContactTableView: Text; ContactLookupPage: Integer)
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Contact: Record Contact;
     begin
         POSSession.GetSale(POSSale);
@@ -95,7 +95,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
     local procedure RemoveContact(var POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

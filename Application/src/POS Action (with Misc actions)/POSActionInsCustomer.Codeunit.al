@@ -38,7 +38,7 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         JSON: Codeunit "NPR POS JSON Management";
         CardPageId: Integer;
     begin
@@ -67,7 +67,7 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
         POSSession.RequestRefreshData;
     end;
 
-    local procedure OnActionCreateContact(CardPageId: Integer; var SalePOS: Record "NPR Sale POS")
+    local procedure OnActionCreateContact(CardPageId: Integer; var SalePOS: Record "NPR POS Sale")
     var
         Contact: Record Contact;
         PageMgt: Codeunit "Page Management";
@@ -94,7 +94,7 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
         SalePOS.Validate("Customer No.", Contact."No.");
     end;
 
-    local procedure OnActionCreateCustomer(CardPageId: Integer; var SalePOS: Record "NPR Sale POS")
+    local procedure OnActionCreateCustomer(CardPageId: Integer; var SalePOS: Record "NPR POS Sale")
     var
         Customer: Record Customer;
     begin
@@ -164,7 +164,7 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
     local procedure SelectCustomerRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         Customer: Record Customer;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         PrevRec: Text;
     begin

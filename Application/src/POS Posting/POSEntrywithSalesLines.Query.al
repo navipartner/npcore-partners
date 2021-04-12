@@ -12,7 +12,7 @@ query 6014417 "NPR POS Entry with Sales Lines"
             column(POS_Unit_No; "POS Unit No.")
             {
             }
-            dataitem(POS_Sales_Line; "NPR POS Sales Line")
+            dataitem(POS_Sales_Line; "NPR POS Entry Sales Line")
             {
                 DataItemLink = "POS Entry No." = POS_Entry."Entry No.";
                 SqlJoinType = InnerJoin;

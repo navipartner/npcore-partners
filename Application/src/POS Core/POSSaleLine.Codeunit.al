@@ -5,9 +5,9 @@ codeunit 6150706 "NPR POS Sale Line"
     end;
 
     var
-        Rec: Record "NPR Sale Line POS";
-        xRec: Record "NPR Sale Line POS";
-        Sale: Record "NPR Sale POS";
+        Rec: Record "NPR POS Sale Line";
+        xRec: Record "NPR POS Sale Line";
+        Sale: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -81,7 +81,7 @@ codeunit 6150706 "NPR POS Sale Line"
 
     procedure GetNextLineNo() NextLineNo: Integer
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         IsAutoSplitKeyRecord := false;
         if (InsertLineWithAutoSplitKey or InsertWithAutoSplitKeyForced) and (Rec."Line No." <> 0) then begin
@@ -110,7 +110,7 @@ codeunit 6150706 "NPR POS Sale Line"
         exit(NextLineNo);
     end;
 
-    procedure GetNewSaleLine(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure GetNewSaleLine(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         InitLine();
         SaleLinePOS := Rec;
@@ -137,22 +137,22 @@ codeunit 6150706 "NPR POS Sale Line"
         exit(Rec.Find);
     end;
 
-    procedure GetCurrentSaleLine(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure GetCurrentSaleLine(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         RefreshCurrent();
         SaleLinePOS.Copy(Rec);
     end;
 
-    procedure InsertLine(var Line: Record "NPR Sale Line POS") Return: Boolean
+    procedure InsertLine(var Line: Record "NPR POS Sale Line") Return: Boolean
     begin
         exit(InsertLine(Line, true));
     end;
 
-    procedure InsertLine(var Line: Record "NPR Sale Line POS"; IncludeDiscountFields: Boolean) Return: Boolean
+    procedure InsertLine(var Line: Record "NPR POS Sale Line"; IncludeDiscountFields: Boolean) Return: Boolean
     var
         Contact: Record Contact;
-        Linie: Record "NPR Sale Line POS";
-        "Linie 2": Record "NPR Sale Line POS";
+        Linie: Record "NPR POS Sale Line";
+        "Linie 2": Record "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         LinieInteger: Integer;
         Mikspris: Record "NPR Mixed Discount Line";
@@ -248,9 +248,9 @@ codeunit 6150706 "NPR POS Sale Line"
 
     procedure DeleteLine()
     var
-        xRec: Record "NPR Sale Line POS";
+        xRec: Record "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-        RecalcSaleLinePOS: Record "NPR Sale Line POS";
+        RecalcSaleLinePOS: Record "NPR POS Sale Line";
     begin
         if (not RefreshCurrent()) then
             exit;
@@ -274,7 +274,7 @@ codeunit 6150706 "NPR POS Sale Line"
 
     procedure DeleteAll()
     var
-        xRec: Record "NPR Sale Line POS";
+        xRec: Record "NPR POS Sale Line";
     begin
         if Rec.FindSet(true) then
             repeat
@@ -340,7 +340,7 @@ codeunit 6150706 "NPR POS Sale Line"
 
     procedure CalculateBalance(var AmountExclVAT: Decimal; var VATAmount: Decimal; var TotalAmount: Decimal)
     var
-        SaleLine: Record "NPR Sale Line POS";
+        SaleLine: Record "NPR POS Sale Line";
         OutPaymentAmount: Decimal;
     begin
         AmountExclVAT := 0;
@@ -388,12 +388,12 @@ codeunit 6150706 "NPR POS Sale Line"
         CurrDataSet.Totals.Add('ItemCount', ItemCountWhenCalculatedBalance);
     end;
 
-    procedure GetDepositLine(var LinePOS: Record "NPR Sale Line POS")
+    procedure GetDepositLine(var LinePOS: Record "NPR POS Sale Line")
     begin
         SetDepositLineType(LinePOS);
     end;
 
-    local procedure SetDepositLineType(var LinePOS: Record "NPR Sale Line POS")
+    local procedure SetDepositLineType(var LinePOS: Record "NPR POS Sale Line")
     begin
         with LinePOS do begin
             "Register No." := Sale."Register No.";
@@ -404,7 +404,7 @@ codeunit 6150706 "NPR POS Sale Line"
         end;
     end;
 
-    procedure InsertDepositLine(var Line: Record "NPR Sale Line POS"; ForeignCurrencyAmount: Decimal) Return: Boolean
+    procedure InsertDepositLine(var Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
         with Rec do begin
             InitLine();
@@ -430,7 +430,7 @@ codeunit 6150706 "NPR POS Sale Line"
 
     procedure ResendAllOnAfterInsertPOSSaleLine()
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
     begin
         SaleLinePOS.CopyFilters(Rec);
@@ -486,7 +486,7 @@ codeunit 6150706 "NPR POS Sale Line"
         IsRequired := not ItemVariant.IsEmpty;
     end;
 
-    procedure InsertLineRaw(var Line: Record "NPR Sale Line POS"; HandleReturnValue: Boolean): Boolean
+    procedure InsertLineRaw(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean): Boolean
     begin
         Line.TestField("Register No.", Sale."Register No.");
         Line.TestField("Sales Ticket No.", Sale."Sales Ticket No.");
@@ -495,7 +495,7 @@ codeunit 6150706 "NPR POS Sale Line"
         exit(InsertLineInternal(Line, HandleReturnValue));
     end;
 
-    local procedure InsertLineInternal(var Line: Record "NPR Sale Line POS"; HandleReturnValue: Boolean) ReturnValue: Boolean
+    local procedure InsertLineInternal(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean) ReturnValue: Boolean
     var
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
     begin
@@ -520,27 +520,27 @@ codeunit 6150706 "NPR POS Sale Line"
     //--- Publishers ---
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnAfterDeletePOSSaleLine(SaleLinePOS: Record "NPR Sale Line POS")
+    procedure OnAfterDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR Sale Line POS")
+    procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnUpdateLine(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure OnUpdateLine(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnAfterSetQuantity(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure OnAfterSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR Sale Line POS"; var NewQuantity: Decimal)
+    procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     begin
     end;
 
@@ -568,7 +568,7 @@ codeunit 6150706 "NPR POS Sale Line"
         exit(CODEUNIT::"NPR POS Sale Line");
     end;
 
-    procedure InvokeOnBeforeInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure InvokeOnBeforeInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
@@ -588,7 +588,7 @@ codeunit 6150706 "NPR POS Sale Line"
         until POSSalesWorkflowStep.Next = 0;
     end;
 
-    procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
@@ -609,16 +609,16 @@ codeunit 6150706 "NPR POS Sale Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnBeforeInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnAfterInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATBusPostingGr: Code[20]; FromVATProdPostingGr: Code[20]; SaleLinePOS: Record "NPR Sale Line POS"; var UnitPrice: Decimal)
+    procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATBusPostingGr: Code[20]; FromVATProdPostingGr: Code[20]; SaleLinePOS: Record "NPR POS Sale Line"; var UnitPrice: Decimal)
     var
         Currency: Record Currency;
         VATPostingSetup: Record "VAT Posting Setup";
@@ -678,7 +678,7 @@ codeunit 6150706 "NPR POS Sale Line"
         xRec := Rec;
     end;
 
-    procedure GetxRec(var xSaleLinePOS: Record "NPR Sale Line POS")
+    procedure GetxRec(var xSaleLinePOS: Record "NPR POS Sale Line")
     begin
         xSaleLinePOS := xRec;
     end;

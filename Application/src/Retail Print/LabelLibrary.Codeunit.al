@@ -501,8 +501,8 @@ codeunit 6014413 "NPR Label Library"
         Item: Record Item;
         ItemLedgerEntry: Record "Item Ledger Entry";
         PurchaseHeader: Record "Purchase Header";
-        TempSalePOS: Record "NPR Sale POS" temporary;
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSalePOS: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         PurchaseUnit: Code[10];
         RegisterNo: Code[10];

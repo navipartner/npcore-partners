@@ -1,10 +1,10 @@
-codeunit 6151004 "NPR POS Action: SavePOSQuote"
+codeunit 6151004 "NPR POS Action: SavePOSSvSl"
 {
     var
-        Text000: Label 'Save POS Sale as POS Quote';
-        Text001: Label 'POS Quote';
-        Text002: Label 'Save current Sale as POS Quote?';
-        SaleWasParkedTxt: Label 'Sale was saved as POS Quote (parked) at %1';
+        Text000: Label 'Save POS Sale as POS Saved Sale';
+        Text001: Label 'POS Saved Sale';
+        Text002: Label 'Save current Sale as POS Saved Sale?';
+        SaleWasParkedTxt: Label 'Sale was saved as POS Saved Sale (parked) at %1';
         ErrorCancelling: Label 'System was not able to cancel current sale after parking. Please do it manually.';
 
     local procedure ActionCode(): Text
@@ -66,7 +66,7 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
 
         Handled := true;
 
-        RPTemplateHeader.SetRange("Table ID", DATABASE::"NPR POS Quote Entry");
+        RPTemplateHeader.SetRange("Table ID", DATABASE::"NPR POS Saved Sale Entry");
         if PAGE.RunModal(0, RPTemplateHeader) = ACTION::LookupOK then
             POSParameterValue.Value := RPTemplateHeader.Code;
     end;
@@ -93,8 +93,8 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
 
     local procedure OnActionSaveAsQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        SalePOS: Record "NPR Sale POS";
-        POSQuoteEntry: Record "NPR POS Quote Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
         POSSale: Codeunit "NPR POS Sale";
         RPTemplateHeader: Record "NPR RP Template Header";
@@ -125,7 +125,7 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         if not RPTemplateHeader.Get(PrintTemplateCode) then
             exit;
         RPTemplateHeader.CalcFields("Table ID");
-        if RPTemplateHeader."Table ID" <> DATABASE::"NPR POS Quote Entry" then
+        if RPTemplateHeader."Table ID" <> DATABASE::"NPR POS Saved Sale Entry" then
             exit;
 
         POSQuoteEntry.SetRecFilter;
@@ -133,9 +133,9 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
 
     end;
 
-    procedure CreatePOSQuote(SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry")
+    procedure CreatePOSQuote(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         LineNo: Integer;
     begin
         OnBeforeSaveAsQuote(SalePOS);
@@ -156,9 +156,9 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
             until SaleLinePOS.Next = 0;
     end;
 
-    local procedure InsertPOSQuoteEntry(SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry")
+    local procedure InsertPOSQuoteEntry(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
     var
-        POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
+        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDoc: XmlDocument;
         OutStr: OutStream;
@@ -182,9 +182,9 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         POSQuoteEntry.Insert(true);
     end;
 
-    local procedure InsertPOSQuoteLine(SaleLinePOS: Record "NPR Sale Line POS"; POSQuoteEntry: Record "NPR POS Quote Entry"; var LineNo: Integer)
+    local procedure InsertPOSQuoteLine(SaleLinePOS: Record "NPR POS Sale Line"; POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var LineNo: Integer)
     var
-        POSQuoteLine: Record "NPR POS Quote Line";
+        POSQuoteLine: Record "NPR POS Saved Sale Line";
     begin
         LineNo += 10000;
 
@@ -217,7 +217,7 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSaveAsQuote(var SalePOS: Record "NPR Sale POS")
+    local procedure OnBeforeSaveAsQuote(var SalePOS: Record "NPR POS Sale")
     begin
         //-NPR5.48 [338537]
         //+NPR5.48 [338537]

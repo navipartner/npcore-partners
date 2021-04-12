@@ -143,7 +143,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        ThisShouldBeEmpty_SaleLinePOS: Record "NPR Sale Line POS";
+        ThisShouldBeEmpty_SaleLinePOS: Record "NPR POS Sale Line";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";

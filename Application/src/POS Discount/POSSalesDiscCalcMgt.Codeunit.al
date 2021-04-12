@@ -29,12 +29,12 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
     begin
     end;
 
-    procedure RecalculateAllSaleLinePOS(SalePOS: Record "NPR Sale POS")
+    procedure RecalculateAllSaleLinePOS(SalePOS: Record "NPR POS Sale")
     var
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         StartTime: DateTime;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         StartTime := CurrentDateTime;
 
@@ -51,10 +51,10 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
         LogStopwatch('DISCOUNT_RECALCULATE', CurrentDateTime - StartTime);
     end;
 
-    procedure OnAfterInsertSaleLinePOS(var Rec: Record "NPR Sale Line POS")
+    procedure OnAfterInsertSaleLinePOS(var Rec: Record "NPR POS Sale Line")
     var
-        SalePOS: Record "NPR Sale POS";
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        SalePOS: Record "NPR POS Sale";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
         StartTime: DateTime;
@@ -89,10 +89,10 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
             LogStopwatch('DISCOUNT_ON_INSERT', CurrentDateTime - StartTime);
     end;
 
-    procedure OnAfterModifySaleLinePOS(var Rec: Record "NPR Sale Line POS"; var xRec: Record "NPR Sale Line POS")
+    procedure OnAfterModifySaleLinePOS(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line")
     var
-        SalePOS: Record "NPR Sale POS";
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        SalePOS: Record "NPR POS Sale";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
         StartTime: DateTime;
@@ -126,10 +126,10 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
             LogStopwatch('DISCOUNT_ON_MODIFY', CurrentDateTime - StartTime);
     end;
 
-    procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR Sale Line POS")
+    procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR POS Sale Line")
     var
-        SalePOS: Record "NPR Sale POS";
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        SalePOS: Record "NPR POS Sale";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
         StartTime: DateTime;
@@ -165,8 +165,8 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
 
     procedure OnAfterInsertSaleLinePOSCoupon(var Rec: Record "NPR NpDc SaleLinePOS Coupon")
     var
-        SalePOS: Record "NPR Sale POS";
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        SalePOS: Record "NPR POS Sale";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
         if not CheckDiscTriggerCoupon(Rec) then
@@ -182,7 +182,7 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
     begin
     end;
 
-    local procedure ApplyDiscounts(SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    local procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     var
         DiscPriority: Record "NPR Discount Priority";
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
@@ -198,9 +198,9 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
         end;
     end;
 
-    local procedure UpdateDiscOnSalesLine(var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; RecalculateAllLines: Boolean)
+    local procedure UpdateDiscOnSalesLine(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; RecalculateAllLines: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
     begin
         Clear(TempSaleLinePOS);
@@ -242,7 +242,7 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
     begin
     end;
 
-    local procedure CheckDiscTrigger(var SaleLinePOS: Record "NPR Sale Line POS"): Boolean
+    local procedure CheckDiscTrigger(var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     begin
         if SaleLinePOS.IsTemporary then
             exit(false);
@@ -271,7 +271,7 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
         exit(SaleLinePOSCoupon.Type = SaleLinePOSCoupon.Type::Coupon);
     end;
 
-    local procedure FindRelevantSaleLineDiscounts(SalePOS: Record "NPR Sale POS"; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; LineOperation: Option Insert,Modify,Delete): Boolean
+    local procedure FindRelevantSaleLineDiscounts(SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; LineOperation: Option Insert,Modify,Delete): Boolean
     var
         DiscountPriority: Record "NPR Discount Priority";
     begin
@@ -315,10 +315,10 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
     begin
     end;
 
-    procedure SetupTempSalesLines(SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary)
+    procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         Item: Record Item;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if not TempSaleLinePOS.IsTemporary then
             exit;
@@ -371,12 +371,12 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    procedure ApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    procedure ApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR Sale POS"; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete)
+    procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     begin
     end;
 }

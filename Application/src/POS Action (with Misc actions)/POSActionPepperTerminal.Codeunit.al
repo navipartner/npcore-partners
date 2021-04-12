@@ -47,7 +47,7 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         AuxCommand: Integer;
         OtherCommand: Integer;
@@ -139,9 +139,9 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         exit('1.1');
     end;
 
-    local procedure DoWork(POSSession: Codeunit "NPR POS Session"; EftCommand: Option; AuxCommand: Integer; OtherCommand: Integer; SalePOS: Record "NPR Sale POS"; POSUnit: Record "NPR POS Unit")
+    local procedure DoWork(POSSession: Codeunit "NPR POS Session"; EftCommand: Option; AuxCommand: Integer; OtherCommand: Integer; SalePOS: Record "NPR POS Sale"; POSUnit: Record "NPR POS Unit")
     var
-        SaleLine: Record "NPR Sale Line POS";
+        SaleLine: Record "NPR POS Sale Line";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Handled: Boolean;
         PepperLibraryTranscendence: Codeunit "NPR Pepper Library TSD";

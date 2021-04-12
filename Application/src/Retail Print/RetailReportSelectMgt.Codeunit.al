@@ -187,7 +187,7 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
         Item: Record Item;
         RetailJournalLine: Record "NPR Retail Journal Line";
         ExchangeLabel: Record "NPR Exchange Label";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if RecordFilter <> '' then begin
             if RecRef.Number = ObjectNo then begin
@@ -223,7 +223,7 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
                                         ExchangeLabel.MarkedOnly(true);
                                         RecRef.GetTable(ExchangeLabel);
                                     end;
-                                DATABASE::"NPR Sale Line POS":
+                                DATABASE::"NPR POS Sale Line":
                                     begin
                                         RecRef.SetTable(SaleLinePOS);
                                         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);

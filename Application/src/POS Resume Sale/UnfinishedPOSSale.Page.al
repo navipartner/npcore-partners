@@ -6,7 +6,7 @@ page 6150746 "NPR Unfinished POS Sale"
     PageType = ConfirmationDialog;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR Sale POS";
+    SourceTable = "NPR POS Sale";
 
     layout
     {

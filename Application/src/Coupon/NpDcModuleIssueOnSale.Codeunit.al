@@ -10,7 +10,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Text006: Label 'Checks On-Sale Discount Coupons on Sale Line Insert';
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
-    local procedure OnAfterEndSale(SalePOS: Record "NPR Sale POS")
+    local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
     var
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -28,9 +28,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure AddNewOnSaleCoupons(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure AddNewOnSaleCoupons(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -44,9 +44,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterDeletePOSSaleLine', '', true, true)]
-    local procedure OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not TriggerOnSaleCoupon(SaleLinePOS, SalePOS) then begin
             if SaleLinePOS.Type = SaleLinePOS.Type::Comment then
@@ -58,9 +58,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterSetQuantity', '', true, true)]
-    local procedure OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not TriggerOnSaleCoupon(SaleLinePOS, SalePOS) then
             exit;
@@ -107,7 +107,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         until TempCoupon.Next = 0;
     end;
 
-    local procedure AddNewCoupons(SalePOS: Record "NPR Sale POS")
+    local procedure AddNewCoupons(SalePOS: Record "NPR POS Sale")
     var
         CouponType: Record "NPR NpDc Coupon Type";
         CouponQty: Integer;
@@ -127,10 +127,10 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         until CouponType.Next = 0;
     end;
 
-    local procedure InsertNewCoupons(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type"; NewCouponQty: Integer)
+    local procedure InsertNewCoupons(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type"; NewCouponQty: Integer)
     var
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         LineNo: Integer;
         i: Integer;
     begin
@@ -172,10 +172,10 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         end;
     end;
 
-    local procedure RemoveNewCoupons(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type"; RemoveCouponQty: Integer)
+    local procedure RemoveNewCoupons(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type"; RemoveCouponQty: Integer)
     var
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         CouponQtyRemoved: Integer;
     begin
         NpDcSaleLinePOSNewCoupon.SetRange("Register No.", SalePOS."Register No.");
@@ -194,7 +194,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         until (NpDcSaleLinePOSNewCoupon.Next = 0) or (CouponQtyRemoved >= RemoveCouponQty);
     end;
 
-    local procedure RemoveNewCouponsSalesLinePOS(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure RemoveNewCouponsSalesLinePOS(SaleLinePOS: Record "NPR POS Sale Line")
     var
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
     begin
@@ -249,7 +249,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         JSON: Codeunit "NPR POS JSON Management";
     begin
@@ -288,7 +288,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
     local procedure OnActionIssueCoupon(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         CouponType: Record "NPR NpDc Coupon Type";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpDcModuleIssueDefault: Codeunit "NPR NpDc Module Issue: Default";
         POSSale: Codeunit "NPR POS Sale";
         CouponTypeCode: Text;
@@ -327,7 +327,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         exit(true);
     end;
 
-    local procedure CountCouponQty(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type"): Integer
+    local procedure CountCouponQty(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type"): Integer
     var
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
     begin
@@ -351,7 +351,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         exit(CouponType.FindFirst);
     end;
 
-    local procedure FindNewCoupons(SalePOS: Record "NPR Sale POS"; var NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon"): Boolean
+    local procedure FindNewCoupons(SalePOS: Record "NPR POS Sale"; var NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon"): Boolean
     begin
         Clear(NpDcSaleLinePOSNewCoupon);
         NpDcSaleLinePOSNewCoupon.SetRange("Register No.", SalePOS."Register No.");
@@ -359,7 +359,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         exit(NpDcSaleLinePOSNewCoupon.FindFirst);
     end;
 
-    local procedure IssueOnSaleAchieved(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type") NewCouponQty: Integer
+    local procedure IssueOnSaleAchieved(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type") NewCouponQty: Integer
     var
         NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup";
         NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary;
@@ -426,9 +426,9 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         exit(LotQty);
     end;
 
-    local procedure SalePOS2DiscBuffer(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary): Decimal
+    local procedure SalePOS2DiscBuffer(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary): Decimal
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NpDcIssueOnSaleSetupLine: Record "NPR NpDc Iss.OnSale Setup Line";
     begin
         NpDcItemBuffer.DeleteAll;
@@ -463,7 +463,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         until NpDcIssueOnSaleSetupLine.Next = 0;
     end;
 
-    local procedure SaleLinePOS2DiscBuffer(var SaleLinePOS: Record "NPR Sale Line POS"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary): Decimal
+    local procedure SaleLinePOS2DiscBuffer(var SaleLinePOS: Record "NPR POS Sale Line"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary): Decimal
     begin
         if not SaleLinePOS.FindSet then
             exit;
@@ -544,7 +544,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Error(Text001);
     end;
 
-    local procedure TriggerOnSaleCoupon(SaleLinePOS: Record "NPR Sale Line POS"; var SalePOS: Record "NPR Sale POS"): Boolean
+    local procedure TriggerOnSaleCoupon(SaleLinePOS: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"): Boolean
     begin
         if SaleLinePOS.IsTemporary then
             exit(false);

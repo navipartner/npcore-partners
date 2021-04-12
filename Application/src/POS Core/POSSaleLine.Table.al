@@ -1,6 +1,6 @@
-table 6014406 "NPR Sale Line POS"
+table 6014406 "NPR POS Sale Line"
 {
-    Caption = 'Sale Line';
+    Caption = 'POS Sale Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Sale Lines Subpage";
     PasteIsValid = false;
@@ -158,7 +158,7 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             var
-                SaleLinePOS: Record "NPR Sale Line POS";
+                SaleLinePOS: Record "NPR POS Sale Line";
                 Txt001: Label 'Quantity can not be changes on a repair sale';
                 Err001: Label 'Quantity at %2 %1 can only be 1 or -1';
                 Err003: Label 'A quantity must be specified on the line';
@@ -351,7 +351,7 @@ table 6014406 "NPR Sale Line POS"
             trigger OnValidate()
             var
                 POSUnit: Record "NPR POS Unit";
-                SaleLinePOS: Record "NPR Sale Line POS";
+                SaleLinePOS: Record "NPR POS Sale Line";
                 ErrMin: Label 'Discount % cannot be negative.';
                 ErrMax: Label 'Discount % cannot exeed 100.';
                 POSSetup: Codeunit "NPR POS Setup";
@@ -1599,7 +1599,7 @@ table 6014406 "NPR Sale Line POS"
 
     trigger OnDelete()
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
         ICommRec: Record "NPR I-Comm";
@@ -1674,7 +1674,7 @@ table 6014406 "NPR Sale Line POS"
         Item: Record Item;
         POSUnitGlobal: Record "NPR POS Unit";
         CustomerGlobal: Record Customer;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Currency: Record Currency;
         DimMgt: Codeunit DimensionManagement;
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
@@ -1691,14 +1691,14 @@ table 6014406 "NPR Sale Line POS"
 
     local procedure GetPOSHeader()
     var
-        SalePOS2: Record "NPR Sale POS";
+        SalePOS2: Record "NPR POS Sale";
     begin
         if SalePOS2.Get("Register No.", "Sales Ticket No.") then
             SalePOS := SalePOS2;
         Currency.InitRoundingPrecision;
     end;
 
-    procedure SetPOSHeader(NewSalePOS: Record "NPR Sale POS")
+    procedure SetPOSHeader(NewSalePOS: Record "NPR POS Sale")
     begin
         SalePOS := NewSalePOS;
         Currency.InitRoundingPrecision;
@@ -1723,7 +1723,7 @@ table 6014406 "NPR Sale Line POS"
 
     procedure RemoveBOMDiscount()
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if ("Discount Type" = "Discount Type"::"BOM List") then begin
             SaleLinePOS.SetRange("Register No.", "Register No.");
@@ -1751,7 +1751,7 @@ table 6014406 "NPR Sale Line POS"
 
     procedure FindItemSalesPrice(): Decimal
     var
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
     begin
         if "Manual Item Sales Price" then
@@ -1767,7 +1767,7 @@ table 6014406 "NPR Sale Line POS"
         exit(TempSaleLinePOS."Unit Price");
     end;
 
-    procedure GetAmount(var SaleLinePOS: Record "NPR Sale Line POS"; var Item: Record Item; UnitPrice: Decimal)
+    procedure GetAmount(var SaleLinePOS: Record "NPR POS Sale Line"; var Item: Record Item; UnitPrice: Decimal)
     begin
         SaleLinePOS."Unit Price" := UnitPrice;
         UpdateAmounts(SaleLinePOS);
@@ -1847,7 +1847,7 @@ table 6014406 "NPR Sale Line POS"
         Err001: Label '%2 %1 is already in stock but has not been posted yet';
         Err002: Label '%2 %1 has already been sold to a customer but is not yet posted';
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         p: Record "NPR POS Entry";
     begin
         POSSalesLine.SetRange("Item Entry No.", 0);
@@ -1886,7 +1886,7 @@ table 6014406 "NPR Sale Line POS"
     procedure ExplodeBOM(ItemNo: Code[20]; StartLineNo: Integer; EndLineNo: Integer; var Level: Integer; UnitPrice: Decimal; "Sum": Decimal)
     var
         BOMComponent: Record "BOM Component";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item2: Record Item;
         FromLineNo: Integer;
         ToLineNo: Integer;
@@ -2040,9 +2040,9 @@ table 6014406 "NPR Sale Line POS"
         end;
     end;
 
-    procedure UpdateAmounts(var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure UpdateAmounts(var SaleLinePOS: Record "NPR POS Sale Line")
     var
-        SaleLinePOS2: Record "NPR Sale Line POS";
+        SaleLinePOS2: Record "NPR POS Sale Line";
         TotalLineAmount: Decimal;
         TotalInvDiscAmount: Decimal;
         TotalAmount: Decimal;
@@ -2087,7 +2087,7 @@ table 6014406 "NPR Sale Line POS"
 
     end;
 
-    procedure UpdateLineVatAmounts(var SaleLinePOS: Record "NPR Sale Line POS"; TotalLineAmount: Decimal; TotalInvDiscAmount: Decimal; TotalAmount: Decimal; TotalAmountInclVAT: Decimal)
+    procedure UpdateLineVatAmounts(var SaleLinePOS: Record "NPR POS Sale Line"; TotalLineAmount: Decimal; TotalInvDiscAmount: Decimal; TotalAmount: Decimal; TotalAmountInclVAT: Decimal)
     var
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
     begin
@@ -2315,7 +2315,7 @@ table 6014406 "NPR Sale Line POS"
     local procedure TestPaymentMethod(POSPaymentMethod: Record "NPR POS Payment Method")
     var
         POSUnit: Record "NPR POS Unit";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSUnit.Get("Register No.");
 
@@ -2394,7 +2394,7 @@ table 6014406 "NPR Sale Line POS"
 
     local procedure UpdateDependingLinesQuantity()
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if Silent then
             exit;
@@ -2458,7 +2458,7 @@ table 6014406 "NPR Sale Line POS"
 
     procedure SerialNoLookup()
     var
-        xSaleLinePOS2: Record "NPR Sale Line POS";
+        xSaleLinePOS2: Record "NPR POS Sale Line";
     begin
         xSaleLinePOS2 := Rec;
         if not SerialNoLookup2() then
@@ -2520,8 +2520,8 @@ table 6014406 "NPR Sale Line POS"
 
     procedure SerialNoValidate()
     var
-        SaleLinePOS2: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS2: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         ItemLedgerEntry: Record "Item Ledger Entry";
         ItemTrackingCode: Record "Item Tracking Code";
         Positive: Boolean;

@@ -1,13 +1,13 @@
-codeunit 6151006 "NPR POS Quote Mgt."
+codeunit 6151006 "NPR POS Saved Sale Mgt."
 {
     var
-        Text000: Label 'Delete all saved POS Quotes,Review saved POS Quotes';
-        EFT_WARNING: Label 'WARNING:\%1 %2 has one or more POS Quotes linked to it with approved EFT transactions inside. These should be voided or completed as the transaction has already occurred!\\Do you want to continue with end of day?';
+        Text000: Label 'Delete all saved POS Saved Sales,Review saved POS Saved Sales';
+        EFT_WARNING: Label 'WARNING:\%1 %2 has one or more POS Saved Sales linked to it with approved EFT transactions inside. These should be voided or completed as the transaction has already occurred!\\Do you want to continue with end of day?';
 
-    procedure CleanupPOSQuotesBeforeBalancing(SalePOS: Record "NPR Sale POS") Confirmed: Boolean
+    procedure CleanupPOSQuotesBeforeBalancing(SalePOS: Record "NPR POS Sale") Confirmed: Boolean
     var
-        POSQuoteEntry: Record "NPR POS Quote Entry";
-        POSQuotes: Page "NPR POS Quotes";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
+        POSQuotes: Page "NPR POS Saved Sales";
         SelectedMenu: Integer;
     begin
         if not GuiAllowed then
@@ -44,7 +44,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         exit(Confirmed);
     end;
 
-    procedure SetSalePOSFilter(SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry"; "Filter": Option All,Register,Salesperson,"Register+Salesperson")
+    procedure SetSalePOSFilter(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; "Filter": Option All,Register,Salesperson,"Register+Salesperson")
     begin
         Clear(POSQuoteEntry);
         POSQuoteEntry.FilterGroup(40);
@@ -66,7 +66,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         POSQuoteEntry.FilterGroup(0);
     end;
 
-    procedure POSSale2Xml(SalePOS: Record "NPR Sale POS"; var XmlDoc: XmlDocument)
+    procedure POSSale2Xml(SalePOS: Record "NPR POS Sale"; var XmlDoc: XmlDocument)
     var
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
@@ -75,7 +75,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         RetailCrossReference: Record "NPR Retail Cross Reference";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
         NpIaSaleLinePOSAddOnFieldBuffer: Record "Field" temporary;
@@ -355,7 +355,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         exit(false);
     end;
 
-    procedure LoadPOSSaleData(POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: XmlDocument): Boolean
+    procedure LoadPOSSaleData(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var XmlDoc: XmlDocument): Boolean
     var
         InStr: InStream;
     begin
@@ -366,7 +366,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         exit(XmlDocument.ReadFrom(InStr, XmlDoc));
     end;
 
-    procedure Xml2POSSale(var XmlDoc: XmlDocument; var SalePOS: Record "NPR Sale POS")
+    procedure Xml2POSSale(var XmlDoc: XmlDocument; var SalePOS: Record "NPR POS Sale")
     var
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
@@ -375,7 +375,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         RetailCrossReference: Record "NPR Retail Cross Reference";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
         NpIaSaleLinePOSAddOnFieldBuffer: Record "Field" temporary;
@@ -406,7 +406,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         RetailCrossReferenceNode: XmlNode;
         NewDiscountCouponNodes: XmlNodeList;
         NewDiscountCouponNode: XmlNode;
-        xSalePOS: Record "NPR Sale POS";
+        xSalePOS: Record "NPR POS Sale";
     begin
         if not XmlDoc.GetRoot(Root) then
             exit;
@@ -682,7 +682,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         end;
     end;
 
-    procedure ViewPOSSalesData(POSQuoteEntry: Record "NPR POS Quote Entry")
+    procedure ViewPOSSalesData(POSQuoteEntry: Record "NPR POS Saved Sale Entry")
     var
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
@@ -703,19 +703,19 @@ codeunit 6151006 "NPR POS Quote Mgt."
         Message(POSSalesData);
     end;
 
-    local procedure OnPOSSale2Xml(SalePOS: Record "NPR Sale POS"; XmlRoot: XmlElement)
+    local procedure OnPOSSale2Xml(SalePOS: Record "NPR POS Sale"; XmlRoot: XmlElement)
     begin
     end;
 
-    local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "NPR Sale Line POS"; XmlElement: XmlElement)
+    local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "NPR POS Sale Line"; XmlElement: XmlElement)
     begin
     end;
 
-    local procedure OnXml2POSSale(XmlRoot: XmlElement; SalePOS: Record "NPR Sale POS")
+    local procedure OnXml2POSSale(XmlRoot: XmlElement; SalePOS: Record "NPR POS Sale")
     begin
     end;
 
-    local procedure OnXml2POSSaleLine(XmlElement: XmlElement; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnXml2POSSaleLine(XmlElement: XmlElement; SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 }

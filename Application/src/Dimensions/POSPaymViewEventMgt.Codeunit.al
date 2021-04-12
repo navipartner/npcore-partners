@@ -25,7 +25,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup";
         POSPaymentViewLogEntry: Record "NPR POS Paym. View Log Entry";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         DimensionValue: Code[20];
         POSSalesNo: Integer;
         POSAction: Record "NPR POS Action";
@@ -113,7 +113,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         POSSession.RequestRefreshData();
     end;
 
-    local procedure SkipPopup(SalePOS: Record "NPR Sale POS"; var POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup"): Boolean
+    local procedure SkipPopup(SalePOS: Record "NPR POS Sale"; var POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup"): Boolean
     begin
 
         if not POSPaymentViewEventSetup.Get then
@@ -139,9 +139,9 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         exit(false);
     end;
 
-    local procedure SkipOnItemFilter(SalePOS: Record "NPR Sale POS"): Boolean;
+    local procedure SkipOnItemFilter(SalePOS: Record "NPR POS Sale"): Boolean;
     var
-        SalePOSLine: Record "NPR Sale Line POS";
+        SalePOSLine: Record "NPR POS Sale Line";
         PopupDimFilter: Record "NPR Popup Dim. Filter";
     begin
         if PopupDimFilter.IsEmpty() then
@@ -171,7 +171,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         exit((CheckTime >= StartTime) or (CheckTime <= EndTime));
     end;
 
-    local procedure HasDimValue(SalePOS: Record "NPR Sale POS"; DimensionCode: Code[20]): Boolean
+    local procedure HasDimValue(SalePOS: Record "NPR POS Sale"; DimensionCode: Code[20]): Boolean
     var
         DimensionSetEntry: Record "Dimension Set Entry";
     begin

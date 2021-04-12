@@ -72,7 +72,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         PaymentTerms: Record "Payment Terms";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
         JSON: Codeunit "NPR POS JSON Management";
         POSLayawayMgt: Codeunit "NPR POS Layaway Mgt.";
@@ -142,7 +142,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     var
         Item: Record Item;
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if CreationFeeItemNo = '' then
             exit;
@@ -163,8 +163,8 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -222,7 +222,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
             Message(ErrorDownpayment, GetLastErrorText);
     end;
 
-    local procedure SelectCustomer(var SalePOS: Record "NPR Sale POS"): Boolean
+    local procedure SelectCustomer(var SalePOS: Record "NPR POS Sale"): Boolean
     var
         Customer: Record Customer;
     begin

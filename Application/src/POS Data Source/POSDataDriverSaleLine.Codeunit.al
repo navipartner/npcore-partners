@@ -4,7 +4,7 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         POSViewProfile: Record "NPR POS View Profile";
-        SaleLine: Record "NPR Sale Line POS";
+        SaleLine: Record "NPR POS Sale Line";
         DataMgt: Codeunit "NPR POS Data Management";
     begin
         if Name <> GetSourceNameText() then
@@ -12,7 +12,7 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
 
         DataSource.Constructor();
         DataSource.SetId(Name);
-        DataSource.SetTableNo(Database::"NPR Sale Line POS");
+        DataSource.SetTableNo(Database::"NPR POS Sale Line");
         Setup.GetPOSViewProfile(POSViewProfile);
 
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("No."), false);

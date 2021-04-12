@@ -1497,7 +1497,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
     local procedure IsConsolidationEligibleShared(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
         Item: Record Item;
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         SalesAmount: Decimal;
         POSEntry: Record "NPR POS Entry";
     begin
@@ -1545,7 +1545,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
     local procedure IsStoredSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
         Item: Record Item;
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         SaleAmount: Decimal;
         POSEntry: Record "NPR POS Entry";
     begin
@@ -1588,8 +1588,8 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
     local procedure IsActiveSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
         Item: Record Item;
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         SaleAmount: Decimal;
     begin
         SaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
@@ -1669,7 +1669,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
     local procedure GetPurchaseDetailsXML(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary): Text
     var
         Item: Record Item;
-        PosSalesLine: Record "NPR POS Sales Line";
+        PosSalesLine: Record "NPR POS Entry Sales Line";
         ItemXML: Text;
         ReceiptXML: Text;
         XML: Text;
