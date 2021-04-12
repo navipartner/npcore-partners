@@ -90,7 +90,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -118,7 +118,6 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
-        ConfirmString: Text;
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -202,7 +201,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         WebClientDependency: Record "NPR Web Client Dependency";
         InStr: InStream;
     begin
-        if WebClientDependency.Get(WebClientDependency.Type::CSS, ActionCode()) and WebClientDependency.BLOB.HasValue then begin
+        if WebClientDependency.Get(WebClientDependency.Type::CSS, ActionCode()) and WebClientDependency.BLOB.HasValue() then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
             InStr.Read(Css);
@@ -216,7 +215,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         WebClientDependency: Record "NPR Web Client Dependency";
         InStr: InStream;
     begin
-        if WebClientDependency.Get(WebClientDependency.Type::HTML, ActionCode()) and WebClientDependency.BLOB.HasValue then begin
+        if WebClientDependency.Get(WebClientDependency.Type::HTML, ActionCode()) and WebClientDependency.BLOB.HasValue() then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
             InStr.Read(Html);
@@ -262,7 +261,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         Script := '$scope.bill_lines = [';
 
         NPREWaiterPadLine.SetRange("Waiter Pad No.", CurrNPREWaiterPad."No.");
-        if NPREWaiterPadLine.FindSet then
+        if NPREWaiterPadLine.FindSet() then
             repeat
                 if NPREWaiterPadLine.RemainingQtyToBill > 0 then
                     for i := 1 to NPREWaiterPadLine.RemainingQtyToBill do begin
@@ -277,7 +276,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 
                         ArrayIndex += 1;
                     end;
-            until NPREWaiterPadLine.Next = 0;
+            until NPREWaiterPadLine.Next() = 0;
 
         Script += '];';
         exit(Script);
@@ -350,7 +349,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 
         FrontEnd.GetSession(POSSession);
         POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.DeleteAll;
+        POSSaleLine.DeleteAll();
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -382,7 +381,6 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 
     local procedure FindBill(BillLine: JsonToken; var TempNPREWaiterPad: Record "NPR NPRE Waiter Pad" temporary; var NPREWaiterPad: Record "NPR NPRE Waiter Pad")
     var
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         BillId: Code[20];
     begin
@@ -395,10 +393,10 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         Clear(NPREWaiterPad);
         WaiterPadMgt.DuplicateWaiterPadHdr(CurrNPREWaiterPad, NPREWaiterPad);
         WaiterPadMgt.MoveNumberOfGuests(CurrNPREWaiterPad, NPREWaiterPad, 1);
-        TempNPREWaiterPad.Init;
+        TempNPREWaiterPad.Init();
         TempNPREWaiterPad."No." := BillId;
         TempNPREWaiterPad.Description := NPREWaiterPad."No.";
-        TempNPREWaiterPad.Insert;
+        TempNPREWaiterPad.Insert();
     end;
 
     local procedure GetValueAsString(JToken: JsonToken; JPath: Text): Text
@@ -450,7 +448,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         SaleLinePOSAddOn.SetFilter("Sale Line No.", '<>%1', SaleLinePOS."Line No.");
         SaleLinePOSAddOn.SetRange("Applies-to Line No.", SaleLinePOS."Line No.");
         SaleLinePOSAddOn.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
-        if not SaleLinePOSAddOn.FindFirst then
+        if not SaleLinePOSAddOn.FindFirst() then
             exit(0);
 
         if SaleLinePOS2.Get(
@@ -471,7 +469,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
-        if SaleLinePOSAddOn.FindLast then;
+        if SaleLinePOSAddOn.FindLast() then;
         LineNo := SaleLinePOSAddOn."Line No." + 10000;
 
         exit(LineNo);

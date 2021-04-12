@@ -16,47 +16,47 @@ page 6059911 "NPR Task Output Log"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Task Log Entry No."; "Task Log Entry No.")
+                field("Task Log Entry No."; Rec."Task Log Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Log Entry No. field';
                 }
-                field("Journal Template Name"; "Journal Template Name")
+                field("Journal Template Name"; Rec."Journal Template Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Journal Template Name field';
                 }
-                field("Journal Batch Name"; "Journal Batch Name")
+                field("Journal Batch Name"; Rec."Journal Batch Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Journal Batch Name field';
                 }
-                field("Journal Line No."; "Journal Line No.")
+                field("Journal Line No."; Rec."Journal Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Journal Line No. field';
                 }
-                field("File"; File)
+                field("File"; Rec.File)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the File field';
                 }
-                field("File Name"; "File Name")
+                field("File Name"; Rec."File Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the File Name field';
                 }
-                field("Import DateTime"; "Import DateTime")
+                field("Import DateTime"; Rec."Import DateTime")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Import DateTime field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -81,14 +81,14 @@ page 6059911 "NPR Task Output Log"
                     Instr: InStream;
                     Downloaded: Boolean;
                 begin
-                    CalcFields(File);
-                    if not File.HasValue then begin
+                    Rec.CalcFields(File);
+                    if not File.HasValue() then begin
                         Message(ReportIsEmptyMsg);
                         exit;
                     end;
 
                     File.CreateInStream(Instr);
-                    Downloaded := DownloadFromStream(Instr, FileDownLoadTxt, '', '', "File Name");
+                    Downloaded := DownloadFromStream(Instr, FileDownLoadTxt, '', '', Rec."File Name");
                 end;
             }
         }

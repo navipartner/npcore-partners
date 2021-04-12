@@ -15,22 +15,22 @@ page 6060061 "NPR Catalog Suppliers"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vendor No. field';
                 }
-                field("Send Sales Statistics"; "Send Sales Statistics")
+                field("Send Sales Statistics"; Rec."Send Sales Statistics")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send Sales Statistics field';
                 }
-                field("Trade Number"; "Trade Number")
+                field("Trade Number"; Rec."Trade Number")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Trade Number field';

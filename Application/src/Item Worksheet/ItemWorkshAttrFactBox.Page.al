@@ -18,8 +18,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 1, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[1]);
+                        DATABASE::"NPR Item Worksheet Line", 1, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[1]);
                 end;
             }
             field(NPRExItemAttrTextArray_01; NPRExItemAttrTextArray[1])
@@ -43,8 +43,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 2, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[2]);
+                        DATABASE::"NPR Item Worksheet Line", 2, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[2]);
                 end;
             }
             field(NPRExItemAttrTextArray_02; NPRExItemAttrTextArray[2])
@@ -68,8 +68,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 3, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[3]);
+                        DATABASE::"NPR Item Worksheet Line", 3, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[3]);
                 end;
             }
             field(NPRExItemAttrTextArray_03; NPRExItemAttrTextArray[3])
@@ -93,8 +93,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 4, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[4]);
+                        DATABASE::"NPR Item Worksheet Line", 4, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[4]);
                 end;
             }
             field(NPRExItemAttrTextArray_04; NPRExItemAttrTextArray[4])
@@ -118,8 +118,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 5, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[5]);
+                        DATABASE::"NPR Item Worksheet Line", 5, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[5]);
                 end;
             }
             field(NPRExItemAttrTextArray_05; NPRExItemAttrTextArray[5])
@@ -143,8 +143,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 6, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[6]);
+                        DATABASE::"NPR Item Worksheet Line", 6, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[6]);
                 end;
             }
             field(NPRExItemAttrTextArray_06; NPRExItemAttrTextArray[6])
@@ -168,8 +168,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 7, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[7]);
+                        DATABASE::"NPR Item Worksheet Line", 7, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[7]);
                 end;
             }
             field(NPRExItemAttrTextArray_07; NPRExItemAttrTextArray[7])
@@ -193,8 +193,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 8, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[8]);
+                        DATABASE::"NPR Item Worksheet Line", 8, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[8]);
                 end;
             }
             field(NPRExItemAttrTextArray_08; NPRExItemAttrTextArray[8])
@@ -218,8 +218,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 9, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[9]);
+                        DATABASE::"NPR Item Worksheet Line", 9, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[9]);
                 end;
             }
             field(NPRExItemAttrTextArray_09; NPRExItemAttrTextArray[9])
@@ -243,8 +243,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 trigger OnValidate()
                 begin
                     NPRAttrManagement.SetWorksheetLineAttributeValue(
-                        DATABASE::"NPR Item Worksheet Line", 10, "Worksheet Template Name",
-                        "Worksheet Name", "Line No.", NPRAttrTextArray[10]);
+                        DATABASE::"NPR Item Worksheet Line", 10, Rec."Worksheet Template Name",
+                        Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[10]);
                 end;
             }
             field(NPRExItemAttrTextArray_10; NPRExItemAttrTextArray[10])
@@ -268,14 +268,14 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
     begin
         NPRAttrManagement.GetWorksheetLineAttributeValue(
             NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line",
-            "Worksheet Template Name", "Worksheet Name", "Line No.");
-        if ("Existing Item No." <> '') then
-            NPRAttrManagement.GetMasterDataAttributeValue(NPRExItemAttrTextArray, DATABASE::Item, "Existing Item No.")
+            Rec."Worksheet Template Name", Rec."Worksheet Name", Rec."Line No.");
+        if (Rec."Existing Item No." <> '') then
+            NPRAttrManagement.GetMasterDataAttributeValue(NPRExItemAttrTextArray, DATABASE::Item, Rec."Existing Item No.")
         else
             Clear(NPRExItemAttrTextArray);
 
         for i := 1 to 10 do begin
-            if (NPRExItemAttrTextArray[i] <> NPRAttrTextArray[i]) and ("Existing Item No." <> '') then
+            if (NPRExItemAttrTextArray[i] <> NPRAttrTextArray[i]) and (Rec."Existing Item No." <> '') then
                 ExItemCaptionDim[i] := ExItemLbl
             else begin
                 NPRExItemAttrTextArray[i] := '';
@@ -317,7 +317,6 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;
-        NPRItemAttrVisibleArray: array[40] of Boolean;
         ExItemCaptionDim: array[20] of Text[20];
         NPRAttrTextArray: array[40] of Text[100];
         NPRExItemAttrTextArray: array[40] of Text[100];

@@ -15,17 +15,17 @@ page 6150731 "NPR POS Secure Methods"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
@@ -40,7 +40,7 @@ page 6150731 "NPR POS Secure Methods"
 
     trigger OnOpenPage()
     begin
-        RunDiscovery();
+        Rec.RunDiscovery();
     end;
 }
 

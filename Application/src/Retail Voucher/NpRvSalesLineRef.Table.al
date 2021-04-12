@@ -50,7 +50,7 @@ table 6151017 "NPR NpRv Sales Line Ref."
     trigger OnInsert()
     begin
         if IsNullGuid(Id) then
-            Id := CreateGuid;
+            Id := CreateGuid();
     end;
 
     var
@@ -64,7 +64,7 @@ table 6151017 "NPR NpRv Sales Line Ref."
             exit;
 
         Voucher.SetRange("Reference No.", "Reference No.");
-        if Voucher.FindFirst then
+        if Voucher.FindFirst() then
             Error(Text000, "Reference No.");
     end;
 }

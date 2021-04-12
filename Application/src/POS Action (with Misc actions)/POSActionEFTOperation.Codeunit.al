@@ -2,7 +2,6 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 {
     var
         ActionDescription: Label 'This is a template for POS Action';
-        ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for EFT Operation';
         ERROR_MISSING_PARAM: Label 'Parameter %1 is missing';
         CAPTION_VOID_CONFIRM: Label 'Void the following transaction?\\From Sales Ticket No.: %1\Type: %2\Amount: %3 %4\External Ref. No.: %5';
 
@@ -140,11 +139,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 
     local procedure VoidLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        EFTIntegration: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        RecoveredEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Continue: Boolean;
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         GetLastFinancialTransaction(LastEFTTransactionRequest, EFTSetup, SalePOS, false);
@@ -155,8 +150,6 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 
     local procedure ReprintLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale")
     var
-        EFTIntegration: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         GetLastFinancialTransaction(LastEFTTransactionRequest, EFTSetup, SalePOS, true);
@@ -165,8 +158,6 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 
     local procedure LookupLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        EFTIntegration: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
@@ -200,7 +191,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                 EFTTransactionRequest."Processing Type"::REFUND,
                 EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD);
         end;
-        EFTTransactionRequest.FindLast;
+        EFTTransactionRequest.FindLast();
     end;
 
     local procedure VoidConfirm(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
@@ -209,11 +200,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
     begin
         if EFTTransactionRequest.Recovered then begin
             RecoveredEFTTransactionRequest.Get(EFTTransactionRequest."Recovered by Entry No.");
-            with RecoveredEFTTransactionRequest do
-                exit(Confirm(CAPTION_VOID_CONFIRM, false, EFTTransactionRequest."Sales Ticket No.", Format(EFTTransactionRequest."Processing Type"), "Result Amount", "Currency Code", "External Transaction ID"));
+            exit(Confirm(CAPTION_VOID_CONFIRM, false, EFTTransactionRequest."Sales Ticket No.", Format(EFTTransactionRequest."Processing Type"), RecoveredEFTTransactionRequest."Result Amount", RecoveredEFTTransactionRequest."Currency Code", RecoveredEFTTransactionRequest."External Transaction ID"));
         end else
-            with EFTTransactionRequest do
-                exit(Confirm(CAPTION_VOID_CONFIRM, false, "Sales Ticket No.", Format("Processing Type"), "Result Amount", "Currency Code", "External Transaction ID"));
+            exit(Confirm(CAPTION_VOID_CONFIRM, false, EFTTransactionRequest."Sales Ticket No.", Format(EFTTransactionRequest."Processing Type"), EFTTransactionRequest."Result Amount", EFTTransactionRequest."Currency Code", EFTTransactionRequest."External Transaction ID"));
     end;
 
     local procedure SelectTransaction(var EftTransactionRequestOut: Record "NPR EFT Transaction Request"): Boolean
@@ -257,21 +246,21 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
             'PaymentType':
                 begin
                     POSParameterValue2 := POSParameterValue;
-                    POSParameterValue2.SetRecFilter;
+                    POSParameterValue2.SetRecFilter();
                     POSParameterValue2.SetRange(Name, 'EftType');
-                    if not POSParameterValue2.FindFirst then
+                    if not POSParameterValue2.FindFirst() then
                         exit;
                     if POSParameterValue2.Value = '' then
                         exit;
 
                     EFTSetup.SetRange("EFT Integration Type", POSParameterValue2.Value);
-                    if not EFTSetup.FindSet then
+                    if not EFTSetup.FindSet() then
                         exit;
                     repeat
                         if PaymentTypeFilter <> '' then
                             PaymentTypeFilter += '|';
                         PaymentTypeFilter += StrSubstNo('%1', EFTSetup."Payment Type POS");
-                    until EFTSetup.Next = 0;
+                    until EFTSetup.Next() = 0;
                     POSPaymentMethod.SetFilter(Code, PaymentTypeFilter);
                     if PAGE.RunModal(0, POSPaymentMethod) = ACTION::LookupOK then
                         POSParameterValue.Value := POSPaymentMethod.Code;
@@ -279,9 +268,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
             'AuxId':
                 begin
                     POSParameterValue2 := POSParameterValue;
-                    POSParameterValue2.SetRecFilter;
+                    POSParameterValue2.SetRecFilter();
                     POSParameterValue2.SetRange(Name, 'EftType');
-                    if not POSParameterValue2.FindFirst then
+                    if not POSParameterValue2.FindFirst() then
                         exit;
                     if POSParameterValue2.Value = '' then
                         exit;
@@ -314,21 +303,21 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                         exit;
                     EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
                     tmpEFTIntegrationType.SetRange(Code, POSParameterValue.Value);
-                    tmpEFTIntegrationType.FindFirst;
+                    tmpEFTIntegrationType.FindFirst();
                 end;
             'PaymentType':
                 begin
                     POSParameterValue2 := POSParameterValue;
-                    POSParameterValue2.SetRecFilter;
+                    POSParameterValue2.SetRecFilter();
                     POSParameterValue2.SetRange(Name, 'EftType');
-                    if not POSParameterValue2.FindFirst then
+                    if not POSParameterValue2.FindFirst() then
                         exit;
                     if POSParameterValue2.Value = '' then
                         exit;
 
                     EFTSetup.SetRange("EFT Integration Type", POSParameterValue2.Value);
                     EFTSetup.SetRange("Payment Type POS", POSParameterValue.Value);
-                    EFTSetup.FindFirst;
+                    EFTSetup.FindFirst();
                 end;
             'AuxId':
                 begin
@@ -336,9 +325,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                         exit;
 
                     POSParameterValue2 := POSParameterValue;
-                    POSParameterValue2.SetRecFilter;
+                    POSParameterValue2.SetRecFilter();
                     POSParameterValue2.SetRange(Name, 'EftType');
-                    if not POSParameterValue2.FindFirst then
+                    if not POSParameterValue2.FindFirst() then
                         exit;
                     if POSParameterValue2.Value = '' then
                         exit;
@@ -347,7 +336,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                     tmpEFTAuxOperation.SetRange("Integration Type", POSParameterValue2.Value);
                     Evaluate(AuxId, POSParameterValue.Value);
                     tmpEFTAuxOperation.SetRange("Auxiliary ID", AuxId);
-                    tmpEFTAuxOperation.FindFirst;
+                    tmpEFTAuxOperation.FindFirst();
                 end;
         end;
     end;

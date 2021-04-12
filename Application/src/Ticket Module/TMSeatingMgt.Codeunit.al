@@ -30,9 +30,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
     end;
 
     procedure AddChild(ParentEntryNo: Integer) EntryNo: Integer
-    var
-        ParentSeatingTemplate: Record "NPR TM Seating Template";
-        SeatingTemplate: Record "NPR TM Seating Template";
     begin
 
         exit(AddChildWorker(ParentEntryNo, ''));
@@ -75,7 +72,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
     procedure AddSibling(SiblingEntryNo: Integer) EntryNo: Integer
     var
-        SiblingSeatingTemplate: Record "NPR TM Seating Template";
         SeatingTemplate: Record "NPR TM Seating Template";
     begin
 
@@ -88,7 +84,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
     procedure AddSiblingWorker(SiblingEntryNo: Integer; Description: Text[80]) EntryNo: Integer
     var
         SiblingSeatingTemplate: Record "NPR TM Seating Template";
-        SeatingTemplate: Record "NPR TM Seating Template";
     begin
 
         SiblingSeatingTemplate.Get(SiblingEntryNo);
@@ -191,7 +186,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
     procedure SwapSubNodes(AdmissionCode: Code[20]; PathA: Text; PathB: Text)
     var
-        SeatingTemplate: Record "NPR TM Seating Template";
         TmpSeatingTemplateA: Record "NPR TM Seating Template" temporary;
         TmpSeatingTemplateB: Record "NPR TM Seating Template" temporary;
     begin
@@ -283,7 +277,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
             SeatingTemplate.Description := RecToIndent.Description;
             SeatingTemplate."Description 2" := RecToIndent."Description 2";
-            RecToIndent.Delete;
+            RecToIndent.Delete();
         end
     end;
 
@@ -317,12 +311,10 @@ codeunit 6151130 "NPR TM Seating Mgt."
         UpdatePersistentTemplate(TmpSeatingTemplate, -1);
 
         RecToUnIndent.Get(RecToUnIndent."Entry No.");
-        RecToUnIndent.Delete;
+        RecToUnIndent.Delete();
     end;
 
     local procedure UpdateTemporaryPathList(AdmissionCode: Code[20]; PathA: Text; PathB: Text; var TmpSeatingTemplate: Record "NPR TM Seating Template" temporary)
-    var
-        SeatingTemplate: Record "NPR TM Seating Template";
     begin
 
         UpdateTemporaryPathListN(AdmissionCode, PathA, PathB, TmpSeatingTemplate, 0);
@@ -461,10 +453,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
     end;
 
     local procedure RenumberRowAndSeat(StartFromEntryNo: Integer; RowStartNumber: Code[10]; SeatStartNumber: Code[10]; var AssignedNumber: Code[10]; RowNumberOrder: Option; SeatNumberOrder: Option; ContinuousNumbering: Boolean; SeatingIncrement: Option)
-    var
-        SeatingTemplate: Record "NPR TM Seating Template";
-        RowNumber: Code[10];
-        SeatNumber: Code[10];
     begin
 
         if (RowStartNumber <> '') then
@@ -507,7 +495,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
     local procedure RenumberLeafWorker(StartFromEntryNo: Integer; StartNumber: Code[10]; var AssignedNumber: Code[10]; NumberOrder: Option "ASCENDING","DESCENDING"; ContinuousNumbering: Boolean; IncrementStyle: Option CONSECUTIVE,ODD,EVEN)
     var
         NodeList: Record "NPR TM Seating Template";
-        LeafList: Record "NPR TM Seating Template";
     begin
 
         NodeList.SetCurrentKey(Path);
@@ -585,13 +572,13 @@ codeunit 6151130 "NPR TM Seating Mgt."
                     //
                     //      NewNodeAt := GetNextSplitFraction (SplitAtLocationCsvList, NodeCount);
                     //      WHILE (NewNodeAt < 1) DO
-                    //        SeatingTemplate.FINDSET ();
+                    //        SeatingTemplate.FindSet() ();
                     //        NodeIndex := 0;
                     //        NewNodeEntryNumber := AddSibling (ApplyToEntryNumber);
                     //        REPEAT
                     //          ChangeParentN (SeatingTemplate."Entry No.", NewNodeEntryNumber, NewNodeAt);
                     //          NewNodeAt := GetNextSplitFraction (SplitAtLocationCsvList, NodeCount); // Advance to next threshold
-                    //        UNTIL (SeatingTemplate.NEXT () = 0);
+                    //        UNTIL (SeatingTemplate.Next() () = 0);
 
                 end;
         end;
@@ -632,11 +619,10 @@ codeunit 6151130 "NPR TM Seating Mgt."
         exit(NextNumber);
     end;
 
-    local procedure IncreaseNumber(StartNumber: Code[10]) NewNumber: Code[10]
+    local procedure IncreaseNumber(StartNumber: Code[10]): Code[10]
     var
         AlphaNumeric: Boolean;
         Numeric: Boolean;
-        Value: Char;
     begin
 
         AlphaNumeric := IsInRange(StartNumber[StrLen(StartNumber)], 'A', 'Z');
@@ -656,8 +642,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
     end;
 
     local procedure StringAddOne(Value: Code[10]; DigitPos: Integer): Code[10]
-    var
-        i: Integer;
     begin
         if (DigitPos = 0) then
             exit(StrSubstNo('A%1', Value));
@@ -694,7 +678,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
         exit(GetInheritedUnitPice(SeatingTemplate."Parent Entry No."));
     end;
 
-    local procedure NextField(var VarLineOfText: Text[1024]) rField: Text[1024]
+    local procedure NextField(var VarLineOfText: Text[1024]): Text[1024]
     begin
 
         exit(ForwardTokenizer(VarLineOfText, ';', '"'));
@@ -702,8 +686,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
     local procedure ForwardTokenizer(var vText: Text; pSeparator: Char; pQuote: Char) rField: Text
     var
-        Separator: Char;
-        Quote: Char;
         IsQuoted: Boolean;
         InputText: Text[1024];
         NextFieldPos: Integer;

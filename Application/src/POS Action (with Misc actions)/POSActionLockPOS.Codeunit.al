@@ -33,12 +33,10 @@ codeunit 6150835 "NPR POS Action: Lock POS"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        Confirmed: Boolean;
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSSetup: Codeunit "NPR POS Setup";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;

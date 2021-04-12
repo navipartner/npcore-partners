@@ -14,35 +14,35 @@ page 6150638 "NPR POS Posting Profiles"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Default POS Entry No. Series"; "Default POS Entry No. Series")
+                field("Default POS Entry No. Series"; Rec."Default POS Entry No. Series")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Default POS Entry No. Series field';
                 }
-                field("Max. POS Posting Diff. (LCY)"; "Max. POS Posting Diff. (LCY)")
+                field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Max. POS Posting Diff. (LCY) field';
                 }
-                field("POS Posting Diff. Account"; "POS Posting Diff. Account")
+                field("POS Posting Diff. Account"; Rec."POS Posting Diff. Account")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Differences Account field';
                 }
-                field("Source Code"; "Source Code")
+                field("Source Code"; Rec."Source Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Code field';

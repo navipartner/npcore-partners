@@ -43,7 +43,7 @@ page 6150713 "NPR POS Stargate Packages"
                 Caption = 'Import Package';
                 Image = NewItem;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -59,7 +59,7 @@ page 6150713 "NPR POS Stargate Packages"
                 Caption = 'Export Managed Dependency Manifest';
                 Image = ExportElectronicDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -91,7 +91,7 @@ page 6150713 "NPR POS Stargate Packages"
                 Caption = 'Methods';
                 Image = CreateDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Stargate Pckg Method";
@@ -150,7 +150,7 @@ page 6150713 "NPR POS Stargate Packages"
             StargatePackage.Delete(false);
         end;
 
-        Rec.Init;
+        Rec.Init();
         Rec.Name := Package.Name;
         Rec.Version := Package.Version;
         Rec.JSON.CreateOutStream(OutStr);

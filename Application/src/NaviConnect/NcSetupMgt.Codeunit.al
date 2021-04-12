@@ -1,22 +1,17 @@
-codeunit 6151500 "NPR Nc Setup Mgt."
+﻿codeunit 6151500 "NPR Nc Setup Mgt."
 {
     trigger OnRun()
     begin
     end;
 
     var
-        Text001: Label 'Source Card has not been activated for Table %1';
         NaviConnectSetup: Record "NPR Nc Setup";
-        Text10000: Label 'Check Payment Mapping?';
-        Text10010: Label 'Check Shipment Mapping?';
-        Text10020: Label 'Check VAT Business Posting Groups?';
-        Text10030: Label 'Check VAT Product Posting Groups?';
 
     procedure InitNaviConnectSetup()
     begin
-        if not NaviConnectSetup.Get then begin
-            NaviConnectSetup.Init;
-            NaviConnectSetup.Insert;
+        if not NaviConnectSetup.Get() then begin
+            NaviConnectSetup.Init();
+            NaviConnectSetup.Insert();
         end;
 
         NaviConnectSetup."Keep Tasks for" := CreateDateTime(Today, 000000T) - CreateDateTime(CalcDate('<-7D>', Today), 000000T);
@@ -30,9 +25,8 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskCode: Code[10];
         TaskDescription: Text[50];
         TaskLineNo: Integer;
-        TaskLine: Record "NPR Task Line";
     begin
-        NaviConnectSetup.Get;
+        NaviConnectSetup.Get();
         if not NaviConnectSetup."Task Queue Enabled" then
             exit;
         TaskCode := NaviConnectSetup."Task Worker Group";
@@ -74,10 +68,10 @@ codeunit 6151500 "NPR Nc Setup Mgt."
                 if not TaskQueue.Get(CompanyName, TemplateName, BatchName, LineNo) then begin
                     TaskQueue.SetupNewLine(TaskLine, false);
                     TaskQueue."Next Run time" := CurrentDateTime;
-                    TaskQueue.Insert;
+                    TaskQueue.Insert();
                 end else begin
                     TaskQueue."Next Run time" := CurrentDateTime;
-                    TaskQueue.Modify;
+                    TaskQueue.Modify();
                 end;
             TaskLine.Validate(Enabled, Enabled);
             TaskLine.Modify(true);
@@ -89,7 +83,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskWorkerGroup: Record "NPR Task Worker Group";
     begin
         if not TaskWorkerGroup.Get(GroupCode) then begin
-            TaskWorkerGroup.Init;
+            TaskWorkerGroup.Init();
             TaskWorkerGroup.Code := GroupCode;
             TaskWorkerGroup.Description := GroupDescription;
             TaskWorkerGroup.Validate("Language ID", 1033);
@@ -105,7 +99,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskTemplate: Record "NPR Task Template";
     begin
         if not TaskTemplate.Get(TemplateName) then begin
-            TaskTemplate.Init;
+            TaskTemplate.Init();
             TaskTemplate.Name := TemplateName;
             TaskTemplate.Description := TemplateDescription;
             TaskTemplate."Page ID" := PAGE::"NPR Task Journal";
@@ -120,7 +114,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskBatch: Record "NPR Task Batch";
     begin
         if not TaskBatch.Get(TemplateName, BatchName) then begin
-            TaskBatch.Init;
+            TaskBatch.Init();
             TaskBatch."Journal Template Name" := TemplateName;
             TaskBatch.Name := BatchName;
             TaskBatch.Description := BatchDescription;
@@ -135,7 +129,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskLine: Record "NPR Task Line";
     begin
         if not TaskLine.Get(TemplateName, BatchName, LineNo) then begin
-            TaskLine.Init;
+            TaskLine.Init();
             TaskLine."Journal Template Name" := TemplateName;
             TaskLine."Journal Batch Name" := BatchName;
             TaskLine."Line No." := LineNo;
@@ -166,7 +160,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskLine: Record "NPR Task Line";
     begin
         if not TaskLine.Get(TemplateName, BatchName, LineNo) then begin
-            TaskLine.Init;
+            TaskLine.Init();
             TaskLine."Journal Template Name" := TemplateName;
             TaskLine."Journal Batch Name" := BatchName;
             TaskLine."Line No." := LineNo;
@@ -196,7 +190,6 @@ codeunit 6151500 "NPR Nc Setup Mgt."
     local procedure SetupTaskLineParameterBool(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; ParameterName: Code[20]; ParameterValue: Boolean)
     var
         TaskLine: Record "NPR Task Line";
-        TaskLineParam: Record "NPR Task Line Parameters";
     begin
         if TaskLine.Get(TemplateName, BatchName, LineNo) then begin
             TaskLine.GetParameterBool(ParameterName);
@@ -207,7 +200,6 @@ codeunit 6151500 "NPR Nc Setup Mgt."
     local procedure SetupTaskLineParameterInt(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; ParameterName: Code[20]; ParameterValue: Integer)
     var
         TaskLine: Record "NPR Task Line";
-        TaskLineParam: Record "NPR Task Line Parameters";
     begin
         if TaskLine.Get(TemplateName, BatchName, LineNo) then begin
             TaskLine.GetParameterInt(ParameterName);
@@ -220,7 +212,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskLine: Record "NPR Task Line";
     begin
         if not TaskLine.Get(TemplateName, BatchName, LineNo) then begin
-            TaskLine.Init;
+            TaskLine.Init();
             TaskLine."Journal Template Name" := TemplateName;
             TaskLine."Journal Batch Name" := BatchName;
             TaskLine."Line No." := LineNo;
@@ -253,12 +245,11 @@ codeunit 6151500 "NPR Nc Setup Mgt."
     procedure GetImportTypeCode(WebServiceCodeunitID: Integer; WebserviceFunction: Text): Code[20]
     var
         ImportType: Record "NPR Nc Import Type";
-        Text1: Text;
     begin
         Clear(ImportType);
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", '%1', CopyStr('@' + WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));
-        if ImportType.FindFirst then
+        if ImportType.FindFirst() then
             exit(ImportType.Code);
 
         exit('');
@@ -275,7 +266,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
         TaskLine.SetRange("Journal Template Name", TemplateName);
         TaskLine.SetRange("Journal Batch Name", BatchName);
         TaskLine.SetRange(Description, TaskDescription);
-        if TaskLine.FindLast then;
+        if TaskLine.FindLast() then;
         LineNo := TaskLine."Line No." + 10000;
     end;
 }

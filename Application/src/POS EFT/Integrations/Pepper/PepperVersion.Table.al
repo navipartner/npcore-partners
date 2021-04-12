@@ -31,7 +31,7 @@ table 6184494 "NPR Pepper Version"
         }
         field(105; "XMLport Configuration Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("XMLport Configuration")));
             Caption = 'XMLport Configuration Name';
             Editable = false;
@@ -45,7 +45,7 @@ table 6184494 "NPR Pepper Version"
         }
         field(205; "Codeunit Begin Workshift Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Codeunit Begin Workshift")));
             Caption = 'Codeunit Begin Workshift Name';
             Editable = false;
@@ -59,7 +59,7 @@ table 6184494 "NPR Pepper Version"
         }
         field(215; "Codeunit Transaction Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Codeunit Transaction")));
             Caption = 'Codeunit Transaction Name';
             Editable = false;
@@ -73,7 +73,7 @@ table 6184494 "NPR Pepper Version"
         }
         field(225; "Codeunit End Workshift Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Codeunit End Workshift")));
             Caption = 'Codeunit End Workshift Name';
             Editable = false;
@@ -87,7 +87,7 @@ table 6184494 "NPR Pepper Version"
         }
         field(235; "Codeunit Auxiliary Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Codeunit Auxiliary Functions")));
             Caption = 'Codeunit Auxiliary Name';
             Editable = false;
@@ -101,7 +101,7 @@ table 6184494 "NPR Pepper Version"
         }
         field(245; "Codeunit Install Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Codeunit Install")));
             Caption = 'Codeunit Install Name';
             Editable = false;
@@ -155,7 +155,6 @@ table 6184494 "NPR Pepper Version"
         TxtSuccess: Label 'File %1 was uploaded.';
         TxtNotStored: Label 'File was not stored.';
         TxtCaption: Label 'Pepper installation .zip file';
-        TxtDescription: Label 'Zip File';
         TxtZipfilefilter: Label '*.zip';
         TxtZipfileDescription: Label 'ZIP Files (*.zip)|*.zip';
         RecRef: RecordRef;
@@ -170,7 +169,7 @@ table 6184494 "NPR Pepper Version"
                 begin
                     CalcFields("Install Zip File");
                     Clear("Install Zip File");
-                    Modify;
+                    Modify();
                     CalcFields("Install Zip File");
 
                     RecRef.GetTable(Rec);
@@ -178,8 +177,8 @@ table 6184494 "NPR Pepper Version"
                     RecRef.SetTable(Rec);
 
                     "Pepper DLL Version" := '';
-                    Modify;
-                    if not "Install Zip File".HasValue then
+                    Modify();
+                    if not "Install Zip File".HasValue() then
                         Error(TxtNotStored);
                 end;
         end;
@@ -188,9 +187,6 @@ table 6184494 "NPR Pepper Version"
 
     procedure ClearZipFile(FileType: Option InstallFile)
     var
-        FileManagement: Codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        UploadResult: Text[250];
         TxtNoFile: Label 'No file is present.';
         TxtConfirmClearFile: Label 'Are you sure you want to delete the file?';
         TxtFileCleared: Label 'File deleted.';
@@ -200,13 +196,13 @@ table 6184494 "NPR Pepper Version"
             FileType::InstallFile:
                 begin
                     CalcFields("Install Zip File");
-                    if not "Install Zip File".HasValue then
+                    if not "Install Zip File".HasValue() then
                         Error(TxtNoFile);
                     if not Confirm(TxtConfirmClearFile) then
                         exit;
                     Clear("Install Zip File");
                     "Pepper DLL Version" := '';
-                    Modify;
+                    Modify();
                     Message(TxtFileCleared);
                 end;
         end;
@@ -216,22 +212,18 @@ table 6184494 "NPR Pepper Version"
     procedure ExportZipFile(FileType: Option InstallFile)
     var
         TxtNoFile: Label 'No file is present.';
-        PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
-        PepperVersion: Record "NPR Pepper Version";
         StreamIn: InStream;
-        StreamOut: OutStream;
         ExportName: Text;
         TxtFileName: Label 'Pepper.zip';
         TxtTitle: Label 'ZIP File Export';
         TxtZIPFileFilter: Label 'ZIP Files (*.zip)|*.zip';
-        TempFile: File;
     begin
         //-NPR5.22
         case FileType of
             FileType::InstallFile:
                 begin
                     CalcFields("Install Zip File");
-                    if not "Install Zip File".HasValue then
+                    if not "Install Zip File".HasValue() then
                         Error(TxtNoFile);
                     ExportName := TxtFileName;
                     "Install Zip File".CreateInStream(StreamIn);

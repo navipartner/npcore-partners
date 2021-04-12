@@ -9,8 +9,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
-        ErrorReason: Text;
-        WELCOME: Label 'Welcome %1.';
 
     local procedure "--Subscribers"()
     begin
@@ -28,11 +26,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    var
-        FunctionOptionString: Text;
-        JSArr: Text;
-        OptionName: Text;
-        N: Integer;
     begin
         if Sender.DiscoverAction(
           ActionCode(),
@@ -59,21 +52,17 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'MemberCardPrompt', MemberCardPrompt);
-        Captions.AddActionCaption(ActionCode, 'MemberNumberPrompt', MemberNumberPrompt);
-        Captions.AddActionCaption(ActionCode, 'MembershipNumberPrompt', MembershipNumberPrompt);
-        Captions.AddActionCaption(ActionCode, 'MembershipTitle', MembershipTitle);
+        Captions.AddActionCaption(ActionCode(), 'MemberCardPrompt', MemberCardPrompt);
+        Captions.AddActionCaption(ActionCode(), 'MemberNumberPrompt', MemberNumberPrompt);
+        Captions.AddActionCaption(ActionCode(), 'MembershipNumberPrompt', MembershipNumberPrompt);
+        Captions.AddActionCaption(ActionCode(), 'MembershipTitle', MembershipTitle);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        Membership: Record "NPR MM Membership";
-        FunctionId: Integer;
         MemberCardNumber: Text[100];
-        MembershipEntryNo: Integer;
         DialogPrompt: Integer;
         DialogMethodType: Option;
         POSWorkflowType: Option;
@@ -151,7 +140,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
         MembershipEvents: Codeunit "NPR MM Membership Events";
         ExternalItemNo: Code[50];
-        Parameter: Code[20];
         LogEntryNo: Integer;
         ResponseCode: Integer;
         ResponseMessage: Text;
@@ -222,9 +210,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
-        MMMember: Record "NPR MM Member";
         MMMemberCard: Record "NPR MM Member Card";
-        MMMembership: Record "NPR MM Membership";
     begin
 
         if (not EanBoxEvent.Get(EventCodeExtMemberCardNo())) then begin

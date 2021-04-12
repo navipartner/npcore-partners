@@ -454,13 +454,13 @@ table 6150701 "NPR POS Menu Button"
         ParamValue.Name := 'Columns';
         ParamValue."Data Type" := ParamValue."Data Type"::Integer;
         ParamValue.Value := Format(5);
-        ParamValue.Insert;
+        ParamValue.Insert();
 
         ParamValue.InitForMenuButton(Rec);
         ParamValue.Name := 'Rows';
         ParamValue."Data Type" := ParamValue."Data Type"::Integer;
         ParamValue.Value := Format(6);
-        ParamValue.Insert;
+        ParamValue.Insert();
     end;
 
     procedure RefreshParameters()
@@ -485,13 +485,13 @@ table 6150701 "NPR POS Menu Button"
                         ParamValue := ParColumns;
                         ParamValue.Find();
                         ParamValue.Value := ParColumns.Value;
-                        ParamValue.Modify;
+                        ParamValue.Modify();
                     end;
                     if ParRowsKnown then begin
                         ParamValue := ParRows;
                         ParamValue.Find();
                         ParamValue.Value := ParRows.Value;
-                        ParamValue.Modify;
+                        ParamValue.Modify();
                     end;
                 end;
         end;
@@ -511,7 +511,6 @@ table 6150701 "NPR POS Menu Button"
     var
         ActionMgt: Codeunit "NPR POS Action Management";
         ErrorText: Text;
-        POSAction: Record "NPR POS Action";
         ActionInterface: interface "NPR IAction";
     begin
         if ("Action Type" = "Action Type"::SubMenu) or (not "Action Type".Ordinals().Contains("Action Type".AsInteger())) then
@@ -548,18 +547,15 @@ table 6150701 "NPR POS Menu Button"
             POSParameterValue.SetRange(ID, ID);
         end;
 
-        if POSParameterValue.FindSet then
+        if POSParameterValue.FindSet() then
             repeat
                 POSParameterValue.AddParameterToAction(ActionIn);
-            until POSParameterValue.Next = 0;
+            until POSParameterValue.Next() = 0;
     end;
 
     local procedure StoreActionOtherConfiguration(ActionIn: Interface "NPR IAction"; POSSession: Codeunit "NPR POS Session")
     var
-        TempParam: Record "NPR POS Parameter Value" temporary;
         POSAction: Record "NPR POS Action";
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
     begin
         if "Blocking UI" then
             ActionIn.Content.Add('Blocking', true);
@@ -617,8 +613,6 @@ table 6150701 "NPR POS Menu Button"
     end;
 
     procedure UnIndentAllowed(): Boolean
-    var
-        MenuButton: Record "NPR POS Menu Button";
     begin
         exit(Level > 0);
     end;
@@ -647,7 +641,7 @@ table 6150701 "NPR POS Menu Button"
     begin
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton.SetRange("Parent ID", ID);
-        exit(MenuButton.IsEmpty);
+        exit(MenuButton.IsEmpty());
     end;
 
     procedure InsertRow()
@@ -672,7 +666,7 @@ table 6150701 "NPR POS Menu Button"
             repeat
                 MenuButton := TempMenuButton;
                 MenuButton.Modify();
-            until TempMenuButton.Next = 0;
+            until TempMenuButton.Next() = 0;
 
         Init();
         Ordinal := xRec.Ordinal;
@@ -716,7 +710,7 @@ table 6150701 "NPR POS Menu Button"
                 MenuButton.Level += 1;
                 MenuButton.CalculatePath();
                 MenuButton.Modify();
-            until MenuButton.Next = 0;
+            until MenuButton.Next() = 0;
     end;
 
     procedure UnIndent()
@@ -743,15 +737,13 @@ table 6150701 "NPR POS Menu Button"
                 MenuButton.Level -= 1;
                 MenuButton.CalculatePath();
                 MenuButton.Modify();
-            until MenuButton.Next = 0;
+            until MenuButton.Next() = 0;
     end;
 
     procedure MoveUp()
     var
         CopyRec: Record "NPR POS Menu Button";
         MenuButton: Record "NPR POS Menu Button";
-        TempMoveUp: Record "NPR POS Menu Button" temporary;
-        TempMoveDown: Record "NPR POS Menu Button" temporary;
     begin
         if not MoveUpAllowed() then
             exit;
@@ -775,8 +767,6 @@ table 6150701 "NPR POS Menu Button"
     var
         CopyRec: Record "NPR POS Menu Button";
         MenuButton: Record "NPR POS Menu Button";
-        TempMoveUp: Record "NPR POS Menu Button" temporary;
-        TempMoveDown: Record "NPR POS Menu Button" temporary;
     begin
         if not MoveDownAllowed() then
             exit;
@@ -863,22 +853,22 @@ table 6150701 "NPR POS Menu Button"
         MenuButton: Record "NPR POS Menu Button";
     begin
         FirstHierarchy.SetCurrentKey(Ordinal);
-        if FirstHierarchy.FindSet then
+        if FirstHierarchy.FindSet() then
             repeat
                 MenuButton := FirstHierarchy;
                 MenuButton.Ordinal := NextOrdinal;
                 MenuButton.Modify();
                 NextOrdinal += 1;
-            until FirstHierarchy.Next = 0;
+            until FirstHierarchy.Next() = 0;
 
         SecondHierarchy.SetCurrentKey(Ordinal);
-        if SecondHierarchy.FindSet then
+        if SecondHierarchy.FindSet() then
             repeat
                 MenuButton := SecondHierarchy;
                 MenuButton.Ordinal := NextOrdinal;
                 MenuButton.Modify();
                 NextOrdinal += 1;
-            until SecondHierarchy.Next = 0;
+            until SecondHierarchy.Next() = 0;
     end;
 
     local procedure MoveSubtreeAboveNode(var Hierarchy: Record "NPR POS Menu Button" temporary; Node: Record "NPR POS Menu Button")
@@ -898,7 +888,7 @@ table 6150701 "NPR POS Menu Button"
 
         // Move the hierarchy above node
         First := true;
-        if Hierarchy.FindSet then
+        if Hierarchy.FindSet() then
             repeat
                 MenuButton := Hierarchy;
                 MenuButton.Ordinal := NextOrdinal;
@@ -908,7 +898,7 @@ table 6150701 "NPR POS Menu Button"
                 MenuButton.Modify();
                 NextOrdinal += 1;
                 First := false;
-            until Hierarchy.Next = 0;
+            until Hierarchy.Next() = 0;
     end;
 
     local procedure MoveSubtreeBelowNode(var Hierarchy: Record "NPR POS Menu Button" temporary; Node: Record "NPR POS Menu Button")
@@ -929,7 +919,7 @@ table 6150701 "NPR POS Menu Button"
 
         // Move the hierarchy below node
         First := true;
-        if Hierarchy.FindSet then
+        if Hierarchy.FindSet() then
             repeat
                 MenuButton := Hierarchy;
                 MenuButton.Ordinal := NextOrdinal;
@@ -939,7 +929,7 @@ table 6150701 "NPR POS Menu Button"
                 MenuButton.Modify();
                 NextOrdinal += 1;
                 First := false;
-            until Hierarchy.Next = 0;
+            until Hierarchy.Next() = 0;
     end;
 
     local procedure HandleDescendantsOnDelete()
@@ -983,7 +973,7 @@ table 6150701 "NPR POS Menu Button"
                 MenuButton.Level -= 1;
                 MenuButton.CalculatePath();
                 MenuButton.Modify();
-            until MenuButton.Next = 0;
+            until MenuButton.Next() = 0;
     end;
 
     local procedure DeleteDescendantsOnDelete()
@@ -1019,14 +1009,13 @@ table 6150701 "NPR POS Menu Button"
     local procedure CalculateID()
     var
         MenuButton: Record "NPR POS Menu Button";
-        NewOrdinal: Integer;
     begin
         if ID <> 0 then
             exit;
 
         MenuButton.SetCurrentKey("Menu Code", ID);
         MenuButton.SetRange("Menu Code", "Menu Code");
-        if MenuButton.FindLast then;
+        if MenuButton.FindLast() then;
         ID := MenuButton.ID + 1;
     end;
 
@@ -1039,7 +1028,7 @@ table 6150701 "NPR POS Menu Button"
 
         MenuButton.SetCurrentKey("Menu Code", Ordinal);
         MenuButton.SetRange("Menu Code", "Menu Code");
-        if MenuButton.FindLast then;
+        if MenuButton.FindLast() then;
         Ordinal := MenuButton.Ordinal + 1;
     end;
 
@@ -1101,11 +1090,11 @@ table 6150701 "NPR POS Menu Button"
 
     local procedure RemoveSubset(var FromSuperset: Record "NPR POS Menu Button" temporary; var Subset: Record "NPR POS Menu Button" temporary) Removed: Boolean
     begin
-        if Subset.FindSet then
+        if Subset.FindSet() then
             repeat
                 FromSuperset := Subset;
                 Removed := Removed or FromSuperset.Delete();
-            until Subset.Next = 0;
+            until Subset.Next() = 0;
     end;
 
     local procedure LookupBackgroundColor()
@@ -1122,7 +1111,7 @@ table 6150701 "NPR POS Menu Button"
         foreach String in ColorList do begin
             TempRetailList.Number += 1;
             TempRetailList.Choice := String;
-            TempRetailList.Insert;
+            TempRetailList.Insert();
         end;
 
         if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then

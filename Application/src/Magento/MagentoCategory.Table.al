@@ -196,19 +196,19 @@ table 6151414 "NPR Magento Category"
 
         MagentoCategory.SetRange("Parent Category Id", Id);
         MagentoCategory.SetSilentDelete(true);
-        if MagentoCategory.FindSet then
+        if MagentoCategory.FindSet() then
             repeat
                 MagentoCategory.Delete(true);
-            until MagentoCategory.Next = 0;
+            until MagentoCategory.Next() = 0;
 
         if (not SilentDelete) and (not GuiAllowed) then
             if not Confirm(Text000, false) then
                 Error('');
         MagentoCategoryLink.SetRange("Category Id", Id);
-        if MagentoCategoryLink.FindSet then
+        if MagentoCategoryLink.FindSet() then
             repeat
                 MagentoCategoryLink.Delete(true);
-            until MagentoCategoryLink.Next = 0;
+            until MagentoCategoryLink.Next() = 0;
     end;
 
     trigger OnInsert()
@@ -244,11 +244,11 @@ table 6151414 "NPR Magento Category"
         MagentoCategory: Record "NPR Magento Category";
     begin
         MagentoCategory.SetRange("Parent Category Id", Id);
-        ChildrenCount := MagentoCategory.Count;
-        if MagentoCategory.FindSet then
+        ChildrenCount := MagentoCategory.Count();
+        if MagentoCategory.FindSet() then
             repeat
                 ChildrenCount += MagentoCategory.GetChildrenCount();
-            until MagentoCategory.Next = 0;
+            until MagentoCategory.Next() = 0;
 
         exit(ChildrenCount);
     end;
@@ -258,7 +258,7 @@ table 6151414 "NPR Magento Category"
         MagentoCategory: Record "NPR Magento Category";
     begin
         MagentoCategory.SetRange("Parent Category Id", Id);
-        if not MagentoCategory.FindLast then
+        if not MagentoCategory.FindLast() then
             exit(Id + '00');
 
         exit(IncStr(MagentoCategory.Id));
@@ -277,7 +277,7 @@ table 6151414 "NPR Magento Category"
         exit(MagentoCategoryPath);
     end;
 
-    local procedure GetRootNo() RootNo: Code[20]
+    local procedure GetRootNo(): Code[20]
     var
         MagentoCategory: Record "NPR Magento Category";
     begin
@@ -301,15 +301,15 @@ table 6151414 "NPR Magento Category"
         NewPath: Text;
     begin
         MagentoCategory.SetRange("Parent Category Id", Id);
-        if MagentoCategory.FindSet then
+        if MagentoCategory.FindSet() then
             repeat
                 NewPath := Path + '/' + MagentoCategory.Id;
                 if (MagentoCategory.Path <> NewPath) or (MagentoCategory."Root No." <> "Root No.") then begin
                     MagentoCategory.Path := NewPath;
                     MagentoCategory."Root No." := "Root No.";
-                    MagentoCategory.Modify;
+                    MagentoCategory.Modify();
                 end;
                 MagentoCategory.UpdateChildPath();
-            until MagentoCategory.Next = 0;
+            until MagentoCategory.Next() = 0;
     end;
 }

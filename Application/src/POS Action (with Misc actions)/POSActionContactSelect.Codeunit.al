@@ -2,9 +2,6 @@ codeunit 6150866 "NPR POS Action: Contact Select"
 {
     var
         ActionDescription: Label 'Attach or remove Contact from POS sale.';
-        ERRDOCTYPE: Label 'Wrong Document Type. Document Type is set to %1. It must be one of %2, %3, %4 or %5';
-        ERRPARSED: Label 'SalesDocumentToPOS and SalesDocumentAmountToPOS can not be used simultaneously. This is an error in parameter setting on menu button for action %1.';
-        ERRPARSEDCOMB: Label 'Import of amount is only supported for Document Type Order. This is an error in parameter setting on menu button for action %1.';
         CAPTION_OPERATION: Label 'Operation';
         CAPTION_TABLEVIEW: Label 'Contact Table View';
         CAPTION_CONTACTPAGE: Label 'Contact Lookup Page';
@@ -26,20 +23,18 @@ codeunit 6150866 "NPR POS Action: Contact Select"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('Select', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('Select', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('Operation', 'Attach,Remove', 'Attach');
-                RegisterTextParameter('ContactTableView', '');
-                RegisterIntegerParameter('ContactLookupPage', 0);
-            end;
+            Sender.RegisterOptionParameter('Operation', 'Attach,Remove', 'Attach');
+            Sender.RegisterTextParameter('ContactTableView', '');
+            Sender.RegisterIntegerParameter('ContactLookupPage', 0);
         end;
     end;
 
@@ -51,7 +46,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
         ContactTableView: Text;
         ContactLookupPage: Integer;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -110,7 +105,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -126,7 +121,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -142,7 +137,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -156,9 +151,8 @@ codeunit 6150866 "NPR POS Action: Contact Select"
     var
         FilterPageBuilder: FilterPageBuilder;
         Contact: Record Contact;
-        AllObj: Record AllObj;
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -182,7 +176,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
         PageId: Integer;
         Contact: Record Contact;
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -193,7 +187,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
                     Evaluate(PageId, POSParameterValue.Value);
                     PageMetadata.SetRange(ID, PageId);
                     PageMetadata.SetRange(SourceTable, DATABASE::Contact);
-                    PageMetadata.FindFirst;
+                    PageMetadata.FindFirst();
                 end;
             'ContactTableView':
                 begin

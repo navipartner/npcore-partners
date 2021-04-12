@@ -32,7 +32,7 @@ codeunit 6014496 "NPR Reten. Pol. Install"
     trigger OnInstallAppPerCompany()
     begin
         AddAllowedTables();
-        
+
     end;
 
     procedure AddAllowedTables()

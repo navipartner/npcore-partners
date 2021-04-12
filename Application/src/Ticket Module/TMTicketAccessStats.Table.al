@@ -115,7 +115,7 @@ table 6060115 "NPR TM Ticket Access Stats"
         }
         field(120; "Sum Admission Count"; Decimal)
         {
-            CalcFormula = Sum ("NPR TM Ticket Access Stats"."Admission Count" WHERE("Item No." = FIELD("Item No. Filter"),
+            CalcFormula = Sum("NPR TM Ticket Access Stats"."Admission Count" WHERE("Item No." = FIELD("Item No. Filter"),
                                                                                      "Ticket Type" = FIELD("Ticket Type Filter"),
                                                                                      "Admission Date" = FIELD("Admission Date Filter"),
                                                                                      "Admission Hour" = FIELD("Admission Hour Filter"),
@@ -127,7 +127,7 @@ table 6060115 "NPR TM Ticket Access Stats"
         }
         field(122; "Sum Admission Count (Neg)"; Decimal)
         {
-            CalcFormula = Sum ("NPR TM Ticket Access Stats"."Admission Count (Neg)" WHERE("Item No." = FIELD("Item No. Filter"),
+            CalcFormula = Sum("NPR TM Ticket Access Stats"."Admission Count (Neg)" WHERE("Item No." = FIELD("Item No. Filter"),
                                                                                            "Ticket Type" = FIELD("Ticket Type Filter"),
                                                                                            "Admission Date" = FIELD("Admission Date Filter"),
                                                                                            "Admission Hour" = FIELD("Admission Hour Filter"),
@@ -139,7 +139,7 @@ table 6060115 "NPR TM Ticket Access Stats"
         }
         field(123; "Sum Admission Count (Re-Entry)"; Decimal)
         {
-            CalcFormula = Sum ("NPR TM Ticket Access Stats"."Admission Count (Re-Entry)" WHERE("Item No." = FIELD("Item No. Filter"),
+            CalcFormula = Sum("NPR TM Ticket Access Stats"."Admission Count (Re-Entry)" WHERE("Item No." = FIELD("Item No. Filter"),
                                                                                                 "Ticket Type" = FIELD("Ticket Type Filter"),
                                                                                                 "Admission Date" = FIELD("Admission Date Filter"),
                                                                                                 "Admission Hour" = FIELD("Admission Hour Filter"),

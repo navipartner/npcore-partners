@@ -13,29 +13,29 @@ page 6060164 "NPR Event Attr. Column Values"
         {
             repeater(Group)
             {
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Include in Formula"; "Include in Formula")
+                field("Include in Formula"; Rec."Include in Formula")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Include in Formula field';
                 }
-                field(Promote; Promote)
+                field(Promote; Rec.Promote)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Promote field';

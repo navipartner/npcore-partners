@@ -110,35 +110,35 @@ table 6060128 "NPR MM Membership Role"
         }
         field(100; "External Member No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'External Member No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(101; "Member Display Name"; Text[100])
         {
-            CalcFormula = Lookup ("NPR MM Member"."Display Name" WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."Display Name" WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'Member Display Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(110; "External Membership No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'External Membership No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(111; "Membership Code"; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."Membership Code" WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."Membership Code" WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Membership Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(112; "Company Name"; Text[50])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."Company Name" WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."Company Name" WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Company Name';
             Editable = false;
             FieldClass = FlowField;
@@ -164,7 +164,7 @@ table 6060128 "NPR MM Membership Role"
         }
         field(510; "GDPR Current Entry No."; Integer)
         {
-            CalcFormula = Max ("NPR GDPR Consent Log"."Entry No." WHERE("Agreement No." = FIELD("GDPR Agreement No."),
+            CalcFormula = Max("NPR GDPR Consent Log"."Entry No." WHERE("Agreement No." = FIELD("GDPR Agreement No."),
                                                                     "Data Subject Id" = FIELD("GDPR Data Subject Id"),
                                                                     "Agreement Version" = FIELD("GDPR Version Filter"),
                                                                     "Valid From Date" = FIELD("GDPR Date Filter")));
@@ -175,7 +175,7 @@ table 6060128 "NPR MM Membership Role"
         }
         field(520; "GDPR Approval"; Option)
         {
-            CalcFormula = Lookup ("NPR GDPR Consent Log"."Entry Approval State" WHERE("Entry No." = FIELD("GDPR Current Entry No.")));
+            CalcFormula = Lookup("NPR GDPR Consent Log"."Entry Approval State" WHERE("Entry No." = FIELD("GDPR Current Entry No.")));
             Caption = 'GDPR Approval';
             Description = '';
             Editable = false;

@@ -183,7 +183,7 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
                         begin
 
                             if (TmpContactResponse."First Name" = '') and (TmpContactResponse.Surname = '') then
-                                currXMLport.Skip;
+                                currXMLport.Skip();
                         end;
                     }
                     fieldelement(Email; TmpContactResponse."E-Mail")
@@ -255,11 +255,11 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
         StartTime := Time;
         SetErrorResponse('No response.');
 
-        TmpContactRequest.FindFirst;
+        TmpContactRequest.FindFirst();
         TmpContact.TransferFields(TmpContactRequest, true);
         TmpContact.Insert();
 
-        TmpCustomerRequest.FindFirst;
+        TmpCustomerRequest.FindFirst();
         TmpCustomer.TransferFields(TmpCustomerRequest, true);
         TmpCustomer.Insert();
     end;

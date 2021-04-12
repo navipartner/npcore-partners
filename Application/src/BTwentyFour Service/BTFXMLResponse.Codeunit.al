@@ -6,7 +6,6 @@ codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
         Node: XmlNode;
         ChildNode: XmlNode;
         Xml: Text;
-        InStr: InStream;
         OutStr: OutStream;
     begin
         Document := XmlDocument.Create();
@@ -15,10 +14,10 @@ codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
         Document.Add(Node);
 
         ChildNode := XmlElement.Create('error', '', ErrorCode).AsXmlNode();
-        Node.AsXmlElement.Add(ChildNode);
+        Node.AsXmlElement().Add(ChildNode);
 
         ChildNode := XmlElement.Create('error_description', '', ErrorDescription).AsXmlNode();
-        Node.AsXmlElement.Add(ChildNode);
+        Node.AsXmlElement().Add(ChildNode);
 
         Document.WriteTo(Xml);
 

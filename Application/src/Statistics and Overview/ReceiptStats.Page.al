@@ -1,4 +1,4 @@
-page 6014491 "NPR Receipt Stats"
+﻿page 6014491 "NPR Receipt Stats"
 {
     Caption = 'Receipt statistics';
     PageType = List;
@@ -13,12 +13,12 @@ page 6014491 "NPR Receipt Stats"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Period Start"; "Period Start")
+                field("Period Start"; Rec."Period Start")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Start field';
                 }
-                field("Period Name"; "Period Name")
+                field("Period Name"; Rec."Period Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Name field';
@@ -38,28 +38,28 @@ page 6014491 "NPR Receipt Stats"
 
                                 PeriodType := PeriodType::Day;
                                 VendPeriodLength := PeriodType::Day;
-                                SetRange("Period Type", "Period Type"::Date);
+                                Rec.SetRange("Period Type", Rec."Period Type"::Date);
                                 CurrPage.Update(true);
                             end;
                         PeriodType::Week:
                             begin
                                 PeriodType := PeriodType::Week;
                                 VendPeriodLength := PeriodType::Week;
-                                SetRange("Period Type", "Period Type"::Week);
+                                Rec.SetRange("Period Type", Rec."Period Type"::Week);
                                 CurrPage.Update(true);
                             end;
 
                         PeriodType::Month:
                             begin
                                 VendPeriodLength := PeriodType::Month;
-                                SetRange("Period Type", "Period Type"::Month);
+                                Rec.SetRange("Period Type", Rec."Period Type"::Month);
                                 CurrPage.Update(true);
                             end;
                         PeriodType::Quarter:
                             begin
                                 PeriodType := PeriodType::Quarter;
                                 VendPeriodLength := PeriodType::Quarter;
-                                SetRange("Period Type", "Period Type"::Quarter);
+                                Rec.SetRange("Period Type", Rec."Period Type"::Quarter);
                                 CurrPage.Update(true);
                             end;
 
@@ -67,7 +67,7 @@ page 6014491 "NPR Receipt Stats"
                             begin
                                 PeriodType := PeriodType::Year;
                                 VendPeriodLength := PeriodType;
-                                SetRange("Period Type", "Period Type"::Year);
+                                Rec.SetRange("Period Type", Rec."Period Type"::Year);
                                 CurrPage.Update(true);
                             end;
                     end;
@@ -91,7 +91,7 @@ page 6014491 "NPR Receipt Stats"
     trigger OnOpenPage()
     begin
 
-        Reset;
+        Rec.Reset();
     end;
 
     var

@@ -128,7 +128,7 @@ page 6060040 "NPR Item Worksheet Templates"
                 Caption = 'Worksheets';
                 Image = Worksheet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Item Worksheets";
@@ -150,8 +150,8 @@ page 6060040 "NPR Item Worksheet Templates"
                     ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
                     ItemWorksheetFieldSetupPage: Page "NPR Item Worksh. Field Setup";
                 begin
-                    InsertDefaultFieldSetup();
-                    ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", Name);
+                    Rec.InsertDefaultFieldSetup();
+                    ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", Rec.Name);
                     ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '');
                     ItemWorksheetFieldSetupPage.SetTableView(ItemWorksheetFieldSetup);
                     ItemWorksheetFieldSetupPage.Run();

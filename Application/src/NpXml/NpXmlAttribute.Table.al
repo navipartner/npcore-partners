@@ -69,8 +69,6 @@ table 6151554 "NPR NpXml Attribute"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                "Field": Record "Field";
             begin
             end;
         }

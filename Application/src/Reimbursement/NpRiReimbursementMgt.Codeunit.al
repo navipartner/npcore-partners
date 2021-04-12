@@ -1,4 +1,4 @@
-codeunit 6151102 "NPR NpRi Reimbursement Mgt."
+﻿codeunit 6151102 "NPR NpRi Reimbursement Mgt."
 {
 
     TableNo = "NPR NpRi Reimbursement";
@@ -34,7 +34,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
     begin
         NpRiReimbursementEntry.SetRange("Entry Type", NpRiReimbursementEntry."Entry Type"::"Data Collection");
         NpRiReimbursementEntry.SetRange(Open, true);
-        if not NpRiReimbursementEntry.FindSet then
+        if not NpRiReimbursementEntry.FindSet() then
             exit;
 
         repeat
@@ -46,15 +46,15 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
             NpRiReimbursementEntry.Open := false;
             NpRiReimbursementEntry."Remaining Amount" := 0;
             NpRiReimbursementEntry."Closed by Entry No." := NpRiReimbursementEntryApply."Entry No.";
-            NpRiReimbursementEntry.Modify;
+            NpRiReimbursementEntry.Modify();
 
             xNpRiReimbursementEntry := NpRiReimbursementEntry;
-        until NpRiReimbursementEntry.Next = 0;
+        until NpRiReimbursementEntry.Next() = 0;
     end;
 
     local procedure CreateManualApplicationEntry(NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
     begin
-        NpRiReimbursementEntryApply.Init;
+        NpRiReimbursementEntryApply.Init();
         NpRiReimbursementEntryApply."Entry No." := 0;
         NpRiReimbursementEntryApply."Entry Type" := NpRiReimbursementEntryApply."Entry Type"::"Manual Application";
         NpRiReimbursementEntryApply."Party Type" := NpRiReimbursementEntry."Party Type";
@@ -66,7 +66,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntryApply.Open := false;
         NpRiReimbursementEntryApply."Remaining Amount" := 0;
         NpRiReimbursementEntryApply."Closed by Entry No." := NpRiReimbursementEntry."Entry No.";
-        NpRiReimbursementEntryApply."Posting Date" := Today;
+        NpRiReimbursementEntryApply."Posting Date" := Today();
         NpRiReimbursementEntryApply."Document Type" := NpRiReimbursementEntry."Document Type"::" ";
         NpRiReimbursementEntryApply."Document No." := '';
         NpRiReimbursementEntryApply.Insert(true);
@@ -75,18 +75,18 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntryApply."Source Table No." := DATABASE::"NPR NpRi Reimbursement Entry";
         NpRiReimbursementEntryApply."Source Record Position" := NpRiReimbursementEntryApply.GetPosition(false);
         NpRiReimbursementEntryApply."Source Entry No." := NpRiReimbursementEntryApply."Entry No.";
-        NpRiReimbursementEntryApply.Modify;
+        NpRiReimbursementEntryApply.Modify();
     end;
 
     local procedure UpdateManualApplicationEntry(NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
     begin
-        NpRiReimbursementEntryApply.Find;
+        NpRiReimbursementEntryApply.Find();
         NpRiReimbursementEntryApply.TestField("Entry Type", NpRiReimbursementEntryApply."Entry Type"::"Manual Application");
 
         NpRiReimbursementEntryApply.Amount -= NpRiReimbursementEntry."Remaining Amount";
         NpRiReimbursementEntryApply.Positive := NpRiReimbursementEntry.Amount > 0;
         NpRiReimbursementEntryApply."Closed by Entry No." := NpRiReimbursementEntry."Entry No.";
-        NpRiReimbursementEntryApply.Modify;
+        NpRiReimbursementEntryApply.Modify();
     end;
 
     local procedure IsNewApplication(xNpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"): Boolean
@@ -106,30 +106,30 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntry.Open := true;
         NpRiReimbursementEntry."Remaining Amount" := NpRiReimbursementEntry.Amount;
         NpRiReimbursementEntry."Closed by Entry No." := 0;
-        NpRiReimbursementEntry.Modify;
+        NpRiReimbursementEntry.Modify();
 
         NpRiReimbursementEntryApply.SetRange(Open, false);
         NpRiReimbursementEntryApply.SetRange("Closed by Entry No.", NpRiReimbursementEntry."Entry No.");
-        if not NpRiReimbursementEntryApply.FindSet then
+        if not NpRiReimbursementEntryApply.FindSet() then
             exit;
 
         repeat
             NpRiReimbursementEntryApply.Open := true;
             NpRiReimbursementEntryApply."Remaining Amount" := NpRiReimbursementEntryApply.Amount;
             NpRiReimbursementEntryApply."Closed by Entry No." := 0;
-            NpRiReimbursementEntryApply.Modify;
-        until NpRiReimbursementEntryApply.Next = 0;
+            NpRiReimbursementEntryApply.Modify();
+        until NpRiReimbursementEntryApply.Next() = 0;
 
         CreateCancelApplicationEntry(NpRiReimbursementEntry, NpRiReimbursementEntryApply);
         NpRiReimbursementEntry.Open := false;
         NpRiReimbursementEntry."Remaining Amount" := 0;
         NpRiReimbursementEntry."Closed by Entry No." := NpRiReimbursementEntryApply."Entry No.";
-        NpRiReimbursementEntry.Modify;
+        NpRiReimbursementEntry.Modify();
     end;
 
     local procedure CreateCancelApplicationEntry(var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
     begin
-        NpRiReimbursementEntryApply.Init;
+        NpRiReimbursementEntryApply.Init();
         NpRiReimbursementEntryApply."Entry No." := 0;
         NpRiReimbursementEntryApply."Entry Type" := NpRiReimbursementEntryApply."Entry Type"::"Manual Application";
         NpRiReimbursementEntryApply."Party Type" := NpRiReimbursementEntry."Party Type";
@@ -141,7 +141,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntryApply.Open := false;
         NpRiReimbursementEntryApply."Remaining Amount" := 0;
         NpRiReimbursementEntryApply."Closed by Entry No." := NpRiReimbursementEntry."Entry No.";
-        NpRiReimbursementEntryApply."Posting Date" := Today;
+        NpRiReimbursementEntryApply."Posting Date" := Today();
         NpRiReimbursementEntryApply."Document Type" := NpRiReimbursementEntry."Document Type"::" ";
         NpRiReimbursementEntryApply."Document No." := '';
         NpRiReimbursementEntryApply.Insert(true);
@@ -150,19 +150,19 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntryApply."Source Table No." := DATABASE::"NPR NpRi Reimbursement Entry";
         NpRiReimbursementEntryApply."Source Record Position" := NpRiReimbursementEntryApply.GetPosition(false);
         NpRiReimbursementEntryApply."Source Entry No." := NpRiReimbursementEntryApply."Entry No.";
-        NpRiReimbursementEntryApply.Modify;
+        NpRiReimbursementEntryApply.Modify();
     end;
 
     //Reimbursement
     procedure RunReimbursements(var NpRiReimbursement: Record "NPR NpRi Reimbursement")
     begin
-        if NpRiReimbursement.FindSet then
+        if NpRiReimbursement.FindSet() then
             repeat
                 if not NpRiReimbursement.Deactivated then begin
                     RunReimbursement(NpRiReimbursement);
-                    Commit;
+                    Commit();
                 end;
-            until NpRiReimbursement.Next = 0;
+            until NpRiReimbursement.Next() = 0;
     end;
 
     procedure RunReimbursement(var NpRiReimbursement: Record "NPR NpRi Reimbursement")
@@ -201,7 +201,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
             Error(Text002, NpRiReimbursement."Reimbursement Module");
 
         NpRiReimbursement2 := NpRiReimbursement;
-        NpRiReimbursement.Find;
+        NpRiReimbursement.Find();
         NpRiReimbursement := NpRiReimbursement2;
         NpRiReimbursement."Last Posting Date" := NpRiReimbursement."Posting Date";
         NpRiReimbursement."Last Reimbursement at" := CurrentDateTime;
@@ -229,7 +229,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntry.SetRange("Entry Type", NpRiReimbursementEntry."Entry Type"::"Data Collection");
         NpRiReimbursementEntry.SetRange(Open, true);
         NpRiReimbursementEntry.SetFilter("Posting Date", '<=%1', NpRiReimbursement."Posting Date");
-        exit(NpRiReimbursementEntry.FindFirst);
+        exit(NpRiReimbursementEntry.FindFirst());
     end;
 
     local procedure ReimburseApplyEntries(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
@@ -240,7 +240,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntry.CalcSums(Amount);
         CreateReimbursementApplicationEntry(NpRiReimbursement, -NpRiReimbursementEntry.Amount, NpRiReimbursementEntryApply);
 
-        NpRiReimbursementEntry.FindLast;
+        NpRiReimbursementEntry.FindLast();
         NpRiReimbursementEntry.ModifyAll("Remaining Amount", 0);
         NpRiReimbursementEntry.ModifyAll("Closed by Entry No.", NpRiReimbursementEntryApply."Entry No.");
         NpRiReimbursementEntry.ModifyAll(Open, false);
@@ -259,7 +259,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         if NpRiReimbursementTemplate."Posting Description" = '' then
             NpRiReimbursementTemplate."Posting Description" := NpRiReimbursementTemplate.Description;
 
-        NpRiReimbursementEntryApply.Init;
+        NpRiReimbursementEntryApply.Init();
         NpRiReimbursementEntryApply."Entry No." := 0;
         NpRiReimbursementEntryApply."Entry Type" := NpRiReimbursementEntryApply."Entry Type"::Reimbursement;
         NpRiReimbursementEntryApply."Party Type" := NpRiReimbursement."Party Type";

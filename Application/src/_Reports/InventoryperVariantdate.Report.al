@@ -1,4 +1,4 @@
-report 6014612 "NPR Inventory per Variant/date"
+﻿report 6014612 "NPR Inventory per Variant/date"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Variant at date.rdlc';
@@ -215,7 +215,7 @@ report 6014612 "NPR Inventory per Variant/date"
                     Clear(ItemLedgEntry);
                     TempQuantity := 0;
 
-                    ItemLedgEntry.Reset;
+                    ItemLedgEntry.Reset();
                     ItemLedgEntry.SetRange("Item No.", Item."No.");
                     ItemLedgEntry.SetRange("Variant Code", Code);
                     ItemLedgEntry.SetFilter("Posting Date", Item1.GetFilter("Date Filter"));
@@ -263,7 +263,7 @@ report 6014612 "NPR Inventory per Variant/date"
 
                     ItemLedgEntry.SetRange("Location Code");
                     ItemLedgEntry.SetRange("Entry Type", 1);
-                    if ItemLedgEntry.FindLast then
+                    if ItemLedgEntry.FindLast() then
                         SaleDateVariant := ItemLedgEntry."Posting Date"
                     else
                         SaleDateVariant := 0D;
@@ -321,7 +321,7 @@ report 6014612 "NPR Inventory per Variant/date"
                 "Unit Price" := Round("Unit Price", 0.01);
                 "Last Direct Cost" := Round("Last Direct Cost", 0.01);
 
-                ItemLedgEntry.Reset;
+                ItemLedgEntry.Reset();
                 ItemLedgEntry.SetCurrentKey("Item No.", "Entry Type", "Posting Date");
                 ItemLedgEntry.SetRange("Entry Type", 1);
                 ItemLedgEntry.SetFilter(ItemLedgEntry."Item No.", '%1', "No.");

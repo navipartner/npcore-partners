@@ -72,22 +72,19 @@ table 6060091 "NPR MM Admis. Service Entry"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-                NotFoundReasonText: Text;
             begin
             end;
         }
         field(24; "External Membership No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Lookup("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
             Caption = 'External Membership No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(25; "External Member No."; Code[20])
         {
-            CalcFormula = Lookup ("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
+            CalcFormula = Lookup("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));
             Caption = 'External Member No.';
             Editable = false;
             FieldClass = FlowField;

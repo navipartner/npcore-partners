@@ -40,7 +40,7 @@ table 6151525 "NPR Nc Collector"
         }
         field(35; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;

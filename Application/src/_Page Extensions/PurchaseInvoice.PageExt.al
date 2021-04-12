@@ -4,7 +4,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
     {
         addafter(Status)
         {
-            field("NPR PostingDescription"; "Posting Description")
+            field("NPR PostingDescription"; Rec."Posting Description")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Posting Description field';
@@ -29,13 +29,13 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                 Caption = 'Show Imported File';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Imported File action';
-                Image = View; 
+                Image = View;
 
                 trigger OnAction()
                 var
                     NcImportListPg: Page "NPR Nc Import List";
                 begin
-                    NcImportListPg.ShowFormattedDocByDocNo("Vendor Invoice No.");
+                    NcImportListPg.ShowFormattedDocByDocNo(Rec."Vendor Invoice No.");
                 end;
             }
         }
@@ -51,7 +51,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Ellipsis = true;
                     Image = BinContent;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Print action';
@@ -61,7 +61,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Caption = 'Price Label';
                     Image = BinContent;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

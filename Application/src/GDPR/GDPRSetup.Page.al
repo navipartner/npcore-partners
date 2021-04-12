@@ -14,7 +14,7 @@ page 6151120 "NPR GDPR Setup"
         {
             group(General)
             {
-                field("Agreement Nos."; "Agreement Nos.")
+                field("Agreement Nos."; Rec."Agreement Nos.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Agreement Nos. field';

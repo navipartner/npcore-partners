@@ -1,4 +1,4 @@
-page 6151153 "NPR GDPR Anonymization Req."
+﻿page 6151153 "NPR GDPR Anonymization Req."
 {
     Caption = 'GDPR Anonymization Request';
     Editable = false;
@@ -13,42 +13,42 @@ page 6151153 "NPR GDPR Anonymization Req."
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Contact No."; "Contact No.")
+                field("Contact No."; Rec."Contact No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact No. field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Request Received"; "Request Received")
+                field("Request Received"; Rec."Request Received")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request Received field';
                 }
-                field("Processed At"; "Processed At")
+                field("Processed At"; Rec."Processed At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processed At field';
                 }
-                field("Log Count"; "Log Count")
+                field("Log Count"; Rec."Log Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Count field';
                 }
-                field(Reason; Reason)
+                field(Reason; Rec.Reason)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reason field';
@@ -67,7 +67,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 Ellipsis = true;
                 Image = ChangeLog;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Page "NPR Customer GDPR Log Entries";
                 RunPageLink = "Customer No" = FIELD("Customer No.");
@@ -82,7 +82,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 Caption = 'Anonymize';
                 Image = Absence;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Anonymize action';
@@ -100,8 +100,6 @@ page 6151153 "NPR GDPR Anonymization Req."
         }
     }
 
-    var
-        NPGDPRManagement: Codeunit "NPR GDPR Management";
 
     trigger OnOpenPage()
     begin
@@ -133,7 +131,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                                 if (CancelMembership(MembershipEntryNo)) then
                                     if (GDPRManagement.AnonymizeMembership(MembershipEntryNo, false, Reason)) then begin
                                         GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
-                                        InsertLogEntry("Customer No.");
+                                        InsertLogEntry(Rec."Customer No.");
                                     end;
                                 GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
                                 GDPRAnonymizationRequest.Modify();
@@ -204,7 +202,7 @@ page 6151153 "NPR GDPR Anonymization Req."
             Membership."Block Reason" := Membership."Block Reason"::ANONYMIZED;
             Membership.Modify(true);
 
-            MemberInfoCapture.INIT;
+            MemberInfoCapture.Init();
             MemberInfoCapture."Entry No." := 0;
             MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
             MemberInfoCapture."External Membership No." := Membership."External Membership No.";
@@ -246,7 +244,7 @@ page 6151153 "NPR GDPR Anonymization Req."
         else
             EntryNo := 1;
 
-        GDPRLogEntry.INIT;
+        GDPRLogEntry.Init();
         GDPRLogEntry."Entry No" := EntryNo + 1;
         GDPRLogEntry."Customer No" := CustNo;
         GDPRLogEntry.Status := GDPRLogEntry.Status::Anonymised;

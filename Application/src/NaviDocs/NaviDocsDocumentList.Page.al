@@ -1,4 +1,4 @@
-page 6059769 "NPR NaviDocs Document List"
+﻿page 6059769 "NPR NaviDocs Document List"
 {
     Caption = 'NaviDocs Document List';
     DeleteAllowed = false;
@@ -355,8 +355,8 @@ page 6059769 "NPR NaviDocs Document List"
     var
         NaviDocsEntryAttachment: Record "NPR NaviDocs Entry Attachment";
     begin
-        NaviDocsSetup.Get;
-        ShowAttachmentSubpage := not NaviDocsEntryAttachment.IsEmpty;
+        NaviDocsSetup.Get();
+        ShowAttachmentSubpage := not NaviDocsEntryAttachment.IsEmpty();
     end;
 
     var
@@ -383,17 +383,17 @@ page 6059769 "NPR NaviDocs Document List"
         if not Confirm(StrSubstNo(TxtConfirm001, Format(NaviDocsEntry2.Count), TxtConfirm011), true) then
             Error(TxtConfirm020);
 
-        if NaviDocsEntry2.FindSet then
+        if NaviDocsEntry2.FindSet() then
             repeat
                 NaviDocsEntry3.Copy(NaviDocsEntry2);
                 NaviDocsManagement.Process(NaviDocsEntry3);
                 Commit();
-            until NaviDocsEntry2.Next = 0;
+            until NaviDocsEntry2.Next() = 0;
 
-        NaviDocsEntry2.Reset;
+        NaviDocsEntry2.Reset();
         NaviDocsEntry2.SetCurrentKey(Status);
         NaviDocsEntry2.SetRange(Status, 0, 1);
-        if NaviDocsEntry2.Count > 0 then
+        if NaviDocsEntry2.Count() > 0 then
             Message(TxtHandled001, NaviDocsEntry2.Count)
         else
             Message(TxtHandled002);
@@ -407,11 +407,11 @@ page 6059769 "NPR NaviDocs Document List"
         NaviDocsEntry2.SetCurrentKey(Status);
         CurrPage.SetSelectionFilter(NaviDocsEntry2);
         NaviDocsEntry2.SetRange(Status, 0, 1);
-        if NaviDocsEntry2.FindSet then
+        if NaviDocsEntry2.FindSet() then
             repeat
                 if NaviDocsManagement.CheckAndUpdateStatus(NaviDocsEntry2) then
-                    Commit;
-            until NaviDocsEntry2.Next = 0;
+                    Commit();
+            until NaviDocsEntry2.Next() = 0;
 
         CurrPage.Update(false);
     end;
@@ -423,12 +423,12 @@ page 6059769 "NPR NaviDocs Document List"
         if not Confirm(StrSubstNo(TxtConfirm001, Format(NaviDocsEntry2.Count), TxtConfirm012)) then
             Error(TxtConfirm020);
 
-        if NaviDocsEntry2.FindSet then
+        if NaviDocsEntry2.FindSet() then
             repeat
                 NaviDocsEntry3.Copy(NaviDocsEntry2);
                 NaviDocsManagement.UpdateStatus(NaviDocsEntry3, UpdateStatus);
-                Commit;
-            until NaviDocsEntry2.Next = 0;
+                Commit();
+            until NaviDocsEntry2.Next() = 0;
 
         CurrPage.Update(false);
     end;
@@ -442,25 +442,25 @@ page 6059769 "NPR NaviDocs Document List"
 
         if PAGE.RunModal(0, NewHandlingProfile) <> ACTION::LookupOK then
             exit;
-        if NaviDocsEntry2.FindSet then
+        if NaviDocsEntry2.FindSet() then
             repeat
                 if NaviDocsManagement.SetHandlingProfile(NaviDocsEntry2, NewHandlingProfile) then begin
                     TempChangedNaviDocsEntry := NaviDocsEntry2;
-                    TempChangedNaviDocsEntry.Insert;
-                    Commit;
+                    TempChangedNaviDocsEntry.Insert();
+                    Commit();
                 end;
-            until NaviDocsEntry2.Next = 0;
+            until NaviDocsEntry2.Next() = 0;
 
-        if TempChangedNaviDocsEntry.FindSet then
+        if TempChangedNaviDocsEntry.FindSet() then
             if Confirm(TxtConfirmHandleChanged) then
                 repeat
                     NaviDocsEntry2.Get(TempChangedNaviDocsEntry."Entry No.");
                     NaviDocsEntry2.Status := 0;
                     if NaviDocsManagement.Run(NaviDocsEntry2) then;
-                    Commit;
-                until TempChangedNaviDocsEntry.Next = 0;
+                    Commit();
+                until TempChangedNaviDocsEntry.Next() = 0;
 
-        NaviDocsEntry2.Reset;
+        NaviDocsEntry2.Reset();
         CurrPage.Update(false);
     end;
 }

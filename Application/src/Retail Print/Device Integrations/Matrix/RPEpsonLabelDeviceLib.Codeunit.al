@@ -55,13 +55,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
     EventSubscriberInstance = Manual;
 
     trigger OnRun()
-    var
-        Itt: Integer;
-        J: Integer;
-        cNUL: Char;
-        ff: File;
-        kc1: Char;
-        kc2: Char;
     begin
     end;
 
@@ -69,8 +62,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         TempPattern: Text[50];
         ESC: Codeunit "NPR RP Escape Code Library";
         PrintBuffer: Text;
-        iTemp: Integer;
-        iTemp2: Integer;
         PrinterInitialized: Boolean;
         LabelHeight: Integer;
 
@@ -103,8 +94,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
-        with POSPrintBuffer do
-            PrintData(Text, Font, Align, Rotation, Height, Width, X, Y);
+        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnLookupFont', '', false, false)]
@@ -143,7 +133,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         tmpRetailList.Number += 1;
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     local procedure "// Shorthand function"()
@@ -170,7 +160,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
 
     procedure PrintData(TextIn: Text[100]; FontType: Text[100]; Align: Integer; Rotation: Integer; Height: Integer; Width: Integer; X: Integer; Y: Integer)
     var
-        BarcodeNo: Integer;
         Err00001: Label 'Font ''%1'' is not supported';
         FontParam: Text;
         StringLib: Codeunit "NPR String Library";
@@ -347,7 +336,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
 
     procedure SetFontStretch(Height: Integer; Width: Integer)
     var
-        Int: Integer;
         n: Char;
     begin
         TempPattern := '0' + ESC.GetBitPatternAndPad(Width, 3) + '0' + ESC.GetBitPatternAndPad(Height, 3);
@@ -752,13 +740,10 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
 
     local procedure Text(Type: Text; Align: Integer; Rotation: Integer; X: Integer; Y: Integer; Height: Integer; Bold: Boolean; TextIn: Text)
     var
-        tmpY: Integer;
         highY: Integer;
         lowY: Integer;
-        tmpX: Integer;
         highX: Integer;
         lowX: Integer;
-        tmpH: Integer;
         highH: Integer;
         lowH: Integer;
         AreaHeight: Integer;
@@ -984,7 +969,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
     begin
         RetailList.Number += 1;
         RetailList.Choice := Value;
-        RetailList.Insert;
+        RetailList.Insert();
     end;
 
     local procedure "// Aux Functions"()

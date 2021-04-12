@@ -15,91 +15,91 @@ page 6151017 "NPR NpRv Sales Lines"
         {
             repeater(Group)
             {
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Voucher Type"; "Voucher Type")
+                field("Voucher Type"; Rec."Voucher Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher Type field';
                 }
-                field("Voucher No."; "Voucher No.")
+                field("Voucher No."; Rec."Voucher No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Document Source"; "Document Source")
+                field("Document Source"; Rec."Document Source")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Source field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Sale Date"; "Sale Date")
+                field("Sale Date"; Rec."Sale Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sale Date field';
                 }
-                field("Sale Line No."; "Sale Line No.")
+                field("Sale Line No."; Rec."Sale Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sale Line No. field';
                 }
-                field("Document Type"; "Document Type")
+                field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Document Line No."; "Document Line No.")
+                field("Document Line No."; Rec."Document Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Line No. field';
                 }
-                field("Posting No."; "Posting No.")
+                field("Posting No."; Rec."Posting No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Posting No. field';
                 }
-                field("Retail ID"; "Retail ID")
+                field("Retail ID"; Rec."Retail ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Retail ID field';
                 }
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -128,16 +128,16 @@ page 6151017 "NPR NpRv Sales Lines"
                     Qty: Decimal;
                 begin
                     Qty := 1;
-                    case "Document Source" of
-                        "Document Source"::POS:
+                    case Rec."Document Source" of
+                        Rec."Document Source"::POS:
                             begin
-                                SaleLinePOS.SetRange("Retail ID", "Retail ID");
-                                if SaleLinePOS.FindFirst then
+                                SaleLinePOS.SetRange("Retail ID", Rec."Retail ID");
+                                if SaleLinePOS.FindFirst() then
                                     Qty := SaleLinePOS.Quantity;
                             end;
-                        "Document Source"::"Sales Document":
+                        Rec."Document Source"::"Sales Document":
                             begin
-                                if SalesLine.Get("Document Type", "Document No.", "Document Line No.") then
+                                if SalesLine.Get(Rec."Document Type", Rec."Document No.", Rec."Document Line No.") then
                                     Qty := SalesLine.Quantity;
                             end;
                     end;

@@ -1,4 +1,4 @@
-codeunit 6151425 "NPR Magento Proj.Avail.Balan."
+﻿codeunit 6151425 "NPR Magento Proj.Avail.Balan."
 {
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Item Mgt.", 'OnCalcStockQty', '', true, true)]
     local procedure CalcProjectedAvailableInventory(MagentoSetup: Record "NPR Magento Setup"; ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text; var StockQty: Decimal; var Handled: Boolean)
@@ -13,7 +13,6 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         ProjAvailableBalance: Decimal;
         ExpectedInventory: Decimal;
         QtyAvailable: Decimal;
-        VariantStockQty: Decimal;
     begin
         if Handled then
             exit;
@@ -43,9 +42,8 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         end;
 
         ItemVariant.SetRange("Item No.", Item."No.");
-        if ItemVariant.FindSet then begin
+        if ItemVariant.FindSet() then begin
             StockQty := 0;
-            VariantStockQty := 0;
             repeat
                 Item.SetFilter("Variant Filter", ItemVariant.Code);
                 Item.SetFilter("Location Filter", LocationFilter);
@@ -56,7 +54,7 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                   PlannedOrderReleases, ProjAvailableBalance, ExpectedInventory, QtyAvailable);
 
                 StockQty += ProjAvailableBalance;
-            until ItemVariant.Next = 0;
+            until ItemVariant.Next() = 0;
 
             exit;
         end;
@@ -77,17 +75,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempSalesLine);
-            TempSalesLine.Insert;
+            TempSalesLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(SalesLine);
-        if not SalesLine.Find then
+        if not SalesLine.Find() then
             exit(false);
 
-        TempSalesLine.Init;
+        TempSalesLine.Init();
         TempSalesLine := SalesLine;
-        TempSalesLine.Insert;
+        TempSalesLine.Insert();
         exit(true)
     end;
 
@@ -97,17 +95,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempPurchLine);
-            TempPurchLine.Insert;
+            TempPurchLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(PurchLine);
-        if not PurchLine.Find then
+        if not PurchLine.Find() then
             exit(false);
 
-        TempPurchLine.Init;
+        TempPurchLine.Init();
         TempPurchLine := PurchLine;
-        TempPurchLine.Insert;
+        TempPurchLine.Insert();
         exit(true);
     end;
 
@@ -117,17 +115,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempReqLine);
-            TempReqLine.Insert;
+            TempReqLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(ReqLine);
-        if not ReqLine.Find then
+        if not ReqLine.Find() then
             exit(false);
 
-        TempReqLine.Init;
+        TempReqLine.Init();
         TempReqLine := ReqLine;
-        TempReqLine.Insert;
+        TempReqLine.Insert();
         exit(true);
     end;
 
@@ -137,17 +135,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempAssemblyHeader);
-            TempAssemblyHeader.Insert;
+            TempAssemblyHeader.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(AssemblyHeader);
-        if not AssemblyHeader.Find then
+        if not AssemblyHeader.Find() then
             exit(false);
 
-        TempAssemblyHeader.Init;
+        TempAssemblyHeader.Init();
         TempAssemblyHeader := AssemblyHeader;
-        TempAssemblyHeader.Insert;
+        TempAssemblyHeader.Insert();
         exit(true);
     end;
 
@@ -157,17 +155,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempAssemblyLine);
-            TempAssemblyLine.Insert;
+            TempAssemblyLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(AssemblyLine);
-        if not AssemblyLine.Find then
+        if not AssemblyLine.Find() then
             exit(false);
 
-        TempAssemblyLine.Init;
+        TempAssemblyLine.Init();
         TempAssemblyLine := AssemblyLine;
-        TempAssemblyLine.Insert;
+        TempAssemblyLine.Insert();
         exit(true);
     end;
 
@@ -177,17 +175,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempJobPlanningLine);
-            TempJobPlanningLine.Insert;
+            TempJobPlanningLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(JobPlanningLine);
-        if not JobPlanningLine.Find then
+        if not JobPlanningLine.Find() then
             exit(false);
 
-        TempJobPlanningLine.Init;
+        TempJobPlanningLine.Init();
         TempJobPlanningLine := JobPlanningLine;
-        TempJobPlanningLine.Insert;
+        TempJobPlanningLine.Insert();
         exit(true);
     end;
 
@@ -197,17 +195,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempProdOrderLine);
-            TempProdOrderLine.Insert;
+            TempProdOrderLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(ProdOrderLine);
-        if not ProdOrderLine.Find then
+        if not ProdOrderLine.Find() then
             exit(false);
 
-        TempProdOrderLine.Init;
+        TempProdOrderLine.Init();
         TempProdOrderLine := ProdOrderLine;
-        TempProdOrderLine.Insert;
+        TempProdOrderLine.Insert();
         exit(true);
     end;
 
@@ -217,17 +215,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempProdOrderComponent);
-            TempProdOrderComponent.Insert;
+            TempProdOrderComponent.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(ProdOrderComponent);
-        if not ProdOrderComponent.Find then
+        if not ProdOrderComponent.Find() then
             exit(false);
 
-        TempProdOrderComponent.Init;
+        TempProdOrderComponent.Init();
         TempProdOrderComponent := ProdOrderComponent;
-        TempProdOrderComponent.Insert;
+        TempProdOrderComponent.Insert();
         exit(true);
     end;
 
@@ -237,17 +235,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempTransLine);
-            TempTransLine.Insert;
+            TempTransLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(TransLine);
-        if not TransLine.Find then
+        if not TransLine.Find() then
             exit(false);
 
-        TempTransLine.Init;
+        TempTransLine.Init();
         TempTransLine := TransLine;
-        TempTransLine.Insert;
+        TempTransLine.Insert();
         exit(true);
     end;
 
@@ -257,17 +255,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempServiceLine);
-            TempServiceLine.Insert;
+            TempServiceLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(ServiceLine);
-        if not ServiceLine.Find then
+        if not ServiceLine.Find() then
             exit(false);
 
-        TempServiceLine.Init;
+        TempServiceLine.Init();
         TempServiceLine := ServiceLine;
-        TempServiceLine.Insert;
+        TempServiceLine.Insert();
         exit(true);
     end;
 
@@ -277,17 +275,17 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempPlanningComponent);
-            TempPlanningComponent.Insert;
+            TempPlanningComponent.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(PlanningComponent);
-        if not PlanningComponent.Find then
+        if not PlanningComponent.Find() then
             exit(false);
 
-        TempPlanningComponent.Init;
+        TempPlanningComponent.Init();
         TempPlanningComponent := PlanningComponent;
-        TempPlanningComponent.Insert;
+        TempPlanningComponent.Insert();
         exit(true);
     end;
 
@@ -307,7 +305,6 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         TransLine: Record "Transfer Line";
         ServiceLine: Record "Service Line";
         PlanningComponent: Record "Planning Component";
-        NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
     begin
         if Handled then
@@ -363,7 +360,7 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                 begin
                     RecRef.SetTable(ItemLedgerEntry);
                     ItemLedgerEntry.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
-                    if not ItemLedgerEntry.Find then
+                    if not ItemLedgerEntry.Find() then
                         exit;
 
                     ItemNo := ItemLedgerEntry."Item No.";
@@ -373,14 +370,14 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempSalesLine(RecRef, TempSalesLine) then
                         exit;
 
-                    TempSalesLine.SetRecFilter;
+                    TempSalesLine.SetRecFilter();
                     TempSalesLine.FilterGroup(40);
                     TempSalesLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempSalesLine.SetFilter("Document Type", '%1|%2', TempSalesLine."Document Type"::Order, TempSalesLine."Document Type"::"Return Order");
                     TempSalesLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempSalesLine.SetRange(Type, TempSalesLine.Type::Item);
                     TempSalesLine.SetFilter("No.", '<>%1', '');
-                    if not TempSalesLine.FindFirst then
+                    if not TempSalesLine.FindFirst() then
                         exit;
 
                     ItemNo := TempSalesLine."No.";
@@ -390,14 +387,14 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempPurchLine(RecRef, TempPurchLine) then
                         exit;
 
-                    TempPurchLine.SetRecFilter;
+                    TempPurchLine.SetRecFilter();
                     TempPurchLine.FilterGroup(40);
                     TempPurchLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempPurchLine.SetFilter("Document Type", '%1|%2', TempPurchLine."Document Type"::Order, TempPurchLine."Document Type"::"Return Order");
                     TempPurchLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempPurchLine.SetRange(Type, TempPurchLine.Type::Item);
                     TempPurchLine.SetFilter("No.", '<>%1', '');
-                    if not TempPurchLine.FindFirst then
+                    if not TempPurchLine.FindFirst() then
                         exit;
 
                     ItemNo := TempPurchLine."No.";
@@ -407,13 +404,13 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempReqLine(RecRef, TempReqLine) then
                         exit;
 
-                    TempReqLine.SetRecFilter;
+                    TempReqLine.SetRecFilter();
                     TempReqLine.FilterGroup(40);
                     TempReqLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempReqLine.SetRange("Planning Line Origin", TempReqLine."Planning Line Origin"::" ");
                     TempReqLine.SetRange(Type, TempReqLine.Type::Item);
                     TempReqLine.SetFilter("No.", '<>%1', '');
-                    if not TempReqLine.FindFirst then
+                    if not TempReqLine.FindFirst() then
                         exit;
 
                     ItemNo := TempReqLine."No.";
@@ -423,12 +420,12 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempAssemblyHeader(RecRef, TempAssemblyHeader) then
                         exit;
 
-                    TempAssemblyHeader.SetRecFilter;
+                    TempAssemblyHeader.SetRecFilter();
                     TempAssemblyHeader.FilterGroup(40);
                     TempAssemblyHeader.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempAssemblyHeader.SetRange("Document Type", TempAssemblyHeader."Document Type"::Order);
                     TempAssemblyHeader.SetFilter("Item No.", '<>%1', '');
-                    if not TempAssemblyHeader.FindFirst then
+                    if not TempAssemblyHeader.FindFirst() then
                         exit;
 
                     ItemNo := TempAssemblyHeader."Item No.";
@@ -438,13 +435,13 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempAssemblyLine(RecRef, TempAssemblyLine) then
                         exit;
 
-                    TempAssemblyLine.SetRecFilter;
+                    TempAssemblyLine.SetRecFilter();
                     TempAssemblyLine.FilterGroup(40);
                     TempAssemblyLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempAssemblyLine.SetRange("Document Type", TempAssemblyLine."Document Type"::Order);
                     TempAssemblyLine.SetRange(Type, TempAssemblyLine.Type::Item);
                     TempAssemblyLine.SetFilter("No.", '<>%1', '');
-                    if not TempAssemblyLine.FindFirst then
+                    if not TempAssemblyLine.FindFirst() then
                         exit;
 
                     ItemNo := TempAssemblyLine."No.";
@@ -454,13 +451,13 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempJobPlanningLine(RecRef, TempJobPlanningLine) then
                         exit;
 
-                    TempJobPlanningLine.SetRecFilter;
+                    TempJobPlanningLine.SetRecFilter();
                     TempJobPlanningLine.FilterGroup(40);
                     TempJobPlanningLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempJobPlanningLine.SetRange(Status, TempJobPlanningLine.Status::Order);
                     TempJobPlanningLine.SetRange(Type, TempJobPlanningLine.Type::Item);
                     TempJobPlanningLine.SetFilter("No.", '<>%1', '');
-                    if not TempJobPlanningLine.FindFirst then
+                    if not TempJobPlanningLine.FindFirst() then
                         exit;
 
                     ItemNo := TempJobPlanningLine."No.";
@@ -470,12 +467,12 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempProdOrderLine(RecRef, TempProdOrderLine) then
                         exit;
 
-                    TempProdOrderLine.SetRecFilter;
+                    TempProdOrderLine.SetRecFilter();
                     TempProdOrderLine.FilterGroup(40);
                     TempProdOrderLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempProdOrderLine.SetFilter(Status, '%1|%2|%3', TempProdOrderLine.Status::Planned, TempProdOrderLine.Status::"Firm Planned", TempProdOrderLine.Status::Released);
                     TempProdOrderLine.SetFilter("Item No.", '<>%1', '');
-                    if not TempProdOrderLine.FindFirst then
+                    if not TempProdOrderLine.FindFirst() then
                         exit;
 
                     ItemNo := TempProdOrderLine."Item No.";
@@ -485,12 +482,12 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempProdOrderComponent(RecRef, TempProdOrderComponent) then
                         exit;
 
-                    TempProdOrderComponent.SetRecFilter;
+                    TempProdOrderComponent.SetRecFilter();
                     TempProdOrderComponent.FilterGroup(40);
                     TempProdOrderComponent.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempProdOrderComponent.SetFilter(Status, '%1..%2', TempProdOrderComponent.Status::Planned, TempProdOrderComponent.Status::Released);
                     TempProdOrderComponent.SetFilter("Item No.", '<>%1', '');
-                    if not TempProdOrderComponent.FindFirst then
+                    if not TempProdOrderComponent.FindFirst() then
                         exit;
 
                     ItemNo := TempProdOrderComponent."Item No.";
@@ -500,15 +497,15 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempTransLine(RecRef, TempTransLine) then
                         exit;
 
-                    TempTransLine.SetRecFilter;
+                    TempTransLine.SetRecFilter();
                     TempTransLine.FilterGroup(40);
                     TempTransLine.SetRange("Derived From Line No.", 0);
                     TempTransLine.SetFilter("Item No.", '<>%1', '');
                     TempTransLine.SetFilter("Transfer-to Code", MagentoSetup."Inventory Location Filter");
-                    if not TempTransLine.FindFirst then begin
+                    if not TempTransLine.FindFirst() then begin
                         TempTransLine.SetRange("Transfer-to Code");
                         TempTransLine.SetFilter("Transfer-from Code", MagentoSetup."Inventory Location Filter");
-                        if not TempTransLine.FindFirst then
+                        if not TempTransLine.FindFirst() then
                             exit;
                     end;
 
@@ -519,13 +516,13 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempServiceLine(RecRef, TempServiceLine) then
                         exit;
 
-                    TempServiceLine.SetRecFilter;
+                    TempServiceLine.SetRecFilter();
                     TempServiceLine.FilterGroup(40);
                     TempServiceLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempServiceLine.SetRange("Document Type", TempServiceLine."Document Type"::Order);
                     TempServiceLine.SetRange(Type, TempServiceLine.Type::Item);
                     TempServiceLine.SetFilter("No.", '<>%1', '');
-                    if not TempServiceLine.FindFirst then
+                    if not TempServiceLine.FindFirst() then
                         exit;
 
                     ItemNo := TempServiceLine."No.";
@@ -535,12 +532,12 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
                     if not RecRef2TempPlanningComponent(RecRef, TempPlanningComponent) then
                         exit;
 
-                    TempPlanningComponent.SetRecFilter;
+                    TempPlanningComponent.SetRecFilter();
                     TempPlanningComponent.FilterGroup(40);
                     TempPlanningComponent.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempPlanningComponent.SetRange("Planning Line Origin", TempPlanningComponent."Planning Line Origin"::" ");
                     TempPlanningComponent.SetFilter("Item No.", '<>%1', '');
-                    if not TempPlanningComponent.FindFirst then
+                    if not TempPlanningComponent.FindFirst() then
                         exit;
 
                     ItemNo := TempPlanningComponent."Item No.";
@@ -557,9 +554,9 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         if not Item."NPR Magento Item" then
             exit;
 
-        TempItem.Init;
+        TempItem.Init();
         TempItem := Item;
-        TempItem.Insert;
+        TempItem.Insert();
     end;
 
     local procedure CurrCodeunitId(): Integer

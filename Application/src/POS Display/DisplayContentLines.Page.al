@@ -42,7 +42,7 @@ page 6059952 "NPR Display Content Lines"
         if (DisplayContent.Type = DisplayContent.Type::Html) then begin
             Clear(DisplayContentLines);
             DisplayContentLines.SetRange("Content Code", DisplayContent.Code);
-            if DisplayContentLines.Count > 0 then
+            if DisplayContentLines.Count() > 0 then
                 Error(Txt001);
         end;
     end;

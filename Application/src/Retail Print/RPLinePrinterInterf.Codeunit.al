@@ -51,8 +51,6 @@ codeunit 6014548 "NPR RP Line Printer Interf."
     end;
 
     procedure Dispose()
-    var
-        HasError: Boolean;
     begin
         if EpsonVBound then
             UnbindSubscription(EpsonVCommandLibrary);

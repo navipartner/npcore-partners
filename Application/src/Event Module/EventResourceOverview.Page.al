@@ -29,22 +29,22 @@ page 6151576 "NPR Event Resource Overview"
             }
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("E-Mail"; "NPR E-Mail")
+                field("E-Mail"; Rec."NPR E-Mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR E-Mail field';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Capacity field';
@@ -62,7 +62,7 @@ page 6151576 "NPR Event Resource Overview"
                     begin
                         SetPlanningLineFilter(JobPlanningLine);
                         EventPlanningLineList.SetTableView(JobPlanningLine);
-                        EventPlanningLineList.Run;
+                        EventPlanningLineList.Run();
                     end;
                 }
                 field(Available; Available)
@@ -189,9 +189,9 @@ page 6151576 "NPR Event Resource Overview"
     trigger OnAfterGetRecord()
     begin
         QtyOnEvent := CalcQtyOnEvent();
-        SetFilter("Date Filter", '%1..%2', StartingDate, EndingDate);
-        CalcFields(Capacity);
-        Available := Capacity - QtyOnEvent;
+        Rec.SetFilter("Date Filter", '%1..%2', StartingDate, EndingDate);
+        Rec.CalcFields(Capacity);
+        Available := Rec.Capacity - QtyOnEvent;
     end;
 
     trigger OnOpenPage()
@@ -221,12 +221,12 @@ page 6151576 "NPR Event Resource Overview"
         JobPlanningLine: Record "Job Planning Line";
     begin
         SetPlanningLineFilter(JobPlanningLine);
-        if JobPlanningLine.FindSet then
+        if JobPlanningLine.FindSet() then
             repeat
                 Job.Get(JobPlanningLine."Job No.");
                 if Job."NPR Event" then
                     TotalQty += JobPlanningLine."Quantity (Base)";
-            until JobPlanningLine.Next = 0;
+            until JobPlanningLine.Next() = 0;
         exit(TotalQty);
     end;
 
@@ -236,7 +236,7 @@ page 6151576 "NPR Event Resource Overview"
     begin
         BusinessChartBuffer."Period Length" := DateType;
         if ReferalDate = 0D then begin
-            ReferalDate := WorkDate;
+            ReferalDate := WorkDate();
             Clear(FromDate);
             Clear(ToDate);
         end;

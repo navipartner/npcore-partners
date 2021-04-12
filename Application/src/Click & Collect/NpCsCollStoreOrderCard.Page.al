@@ -1,4 +1,4 @@
-page 6151206 "NPR NpCs Coll. StoreOrder Card"
+﻿page 6151206 "NPR NpCs Coll. StoreOrder Card"
 {
     UsageCategory = None;
     Caption = 'Collect in Store Order Card';
@@ -15,92 +15,92 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 group(Control6014443)
                 {
                     ShowCaption = false;
-                    field("Document Type"; "Document Type")
+                    field("Document Type"; Rec."Document Type")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Document Type field';
                     }
-                    field("Document No."; "Document No.")
+                    field("Document No."; Rec."Document No.")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Document No. field';
                     }
-                    field("Reference No."; "Reference No.")
+                    field("Reference No."; Rec."Reference No.")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Reference No. field';
                     }
-                    field("Sell-to Customer Name"; "Sell-to Customer Name")
+                    field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Sell-to Customer Name field';
                     }
-                    field("Location Code"; "Location Code")
+                    field("Location Code"; Rec."Location Code")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Location Code field';
                     }
-                    field("Opening Hour Set"; "Opening Hour Set")
+                    field("Opening Hour Set"; Rec."Opening Hour Set")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Opening Hour Set field';
                     }
-                    field("From Document Type"; "From Document Type")
+                    field("From Document Type"; Rec."From Document Type")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the From Document Type field';
                     }
-                    field("From Document No."; "From Document No.")
+                    field("From Document No."; Rec."From Document No.")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the From Document No. field';
                     }
-                    field("From Store Code"; "From Store Code")
+                    field("From Store Code"; Rec."From Store Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the From Store Code field';
                     }
-                    field("Processing Status"; "Processing Status")
+                    field("Processing Status"; Rec."Processing Status")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Processing Status field';
                     }
-                    field("Processing Expiry Duration"; "Processing Expiry Duration")
+                    field("Processing Expiry Duration"; Rec."Processing Expiry Duration")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Processing Expiry Duration field';
                     }
-                    field("Processing expires at"; "Processing expires at")
+                    field("Processing expires at"; Rec."Processing expires at")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Processing expires at field';
                     }
-                    field("Processing updated at"; "Processing updated at")
+                    field("Processing updated at"; Rec."Processing updated at")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Processing updated at field';
                     }
-                    field("Processing updated by"; "Processing updated by")
+                    field("Processing updated by"; Rec."Processing updated by")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Processing updated by field';
                     }
-                    field("Processing Print Template"; "Processing Print Template")
+                    field("Processing Print Template"; Rec."Processing Print Template")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -110,81 +110,81 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 group(Control6014445)
                 {
                     ShowCaption = false;
-                    field("Delivery Status"; "Delivery Status")
+                    field("Delivery Status"; Rec."Delivery Status")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Delivery Status field';
                     }
-                    field("Delivery Expiry Days (Qty.)"; "Delivery Expiry Days (Qty.)")
+                    field("Delivery Expiry Days (Qty.)"; Rec."Delivery Expiry Days (Qty.)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Delivery Expiry Days (Qty.) field';
                     }
-                    field("Delivery expires at"; "Delivery expires at")
+                    field("Delivery expires at"; Rec."Delivery expires at")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Delivery expires at field';
                     }
-                    field("Delivery updated at"; "Delivery updated at")
+                    field("Delivery updated at"; Rec."Delivery updated at")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Delivery updated at field';
                     }
-                    field("Delivery updated by"; "Delivery updated by")
+                    field("Delivery updated by"; Rec."Delivery updated by")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Delivery updated by field';
                     }
-                    field("Delivery Document Type"; "Delivery Document Type")
+                    field("Delivery Document Type"; Rec."Delivery Document Type")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Delivery Document Type field';
                     }
-                    field("Delivery Document No."; "Delivery Document No.")
+                    field("Delivery Document No."; Rec."Delivery Document No.")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Delivery Document No. field';
                     }
-                    field("Archive on Delivery"; "Archive on Delivery")
+                    field("Archive on Delivery"; Rec."Archive on Delivery")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Archive on Delivery field';
                     }
-                    field("Prepaid Amount"; "Prepaid Amount")
+                    field("Prepaid Amount"; Rec."Prepaid Amount")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Prepaid Amount field';
                     }
-                    field("Prepayment Account No."; "Prepayment Account No.")
+                    field("Prepayment Account No."; Rec."Prepayment Account No.")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Prepayment Account No. field';
                     }
-                    field("Bill via"; "Bill via")
+                    field("Bill via"; Rec."Bill via")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Bill via field';
                     }
-                    field("Post on"; "Post on")
+                    field("Post on"; Rec."Post on")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Post on field';
                     }
-                    field("Store Stock"; "Store Stock")
+                    field("Store Stock"; Rec."Store Stock")
                     {
                         ApplicationArea = All;
                         Style = Unfavorable;
@@ -194,8 +194,8 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     group(Control6014458)
                     {
                         ShowCaption = false;
-                        Visible = "Bill via" = "Bill via"::POS;
-                        field("Delivery Print Template (POS)"; "Delivery Print Template (POS)")
+                        Visible = Rec."Bill via" = Rec."Bill via"::POS;
+                        field("Delivery Print Template (POS)"; Rec."Delivery Print Template (POS)")
                         {
                             ApplicationArea = All;
                             Importance = Additional;
@@ -205,8 +205,8 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     group(Control6014459)
                     {
                         ShowCaption = false;
-                        Visible = "Bill via" = "Bill via"::"Sales Document";
-                        field("Delivery Print Template (S.)"; "Delivery Print Template (S.)")
+                        Visible = Rec."Bill via" = Rec."Bill via"::"Sales Document";
+                        field("Delivery Print Template (S.)"; Rec."Delivery Print Template (S.)")
                         {
                             ApplicationArea = All;
                             Importance = Additional;
@@ -216,7 +216,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     group(Control6014447)
                     {
                         ShowCaption = false;
-                        Visible = NOT "Store Stock";
+                        Visible = NOT Rec."Store Stock";
                         field("UPPERCASE(Text002)"; UpperCase(Text002))
                         {
                             ApplicationArea = All;
@@ -231,7 +231,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
             group(Notification)
             {
                 Caption = 'Notification';
-                field("Send Notification from Store"; "Send Notification from Store")
+                field("Send Notification from Store"; Rec."Send Notification from Store")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
@@ -240,18 +240,18 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 group(Control6014468)
                 {
                     ShowCaption = false;
-                    field("Notify Store via E-mail"; "Notify Store via E-mail")
+                    field("Notify Store via E-mail"; Rec."Notify Store via E-mail")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Notify Store via E-mail field';
                     }
-                    field("Store E-mail Temp. (Pending)"; "Store E-mail Temp. (Pending)")
+                    field("Store E-mail Temp. (Pending)"; Rec."Store E-mail Temp. (Pending)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Store E-mail Template (Pending) field';
                     }
-                    field("Store E-mail Temp. (Expired)"; "Store E-mail Temp. (Expired)")
+                    field("Store E-mail Temp. (Expired)"; Rec."Store E-mail Temp. (Expired)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -261,18 +261,18 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 group(Control6014475)
                 {
                     ShowCaption = false;
-                    field("Notify Store via Sms"; "Notify Store via Sms")
+                    field("Notify Store via Sms"; Rec."Notify Store via Sms")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Notify Store via Sms field';
                     }
-                    field("Store Sms Template (Pending)"; "Store Sms Template (Pending)")
+                    field("Store Sms Template (Pending)"; Rec."Store Sms Template (Pending)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Store Sms Template (Pending) field';
                     }
-                    field("Store Sms Template (Expired)"; "Store Sms Template (Expired)")
+                    field("Store Sms Template (Expired)"; Rec."Store Sms Template (Expired)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -282,37 +282,37 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 group(Control6014441)
                 {
                     ShowCaption = false;
-                    field("Notify Customer via E-mail"; "Notify Customer via E-mail")
+                    field("Notify Customer via E-mail"; Rec."Notify Customer via E-mail")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Notify Customer via E-mail field';
                     }
-                    field("Customer E-mail"; "Customer E-mail")
+                    field("Customer E-mail"; Rec."Customer E-mail")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Customer E-mail field';
                     }
-                    field("E-mail Template (Pending)"; "E-mail Template (Pending)")
+                    field("E-mail Template (Pending)"; Rec."E-mail Template (Pending)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the E-mail Template (Pending) field';
                     }
-                    field("E-mail Template (Confirmed)"; "E-mail Template (Confirmed)")
+                    field("E-mail Template (Confirmed)"; Rec."E-mail Template (Confirmed)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the E-mail Template (Confirmed) field';
                     }
-                    field("E-mail Template (Rejected)"; "E-mail Template (Rejected)")
+                    field("E-mail Template (Rejected)"; Rec."E-mail Template (Rejected)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the E-mail Template (Rejected) field';
                     }
-                    field("E-mail Template (Expired)"; "E-mail Template (Expired)")
+                    field("E-mail Template (Expired)"; Rec."E-mail Template (Expired)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -322,37 +322,37 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 group(Control6014440)
                 {
                     ShowCaption = false;
-                    field("Notify Customer via Sms"; "Notify Customer via Sms")
+                    field("Notify Customer via Sms"; Rec."Notify Customer via Sms")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Notify Customer via Sms field';
                     }
-                    field("Customer Phone No."; "Customer Phone No.")
+                    field("Customer Phone No."; Rec."Customer Phone No.")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Customer Phone No. field';
                     }
-                    field("Sms Template (Pending)"; "Sms Template (Pending)")
+                    field("Sms Template (Pending)"; Rec."Sms Template (Pending)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Sms Template (Pending) field';
                     }
-                    field("Sms Template (Confirmed)"; "Sms Template (Confirmed)")
+                    field("Sms Template (Confirmed)"; Rec."Sms Template (Confirmed)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Sms Template (Confirmed) field';
                     }
-                    field("Sms Template (Rejected)"; "Sms Template (Rejected)")
+                    field("Sms Template (Rejected)"; Rec."Sms Template (Rejected)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Sms Template (Rejected) field';
                     }
-                    field("Sms Template (Expired)"; "Sms Template (Expired)")
+                    field("Sms Template (Expired)"; Rec."Sms Template (Expired)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -364,13 +364,13 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
             {
                 SubPageLink = "Document Type" = FIELD("Document Type"),
                               "Document No." = FIELD("Document No.");
-                Visible = "Document Type" = "Document Type"::Order;
+                Visible = Rec."Document Type" = Rec."Document Type"::Order;
                 ApplicationArea = All;
             }
             part(Control6014464; "NPR NpCs Coll. Store Inv.Lines")
             {
                 SubPageLink = "Document No." = FIELD("Document No.");
-                Visible = "Document Type" = "Document Type"::"Posted Invoice";
+                Visible = Rec."Document Type" = Rec."Document Type"::"Posted Invoice";
                 ApplicationArea = All;
             }
         }
@@ -389,10 +389,10 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Print Order';
                     Image = ConfirmAndPrint;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = "Processing Print Template" <> '';
+                    Visible = Rec."Processing Print Template" <> '';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Order action';
 
@@ -409,10 +409,10 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Ellipsis = true;
                     Image = PrintReport;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = "Document Type" = "Document Type"::Order;
+                    Visible = Rec."Document Type" = Rec."Document Type"::Order;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Confirmation action';
 
@@ -422,7 +422,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                         DocPrint: Codeunit "Document-Print";
                         Usage: Option "Order Confirmation","Work Order","Pick Instruction";
                     begin
-                        SalesHeader.Get("Document Type", "Document No.");
+                        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
                         DocPrint.PrintSalesOrder(SalesHeader, Usage::"Order Confirmation");
                     end;
                 }
@@ -431,10 +431,10 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Print Delivery';
                     Image = Print;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Delivery Status" = "Delivery Status"::Delivered) AND ((("Bill via" = "Bill via"::POS) AND ("Delivery Print Template (POS)" <> '')) OR (("Bill via" = "Bill via"::"Sales Document") AND ("Delivery Print Template (S.)" <> '')));
+                    Visible = (Rec."Delivery Status" = Rec."Delivery Status"::Delivered) AND (((Rec."Bill via" = Rec."Bill via"::POS) AND (Rec."Delivery Print Template (POS)" <> '')) OR ((Rec."Bill via" = Rec."Bill via"::"Sales Document") AND (Rec."Delivery Print Template (S.)" <> '')));
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Delivery action';
 
@@ -454,10 +454,10 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Confirm Order';
                     Image = Approve;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0);
+                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0);
                     ApplicationArea = All;
                     ToolTip = 'Executes the Confirm Order action';
 
@@ -465,7 +465,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        if not Confirm(Text000, true, "Document No.") then
+                        if not Confirm(Text000, true, Rec."Document No.") then
                             exit;
 
                         NpCsCollectMgt.ConfirmProcessing(Rec);
@@ -476,10 +476,10 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Reject Order';
                     Image = Reject;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0) AND ("Store Stock");
+                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0) AND (Rec."Store Stock");
                     ApplicationArea = All;
                     ToolTip = 'Executes the Reject Order action';
 
@@ -487,7 +487,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        if not Confirm(Text001, true, "Document No.") then
+                        if not Confirm(Text001, true, Rec."Document No.") then
                             exit;
 
                         NpCsCollectMgt.RejectProcessing(Rec);
@@ -498,10 +498,10 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = "Send Notification from Store";
+                    Visible = Rec."Send Notification from Store";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send Notification to Customer action';
 
@@ -521,7 +521,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 Caption = 'Document';
                 Image = Document;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
                 ApplicationArea = All;
@@ -539,7 +539,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 Caption = 'Log Entries';
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
@@ -557,7 +557,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
 
     trigger OnOpenPage()
     begin
-        Reset;
+        Rec.Reset();
     end;
 
     var

@@ -877,8 +877,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
     end;
 
     procedure SetItemWorksheetLineResult(ParReturnValue: Text)
-    var
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
         ReturnValue := ParReturnValue;
     end;

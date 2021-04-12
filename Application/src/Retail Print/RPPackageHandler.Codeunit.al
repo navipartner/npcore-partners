@@ -1,4 +1,4 @@
-codeunit 6014585 "NPR RP Package Handler"
+﻿codeunit 6014585 "NPR RP Package Handler"
 {
     var
         ImportedMessage: Label 'Templates imported:\Created: %1\Replaced: %2';
@@ -17,7 +17,7 @@ codeunit 6014585 "NPR RP Package Handler"
         i: Integer;
         FileName: Text;
     begin
-        if not TemplateHeader.FindSet then
+        if not TemplateHeader.FindSet() then
             exit;
 
         repeat
@@ -29,7 +29,7 @@ codeunit 6014585 "NPR RP Package Handler"
             DeviceSettings.SetRange(Template, TemplateHeader.Code);
             MediaInfo.SetRange(Template, TemplateHeader.Code);
             TemplateHeader2 := TemplateHeader;
-            TemplateHeader2.SetRecFilter;
+            TemplateHeader2.SetRecFilter();
 
             ManagedPackageBuilder.AddRecord(TemplateHeader2);
             ManagedPackageBuilder.AddRecord(TemplateLine);
@@ -41,7 +41,7 @@ codeunit 6014585 "NPR RP Package Handler"
             ManagedPackageBuilder.AddRecord(MediaInfo);
 
             i += 1;
-        until TemplateHeader.Next = 0;
+        until TemplateHeader.Next() = 0;
 
         if i = 1 then
             FileName := StrSubstNo('%1, Version %2', TemplateHeader.Code, TemplateHeader.Version)
@@ -64,7 +64,7 @@ codeunit 6014585 "NPR RP Package Handler"
     begin
         //Does not export media info to prevent archive bloat.
 
-        if not TemplateHeader.FindSet then
+        if not TemplateHeader.FindSet() then
             exit;
 
         repeat
@@ -75,7 +75,7 @@ codeunit 6014585 "NPR RP Package Handler"
             DataItemConstraintLinks.SetRange("Data Item Code", TemplateHeader.Code);
             DeviceSettings.SetRange(Template, TemplateHeader.Code);
             TemplateHeader2 := TemplateHeader;
-            TemplateHeader2.SetRecFilter;
+            TemplateHeader2.SetRecFilter();
 
             ManagedPackageBuilder.AddRecord(TemplateHeader2);
             ManagedPackageBuilder.AddRecord(TemplateLine);
@@ -84,7 +84,7 @@ codeunit 6014585 "NPR RP Package Handler"
             ManagedPackageBuilder.AddRecord(DataItemConstraint);
             ManagedPackageBuilder.AddRecord(DataItemConstraintLinks);
             ManagedPackageBuilder.AddRecord(DeviceSettings);
-        until TemplateHeader.Next = 0;
+        until TemplateHeader.Next() = 0;
 
         ManagedPackageBuilder.ExportToBlob('RP Template Archive', '1.0', StrSubstNo('Archived template: %1', TemplateHeader.Code), DATABASE::"NPR RP Template Header", TempBlobOut);
     end;
@@ -163,7 +163,7 @@ codeunit 6014585 "NPR RP Package Handler"
             exit;
 
         repeat
-            tmpImportWorksheet.Init;
+            tmpImportWorksheet.Init();
             tmpImportWorksheet."Entry No." += 1;
             tmpImportWorksheet.Template := tmpTemplateHeader.Code;
             tmpImportWorksheet."New Description" := tmpTemplateHeader.Description;
@@ -175,7 +175,7 @@ codeunit 6014585 "NPR RP Package Handler"
                 tmpImportWorksheet."Existing Version" := TemplateHeader.Version;
             end;
             tmpImportWorksheet.Insert(true);
-        until tmpTemplateHeader.Next = 0;
+        until tmpTemplateHeader.Next() = 0;
 
         if PAGE.RunModal(PAGE::"NPR RP Imp. Worksh.", tmpImportWorksheet) <> ACTION::LookupOK then
             exit;
@@ -238,8 +238,8 @@ codeunit 6014585 "NPR RP Package Handler"
                         Error('Unexpected field data.');
                 end;
 
-            RecRef.Insert;
-            RecRef.Close;
+            RecRef.Insert();
+            RecRef.Close();
         end;
 
         exit(tmpTemplateHeader.FindSet);
@@ -259,7 +259,7 @@ codeunit 6014585 "NPR RP Package Handler"
         CreateCounter: Integer;
     begin
         tmpImportWorksheet.SetFilter(Action, '<>%1', tmpImportWorksheet.Action::Skip);
-        if tmpImportWorksheet.FindSet then
+        if tmpImportWorksheet.FindSet() then
             repeat
                 if tmpImportWorksheet.Action = tmpImportWorksheet.Action::Replace then begin
                     DeleteTemplate(tmpImportWorksheet.Template);
@@ -276,61 +276,61 @@ codeunit 6014585 "NPR RP Package Handler"
                 tmpDeviceSettings.SetRange(Template, tmpImportWorksheet.Template);
                 tmpMediaInfo.SetRange(Template, tmpImportWorksheet.Template);
 
-                TemplateHeader.Init;
+                TemplateHeader.Init();
                 TemplateHeader := tmpTemplateHeader;
-                TemplateHeader.Insert;
+                TemplateHeader.Insert();
 
-                if tmpTemplateLine.FindSet then
+                if tmpTemplateLine.FindSet() then
                     repeat
-                        TemplateLine.Init;
+                        TemplateLine.Init();
                         TemplateLine := tmpTemplateLine;
-                        TemplateLine.Insert;
-                    until tmpTemplateLine.Next = 0;
+                        TemplateLine.Insert();
+                    until tmpTemplateLine.Next() = 0;
 
-                if tmpDataItem.FindSet then
+                if tmpDataItem.FindSet() then
                     repeat
-                        DataItems.Init;
+                        DataItems.Init();
                         DataItems := tmpDataItem;
-                        DataItems.Insert;
-                    until tmpDataItem.Next = 0;
+                        DataItems.Insert();
+                    until tmpDataItem.Next() = 0;
 
-                if tmpDataItemLinks.FindSet then
+                if tmpDataItemLinks.FindSet() then
                     repeat
-                        DataItemLinks.Init;
+                        DataItemLinks.Init();
                         DataItemLinks := tmpDataItemLinks;
-                        DataItemLinks.Insert;
-                    until tmpDataItemLinks.Next = 0;
+                        DataItemLinks.Insert();
+                    until tmpDataItemLinks.Next() = 0;
 
-                if tmpDataItemConstraint.FindSet then
+                if tmpDataItemConstraint.FindSet() then
                     repeat
-                        DataItemConstraint.Init;
+                        DataItemConstraint.Init();
                         DataItemConstraint := tmpDataItemConstraint;
-                        DataItemConstraint.Insert;
-                    until tmpDataItemConstraint.Next = 0;
+                        DataItemConstraint.Insert();
+                    until tmpDataItemConstraint.Next() = 0;
 
-                if tmpDataItemConstraintLinks.FindSet then
+                if tmpDataItemConstraintLinks.FindSet() then
                     repeat
-                        DataItemConstraintLinks.Init;
+                        DataItemConstraintLinks.Init();
                         DataItemConstraintLinks := tmpDataItemConstraintLinks;
-                        DataItemConstraintLinks.Insert;
-                    until tmpDataItemConstraintLinks.Next = 0;
+                        DataItemConstraintLinks.Insert();
+                    until tmpDataItemConstraintLinks.Next() = 0;
 
-                if tmpDeviceSettings.FindSet then
+                if tmpDeviceSettings.FindSet() then
                     repeat
-                        DeviceSettings.Init;
+                        DeviceSettings.Init();
                         DeviceSettings := tmpDeviceSettings;
-                        DeviceSettings.Insert;
-                    until tmpDeviceSettings.Next = 0;
+                        DeviceSettings.Insert();
+                    until tmpDeviceSettings.Next() = 0;
 
                 tmpMediaInfo.SetAutoCalcFields(Picture);
-                if tmpMediaInfo.FindSet then
+                if tmpMediaInfo.FindSet() then
                     repeat
-                        MediaInfo.Init;
+                        MediaInfo.Init();
                         MediaInfo := tmpMediaInfo;
-                        MediaInfo.Insert;
-                    until tmpMediaInfo.Next = 0;
+                        MediaInfo.Insert();
+                    until tmpMediaInfo.Next() = 0;
 
-            until tmpImportWorksheet.Next = 0;
+            until tmpImportWorksheet.Next() = 0;
 
         if (ReplaceCounter > 0) or (CreateCounter > 0) then
             Message(ImportedMessage, CreateCounter, ReplaceCounter);
@@ -365,14 +365,14 @@ codeunit 6014585 "NPR RP Package Handler"
         DeviceSettings.SetRange(Template, Code);
         MediaInfo.SetRange(Template, Code);
 
-        TemplateHeader.DeleteAll;
-        TemplateLine.DeleteAll;
-        DataItems.DeleteAll;
-        DataItemLinks.DeleteAll;
-        DataItemConstraint.DeleteAll;
-        DataItemConstraintLinks.DeleteAll;
-        DeviceSettings.DeleteAll;
-        MediaInfo.DeleteAll;
+        TemplateHeader.DeleteAll();
+        TemplateLine.DeleteAll();
+        DataItems.DeleteAll();
+        DataItemLinks.DeleteAll();
+        DataItemConstraint.DeleteAll();
+        DataItemConstraintLinks.DeleteAll();
+        DeviceSettings.DeleteAll();
+        MediaInfo.DeleteAll();
     end;
 }
 

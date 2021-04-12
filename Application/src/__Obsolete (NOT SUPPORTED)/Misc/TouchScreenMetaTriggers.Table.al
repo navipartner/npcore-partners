@@ -69,8 +69,5 @@ table 6014443 "NPR Touch Screen: MetaTriggers"
     {
     }
 
-    var
-        RapportValg2: Record "NPR Report Selection Retail";
-        printerID: Record "NPR Period Line";
 }
 

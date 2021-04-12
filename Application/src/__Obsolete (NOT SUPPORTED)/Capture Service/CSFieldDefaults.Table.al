@@ -1,12 +1,12 @@
 table 6151378 "NPR CS Field Defaults"
 {
-   
+
     Caption = 'CS Field Defaults';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
-    
+
 
     fields
     {

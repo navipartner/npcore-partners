@@ -99,17 +99,13 @@ table 6059897 "NPR Data Log Setup (Table)"
             DataLogSetupField.DeleteAll();
     end;
 
-    var
-        DataLogMgt: Codeunit "NPR Data Log Management";
 
     procedure InsertNewTable(TableID: Integer; LogInsertion: Option " ",Simple,Detailed; LogModification: Option " ",Simple,Detailed; LogDeletion: Option " ",Simple,Detailed)
-    var
-        Dec: Decimal;
     begin
         if Get(TableID) then
             exit;
 
-        Init;
+        Init();
         "Table ID" := TableID;
         "Log Insertion" := LogInsertion;
         "Log Modification" := LogModification;

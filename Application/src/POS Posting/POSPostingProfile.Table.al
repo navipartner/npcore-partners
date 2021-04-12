@@ -151,21 +151,21 @@ table 6150653 "NPR POS Posting Profile"
         {
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
-        }        
+        }
         field(154; "Default POS Posting Setup"; Option)
         {
             Caption = 'Default POS Posting Setup';
             DataClassification = CustomerContent;
             OptionCaption = 'Store,Customer';
             OptionMembers = Store,Customer;
-        }        
+        }
         field(155; "VAT Customer No."; Code[20])
         {
             Caption = 'VAT Customer No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
             TableRelation = Customer;
-        }      
+        }
         field(156; "Posting Compression"; Option)
         {
             Caption = 'Posting Compression';
@@ -174,7 +174,7 @@ table 6150653 "NPR POS Posting Profile"
             InitValue = "Per POS Entry";
             OptionCaption = 'Uncompressed,Per POS Entry,Per POS Period';
             OptionMembers = Uncompressed,"Per POS Entry","Per POS Period";
-        }          
+        }
         field(160; "POS Period Register No. Series"; Code[20])
         {
             Caption = 'POS Period Register No. Series';
@@ -194,9 +194,6 @@ table 6150653 "NPR POS Posting Profile"
     {
     }
 
-    var
-        ReciprocalMustBeInteger: Label 'Rounding precision must be divisible by 1.';
-        ReciprocalExample: Label 'Example: 0,25 * 4 = 1';
 
     procedure RoundingDirection(): Text[1]
     begin
@@ -217,7 +214,7 @@ table 6150653 "NPR POS Posting Profile"
         PostingAllowedFrom: Date;
         PostingAllowedTo: Date;
     begin
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
         if UserId <> '' then
             if UserSetup.Get(UserId) then begin
                 PostingAllowedFrom := UserSetup."Allow Posting From";
@@ -253,7 +250,7 @@ table 6150653 "NPR POS Posting Profile"
             end;
         end;
 
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
         if GeneralLedgerSetup."Allow Posting From" > Date2 then begin
             GeneralLedgerSetup."Allow Posting From" := Date2;
             GeneralLedgerSetup.Modify(true);

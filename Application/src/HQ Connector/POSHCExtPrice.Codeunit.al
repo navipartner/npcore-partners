@@ -74,8 +74,6 @@ codeunit 6150910 "NPR POS HC Ext. Price"
     end;
 
     local procedure BuildPriceRequest(CustomerNo: Code[20]; ExternalDocumentNumber: Code[20]; CurrencyCode: Code[10]; var TmpSaleLine: Record "Sales Line" temporary; var SoapAction: Text; XmlRequest: Text): Boolean
-    var
-        LineType: Option;
     begin
         SoapAction := 'urn:microsoft-dynamics-schemas/codeunit/hqconnector:GetCustomerPrice';
         XmlRequest :=
@@ -155,7 +153,6 @@ codeunit 6150910 "NPR POS HC Ext. Price"
 
     procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; var XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseText: Text): Boolean
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XMLDomManagement: Codeunit "XML DOM Management";
         Base64Convert: codeunit "Base64 Convert";
         B64Credential: Text[200];

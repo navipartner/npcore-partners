@@ -14,82 +14,82 @@ page 6150656 "NPR POS Entry Pmt. Line List"
         {
             repeater(Group)
             {
-                field("Entry Date"; "Entry Date")
+                field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Date field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Ending Time"; "Ending Time")
+                field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Time field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("POS Period Register No."; "POS Period Register No.")
+                field("POS Period Register No."; Rec."POS Period Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Period Register No. field';
                 }
-                field("POS Payment Method Code"; "POS Payment Method Code")
+                field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Method Code field';
                 }
-                field("POS Payment Bin Code"; "POS Payment Bin Code")
+                field("POS Payment Bin Code"; Rec."POS Payment Bin Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Bin Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Paid Currency Code field';
                 }
-                field("Amount (Sales Currency)"; "Amount (Sales Currency)")
+                field("Amount (Sales Currency)"; Rec."Amount (Sales Currency)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount (Sales Currency) field';
                 }
-                field("Amount (LCY)"; "Amount (LCY)")
+                field("Amount (LCY)"; Rec."Amount (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount (LCY) field';
                 }
-                field("POS Entry No."; "POS Entry No.")
+                field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Entry No. field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line No. field';
@@ -110,7 +110,7 @@ page 6150656 "NPR POS Entry Pmt. Line List"
                     Caption = 'POS Entry Card';
                     Image = List;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");

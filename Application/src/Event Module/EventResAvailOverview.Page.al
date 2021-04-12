@@ -284,14 +284,13 @@ page 6059833 "NPR Event Res. Avail. Overview"
         ResourceCounter: Integer;
         i: Integer;
         FromTime: Time;
-        ToTime: Time;
     begin
         CheckDate();
         CheckTime();
-        Rec.DeleteAll;
+        Rec.DeleteAll();
         if ResourceNoFilter <> '' then
             Resource.SetFilter("No.", ResourceNoFilter);
-        if Resource.FindSet then
+        if Resource.FindSet() then
             repeat
                 FromTime := StartingTime;
                 ResourceCounter += 10000;
@@ -300,7 +299,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     InsertRec(Resource, ResourceCounter + i, ResourceCounter, FromTime, FromTime + TimeInterval);
                     FromTime := FromTime + TimeInterval;
                 end;
-            until Resource.Next = 0;
+            until Resource.Next() = 0;
         LoadDateArrays(StartingDate);
     end;
 
@@ -325,7 +324,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 DateArray[i] := CalcDate(StrSubstNo('%1D', i - 1), FromDate);
             Date.SetRange("Period Type", Date."Period Type"::Date);
             Date.SetRange("Period Start", DateArray[i]);
-            Date.FindFirst;
+            Date.FindFirst();
             DateColumnCaption[i] := Format(DateArray[i]) + ' ' + Date."Period Name";
         end;
         NextSetEnabled := DateArray[UpperBound] <> EndingDate;
@@ -391,13 +390,13 @@ page 6059833 "NPR Event Res. Avail. Overview"
 
     local procedure InsertRec(Resource: Record Resource; LineNo: Integer; MainLineNo: Integer; FromTime: Time; ToTime: Time)
     begin
-        Rec.Init;
+        Rec.Init();
         Rec."No." := Resource."No.";
         Rec."Job Planning Line No." := LineNo;
         Rec."Line No." := MainLineNo;
         Rec."Starting Time" := FromTime;
         Rec."Ending Time" := ToTime;
-        Rec.Insert;
+        Rec.Insert();
     end;
 
     local procedure SetStyle()

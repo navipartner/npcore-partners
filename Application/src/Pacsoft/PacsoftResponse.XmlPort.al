@@ -52,7 +52,7 @@ xmlport 6014485 "NPR Pacsoft Response"
 
     trigger OnPostXmlPort()
     begin
-        ShipmentDocument.Modify;
+        ShipmentDocument.Modify();
     end;
 
     var

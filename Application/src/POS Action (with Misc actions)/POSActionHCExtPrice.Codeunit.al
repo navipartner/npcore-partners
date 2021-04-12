@@ -16,17 +16,16 @@ codeunit 6150909 "NPR POS Action: HC Ext. Price"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'respond();');
-                RegisterWorkflow(false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterWorkflow(false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -43,7 +42,7 @@ codeunit 6150909 "NPR POS Action: HC Ext. Price"
         EndpointSetup: Record "NPR POS HC Endpoint Setup";
         PrevRec: Text;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -87,7 +86,7 @@ codeunit 6150909 "NPR POS Action: HC Ext. Price"
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
 
             if PrevRec <> Format(SaleLinePOS) then
-                SaleLinePOS.Modify;
+                SaleLinePOS.Modify();
         until (SaleLinePOS.Next() = 0);
 
         POSSaleLine.RefreshCurrent();

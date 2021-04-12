@@ -1,4 +1,4 @@
-table 6060120 "NPR TM Admission"
+﻿table 6060120 "NPR TM Admission"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.04/TSA/20160104  CASE 230600 Caption Change Occation -> Event
@@ -201,7 +201,7 @@ table 6060120 "NPR TM Admission"
         if (MMMembershipAdmissionSetup.FindFirst()) then
             Error(ADMISSION_REF, "Admission Code", MMMembershipAdmissionSetup.TableCaption, MMMembershipAdmissionSetup."Membership  Code");
 
-        TMAdmissionScheduleLines.Reset;
+        TMAdmissionScheduleLines.Reset();
         TMAdmissionScheduleLines.SetRange("Admission Code", "Admission Code");
         TMAdmissionScheduleLines.DeleteAll(true);
         //+TM1.11

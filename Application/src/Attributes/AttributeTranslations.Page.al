@@ -14,29 +14,29 @@ page 6014606 "NPR Attribute Translations"
         {
             repeater(Group)
             {
-                field("Attribute Code"; "Attribute Code")
+                field("Attribute Code"; Rec."Attribute Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Attribute Code field';
                 }
-                field("Language ID"; "Language ID")
+                field("Language ID"; Rec."Language ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Language ID field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Code Caption"; "Code Caption")
+                field("Code Caption"; Rec."Code Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code Caption field';
                 }
-                field("Filter Caption"; "Filter Caption")
+                field("Filter Caption"; Rec."Filter Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Caption field';

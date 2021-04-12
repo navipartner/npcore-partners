@@ -18,47 +18,47 @@ page 6151151 "NPR Customer GDPR Log Entries"
         {
             repeater(Group)
             {
-                field("Entry No"; "Entry No")
+                field("Entry No"; Rec."Entry No")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No field';
                 }
-                field("Customer No"; "Customer No")
+                field("Customer No"; Rec."Customer No")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Open Sales Documents"; "Open Sales Documents")
+                field("Open Sales Documents"; Rec."Open Sales Documents")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open Sales Documents field';
                 }
-                field("Open Cust. Ledger Entry"; "Open Cust. Ledger Entry")
+                field("Open Cust. Ledger Entry"; Rec."Open Cust. Ledger Entry")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open Cust. Ledger Entry field';
                 }
-                field("Has transactions"; "Has transactions")
+                field("Has transactions"; Rec."Has transactions")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Has transactions field';
                 }
-                field("Customer is a Member"; "Customer is a Member")
+                field("Customer is a Member"; Rec."Customer is a Member")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer is a Member field';
                 }
-                field("Open Journal Entries/Statement"; "Open Journal Entries/Statement")
+                field("Open Journal Entries/Statement"; Rec."Open Journal Entries/Statement")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open Journal Entries/Statement field';
                 }
-                field("Log Entry Date Time"; "Log Entry Date Time")
+                field("Log Entry Date Time"; Rec."Log Entry Date Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Entry Date Time field';

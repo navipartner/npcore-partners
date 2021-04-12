@@ -43,7 +43,7 @@ page 6014585 "NPR Advanced Sales Stats"
                         if PeriodType = PeriodType::Day then
                             DayPeriodTypeOnValidate;
 
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 field(DateFilter; DateFilter)
@@ -125,8 +125,8 @@ page 6014585 "NPR Advanced Sales Stats"
                         //UpdateSubformFilters;
                         //+NPR5.31
                         //UpdateHiddenLines( ViewPosition, TRUE );
-                        CurrPage.Update;
-                        //CurrForm.UPDATE;
+                        CurrPage.Update();
+                        //CurrForm.Update();
                     end;
                 }
                 field(Dim2Filter; Dim2Filter)
@@ -142,8 +142,8 @@ page 6014585 "NPR Advanced Sales Stats"
                         //UpdateSubformFilters;
                         //+NPR5.31
                         //UpdateHiddenLines( ViewPosition, TRUE );
-                        //CurrForm.UPDATE;
-                        CurrPage.Update;
+                        //CurrForm.Update();
+                        CurrPage.Update();
                     end;
                 }
                 field(ShowLastYear; ShowLastYear)
@@ -199,7 +199,7 @@ page 6014585 "NPR Advanced Sales Stats"
             repeater(UpdateControls)
             {
                 Editable = false;
-                field("Period Name"; "Period Name")
+                field("Period Name"; Rec."Period Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Name field';
@@ -209,7 +209,7 @@ page 6014585 "NPR Advanced Sales Stats"
                         ViewPosition := ViewPosition::Period;
                     end;
                 }
-                field("Period Start"; "Period Start")
+                field("Period Start"; Rec."Period Start")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Start field';
@@ -229,7 +229,7 @@ page 6014585 "NPR Advanced Sales Stats"
                         SetItemLedgerEntryFilter(AuxItemLedgerEntry);
                         AuxItemLedgerEntries.SetTableView(AuxItemLedgerEntry);
                         AuxItemLedgerEntries.Editable(false);
-                        AuxItemLedgerEntries.RunModal;
+                        AuxItemLedgerEntries.RunModal();
                     end;
                 }
                 field("-""LastYear Sale (QTY)"""; -"LastYear Sale (QTY)")
@@ -254,7 +254,7 @@ page 6014585 "NPR Advanced Sales Stats"
                         SetValueEntryFilter(AuxValueEntry);
                         AuxValueEntries.SetTableView(AuxValueEntry);
                         AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal;
+                        AuxValueEntries.RunModal();
                     end;
                 }
                 field("LastYear Sale (LCY)"; "LastYear Sale (LCY)")
@@ -313,14 +313,14 @@ page 6014585 "NPR Advanced Sales Stats"
                     begin
                         //-NPR4.13
 
-                        SalesStatisticsReport.setFilter(ViewPosition, Day, Dim1Filter, Dim2Filter, "Period Start",
-                                           "Period End", ItemCategoryCodeFilter, LastYearCalc,
+                        SalesStatisticsReport.setFilter(ViewPosition, Day, Dim1Filter, Dim2Filter, Rec."Period Start",
+                                           Rec."Period End", ItemCategoryCodeFilter, LastYearCalc,
                                            (((ViewPosition = ViewPosition::ItemGroup) and HideItemGroup) or
                                              ((ViewPosition = ViewPosition::Item) and HideItem) or
                                              ((ViewPosition = ViewPosition::Customer) and HideCustomer) or
                                              ((ViewPosition = ViewPosition::Vendor) and HideVendor) or
                                              ((ViewPosition = ViewPosition::Projectcode) and false)));
-                        SalesStatisticsReport.RunModal;
+                        SalesStatisticsReport.RunModal();
 
                         //+NPR4.13
                     end;
@@ -347,11 +347,11 @@ page 6014585 "NPR Advanced Sales Stats"
                     begin
                         //-NPR4.21
                         SalespersonStatistics.InitForm;
-                        SalespersonStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemCategoryCodeFilter, LastYearCalc, ItemNoFilter);
+                        SalespersonStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc, ItemNoFilter);
                         SalespersonStatistics.ShowLastYear(ShowLastYear);
                         SalespersonStatistics.ChangeEmptyFilter();
                         Sleep(10);
-                        SalespersonStatistics.RunModal;
+                        SalespersonStatistics.RunModal();
                         //+NPR4.21
                     end;
                 }
@@ -373,12 +373,12 @@ page 6014585 "NPR Advanced Sales Stats"
                         ItemStatistics.InitForm;
                         //-NPR5.51 [365732]
                         //ItemStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc);
-                        ItemStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc, ItemCategoryCodeFilter);
+                        ItemStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemCategoryCodeFilter);
                         //+NPR5.51 [365732]
                         ItemStatistics.ShowLastYear(ShowLastYear);
                         ItemStatistics.ChangeEmptyFilter();
                         Sleep(10);
-                        ItemStatistics.RunModal;
+                        ItemStatistics.RunModal();
                         //+NPR4.21
                     end;
                 }
@@ -398,12 +398,12 @@ page 6014585 "NPR Advanced Sales Stats"
                     begin
                         //-NPR4.21
                         CustomerStatistics.InitForm;
-                        CustomerStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemCategoryCodeFilter, LastYearCalc);
+                        CustomerStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc);
 
                         CustomerStatistics.ShowLastYear(ShowLastYear);
                         CustomerStatistics.ChangeEmptyFilter();
                         Sleep(10);
-                        CustomerStatistics.RunModal;
+                        CustomerStatistics.RunModal();
                         //+NPR4.21
                     end;
                 }
@@ -423,12 +423,12 @@ page 6014585 "NPR Advanced Sales Stats"
                     begin
                         //-NPR4.21
                         VendorStatistics.InitForm;
-                        VendorStatistics.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemCategoryCodeFilter, LastYearCalc);
+                        VendorStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc);
 
                         VendorStatistics.ShowLastYear(ShowLastYear);
                         VendorStatistics.ChangeEmptyFilter();
                         Sleep(10);
-                        VendorStatistics.RunModal;
+                        VendorStatistics.RunModal();
                         //+NPR4.21
                     end;
                 }
@@ -449,7 +449,7 @@ page 6014585 "NPR Advanced Sales Stats"
 
                         //-NPR5.31
                         ItemCategoryStatsSubpage.InitForm;
-                        ItemCategoryStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc, ItemCategoryCodeFilter, ItemNoFilter);
+                        ItemCategoryStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemCategoryCodeFilter, ItemNoFilter);
                         ItemCategoryStatsSubpage.ShowLastYear(ShowLastYear);
                         ItemCategoryStatsSubpage.ChangeEmptyFilter;
                         Sleep(10);
@@ -474,7 +474,7 @@ page 6014585 "NPR Advanced Sales Stats"
 
                         //-NPR5.31
                         ProdGroupCodeStatsSubpage.InitForm;
-                        ProdGroupCodeStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc, ItemNoFilter, ItemCategoryCodeFilter);
+                        ProdGroupCodeStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemNoFilter, ItemCategoryCodeFilter);
                         ProdGroupCodeStatsSubpage.ShowLastYear(ShowLastYear);
                         ProdGroupCodeStatsSubpage.ChangeEmptyFilter;
                         Sleep(10);
@@ -490,9 +490,9 @@ page 6014585 "NPR Advanced Sales Stats"
     begin
 
         if not (UsingPeriod) then begin
-            DateFilter := CopyStr(StrSubstNo('%1..%2', "Period Start", "Period End"), 1, 50);
-            DateFilterLastYear := CopyStr(StrSubstNo('%1..%2', CalcDate(LastYearCalc, "Period Start"),
-            CalcDate(LastYearCalc, "Period End")), 1, 50);
+            DateFilter := CopyStr(StrSubstNo('%1..%2', Rec."Period Start", Rec."Period End"), 1, 50);
+            DateFilterLastYear := CopyStr(StrSubstNo('%1..%2', CalcDate(LastYearCalc, Rec."Period Start"),
+            CalcDate(LastYearCalc, Rec."Period End")), 1, 50);
         end;
         //-NPR5.31
         //  UpdateSubformFilters;
@@ -555,8 +555,6 @@ page 6014585 "NPR Advanced Sales Stats"
         HideItemGroup := false;
         HideCustomer := true;
         HideVendor := true;
-        HideProjectcode := true;
-        HideSalesperson := true;
         //-NPR4.21
         //CurrForm.SubItemGroup.FORM.InitForm;
         //CurrForm.SubSalesperson.FORM.InitForm;
@@ -595,17 +593,13 @@ page 6014585 "NPR Advanced Sales Stats"
         HideItemGroup: Boolean;
         HideCustomer: Boolean;
         HideVendor: Boolean;
-        HideProjectcode: Boolean;
-        HideSalesperson: Boolean;
         LastYear: Boolean;
         ShowLastYear: Boolean;
         LastYearCalc: Text[30];
         ShowSameWeekday: Boolean;
         DateFilterLastYear: Text[50];
         UsingPeriod: Boolean;
-        Switch: Option Off,On;
         ItemNoFilter: Code[20];
-        FilterNoSales: Boolean;
         [InDataSet]
         PLYSaleQty: Boolean;
         [InDataSet]
@@ -616,7 +610,6 @@ page 6014585 "NPR Advanced Sales Stats"
         "PLYProfit%": Boolean;
         PeriodType: Option Day,Week,Month,Quarter,Year,Period;
         ItemCategoryCodeFilter: Code[20];
-        ProductGroupCodeFilter: Code[10];
 
     procedure Calc()
     var
@@ -645,7 +638,7 @@ page 6014585 "NPR Advanced Sales Stats"
         else
             LastYearCalc := '<-1Y>';
 
-        if (Date2DMY("Period Start", 3) < 1) or (Date2DMY("Period Start", 3) > 9998) then
+        if (Date2DMY(Rec."Period Start", 3) < 1) or (Date2DMY(Rec."Period Start", 3) > 9998) then
             LastYearCalc := '';
 
         SetValueEntryFilter(AuxValueEntry);
@@ -671,9 +664,9 @@ page 6014585 "NPR Advanced Sales Stats"
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
         if not LastYear then
-            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', "Period Start", "Period End")
+            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Rec."Period Start", Rec."Period End")
         else
-            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, "Period Start"), CalcDate(LastYearCalc, "Period End")
+            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, Rec."Period Start"), CalcDate(LastYearCalc, Rec."Period End")
           );
 
         if Dim1Filter <> '' then
@@ -702,9 +695,9 @@ page 6014585 "NPR Advanced Sales Stats"
         //SetValueEntryFilter
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
         if not LastYear then
-            AuxValueEntry.SetFilter("Posting Date", '%1..%2', "Period Start", "Period End")
+            AuxValueEntry.SetFilter("Posting Date", '%1..%2', Rec."Period Start", Rec."Period End")
         else
-            AuxValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, "Period Start"), CalcDate(LastYearCalc, "Period End"));
+            AuxValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, Rec."Period Start"), CalcDate(LastYearCalc, Rec."Period End"));
 
         if Dim1Filter <> '' then
             AuxValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
@@ -843,15 +836,15 @@ page 6014585 "NPR Advanced Sales Stats"
         if UsingPeriod then begin
             //IF FORM.RUNMODAL(6060102,tblPeriode) = ACTION::LookupOK THEN BEGIN
             if PAGE.RunModal(6060102, tblPeriode) = ACTION::LookupOK then begin
-                "Period Start" := tblPeriode."Start Date";
-                "Period End" := tblPeriode."End Date";
-                DateFilter := StrSubstNo('%1..%2', "Period Start", "Period End");
-                SetFilter("Period Start", DateFilter);
+                Rec."Period Start" := tblPeriode."Start Date";
+                Rec."Period End" := tblPeriode."End Date";
+                DateFilter := StrSubstNo('%1..%2', Rec."Period Start", Rec."Period End");
+                Rec.SetFilter("Period Start", DateFilter);
                 DateFilterLastYear := StrSubstNo('%1..%2', tblPeriode."Start Date Last Year", tblPeriode."End Date Last Year");
                 Day := Day::Day;
             end;
         end else
-            SetFilter("Period Start", '');
+            Rec.SetFilter("Period Start", '');
         //-NPR5.31
         //UpdateSubformFilters;
         //+NPR5.31

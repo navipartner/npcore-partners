@@ -543,17 +543,13 @@ table 6184495 "NPR EFT Transaction Request"
     trigger OnInsert()
     begin
         if IsNullGuid(Token) then
-            Token := CreateGuid;
+            Token := CreateGuid();
     end;
 
-    var
-        EftRequestNotFound: Label 'Action Code %1 tried retrieving "TransactionRequest_EntryNo" from POS Session and got %2. There is however no record in %3 to match that entry number.';
-        EftRequestMissMatch: Label 'Action Code %1 has detected a EFT request identity missmatch:\\For Entry No. %2 the expected token is %3, but the record contains %4.';
 
     procedure PrintReceipts(IsReprint: Boolean)
     var
         CreditCardTransaction: Record "NPR EFT Receipt";
-        RecRef: RecordRef;
         ReceiptNo: Integer;
         EntryNo: Integer;
         CreditCardTransaction2: Record "NPR EFT Receipt";
@@ -566,7 +562,7 @@ table 6184495 "NPR EFT Transaction Request"
 
         if IsReprint then begin
             "No. of Reprints" += 1;
-            Modify;
+            Modify();
         end;
 
         EFTInterface.OnPrintReceipt(Rec, Handled);
@@ -575,7 +571,7 @@ table 6184495 "NPR EFT Transaction Request"
 
         CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
         CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', "Entry No.");
-        if not CreditCardTransaction.FindSet then
+        if not CreditCardTransaction.FindSet() then
             exit;
 
         First := true;
@@ -588,7 +584,7 @@ table 6184495 "NPR EFT Transaction Request"
             ReceiptNo := CreditCardTransaction."Receipt No.";
             EntryNo := CreditCardTransaction."EFT Trans. Request Entry No.";
             First := false;
-        until CreditCardTransaction.Next = 0;
+        until CreditCardTransaction.Next() = 0;
     end;
 
     procedure IsType(Type: Text): Boolean

@@ -57,7 +57,7 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
 
                         TmpSalePOSRequest."Sales Ticket No." := TicketNumber;
                         if (TmpSalePOSRequest.Date < Today) then
-                            TmpSalePOSRequest.Date := Today;
+                            TmpSalePOSRequest.Date := Today();
                     end;
                 }
             }

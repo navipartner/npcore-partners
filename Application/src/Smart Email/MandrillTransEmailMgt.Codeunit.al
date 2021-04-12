@@ -35,7 +35,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
-            if JObject.Keys.Count <> 0 then begin
+            if JObject.Keys.Count() <> 0 then begin
                 TransactionalJSONResult.Init();
                 TransactionalJSONResult.Provider := TransactionalJSONResult.Provider::Mailchimp;
                 TransactionalJSONResult."Entry No" := i;
@@ -124,7 +124,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
 
     local procedure SaveMessageDetails(EmailLog: Record "NPR Trx Email Log"; var JObject: JsonObject)
     begin
-        if JObject.Keys.Count = 0 then
+        if JObject.Keys.Count() = 0 then
             exit;
         EmailLog.Status := GetString(JObject, 'state');
         EmailLog.Recipient := CopyStr(GetString(JObject, 'email'), 1, MaxStrLen(EmailLog.Recipient));
@@ -149,7 +149,6 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JObject: JsonObject;
         MessageJObject: JsonObject;
         JToken: JsonToken;
-        I: Integer;
     begin
         SmartEmail.TestField("Smart Email ID");
         Initialize(GetFullURL('/messages/send-template.json'), 'POST');
@@ -181,7 +180,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
-            if JObject.Keys.Count <> 0 then begin
+            if JObject.Keys.Count() <> 0 then begin
                 EmailLog.Init();
                 EmailLog."Entry No." := 0;
                 EmailLog.Provider := EmailLog.Provider::Mailchimp;
@@ -202,7 +201,6 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JObject: JsonObject;
         MessageJObject: JsonObject;
         JToken: JsonToken;
-        I: Integer;
     begin
         Initialize(GetFullURL('/messages/send.json'), 'POST');
         MessageJObject.Add('from_email', FromEmail);
@@ -237,7 +235,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
-            if JObject.Keys.Count <> 0 then begin
+            if JObject.Keys.Count() <> 0 then begin
                 EmailLog.Init();
                 EmailLog."Entry No." := 0;
                 EmailLog.Provider := EmailLog.Provider::Mailchimp;
@@ -293,7 +291,6 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     local procedure Initialize(URL: Text; Method: Text[6])
     var
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
-        Jtoken: Integer;
     begin
         TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::Mailchimp);
         TransactionalEmailSetup.TestField("API Key");
@@ -312,7 +309,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         TempBlob: Codeunit "Temp Blob";
         OStream: OutStream;
     begin
-        If BodyJObject.Keys.Count <> 0 then begin
+        If BodyJObject.Keys.Count() <> 0 then begin
             TempBlob.CreateOutStream(OStream);
             BodyJObject.WriteTo(OStream);
             HttpWebRequestMgt.AddBodyBlob(TempBlob);
@@ -366,7 +363,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         ArrayName: Text;
     begin
         if (SmartEmail."NpXml Template Code" <> '') and NpXmlTemplate.Get(SmartEmail."NpXml Template Code") then begin
-            RecRef.SetRecFilter;
+            RecRef.SetRecFilter();
             NpXmlMgt.Initialize(NpXmlTemplate, RecRef, NpXmlValueMgt.GetPrimaryKeyValue(RecRef), true);
             NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name");
             NpXmlMgt.ParseDataToXmlDocNode(RecRef, true, XmlDocNode);
@@ -478,7 +475,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
             exit;
         if Attachment.FindSet() then
             repeat
-                if Attachment."Attached File".HasValue then begin
+                if Attachment."Attached File".HasValue() then begin
                     Attachment.CalcFields("Attached File");
                     Attachment."Attached File".CreateInStream(IStream);
                     JObject.Add('content', Convert.ToBase64(IStream));

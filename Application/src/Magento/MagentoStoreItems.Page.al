@@ -16,24 +16,24 @@ page 6151445 "NPR Magento Store Items"
         {
             repeater(Group)
             {
-                field(Webshop; Webshop)
+                field(Webshop; Rec.Webshop)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Webshop field';
                 }
-                field("Store Code"; "Store Code")
+                field("Store Code"; Rec."Store Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Store Code field';
                 }
-                field("Website Code"; "Website Code")
+                field("Website Code"; Rec."Website Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Website Code field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
@@ -43,7 +43,7 @@ page 6151445 "NPR Magento Store Items"
                         CurrPage.Update(true);
                     end;
                 }
-                field(GetEnabledFieldsCaption; GetEnabledFieldsCaption)
+                field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption)
                 {
                     ApplicationArea = All;
                     Caption = 'Fields Enabled';
@@ -56,9 +56,6 @@ page 6151445 "NPR Magento Store Items"
 
     trigger OnAfterGetRecord()
     begin
-        Storecode := Rec."Store Code";
     end;
 
-    var
-        Storecode: Code[32];
 }

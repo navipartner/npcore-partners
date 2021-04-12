@@ -43,12 +43,12 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
     }
     procedure GetDimSelBuf(var TheDimSelectionBuf: Record "Dimension Selection Buffer")
     begin
-        TheDimSelectionBuf.DeleteAll;
+        TheDimSelectionBuf.DeleteAll();
         if Rec.FindSet() then
             repeat
                 TheDimSelectionBuf := Rec;
-                TheDimSelectionBuf.Insert;
-            until Rec.Next = 0;
+                TheDimSelectionBuf.Insert();
+            until Rec.Next() = 0;
     end;
 
     procedure InsertDimSelBuf(NewSelected: Boolean; NewCode: Text[30]; NewDescription: Text[30]; NewDimValueFilter: Text[250])
@@ -61,7 +61,7 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
             if Dim.Get(NewCode) then
                 NewDescription := Dim.GetMLName(GlobalLanguage);
 
-        Rec.Init;
+        Rec.Init();
         Rec.Selected := NewSelected;
         Rec.Code := NewCode;
         Rec.Description := NewDescription;
@@ -72,7 +72,7 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
             BusinessUnit.TableCaption:
                 Rec."Filter Lookup Table No." := DATABASE::"Business Unit";
         end;
-        Rec.Insert;
+        Rec.Insert();
     end;
 }
 

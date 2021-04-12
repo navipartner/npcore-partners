@@ -174,7 +174,7 @@ report 6014419 "NPR Vendor Sales Stat"
                 Clear(VendorAllYear);
                 VendorAllYear.SetRange("No.", "No.");
                 VendorAllYear.SetFilter("Date Filter", '%1..%2', DMY2Date(1, 1, Year), Today);
-                if VendorAllYear.FindSet then begin
+                if VendorAllYear.FindSet() then begin
                     VendorAllYear.CalcFields("NPR Stock", "Purchases (LCY)", "NPR Sales (LCY)");
                     CoverageAllYear := CalcCoverage(VendorAllYear."Purchases (LCY)", VendorAllYear."NPR Sales (LCY)");
                     CoverRateAllYear := CalcCoverageRate(CoverageAllYear, VendorAllYear."NPR Sales (LCY)");
@@ -223,7 +223,7 @@ report 6014419 "NPR Vendor Sales Stat"
         Month := Date2DMY(Today, 2);
         Year := Date2DWY(Today, 3);
         StartDate := DMY2Date(1, Month, Year);
-        CompanyInfo.Get;
+        CompanyInfo.Get();
     end;
 
     trigger OnPreReport()
@@ -235,13 +235,11 @@ report 6014419 "NPR Vendor Sales Stat"
 
     var
         CompanyInfo: Record "Company Information";
-        VATPostingSetup: Record "VAT Posting Setup";
         VendorAllYear: Record Vendor;
         Month: Integer;
         Year: Integer;
         StartDate: Date;
         EndDate: Date;
-        "---": Integer;
         PurchaseQty: Decimal;
         PurchaseLCY: Decimal;
         SalesQty: Decimal;

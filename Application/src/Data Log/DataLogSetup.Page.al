@@ -14,14 +14,14 @@ page 6059897 "NPR Data Log Setup"
         {
             repeater(Group)
             {
-                field("Table ID"; "Table ID")
+                field("Table ID"; Rec."Table ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table ID field';
 
                     trigger OnValidate()
                     begin
-                        CalcFields("Table Name");
+                        Rec.CalcFields("Table Name");
                     end;
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -38,22 +38,22 @@ page 6059897 "NPR Data Log Setup"
                         exit(false);
                     end;
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Log Insertion"; "Log Insertion")
+                field("Log Insertion"; Rec."Log Insertion")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Insertion field';
                 }
-                field("Log Modification"; "Log Modification")
+                field("Log Modification"; Rec."Log Modification")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Modification field';
                 }
-                field("Ignored Fields"; "Ignored Fields")
+                field("Ignored Fields"; Rec."Ignored Fields")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
@@ -61,26 +61,26 @@ page 6059897 "NPR Data Log Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        TestField("Log Modification");
+                        Rec.TestField("Log Modification");
                         AssistEditIgnoreList();
                     end;
                 }
-                field("Log Deletion"; "Log Deletion")
+                field("Log Deletion"; Rec."Log Deletion")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Deletion field';
                 }
-                field("Keep Log for"; "Keep Log for")
+                field("Keep Log for"; Rec."Keep Log for")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Keep Log For field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Date Modified field';
@@ -98,7 +98,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Clean Data Log';
                 Image = ClearLog;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Clean Data Log action';
@@ -113,7 +113,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Add Records to Data Log';
                 Image = AddAction;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -129,7 +129,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Set Ignored Fields';
                 Image = MaintenanceRegistrations;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -148,7 +148,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Data Log Subscribers';
                 Image = ContactPerson;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Data Log Subscribers";
@@ -161,7 +161,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Data Log';
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Data Log Records";
@@ -176,7 +176,6 @@ page 6059897 "NPR Data Log Setup"
     var
         Text001: Label 'All old Data Log Records will be deleted\Continue?';
         Text002: Label '%1 record quantity withing the filter:  %2\Do you wish to add the records to Data Log?';
-        DataLogMgt: Codeunit "NPR Data Log Management";
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         Text003: Label 'Data Log Filters - %1', Comment = '%1 = Table Name';
         Text004: Label 'Adding records to Data Log: @1@@@@@@@@@@@@@@@@@@@@@@@';
@@ -196,8 +195,8 @@ page 6059897 "NPR Data Log Setup"
         if not SetFiltersOnTable(Filters, RecRef) then
             exit;
 
-        Total := RecRef.Count;
-        if not Confirm(StrSubstNo(Text002, "Table Name", Total), true) then
+        Total := RecRef.Count();
+        if not Confirm(StrSubstNo(Text002, Rec."Table Name", Total), true) then
             exit;
 
         Counter := 0;
@@ -206,8 +205,8 @@ page 6059897 "NPR Data Log Setup"
             Counter += 1;
             Window.Update(1, Round((Counter / Total) * 10000, 1));
             DataLogMgt.OnDatabaseInsert(RecRef);
-        until RecRef.Next = 0;
-        Window.Close;
+        until RecRef.Next() = 0;
+        Window.Close();
     end;
 
     procedure CleanDataLog()
@@ -222,7 +221,6 @@ page 6059897 "NPR Data Log Setup"
         TableMetadata: Record "Table Metadata";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
-        FieldRec: Record "Field";
         RecRef: RecordRef;
         KyRef: KeyRef;
         FldRef: FieldRef;
@@ -230,36 +228,36 @@ page 6059897 "NPR Data Log Setup"
         DynamicRequestPageField: Record "Dynamic Request Page Field";
         DynamicRequestPageField1: Record "Dynamic Request Page Field";
     begin
-        if not TableMetadata.Get("Table ID") then
+        if not TableMetadata.Get(Rec."Table ID") then
             exit(false);
 
-        DynamicRequestPageField.SetRange("Table ID", "Table ID");
-        if not DynamicRequestPageField.FindSet then begin
-            RecRef.Open("Table ID");
+        DynamicRequestPageField.SetRange("Table ID", Rec."Table ID");
+        if not DynamicRequestPageField.FindSet() then begin
+            RecRef.Open(Rec."Table ID");
             RecRef.CurrentKeyIndex(1);
             KyRef := RecRef.KeyIndex(1);
             for j := 1 to KyRef.FieldCount do begin
                 Clear(FldRef);
                 FldRef := RecRef.FieldIndex(j);
-                DynamicRequestPageField1.Init;
-                DynamicRequestPageField1.Validate("Table ID", "Table ID");
+                DynamicRequestPageField1.Init();
+                DynamicRequestPageField1.Validate("Table ID", Rec."Table ID");
                 DynamicRequestPageField1.Validate("Field ID", FldRef.Number);
                 DynamicRequestPageField1.Insert(true);
-                Commit;
+                Commit();
             end;
         end;
 
-        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, CopyStr("Table Name", 1, 20), "Table ID") then
+        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, CopyStr(Rec."Table Name", 1, 20), Rec."Table ID") then
             exit(false);
         if Filters <> '' then
-            if not RequestPageParametersHelper.SetViewOnDynamicRequestPage(FilterPageBuilder, Filters, CopyStr("Table Name", 1, 20), "Table ID") then
+            if not RequestPageParametersHelper.SetViewOnDynamicRequestPage(FilterPageBuilder, Filters, CopyStr(Rec."Table Name", 1, 20), Rec."Table ID") then
                 exit(false);
 
-        FilterPageBuilder.PageCaption := StrSubstNo(Text003, "Table Name");
-        if not FilterPageBuilder.RunModal then
+        FilterPageBuilder.PageCaption := StrSubstNo(Text003, Rec."Table Name");
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
-        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr("Table Name", 1, 20), "Table ID");
+        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr(Rec."Table Name", 1, 20), Rec."Table ID");
 
         exit(true);
     end;
@@ -270,7 +268,7 @@ page 6059897 "NPR Data Log Setup"
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         OutStream: OutStream;
     begin
-        RecRef.Open("Table ID");
+        RecRef.Open(Rec."Table ID");
 
         if Filters = '' then
             exit(RecRef.FindSet);
@@ -291,11 +289,11 @@ page 6059897 "NPR Data Log Setup"
         DataLogSetupFieldList: Page "NPR Data Log Setup Ignore List";
     begin
         Field.FilterGroup(2);
-        Field.SetRange(TableNo, "Table ID");
+        Field.SetRange(TableNo, Rec."Table ID");
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
         Field.FilterGroup(0);
         DataLogSetupFieldList.SetTableView(Field);
         DataLogSetupFieldList.RunModal();
-        CalcFields("Ignored Fields");
+        Rec.CalcFields("Ignored Fields");
     end;
 }

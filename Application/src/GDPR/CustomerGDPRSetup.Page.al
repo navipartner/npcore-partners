@@ -1,4 +1,4 @@
-page 6151150 "NPR Customer GDPR Setup"
+﻿page 6151150 "NPR Customer GDPR Setup"
 {
     Caption = 'Customer GDPR Setup';
     DeleteAllowed = false;
@@ -14,12 +14,12 @@ page 6151150 "NPR Customer GDPR Setup"
         {
             group(General)
             {
-                field("Anonymize After"; "Anonymize After")
+                field("Anonymize After"; Rec."Anonymize After")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Anonymize After field';
                 }
-                field("Customer Posting Group Filter"; "Customer Posting Group Filter")
+                field("Customer Posting Group Filter"; Rec."Customer Posting Group Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Posting Group Filter field';
@@ -27,10 +27,10 @@ page 6151150 "NPR Customer GDPR Setup"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if (PAGE.RunModal(0, CustPostingGrp) = ACTION::LookupOK) then
-                            "Customer Posting Group Filter" := CustPostingGrp.Code;
+                            Rec."Customer Posting Group Filter" := CustPostingGrp.Code;
                     end;
                 }
-                field("Gen. Bus. Posting Group Filter"; "Gen. Bus. Posting Group Filter")
+                field("Gen. Bus. Posting Group Filter"; Rec."Gen. Bus. Posting Group Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group Filter field';
@@ -38,16 +38,16 @@ page 6151150 "NPR Customer GDPR Setup"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if (PAGE.RunModal(0, GenBusPostingGrp) = ACTION::LookupOK) then
-                            "Gen. Bus. Posting Group Filter" := GenBusPostingGrp.Code;
+                            Rec."Gen. Bus. Posting Group Filter" := GenBusPostingGrp.Code;
                     end;
                 }
-                field("No of Customers"; "No of Customers")
+                field("No of Customers"; Rec."No of Customers")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No of Customers field';
                 }
 
-                field(EnableJobQueue; "Enable Job Queue")
+                field(EnableJobQueue; Rec."Enable Job Queue")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Enqueue job queue entries for anonymization';
@@ -65,7 +65,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 Caption = 'Extract Customers';
                 Image = Customer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -93,7 +93,7 @@ page 6151150 "NPR Customer GDPR Setup"
                             exit;
 
                     CustToAnonymize.Reset();
-                    CustToAnonymize.DeleteAll;
+                    CustToAnonymize.DeleteAll();
 
                     if (GDPRSetup.Get) then;
 
@@ -128,7 +128,7 @@ page 6151150 "NPR Customer GDPR Setup"
 
                             if (NoTrans) then begin
                                 if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod, Today)) then begin
-                                    CustToAnonymize.Init;
+                                    CustToAnonymize.Init();
                                     CustToAnonymize."Entry No" := VarEntryNo;
                                     CustToAnonymize."Customer No" := Customer."No.";
                                     CustToAnonymize."Customer Name" := Customer.Name;
@@ -155,7 +155,7 @@ page 6151150 "NPR Customer GDPR Setup"
                                     NoILE := true;
 
                                 if (NoILE and NoCLE) then begin
-                                    CustToAnonymize.Init;
+                                    CustToAnonymize.Init();
                                     CustToAnonymize."Entry No" := VarEntryNo;
                                     CustToAnonymize."Customer No" := Customer."No.";
                                     CustToAnonymize."Customer Name" := Customer.Name;
@@ -163,8 +163,8 @@ page 6151150 "NPR Customer GDPR Setup"
                                     VarEntryNo += 1;
                                 end;
                             end;
-                        until Customer.Next = 0;
-                    Window.Close;
+                        until Customer.Next() = 0;
+                    Window.Close();
                     Message('Completed');
                 end;
             }
@@ -177,7 +177,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 Ellipsis = true;
                 Image = AbsenceCategory;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR GDPR Anonymization Req.";
                 ApplicationArea = All;
@@ -203,10 +203,10 @@ page 6151150 "NPR Customer GDPR Setup"
     trigger OnOpenPage()
     begin
 
-        Reset();
-        if (not Get) then begin
-            Init;
-            Insert();
+        Rec.Reset();
+        if (not Rec.Get) then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
     end;

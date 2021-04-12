@@ -12,7 +12,7 @@ codeunit 6184505 "NPR EFT Trx Logging Mgt."
         EFTTransactionLog: Record "NPR EFT Transaction Log";
         OutStream: OutStream;
     begin
-        EFTTransactionLog.Init;
+        EFTTransactionLog.Init();
         EFTTransactionLog."Transaction Entry No." := TrxEntryNo;
         EFTTransactionLog.Description := CopyStr(Description, 1, MaxStrLen(EFTTransactionLog.Description));
         if LogContents <> '' then begin
@@ -21,7 +21,7 @@ codeunit 6184505 "NPR EFT Trx Logging Mgt."
         end;
         EFTTransactionLog."Log Entry No." := 0; //autoinc
         EFTTransactionLog."Logged At" := CreateDateTime(Today, Time);
-        EFTTransactionLog.Insert;
+        EFTTransactionLog.Insert();
     end;
 }
 

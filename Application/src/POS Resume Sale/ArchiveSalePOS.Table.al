@@ -351,8 +351,6 @@ table 6014418 "NPR Archive Sale POS"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                Trans0001: Label 'The sign on quantity and amount must be the same';
             begin
             end;
         }

@@ -155,7 +155,7 @@ page 6151419 "NPR Magento Brand Card"
                     MagentoDisplayConfig.SetRange("No.", Rec.Id);
                     MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Brand);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
-                    MagentoDisplayConfigPage.Run;
+                    MagentoDisplayConfigPage.Run();
                 end;
             }
         }
@@ -187,6 +187,6 @@ page 6151419 "NPR Magento Brand Card"
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        DisplayConfigVisible := MagentoSetup.Get and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
+        DisplayConfigVisible := MagentoSetup.Get() and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
     end;
 }

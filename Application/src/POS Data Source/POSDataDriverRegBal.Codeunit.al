@@ -1,7 +1,5 @@
 codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
 {
-    var
-        Caption_CompanyName: Label 'Company Name';
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
@@ -66,7 +64,6 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
     local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        Sale: Codeunit "NPR POS Sale";
         DataRow: Codeunit "NPR Data Row";
     begin
         if DataSource.Id <> GetSourceNameText() then
@@ -122,8 +119,6 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnSetPosition', '', false, false)]
     local procedure SetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
-    var
-        Sale: Codeunit "NPR POS Sale";
     begin
         if DataSource <> GetSourceNameText() then
             exit;
@@ -133,8 +128,6 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnIsDataSourceModified', '', false, false)]
     local procedure Modified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
-    var
-        Sale: Codeunit "NPR POS Sale";
     begin
         if DataSource <> GetSourceNameText() then
             exit;

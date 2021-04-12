@@ -22,7 +22,7 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         if Sender.DiscoverAction(
             ActionCode,
             ActionDescription,
-            ActionVersion,
+            ActionVersion(),
             Sender.Type::Generic,
             Sender."Subscriber Instances Allowed"::Multiple)
         then begin
@@ -54,7 +54,7 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         ContextId: Guid;
     begin
 
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         POSSession.GetSetup(Setup);
@@ -143,7 +143,6 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
     var
         SaleLine: Record "NPR POS Sale Line";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Handled: Boolean;
         PepperLibraryTranscendence: Codeunit "NPR Pepper Library TSD";
         EFTSetup: Record "NPR EFT Setup";
     begin
@@ -252,10 +251,10 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
     begin
         EFTSetup.SetRange("POS Unit No.", POSUnit."No.");
         EFTSetup.SetRange("EFT Integration Type", PepperLibraryTranscendence.GetIntegrationType());
-        if EFTSetup.FindFirst then
+        if EFTSetup.FindFirst() then
             exit;
         EFTSetup.SetRange("POS Unit No.", '');
-        EFTSetup.FindFirst;
+        EFTSetup.FindFirst();
     end;
 }
 

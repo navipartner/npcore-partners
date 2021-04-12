@@ -73,7 +73,7 @@ table 6059894 "NPR Data Log Processing Entry"
         BufferText: Text;
     begin
         ErrorMessage := '';
-        if not "Error Message".HasValue then
+        if not "Error Message".HasValue() then
             exit('');
 
         CalcFields("Error Message");

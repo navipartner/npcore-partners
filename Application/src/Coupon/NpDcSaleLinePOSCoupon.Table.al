@@ -72,7 +72,7 @@ table 6151593 "NPR NpDc SaleLinePOS Coupon"
             begin
                 if Type = Type::Coupon then begin
                     if not CouponType.Get("Coupon Type") then
-                        CouponType.Init;
+                        CouponType.Init();
                     "Application Sequence No." := CouponType."Application Sequence No.";
                 end;
             end;

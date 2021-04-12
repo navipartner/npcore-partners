@@ -16,7 +16,7 @@ page 6014579 "NPR Retail List"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Choice; Choice)
+                field(Choice; Rec.Choice)
                 {
                     ApplicationArea = All;
                     Editable = false;

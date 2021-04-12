@@ -1,4 +1,4 @@
-codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
+﻿codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
 {
     var
         Text002: Label 'Retail Voucher Payment Amount %1 is higher than Remaining Amount %2 on Retail Voucher %3';
@@ -13,9 +13,9 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
     begin
         Clear(NpRvVoucherType);
         FindVoucherTypes(TempNpRvVoucherType);
-        if TempNpRvVoucherType.FindLast then begin
+        if TempNpRvVoucherType.FindLast() then begin
             NpRvVoucherType.Get(TempNpRvVoucherType.Code);
-            TempNpRvVoucherType.FindFirst;
+            TempNpRvVoucherType.FindFirst();
             if NpRvVoucherType.Code = TempNpRvVoucherType.Code then
                 exit(true);
         end;
@@ -38,10 +38,10 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
 
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindLast then;
+        if SalesLine.FindLast() then;
         LineNo := SalesLine."Line No." + 10000;
 
-        SalesLine.Init;
+        SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
@@ -53,8 +53,8 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         SalesLine.Validate(Quantity, 1);
         SalesLine.Modify(true);
 
-        NpRvSalesLine.Init;
-        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
         NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
         NpRvSalesLine."Document Type" := SalesLine."Document Type";
@@ -70,8 +70,8 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             NpRvSalesLine."Send via E-mail" := true;
         NpRvSalesLine.Insert(true);
 
-        NpRvSalesLineReference.Init;
-        NpRvSalesLineReference.Id := CreateGuid;
+        NpRvSalesLineReference.Init();
+        NpRvSalesLineReference.Id := CreateGuid();
         NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
         NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
         NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
@@ -83,7 +83,6 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
     procedure InsertPayment(Element: XmlElement; var SalesHeader: Record "Sales Header"; var NpRvVoucher: Record "NPR NpRv Voucher"; Amount: Decimal): Boolean
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvGlobalVoucherWebservice: Codeunit "NPR NpRv Global Voucher WS";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         LineNo: Integer;
     begin
@@ -96,12 +95,12 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
         NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-        if not NpRvSalesLine.FindFirst then begin
+        if not NpRvSalesLine.FindFirst() then begin
             if NpRvVoucher.CalcInUseQty() > 0 then
                 Error(Text006, NpRvVoucher."Reference No.");
 
-            NpRvSalesLine.Init;
-            NpRvSalesLine.Id := CreateGuid;
+            NpRvSalesLine.Init();
+            NpRvSalesLine.Id := CreateGuid();
             NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
             NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
             NpRvSalesLine."Document Type" := SalesHeader."Document Type";
@@ -116,7 +115,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
 
 
         LineNo += 10000;
-        MagentoPaymentLine.Init;
+        MagentoPaymentLine.Init();
         MagentoPaymentLine."Document Table No." := DATABASE::"Sales Header";
         MagentoPaymentLine."Document Type" := SalesHeader."Document Type";
         MagentoPaymentLine."Document No." := SalesHeader."No.";
@@ -170,7 +169,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.SetRange("Document Type", Rec."Document Type");
         NpRvSalesLine.SetRange("Document No.", Rec."Document No.");
         NpRvSalesLine.SetRange("Document Line No.", Rec."Line No.");
-        if NpRvSalesLine.FindFirst then
+        if NpRvSalesLine.FindFirst() then
             NpRvSalesLine.DeleteAll(true);
     end;
 
@@ -192,7 +191,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.SetRange("Document Type", Rec."Document Type");
         NpRvSalesLine.SetRange("Document No.", Rec."Document No.");
         NpRvSalesLine.SetRange("Document Line No.", Rec."Line No.");
-        if NpRvSalesLine.FindFirst then
+        if NpRvSalesLine.FindFirst() then
             NpRvSalesLine.DeleteAll(true);
     end;
 
@@ -200,9 +199,6 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
     local procedure OnBeforeReleaseSalesDoc(var SalesHeader: Record "Sales Header")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        MagentoPaymentLine: Record "NPR Magento Payment Line";
-        TotalAmtInclVat: Decimal;
     begin
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -212,10 +208,10 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         if NpRvSalesLine.IsEmpty then
             exit;
 
-        NpRvSalesLine.FindSet;
+        NpRvSalesLine.FindSet();
         repeat
             ApplyPayment(SalesHeader, NpRvSalesLine);
-        until NpRvSalesLine.Next = 0;
+        until NpRvSalesLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, true)]
@@ -239,7 +235,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         if NpRvSalesLine.IsEmpty then
             exit;
 
-        NpRvSalesLine.FindSet;
+        NpRvSalesLine.FindSet();
         repeat
             MagentoPaymentLine.Get(DATABASE::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
             NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
@@ -247,7 +243,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             NpRvVoucher.CalcFields(Amount);
             if NpRvVoucher.Amount < MagentoPaymentLine.Amount then
                 Error(Text002, MagentoPaymentLine.Amount, NpRvVoucher.Amount, NpRvVoucher."Reference No.");
-        until NpRvSalesLine.Next = 0;
+        until NpRvSalesLine.Next() = 0;
 
         TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
         SalesHeader.CalcFields("NPR Magento Payment Amount");
@@ -259,8 +255,6 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
     local procedure OnBeforePostCommitSalesDoc(var SalesHeader: Record "Sales Header")
     var
         NoSeriesLine: Record "No. Series Line";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         PostingNo: Code[20];
@@ -280,7 +274,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         PostingNo := SalesHeader."Posting No.";
         if PostingNo = '' then begin
             NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine, SalesHeader."Posting No. Series", 0D);
-            NoSeriesLine.FindLast;
+            NoSeriesLine.FindLast();
             PostingNo := NoSeriesLine."Last No. Used";
         end;
         NpRvSalesLine.ModifyAll("Posting No.", PostingNo);
@@ -327,13 +321,13 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
           NpRvVoucherEntry."Entry Type"::"Issue Voucher", NpRvVoucherEntry."Entry Type"::Payment, NpRvVoucherEntry."Entry Type"::"Top-up");
         NpRvVoucherEntry.SetRange("Document Type", NpRvVoucherEntry."Document Type"::Invoice);
         NpRvVoucherEntry.SetRange("Document No.", SalesInvHeader."No.");
-        if not NpRvVoucherEntry.FindSet then
+        if not NpRvVoucherEntry.FindSet() then
             exit;
 
         repeat
             if NpRvVoucher.Get(NpRvVoucherEntry."Voucher No.") then
                 SendVoucher(NpRvVoucher);
-        until NpRvVoucherEntry.Next = 0;
+        until NpRvVoucherEntry.Next() = 0;
     end;
 
     local procedure IssueNewVouchers(SalesHeader: Record "Sales Header")
@@ -346,15 +340,14 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
         NpRvSalesLine.SetRange("Document No.", SalesHeader."No.");
         NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
-        if NpRvSalesLine.FindSet then
+        if NpRvSalesLine.FindSet() then
             repeat
                 NpRvVoucherMgt.IssueVouchers(NpRvSalesLine);
-            until NpRvSalesLine.Next = 0;
+            until NpRvSalesLine.Next() = 0;
     end;
 
     local procedure PostVoucherPayments(SalesHeader: Record "Sales Header")
     var
-        SalesLine: Record "Sales Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
@@ -362,10 +355,10 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
         NpRvSalesLine.SetRange("Document No.", SalesHeader."No.");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-        if NpRvSalesLine.FindSet then
+        if NpRvSalesLine.FindSet() then
             repeat
                 NpRvVoucherMgt.PostPayment(NpRvSalesLine);
-            until NpRvSalesLine.Next = 0;
+            until NpRvSalesLine.Next() = 0;
     end;
 
     local procedure SendOpenVouchers(SalesInvHeader: Record "Sales Invoice Header")
@@ -380,18 +373,17 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         if MagentoPaymentLine.IsEmpty then
             exit;
 
-        Commit;
-        MagentoPaymentLine.FindSet;
+        Commit();
+        MagentoPaymentLine.FindSet();
         repeat
             if NpRvVoucher.Get(MagentoPaymentLine."Source No.") then
                 SendVoucher(NpRvVoucher);
-        until MagentoPaymentLine.Next = 0;
+        until MagentoPaymentLine.Next() = 0;
     end;
 
     procedure IssueVoucherAction(SalesHeader: Record "Sales Header")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        TotalAmtInclVat: Decimal;
         VoucherNo: Text;
     begin
         CheckHeader(SalesHeader);
@@ -430,15 +422,15 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
     begin
-        if NpRvVoucherType.FindSet then
+        if NpRvVoucherType.FindSet() then
             repeat
                 NpRvReturnVoucherType.SetRange("Return Voucher Type", NpRvVoucherType.Code);
                 if NpRvReturnVoucherType.IsEmpty and not TempNpRvVoucherType.Get(NpRvVoucherType.Code) then begin
-                    TempNpRvVoucherType.Init;
+                    TempNpRvVoucherType.Init();
                     TempNpRvVoucherType := NpRvVoucherType;
-                    TempNpRvVoucherType.Insert;
+                    TempNpRvVoucherType.Insert();
                 end;
-            until NpRvVoucherType.Next = 0;
+            until NpRvVoucherType.Next() = 0;
     end;
 
     local procedure CheckHeader(SalesHeader: Record "Sales Header")

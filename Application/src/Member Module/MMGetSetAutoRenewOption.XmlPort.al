@@ -90,8 +90,6 @@ xmlport 6060146 "NPR MM GetSet AutoRenew Option"
     procedure createResponse()
     var
         Membership: Record "NPR MM Membership";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipEntryNo: Integer;
     begin
 
         if (not tmpMembershipRequest.FindFirst()) then begin

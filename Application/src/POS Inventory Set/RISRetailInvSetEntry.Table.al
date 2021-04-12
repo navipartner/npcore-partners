@@ -109,7 +109,7 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Processing Codeunit ID");
                 if "Processing Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Processing Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(125; "Processing Codeunit Name"; Text[249])
@@ -154,7 +154,7 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Processing Codeunit ID");
                 if "Processing Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Processing Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
     }
@@ -177,9 +177,6 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
     end;
 
     procedure SetApiUrl()
-    var
-        MagentoWebservice: Codeunit "NPR Magento Webservice";
-        Position: Integer;
     begin
         if "Api Url" = '' then
             "Api Url" := GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"NPR Magento Webservice");

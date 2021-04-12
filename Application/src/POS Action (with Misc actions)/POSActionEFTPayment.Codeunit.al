@@ -16,27 +16,26 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction20(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion())
-            then begin
-                RegisterWorkflow20(
-                  'let paymentCreated = await workflow.respond("PrepareRequest");' +
+        if Sender.DiscoverAction20(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion())
+then begin
+            Sender.RegisterWorkflow20(
+              'let paymentCreated = await workflow.respond("PrepareRequest");' +
 
-                  'runtime.suspendTimeout();' +
-                  'let success = await workflow.run($context.integrationWorkflow, { context: { entryNo: $context.entryNo }});' +
+              'runtime.suspendTimeout();' +
+              'let success = await workflow.run($context.integrationWorkflow, { context: { entryNo: $context.entryNo }});' +
 
-                  'return paymentCreated && success;'
-                );
-            end;
+              'return paymentCreated && success;'
+            );
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 

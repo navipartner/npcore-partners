@@ -195,15 +195,15 @@ table 6151591 "NPR NpDc Coupon"
         NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv.";
     begin
         CouponEntry.SetRange("Coupon No.", "No.");
-        CouponEntry.DeleteAll;
+        CouponEntry.DeleteAll();
 
         SaleLinePOSCoupon.SetRange("Coupon No.", "No.");
-        if SaleLinePOSCoupon.FindFirst then
-            SaleLinePOSCoupon.DeleteAll;
+        if SaleLinePOSCoupon.FindFirst() then
+            SaleLinePOSCoupon.DeleteAll();
 
         NpDcExtCouponSalesLine.SetRange("Coupon No.", "No.");
-        if NpDcExtCouponSalesLine.FindFirst then
-            NpDcExtCouponSalesLine.DeleteAll;
+        if NpDcExtCouponSalesLine.FindFirst() then
+            NpDcExtCouponSalesLine.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -213,7 +213,7 @@ table 6151591 "NPR NpDc Coupon"
     begin
         TestField("Coupon Type");
         if "No." = '' then begin
-            CouponSetup.Get;
+            CouponSetup.Get();
             CouponSetup.TestField("Coupon No. Series");
             NoSeriesMgt.InitSeries(CouponSetup."Coupon No. Series", xRec."No. Series", 0D, "No.", "No. Series");
         end;
@@ -247,7 +247,7 @@ table 6151591 "NPR NpDc Coupon"
 
         Coupon.SetFilter("No.", '<>%1', "No.");
         Coupon.SetRange("Reference No.", "Reference No.");
-        if Coupon.FindFirst then
+        if Coupon.FindFirst() then
             Error(Text000, "Reference No.");
     end;
 

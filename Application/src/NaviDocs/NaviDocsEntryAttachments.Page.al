@@ -32,7 +32,7 @@ page 6059949 "NPR NaviDocs Entry Attachments"
                 field(Data; Data.HasValue)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Data.HasValue field';
+                    ToolTip = 'Specifies the value of the Data.HasValue() field';
                 }
             }
         }

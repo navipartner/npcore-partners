@@ -11,7 +11,7 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
         {
             group(General)
             {
-                field("Terminal ID"; "Terminal ID")
+                field("Terminal ID"; Rec."Terminal ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Terminal ID field';
@@ -22,7 +22,7 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
                         TerminalIDOut: Text;
                     begin
                         if EFTNETSCloudIntegration.LookupTerminal(GlobalEFTSetup, TerminalIDOut) then
-                            Validate("Terminal ID", TerminalIDOut);
+                            Rec.Validate("Terminal ID", TerminalIDOut);
                     end;
                 }
             }

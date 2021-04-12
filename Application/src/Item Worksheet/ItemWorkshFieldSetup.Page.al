@@ -101,7 +101,7 @@ page 6060054 "NPR Item Worksh. Field Setup"
                 Caption = 'Field Value Map';
                 Image = MapDimensions;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Item Worksh. Field Mapping";
@@ -118,9 +118,9 @@ page 6060054 "NPR Item Worksh. Field Setup"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Table No." := xRec."Table No.";
-        "Target Table No. Create" := xRec."Target Table No. Create";
-        "Target Table No. Update" := xRec."Target Table No. Update";
+        Rec."Table No." := xRec."Table No.";
+        Rec."Target Table No. Create" := xRec."Target Table No. Create";
+        Rec."Target Table No. Update" := xRec."Target Table No. Update";
     end;
 }
 

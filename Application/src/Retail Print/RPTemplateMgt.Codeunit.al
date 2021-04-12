@@ -1,4 +1,4 @@
-codeunit 6014586 "NPR RP Template Mgt."
+﻿codeunit 6014586 "NPR RP Template Mgt."
 {
     trigger OnRun()
     begin
@@ -49,15 +49,15 @@ codeunit 6014586 "NPR RP Template Mgt."
         TemplateArchive: Record "NPR RP Template Archive";
         TemplateSetup: Record "NPR RP Template Setup";
     begin
-        if not TemplateSetup.Get then begin
-            TemplateSetup.Init;
+        if not TemplateSetup.Get() then begin
+            TemplateSetup.Init();
             TemplateSetup.Insert(true);
         end;
 
         NewVersion := IncrementVersionNumber(TemplateHeader.Version);
         if TemplateArchive.Get(TemplateHeader.Code, NewVersion) then begin //Assume RPTemplateArchive holds the highest version number instead.
             TemplateArchive.SetCurrentKey("Archived at");
-            TemplateArchive.FindLast;
+            TemplateArchive.FindLast();
             NewVersion := IncrementVersionNumber(TemplateArchive.Version);
         end;
     end;
@@ -71,7 +71,7 @@ codeunit 6014586 "NPR RP Template Mgt."
         MajorVersion: Integer;
         TemplateSetup: Record "NPR RP Template Setup";
     begin
-        TemplateSetup.Get;
+        TemplateSetup.Get();
 
         VersionList := VersionIn.Split(',');
         foreach Version in VersionList do begin
@@ -123,7 +123,7 @@ codeunit 6014586 "NPR RP Template Mgt."
 
         //Archive current version, if any is present, before rolling back
         TemplateHeader.SetRange(Code, TemplateArchive.Code);
-        if TemplateHeader.FindFirst then begin
+        if TemplateHeader.FindFirst() then begin
             TemplateHeader."Version Comments" := Caption_AutoArchive;
             TemplateHeader.Validate(Archived, true);
             TemplateHeader.Delete(true);
@@ -155,12 +155,12 @@ codeunit 6014586 "NPR RP Template Mgt."
         CopyDeviceSettings: Record "NPR RP Device Settings";
         CopyMediaInfo: Record "NPR RP Template Media Info";
     begin
-        if not TemplateHeader.FindFirst then
+        if not TemplateHeader.FindFirst() then
             exit;
 
         InputDialog.LookupMode := true;
         InputDialog.SetInput(1, NewTemplateCode, Caption_InsertNewCode);
-        if InputDialog.RunModal = ACTION::LookupOK then
+        if InputDialog.RunModal() = ACTION::LookupOK then
             ID := InputDialog.InputCode(1, NewTemplateCode);
 
         if ID = 0 then
@@ -184,54 +184,54 @@ codeunit 6014586 "NPR RP Template Mgt."
         TemplateHeader."Version Comments" := '';
         TemplateHeader.Insert(true);
 
-        if DataItem.FindSet then
+        if DataItem.FindSet() then
             repeat
                 CopyDataItem := DataItem;
                 CopyDataItem.Code := NewTemplateCode;
-                CopyDataItem.Insert;
-            until DataItem.Next = 0;
+                CopyDataItem.Insert();
+            until DataItem.Next() = 0;
 
-        if DataItemLink.FindSet then
+        if DataItemLink.FindSet() then
             repeat
                 CopyDataItemLink := DataItemLink;
                 CopyDataItemLink."Data Item Code" := NewTemplateCode;
-                CopyDataItemLink.Insert;
-            until DataItemLink.Next = 0;
+                CopyDataItemLink.Insert();
+            until DataItemLink.Next() = 0;
 
-        if DataItemConstraint.FindSet then
+        if DataItemConstraint.FindSet() then
             repeat
                 CopyDataItemConstraint := DataItemConstraint;
                 CopyDataItemConstraint."Data Item Code" := NewTemplateCode;
-                CopyDataItemConstraint.Insert;
-            until DataItemConstraint.Next = 0;
+                CopyDataItemConstraint.Insert();
+            until DataItemConstraint.Next() = 0;
 
-        if DataItemConstraintLink.FindSet then
+        if DataItemConstraintLink.FindSet() then
             repeat
                 CopyDataItemConstraintLink := DataItemConstraintLink;
                 CopyDataItemConstraintLink."Data Item Code" := NewTemplateCode;
-                CopyDataItemConstraintLink.Insert;
-            until DataItemConstraintLink.Next = 0;
+                CopyDataItemConstraintLink.Insert();
+            until DataItemConstraintLink.Next() = 0;
 
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 CopyTemplateLine := TemplateLine;
                 CopyTemplateLine."Template Code" := NewTemplateCode;
-                CopyTemplateLine.Insert;
-            until TemplateLine.Next = 0;
+                CopyTemplateLine.Insert();
+            until TemplateLine.Next() = 0;
 
-        if DeviceSettings.FindSet then
+        if DeviceSettings.FindSet() then
             repeat
                 CopyDeviceSettings := DeviceSettings;
                 CopyDeviceSettings.Template := NewTemplateCode;
-                CopyDeviceSettings.Insert;
-            until DeviceSettings.Next = 0;
+                CopyDeviceSettings.Insert();
+            until DeviceSettings.Next() = 0;
 
-        if MediaInfo.FindSet then
+        if MediaInfo.FindSet() then
             repeat
                 CopyMediaInfo := MediaInfo;
                 CopyMediaInfo.Template := NewTemplateCode;
-                CopyMediaInfo.Insert;
-            until MediaInfo.Next = 0;
+                CopyMediaInfo.Insert();
+            until MediaInfo.Next() = 0;
     end;
 
     procedure ExportArchived(var TemplateArchive: Record "NPR RP Template Archive")
@@ -239,7 +239,7 @@ codeunit 6014586 "NPR RP Template Mgt."
         InStream: InStream;
         FileName: Variant;
     begin
-        if not TemplateArchive.Template.HasValue then
+        if not TemplateArchive.Template.HasValue() then
             exit;
 
         TemplateArchive.CalcFields(Template);
@@ -263,22 +263,22 @@ codeunit 6014586 "NPR RP Template Mgt."
 
         //Was parent before
         TemplateLine.SetRange("Parent Line No.", Rec."Line No.");
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 TemplateLine.FindParentLine();
-                TemplateLine.Modify;
-            until TemplateLine.Next = 0;
+                TemplateLine.Modify();
+            until TemplateLine.Next() = 0;
 
-        TemplateLine.Reset;
+        TemplateLine.Reset();
         //Is parent now
         TemplateLine.SetFilter("Line No.", '>%1', Rec."Line No.");
         TemplateLine.SetFilter(Level, '>%1', 0);
         TemplateLine.SetFilter("Parent Line No.", '<%1', Rec."Line No.");
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 TemplateLine.FindParentLine();
-                TemplateLine.Modify;
-            until TemplateLine.Next = 0;
+                TemplateLine.Modify();
+            until TemplateLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterInsertEvent', '', false, false)]
@@ -292,11 +292,11 @@ codeunit 6014586 "NPR RP Template Mgt."
         TemplateLine.SetFilter("Line No.", '>%1', Rec."Line No.");
         TemplateLine.SetFilter(Level, '>%1', 0);
         TemplateLine.SetFilter("Parent Line No.", '<%1', Rec."Line No.");
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 TemplateLine.FindParentLine();
-                TemplateLine.Modify;
-            until TemplateLine.Next = 0;
+                TemplateLine.Modify();
+            until TemplateLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterDeleteEvent', '', false, false)]
@@ -308,11 +308,11 @@ codeunit 6014586 "NPR RP Template Mgt."
             exit;
 
         TemplateLine.SetRange("Parent Line No.", Rec."Line No.");
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 TemplateLine.FindParentLine();
-                TemplateLine.Modify;
-            until TemplateLine.Next = 0;
+                TemplateLine.Modify();
+            until TemplateLine.Next() = 0;
     end;
 
     local procedure "// Data Upgrade"()
@@ -344,23 +344,23 @@ codeunit 6014586 "NPR RP Template Mgt."
         //-NPR5.39 [304745]
         RPTemplateLine.SetRange("Data Item Table", TableId);
         RPTemplateLine.SetRange(Field, FromFieldId);
-        if RPTemplateLine.FindSet then
+        if RPTemplateLine.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
                 RPTemplateLine.Validate(Field, ToFieldId);
                 if RPTemplateLine."Field 2" = FromFieldId then
                     RPTemplateLine.Validate("Field 2", ToFieldId);
-                RPTemplateLine.Modify;
-            until RPTemplateLine.Next = 0;
+                RPTemplateLine.Modify();
+            until RPTemplateLine.Next() = 0;
         RPTemplateLine.SetRange(Field);
 
         RPTemplateLine.SetRange("Field 2", FromFieldId);
-        if RPTemplateLine.FindSet then
+        if RPTemplateLine.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
                 RPTemplateLine.Validate("Field 2", ToFieldId);
-                RPTemplateLine.Modify;
-            until RPTemplateLine.Next = 0;
+                RPTemplateLine.Modify();
+            until RPTemplateLine.Next() = 0;
         //+NPR5.39 [304745]
     end;
 
@@ -371,22 +371,22 @@ codeunit 6014586 "NPR RP Template Mgt."
         //-NPR5.39 [304745]
         RPDataItemLinks.SetRange("Table ID", TableId);
         RPDataItemLinks.SetRange("Field ID", FromFieldId);
-        if RPDataItemLinks.FindSet then
+        if RPDataItemLinks.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemLinks."Data Item Code");
                 RPDataItemLinks.Validate("Field ID", ToFieldId);
-                RPDataItemLinks.Modify;
-            until RPDataItemLinks.Next = 0;
-        RPDataItemLinks.Reset;
+                RPDataItemLinks.Modify();
+            until RPDataItemLinks.Next() = 0;
+        RPDataItemLinks.Reset();
 
         RPDataItemLinks.SetRange("Parent Table ID", TableId);
         RPDataItemLinks.SetRange("Parent Field ID", FromFieldId);
-        if RPDataItemLinks.FindSet then
+        if RPDataItemLinks.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemLinks."Data Item Code");
                 RPDataItemLinks.Validate("Parent Field ID", ToFieldId);
-                RPDataItemLinks.Modify;
-            until RPDataItemLinks.Next = 0;
+                RPDataItemLinks.Modify();
+            until RPDataItemLinks.Next() = 0;
         //+NPR5.39 [304745]
     end;
 
@@ -398,23 +398,23 @@ codeunit 6014586 "NPR RP Template Mgt."
         //-NPR5.39 [304745]
         RPDataItemConstraintLinks.SetRange("Data Item Table ID", TableId);
         RPDataItemConstraintLinks.SetRange("Data Item Field ID", FromFieldId);
-        if RPDataItemConstraintLinks.FindSet then
+        if RPDataItemConstraintLinks.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemConstraintLinks."Data Item Code");
                 RPDataItemConstraintLinks.Validate("Data Item Field ID", ToFieldId);
-                RPDataItemConstraintLinks.Modify;
-            until RPDataItemConstraintLinks.Next = 0;
-        RPDataItemConstraintLinks.Reset;
+                RPDataItemConstraintLinks.Modify();
+            until RPDataItemConstraintLinks.Next() = 0;
+        RPDataItemConstraintLinks.Reset();
 
         RPDataItemConstraint.SetRange("Table ID", TableId);
-        if RPDataItemConstraint.FindSet then
+        if RPDataItemConstraint.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemConstraint."Data Item Code");
                 RPDataItemConstraintLinks.SetRange("Data Item Code", RPDataItemConstraint."Data Item Code");
                 RPDataItemConstraintLinks.SetRange("Constraint Line No.", RPDataItemConstraint."Line No.");
                 RPDataItemConstraintLinks.SetRange("Field ID", FromFieldId);
                 RPDataItemConstraintLinks.ModifyAll("Field ID", ToFieldId, true);
-            until RPDataItemConstraint.Next = 0;
+            until RPDataItemConstraint.Next() = 0;
         //+NPR5.39 [304745]
     end;
 
@@ -425,19 +425,19 @@ codeunit 6014586 "NPR RP Template Mgt."
         //-NPR5.39 [304745]
         RPTemplateLine.SetRange("Data Item Table", TableId);
         RPTemplateLine.SetRange(Field, FieldId);
-        if RPTemplateLine.FindSet then
+        if RPTemplateLine.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
-                RPTemplateLine.Delete;
-            until RPTemplateLine.Next = 0;
+                RPTemplateLine.Delete();
+            until RPTemplateLine.Next() = 0;
         RPTemplateLine.SetRange(Field);
 
         RPTemplateLine.SetRange("Field 2", FieldId);
-        if RPTemplateLine.FindSet then
+        if RPTemplateLine.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
-                RPTemplateLine.Delete;
-            until RPTemplateLine.Next = 0;
+                RPTemplateLine.Delete();
+            until RPTemplateLine.Next() = 0;
         //+NPR5.39 [304745]
     end;
 
@@ -448,20 +448,20 @@ codeunit 6014586 "NPR RP Template Mgt."
         //-NPR5.39 [304745]
         RPDataItemLinks.SetRange("Table ID", TableId);
         RPDataItemLinks.SetRange("Field ID", FieldId);
-        if RPDataItemLinks.FindSet then
+        if RPDataItemLinks.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemLinks."Data Item Code");
-                RPDataItemLinks.Delete;
-            until RPDataItemLinks.Next = 0;
-        RPDataItemLinks.Reset;
+                RPDataItemLinks.Delete();
+            until RPDataItemLinks.Next() = 0;
+        RPDataItemLinks.Reset();
 
         RPDataItemLinks.SetRange("Parent Table ID", TableId);
         RPDataItemLinks.SetRange("Parent Field ID", FieldId);
-        if RPDataItemLinks.FindSet then
+        if RPDataItemLinks.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemLinks."Data Item Code");
-                RPDataItemLinks.Delete;
-            until RPDataItemLinks.Next = 0;
+                RPDataItemLinks.Delete();
+            until RPDataItemLinks.Next() = 0;
         //+NPR5.39 [304745]
     end;
 
@@ -473,22 +473,22 @@ codeunit 6014586 "NPR RP Template Mgt."
         //-NPR5.39 [304745]
         RPDataItemConstraintLinks.SetRange("Data Item Table ID", TableId);
         RPDataItemConstraintLinks.SetRange("Data Item Field ID", FieldId);
-        if RPDataItemConstraintLinks.FindSet then
+        if RPDataItemConstraintLinks.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemConstraintLinks."Data Item Code");
-                RPDataItemConstraintLinks.Delete;
-            until RPDataItemConstraintLinks.Next = 0;
-        RPDataItemConstraintLinks.Reset;
+                RPDataItemConstraintLinks.Delete();
+            until RPDataItemConstraintLinks.Next() = 0;
+        RPDataItemConstraintLinks.Reset();
 
         RPDataItemConstraint.SetRange("Table ID", TableId);
-        if RPDataItemConstraint.FindSet then
+        if RPDataItemConstraint.FindSet() then
             repeat
                 IncreaseVersionIfNecessary(RPDataItemConstraint."Data Item Code");
                 RPDataItemConstraintLinks.SetRange("Data Item Code", RPDataItemConstraint."Data Item Code");
                 RPDataItemConstraintLinks.SetRange("Constraint Line No.", RPDataItemConstraint."Line No.");
                 RPDataItemConstraintLinks.SetRange("Field ID", FieldId);
-                RPDataItemConstraintLinks.DeleteAll;
-            until RPDataItemConstraint.Next = 0;
+                RPDataItemConstraintLinks.DeleteAll();
+            until RPDataItemConstraint.Next() = 0;
         //+NPR5.39 [304745]
     end;
 
@@ -502,7 +502,7 @@ codeunit 6014586 "NPR RP Template Mgt."
             if RPTemplateHeader.Archived then begin
                 TemplateMgt.CreateNewVersion(RPTemplateHeader);
                 RPTemplateHeader."Version Comments" := 'Auto created version for field upgrade';
-                RPTemplateHeader.Modify;
+                RPTemplateHeader.Modify();
             end;
         //+NPR5.39 [304745]
     end;

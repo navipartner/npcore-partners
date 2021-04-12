@@ -7,8 +7,8 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
     var
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
     begin
-        MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.Update", UpdateCode);
-        MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.Delete", DeleteCode);
+        MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.Update"(), UpdateCode);
+        MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.Delete"(), DeleteCode);
     end;
 
     procedure InitNpXmlTemplateSetup(var TempBlob: Codeunit "Temp Blob")
@@ -21,13 +21,13 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt.LoadGenericSetup(TempBlob, XmlDoc);
 
         NodePath := '';
-        MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.TemplateSetup");
+        MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.TemplateSetup"());
 
-        NodePath := "ElementName.TemplateSetup";
+        NodePath := "ElementName.TemplateSetup"();
         MagentoGenericSetupMgt.AddFieldText(XmlDoc, NodePath, "ElementName.TemplateUrl", 'http://xsd.navipartner.dk/naviconnect/npxml_templates/navishop2dev90/');
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.B2C");
 
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C";
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.Item");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.ItemGroup");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.ItemInventory");
@@ -43,53 +43,53 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.Membership");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.CollectStore");
 
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/ ' + "ElementName.Item";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/ ' + "ElementName.Item";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ITEM', 'DEL_ITEM');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemGroup";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemGroup";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ITEM_GROUP', 'DEL_ITEM_GROUP');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemInventory";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemInventory";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ITEM__STOCK', '');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemStore";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemStore";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ITEM__STORE', '');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Brand";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Brand";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_MANUFACTURER', 'DEL_MANUFACTURER');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemAttribute";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemAttribute";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_PROD_ATTR', 'DEL_PROD_ATTR');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemAttributeSet";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemAttributeSet";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_PROD_ATTR_SET', 'DEL_PROD_ATTR_SET');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Picture";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Picture";
         AddNpXmlTemplate(XmlDoc, NodePath, '', 'DEL_MAG_PICTURE');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.GiftVoucher";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.GiftVoucher";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_GIFT_VOUCHER', '');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CreditVoucher";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.CreditVoucher";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_CREDIT_VOUCHER', '');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.OrderStatus";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.OrderStatus";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ORDER_STATUS', '');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Ticket";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Ticket";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_TICKET_ADMISSION', '');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Membership";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Membership";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_MEMBERSHIP', '');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CollectStore";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.CollectStore";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_COLLECT_STORE', 'DEL_COLLECT_STORE');
-        NodePath := "ElementName.TemplateSetup";
+        NodePath := "ElementName.TemplateSetup"();
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.B2B");
 
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B";
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.Customer");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.DisplayConfig");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.SalesPrice");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.SalesLineDiscount");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.ItemDiscountGroup");
 
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.Customer";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.Customer";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_CONT_RELATION', 'DEL_CONTACT');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.DisplayConfig";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.DisplayConfig";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_DISPLAY_CONFIG', 'DEL_DISPLAY_CONFIG');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.SalesPrice";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.SalesPrice";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_SALES_PRICE', 'DEL_SALES_PRICE');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.SalesLineDiscount";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.SalesLineDiscount";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_SALES_LINE_DISC', 'DEL_SALES_LINE_DISC');
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.ItemDiscountGroup";
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.ItemDiscountGroup";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ITEM_DISC_GROUP', 'DEL_ITEM_DISC_GROUP');
 
         Clear(TempBlob);
@@ -120,12 +120,12 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
             exit;
         end;
 
-        if NcSetup.Get then;
+        if NcSetup.Get() then;
 
         NewTemplate := false;
         if not NpXmlTemplate.Get(TemplateCode) then begin
             NewTemplate := true;
-            TemplateUrl := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup" + '/' + "ElementName.TemplateUrl") + LowerCase(MagentoSetup."Version No.") + '/';
+            TemplateUrl := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup"() + '/' + "ElementName.TemplateUrl") + LowerCase(MagentoSetup."Version No.") + '/';
             if not NpXmlTemplateMgt.ImportNpXmlTemplateUrl(TemplateCode, TemplateUrl) then
                 exit;
             NpXmlTemplate.Get(TemplateCode);
@@ -154,11 +154,11 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         NpXmlTemplate."Task Processor Code" := NcSetup."Task Worker Group";
         NpXmlTemplate."Last Modified by" := UserId;
         NpXmlTemplate."Last Modified at" := CreateDateTime(Today, Time);
-        NpXmlTemplate.Modify;
+        NpXmlTemplate.Modify();
         if NewTemplate and not NpXmlTemplate.VersionArchived() then begin
             if NpXmlTemplate."Version Description" = '' then begin
                 NpXmlTemplate."Version Description" := 'Magento Standard';
-                NpXmlTemplate.Modify;
+                NpXmlTemplate.Modify();
             end;
             NpXmlTemplateMgt.Archive(NpXmlTemplate);
         end;
@@ -169,9 +169,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemAttribute" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemAttribute" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateCreditVoucher(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -179,9 +179,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CreditVoucher" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.CreditVoucher" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateAttributeSet(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -189,9 +189,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemAttributeSet" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemAttributeSet" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateCustomer(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -199,9 +199,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.Customer" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.Customer" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateDisplayConfig(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -209,9 +209,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.DisplayConfig" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.DisplayConfig" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateGiftVoucher(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -219,9 +219,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.GiftVoucher" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.GiftVoucher" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateItem(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -229,9 +229,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Item" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Item" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateItemStore(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -239,9 +239,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemStore" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemStore" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateItemDiscountGroup(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -249,9 +249,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.ItemDiscountGroup" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.ItemDiscountGroup" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateItemGroup(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -259,9 +259,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemGroup" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemGroup" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateItemInventory(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -272,12 +272,12 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         NodePath: Text;
         TemplateCode: Code[20];
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemInventory" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.ItemInventory" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
 
-        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update");
-        MagentoSetup.Get;
+        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"());
+        MagentoSetup.Get();
         if TemplateCode <> MagentoSetup."Stock NpXml Template" then begin
             MagentoSetup.Validate("Stock NpXml Template", TemplateCode);
             MagentoSetup.Modify(true);
@@ -290,9 +290,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Brand" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Brand" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateOrderStatus(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -300,9 +300,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.OrderStatus" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.OrderStatus" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplatePicture(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -310,9 +310,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Picture" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Picture" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateSalesLineDiscount(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -320,9 +320,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.SalesLineDiscount" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.SalesLineDiscount" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateSalesPrice(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -330,9 +330,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.SalesPrice" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2B"() + '/' + "ElementName.SalesPrice" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"()), Enabled);
     end;
 
     procedure SetupTemplateTicket(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -340,8 +340,8 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Ticket" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Ticket" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
     end;
 
     procedure SetupTemplateMember(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -349,8 +349,8 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Membership" + '/';
-        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
+        NodePath := "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Membership" + '/';
+        SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"()), Enabled);
     end;
 
     procedure "--- Template Element Setup"()
@@ -362,7 +362,7 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         TemplateCode: Code[20];
     begin
-        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Item" + '/' + "ElementName.Update");
+        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Item" + '/' + "ElementName.Update"());
         if TemplateCode = '' then
             exit;
 
@@ -381,7 +381,7 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         TemplateCode: Code[20];
     begin
-        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Item" + '/' + "ElementName.Update");
+        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Item" + '/' + "ElementName.Update"());
         if TemplateCode = '' then
             exit;
 
@@ -395,7 +395,7 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         TemplateCode: Code[20];
     begin
-        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Item" + '/' + "ElementName.Update");
+        TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup"() + '/' + "ElementName.B2C"() + '/' + "ElementName.Item" + '/' + "ElementName.Update"());
         if TemplateCode = '' then
             exit;
         NpXmlTemplateMgt.SetNpXmlElementActive(TemplateCode, NodePath, CommentFilter, Enabled);

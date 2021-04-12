@@ -1,4 +1,4 @@
-page 6151500 "NPR Nc Setup"
+﻿page 6151500 "NPR Nc Setup"
 {
     Caption = 'NaviConnect Setup';
     DeleteAllowed = false;
@@ -11,7 +11,7 @@ page 6151500 "NPR Nc Setup"
     {
         area(content)
         {
-            field("Keep Tasks for"; "Keep Tasks for")
+            field("Keep Tasks for"; Rec."Keep Tasks for")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Keep Tasks for field';
@@ -19,7 +19,7 @@ page 6151500 "NPR Nc Setup"
             group(General)
             {
                 Caption = 'Order Import';
-                field("Max Task Count per Batch"; "Max Task Count per Batch")
+                field("Max Task Count per Batch"; Rec."Max Task Count per Batch")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max Task Count per batch field';
@@ -28,12 +28,12 @@ page 6151500 "NPR Nc Setup"
             group("Task Queue")
             {
                 Caption = 'Task Queue';
-                field("Task Queue Enabled"; "Task Queue Enabled")
+                field("Task Queue Enabled"; Rec."Task Queue Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Queue Enabled field';
                 }
-                field("Task Worker Group"; "Task Worker Group")
+                field("Task Worker Group"; Rec."Task Worker Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Worker Group field';
@@ -51,7 +51,7 @@ page 6151500 "NPR Nc Setup"
                 Caption = 'Setup Task Queue';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -82,12 +82,12 @@ page 6151500 "NPR Nc Setup"
     var
         NaviConnectMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
-        Reset;
+        Rec.Reset();
         //-NC1.17
         //IF NOT GET THEN BEGIN
         //  MagentoMgt.InitNaviConnectSetup();
         //END;
-        if not Get then
+        if not Rec.Get() then
             NaviConnectMgt.InitNaviConnectSetup();
         //+NC1.17
     end;

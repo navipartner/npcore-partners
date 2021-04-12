@@ -81,10 +81,6 @@ xmlport 6060134 "NPR MM Change Membership"
                     }
 
                     trigger OnAfterGetRecord()
-                    var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-                        DateValidFromDate: Date;
-                        DateValidUntilDate: Date;
                     begin
                     end;
                 }

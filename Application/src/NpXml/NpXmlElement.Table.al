@@ -59,8 +59,6 @@ table 6151552 "NPR NpXml Element"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                "Field": Record "Field";
             begin
             end;
         }
@@ -134,7 +132,7 @@ table 6151552 "NPR NpXml Element"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Generic Child Codeunit ID");
                 if "Generic Child Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Child Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(605; "Generic Child Codeunit Name"; Text[50])
@@ -181,7 +179,7 @@ table 6151552 "NPR NpXml Element"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Generic Child Codeunit ID");
                 if "Generic Child Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Child Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(620; "Xml Value Codeunit ID"; Integer)
@@ -220,7 +218,7 @@ table 6151552 "NPR NpXml Element"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Xml Value Codeunit ID");
                 if "Xml Value Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Xml Value Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(625; "Xml Value Codeunit Name"; Text[50])
@@ -267,7 +265,7 @@ table 6151552 "NPR NpXml Element"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Xml Value Codeunit ID");
                 if "Xml Value Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Xml Value Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(1000; Active; Boolean)
@@ -330,7 +328,6 @@ table 6151552 "NPR NpXml Element"
 
             trigger OnValidate()
             var
-                "Object": Record "Object";
                 AllObj: Record AllObj;
             begin
                 if "Custom Codeunit ID" <> 0 then
@@ -428,16 +425,15 @@ table 6151552 "NPR NpXml Element"
     trigger OnDelete()
     var
         NpXmlAttribute: Record "NPR NpXml Attribute";
-        NpXmlElement: Record "NPR NpXml Element";
         XMLFilter: Record "NPR NpXml Filter";
     begin
         XMLFilter.SetRange("Xml Template Code", "Xml Template Code");
         XMLFilter.SetRange("Xml Element Line No.", "Line No.");
-        XMLFilter.DeleteAll;
+        XMLFilter.DeleteAll();
 
         NpXmlAttribute.SetRange("Xml Template Code", "Xml Template Code");
         NpXmlAttribute.SetRange("Xml Element Line No.", "Line No.");
-        NpXmlAttribute.DeleteAll;
+        NpXmlAttribute.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -456,11 +452,11 @@ table 6151552 "NPR NpXml Element"
         UpdateParentInfo();
         NpXmlElement.SetRange("Xml Template Code", "Xml Template Code");
         NpXmlElement.SetFilter("Line No.", '<>%1', "Line No.");
-        if NpXmlElement.FindSet then
+        if NpXmlElement.FindSet() then
             repeat
                 NpXmlElement.UpdateParentInfo();
-                NpXmlElement.Modify;
-            until NpXmlElement.Next = 0;
+                NpXmlElement.Modify();
+            until NpXmlElement.Next() = 0;
 
         if "Table No." <> xRec."Table No." then begin
             XMLFilter.SetRange("Xml Template Code", "Xml Template Code");
@@ -496,7 +492,7 @@ table 6151552 "NPR NpXml Element"
         NpXmlElement.SetRange("Xml Template Code", "Xml Template Code");
         NpXmlElement.SetFilter("Line No.", '<%1', "Line No.");
         NpXmlElement.SetFilter(Level, '<%1', Level);
-        if NpXmlElement.FindLast then
+        if NpXmlElement.FindLast() then
             exit(NpXmlElement."Line No.");
     end;
 
@@ -522,9 +518,9 @@ table 6151552 "NPR NpXml Element"
         if not Field.Get("Table No.", "Field No.") then begin
             NpXmlAttribute.SetRange("Xml Template Code", "Xml Template Code");
             NpXmlAttribute.SetFilter("Attribute Field No.", '<>%1', 0);
-            if NpXmlAttribute.FindSet then
+            if NpXmlAttribute.FindSet() then
                 repeat
-                until Field.Get(NpXmlAttribute."Table No.", NpXmlAttribute."Attribute Field No.") or (NpXmlAttribute.Next = 0);
+                until Field.Get(NpXmlAttribute."Table No.", NpXmlAttribute."Attribute Field No.") or (NpXmlAttribute.Next() = 0);
         end;
         if Field."No." = 0 then
             exit;

@@ -1,4 +1,4 @@
-page 6014592 "NPR Item Repl. by Store Matrix"
+﻿page 6014592 "NPR Item Repl. by Store Matrix"
 {
     Caption = 'Item Replen. by Stores Matrix';
     DeleteAllowed = false;
@@ -28,13 +28,13 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     begin
                         FieldTable.SetRange("No.", ShowField);
                         FieldTable.SetRange(Type, FieldTable.Type::Decimal);
-                        if FieldTable.FindFirst then
+                        if FieldTable.FindFirst() then
                             Fields.SetRecord(FieldTable);
                         FieldTable.SetRange("No.");
                         Fields.SetTableView(FieldTable);
                         Fields.LookupMode(true);
                         Fields.Editable(false);
-                        if Fields.RunModal = ACTION::LookupOK then begin
+                        if Fields.RunModal() = ACTION::LookupOK then begin
                             Fields.GetRecord(FieldTable);
                             if ShowField <> FieldTable."No." then begin
                                 ShowField := FieldTable."No.";
@@ -293,7 +293,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                 Caption = 'Variety';
                 Image = ItemVariant;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
@@ -320,7 +320,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
         RecRef.GetTable(ItemReplenByStore);
         FieldTable.SetRange(TableNo, RecRef.Number);
         FieldTable.SetRange(Type, FieldTable.Type::Decimal);
-        if FieldTable.FindFirst then begin
+        if FieldTable.FindFirst() then begin
             ShowField := FieldTable."No.";
             ValidateShowField();
         end;
@@ -397,28 +397,27 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     local procedure PrepareMatrix(PrepareColumnsHeader: Boolean; PrepareRows: Option " ","Fixed Columns","Dynamic Columns","Single Row Dyn. Col.")
     var
         Item: Record Item;
-        ItemVariant: Record "Item Variant";
         StoreGroup: Record "NPR Store Group";
     begin
         if PrepareColumnsHeader then begin
             i := 0;
-            if StoreGroup.FindSet then
+            if StoreGroup.FindSet() then
                 repeat
                     i += 1;
                     MatrixColumnCaptions[i] := StoreGroup.Code;
                     SetColProperty(1, i);
-                until (StoreGroup.Next = 0) or (i = MaxNoOfCol);
+                until (StoreGroup.Next() = 0) or (i = MaxNoOfCol);
             NoOfColUsed := i;
         end;
 
         case PrepareRows of
             PrepareRows::"Fixed Columns", PrepareRows::"Dynamic Columns":
-                if Item.FindSet then
+                if Item.FindSet() then
                     repeat
                         FetchItemOrItemVariant(Item."No.", '', PrepareRows);
                         if PrepareRows = PrepareRows::"Fixed Columns" then
                             UpdateRowsFromSavedData(Item."No.");
-                    until Item.Next = 0;
+                    until Item.Next() = 0;
             PrepareRows::"Single Row Dyn. Col.":
                 FetchItemOrItemVariant(Rec."Item No.", Rec."Variant Code", PrepareRows);
         end;
@@ -465,7 +464,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field1Visible := true;
                         PropertyType::Editable:
-                            Field1Editable := "Variant Code" = '';
+                            Field1Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize1 := MatrixData[ColumnNo] <> '';
                     end;
@@ -476,7 +475,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field2Visible := true;
                         PropertyType::Editable:
-                            Field2Editable := "Variant Code" = '';
+                            Field2Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize2 := MatrixData[ColumnNo] <> '';
                     end;
@@ -487,7 +486,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field3Visible := true;
                         PropertyType::Editable:
-                            Field3Editable := "Variant Code" = '';
+                            Field3Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize3 := MatrixData[ColumnNo] <> '';
                     end;
@@ -498,7 +497,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field4Visible := true;
                         PropertyType::Editable:
-                            Field4Editable := "Variant Code" = '';
+                            Field4Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize4 := MatrixData[ColumnNo] <> '';
                     end;
@@ -509,7 +508,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field5Visible := true;
                         PropertyType::Editable:
-                            Field5Editable := "Variant Code" = '';
+                            Field5Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize5 := MatrixData[ColumnNo] <> '';
                     end;
@@ -520,7 +519,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field6Visible := true;
                         PropertyType::Editable:
-                            Field6Editable := "Variant Code" = '';
+                            Field6Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize6 := MatrixData[ColumnNo] <> '';
                     end;
@@ -531,7 +530,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field7Visible := true;
                         PropertyType::Editable:
-                            Field7Editable := "Variant Code" = '';
+                            Field7Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize7 := MatrixData[ColumnNo] <> '';
                     end;
@@ -542,7 +541,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field8Visible := true;
                         PropertyType::Editable:
-                            Field8Editable := "Variant Code" = '';
+                            Field8Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize8 := MatrixData[ColumnNo] <> '';
                     end;
@@ -553,7 +552,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field9Visible := true;
                         PropertyType::Editable:
-                            Field9Editable := "Variant Code" = '';
+                            Field9Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize9 := MatrixData[ColumnNo] <> '';
                     end;
@@ -564,7 +563,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                         PropertyType::Visible:
                             Field10Visible := true;
                         PropertyType::Editable:
-                            Field10Editable := "Variant Code" = '';
+                            Field10Editable := Rec."Variant Code" = '';
                         PropertyType::Emphasize:
                             Emphasize10 := MatrixData[ColumnNo] <> '';
                     end;
@@ -576,7 +575,6 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     var
         ItemReplenByStore: Record "NPR Item Repl. by Store";
         DecValue: Decimal;
-        DeleteRecord: Boolean;
     begin
         if ItemReplenByStore.Get(MatrixColumnCaptions[ColumnNo], Rec."Item No.", Rec."Variant Code") then begin
             RecRef.GetTable(ItemReplenByStore);
@@ -617,7 +615,6 @@ page 6014592 "NPR Item Repl. by Store Matrix"
         VarietyWrapper: Codeunit "NPR Variety Wrapper";
         ItemReplenishByStore: Record "NPR Item Repl. by Store";
         Item: Record Item;
-        VarietyValue: Record "NPR Variety Value";
         VarietyExists: Boolean;
     begin
         //this block of code can be removed when TestItemIsVariety function in VarietyWrapper is finished
@@ -649,7 +646,6 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     local procedure CheckAndDelete(ColumnNo: Integer)
     var
         ItemReplenByStore: Record "NPR Item Repl. by Store";
-        ItemReplenByStore2: Record "NPR Item Repl. by Store";
         MasterLineMap: Record "NPR Master Line Map";
         RR: RecordRef;
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
@@ -680,7 +676,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     var
         ItemReplenishByStore: Record "NPR Item Repl. by Store";
     begin
-        ItemReplenishByStore.Reset;
+        ItemReplenishByStore.Reset();
         ItemReplenishByStore.SetRange("Item No.", ItemNo);
         ItemReplenishByStore.SetFilter("Variant Code", '<>%1', '');
         if ItemReplenishByStore.FindSet() then

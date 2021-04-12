@@ -1,4 +1,4 @@
-page 6151088 "NPR RIS Retail Inv. Buffer"
+﻿page 6151088 "NPR RIS Retail Inv. Buffer"
 {
     Caption = 'Retail Inventory';
     DeleteAllowed = false;
@@ -53,9 +53,9 @@ page 6151088 "NPR RIS Retail Inv. Buffer"
             RetailInventoryBuffer.Copy(Rec, true)
         else
             RetailInventoryBuffer.Copy(Rec);
-        RetailInventoryBuffer.Reset;
+        RetailInventoryBuffer.Reset();
         RetailInventoryBuffer.SetRange("Processing Error", true);
-        ProcessingErrorExists := RetailInventoryBuffer.FindFirst;
+        ProcessingErrorExists := RetailInventoryBuffer.FindFirst();
     end;
 
     var

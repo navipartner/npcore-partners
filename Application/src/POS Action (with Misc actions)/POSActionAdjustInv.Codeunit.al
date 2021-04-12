@@ -11,33 +11,30 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion(),
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('PromptQuantity', 'numpad({title: context.adjust_description, caption: labels.QtyCaption, value: context.quantity}).cancel(abort);');
-                RegisterWorkflowStep('FixedReturnReason', 'if (param.FixedReturnReason != "")  {respond()}');
-                RegisterWorkflowStep('LookupReturnReason', 'if (param.LookupReturnReason)  {respond()}');
-                RegisterWorkflowStep('AdjustInventory', 'respond();');
+        if Sender.DiscoverAction(
+  ActionCode(),
+  Text000,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('PromptQuantity', 'numpad({title: context.adjust_description, caption: labels.QtyCaption, value: context.quantity}).cancel(abort);');
+            Sender.RegisterWorkflowStep('FixedReturnReason', 'if (param.FixedReturnReason != "")  {respond()}');
+            Sender.RegisterWorkflowStep('LookupReturnReason', 'if (param.LookupReturnReason)  {respond()}');
+            Sender.RegisterWorkflowStep('AdjustInventory', 'respond();');
 
-                RegisterTextParameter('FixedReturnReason', '');
-                RegisterBooleanParameter('LookupReturnReason', false);
-                RegisterOptionParameter('InputAdjustment', 'perform only Negative Adjustment,perform only Positive Adjustment,perform both Negative and Positive Adjustment', 'perform both Negative and Positive Adjustment');
-                RegisterWorkflow(true);
+            Sender.RegisterTextParameter('FixedReturnReason', '');
+            Sender.RegisterBooleanParameter('LookupReturnReason', false);
+            Sender.RegisterOptionParameter('InputAdjustment', 'perform only Negative Adjustment,perform only Positive Adjustment,perform both Negative and Positive Adjustment', 'perform both Negative and Positive Adjustment');
+            Sender.RegisterWorkflow(true);
 
-            end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'QtyCaption', Text001);
+        Captions.AddActionCaption(ActionCode(), 'QtyCaption', Text001);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
@@ -107,7 +104,6 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
     var
         Quantity: Decimal;
         ReturnReasonCode: Code[10];
-        Test: Text;
         SettingScopeErr: Label 'setting scope in OnActionAdjustInventory';
         ReadingErr: Label 'reading in OnActionAdjustInventory';
     begin
@@ -133,7 +129,6 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
     local procedure OnActionFixedReturnReason(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         ReturnReasonCode: Code[10];
-        DiscountType: Integer;
         ReadingErr: Label 'reading in OnActionFixedReturnReason';
     begin
         JSON.SetScopeParameters(ActionCode());
@@ -148,7 +143,6 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
     var
         ReturnReasonCode: Code[10];
         ReturnReason: Record "Return Reason";
-        DiscountType: Integer;
     begin
         JSON.SetScopeParameters(ActionCode());
         ReturnReasonCode := JSON.GetString('FixedReturnReason');
@@ -204,7 +198,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
 
     local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary)
     begin
-        TempItemJnlLine.Init;
+        TempItemJnlLine.Init();
         TempItemJnlLine.Validate("Item No.", SaleLinePOS."No.");
         TempItemJnlLine.Validate("Posting Date", Today);
         TempItemJnlLine."Document No." := SaleLinePOS."Sales Ticket No.";
@@ -222,7 +216,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         TempItemJnlLine.Validate("Shortcut Dimension 1 Code", SaleLinePOS."Shortcut Dimension 1 Code");
         TempItemJnlLine.Validate("Shortcut Dimension 2 Code", SaleLinePOS."Shortcut Dimension 2 Code");
         TempItemJnlLine.Validate("Salespers./Purch. Code", SalePOS."Salesperson Code");
-        TempItemJnlLine.Insert;
+        TempItemJnlLine.Insert();
     end;
 
     local procedure PostItemJnlLine(var TempItemJnlLine: Record "Item Journal Line" temporary)

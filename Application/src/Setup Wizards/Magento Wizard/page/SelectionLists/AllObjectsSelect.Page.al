@@ -16,19 +16,19 @@ page 6014621 "NPR All Objects Select"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Object Type"; "Object Type")
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Object Type';
                     ToolTip = 'Specifies the type of the object.';
                 }
-                field("Object ID"; "Object ID")
+                field("Object ID"; Rec."Object ID")
                 {
                     ApplicationArea = All;
                     Caption = 'Object ID';
                     ToolTip = 'Specifies the ID of the object.';
                 }
-                field("Object Name"; "Object Name")
+                field("Object Name"; Rec."Object Name")
                 {
                     ApplicationArea = All;
                     Caption = 'Object Name';

@@ -1,4 +1,4 @@
-codeunit 6059900 "NPR Task Jnl. Management"
+﻿codeunit 6059900 "NPR Task Jnl. Management"
 {
     // TQ1.19/JDH/20141203 CASE 199066 Multicompany handling extended
     // TQ1.27/JDH/20150701 CASE 217903 Deleted unused Variables and fields
@@ -26,20 +26,20 @@ codeunit 6059900 "NPR Task Jnl. Management"
     begin
         JnlSelected := true;
 
-        TaskJnlTemplate.Reset;
+        TaskJnlTemplate.Reset();
         TaskJnlTemplate.SetRange("Page ID", PageID);
         TaskJnlTemplate.SetRange(Type, PageTemplate);
 
-        case TaskJnlTemplate.Count of
+        case TaskJnlTemplate.Count() of
             0:
                 begin
-                    TaskJnlTemplate.Init;
+                    TaskJnlTemplate.Init();
                     TaskJnlTemplate.Type := PageTemplate;
                     TaskJnlTemplate.Name := Format(TaskJnlTemplate.Type, MaxStrLen(TaskJnlTemplate.Name));
                     TaskJnlTemplate.Description := StrSubstNo(Text001, TaskJnlTemplate.Type);
                     TaskJnlTemplate.Validate("Page ID");
-                    TaskJnlTemplate.Insert;
-                    Commit;
+                    TaskJnlTemplate.Insert();
+                    Commit();
                 end;
             1:
                 TaskJnlTemplate.Find('-');
@@ -72,13 +72,13 @@ codeunit 6059900 "NPR Task Jnl. Management"
         TaskJnlBatch.SetRange("Journal Template Name", CurrentJnlTemplateName);
         if not TaskJnlBatch.Get(CurrentJnlTemplateName, CurrentJnlBatchName) then begin
             if not TaskJnlBatch.Find('-') then begin
-                TaskJnlBatch.Init;
+                TaskJnlBatch.Init();
                 TaskJnlBatch."Journal Template Name" := CurrentJnlTemplateName;
                 TaskJnlBatch.SetupNewBatch;
                 TaskJnlBatch.Name := Text004;
                 TaskJnlBatch.Description := Text005;
                 TaskJnlBatch.Insert(true);
-                Commit;
+                Commit();
             end;
             CurrentJnlBatchName := TaskJnlBatch.Name;
         end;
@@ -103,7 +103,7 @@ codeunit 6059900 "NPR Task Jnl. Management"
     var
         TaskJnlBatch: Record "NPR Task Batch";
     begin
-        Commit;
+        Commit();
         TaskJnlBatch."Journal Template Name" := TaskJnlLine.GetRangeMax("Journal Template Name");
         TaskJnlBatch.Name := TaskJnlLine.GetRangeMax("Journal Batch Name");
         TaskJnlBatch.FilterGroup(2);
@@ -185,7 +185,7 @@ codeunit 6059900 "NPR Task Jnl. Management"
         //+TQ1.19
 
         Comp.SetFilter(Name, '<>%1', CompanyName);
-        if Comp.FindSet then
+        if Comp.FindSet() then
             repeat
                 //-TQ1.19
                 if GuiAllowed then
@@ -210,20 +210,20 @@ codeunit 6059900 "NPR Task Jnl. Management"
                                 //  TaskLine2.INSERT(FALSE);
                                 if TaskLine2.Get(TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.") then begin
                                     TaskLine2.TransferFields(TaskLine, false);
-                                    TaskLine2.Modify;
+                                    TaskLine2.Modify();
                                 end else begin
                                     TaskLine2.TransferFields(TaskLine, true);
-                                    TaskLine2.Insert;
+                                    TaskLine2.Insert();
                                 end;
 
                                 if SyncNextExecuteTime then begin
                                     if not TaskQueue2.Get(Comp.Name, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.") then begin
                                         TaskQueue2 := TaskQueue;
                                         TaskQueue2.Company := Comp.Name;
-                                        TaskQueue2.Insert;
+                                        TaskQueue2.Insert();
                                     end else begin
                                         TaskQueue2.TransferFields(TaskQueue, false);
-                                        TaskQueue2.Modify;
+                                        TaskQueue2.Modify();
                                     end;
                                 end;
 
@@ -232,19 +232,19 @@ codeunit 6059900 "NPR Task Jnl. Management"
                                     TaskLineParm.SetRange("Journal Template Name", TaskLine."Journal Template Name");
                                     TaskLineParm.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
                                     TaskLineParm.SetRange("Journal Line No.", TaskLine."Line No.");
-                                    if TaskLineParm.FindSet then
+                                    if TaskLineParm.FindSet() then
                                         repeat
                                             if TaskLineParm2.Get(TaskLineParm."Journal Template Name", TaskLineParm."Journal Batch Name",
                                                                  TaskLineParm."Journal Line No.", TaskLineParm."Field No.",
                                                                  TaskLineParm."Line No.") then begin
                                                 TaskLineParm2.TransferFields(TaskLineParm, false);
-                                                TaskLineParm2.Modify;
+                                                TaskLineParm2.Modify();
                                             end else begin
                                                 TaskLineParm2.TransferFields(TaskLineParm, true);
-                                                TaskLineParm2.Insert;
+                                                TaskLineParm2.Insert();
                                             end;
 
-                                        until TaskLineParm.Next = 0;
+                                        until TaskLineParm.Next() = 0;
 
                                 end;
 
@@ -257,12 +257,12 @@ codeunit 6059900 "NPR Task Jnl. Management"
                                 if TaskLine2.Get(TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.") then
                                     TaskLine2.Delete(false);
                                 //-TQ1.19
-                                TaskQueue2.LockTable;
+                                TaskQueue2.LockTable();
                                 TaskQueue2.SetRange(Company, CompanyName);
                                 TaskQueue2.SetRange("Task Template", TaskLine."Journal Template Name");
                                 TaskQueue2.SetRange("Task Batch", TaskLine."Journal Batch Name");
                                 TaskQueue2.SetRange("Task Line No.", TaskLine."Line No.");
-                                if TaskQueue2.FindFirst then begin
+                                if TaskQueue2.FindFirst() then begin
                                     TaskQueue2.TestField(Status, TaskQueue.Status::Awaiting);
                                     TaskQueue2.Delete(false);
                                 end;
@@ -276,8 +276,8 @@ codeunit 6059900 "NPR Task Jnl. Management"
                                         TaskLog2."Journal Template Name" := '';
                                         TaskLog2."Journal Batch Name" := '';
                                         TaskLog2."Line No." := 0;
-                                        TaskLog2.Modify;
-                                    until TaskLog2.Next = 0;
+                                        TaskLog2.Modify();
+                                    until TaskLog2.Next() = 0;
 
                                 TaskOutputLog2.ChangeCompany(Comp.Name);
                                 TaskOutputLog2.SetRange("Journal Template Name", TaskLine."Journal Template Name");
@@ -288,14 +288,14 @@ codeunit 6059900 "NPR Task Jnl. Management"
                                         TaskOutputLog2."Journal Template Name" := '';
                                         TaskOutputLog2."Journal Batch Name" := '';
                                         TaskOutputLog2."Journal Line No." := 0;
-                                        TaskOutputLog2.Modify;
-                                    until TaskOutputLog2.Next = 0;
+                                        TaskOutputLog2.Modify();
+                                    until TaskOutputLog2.Next() = 0;
 
                                 TaskLineParm2.ChangeCompany(Comp.Name);
                                 TaskLineParm2.SetRange("Journal Template Name", TaskLine."Journal Template Name");
                                 TaskLineParm2.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
                                 TaskLineParm2.SetRange("Journal Line No.", TaskLine."Line No.");
-                                TaskLineParm2.DeleteAll;
+                                TaskLineParm2.DeleteAll();
                                 //+TQ1.19
                             end;
                         ChangeType::Rename:
@@ -304,11 +304,11 @@ codeunit 6059900 "NPR Task Jnl. Management"
                             end;
                     end;
                 end;
-            until Comp.Next = 0;
+            until Comp.Next() = 0;
         //TQ1.06+
         //-TQ1.19
         if GuiAllowed then
-            Dia.Close;
+            Dia.Close();
         //+TQ1.19
     end;
 
@@ -329,39 +329,39 @@ codeunit 6059900 "NPR Task Jnl. Management"
 
         TaskBatch.TestField("Master Company", CompanyName);
 
-        if Comp.FindSet then
+        if Comp.FindSet() then
             repeat
                 if Comp.Name <> CompanyName then begin
-                    TMPConfigSel.Init;
+                    TMPConfigSel.Init();
                     TMPConfigSel.Name := Comp.Name;
-                    TMPConfigSel.Insert;
+                    TMPConfigSel.Insert();
                 end;
-            until Comp.Next = 0;
+            until Comp.Next() = 0;
 
         if not (PAGE.RunModal(PAGE::"Config. Selection", TMPConfigSel) = ACTION::LookupOK) then
             exit;
 
         TMPConfigSel.SetRange(Selected, true);
-        if TMPConfigSel.FindSet then
+        if TMPConfigSel.FindSet() then
             repeat
                 NASGroup2.ChangeCompany(TMPConfigSel.Name);
                 TaskTemplate2.ChangeCompany(TMPConfigSel.Name);
                 TaskBatch2.ChangeCompany(TMPConfigSel.Name);
                 TaskLine2.ChangeCompany(TMPConfigSel.Name);
 
-                case NASGroup2.Count of
+                case NASGroup2.Count() of
                     0:
                         begin
                             NASGroup.Get(TaskBatch."Task Worker Group");
                             NASGroup2 := NASGroup;
-                            NASGroup2.Insert;
+                            NASGroup2.Insert();
                         end;
                     1:
-                        NASGroup2.FindFirst;
+                        NASGroup2.FindFirst();
                     else begin
                             if not NASGroup2.Get(TaskBatch."Task Worker Group") then begin
                                 NASGroup2.SetRange(Default, true);
-                                NASGroup2.FindFirst;
+                                NASGroup2.FindFirst();
                             end;
                         end;
                 end;
@@ -370,7 +370,7 @@ codeunit 6059900 "NPR Task Jnl. Management"
                     TaskTemplate.Get(TaskBatch."Journal Template Name");
                     TaskTemplate2 := TaskTemplate;
                     TaskTemplate2."Task Worker Group" := NASGroup2.Code;
-                    TaskTemplate2.Insert;
+                    TaskTemplate2.Insert();
                 end;
 
                 if not TaskBatch2.Get(TaskBatch."Journal Template Name", TaskBatch.Name) then begin
@@ -382,7 +382,7 @@ codeunit 6059900 "NPR Task Jnl. Management"
                         TaskBatch2."Mail From Address" := TaskTemplate2."Mail From Address";
                     if TaskTemplate2."Mail From Name" <> '' then
                         TaskBatch2."Mail From Name" := TaskTemplate2."Mail From Name";
-                    TaskBatch2.Insert;
+                    TaskBatch2.Insert();
                 end;
 
                 TaskLine.SetRange("Journal Template Name", TaskBatch."Journal Template Name");
@@ -391,13 +391,13 @@ codeunit 6059900 "NPR Task Jnl. Management"
                     repeat
                         if not TaskLine2.Get(TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.") then begin
                             TaskLine2.TransferFields(TaskLine, true);
-                            TaskLine2.Insert;
+                            TaskLine2.Insert();
                         end else begin
                             TaskLine2.TransferFields(TaskLine, false);
-                            TaskLine2.Modify;
+                            TaskLine2.Modify();
                         end;
-                    until TaskLine.Next = 0;
-            until TMPConfigSel.Next = 0;
+                    until TaskLine.Next() = 0;
+            until TMPConfigSel.Next() = 0;
     end;
 }
 

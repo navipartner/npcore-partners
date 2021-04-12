@@ -1,4 +1,4 @@
-codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
+﻿codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
 {
     var
         XmlAttributeIsMissingInElementErr: Label 'Xml attribute %1 is missing in <%2>', Comment = '%1=Xml attribute name;%2=Xml element name';
@@ -54,7 +54,6 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
         RecRef: RecordRef;
         PrevCust: Text;
         NewCustomer: Boolean;
-        XMlBuff: Record "XML Buffer";
     begin
         FindStore(Element, NpEcStore);
         if not FindCustomer(Element, Customer) then begin
@@ -172,7 +171,6 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
         PaymentMethod: Record "Payment Method";
         Node: XmlNode;
         Attribute: XmlAttribute;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         ExternalPaymentCode, ExternalPaymentType, TransactionId : Text;
         PaymentAmount, RandDecValue : Decimal;
     begin
@@ -251,7 +249,7 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
 
         Clear(SalesHeader);
         SalesHeader.SetHideValidationDialog(true);
-        SalesHeader.Init;
+        SalesHeader.Init();
         SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
         SalesHeader."No." := '';
         if Element.SelectSingleNode('.//external_document_no', Node) then
@@ -343,10 +341,9 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
     var
         SalesLine: Record "Sales Line";
         Node: XmlNode;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
         LineNo += 10000;
-        SalesLine.Init;
+        SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := LineNo;
@@ -371,7 +368,6 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
         SalesLine: Record "Sales Line";
         Node: XmlNode;
         Attribute: XmlAttribute;
-        TableId: Integer;
         RandDecValue, LineAmount, Quantity, UnitPrice, VatPct : Decimal;
         ReferenceNo: Text;
     begin
@@ -802,7 +798,6 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
     procedure SetPaymentMethod(Element: XmlElement; var SalesHeader: Record "Sales Header")
     var
         PaymentMapping: Record "NPR Magento Payment Mapping";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NodeList: XmlNodeList;
         Node: XmlNode;
         Element2: XmlElement;
@@ -899,7 +894,6 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
     var
         NpEcStore: Record "NPR NpEc Store";
         Node: XmlNode;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         CountryCode: Text;
         PostCode: Text;
     begin
@@ -947,7 +941,7 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
             ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
             ItemRef.SetRange("Reference No.", UpperCase(ReferenceNo));
             ItemRef.SetRange("Discontinue Bar Code", false);
-            if ItemRef.FindFirst then begin
+            if ItemRef.FindFirst() then begin
                 ItemVariant."Item No." := ItemRef."Item No.";
                 ItemVariant.Code := ItemRef."Variant Code";
                 exit(true);
@@ -980,7 +974,6 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
         OrderNo: Text;
-        StoreCode: Text;
     begin
         Clear(SalesHeader);
 
@@ -1002,7 +995,6 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
     var
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         OrderNo: Text;
     begin
         FindStore(Element, NpEcStore);
@@ -1038,7 +1030,7 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
                 TempSalesInvHeader.Insert();
             end;
         until NpEcDocument.Next() = 0;
-        exit(TempSalesInvHeader.FindFirst);
+        exit(TempSalesInvHeader.FindFirst());
     end;
 
     local procedure FindStore(Element: XmlElement; var NpEcStore: Record "NPR NpEc Store")

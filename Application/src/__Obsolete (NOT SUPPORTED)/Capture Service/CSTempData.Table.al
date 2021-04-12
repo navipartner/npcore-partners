@@ -1,10 +1,10 @@
 table 6151389 "NPR CS Temp Data"
 {
-    
+
     Caption = 'CS Temp Data';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {

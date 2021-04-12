@@ -69,14 +69,14 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
     procedure FindOrCreateRecord(BinNoIn: Code[10]; NameIn: Text; DataType: Integer; DefaultValue: Variant; OptionStringIn: Text)
     begin
         if not Get(BinNoIn, NameIn) then begin
-            Init;
+            Init();
             "Bin No." := BinNoIn;
             Name := NameIn;
             "Data Type" := DataType;
             OptionString := OptionStringIn;
             Validate(Value, DefaultValue);
-            Insert;
-            Commit;
+            Insert();
+            Commit();
         end;
     end;
 
@@ -103,7 +103,7 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
         foreach Part in Parts do begin
             tmpRetailList.Number += 1;
             tmpRetailList.Choice := Part;
-            tmpRetailList.Insert;
+            tmpRetailList.Insert();
         end;
 
         if tmpRetailList.IsEmpty then

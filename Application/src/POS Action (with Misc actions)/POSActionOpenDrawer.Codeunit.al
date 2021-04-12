@@ -20,7 +20,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
         if Sender.DiscoverAction(
               ActionCode,
               ActionDescription,
-              ActionVersion,
+              ActionVersion(),
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
@@ -40,10 +40,9 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
         SalePOS: Record "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
-        POSPostingProfile: Record "NPR POS Posting Profile";
         RecID: RecordID;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -64,9 +63,9 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
         OpenDrawer(CashDrawerNo, SalePOS);
 
         if SalePOS.RecordId <> RecID then begin
-            SalePOS.Find;
+            SalePOS.Find();
             SalePOS."Drawer Opened" := true;
-            SalePOS.Modify;
+            SalePOS.Modify();
             POSSale.Refresh(SalePOS);
         end;
 

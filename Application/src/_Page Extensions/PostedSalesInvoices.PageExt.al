@@ -48,10 +48,10 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                         SalesInvHeader: Record "Sales Invoice Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesInvHeader);
-                        if SalesInvHeader.FindSet then
+                        if SalesInvHeader.FindSet() then
                             repeat
                                 EmailDocMgt.SendReport(SalesInvHeader, true);
-                            until SalesInvHeader.Next = 0;
+                            until SalesInvHeader.Next() = 0;
                         CurrPage.Update(false);
                     end;
                 }

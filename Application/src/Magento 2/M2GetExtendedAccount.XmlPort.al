@@ -121,7 +121,6 @@ xmlport 6151144 "NPR M2 Get Extended Account"
     }
 
     var
-        NPRDocLocalizationProxy: Codeunit "NPR Doc. Localization Proxy";
         StartTime: Time;
 
     procedure GetRequest() ContactNumber: Code[20]
@@ -155,7 +154,7 @@ xmlport 6151144 "NPR M2 Get Extended Account"
             end;
 
             ResponseCode := 'OK';
-            ResponseMessage := ''; //STRSUBSTNO ('%1 %2', TmpBillToCustomer.COUNT, TmpSellToCustomer.count);
+            ResponseMessage := ''; //STRSUBSTNO ('%1 %2', TmpBillToCustomer.COUNT, TmpSellToCustomer.Count());
         end;
 
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
@@ -171,8 +170,6 @@ xmlport 6151144 "NPR M2 Get Extended Account"
 
     [TryFunction]
     local procedure TryGetEanNo(Customer: Record Customer temporary; var EanNo: Text)
-    var
-        TmpEan: Variant;
     begin
         EanNo := 'NOT IN W1';
     end;

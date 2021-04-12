@@ -15,7 +15,7 @@ page 6150736 "NPR POS Theme Dependencies"
         {
             repeater(Group)
             {
-                field("Target Type"; "Target Type")
+                field("Target Type"; Rec."Target Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Target Type field';
@@ -25,29 +25,29 @@ page 6150736 "NPR POS Theme Dependencies"
                         CalculateEditables();
                     end;
                 }
-                field("Target Code"; "Target Code")
+                field("Target Code"; Rec."Target Code")
                 {
                     ApplicationArea = All;
                     Enabled = TargetCodeEditable;
                     ToolTip = 'Specifies the value of the Target Code field';
                 }
-                field("Target View Type"; "Target View Type")
+                field("Target View Type"; Rec."Target View Type")
                 {
                     ApplicationArea = All;
                     Enabled = TargetViewTypeEditable;
                     ToolTip = 'Specifies the value of the Target View Type field';
                 }
-                field("Dependency Type"; "Dependency Type")
+                field("Dependency Type"; Rec."Dependency Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Dependency Type field';
                 }
-                field("Dependency Code"; "Dependency Code")
+                field("Dependency Code"; Rec."Dependency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Dependency Code field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
@@ -77,8 +77,8 @@ page 6150736 "NPR POS Theme Dependencies"
 
     trigger OnOpenPage()
     begin
-        if (GetRangeMax("POS Theme Code") <> GetRangeMin("POS Theme Code")) or (GetFilter("POS Theme Code") = '') then
-            Error(Text001, FieldCaption("POS Theme Code"));
+        if (Rec.GetRangeMax("POS Theme Code") <> Rec.GetRangeMin("POS Theme Code")) or (Rec.GetFilter("POS Theme Code") = '') then
+            Error(Text001, Rec.FieldCaption("POS Theme Code"));
     end;
 
     var
@@ -88,8 +88,8 @@ page 6150736 "NPR POS Theme Dependencies"
 
     local procedure CalculateEditables()
     begin
-        TargetViewTypeEditable := "Target Type" = "Target Type"::"View Type";
-        TargetCodeEditable := "Target Type" = "Target Type"::View;
+        TargetViewTypeEditable := Rec."Target Type" = Rec."Target Type"::"View Type";
+        TargetCodeEditable := Rec."Target Type" = Rec."Target Type"::View;
     end;
 }
 

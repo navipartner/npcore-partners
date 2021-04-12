@@ -13,7 +13,7 @@ codeunit 6151508 "NPR Nc Task List Processing"
 
         if HasParameter(Rec, ParamUpdateTaskList()) then begin
             NcTaskMgt.UpdateTasks(NcTaskProcessor);
-            Commit;
+            Commit();
         end;
 
         if HasParameter(Rec, ParamProcessTaskList()) then begin
@@ -29,11 +29,10 @@ codeunit 6151508 "NPR Nc Task List Processing"
     local procedure FindTaskProcessorCode(var JobQueueEntry: Record "Job Queue Entry"; var NcTaskProcessor: Record "NPR Nc Task Processor")
     var
         TaskProcessorCode: Text;
-        Position: Integer;
         ParameterString: Text;
     begin
         Clear(NcTaskProcessor);
-        NcTaskProcessor.FindFirst;
+        NcTaskProcessor.FindFirst();
 
         if not HasParameter(JobQueueEntry, ParamProcessor()) then begin
             ParameterString := ParamProcessor() + '=' + NcTaskProcessor.Code;
@@ -42,7 +41,7 @@ codeunit 6151508 "NPR Nc Task List Processing"
 
             JobQueueEntry.Validate("Parameter String", CopyStr(ParameterString, 1, MaxStrLen(JobQueueEntry."Parameter String")));
             JobQueueEntry.Modify(true);
-            Commit;
+            Commit();
         end;
 
         TaskProcessorCode := GetParameterValue(JobQueueEntry, ParamProcessor());
@@ -62,7 +61,7 @@ codeunit 6151508 "NPR Nc Task List Processing"
             ParameterString += ParamMaxRetry() + '=3';
             JobQueueEntry.Validate("Parameter String", CopyStr(ParameterString, 1, MaxStrLen(JobQueueEntry."Parameter String")));
             JobQueueEntry.Modify(true);
-            Commit;
+            Commit();
         end;
 
         ParameterValue := GetParameterValue(JobQueueEntry, ParamMaxRetry());
@@ -138,7 +137,7 @@ codeunit 6151508 "NPR Nc Task List Processing"
         if Rec."Object ID to Run" <> CurrCodeunitId() then
             exit;
 
-        if NcTaskProcessor.FindFirst then;
+        if NcTaskProcessor.FindFirst() then;
 
         ParameterString := ParamProcessor() + '=' + NcTaskProcessor.Code;
         ParameterString += ',' + ParamUpdateTaskList();
@@ -152,7 +151,6 @@ codeunit 6151508 "NPR Nc Task List Processing"
     local procedure OnValidateJobQueueEntryParameterString(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
-        ParameterString: Text;
         Description: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then

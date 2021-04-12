@@ -13,47 +13,47 @@ page 6060146 "NPR MM Foreign Members. Setup"
         {
             repeater(Group)
             {
-                field("Community Code"; "Community Code")
+                field("Community Code"; Rec."Community Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Community Code field';
                 }
-                field("Manager Code"; "Manager Code")
+                field("Manager Code"; Rec."Manager Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Manager Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Invokation Priority"; "Invokation Priority")
+                field("Invokation Priority"; Rec."Invokation Priority")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Invokation Priority field';
                 }
-                field(Disabled; Disabled)
+                field(Disabled; Rec.Disabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Disabled field';
                 }
-                field("Append Local Prefix"; "Append Local Prefix")
+                field("Append Local Prefix"; Rec."Append Local Prefix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Append Local Prefix field';
                 }
-                field("Remove Local Prefix"; "Remove Local Prefix")
+                field("Remove Local Prefix"; Rec."Remove Local Prefix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remove Local Prefix field';
                 }
-                field("Append Local Suffix"; "Append Local Suffix")
+                field("Append Local Suffix"; Rec."Append Local Suffix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Append Local Suffix field';
                 }
-                field("Remove Local Suffix"; "Remove Local Suffix")
+                field("Remove Local Suffix"; Rec."Remove Local Suffix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remove Local Suffix field';
@@ -72,7 +72,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Ellipsis = true;
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Setup action';
@@ -88,7 +88,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Ellipsis = true;
                 Image = Statistics;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

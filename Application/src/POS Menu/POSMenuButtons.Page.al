@@ -359,7 +359,6 @@ page 6150702 "NPR POS Menu Buttons"
         MoveDownEnabled: Boolean;
         HasSubMenus: Boolean;
         ActionTypeEnabled: Boolean;
-        ActionCodeEnabled: Boolean;
         IsParametersEnabled: Boolean;
         IsPopupEnabled: Boolean;
         IsBlockingUIEnabled: Boolean;
@@ -406,7 +405,7 @@ page 6150702 "NPR POS Menu Buttons"
                     MenuButton.Modify(false);
                     Modified := true;
                 end;
-            until MenuButton.Next = 0;
+            until MenuButton.Next() = 0;
 
         if Modified then
             CurrPage.Update(false);
@@ -456,7 +455,6 @@ page 6150702 "NPR POS Menu Buttons"
 
     local procedure SetActionCodeEditable()
     begin
-        ActionCodeEnabled := ActionTypeEnabled and (Rec."Action Type" <> Rec."Action Type"::Submenu);
         IsParametersEnabled := Rec."Action Type" in [Rec."Action Type"::Action, Rec."Action Type"::Item, Rec."Action Type"::PopupMenu, Rec."Action Type"::PaymentType];
         IsPopupEnabled := Rec."Action Type" = Rec."Action Type"::PopupMenu;
         IsBlockingUIEnabled := Rec."Action Type" <> Rec."Action Type"::Action;

@@ -16,25 +16,25 @@ page 6150623 "NPR POS Paym.Bin Set Float"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Processing Type"; "Processing Type")
+                field("Processing Type"; Rec."Processing Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Processing Type field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Include In Counting"; "Include In Counting")
+                field("Include In Counting"; Rec."Include In Counting")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -54,26 +54,26 @@ page 6150623 "NPR POS Paym.Bin Set Float"
                         case true of
                             Amount > 0:
                                 begin
-                                    POSPaymentBinCheckpoint.SetRange("Payment Method No.", Code);
+                                    POSPaymentBinCheckpoint.SetRange("Payment Method No.", Rec.Code);
                                     POSPaymentBinCheckpoint.SetRange("Payment Bin No.", POSPaymentBin."No.");
-                                    if POSPaymentBinCheckpoint.FindLast then
+                                    if POSPaymentBinCheckpoint.FindLast() then
                                         if POSPaymentBinCheckpoint."Float Amount" <> 0 then
                                             Error(FloatAlreadySetErr, POSPaymentBinCheckpoint.FieldCaption("Payment Bin No."), POSPaymentBinCheckpoint."Payment Bin No.",
-                                                                     FieldCaption(Code), Code);
-                                    if not POSPaymentMethodTemp.Get(Code) then begin
-                                        POSPaymentMethodTemp.Init;
-                                        POSPaymentMethodTemp.Code := Code;
+                                                                     Rec.FieldCaption(Code), Rec.Code);
+                                    if not POSPaymentMethodTemp.Get(Rec.Code) then begin
+                                        POSPaymentMethodTemp.Init();
+                                        POSPaymentMethodTemp.Code := Rec.Code;
                                         POSPaymentMethodTemp."Rounding Precision" := Amount;
-                                        POSPaymentMethodTemp.Insert;
+                                        POSPaymentMethodTemp.Insert();
                                     end else
                                         if Amount <> POSPaymentMethodTemp."Rounding Precision" then begin
                                             POSPaymentMethodTemp."Rounding Precision" := Amount;
-                                            POSPaymentMethodTemp.Modify;
+                                            POSPaymentMethodTemp.Modify();
                                         end;
                                 end;
                             Amount = 0:
-                                if POSPaymentMethodTemp.Get(Code) then
-                                    POSPaymentMethodTemp.Delete;
+                                if POSPaymentMethodTemp.Get(Rec.Code) then
+                                    POSPaymentMethodTemp.Delete();
                             Amount < 0:
                                 Error(NegAmountErr);
                         end;
@@ -90,7 +90,7 @@ page 6150623 "NPR POS Paym.Bin Set Float"
     trigger OnAfterGetRecord()
     begin
         Amount := 0;
-        if POSPaymentMethodTemp.Get(Code) then
+        if POSPaymentMethodTemp.Get(Rec.Code) then
             Amount := POSPaymentMethodTemp."Rounding Precision";
     end;
 
@@ -108,11 +108,11 @@ page 6150623 "NPR POS Paym.Bin Set Float"
 
     procedure GetAmounts(var POSPaymentMethodHere: Record "NPR POS Payment Method")
     begin
-        if POSPaymentMethodTemp.FindSet then
+        if POSPaymentMethodTemp.FindSet() then
             repeat
                 POSPaymentMethodHere := POSPaymentMethodTemp;
-                POSPaymentMethodHere.Insert;
-            until POSPaymentMethodTemp.Next = 0;
+                POSPaymentMethodHere.Insert();
+            until POSPaymentMethodTemp.Next() = 0;
     end;
 }
 

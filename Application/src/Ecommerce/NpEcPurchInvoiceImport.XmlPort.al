@@ -151,12 +151,12 @@ xmlport 6151306 "NPR NpEc Purch. Invoice Import"
                             begin
                                 if TempPurchLine9.Get(TempPurchLine."Document Type", TempPurchLine."Document No.", TempPurchLine."Line No.") then begin
                                     TempPurchLine9."Description 2" := description_2;
-                                    TempPurchLine9.Modify;
+                                    TempPurchLine9.Modify();
                                 end else begin
-                                    TempPurchLine9.Init;
+                                    TempPurchLine9.Init();
                                     TempPurchLine9 := TempPurchLine;
                                     TempPurchLine9."Description 2" := description_2;
-                                    TempPurchLine9.Insert;
+                                    TempPurchLine9.Insert();
                                 end;
                             end;
                         }
@@ -206,7 +206,6 @@ xmlport 6151306 "NPR NpEc Purch. Invoice Import"
 
     var
         LineNo: Integer;
-        TempPurchLine8: Record "Purchase Line" temporary;
         TempPurchLine9: Record "Purchase Line" temporary;
 
     procedure GetInvoiceNo(): Text

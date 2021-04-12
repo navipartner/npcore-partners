@@ -179,7 +179,6 @@ table 6060121 "NPR TM Ticket Admission BOM"
 
             trigger OnValidate()
             var
-                TicketSetup: Record "NPR TM Ticket Setup";
                 Item: Record Item;
                 TicketType: Record "NPR TM Ticket Type";
                 Admission: Record "NPR TM Admission";

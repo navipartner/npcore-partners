@@ -1,4 +1,4 @@
-page 6060067 "NPR Items by Loc.Overv. Matrix"
+﻿page 6060067 "NPR Items by Loc.Overv. Matrix"
 {
     // NPR5.52/JAKUBV/20191022  CASE 370333 Transport NPR5.52 - 22 October 2019
 
@@ -17,29 +17,29 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
             repeater(Control6014401)
             {
                 ShowCaption = false;
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Item Description"; "Item Description")
+                field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Description field';
                 }
-                field("Variant Description"; "Variant Description")
+                field("Variant Description"; Rec."Variant Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Description field';
                 }
-                field(Inventory; Quantity)
+                field(Inventory; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     Caption = 'Total Inventory';
@@ -245,13 +245,13 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
         MATRIX_CurrentColumnOrdinal: Integer;
     begin
         MATRIX_CurrentColumnOrdinal := 0;
-        if MatrixRecord.FindSet then
+        if MatrixRecord.FindSet() then
             repeat
                 MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
                 MATRIX_CellData[MATRIX_CurrentColumnOrdinal] := MatrixCalcCell(MATRIX_CurrentColumnOrdinal);
             until (MatrixRecord.Next(1) = 0) or (MATRIX_CurrentColumnOrdinal = MatrixMaxNoOfColumns());
 
-        Quantity := MatrixCalcCell(0);
+        Rec.Quantity := MatrixCalcCell(0);
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -264,8 +264,8 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
         Found: Boolean;
     begin
         ApplyFilters;
-        ItemVariantTmp."Item No." := "Item No.";
-        ItemVariantTmp.Code := "Variant Code";
+        ItemVariantTmp."Item No." := Rec."Item No.";
+        ItemVariantTmp.Code := Rec."Variant Code";
         Found := ItemVariantTmp.Find(Which);
         if Found then
             CopyItemVariantToBuf;
@@ -273,8 +273,6 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
     end;
 
     trigger OnInit()
-    var
-        i: Integer;
     begin
         SetVisible(true);
     end;
@@ -299,8 +297,8 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
         ResultSteps: Integer;
     begin
         ApplyFilters;
-        ItemVariantTmp."Item No." := "Item No.";
-        ItemVariantTmp.Code := "Variant Code";
+        ItemVariantTmp."Item No." := Rec."Item No.";
+        ItemVariantTmp.Code := Rec."Variant Code";
         ResultSteps := ItemVariantTmp.Next(Steps);
         if ResultSteps <> 0 then
             CopyItemVariantToBuf;
@@ -316,8 +314,6 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
         ItemVariantTmp: Record "Item Variant" temporary;
         MatrixRecords: array[32] of Record Location;
         MatrixRecord: Record Location temporary;
-        MatrixMgt: Codeunit "Matrix Management";
-        MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[32] of Decimal;
         ShowItems: Option "On Inventory","Not on Inventory",All;
         MATRIX_CaptionSet: array[32] of Text[80];
@@ -361,26 +357,26 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
         Item: Record Item;
         ItemVariant: Record "Item Variant";
     begin
-        ItemVariantTmp.DeleteAll;
-        if Item.FindSet then
+        ItemVariantTmp.DeleteAll();
+        if Item.FindSet() then
             repeat
                 ItemVariant.SetRange("Item No.", Item."No.");
-                if ItemVariant.FindSet then
+                if ItemVariant.FindSet() then
                     repeat
                         ItemVariantTmp := ItemVariant;
-                        ItemVariantTmp.Insert;
-                    until ItemVariant.Next = 0;
-                ItemVariantTmp.Init;
+                        ItemVariantTmp.Insert();
+                    until ItemVariant.Next() = 0;
+                ItemVariantTmp.Init();
                 ItemVariantTmp."Item No." := Item."No.";
                 ItemVariantTmp.Code := '';
                 ItemVariantTmp.Description := WOutVariantLbl;
-                ItemVariantTmp.Insert;
-            until Item.Next = 0;
+                ItemVariantTmp.Insert();
+            until Item.Next() = 0;
     end;
 
     local procedure ApplyFilters()
     begin
-        ItemVariantTmp.Reset;
+        ItemVariantTmp.Reset();
         if ItemFilter <> '' then
             ItemVariantTmp.SetFilter("Item No.", ItemFilter);
         if VariantFilter <> '' then
@@ -400,11 +396,11 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
         Item: Record Item;
     begin
         Item.Get(ItemVariantTmp."Item No.");
-        Init;
-        "Item No." := ItemVariantTmp."Item No.";
-        "Variant Code" := ItemVariantTmp.Code;
-        "Item Description" := Item.Description;
-        "Variant Description" := ItemVariantTmp.Description;
+        Rec.Init();
+        Rec."Item No." := ItemVariantTmp."Item No.";
+        Rec."Variant Code" := ItemVariantTmp.Code;
+        Rec."Item Description" := Item.Description;
+        Rec."Variant Description" := ItemVariantTmp.Description;
     end;
 
     local procedure MatrixOnDrillDown(ColumnID: Integer)
@@ -413,8 +409,8 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
     begin
         ItemLedgerEntry.SetCurrentKey(
           "Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
-        ItemLedgerEntry.SetRange("Item No.", "Item No.");
-        ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
+        ItemLedgerEntry.SetRange("Item No.", Rec."Item No.");
+        ItemLedgerEntry.SetRange("Variant Code", Rec."Variant Code");
         if ColumnID <> 0 then
             ItemLedgerEntry.SetRange("Location Code", AdjustMatrixRecordCode(MatrixRecords[ColumnID].Code));
         PAGE.Run(0, ItemLedgerEntry);
@@ -438,8 +434,6 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
     end;
 
     local procedure SetVisible(AllVisible: Boolean)
-    var
-        i: Integer;
     begin
         Field1Visible := AllVisible or (MATRIX_CaptionSet[1] <> '');
         Field2Visible := AllVisible or (MATRIX_CaptionSet[2] <> '');

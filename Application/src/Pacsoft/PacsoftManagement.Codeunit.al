@@ -265,7 +265,6 @@ codeunit 6014484 "NPR Pacsoft Management"
         Nodes: XmlNodeList;
         i: Integer;
         y: Integer;
-        NetConvHelper: Variant;
         InnerText: Text;
     begin
         if Node.IsXmlElement() then begin

@@ -1,4 +1,4 @@
-codeunit 6014425 "NPR POS Layaway Mgt."
+﻿codeunit 6014425 "NPR POS Layaway Mgt."
 {
     TableNo = "Sales Header";
 
@@ -96,7 +96,6 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         InvoiceFilterString: Text;
         CustLedgerEntry: Record "Cust. Ledger Entry";
         CreditMemoCustLedgerEntry: Record "Cust. Ledger Entry";
-        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
     begin
         if not SalesCrMemoHeader.Get(CreditMemoNo) then
             exit;
@@ -105,23 +104,23 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         CreditMemoCustLedgerEntry.SetRange("Customer No.", SalesHeader."Bill-to Customer No.");
         CreditMemoCustLedgerEntry.SetRange("Document Type", CreditMemoCustLedgerEntry."Document Type"::"Credit Memo");
         CreditMemoCustLedgerEntry.SetRange("Document No.", CreditMemoNo);
-        CreditMemoCustLedgerEntry.FindFirst;
+        CreditMemoCustLedgerEntry.FindFirst();
         CreditMemoCustLedgerEntry.TestField(Open);
 
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        if not SalesInvoiceHeader.FindSet then
+        if not SalesInvoiceHeader.FindSet() then
             exit;
 
         repeat
             if InvoiceFilterString <> '' then
                 InvoiceFilterString += '|';
             InvoiceFilterString += '''' + SalesInvoiceHeader."No." + '''';
-        until SalesInvoiceHeader.Next = 0;
+        until SalesInvoiceHeader.Next() = 0;
 
         CustLedgerEntry.SetRange("Applies-to ID", UserId);
         if not CustLedgerEntry.IsEmpty then
             CustLedgerEntry.ModifyAll("Applies-to ID", '', true);
-        CustLedgerEntry.Reset;
+        CustLedgerEntry.Reset();
 
         CustLedgerEntry.SetAutoCalcFields("Remaining Amount");
         CustLedgerEntry.SetRange("Customer No.", SalesHeader."Bill-to Customer No.");
@@ -140,7 +139,6 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         CreditMemoCustLedgerEntry: Record "Cust. Ledger Entry";
         InvoiceCustLedgerEntry: Record "Cust. Ledger Entry";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
     begin
         if not SalesCrMemoHeader.Get(CreditMemoNo) then
             exit;
@@ -151,7 +149,7 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         CreditMemoCustLedgerEntry.SetRange("Customer No.", SalesCrMemoHeader."Bill-to Customer No.");
         CreditMemoCustLedgerEntry.SetRange("Document Type", CreditMemoCustLedgerEntry."Document Type"::"Credit Memo");
         CreditMemoCustLedgerEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
-        CreditMemoCustLedgerEntry.FindFirst;
+        CreditMemoCustLedgerEntry.FindFirst();
         if not CreditMemoCustLedgerEntry.Open then
             exit;
         if CreditMemoCustLedgerEntry."Remaining Amount" = 0 then
@@ -161,7 +159,7 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         InvoiceCustLedgerEntry.SetRange("Customer No.", SalesInvoiceHeader."Bill-to Customer No.");
         InvoiceCustLedgerEntry.SetRange("Document Type", InvoiceCustLedgerEntry."Document Type"::Invoice);
         InvoiceCustLedgerEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
-        InvoiceCustLedgerEntry.FindFirst;
+        InvoiceCustLedgerEntry.FindFirst();
         if not InvoiceCustLedgerEntry.Open then
             exit;
         if InvoiceCustLedgerEntry."Remaining Amount" = 0 then
@@ -189,7 +187,7 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         CreditMemoCustLedgerEntry.SetRange("Customer No.", SalesCrMemoHeader."Bill-to Customer No.");
         CreditMemoCustLedgerEntry.SetRange("Document Type", CreditMemoCustLedgerEntry."Document Type"::"Credit Memo");
         CreditMemoCustLedgerEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
-        CreditMemoCustLedgerEntry.FindFirst;
+        CreditMemoCustLedgerEntry.FindFirst();
         if CreditMemoCustLedgerEntry."Remaining Amt. (LCY)" = 0 then
             exit(0);
 
@@ -210,8 +208,6 @@ codeunit 6014425 "NPR POS Layaway Mgt."
     end;
 
     local procedure ApplyCustomerEntry(var ApplyingCustLedgerEntry: Record "Cust. Ledger Entry"; var ApplyToCustLedgerEntries: Record "Cust. Ledger Entry")
-    var
-        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
     begin
         if not ApplyToCustLedgerEntries.FindSet(true) then
             exit;
@@ -219,13 +215,13 @@ codeunit 6014425 "NPR POS Layaway Mgt."
             ApplyToCustLedgerEntries.Validate("Applies-to ID", UserId);
             ApplyToCustLedgerEntries.Validate("Amount to Apply", ApplyToCustLedgerEntries."Remaining Amount");
             ApplyToCustLedgerEntries.Modify(true);
-        until ApplyToCustLedgerEntries.Next = 0;
+        until ApplyToCustLedgerEntries.Next() = 0;
 
         ApplyingCustLedgerEntry.Validate("Applying Entry", true);
         ApplyingCustLedgerEntry.Validate("Applies-to ID", UserId);
         ApplyingCustLedgerEntry.Validate("Amount to Apply", ApplyingCustLedgerEntry."Remaining Amount");
         CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", ApplyingCustLedgerEntry);
-        Commit;
+        Commit();
 
         CODEUNIT.Run(CODEUNIT::"CustEntry-Apply Posted Entries", ApplyingCustLedgerEntry);
     end;
@@ -237,7 +233,7 @@ codeunit 6014425 "NPR POS Layaway Mgt."
     begin
         SalesHeader.Validate("Prepayment %", 0);
         SalesHeader.Validate("Prepmt. Payment Terms Code", PrepaymentPaymentTerms);
-        SalesHeader.Validate("Prepayment Due Date", WorkDate);
+        SalesHeader.Validate("Prepayment Due Date", WorkDate());
         SalesHeader.Modify(true);
 
         if DownpaymentPct <= 0 then
@@ -254,7 +250,7 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         repeat
             SalesLine.Validate("Prepayment %", DownpaymentPct);
             SalesLine.Modify(true);
-        until SalesLine.Next = 0;
+        until SalesLine.Next() = 0;
 
         SalesPostPrepayments.Invoice(SalesHeader);
         SalesHeader.Validate(Status, SalesHeader.Status::Open);
@@ -265,7 +261,6 @@ codeunit 6014425 "NPR POS Layaway Mgt."
     local procedure CreateAndPostLayawayInvoices(var SalesHeader: Record "Sales Header"; Instalments: Integer; PrepaymentPaymentTerms: Text; DownpaymentPct: Decimal)
     var
         InstalmentPct: Decimal;
-        SalesLine: Record "Sales Line";
         i: Integer;
         PaymentTerms: Record "Payment Terms";
     begin
@@ -289,7 +284,6 @@ codeunit 6014425 "NPR POS Layaway Mgt."
     local procedure AppendPrepaymentPctAndPostPrepaymentInvoice(SalesHeader: Record "Sales Header"; PrepaymentPct: Decimal; FullPrepayment: Boolean): Text
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
-        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         SalesLine: Record "Sales Line";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
@@ -302,7 +296,7 @@ codeunit 6014425 "NPR POS Layaway Mgt."
                 repeat
                     SalesLine.Validate("Prepayment %", 100);
                     SalesLine.Modify(true);
-                until SalesLine.Next = 0;
+                until SalesLine.Next() = 0;
         end else
             POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, PrepaymentPct);
 

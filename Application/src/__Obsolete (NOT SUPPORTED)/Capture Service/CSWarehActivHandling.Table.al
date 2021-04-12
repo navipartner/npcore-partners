@@ -1,10 +1,10 @@
 table 6151379 "NPR CS Wareh. Activ. Handling"
 {
-    
+
     Caption = 'CS Warehouse Activity Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields
@@ -66,19 +66,19 @@ table 6151379 "NPR CS Wareh. Activ. Handling"
         {
             Caption = 'Serial No.';
             DataClassification = CustomerContent;
-            
+
         }
         field(25; "Lot No."; Code[20])
         {
             Caption = 'Lot No.';
             DataClassification = CustomerContent;
-            
+
         }
         field(26; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
             DataClassification = CustomerContent;
-            
+
         }
         field(27; "Assignment Date"; Date)
         {
@@ -92,7 +92,7 @@ table 6151379 "NPR CS Wareh. Activ. Handling"
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
 
-            
+
         }
         field(51; "Variant Code"; Code[10])
         {
@@ -100,7 +100,7 @@ table 6151379 "NPR CS Wareh. Activ. Handling"
             DataClassification = CustomerContent;
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
-       field(100; "Table No."; Integer)
+        field(100; "Table No."; Integer)
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
@@ -130,8 +130,8 @@ table 6151379 "NPR CS Wareh. Activ. Handling"
             Caption = 'Transferred to Worksheet';
             DataClassification = CustomerContent;
         }
-       
-       field(140; "Qty. in Stock"; Decimal)
+
+        field(140; "Qty. in Stock"; Decimal)
         {
             Caption = 'Qty. in Stock';
             DataClassification = CustomerContent;
@@ -150,6 +150,6 @@ table 6151379 "NPR CS Wareh. Activ. Handling"
     fieldgroups
     {
     }
-    
+
 }
 

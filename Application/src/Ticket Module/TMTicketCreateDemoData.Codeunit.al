@@ -25,8 +25,6 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
 
     end;
 
-    var
-        myInt: Integer;
 
     procedure CreateTicketDemoData(DeleteCurrentSetup: Boolean)
     var
@@ -35,7 +33,6 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         Admission: Record "NPR TM Admission";
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
-        Item: Record Item;
         TicketSetup: Record "NPR TM Ticket Setup";
         AdmissionGroupConcurrency: Record "NPR TM Concurrent Admis. Setup";
         AdmissionList: array[10] of code[20];
@@ -51,82 +48,72 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         CreateNoSerie('TM-PK20', 'TM-PK2000000000');
 
         SeasonBaseCalendar := CreateBaseCalendar('SEASONPASS', 'Season Pass Calendar');
-        WITH BaseCalendarChange DO BEGIN
-            SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', "Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Tuesday);
-            SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', "Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Thursday);
-            SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', "Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Saturday);
-            SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', "Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Sunday);
-        END;
+        SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', BaseCalendarChange."Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Tuesday);
+        SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', BaseCalendarChange."Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Thursday);
+        SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', BaseCalendarChange."Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Saturday);
+        SetNonWorking(SeasonBaseCalendar, 'Closed for Season Pass Holder', BaseCalendarChange."Recurring System"::"Weekly Recurring", 0D, BaseCalendarChange.Day::Sunday);
 
-        WITH Admission DO BEGIN
-            AdmissionList[1] := (CreateAdmissionCode('CASTLE', 'Castle', Type::LOCATION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::TODAY));
-            AdmissionList[2] := (CreateAdmissionCode('TREASURE', 'Treasure', Type::OCCASION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::TODAY));
-            AdmissionList[3] := (CreateAdmissionCode('DUNGEON', 'Dungeon', Type::OCCASION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::TODAY));
+        AdmissionList[1] := (CreateAdmissionCode('CASTLE', 'Castle', Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
+        AdmissionList[2] := (CreateAdmissionCode('TREASURE', 'Treasure', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
+        AdmissionList[3] := (CreateAdmissionCode('DUNGEON', 'Dungeon', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
 
-            AdmissionList[4] := (CreateAdmissionCode('TOUR01', 'Event Tour', Type::OCCASION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::SCHEDULE_ENTRY));
-            AdmissionList[5] := (CreateAdmissionCode('TOUR02', 'Event Tour', Type::OCCASION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::SCHEDULE_ENTRY));
-            AdmissionList[6] := (CreateAdmissionCode('TOUR03', 'Event Tour', Type::OCCASION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::SCHEDULE_ENTRY));
-            AdmissionList[7] := (CreateAdmissionCode('TOUR04', 'Event Tour', Type::OCCASION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::SCHEDULE_ENTRY));
-        END;
+        AdmissionList[4] := (CreateAdmissionCode('TOUR01', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
+        AdmissionList[5] := (CreateAdmissionCode('TOUR02', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
+        AdmissionList[6] := (CreateAdmissionCode('TOUR03', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
+        AdmissionList[7] := (CreateAdmissionCode('TOUR04', 'Event Tour', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
 
-        WITH AdmissionSchedule DO BEGIN
-            CreateSchedule('M-WEEKDAYS', "Schedule Type"::LOCATION, "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-            CreateSchedule('M-WEEKENDS', "Schedule Type"::LOCATION, "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+        CreateSchedule('M-WEEKDAYS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+        CreateSchedule('M-WEEKENDS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
 
-            CreateSchedule('E-WEEKDAYS-01', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-            CreateSchedule('E-WEEKDAYS-02', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+        CreateSchedule('E-WEEKDAYS-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+        CreateSchedule('E-WEEKDAYS-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
 
-            CreateSchedule('E-WEEKENDS-01', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 103000T, 123000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
-            CreateSchedule('E-WEEKENDS-02', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 150000T, 170000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+        CreateSchedule('E-WEEKENDS-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 103000T, 123000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+        CreateSchedule('E-WEEKENDS-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 150000T, 170000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
 
-            CreateSchedule('TS-08-01', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 080000T, 100000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-            CreateSchedule('TS-08-02', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-            CreateSchedule('TS-08-03', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 120000T, 140000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-            CreateSchedule('TS-08-04', "Schedule Type"::"EVENT", "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-        END;
+        CreateSchedule('TS-08-01', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 100000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+        CreateSchedule('TS-08-02', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 100000T, 120000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+        CreateSchedule('TS-08-03', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 120000T, 140000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+        CreateSchedule('TS-08-04', AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 140000T, 160000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
 
 
         AllowAdmissionBeforeStart := 15;
         AllowAdmissionAfterStart := 5;
 
-        WITH ScheduleLine DO BEGIN
-            CreateScheduleLine('CASTLE', 'M-WEEKDAYS', 1, FALSE, 17, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine('CASTLE', 'M-WEEKENDS', 1, FALSE, 23, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('CASTLE', 'M-WEEKDAYS', 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('CASTLE', 'M-WEEKENDS', 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-            CreateScheduleLine('TREASURE', 'E-WEEKDAYS-01', 1, TRUE, 7, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine('TREASURE', 'E-WEEKDAYS-02', 1, FALSE, 9, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine('TREASURE', 'E-WEEKENDS-01', 1, FALSE, 11, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine('TREASURE', 'E-WEEKENDS-02', 1, FALSE, 5, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKDAYS-01', 1, TRUE, 7, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKDAYS-02', 1, FALSE, 9, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKENDS-01', 1, FALSE, 11, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('TREASURE', 'E-WEEKENDS-02', 1, FALSE, 5, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-            CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-01', 1, FALSE, 7, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-02', 1, FALSE, 9, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine('DUNGEON', 'E-WEEKENDS-01', 1, FALSE, 11, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine('DUNGEON', 'E-WEEKENDS-02', 1, FALSE, 5, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-01', 1, FALSE, 7, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKDAYS-02', 1, FALSE, 9, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKENDS-01', 1, FALSE, 11, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine('DUNGEON', 'E-WEEKENDS-02', 1, FALSE, 5, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-            CreateScheduleLine(AdmissionList[4], 'TS-08-01', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[4], 'TS-08-02', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[4], 'TS-08-03', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[4], 'TS-08-04', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[4], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-            CreateScheduleLine(AdmissionList[5], 'TS-08-01', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[5], 'TS-08-02', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[5], 'TS-08-03', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[5], 'TS-08-04', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[5], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-            CreateScheduleLine(AdmissionList[6], 'TS-08-01', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[6], 'TS-08-02', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[6], 'TS-08-03', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[6], 'TS-08-04', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[6], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[6], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[6], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[6], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-            CreateScheduleLine(AdmissionList[7], 'TS-08-01', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[7], 'TS-08-02', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[7], 'TS-08-03', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            CreateScheduleLine(AdmissionList[7], 'TS-08-04', 1, FALSE, 2, "Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[7], 'TS-08-01', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[7], 'TS-08-02', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[7], 'TS-08-03', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        CreateScheduleLine(AdmissionList[7], 'TS-08-04', 1, FALSE, 2, ScheduleLine."Capacity Control"::SALES, '<+3D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-        END;
-
-        WITH AdmissionGroupConcurrency DO
-            CreateConcurrencyLimit('MAX3', 'Max 3 tours at the same time', 3, "Capacity Control"::SALES, "Concurrency Type"::SCHEDULE);
+        CreateConcurrencyLimit('MAX3', 'Max 3 tours at the same time', 3, AdmissionGroupConcurrency."Capacity Control"::SALES, AdmissionGroupConcurrency."Concurrency Type"::SCHEDULE);
 
         ApplyConcurrencyLimit(AdmissionList[4], '*', 'MAX3');
         ApplyConcurrencyLimit(AdmissionList[5], '*', 'MAX3');
@@ -135,11 +122,9 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
 
         CreateStakeholder('TREASURE', 'E-WEEKDAYS-01', 'tsa@navipartner.dk', AdmissionSchedule."Notify Stakeholder"::ALL);
 
-        WITH TicketType DO BEGIN
-            TicketType.GET(CreateTicketType('POS-MSCAN', 'Manual Scan', '<+7D>', 0, "Admission Registration"::INDIVIDUAL, "Activation Method"::SCAN, "Ticket Entry Validation"::SINGLE, "Ticket Configuration Source"::TICKET_BOM));
-            TicketType.GET(CreateTicketType('POS-AUTO', 'Auto Admit on Sale', '<+7D>', 0, "Admission Registration"::INDIVIDUAL, "Activation Method"::POS_DEFAULT, "Ticket Entry Validation"::SINGLE, "Ticket Configuration Source"::TICKET_BOM));
-            TicketType.GET(CreateTicketType('GROUP', 'Group Ticket', '<+7D>', 0, "Admission Registration"::GROUP, "Activation Method"::SCAN, "Ticket Entry Validation"::SINGLE, "Ticket Configuration Source"::TICKET_BOM));
-        END;
+        TicketType.GET(CreateTicketType('POS-MSCAN', 'Manual Scan', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.GET(CreateTicketType('POS-AUTO', 'Auto Admit on Sale', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.GET(CreateTicketType('GROUP', 'Group Ticket', '<+7D>', 0, TicketType."Admission Registration"::GROUP, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
 
         // Single ticket same day
         CreateItem('31001', '', 'POS-AUTO', 'Adult Ticket', 157);
@@ -166,41 +151,38 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         CreateItem('31043', '', 'POS-MSCAN', 'Tour 3 Ticket with Concurrency', 107);
         CreateItem('31044', '', 'POS-MSCAN', 'Tour 4 Ticket with Concurrency', 107);
 
-        WITH TicketBom DO BEGIN
-            CreateTicketBOM('31001', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31002', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31003', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31004', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31001', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31002', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31003', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31004', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, TRUE, '<CY>', 4, "Activation Method"::SCAN, "Admission Entry Validation"::MULTIPLE);
+        CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, TRUE, '<CY>', 4, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
 
-            CreateTicketBOM('31008', '', AdmissionList[1], '', 4, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31008', '', AdmissionList[1], '', 4, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31009', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SAME_DAY);
-            CreateTicketBOM('31009', '', AdmissionList[2], '', 1, FALSE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31009', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
+        CreateTicketBOM('31009', '', AdmissionList[2], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31010', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SAME_DAY);
-            CreateTicketBOM('31010', '', AdmissionList[2], '', 1, FALSE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31010', '', AdmissionList[3], '', 1, FALSE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31010', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY);
+        CreateTicketBOM('31010', '', AdmissionList[2], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31010', '', AdmissionList[3], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('32001', '', AdmissionList[1], '', 10, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('32001', '', AdmissionList[1], '', 10, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31041', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31041', '', AdmissionList[4], '', 1, FALSE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31041', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31041', '', AdmissionList[4], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31042', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31042', '', AdmissionList[5], '', 1, FALSE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31042', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31042', '', AdmissionList[5], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31043', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31043', '', AdmissionList[6], '', 1, FALSE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31043', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31043', '', AdmissionList[6], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31044', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            CreateTicketBOM('31044', '', AdmissionList[7], '', 1, FALSE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-
-        END;
+        CreateTicketBOM('31044', '', AdmissionList[1], '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        CreateTicketBOM('31044', '', AdmissionList[7], '', 1, FALSE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
         TicketSetup."Print Server Generator URL" := 'http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders';
         TicketSetup."Timeout (ms)" := 30000;
@@ -230,34 +212,28 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         Admission: Record "NPR TM Admission";
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
-        Item: Record Item;
-        TicketSetup: Record "NPR TM Ticket Setup";
-        AdmissionGroupConcurrency: Record "NPR TM Concurrent Admis. Setup";
-        AdmissionList: array[10] of code[20];
     begin
 
         if (not Admission.get(AdmissionCode)) then begin
             WITH Admission DO
-                CreateAdmissionCode(AdmissionCode, AdmissionDescription, Type::LOCATION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::TODAY);
+                CreateAdmissionCode(AdmissionCode, AdmissionDescription, Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
 
             WITH AdmissionSchedule DO BEGIN
-                CreateSchedule(StrSubstNo('%1-WD', AdmissionCode), "Schedule Type"::LOCATION, "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-                CreateSchedule(StrSubstNo('%1-WE', AdmissionCode), "Schedule Type"::LOCATION, "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+                CreateSchedule(StrSubstNo('%1-WD', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+                CreateSchedule(StrSubstNo('%1-WE', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
             END;
 
             WITH ScheduleLine DO BEGIN
-                CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WD', AdmissionCode), 1, FALSE, 17, "Capacity Control"::ADMITTED, '<+5D>', 0, 0);
-                CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WE', AdmissionCode), 1, FALSE, 23, "Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+                CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WD', AdmissionCode), 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+                CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WE', AdmissionCode), 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
             END;
         end;
 
-        WITH TicketType DO
-            CreateTicketType('MM-AUTO', 'Members and Member Guests', '<+7D>', 0, "Admission Registration"::INDIVIDUAL, "Activation Method"::POS_DEFAULT, "Ticket Entry Validation"::SINGLE, "Ticket Configuration Source"::TICKET_BOM);
+        CreateTicketType('MM-AUTO', 'Members and Member Guests', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
 
         CreateItem(ItemCode, '', 'MM-AUTO', ItemDescription, 0);
 
-        WITH TicketBom DO
-            CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
+        CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
         exit(StrSubstNo('IXRF-%1', ItemCode));
     end;
@@ -300,7 +276,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         exit(AdmissionCode);
     end;
 
-    local procedure CreateAdmissionScheduleEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; StartDate: Date; StartTime: Time; EndDate: Date; EndTime: Time) EntryNo: Integer
+    local procedure CreateAdmissionScheduleEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; StartDate: Date; StartTime: Time; EndDate: Date; EndTime: Time): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin
@@ -336,7 +312,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
             BaseCalendar.INSERT();
         end;
 
-        BaseCalendar.INIT;
+        BaseCalendar.Init();
         BaseCalendar.Name := 'Automated Test Framework';
         if (Desc <> '') then
             BaseCalendar.Name := Desc;

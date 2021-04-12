@@ -26,7 +26,7 @@ codeunit 6150721 "NPR POS Action - Login"
         Sender.DiscoverAction(
           ActionCode,
           ActionDescription,
-          ActionVersion,
+          ActionVersion(),
           Sender.Type::BackEnd,
           Sender."Subscriber Instances Allowed"::Single);
     end;
@@ -46,7 +46,7 @@ codeunit 6150721 "NPR POS Action - Login"
         HostName: Text;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         // TODO:

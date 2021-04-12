@@ -14,63 +14,63 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
         {
             repeater(Group)
             {
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("External Membership No."; "External Membership No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Membership No. field';
                 }
-                field("Event Type"; "Event Type")
+                field("Event Type"; Rec."Event Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Event Type field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Delivery Method"; "Delivery Method")
+                field("Delivery Method"; Rec."Delivery Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delivery Method field';
                 }
-                field("Distribution Mode"; "Distribution Mode")
+                field("Distribution Mode"; Rec."Distribution Mode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Mode field';
                 }
-                field("Once Per Period (On Demand)"; "Once Per Period (On Demand)")
+                field("Once Per Period (On Demand)"; Rec."Once Per Period (On Demand)")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -90,7 +90,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 Ellipsis = true;
                 Image = InteractionTemplate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
@@ -104,7 +104,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 Ellipsis = true;
                 Image = InteractionTemplate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
@@ -121,7 +121,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 Ellipsis = true;
                 Image = SendElectronicDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

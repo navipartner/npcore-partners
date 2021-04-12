@@ -595,7 +595,6 @@ report 6014535 "NPR Sales Statistics By Dept."
 
         firstDimValue := true;
 
-        first := true;
     end;
 
     var
@@ -605,7 +604,6 @@ report 6014535 "NPR Sales Statistics By Dept."
         AuxValueEntryLastYear: Record "NPR Aux. Value Entry";
         AuxValueEntry: Record "NPR Aux. Value Entry";
         CurrentYearShow: Boolean;
-        first: Boolean;
         firstDimValue: Boolean;
         isGroupedByLocation: Boolean;
         kunmedsalg: Boolean;

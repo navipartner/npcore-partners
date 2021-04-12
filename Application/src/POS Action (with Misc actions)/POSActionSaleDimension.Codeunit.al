@@ -4,7 +4,6 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
         ActionDescription: Label 'This Action updates the POS Sale Dimension with either a fixed value or provides a list of valid value';
         ValueSelection: Option LIST,"FIXED",PROMPT_N,PROMPT_A;
         DimensionSource: Option SHORTCUT1,SHORTCUT2,ANY;
-        DIMCHANGED: Label 'Dimension code %1 changed from %2 to %3.';
         DIMSET: Label 'Dimension code %1 set to %2.';
         TITLE: Label 'Dimension and Statistics';
         ReadingErr: Label 'reading in %1';
@@ -53,7 +52,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'Title', TITLE);
+        Captions.AddActionCaption(ActionCode(), 'Title', TITLE);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
@@ -89,7 +88,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
 
         Context.SetContext('CaptionText', CaptionText);
 
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
         Handled := true;
     end;
 
@@ -196,7 +195,6 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
     var
         SalePOS: Record "NPR POS Sale";
         DimensionCode: Code[20];
-        OldValue: Code[20];
     begin
 
         if (WithCreate) then
@@ -205,13 +203,11 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
         case DimSource of
             DimensionSource::SHORTCUT1:
                 begin
-                    OldValue := SalePOS."Shortcut Dimension 1 Code";
                     POSSale.SetShortcutDimCode1(DimensionValue);
                     StrMessage := StrSubstNo(DIMSET, 1, DimensionValue);
                 end;
             DimensionSource::SHORTCUT2:
                 begin
-                    OldValue := SalePOS."Shortcut Dimension 2 Code";
                     POSSale.SetShortcutDimCode2(DimensionValue);
                     StrMessage := StrSubstNo(DIMSET, 2, DimensionValue);
                 end;
@@ -244,7 +240,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
         if (DimensionValue.Get(DimCode, DimValue)) then
             exit;
 
-        DimensionValue.Init;
+        DimensionValue.Init();
         DimensionValue."Dimension Code" := DimCode;
         DimensionValue.Code := DimValue;
         DimensionValue."Dimension Value Type" := DimensionValue."Dimension Value Type"::Standard;

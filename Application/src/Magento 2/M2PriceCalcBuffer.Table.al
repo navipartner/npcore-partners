@@ -163,12 +163,4 @@ table 6151145 "NPR M2 Price Calc. Buffer"
         }
     }
 
-    var
-        CustPriceGr: Record "Customer Price Group";
-        Text000: Label '%1 cannot be after %2';
-        Cust: Record Customer;
-        Text001: Label '%1 must be blank.';
-        Campaign: Record Campaign;
-        Item: Record Item;
-        Text002: Label 'If Sales Type = %1, then you can only change Starting Date and Ending Date from the Campaign Card.';
 }

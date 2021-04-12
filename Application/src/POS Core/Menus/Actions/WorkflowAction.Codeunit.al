@@ -3,7 +3,6 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
     var
         _workflow: Codeunit "NPR Workflow";
         _state: JsonObject;
-        _type: Enum "NPR Action Type";
         _base: Codeunit "NPR Base Action";
         TextActionDoesNotExist: Label 'Action %1 does not exist, but it is used in %2.';
         TextUndefinedParameter: Label '%2 specifies a value for a parameter %3, that is not defined for action %1.';
@@ -40,7 +39,6 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
 
     procedure CheckConfiguration(POSSession: Codeunit "NPR POS Session"; Source: Text; var ActionMoniker: Text; var ErrorText: Text; var Severity: Integer): Boolean;
     var
-        POSAction: Record "NPR POS Action";
         Parameter: Record "NPR POS Action Parameter";
         Param: Text;
         Token: JsonToken;
@@ -65,7 +63,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
         end;
 
         Parameter.SetRange("POS Action Code", _workflow.Name);
-        if Parameter.FindSet then
+        if Parameter.FindSet() then
             repeat
                 // Parameter not specified
                 if not _base.Parameters().Contains(Parameter.Name) then begin
@@ -87,7 +85,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
                     ErrorText := StrSubstNo(TextParameterValueInvalid, _workflow.Name, Source, Parameter.Name, Parameter."Data Type", Value);
                     exit(false);
                 end;
-            until Parameter.Next = 0;
+            until Parameter.Next() = 0;
 
         exit(true);
     end;
@@ -123,7 +121,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
                 Workflow.DeserializeFromJsonStream(InStr);
                 if POSAction."Bound to DataSource" then
                     Instance.Content.Add('DataBinding', true);
-                if POSAction."Custom JavaScript Logic".HasValue then begin
+                if POSAction."Custom JavaScript Logic".HasValue() then begin
                     Instance.Content.Add('CustomJavaScript', POSAction.GetCustomJavaScriptLogic());
                 end;
                 if POSAction.Description <> '' then

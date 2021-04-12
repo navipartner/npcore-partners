@@ -81,7 +81,7 @@ table 6151162 "NPR MM Loy. LedgerEntry (Srvr)"
         }
         field(1000; "Reservation is Captured"; Boolean)
         {
-            CalcFormula = Exist ("NPR MM Members. Points Entry" WHERE("Authorization Code" = FIELD("Authorization Code"),
+            CalcFormula = Exist("NPR MM Members. Points Entry" WHERE("Authorization Code" = FIELD("Authorization Code"),
                                                                     "Entry Type" = CONST(CAPTURE)));
             Caption = 'Reservation is Captured';
             Editable = false;

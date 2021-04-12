@@ -51,7 +51,6 @@ codeunit 6150703 "NPR POS JSON Management"
     local procedure GetJToken(var JToken: JsonToken; Property: Text): Boolean
     var
         JTokenTemp: JsonToken;
-        TextTemp: Text;
     begin
         MakeSureJObjectParserIsInitialized(Property);
 
@@ -227,7 +226,7 @@ codeunit 6150703 "NPR POS JSON Management"
     var
         JObjectText: Text;
     begin
-        ScopeID := CreateGuid;
+        ScopeID := CreateGuid();
         JObject.WriteTo(JObjectText);
         Scope.Add(ScopeID, JObjectText);
     end;

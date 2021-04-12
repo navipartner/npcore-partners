@@ -238,10 +238,10 @@ report 6014475 "NPR Item Replenish. by Store"
             trigger OnPreDataItem()
             begin
                 ItemLedgEntryTemp.Reset();
-                if ItemLedgEntryTemp.Count = 0 then
+                if ItemLedgEntryTemp.Count() = 0 then
                     CurrReport.Break()
                 else
-                    SetRange(Number, 1, ItemLedgEntryTemp.Count);
+                    SetRange(Number, 1, ItemLedgEntryTemp.Count());
             end;
         }
     }
@@ -325,11 +325,9 @@ report 6014475 "NPR Item Replenish. by Store"
         SixthColCaptionLbl: Label '(6)=(4+5)';
         InvOverMaxCaptionLbl: Label '** Reorder quantity would pass set maximum inventory.';
         NotBelowReorderPointCaptionLbl: Label '* Projected inventory not below order point.';
-        ItemBlockedCaptionLbl: Label 'Blocked';
         InvCaptionLbl: Label 'Inventory';
         ItemDescCaptionLbl: Label 'Item Description';
         ItemNoCaptionLbl: Label 'Item No.';
-        ItemReplenishText: Label 'Item Replenishment';
         ItemReplenByStoreCaptionLbl: Label 'Item Replenishment by Store';
         LocationCodeCaptionLbl: Label 'Location Code';
         MaxiInvCaptionLbl: Label 'Maximum Inventory';
@@ -388,7 +386,7 @@ report 6014475 "NPR Item Replenish. by Store"
         ItemHere.SetFilter("Location Filter", LocationCode);
         if DateFilter <> '' then
             ItemHere.SetFilter("Date Filter", DateFilter); //influences only purch. and sales orders
-        if ItemHere.FindFirst then begin
+        if ItemHere.FindFirst() then begin
             ItemHere.CalcFields(Inventory, "Qty. on Purch. Order", "Qty. on Sales Order");
             QtyOnHandHere := ItemHere.Inventory;
             QtyPurchOrdHere := ItemHere."Qty. on Purch. Order";

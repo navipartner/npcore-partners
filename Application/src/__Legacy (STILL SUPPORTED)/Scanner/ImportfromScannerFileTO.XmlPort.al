@@ -28,8 +28,6 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
                 }
 
                 trigger OnBeforeInsertRecord()
-                var
-                    RecRef: RecordRef;
                 begin
                     ImportTransferLine(TransferOrderHeader);
                 end;
@@ -54,8 +52,6 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
         TransferOrderHeader: Record "Transfer Header";
 
     procedure SelectTable(Theader: Record "Transfer Header")
-    var
-        TransferLine: Integer;
     begin
         TransferOrderHeader := Theader;
     end;
@@ -67,12 +63,12 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
         Item: Record Item;
     begin
         TransferLine.SetRange("Document No.", TransferHeader."No.");
-        if TransferLine.FindLast then
+        if TransferLine.FindLast() then
             LineNo := TransferLine."Line No." + 10000
         else
             LineNo := 10000;
 
-        TransferLine.Init;
+        TransferLine.Init();
         TransferLine."Document No." := TransferHeader."No.";
         TransferLine."Line No." := LineNo;
         TransferLine."Item No." := '';
@@ -81,6 +77,6 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
             TransferLine.Validate("Item No.", Item."No.")
         else
             TransferLine.Validate("NPR Cross-Reference No.", scanned_item_code);
-        TransferLine.Insert;
+        TransferLine.Insert();
     end;
 }

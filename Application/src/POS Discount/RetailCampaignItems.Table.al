@@ -1,4 +1,4 @@
-table 6014612 "NPR Retail Campaign Items"
+﻿table 6014612 "NPR Retail Campaign Items"
 {
     Caption = 'Period Discount Items';
     DataClassification = CustomerContent;
@@ -269,8 +269,6 @@ table 6014612 "NPR Retail Campaign Items"
             DataClassification = CustomerContent;
 
             trigger OnLookup()
-            var
-                BarcodeLibrary: Codeunit "NPR Barcode Image Library";
             begin
             end;
         }
@@ -378,30 +376,17 @@ table 6014612 "NPR Retail Campaign Items"
     }
 
     trigger OnDelete()
-    var
-        RetailComment: Record "NPR Retail Comment";
     begin
     end;
 
     trigger OnInsert()
-    var
-        QtyDiscLine: Record "NPR Quantity Discount Line";
     begin
     end;
 
     trigger OnRename()
-    var
-        RetailComment: Record "NPR Retail Comment";
-        RetailComment2: Record "NPR Retail Comment";
     begin
     end;
 
-    var
-        Text1060003: Label 'The special offer price exceeds the normal retail price!';
-        Text1060005: Label 'This items includes multi unit prices, which will be controlled by period discounts';
-        VATPostingSetup: Record "VAT Posting Setup";
-        DG: Decimal;
-        VATPct: Decimal;
 
     procedure CreateDiscountItems(RetailCampaignHeader: Record "NPR Retail Campaign Header")
     var
@@ -412,7 +397,6 @@ table 6014612 "NPR Retail Campaign Items"
         MixedDiscount: Record "NPR Mixed Discount";
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         RetailComment: Record "NPR Retail Comment";
-        ItemJournalLine: Record "Item Journal Line";
         LineNo: Integer;
         PurchPriceCalcMgt: Codeunit "Purch. Price Calc. Mgt.";
         RequisitionLine: Record "Requisition Line";
@@ -420,13 +404,13 @@ table 6014612 "NPR Retail Campaign Items"
         DeleteAll;
         LineNo := 0;
         RetailCampaignLine.SetRange("Campaign Code", RetailCampaignHeader.Code);
-        if RetailCampaignLine.FindSet then begin
+        if RetailCampaignLine.FindSet() then begin
             repeat
                 case RetailCampaignLine.Type of
                     RetailCampaignLine.Type::"Period Discount":
                         begin
                             PeriodDiscountLine.SetRange(Code, RetailCampaignLine.Code);
-                            if PeriodDiscountLine.FindSet then begin
+                            if PeriodDiscountLine.FindSet() then begin
                                 PeriodDiscount.Get(PeriodDiscountLine.Code);
                                 repeat
                                     Clear(Rec);
@@ -456,7 +440,7 @@ table 6014612 "NPR Retail Campaign Items"
 
                                         if not Item.Blocked then begin
                                             Clear(RequisitionLine);
-                                            RequisitionLine.Init;
+                                            RequisitionLine.Init();
                                             RequisitionLine.Validate(Type, RequisitionLine.Type::Item);
                                             RequisitionLine.Validate("No.", Item."No.");
                                             RequisitionLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
@@ -476,19 +460,19 @@ table 6014612 "NPR Retail Campaign Items"
                                     RetailComment.SetRange("Table ID", 6014414);
                                     RetailComment.SetRange("No.", PeriodDiscountLine.Code);
                                     RetailComment.SetRange("No. 2", PeriodDiscountLine."Item No.");
-                                    if RetailComment.FindFirst then
+                                    if RetailComment.FindFirst() then
                                         "Comment 2" := CopyStr(RetailComment.Comment, 1, 50);
                                     CalcProfit;
                                     "Quantity Sold" := GetQuantitySold;
                                     if Insert then;
-                                until PeriodDiscountLine.Next = 0;
+                                until PeriodDiscountLine.Next() = 0;
                             end;
                         end;
                     RetailCampaignLine.Type::"Mixed Discount":
                         begin
                             MixedDiscountLine.SetRange(Code, RetailCampaignLine.Code);
                             MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::Item);
-                            if MixedDiscountLine.FindSet then begin
+                            if MixedDiscountLine.FindSet() then begin
                                 repeat
                                     Clear(Rec);
                                     MixedDiscount.Get(MixedDiscountLine.Code);
@@ -515,7 +499,7 @@ table 6014612 "NPR Retail Campaign Items"
                                         "Units per Parcel" := Item."Units per Parcel";
                                         if not Item.Blocked then begin
                                             Clear(RequisitionLine);
-                                            RequisitionLine.Init;
+                                            RequisitionLine.Init();
                                             RequisitionLine.Validate(Type, RequisitionLine.Type::Item);
                                             RequisitionLine.Validate("No.", Item."No.");
                                             RequisitionLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
@@ -540,11 +524,11 @@ table 6014612 "NPR Retail Campaign Items"
                                     "Mix Type" := MixedDiscount."Mix Type" + 1;
                                     "Quantity Sold" := GetQuantitySold;
                                     if Insert then;
-                                until MixedDiscountLine.Next = 0;
+                                until MixedDiscountLine.Next() = 0;
                             end;
                         end;
                 end;
-            until RetailCampaignLine.Next = 0;
+            until RetailCampaignLine.Next() = 0;
         end;
     end;
 

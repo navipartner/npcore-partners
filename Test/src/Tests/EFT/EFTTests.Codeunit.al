@@ -1,4 +1,4 @@
-codeunit 85004 "NPR EFT Tests"
+﻿codeunit 85004 "NPR EFT Tests"
 {
     // // [Feature] EFT Framework
 
@@ -41,7 +41,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -126,7 +126,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -177,7 +177,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -230,7 +230,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -290,7 +290,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval with tip of 3 LCY
@@ -344,7 +344,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval with surcharge of 4 LCY
@@ -398,7 +398,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth 5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 5;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval with surcharge of 4 LCY
@@ -451,7 +451,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth 5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 5;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -494,7 +494,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth -5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 5;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", -1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -545,7 +545,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth -5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 5;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", -1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -644,7 +644,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -654,7 +654,7 @@ codeunit 85004 "NPR EFT Tests"
         EFTTestMockIntegration.SetPaymentConfirmationHandler(0);
 
         // [When] Refunding the approved EFT payment, with an entry no. that doesn't exist.
-        if OriginalEFTTransactionRequest.FindLast then;
+        if OriginalEFTTransactionRequest.FindLast() then;
         OriginalEFTTransactionRequest."Entry No." += 10000;
 
         // [Then] Error since the original transaction could not be found.
@@ -1108,7 +1108,7 @@ codeunit 85004 "NPR EFT Tests"
         // [When] Attempting to void trx again.
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        EFTTransactionRequest.Reset;
+        EFTTransactionRequest.Reset();
         // [Then] an error occurs since a trx can only be voided once.
         asserterror EFTTransactionMgt.StartVoid(_EFTSetup, SalePOS, OriginalEFTTransactionRequest."Entry No.", true);
     end;
@@ -1776,7 +1776,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth >5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -1786,7 +1786,7 @@ codeunit 85004 "NPR EFT Tests"
         EFTTestMockIntegration.SetPaymentConfirmationHandler(0);
 
         // [When] Performing lookup on a non existing trx
-        if OriginalEFTTransactionRequest.FindLast then;
+        if OriginalEFTTransactionRequest.FindLast() then;
         OriginalEFTTransactionRequest."Entry No." += 1000;
 
         // [Then] Error
@@ -1935,7 +1935,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         EFTTransactionMgt.StartLookup(_EFTSetup, SalePOS, OriginalEFTTransactionRequest."Entry No.");
-        OriginalEFTTransactionRequest.Find;
+        OriginalEFTTransactionRequest.Find();
         OriginalEFTTransactionRequest.TestField(Recovered, true);
 
         // [When] Attempting to lookup the 2nd time
@@ -2420,7 +2420,7 @@ codeunit 85004 "NPR EFT Tests"
         // [Given] Item line worth 5 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 5;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval with tip & surcharge
@@ -2452,17 +2452,17 @@ codeunit 85004 "NPR EFT Tests"
 
         // [Then] All 3 lines are posted correctly
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        POSEntry.FindFirst;
+        POSEntry.FindFirst();
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSPaymentLine.SetRange("Retail ID", EFTTransactionRequest."Sales Line ID");
-        POSPaymentLine.FindFirst;
+        POSPaymentLine.FindFirst();
         POSPaymentLine.TestField("Amount (LCY)", EFTTransactionRequest."Result Amount");
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetRange("Retail ID", EFTTransactionRequest."Fee Line ID");
-        POSSalesLine.FindFirst;
+        POSSalesLine.FindFirst();
         POSSalesLine.TestField("Amount Incl. VAT (LCY)", EFTTransactionRequest."Fee Amount");
         POSSalesLine.SetRange("Retail ID", EFTTransactionRequest."Tip Line ID");
-        POSSalesLine.FindFirst;
+        POSSalesLine.FindFirst();
         POSSalesLine.TestField("Amount Incl. VAT (LCY)", EFTTransactionRequest."Tip Amount");
     end;
 
@@ -2513,7 +2513,7 @@ codeunit 85004 "NPR EFT Tests"
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(GiftCardPOSPaymentMethod, GiftCardPOSPaymentMethod."Processing Type"::VOUCHER, '', false);
         GiftCardPOSPaymentMethod.Get(GiftCardPOSPaymentMethod.Code);
         GiftCardPOSPaymentMethod."Processing Type" := GiftCardPOSPaymentMethod."Processing Type"::Voucher;
-        GiftCardPOSPaymentMethod.Modify;
+        GiftCardPOSPaymentMethod.Modify();
         NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPOSPaymentMethod.Code);
 
         // [When] Loading a gift card with 10% discount
@@ -2580,14 +2580,14 @@ codeunit 85004 "NPR EFT Tests"
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(GiftCardPOSPaymentMethod, GiftCardPOSPaymentMethod."Processing Type"::VOUCHER, '', false);
         GiftCardPOSPaymentMethod.Get(GiftCardPOSPaymentMethod.Code);
         GiftCardPOSPaymentMethod."Processing Type" := GiftCardPOSPaymentMethod."Processing Type"::Voucher;
-        GiftCardPOSPaymentMethod.Modify;
+        GiftCardPOSPaymentMethod.Modify();
         NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPOSPaymentMethod.Code);
 
         // [When] Loading a gift card with 10% discount
         _POSSession.GetFrontEnd(POSFrontEndManagement, true);
         POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPOSPaymentMethod.Code, 5, 10, 1);
         _LastTrxEntryNo := POSActionEFTGiftCard.LoadGiftCard(_POSSession, POSFrontEndManagement);
-        Commit;
+        Commit();
         asserterror POSActionEFTGiftCard.InsertVoucherDiscountLine(_POSSession);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
@@ -2648,14 +2648,14 @@ codeunit 85004 "NPR EFT Tests"
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(GiftCardPOSPaymentMethod, GiftCardPOSPaymentMethod."Processing Type"::VOUCHER, '', false);
         GiftCardPOSPaymentMethod.Get(GiftCardPOSPaymentMethod.Code);
         GiftCardPOSPaymentMethod."Processing Type" := GiftCardPOSPaymentMethod."Processing Type"::Voucher;
-        GiftCardPOSPaymentMethod.Modify;
+        GiftCardPOSPaymentMethod.Modify();
         NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPOSPaymentMethod.Code);
 
         // [When] Loading a gift card with 10% discount
         _POSSession.GetFrontEnd(POSFrontEndManagement, true);
         POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPOSPaymentMethod.Code, 5, 10, 1);
         _LastTrxEntryNo := POSActionEFTGiftCard.LoadGiftCard(_POSSession, POSFrontEndManagement);
-        Commit;
+        Commit();
         asserterror POSActionEFTGiftCard.InsertVoucherDiscountLine(_POSSession);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
@@ -2798,10 +2798,10 @@ codeunit 85004 "NPR EFT Tests"
         SaleLinePOS.SetRange("Retail ID", LineRetailID);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
         if ShouldExist then begin
-            SaleLinePOS.FindFirst;
+            SaleLinePOS.FindFirst();
             SaleLinePOS.TestField("Amount Including VAT", Amount);
         end else begin
-            asserterror SaleLinePOS.FindFirst;
+            asserterror SaleLinePOS.FindFirst();
         end;
     end;
 
@@ -2813,10 +2813,10 @@ codeunit 85004 "NPR EFT Tests"
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
         if ShouldExist then begin
-            SaleLinePOS.FindFirst;
+            SaleLinePOS.FindFirst();
             SaleLinePOS.TestField("Amount Including VAT", Amount);
         end else begin
-            asserterror SaleLinePOS.FindFirst;
+            asserterror SaleLinePOS.FindFirst();
         end;
     end;
 
@@ -2828,10 +2828,10 @@ codeunit 85004 "NPR EFT Tests"
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"G/L Entry");
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
         if ShouldExist then begin
-            SaleLinePOS.FindFirst;
+            SaleLinePOS.FindFirst();
             SaleLinePOS.TestField("Amount Including VAT", Amount);
         end else begin
-            asserterror SaleLinePOS.FindFirst;
+            asserterror SaleLinePOS.FindFirst();
         end;
     end;
 

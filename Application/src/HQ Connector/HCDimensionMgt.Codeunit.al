@@ -10,7 +10,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
     begin
         if not RunTrigger then
             exit;
-        GLSetup.Get;
+        GLSetup.Get();
         if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
             UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
         if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
@@ -24,7 +24,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
     begin
         if not RunTrigger then
             exit;
-        GLSetup.Get;
+        GLSetup.Get();
         if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
             UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
         if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
@@ -38,7 +38,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
     begin
         if not RunTrigger then
             exit;
-        GLSetup.Get;
+        GLSetup.Get();
         if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
             UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", '');
         if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
@@ -47,8 +47,6 @@ codeunit 6150917 "NPR HC Dimension Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, 408, 'OnAfterSetupObjectNoList', '', true, true)]
     local procedure DimensionMgtOnAfterSetupObjectNoList(var TempAllObjWithCaption: Record AllObjWithCaption temporary)
-    var
-        AllObjWithCaption: Record AllObjWithCaption;
     begin
         DimensionMgt.InsertObject(TempAllObjWithCaption, DATABASE::"NPR HC Register");
     end;

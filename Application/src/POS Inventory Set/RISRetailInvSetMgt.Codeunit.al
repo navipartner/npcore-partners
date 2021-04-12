@@ -1,13 +1,11 @@
 codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 {
-    var
-        Text000: Label 'Error for Company %1: %2';
 
     procedure GetRetailInventoryEnabled(): Boolean
     var
         RetailInventorySet: Record "NPR RIS Retail Inv. Set";
     begin
-        exit(RetailInventorySet.FindFirst);
+        exit(RetailInventorySet.FindFirst());
     end;
 
     [IntegrationEvent(false, false)]
@@ -26,7 +24,7 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
             exit;
 
         ItemVariant.SetRange("Item No.", Item."No.");
-        if ItemVariant.FindFirst then begin
+        if ItemVariant.FindFirst() then begin
             if PAGE.RunModal(0, ItemVariant) = ACTION::LookupOK then
                 VariantFilter := ItemVariant.Code;
         end;
@@ -52,13 +50,13 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry";
         Handled: Boolean;
     begin
-        RetailInventoryBuffer.DeleteAll;
+        RetailInventoryBuffer.DeleteAll();
 
         RetailInventorySetEntry.SetRange("Set Code", RetailInventorySet.Code);
         RetailInventorySetEntry.SetRange(Enabled, true);
-        if RetailInventorySetEntry.FindSet then
+        if RetailInventorySetEntry.FindSet() then
             repeat
-                RetailInventoryBuffer.Init;
+                RetailInventoryBuffer.Init();
                 RetailInventoryBuffer."Set Code" := RetailInventorySetEntry."Set Code";
                 RetailInventoryBuffer."Line No." := RetailInventorySetEntry."Line No.";
                 RetailInventoryBuffer."Item Filter" := ItemFilter;
@@ -66,13 +64,13 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
                 RetailInventoryBuffer."Location Filter" := RetailInventorySetEntry."Location Filter";
                 RetailInventoryBuffer."Company Name" := RetailInventorySetEntry."Company Name";
                 RetailInventoryBuffer.Inventory := 0;
-                RetailInventoryBuffer.Insert;
+                RetailInventoryBuffer.Insert();
 
                 Handled := false;
                 OnProcessInventorySetEntry(RetailInventorySetEntry, RetailInventoryBuffer, Handled);
                 if not Handled then
                     ProcessInventorySetEntry(RetailInventorySetEntry, RetailInventoryBuffer, Handled);
-            until RetailInventorySetEntry.Next = 0;
+            until RetailInventorySetEntry.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RIS Retail Inv. Set Mgt.", 'OnProcessInventorySetEntry', '', true, true)]
@@ -87,7 +85,7 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 
         if RetailInventoryBuffer.Inventory <> 0 then begin
             RetailInventoryBuffer.Inventory := 0;
-            RetailInventoryBuffer.Modify;
+            RetailInventoryBuffer.Modify();
         end;
 
         if TryRequestInventory(RetailInventorySetEntry, RetailInventoryBuffer, Inventory) then
@@ -97,7 +95,7 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
             RetailInventoryBuffer."Processing Error Message" := CopyStr(GetLastErrorText, 1, MaxStrLen(RetailInventoryBuffer."Processing Error Message"));
         end;
 
-        RetailInventoryBuffer.Modify;
+        RetailInventoryBuffer.Modify();
     end;
 
     [TryFunction]
@@ -194,7 +192,7 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 
         XmlDoc.SelectNodes('.//*[local-name()="item"]', XmlNodeList);
 
-        for i := 1 to XmlNodeList.Count do begin
+        for i := 1 to XmlNodeList.Count() do begin
             XmlNodeList.Get(i, Node);
             if Evaluate(Inventory, Node.AsXmlElement().InnerText, 9) then begin
                 if Inventory < 0 then

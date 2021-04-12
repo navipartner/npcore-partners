@@ -1,7 +1,6 @@
-codeunit 6014467 "NPR Retail Journal Code"
+﻿codeunit 6014467 "NPR Retail Journal Code"
 {
     var
-        Text002: Label 'Update of Variant prices not supported from here. Please update them from the item card';
         RetailJnlHeader: Record "NPR Retail Journal Header";
         LineNo: Integer;
         Text003: Label 'Filters - %1', Comment = '%1 = Table Name';
@@ -25,22 +24,22 @@ codeunit 6014467 "NPR Retail Journal Code"
         RetailJournalList.LookupMode(true);
         RetailJournalList.SetTableView(RetailJournalHeader);
 
-        if not (RetailJournalList.RunModal = ACTION::LookupOK) then
+        if not (RetailJournalList.RunModal() = ACTION::LookupOK) then
             exit;
 
         RetailJournalList.GetSelectionFilter(RetailJournalHeader);
 
-        Total := RetailJournalLine.Count;
-        TotalHeaders := RetailJournalHeader.Count;
+        Total := RetailJournalLine.Count();
+        TotalHeaders := RetailJournalHeader.Count();
 
         Dialog.Open(Text001 + '\' + Text002);
 
-        if RetailJournalHeader.FindFirst then
+        if RetailJournalHeader.FindFirst() then
             repeat
                 Clear(RetailJournalLine2);
                 RetailJournalLine2.SetRange("No.", RetailJournalHeader."No.");
 
-                if RetailJournalLine2.FindLast then
+                if RetailJournalLine2.FindLast() then
                     TotalHeaders := RetailJournalLine2."Line No." + 10000
                 else
                     TotalHeaders := 10000;
@@ -51,14 +50,14 @@ codeunit 6014467 "NPR Retail Journal Code"
                         Counter += 1;
                         LineCounter += 1;
                         Dialog.Update(1, Round(Counter / (Total * TotalHeaders) * 10000, 1, '>'));
-                        RetailJournalLine2.Init;
+                        RetailJournalLine2.Init();
                         RetailJournalLine2 := RetailJournalLine;
                         RetailJournalLine2."No." := RetailJournalHeader."No.";
                         RetailJournalLine2."Line No." := LineNo + LineCounter * 10000;
                         RetailJournalLine2.Insert(true);
-                    until RetailJournalLine.Next = 0;
-            until RetailJournalHeader.Next = 0;
-        Dialog.Close;
+                    until RetailJournalLine.Next() = 0;
+            until RetailJournalHeader.Next() = 0;
+        Dialog.Close();
     end;
 
     procedure ExportToPeriodDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
@@ -73,16 +72,16 @@ codeunit 6014467 "NPR Retail Journal Code"
     begin
         CampaignDiscountList.LookupMode(true);
 
-        if not (CampaignDiscountList.RunModal = ACTION::LookupOK) then
+        if not (CampaignDiscountList.RunModal() = ACTION::LookupOK) then
             exit;
 
         CampaignDiscountList.GetRecord(PeriodDiscount);
 
         Dialog.Open(Text0001);
 
-        Total := RetailJournalLine.Count;
+        Total := RetailJournalLine.Count();
 
-        PeriodDiscountLine.Reset;
+        PeriodDiscountLine.Reset();
 
         if RetailJournalLine.Find('-') then
             repeat
@@ -90,26 +89,26 @@ codeunit 6014467 "NPR Retail Journal Code"
                 Dialog.Update(1, RetailJournalLine."Item No.");
                 Dialog.Update(2, Round(Counter / Total * 10000, 10000, '='));
                 if not PeriodDiscountLine.Get(PeriodDiscount.Code, RetailJournalLine."Item No.") then begin
-                    PeriodDiscountLine.Init;
+                    PeriodDiscountLine.Init();
                     PeriodDiscountLine.Validate(Code, PeriodDiscount.Code);
                     PeriodDiscountLine.Validate("Item No.", RetailJournalLine."Item No.");
-                    PeriodDiscountLine.Insert;
+                    PeriodDiscountLine.Insert();
                     PeriodDiscountLine.CalcFields("Unit Price");
                     if PeriodDiscountLine."Unit Price" <> 0 then
                         PeriodDiscountLine.Validate("Campaign Unit Price", PeriodDiscountLine."Unit Price")
                     else
                         PeriodDiscountLine."Campaign Unit Price" := RetailJournalLine."Discount Price Incl. Vat";
-                    PeriodDiscountLine.Modify;
+                    PeriodDiscountLine.Modify();
                 end else begin
                     PeriodDiscountLine.CalcFields("Unit Price");
                     if PeriodDiscountLine."Unit Price" <> 0 then
                         PeriodDiscountLine.Validate("Campaign Unit Price", RetailJournalLine."Discount Price Incl. Vat")
                     else
                         PeriodDiscountLine."Campaign Unit Price" := RetailJournalLine."Discount Price Incl. Vat";
-                    PeriodDiscountLine.Modify;
+                    PeriodDiscountLine.Modify();
                 end;
-            until RetailJournalLine.Next = 0;
-        Dialog.Close;
+            until RetailJournalLine.Next() = 0;
+        Dialog.Close();
     end;
 
     procedure ExportToItemJournal(var RetailJournalLine: Record "NPR Retail Journal Line")
@@ -134,7 +133,7 @@ codeunit 6014467 "NPR Retail Journal Code"
         if ItemJournalTemplate.Find('-') then
             repeat
                 BatchFilter += '|' + ItemJournalTemplate.Name;
-            until ItemJournalTemplate.Next = 0;
+            until ItemJournalTemplate.Next() = 0;
 
         BatchFilter := DelStr(BatchFilter, 1, 1);
 
@@ -142,7 +141,7 @@ codeunit 6014467 "NPR Retail Journal Code"
         ItemJournalBatches.SetTableView(ItemJournalBatch);
         ItemJournalBatches.LookupMode(true);
 
-        if not (ItemJournalBatches.RunModal = ACTION::LookupOK) then
+        if not (ItemJournalBatches.RunModal() = ACTION::LookupOK) then
             exit;
 
         ItemJournalBatches.GetRecord(ItemJournalBatch);
@@ -155,17 +154,17 @@ codeunit 6014467 "NPR Retail Journal Code"
         else
             NextItemJournalLineNo := 10000;
 
-        ItemJournalLine.Reset;
+        ItemJournalLine.Reset();
 
         CurrentLine := 0;
-        Total := RetailJournalLine.Count;
+        Total := RetailJournalLine.Count();
         Dialog.Open(Text002, RetailJournalLine.Description, CurrentLine, Total);
 
         if RetailJournalLine.Find('-') then
             repeat
-                Dialog.Update;
+                Dialog.Update();
                 if RetailJournalLine."Item No." <> '' then begin
-                    ItemJournalLine.Init;
+                    ItemJournalLine.Init();
                     ItemJournalLine.Validate("Journal Template Name", ItemJournalBatch."Journal Template Name");
                     ItemJournalLine.Validate("Journal Batch Name", ItemJournalBatch.Name);
                     ItemJournalLine."Line No." := NextItemJournalLineNo;
@@ -182,11 +181,11 @@ codeunit 6014467 "NPR Retail Journal Code"
                     ItemJournalLine."Shortcut Dimension 1 Code" := RetailJournalHeader."Shortcut Dimension 1 Code";
                     ItemJournalLine."Shortcut Dimension 2 Code" := RetailJournalHeader."Shortcut Dimension 2 Code";
                     ItemJournalLine."Location Code" := RetailJournalHeader."Location Code";
-                    ItemJournalLine.Insert;
+                    ItemJournalLine.Insert();
                     NextItemJournalLineNo += 10000;
                 end;
                 CurrentLine += 1;
-            until RetailJournalLine.Next = 0;
+            until RetailJournalLine.Next() = 0;
 
         Message(Text001, '"' + RetailJournalHeader."No." + ' ' + RetailJournalHeader.Description + '"', ItemJournalBatch.Name);
     end;
@@ -208,7 +207,7 @@ codeunit 6014467 "NPR Retail Journal Code"
         if ReqWkshTemplate.Find('-') then
             repeat
                 ReqFilter += '|' + ReqWkshTemplate.Name;
-            until ReqWkshTemplate.Next = 0;
+            until ReqWkshTemplate.Next() = 0;
 
         ReqFilter := DelStr(ReqFilter, 1, 1);
 
@@ -223,7 +222,7 @@ codeunit 6014467 "NPR Retail Journal Code"
             if RetailJournalLine.Find('-') then
                 repeat
                     if (RetailJournalLine."Item No." <> '') and (Item.Get(RetailJournalLine."Item No.")) then begin
-                        RequisitionLine.Init;
+                        RequisitionLine.Init();
                         RequisitionLine.Validate("Worksheet Template Name", RequisitionWkshName."Worksheet Template Name");
                         RequisitionLine.Validate("Journal Batch Name", RequisitionWkshName.Name);
                         RequisitionLine.Validate("Line No.", LineNo);
@@ -236,7 +235,7 @@ codeunit 6014467 "NPR Retail Journal Code"
                         RequisitionLine.Insert(true);
                         LineNo += 10000;
                     end;
-                until RetailJournalLine.Next = 0;
+                until RetailJournalLine.Next() = 0;
         end;
     end;
 
@@ -269,18 +268,16 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with PeriodDiscountLine do begin
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    CalcFields("Unit Price Incl. VAT");
-                    RetailJnlLine.InitLine;
-                    RetailJnlLine.SetItem("Item No.", "Variant Code", "Cross-Reference No.");
-                    RetailJnlLine.SetDiscountType(1, Code, "Campaign Unit Price", 1, "Unit Price Incl. VAT");
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(PeriodDiscountLine.Count());
+        if PeriodDiscountLine.FindSet() then
+            repeat
+                PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
+                RetailJnlLine.InitLine;
+                RetailJnlLine.SetItem(PeriodDiscountLine."Item No.", PeriodDiscountLine."Variant Code", PeriodDiscountLine."Cross-Reference No.");
+                RetailJnlLine.SetDiscountType(1, PeriodDiscountLine.Code, PeriodDiscountLine."Campaign Unit Price", 1, PeriodDiscountLine."Unit Price Incl. VAT");
+                RetailJnlLine.Insert();
+            until PeriodDiscountLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -306,18 +303,16 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with MixedDiscountLine do begin
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    CalcFields("Unit price incl. VAT");
-                    RetailJnlLine.InitLine;
-                    RetailJnlLine.SetItem("No.", "Variant Code", "Cross-Reference No.");
-                    RetailJnlLine.SetDiscountType(2, Code, "Unit price", Quantity, "Unit price incl. VAT");
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(MixedDiscountLine.Count());
+        if MixedDiscountLine.FindSet() then
+            repeat
+                MixedDiscountLine.CalcFields("Unit price incl. VAT");
+                RetailJnlLine.InitLine;
+                RetailJnlLine.SetItem(MixedDiscountLine."No.", MixedDiscountLine."Variant Code", MixedDiscountLine."Cross-Reference No.");
+                RetailJnlLine.SetDiscountType(2, MixedDiscountLine.Code, MixedDiscountLine."Unit price", MixedDiscountLine.Quantity, MixedDiscountLine."Unit price incl. VAT");
+                RetailJnlLine.Insert();
+            until MixedDiscountLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -344,18 +339,16 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with QuantityDiscountLine do begin
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    CalcFields("Price Includes VAT");
-                    RetailJnlLine.InitLine;
-                    RetailJnlLine.SetItem("Item No.", '', '');
-                    RetailJnlLine.SetDiscountType(3, "Main no.", "Unit Price", Quantity, "Price Includes VAT");
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(QuantityDiscountLine.Count());
+        if QuantityDiscountLine.FindSet() then
+            repeat
+                QuantityDiscountLine.CalcFields("Price Includes VAT");
+                RetailJnlLine.InitLine;
+                RetailJnlLine.SetItem(QuantityDiscountLine."Item No.", '', '');
+                RetailJnlLine.SetDiscountType(3, QuantityDiscountLine."Main no.", QuantityDiscountLine."Unit Price", QuantityDiscountLine.Quantity, QuantityDiscountLine."Price Includes VAT");
+                RetailJnlLine.Insert();
+            until QuantityDiscountLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -381,18 +374,16 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with TransferShipmentLine do begin
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    RetailJnlLine.InitLine;
-                    RetailJnlLine.SetItem("Item No.", "Variant Code", '');
-                    RetailJnlLine."Quantity to Print" := Quantity;
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(TransferShipmentLine.Count());
+        if TransferShipmentLine.FindSet() then
+            repeat
+                RetailJnlLine.InitLine;
+                RetailJnlLine.SetItem(TransferShipmentLine."Item No.", TransferShipmentLine."Variant Code", '');
+                RetailJnlLine."Quantity to Print" := TransferShipmentLine.Quantity;
 
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+                RetailJnlLine.Insert();
+            until TransferShipmentLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -418,18 +409,16 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with TransferReceiptLine do begin
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    RetailJnlLine.InitLine;
-                    RetailJnlLine.SetItem("Item No.", "Variant Code", '');
-                    RetailJnlLine."Quantity to Print" := Quantity;
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(TransferReceiptLine.Count());
+        if TransferReceiptLine.FindSet() then
+            repeat
+                RetailJnlLine.InitLine;
+                RetailJnlLine.SetItem(TransferReceiptLine."Item No.", TransferReceiptLine."Variant Code", '');
+                RetailJnlLine."Quantity to Print" := TransferReceiptLine.Quantity;
 
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+                RetailJnlLine.Insert();
+            until TransferReceiptLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -456,18 +445,16 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with TransferLine do begin
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    RetailJnlLine.InitLine;
-                    RetailJnlLine.SetItem("Item No.", "Variant Code", '');
-                    RetailJnlLine."Quantity to Print" := Quantity;
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(TransferLine.Count());
+        if TransferLine.FindSet() then
+            repeat
+                RetailJnlLine.InitLine;
+                RetailJnlLine.SetItem(TransferLine."Item No.", TransferLine."Variant Code", '');
+                RetailJnlLine."Quantity to Print" := TransferLine.Quantity;
 
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+                RetailJnlLine.Insert();
+            until TransferLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -497,31 +484,29 @@ codeunit 6014467 "NPR Retail Journal Code"
         Selection := StrMenu(Text004, 1);
         if Selection = 0 then
             exit;
-        with PurchaseLine do begin
-            SetRange(Type, Type::Item);
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    RetailJnlLine.InitLine;
-                    if "Item Reference Type" = "Item Reference Type"::"Bar Code" then
-                        RetailJnlLine.SetItem("No.", "Variant Code", "Item Reference No.")
-                    else
-                        RetailJnlLine.SetItem("No.", "Variant Code", '');
-                    case Selection of
-                        1:
-                            RetailJnlLine."Quantity to Print" := Quantity;
-                        2:
-                            RetailJnlLine."Quantity to Print" := "Qty. to Receive";
-                        3:
-                            RetailJnlLine."Quantity to Print" := "Quantity Received";
-                    end;
-                    RetailJnlLine."Last Direct Cost" := PurchaseLine."Direct Unit Cost";
+        PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(PurchaseLine.Count());
+        if PurchaseLine.FindSet() then
+            repeat
+                RetailJnlLine.InitLine;
+                if PurchaseLine."Item Reference Type" = PurchaseLine."Item Reference Type"::"Bar Code" then
+                    RetailJnlLine.SetItem(PurchaseLine."No.", PurchaseLine."Variant Code", PurchaseLine."Item Reference No.")
+                else
+                    RetailJnlLine.SetItem(PurchaseLine."No.", PurchaseLine."Variant Code", '');
+                case Selection of
+                    1:
+                        RetailJnlLine."Quantity to Print" := PurchaseLine.Quantity;
+                    2:
+                        RetailJnlLine."Quantity to Print" := PurchaseLine."Qty. to Receive";
+                    3:
+                        RetailJnlLine."Quantity to Print" := PurchaseLine."Quantity Received";
+                end;
+                RetailJnlLine."Last Direct Cost" := PurchaseLine."Direct Unit Cost";
 
-                    OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+                OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);
+                RetailJnlLine.Insert();
+            until PurchaseLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -547,26 +532,24 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with PurchInvLine do begin
-            SetRange(Type, Type::Item);
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    RetailJnlLine.InitLine;
+        PurchInvLine.SetRange(Type, PurchInvLine.Type::Item);
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(PurchInvLine.Count());
+        if PurchInvLine.FindSet() then
+            repeat
+                RetailJnlLine.InitLine;
 
-                    if "Item Reference Type" = "Item Reference Type"::"Bar Code" then
-                        RetailJnlLine.SetItem("No.", "Variant Code", "Item Reference No.")
-                    else
-                        RetailJnlLine.SetItem("No.", "Variant Code", '');
-                    RetailJnlLine."Quantity to Print" := Quantity;
+                if PurchInvLine."Item Reference Type" = PurchInvLine."Item Reference Type"::"Bar Code" then
+                    RetailJnlLine.SetItem(PurchInvLine."No.", PurchInvLine."Variant Code", PurchInvLine."Item Reference No.")
+                else
+                    RetailJnlLine.SetItem(PurchInvLine."No.", PurchInvLine."Variant Code", '');
+                RetailJnlLine."Quantity to Print" := PurchInvLine.Quantity;
 
-                    RetailJnlLine."Last Direct Cost" := PurchInvLine."Direct Unit Cost";
+                RetailJnlLine."Last Direct Cost" := PurchInvLine."Direct Unit Cost";
 
-                    OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine, RetailJnlLine);
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+                OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine, RetailJnlLine);
+                RetailJnlLine.Insert();
+            until PurchInvLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -594,19 +577,17 @@ codeunit 6014467 "NPR Retail Journal Code"
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        with WarehouseActivityLine do begin
-            RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
-            RetailJnlLine.UseGUI(Count);
-            if FindSet then
-                repeat
-                    RetailJnlLine.InitLine;
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(WarehouseActivityLine.Count());
+        if WarehouseActivityLine.FindSet() then
+            repeat
+                RetailJnlLine.InitLine;
 
-                    RetailJnlLine.SetItem(WarehouseActivityLine."Item No.", "Variant Code", '');
-                    RetailJnlLine."Quantity to Print" := Quantity;
+                RetailJnlLine.SetItem(WarehouseActivityLine."Item No.", WarehouseActivityLine."Variant Code", '');
+                RetailJnlLine."Quantity to Print" := WarehouseActivityLine.Quantity;
 
-                    RetailJnlLine.Insert();
-                until Next = 0;
-        end;
+                RetailJnlLine.Insert();
+            until WarehouseActivityLine.Next() = 0;
         RetailJnlLine.CloseGUI;
     end;
 
@@ -624,10 +605,9 @@ codeunit 6014467 "NPR Retail Journal Code"
         end;
 
         RetailJnlLine.SetRange("No.", RetailJnlHeader."No.");
-        if RetailJnlLine.FindLast then
-            LineNo := RetailJnlLine."Line No." + 10000
-        else
-            LineNo := 10000;
+        if RetailJnlLine.FindLast() then
+            LineNo := RetailJnlLine."Line No." + 10000;
+
         exit(true);
     end;
 
@@ -635,11 +615,10 @@ codeunit 6014467 "NPR Retail Journal Code"
     var
         POSUnit: Record "NPR POS Unit";
     begin
-        RetailJnlHeader.Init;
+        RetailJnlHeader.Init();
         RetailJnlHeader."No." := RetailJnlCode;
         RetailJnlHeader."Register No." := POSUnit.GetCurrentPOSUnit();
 
-        LineNo := 10000;
     end;
 
     local procedure RunDynamicRequestPage(var ReturnFilters: Text; Filters: Text): Boolean
@@ -647,7 +626,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         TableMetadata: Record "Table Metadata";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
-        FieldRec: Record "Field";
         RecRef: RecordRef;
         KyRef: KeyRef;
         FldRef: FieldRef;
@@ -660,7 +638,7 @@ codeunit 6014467 "NPR Retail Journal Code"
 
 
         DynamicRequestPageField.SetRange("Table ID", 6014407);
-        if not DynamicRequestPageField.FindSet then begin
+        if not DynamicRequestPageField.FindSet() then begin
             RecRef.Open(6014407);
             RecRef.CurrentKeyIndex(1);
             KyRef := RecRef.KeyIndex(1);
@@ -668,11 +646,11 @@ codeunit 6014467 "NPR Retail Journal Code"
                 if (j = 1) or (j = 6) then begin
                     Clear(FldRef);
                     FldRef := RecRef.FieldIndex(j);
-                    DynamicRequestPageField1.Init;
+                    DynamicRequestPageField1.Init();
                     DynamicRequestPageField1.Validate("Table ID", 6014407);
                     DynamicRequestPageField1.Validate("Field ID", FldRef.Number);
                     DynamicRequestPageField1.Insert(true);
-                    Commit;
+                    Commit();
                 end;
             end;
         end;
@@ -686,7 +664,7 @@ codeunit 6014467 "NPR Retail Journal Code"
                 exit(false);
 
         FilterPageBuilder.PageCaption := StrSubstNo(Text003, 'Audit Roll');
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         ReturnFilters :=

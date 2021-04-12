@@ -16,21 +16,21 @@ codeunit 6151459 "NPR Magento NpXml Qty. Incr."
         RecRef.Open(Rec."Table No.");
         RecRef.SetPosition(Rec."Record Position");
 
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
 
         SetRecInfo(RecRef, ItemNo);
-        RecRef.Close;
+        RecRef.Close();
         Clear(RecRef);
 
         CustomValue := Format(CalcQtyIncrement(ItemNo), 0, 9);
 
         Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Rec.Modify;
+        Rec.Modify();
     end;
 
-    local procedure CalcQtyIncrement(ItemNo: Code[20]) QtyIncrement: Decimal
+    local procedure CalcQtyIncrement(ItemNo: Code[20]): Decimal
     var
         MagentoSetup: Record "NPR Magento Setup";
         ItemUOM: Record "Item Unit of Measure";
@@ -38,7 +38,7 @@ codeunit 6151459 "NPR Magento NpXml Qty. Incr."
         SalesUOMQty: Decimal;
         BaseUOMQty: Decimal;
     begin
-        if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit(0);
 
         if not Item.Get(ItemNo) then

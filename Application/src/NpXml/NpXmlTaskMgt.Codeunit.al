@@ -4,7 +4,6 @@ codeunit 6151550 "NPR NpXml Task Mgt."
 
     trigger OnRun()
     var
-        NpXmlTemplate: Record "NPR NpXml Template";
         TaskProcessor: Record "NPR Nc Task Processor";
         UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
@@ -36,18 +35,18 @@ codeunit 6151550 "NPR NpXml Task Mgt."
                 end;
             Type::Delete:
                 begin
-                    RecRef2 := PrevRecRef.Duplicate;
+                    RecRef2 := PrevRecRef.Duplicate();
                     if NcTaskMgt.RecExists(RecRef2, "Company Name") then
-                        RecRef2.Find;
+                        RecRef2.Find();
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
                     ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
                 end;
             Type::Rename:
                 begin
-                    RecRef2 := PrevRecRef.Duplicate;
+                    RecRef2 := PrevRecRef.Duplicate();
                     if NcTaskMgt.RecExists(RecRef2, "Company Name") then
-                        RecRef2.Find;
+                        RecRef2.Find();
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
                     ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
@@ -79,7 +78,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
         TempBlob.CreateOutStream(OutStr);
 
         Task.CalcFields("Data Output");
-        if Task."Data Output".HasValue then begin
+        if Task."Data Output".HasValue() then begin
             Task."Data Output".CreateInStream(InStr);
             CopyStream(OutStr, InStr);
         end;
@@ -94,7 +93,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
         RecRef.SetTable(Task);
 
         Task.Modify(true);
-        Commit;
+        Commit();
     end;
 
     local procedure CommitResponse(var Task: Record "NPR Nc Task")
@@ -109,7 +108,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
             RecRef.SetTable(Task);
         end;
         Task.Modify(true);
-        Commit;
+        Commit();
         Clear(ResponseTempBlob);
     end;
 
@@ -118,10 +117,10 @@ codeunit 6151550 "NPR NpXml Task Mgt."
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
         NpXmlTemplate.SetRange("Transaction Task", true);
-        if NpXmlTemplate.FindSet then
+        if NpXmlTemplate.FindSet() then
             repeat
                 NpXmlTemplate.UpdateNaviConnectSetup();
-            until NpXmlTemplate.Next = 0;
+            until NpXmlTemplate.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151501, 'IsUniqueTask', '', true, true)]
@@ -142,7 +141,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
             exit;
 
         if not NcTaskMgt.GetRecRef(TempTask, RecRef) then
-            RecRef := PrevRecRef.Duplicate;
+            RecRef := PrevRecRef.Duplicate();
 
         if NpXmlTriggerMgt.IsUniqueTask(TaskProcessor,
           TempTask.Type in [TempTask.Type::Insert, TempTask.Type::Rename],
@@ -160,13 +159,13 @@ codeunit 6151550 "NPR NpXml Task Mgt."
         NcTaskSetup: Record "NPR Nc Task Setup";
         NpXmlSetup: Record "NPR NpXml Setup";
     begin
-        if not (NpXmlSetup.Get and NpXmlSetup."NpXml Enabled") then
+        if not (NpXmlSetup.Get() and NpXmlSetup."NpXml Enabled") then
             exit(false);
 
         NcTaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
         NcTaskSetup.SetRange("Table No.", Task."Table No.");
         NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpXml Task Mgt.");
-        exit(NcTaskSetup.FindFirst);
+        exit(NcTaskSetup.FindFirst());
     end;
 }
 

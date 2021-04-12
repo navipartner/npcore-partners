@@ -28,7 +28,6 @@ xmlport 6151150 "NPR M2 Authenticate"
 
                 trigger OnBeforeInsertRecord()
                 begin
-                    RequestEntryCount += 1;
                 end;
             }
             textelement(Response)
@@ -237,11 +236,9 @@ xmlport 6151150 "NPR M2 Authenticate"
 
     trigger OnInitXmlPort()
     begin
-        RequestEntryCount := 0;
     end;
 
     var
-        RequestEntryCount: Integer;
         StartTime: Time;
         Customer: Record Customer;
 

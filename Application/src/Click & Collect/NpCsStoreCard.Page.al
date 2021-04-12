@@ -324,7 +324,7 @@ page 6151196 "NPR NpCs Store Card"
                 begin
                     Clear(NpCsStoresbyDistance);
                     NpCsStoresbyDistance.SetFromStoreCode(Rec.Code);
-                    NpCsStoresbyDistance.Run;
+                    NpCsStoresbyDistance.Run();
                 end;
             }
             action("Store Stock Items")

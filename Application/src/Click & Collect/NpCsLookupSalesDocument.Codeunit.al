@@ -22,7 +22,7 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
 
         MarkOrderMappings(Node.AsXmlElement(), NpCsDocumentMapping);
         NpCsDocumentMapping.MarkedOnly(true);
-        if NpCsDocumentMapping.FindFirst then begin
+        if NpCsDocumentMapping.FindFirst() then begin
             PAGE.Run(0, NpCsDocumentMapping);
             exit;
         end;
@@ -90,7 +90,7 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
         NpCsDocument.SetRange("From Document Type", DocType);
         NpCsDocument.SetRange("From Document No.", DocNo);
         NpCsDocument.SetRange("From Store Code", StoreCode);
-        exit(NpCsDocument.FindFirst);
+        exit(NpCsDocument.FindFirst());
     end;
 
     local procedure GetFromStoreCode(Element: XmlElement) StoreCode: Code[20]

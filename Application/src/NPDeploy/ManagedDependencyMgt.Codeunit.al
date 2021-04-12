@@ -42,9 +42,9 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     begin
         RecRef.GetTable(Record);
 
-        if JArray.Count = 0 then
+        if JArray.Count() = 0 then
             exit;
-        if not RecRef.FindFirst then
+        if not RecRef.FindFirst() then
             exit;
 
         GetTypeNameVersionFromRecordRef(RecRef, FileType, Name, FileVersion);
@@ -81,7 +81,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
                 end;
                 JObject.Add('Fields', JObjectRec);
                 JArray.Add(JObject);
-            until RecRef.Next = 0;
+            until RecRef.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
@@ -99,8 +99,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     end;
 
     local procedure DependencyManagementConfigured(var DepMgtSetup: Record "NPR Dependency Mgt. Setup"): Boolean
-    var
-        UserSetup: Record "User Setup";
     begin
         GetDependencyMgtSetup(DepMgtSetup);
         exit(not DepMgtSetup."Disable Deployment");
@@ -109,7 +107,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     local procedure ReadDependenciesFromGroundControl() Result: Boolean
     var
         DepMgtSetup: Record "NPR Dependency Mgt. Setup";
-        JObject: JsonObject;
         JArray: JsonArray;
         JToken: JsonToken;
         DependencyObject: JsonObject;
@@ -126,7 +123,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         if JToken.IsArray then
             KeysCount := JToken.AsArray.Count()
         else
-            KeysCount := JToken.AsObject.Keys.Count;
+            KeysCount := JToken.AsObject.Keys.Count();
 
         if KeysCount = 0 then
             exit(true);
@@ -136,7 +133,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         //Recheck that there are still unresolved dependencies after grabbing semaphore.
         Clear(JToken);
         if not GetJSON(DepMgtSetup, 'ManagedDependencyList', JToken, GetAvailableDependenciesFilter(DepMgtSetup), false) then begin
-            Commit;
+            Commit();
             exit(false);
         end;
 
@@ -146,7 +143,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         JArray := JToken.AsArray();
         KeysCount := JArray.Count();
 
-        for i := 0 to JArray.Count - 1 do begin
+        for i := 0 to JArray.Count() - 1 do begin
             JArray.Get(i, JToken);
             DependencyObject := JToken.AsObject();
             if GetJSON(
@@ -168,7 +165,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
                 Result := false;
         end;
 
-        Commit;
+        Commit();
 
         if Result and (KeysCount > 0) then
             OnDependenciesDeployed();
@@ -185,7 +182,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
             exit(false);
 
         JArray := Jtoken.AsArray();
-        for i := 0 to JArray.Count - 1 do begin
+        for i := 0 to JArray.Count() - 1 do begin
             JArray.Get(i, Jtoken);
             JObject := Jtoken.AsObject();
             if not DeployOneDependency(JObject) then
@@ -227,7 +224,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
         Result := RecRef.Insert(false);
         if not Result then
-            Result := RecRef.Modify;
+            Result := RecRef.Modify();
     end;
 
     [TryFunction]
@@ -253,7 +250,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         JObject.ReadFrom(JSON);
         JObject.Get('value', JToken);
 
-        if Specific and (JToken.AsArray.Count = 1) then
+        if Specific and (JToken.AsArray.Count() = 1) then
             JToken.AsArray.Get(0, JToken);
     end;
 
@@ -374,8 +371,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
     procedure AddToJObject(JObject: JsonObject; "Key": Text; Value: Variant)
     var
-        JValue: JsonValue;
-        Jtoken: JsonToken;
         ValueInt: Integer;
         ValueBigInt: BigInteger;
         ValueOption: Option;
@@ -384,7 +379,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         ValueDate: Date;
         ValueDateTime: DateTime;
         ValueTime: Time;
-        ValueDateFormula: DateFormula;
         ValueDuration: Duration;
     begin
         case TRUE of

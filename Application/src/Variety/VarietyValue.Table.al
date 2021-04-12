@@ -144,7 +144,7 @@ table 6059973 "NPR Variety Value"
             VRTValue.SetCurrentKey(Type, Table, "Sort Order");
             VRTValue.SetRange(Type, Type);
             VRTValue.SetRange(Table, Table);
-            if VRTValue.FindLast then begin
+            if VRTValue.FindLast() then begin
                 NewSortOrder := Round(VRTValue."Sort Order", 10, '<');
                 NewSortOrder += 10;
             end else

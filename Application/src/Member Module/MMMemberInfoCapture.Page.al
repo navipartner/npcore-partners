@@ -29,8 +29,8 @@ page 6060134 "NPR MM Member Info Capture"
                         TmpMembership: Record "NPR MM Membership" temporary;
                     begin
                         if (Rec."Receipt No." <> '') then begin
-                            MemberInfoCapture.SetFilter("Receipt No.", '=%1', "Receipt No.");
-                            MemberInfoCapture.SetFilter("Line No.", '<>%1', "Line No.");
+                            MemberInfoCapture.SetFilter("Receipt No.", '=%1', Rec."Receipt No.");
+                            MemberInfoCapture.SetFilter("Line No.", '<>%1', Rec."Line No.");
                             if (MemberInfoCapture.FindSet()) then begin
                                 repeat
                                     if (Membership.Get(MemberInfoCapture."Membership Entry No.")) then begin
@@ -54,8 +54,6 @@ page 6060134 "NPR MM Member Info Capture"
                     end;
 
                     trigger OnValidate()
-                    var
-                        Membership: Record "NPR MM Membership";
                     begin
 
                         SetExternalMembershipNo(Rec."External Membership No.");
@@ -120,7 +118,7 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnValidate()
                     begin
-                        SetExternalMemberNo("External Member No");
+                        SetExternalMemberNo(Rec."External Member No");
                     end;
                 }
             }
@@ -187,7 +185,7 @@ page 6060134 "NPR MM Member Info Capture"
                         Member: Record "NPR MM Member";
                         ReasonText: Text;
                     begin
-                        if (not Member.Get(MembershipManagement.GetMemberFromExtCardNo("Replace External Card No.", Today, ReasonText))) then
+                        if (not Member.Get(MembershipManagement.GetMemberFromExtCardNo(Rec."Replace External Card No.", Today, ReasonText))) then
                             Error(ReasonText);
 
                         Rec.Validate("External Member No", Member."External Member No.");
@@ -450,8 +448,6 @@ page 6060134 "NPR MM Member Info Capture"
                         TmpMember: Record "NPR MM Member" temporary;
                         MemberInfoCapture: Record "NPR MM Member Info Capture";
                         Member: Record "NPR MM Member";
-                        MembersPage: Page "NPR MM Members";
-                        PageAction: Action;
                     begin
                         if (Rec."Receipt No." <> '') then begin
                             MemberInfoCapture.SetFilter("Receipt No.", '=%1', Rec."Receipt No.");
@@ -467,8 +463,8 @@ page 6060134 "NPR MM Member Info Capture"
                             end;
 
                             if (PAGE.RunModal(6060126, TmpMember) = ACTION::LookupOK) then begin
-                                "Guardian External Member No." := TmpMember."External Member No.";
-                                "E-Mail Address" := TmpMember."E-Mail Address";
+                                Rec."Guardian External Member No." := TmpMember."External Member No.";
+                                Rec."E-Mail Address" := TmpMember."E-Mail Address";
                                 CurrPage.Update(true);
                             end;
                         end else begin
@@ -492,7 +488,7 @@ page 6060134 "NPR MM Member Info Capture"
                             exit;
                         end;
 
-                        if (Member.Get(MembershipManagement.GetMemberFromExtCardNo("Guardian External Member No.", Today, ReasonText))) then begin
+                        if (Member.Get(MembershipManagement.GetMemberFromExtCardNo(Rec."Guardian External Member No.", Today, ReasonText))) then begin
                             Rec."Guardian External Member No." := Member."External Member No.";
                             Rec."E-Mail Address" := Member."E-Mail Address";
                             CurrPage.Update(true);
@@ -561,7 +557,7 @@ page 6060134 "NPR MM Member Info Capture"
                                 MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
                                 if (Rec."Document Date" > 0D) then begin
-                                    if (CalcDate(MembershipSalesSetup."Duration Formula", Rec."Document Date") < WorkDate) then
+                                    if (CalcDate(MembershipSalesSetup."Duration Formula", Rec."Document Date") < WorkDate()) then
                                         Error(INVALID_ACTIVATION_DATE, Rec."Document Date");
 
                                     case MembershipSetup."Card Expire Date Calculation" of
@@ -901,8 +897,8 @@ page 6060134 "NPR MM Member Info Capture"
         if (CloseAction = ACTION::LookupOK) then begin
             if (Rec."Receipt No." <> '') then begin
                 Rec.Modify();
-                MemberInfoCapture.SetFilter("Receipt No.", '=%1', "Receipt No.");
-                MemberInfoCapture.SetFilter("Line No.", '=%1', "Line No.");
+                MemberInfoCapture.SetFilter("Receipt No.", '=%1', Rec."Receipt No.");
+                MemberInfoCapture.SetFilter("Line No.", '=%1', Rec."Line No.");
                 RequiredFields := true;
                 if (MemberInfoCapture.FindSet()) then begin
                     repeat
@@ -932,7 +928,6 @@ page 6060134 "NPR MM Member Info Capture"
         INVALID_ACTIVATION_DATE: Label 'The activation date %1 is not valid. The resulting membership must have remaining time when applying the membership duration formula to activation date.';
         ActivationDate: Date;
         ExternalMembershipNo: Code[20];
-        ExternalMemberNo: Code[20];
         ShowMemberOverviewSection: Boolean;
         ShowNewMemberSection: Boolean;
         ShowNewCardSection: Boolean;
@@ -940,20 +935,16 @@ page 6060134 "NPR MM Member Info Capture"
         ShowAddMemberCardSection: Boolean;
         ShowReplaceCardSection: Boolean;
         ShowCardholderSection: Boolean;
-        ShowQuantityField: Boolean;
         ShowAttributesSection: Boolean;
         EditMemberCardType: Boolean;
-        ExtraInfo: Text;
         ShowAutoRenew: Boolean;
         ExternalMembershipNoEditable: Boolean;
         AutoRenewPaymentMethodMandatory: Boolean;
         SetAddGuardianMode: Boolean;
         CardValidUntilMandatory: Boolean;
-        INVALID_SETUP: Label 'The combination %1 %2 and %3 %4 is not supported.';
         GDPRMandatory: Boolean;
         GDPRSelected: Boolean;
         NAMEFIELD_TO_LONG: Label 'The maximum length for "%1", "%2" and "%3" when combined is %4. Current total length is %5.';
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
@@ -973,7 +964,6 @@ page 6060134 "NPR MM Member Info Capture"
     local procedure CheckEmail()
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        MembershipCommunity: Record "NPR MM Member Community";
         Member: Record "NPR MM Member";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         ValidEmail: Boolean;
@@ -988,7 +978,7 @@ page 6060134 "NPR MM Member Info Capture"
             ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
 
         if (not ValidEmail) then
-            if (Confirm(EMAIL_INVALID_CONFIRM, true, FieldCaption("E-Mail Address"))) then
+            if (Confirm(EMAIL_INVALID_CONFIRM, true, Rec.FieldCaption("E-Mail Address"))) then
                 Error(INVALID_VALUE, Rec.FieldCaption("E-Mail Address"));
 
         if (Rec."Item No." <> '') then begin
@@ -1062,7 +1052,7 @@ page 6060134 "NPR MM Member Info Capture"
                                 MembershipSetup."Validate Age Against",
                                 MembershipSalesSetup."Age Constraint Type",
                                 MembershipSalesSetup."Age Constraint (Years)")) then begin
-                                SetMissingInfo(MissingInformation, MissingFields, FieldCaption(Birthday), true);
+                                SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption(Birthday), true);
                                 Message(AGE_VERIFICATION, MemberInfoCapture."First Name", MembershipSalesSetup."Age Constraint (Years)");
                             end;
                     end;
@@ -1071,24 +1061,24 @@ page 6060134 "NPR MM Member Info Capture"
 
                 if (ShowNewCardSection) then begin
                     if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL) then begin
-                        SetMissingInfo(MissingInformation, MissingFields, FieldCaption("External Card No."), (MemberInfoCapture."External Card No." = ''));
+                        SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("External Card No."), (MemberInfoCapture."External Card No." = ''));
 
                         if (MembershipSetup."Card Expire Date Calculation" <> MembershipSetup."Card Expire Date Calculation"::NA) then
-                            SetMissingInfo(MissingInformation, MissingFields, FieldCaption("Valid Until"), (MemberInfoCapture."Valid Until" = 0D));
+                            SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Valid Until"), (MemberInfoCapture."Valid Until" = 0D));
 
                     end;
                 end;
 
                 if (ShowAddToMembershipSection) or (ShowAddMemberCardSection) or (ShowReplaceCardSection) then begin
-                    SetMissingInfo(MissingInformation, MissingFields, FieldCaption("External Membership No."), (MemberInfoCapture."External Membership No." = ''));
+                    SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("External Membership No."), (MemberInfoCapture."External Membership No." = ''));
                 end;
 
                 if (ShowAddMemberCardSection) or (ShowReplaceCardSection) then begin
-                    SetMissingInfo(MissingInformation, MissingFields, FieldCaption("External Member No"), (MemberInfoCapture."External Member No" = ''));
+                    SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("External Member No"), (MemberInfoCapture."External Member No" = ''));
                 end;
 
-                if ("Enable Auto-Renew") then
-                    SetMissingInfo(MissingInformation, MissingFields, FieldCaption("Auto-Renew Payment Method Code"), ("Auto-Renew Payment Method Code" = ''));
+                if (Rec."Enable Auto-Renew") then
+                    SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Auto-Renew Payment Method Code"), (Rec."Auto-Renew Payment Method Code" = ''));
 
                 case MembershipSetup."GDPR Mode" of
                     MembershipSetup."GDPR Mode"::REQUIRED:
@@ -1121,7 +1111,7 @@ page 6060134 "NPR MM Member Info Capture"
 
             if (SetAddGuardianMode) then begin
                 MissingInformation := false;
-                SetMissingInfo(MissingInformation, MissingFields, FieldCaption("Guardian External Member No."), (MemberInfoCapture."Guardian External Member No." = ''));
+                SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Guardian External Member No."), (MemberInfoCapture."Guardian External Member No." = ''));
             end;
 
         end;
@@ -1138,9 +1128,9 @@ page 6060134 "NPR MM Member Info Capture"
         MemberCommunity: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
-        if ("Item No." <> '') then begin
+        if (Rec."Item No." <> '') then begin
             MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
-            MembershipSalesSetup.SetFilter("No.", '=%1', "Item No.");
+            MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
             if (MembershipSalesSetup.FindFirst()) then begin
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
@@ -1167,7 +1157,7 @@ page 6060134 "NPR MM Member Info Capture"
                         ActivationDateMandatory := true;
                 end;
 
-                AutoRenewPaymentMethodMandatory := "Enable Auto-Renew";
+                AutoRenewPaymentMethodMandatory := Rec."Enable Auto-Renew";
 
                 BirthDateMandatory := MembershipSetup."Enable Age Verification";
 
@@ -1190,7 +1180,7 @@ page 6060134 "NPR MM Member Info Capture"
         ValidUntilBaseDate: Date;
     begin
 
-        ShowMemberOverviewSection := (Rec.Count > 1);
+        ShowMemberOverviewSection := (Rec.Count() > 1);
         ShowNewMemberSection := true;
 
         ShowAddToMembershipSection := false;
@@ -1199,7 +1189,6 @@ page 6060134 "NPR MM Member Info Capture"
         ShowReplaceCardSection := false;
         ShowNewCardSection := false;
         ShowAutoRenew := false;
-        ShowQuantityField := false;
         EditMemberCardType := false;
 
         ShowAttributesSection := true;
@@ -1207,7 +1196,7 @@ page 6060134 "NPR MM Member Info Capture"
 
         Rec.Quantity := 1;
 
-        ExternalMembershipNoEditable := ("External Membership No." = '');
+        ExternalMembershipNoEditable := (Rec."External Membership No." = '');
 
         if (SetAddGuardianMode) then begin
             ShowAddToMembershipSection := false;
@@ -1215,27 +1204,26 @@ page 6060134 "NPR MM Member Info Capture"
             ShowNewMemberSection := false;
             ShowCardholderSection := false;
             ShowNewCardSection := false;
-            ShowQuantityField := false;
 
             ShowAttributesSection := false;
             GuardianMandatory := true;
 
         end;
 
-        if ("Item No." <> '') then begin
+        if (Rec."Item No." <> '') then begin
             MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
-            MembershipSalesSetup.SetFilter("No.", '=%1', "Item No.");
+            MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
             if (MembershipSalesSetup.FindFirst()) then begin
 
-                // MembershipSetup.GET (MembershipSalesSetup."Membership Code");
-                // MemberCommunity.GET (MembershipSetup."Community Code");
+                // MembershipSetup.Get() (MembershipSalesSetup."Membership Code");
+                // MemberCommunity.Get() (MembershipSetup."Community Code");
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
 
                 ShowNewCardSection := (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES);
 
                 EditMemberCardType := (MembershipSalesSetup."Member Card Type Selection" = MembershipSalesSetup."Member Card Type Selection"::USER_SELECT);
-                "Member Card Type" := MembershipSalesSetup."Member Card Type";
+                Rec."Member Card Type" := MembershipSalesSetup."Member Card Type";
 
                 ShowAutoRenew := MemberCommunity."Membership to Cust. Rel.";
 
@@ -1250,7 +1238,6 @@ page 6060134 "NPR MM Member Info Capture"
                             ShowNewMemberSection := false;
                             ShowCardholderSection := false;
                             ShowNewCardSection := false;
-                            ShowQuantityField := true;
                         end;
 
                     MembershipSalesSetup."Business Flow Type"::ADD_CARD:
@@ -1277,50 +1264,50 @@ page 6060134 "NPR MM Member Info Capture"
                 ActivationDateEditable := false;
                 case MembershipSalesSetup."Valid From Base" of
                     MembershipSalesSetup."Valid From Base"::SALESDATE:
-                        "Document Date" := WorkDate;
+                        Rec."Document Date" := WorkDate();
                     MembershipSalesSetup."Valid From Base"::DATEFORMULA:
                         begin
-                            "Document Date" := CalcDate(MembershipSalesSetup."Valid From Date Calculation", WorkDate);
+                            Rec."Document Date" := CalcDate(MembershipSalesSetup."Valid From Date Calculation", WorkDate());
                             ActivationDateEditable := true;
                         end;
                     MembershipSalesSetup."Valid From Base"::PROMPT:
                         ActivationDateEditable := true;
                     MembershipSalesSetup."Valid From Base"::FIRST_USE:
-                        "Document Date" := 0D;
+                        Rec."Document Date" := 0D;
                 end;
 
-                ValidUntilBaseDate := "Document Date";
+                ValidUntilBaseDate := Rec."Document Date";
                 if (ValidUntilBaseDate = 0D) then
-                    ValidUntilBaseDate := WorkDate;
+                    ValidUntilBaseDate := WorkDate();
 
                 if (MembershipSalesSetup."Membership Code" = '') then
                     MembershipSetup."Card Number Valid Until" := MembershipSalesSetup."Duration Formula";
 
                 case MembershipSetup."Card Expire Date Calculation" of
                     MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
-                        "Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", ValidUntilBaseDate);
+                        Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", ValidUntilBaseDate);
                     MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
-                        "Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", ValidUntilBaseDate);
+                        Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", ValidUntilBaseDate);
                     else
-                        "Valid Until" := 0D;
+                        Rec."Valid Until" := 0D;
                 end;
 
                 GDPRMandatory := false;
                 GDPRSelected := true;
                 case MembershipSetup."GDPR Mode" of
                     MembershipSetup."GDPR Mode"::NA:
-                        "GDPR Approval" := Rec."GDPR Approval"::NA;
+                        Rec."GDPR Approval" := Rec."GDPR Approval"::NA;
                     MembershipSetup."GDPR Mode"::IMPLIED:
-                        "GDPR Approval" := Rec."GDPR Approval"::ACCEPTED;
+                        Rec."GDPR Approval" := Rec."GDPR Approval"::ACCEPTED;
                     MembershipSetup."GDPR Mode"::REQUIRED:
                         begin
-                            "GDPR Approval" := Rec."GDPR Approval"::NA;
+                            Rec."GDPR Approval" := Rec."GDPR Approval"::NA;
                             GDPRMandatory := true;
                             GDPRSelected := false;
                         end;
                     MembershipSetup."GDPR Mode"::CONSENT:
                         begin
-                            "GDPR Approval" := Rec."GDPR Approval"::PENDING;
+                            Rec."GDPR Approval" := Rec."GDPR Approval"::PENDING;
                             GDPRMandatory := true;
                             GDPRSelected := false;
                         end;
@@ -1383,20 +1370,20 @@ page 6060134 "NPR MM Member Info Capture"
             Membership.Get(MemberCard."Membership Entry No.");
         end;
 
-        "Membership Entry No." := Membership."Entry No.";
-        "External Membership No." := Membership."External Membership No.";
+        Rec."Membership Entry No." := Membership."Entry No.";
+        Rec."External Membership No." := Membership."External Membership No.";
 
         ExternalMembershipNo := Membership."External Membership No.";
 
         // Set guardian
         if (ShowAddToMembershipSection) then begin
-            MembershipRole.SetFilter("Membership Entry No.", '=%1', "Membership Entry No.");
+            MembershipRole.SetFilter("Membership Entry No.", '=%1', Rec."Membership Entry No.");
             MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
             MembershipRole.SetFilter(Blocked, '=%1', false);
             if (MembershipRole.FindFirst()) then begin
                 GuardianMember.Get(MembershipRole."Member Entry No.");
-                "Guardian External Member No." := GuardianMember."External Member No.";
-                "E-Mail Address" := GuardianMember."E-Mail Address";
+                Rec."Guardian External Member No." := GuardianMember."External Member No.";
+                Rec."E-Mail Address" := GuardianMember."E-Mail Address";
             end;
         end;
 
@@ -1425,21 +1412,20 @@ page 6060134 "NPR MM Member Info Capture"
             pExternalMemberNo := Member."External Member No.";
         end;
 
-        "Member Entry No" := Member."Entry No.";
-        "External Member No" := Member."External Member No.";
-        ExternalMemberNo := Member."External Member No.";
+        Rec."Member Entry No" := Member."Entry No.";
+        Rec."External Member No" := Member."External Member No.";
 
         Member.CalcFields(Picture);
         if (Member.Picture.HasValue()) then begin
-            Picture := Member.Picture;
+            Rec.Picture := Member.Picture;
         end else begin
-            Clear(Picture);
+            Clear(Rec.Picture);
         end;
 
-        "First Name" := Member."First Name";
-        "Middle Name" := Member."Middle Name";
-        "Last Name" := Member."Last Name";
-        "E-Mail Address" := Member."E-Mail Address";
+        Rec."First Name" := Member."First Name";
+        Rec."Middle Name" := Member."Middle Name";
+        Rec."Last Name" := Member."Last Name";
+        Rec."E-Mail Address" := Member."E-Mail Address";
 
         Membership.Get(MembershipManagement.GetMembershipFromExtMemberNo(pExternalMemberNo));
         SetExternalMembershipNo(Membership."External Membership No.");
@@ -1504,7 +1490,7 @@ page 6060134 "NPR MM Member Info Capture"
             end;
 
             if (SetAddGuardianMode) then
-                "Guardian External Member No." := Member."External Member No.";
+                Rec."Guardian External Member No." := Member."External Member No.";
 
         end;
     end;
@@ -1512,13 +1498,8 @@ page 6060134 "NPR MM Member Info Capture"
     local procedure MemberCardLookup(MemberEntryNo: Integer; WithDialog: Boolean)
     var
         MemberCardList: Page "NPR MM Member Card List";
-        MemberList: Page "NPR MM Members";
         MemberCard: Record "NPR MM Member Card";
-        Member: Record "NPR MM Member";
-        MemberRole: Record "NPR MM Membership Role";
         PageAction: Action;
-        PageId: Integer;
-        TmpMember: Record "NPR MM Member" temporary;
     begin
 
         if (MemberEntryNo = 0) then
@@ -1529,7 +1510,7 @@ page 6060134 "NPR MM Member Info Capture"
         if (not MemberCard.FindSet()) then
             exit;
 
-        if ((MemberCard.Count > 1) and (not WithDialog)) then
+        if ((MemberCard.Count() > 1) and (not WithDialog)) then
             exit;
 
         if (WithDialog) then begin
@@ -1542,7 +1523,7 @@ page 6060134 "NPR MM Member Info Capture"
             MemberCardList.GetRecord(MemberCard);
         end;
 
-        "Replace External Card No." := MemberCard."External Card No.";
+        Rec."Replace External Card No." := MemberCard."External Card No.";
     end;
 
     procedure SetAddMembershipGuardianMode()
@@ -1553,14 +1534,14 @@ page 6060134 "NPR MM Member Info Capture"
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
 
-        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
+        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, Rec."Entry No.", NPRAttrTextArray[AttributeNumber]);
 
     end;
 
     local procedure GetMasterDataAttributeValue()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, "Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
 
     end;

@@ -1,4 +1,4 @@
-codeunit 6150614 "NPR POS Create Entry"
+﻿codeunit 6150614 "NPR POS Create Entry"
 {
     TableNo = "NPR POS Sale";
 
@@ -6,7 +6,6 @@ codeunit 6150614 "NPR POS Create Entry"
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
-        POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         WasModified: Boolean;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
@@ -32,7 +31,7 @@ codeunit 6150614 "NPR POS Create Entry"
         CreateLines(POSEntry, Rec);
 
         POSEntryManagement.RecalculatePOSEntry(POSEntry, WasModified);
-        POSEntry.Modify;
+        POSEntry.Modify();
 
         if SaleCancelled then begin
             POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CANCEL_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CANCEL_SALE_END, '')
@@ -61,7 +60,7 @@ codeunit 6150614 "NPR POS Create Entry"
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindSet then begin
+        if SaleLinePOS.FindSet() then begin
             repeat
                 case SaleLinePOS."Sale Type" of
                     SaleLinePOS."Sale Type"::Sale,
@@ -82,7 +81,7 @@ codeunit 6150614 "NPR POS Create Entry"
                     SaleLinePOS."Sale Type"::Payment:
                         InsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
                 end;
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
         end;
     end;
 
@@ -90,7 +89,6 @@ codeunit 6150614 "NPR POS Create Entry"
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         WasModified: Boolean;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
@@ -117,7 +115,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
         if POSEntry.Description = '' then
             POSEntry.Description := StrSubstNo('%1 %2', SalesHeader."Document Type", SalesHeader."No.");
-        POSEntry.Modify;
+        POSEntry.Modify();
 
         POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CREDIT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CREDIT_SALE_END, '');
 
@@ -130,7 +128,7 @@ codeunit 6150614 "NPR POS Create Entry"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        POSEntry.Init;
+        POSEntry.Init();
         POSEntry."Entry No." := 0; //Autoincrement;
         POSEntry."POS Period Register No." := POSPeriodRegister."No.";
         POSEntry."POS Store Code" := SalePOS."POS Store Code";
@@ -183,7 +181,7 @@ codeunit 6150614 "NPR POS Create Entry"
                     begin
                         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
                         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-                        if SaleLinePOS.FindFirst and (SaleLinePOS.Description <> '') then
+                        if SaleLinePOS.FindFirst() and (SaleLinePOS.Description <> '') then
                             POSEntry.Description := SaleLinePOS.Description
                         else
                             POSEntry.Description := CANCEL_SALE;
@@ -191,7 +189,7 @@ codeunit 6150614 "NPR POS Create Entry"
             end;
         end;
 
-        POSEntry.Insert;
+        POSEntry.Insert();
     end;
 
     local procedure InsertPOSSaleLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Entry Sales Line")
@@ -437,7 +435,6 @@ codeunit 6150614 "NPR POS Create Entry"
     local procedure InsertPOSBalancingLine(PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."; POSEntry: Record "NPR POS Entry"; var LineNo: Integer; IsBinTransfer: Boolean)
     var
         POSBalancingLine: Record "NPR POS Balancing Line";
-        POSPaymentBin: Record "NPR POS Payment Bin";
         POSBinEntry: Record "NPR POS Bin Entry";
         POSPaymentMethod: Record "NPR POS Payment Method";
         Difference: Decimal;
@@ -494,7 +491,7 @@ codeunit 6150614 "NPR POS Create Entry"
         // Move to a different bin instruction ("The safe")
         if (PaymentBinCheckpoint."Move to Bin Amount" <> 0) then begin
             if (PaymentBinCheckpoint."Move to Bin Reference" = '') then begin
-                PaymentBinCheckpoint."Move to Bin Reference" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+                PaymentBinCheckpoint."Move to Bin Reference" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
                 PaymentBinCheckpoint.Modify();
             end;
             PaymentBinCheckpoint.TestField("Move to Bin Code");
@@ -510,7 +507,7 @@ codeunit 6150614 "NPR POS Create Entry"
         // Move to a different bin instruction (The "BANK")
         if (PaymentBinCheckpoint."Bank Deposit Amount" <> 0) then begin
             if (PaymentBinCheckpoint."Bank Deposit Reference" = '') then begin
-                PaymentBinCheckpoint."Bank Deposit Reference" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+                PaymentBinCheckpoint."Bank Deposit Reference" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
                 PaymentBinCheckpoint.Modify();
             end;
             PaymentBinCheckpoint.TestField("Bank Deposit Bin Code");
@@ -545,7 +542,7 @@ codeunit 6150614 "NPR POS Create Entry"
     begin
 
         // Withdrawl from source bin
-        POSBinEntry.Init;
+        POSBinEntry.Init();
         POSBinEntry.TransferFields(CheckpointEntry);
         POSBinEntry."Entry No." := 0;
         POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_OUT;
@@ -574,7 +571,7 @@ codeunit 6150614 "NPR POS Create Entry"
     begin
 
         // Withdrawl from source bin
-        POSBinEntry.Init;
+        POSBinEntry.Init();
         POSBinEntry.TransferFields(CheckpointEntry);
         POSBinEntry."Entry No." := 0;
         POSBinEntry.Type := POSBinEntry.Type::BANK_TRANSFER_OUT;
@@ -603,7 +600,7 @@ codeunit 6150614 "NPR POS Create Entry"
     begin
 
         // Adjustment to bin
-        POSBinEntry.Init;
+        POSBinEntry.Init();
         POSBinEntry.TransferFields(CheckpointBinEntry);
         POSBinEntry."Entry No." := 0;
 
@@ -621,7 +618,7 @@ codeunit 6150614 "NPR POS Create Entry"
     begin
 
         // Adjustment to bin
-        POSBinEntry.Init;
+        POSBinEntry.Init();
         POSBinEntry.TransferFields(CheckpointBinEntry);
         POSBinEntry."Entry No." := 0;
 
@@ -639,7 +636,7 @@ codeunit 6150614 "NPR POS Create Entry"
     begin
 
         // Adjustment to bin
-        POSBinEntry.Init;
+        POSBinEntry.Init();
         POSBinEntry.TransferFields(CheckpointBinEntry);
         POSBinEntry."Entry No." := 0;
 
@@ -654,7 +651,6 @@ codeunit 6150614 "NPR POS Create Entry"
     procedure InsertUnitOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSEntry: Record "NPR POS Entry";
-        POSLedgerRegister: Record "NPR POS Period Register";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
     begin
@@ -776,7 +772,7 @@ codeunit 6150614 "NPR POS Create Entry"
         CreatedEntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo('[System Event] %1 transferred to location receipt %2', OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
     end;
 
-    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; Description: Text[80]) EntryNo: Integer
+    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; Description: Text[80]): Integer
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
@@ -785,7 +781,7 @@ codeunit 6150614 "NPR POS Create Entry"
         if (not GetPOSPeriodRegisterForPOSUnit(POSUnitNo, POSPeriodRegister, false)) then
             Error(ERR_NO_OPEN_UNIT, POSPeriodRegister.TableCaption, POSPeriodRegister.FieldCaption("POS Unit No."), POSUnitNo);
 
-        POSEntry.Init;
+        POSEntry.Init();
         POSEntry."Entry No." := 0;
         POSEntry."Entry Type" := POSEntry."Entry Type"::Other;
         POSEntry."System Entry" := true;
@@ -794,7 +790,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSEntry."POS Store Code" := GetStoreNoForUnitNo(POSUnitNo);
         POSEntry."POS Unit No." := POSUnitNo;
 
-        POSEntry."Entry Date" := Today;
+        POSEntry."Entry Date" := Today();
         POSEntry."Starting Time" := Time;
         POSEntry."Ending Time" := Time;
         POSEntry."Salesperson Code" := SalespersonCode;
@@ -828,7 +824,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSBinEntry."POS Store Code" := POSPaymentLine."POS Store Code";
         POSBinEntry."POS Unit No." := POSPaymentLine."POS Unit No.";
 
-        POSBinEntry."Transaction Date" := Today;
+        POSBinEntry."Transaction Date" := Today();
         POSBinEntry."Transaction Time" := Time;
         POSBinEntry."Transaction Amount" := POSPaymentLine.Amount;
         POSBinEntry."Transaction Currency Code" := POSPaymentLine."Currency Code";
@@ -845,9 +841,6 @@ codeunit 6150614 "NPR POS Create Entry"
     local procedure CalculateTransactionAmountLCY(var POSBinEntry: Record "NPR POS Bin Entry")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        Currency: Record Currency;
-        CurrencyFactor: Decimal;
-        CurrExchRate: Record "Currency Exchange Rate";
     begin
 
         POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount";
@@ -874,7 +867,7 @@ codeunit 6150614 "NPR POS Create Entry"
         // ** End Legacy
 
         // ** Future way
-        // IF (NOT Currency.GET (CurrencyCode)) THEN
+        // IF (NOT Currency.Get() (CurrencyCode)) THEN
         //  EXIT;
         //
         // EXIT (ROUND (CurrExchRate.ExchangeAmtFCYToLCY (TransactionDate, CurrencyCode, Amount,
@@ -887,12 +880,10 @@ codeunit 6150614 "NPR POS Create Entry"
     end;
 
     local procedure GetPOSPeriodRegisterForPOSUnit(var POSUnitNo: Code[10]; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
-    var
-        POSOpenPOSUnit: Codeunit "NPR POS Manage POS Unit";
     begin
-        POSPeriodRegister.Reset;
+        POSPeriodRegister.Reset();
         POSPeriodRegister.SetRange("POS Unit No.", POSUnitNo);
-        if not POSPeriodRegister.FindLast then
+        if not POSPeriodRegister.FindLast() then
             exit(false);
         if CheckOpen then
             if POSPeriodRegister.Status <> POSPeriodRegister.Status::OPEN then
@@ -926,7 +917,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
         GetPOSPeriodRegister(SalePOS, POSPeriodRegister, false);
 
-        POSEntry.Init;
+        POSEntry.Init();
 
         POSWorkshiftCheckpoint.Get(WorkshiftEntryNo);
         case POSWorkshiftCheckpoint.Type of
@@ -1042,10 +1033,9 @@ codeunit 6150614 "NPR POS Create Entry"
     end;
 
 
-    local procedure SelectUnitBin(UnitNo: Code[10]) BinNo: Code[10]
+    local procedure SelectUnitBin(UnitNo: Code[10]): Code[10]
     var
         POSUnit: Record "NPR POS Unit";
-        POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
     begin
         POSUnit.Get(UnitNo);
 
@@ -1065,7 +1055,7 @@ codeunit 6150614 "NPR POS Create Entry"
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Comment);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Cancelled);
-        exit(not SaleLinePOS.IsEmpty);
+        exit(not SaleLinePOS.IsEmpty());
 
     end;
 
@@ -1074,7 +1064,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSEntry: Record "NPR POS Entry";
     begin
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        exit(POSEntry.IsEmpty);
+        exit(POSEntry.IsEmpty());
     end;
 
     local procedure ValidateSaleHeader(SalePOS: Record "NPR POS Sale")
@@ -1266,14 +1256,14 @@ codeunit 6150614 "NPR POS Create Entry"
 
         if (POSEntry.ReadPermission) then begin
             if not (POSEntry.SetCurrentKey(POSEntry."Document No.")) then;
-            POSEntry.Reset;
+            POSEntry.Reset();
             POSEntry.SetFilter("Document No.", DocNoFilter);
             POSEntry.SetFilter("Posting Date", PostingDateFilter);
             RecordCount := InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR POS Entry", 0, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
 
             if (RecordCount = 0) then begin
                 if not (POSEntry.SetCurrentKey(POSEntry."Fiscal No.")) then;
-                POSEntry.Reset;
+                POSEntry.Reset();
                 POSEntry.SetFilter("Fiscal No.", DocNoFilter);
                 POSEntry.SetFilter("Posting Date", PostingDateFilter);
                 RecordCount := InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR POS Entry", 1, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
@@ -1282,7 +1272,7 @@ codeunit 6150614 "NPR POS Create Entry"
             if (RecordCount = 0) then begin
                 POSPeriodRegister.SetFilter("Document No.", DocNoFilter);
                 if (POSPeriodRegister.FindFirst()) then begin
-                    POSEntry.Reset;
+                    POSEntry.Reset();
                     POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegister."No.");
                     POSEntry.SetFilter("System Entry", '=%1', false);
                     RecordCount := InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR POS Entry", 2, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
@@ -1336,14 +1326,14 @@ codeunit 6150614 "NPR POS Create Entry"
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);
 
-        DocumentEntry.Init;
+        DocumentEntry.Init();
         DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
         DocumentEntry."Table ID" := DocTableID;
         DocumentEntry."Document Type" := DocType;
         DocumentEntry."Document No." := DocNoFilter;
         DocumentEntry."Table Name" := CopyStr(DocTableName, 1, MaxStrLen(DocumentEntry."Table Name"));
         DocumentEntry."No. of Records" := DocNoOfRecords;
-        DocumentEntry.Insert;
+        DocumentEntry.Insert();
 
         exit(DocNoOfRecords);
 

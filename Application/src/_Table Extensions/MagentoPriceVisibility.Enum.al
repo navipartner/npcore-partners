@@ -1,7 +1,7 @@
 enum 6014461 "NPR Magento Price Visibility"
 {
     Extensible = true;
-    
+
     value(0; VISIBLE)
     {
         Caption = 'Visible';
@@ -10,5 +10,5 @@ enum 6014461 "NPR Magento Price Visibility"
     {
         Caption = 'Hidden';
     }
-    
+
 }

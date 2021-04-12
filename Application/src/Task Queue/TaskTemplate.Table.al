@@ -60,16 +60,16 @@ table 6059900 "NPR Task Template"
                         begin
                             "Page ID" := PAGE::"NPR Task Journal";
                             "Mail Program" := "Mail Program"::JMail;
-                            case NASGroup.Count of
+                            case NASGroup.Count() of
                                 0:
                                     begin
                                         NASGroup.InsertDefault;
-                                        NASGroup.FindFirst;
+                                        NASGroup.FindFirst();
                                         "Task Worker Group" := NASGroup.Code;
                                     end;
                                 1:
                                     begin
-                                        NASGroup.FindFirst;
+                                        NASGroup.FindFirst();
                                         "Task Worker Group" := NASGroup.Code;
                                     end;
                             end;
@@ -78,16 +78,16 @@ table 6059900 "NPR Task Template"
                         begin
                             //"Page ID" :=  PAGE::Page6059910;
                             "Mail Program" := "Mail Program"::JMail;
-                            case NASGroup.Count of
+                            case NASGroup.Count() of
                                 0:
                                     begin
                                         NASGroup.InsertDefault;
-                                        NASGroup.FindFirst;
+                                        NASGroup.FindFirst();
                                         "Task Worker Group" := NASGroup.Code;
                                     end;
                                 1:
                                     begin
-                                        NASGroup.FindFirst;
+                                        NASGroup.FindFirst();
                                         "Task Worker Group" := NASGroup.Code;
                                     end;
                             end;
@@ -157,7 +157,7 @@ table 6059900 "NPR Task Template"
         TaskLine.SetRange("Journal Template Name", Name);
         TaskLine.DeleteAll(true);
         TaskBatch.SetRange("Journal Template Name", Name);
-        TaskBatch.DeleteAll;
+        TaskBatch.DeleteAll();
     end;
 
     trigger OnInsert()

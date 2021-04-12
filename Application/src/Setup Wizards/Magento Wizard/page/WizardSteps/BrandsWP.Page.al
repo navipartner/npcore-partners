@@ -15,7 +15,7 @@ page 6014552 "NPR Brands WP"
             repeater(Brands)
             {
                 ShowCaption = false;
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
@@ -23,20 +23,20 @@ page 6014552 "NPR Brands WP"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInMagBrand(ExistingMagBrands, Id);
+                        CheckIfNoAvailableInMagBrand(ExistingMagBrands, Rec.Id);
                     end;
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Picture field';
                 }
-                field("Sorting"; Sorting)
+                field("Sorting"; Rec.Sorting)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';

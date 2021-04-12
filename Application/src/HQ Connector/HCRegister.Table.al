@@ -187,7 +187,7 @@ table 6150902 "NPR HC Register"
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR HC Register", "Register No.", FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 }
 

@@ -1,4 +1,4 @@
-codeunit 6151292 "NPR SS Action: NpRv Apply"
+﻿codeunit 6151292 "NPR SS Action: NpRv Apply"
 {
     //this action is a SelfService variant of 'SCAN_VOUCHER' action (codeunit 6151014 "NPR NpRv Scan POSAction Mgt.")
     local procedure ActionCode(): Text
@@ -42,7 +42,6 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
         ApplyVoucherCaptionTxt: Label 'Apply Retail Voucher';
         EnterRefNoCaptionTxt: Label 'Enter Vourcher Reference No.';
         CaptionsDictionary: Dictionary of [Text, Text];
-        ActionCaption: Text;
     begin
         CaptionsDictionary.Add('ApplyVoucherCaption', ApplyVoucherCaptionTxt);
         CaptionsDictionary.Add('EnterRefNoCaption', EnterRefNoCaptionTxt);
@@ -93,7 +92,7 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         if not NpRvVoucherType.Get(POSParameterValue.Value) then begin
             NpRvVoucherType.SetFilter(Code, '%1*', POSParameterValue.Value);
-            if NpRvVoucherType.FindFirst then
+            if NpRvVoucherType.FindFirst() then
                 POSParameterValue.Value := NpRvVoucherType.Code;
         end;
 
@@ -105,7 +104,7 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
     var
         CaptionVoucherTypeCode: Label 'Voucher Type';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -119,7 +118,7 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
     var
         DescVoucherTypeCode: Label 'Defines retail voucher type';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -131,7 +130,7 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -153,7 +152,6 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
         POSSale: Codeunit "NPR POS Sale";
         ReferenceNo: Text;
         VoucherTypeCode: Text;
-        Handled: Boolean;
     begin
         Context.SetScopeParameters(ObjectIdentifier());
         VoucherTypeCode := UpperCase(Context.GetStringOrFail('VoucherTypeCode', ObjectIdentifier()));
@@ -167,7 +165,7 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
             Clear(VoucherType);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        NpRvVoucherBuffer.Init;
+        NpRvVoucherBuffer.Init();
         NpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
         NpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
         NpRvVoucherBuffer."Reference No." := ReferenceNo;
@@ -191,8 +189,8 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
         POSPaymentLine.InsertPaymentLine(SaleLinePOS, 0);
         POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
 
-        NpRvSalesLine.Init;
-        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
         NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
         NpRvSalesLine."Register No." := SalePOS."Register No.";

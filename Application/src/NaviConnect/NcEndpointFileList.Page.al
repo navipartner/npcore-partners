@@ -20,32 +20,32 @@ page 6151526 "NPR Nc Endpoint File List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field(Path; Path)
+                field(Path; Rec.Path)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Path field';
                 }
-                field("Client Path"; "Client Path")
+                field("Client Path"; Rec."Client Path")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Path field';
                 }
-                field(Filename; Filename)
+                field(Filename; Rec.Filename)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filename field';
@@ -67,7 +67,7 @@ page 6151526 "NPR Nc Endpoint File List"
 
                 trigger OnAction()
                 begin
-                    ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks;
                 end;
             }
         }

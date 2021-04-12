@@ -1,8 +1,8 @@
 report 6060150 "NPR Event Customer Template"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Event Customer Template.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Event Customer Template.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Event Customer Template';
     dataset
@@ -446,9 +446,9 @@ report 6060150 "NPR Event Customer Template"
                     Clear(Resource);
                 EventAttribute.SetRange("Job No.", "No.");
                 EventAttribute.SetRange(Promote, true);
-                if EventAttribute.FindSet then
+                if EventAttribute.FindSet() then
                     EventAttributeTempName1 := EventAttribute."Template Name";
-                if EventAttribute.Next <> 0 then
+                if EventAttribute.Next() <> 0 then
                     EventAttributeTempName2 := EventAttribute."Template Name";
                 CommentsForCustomer := '';
                 CommentLine.SetRange("Table Name", CommentLine."Table Name"::Job);
@@ -473,7 +473,6 @@ report 6060150 "NPR Event Customer Template"
         EventAttributeTempName2: Code[20];
         EstTotalAmtInclVAT: Decimal;
         TotalAmount: Decimal;
-        FromToText: Label 'From %1 to %2: ';
         AttributeValue: array[5] of Text;
         ColumnCaption: array[5] of Text;
         CommentsForCustomer: Text;

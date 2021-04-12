@@ -23,37 +23,36 @@ codeunit 6150786 "NPR POS Action - Play Sound"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-                ActionCode(),
-                ActionDescription,
-                ActionVersion,
-                Type::Generic,
-                "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('PlaySoundAndDisplayMessage',
-                  'if (param.AudioFileUrl) {' +
-                  '  var audio = new Audio(param.AudioFileUrl);' +
-                  '  audio.play();' +
-                  '}' +
-                  'if (param.ShowMessage) {' +
-                  '  if (param.MessageText.length > 0) {' +
-                  '    message(param.MessageHeader,param.MessageText);' +
-                  '  };' +
-                  '}');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+    ActionCode(),
+    ActionDescription,
+    ActionVersion(),
+    Sender.Type::Generic,
+    Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('PlaySoundAndDisplayMessage',
+              'if (param.AudioFileUrl) {' +
+              '  var audio = new Audio(param.AudioFileUrl);' +
+              '  audio.play();' +
+              '}' +
+              'if (param.ShowMessage) {' +
+              '  if (param.MessageText.length > 0) {' +
+              '    message(param.MessageHeader,param.MessageText);' +
+              '  };' +
+              '}');
+            Sender.RegisterWorkflow(false);
 
-                RegisterTextParameter('AudioFileUrl', '');
-                RegisterBooleanParameter('ShowMessage', false);
-                RegisterTextParameter('MessageText', '');
-                RegisterTextParameter('MessageHeader', 'You might want to know...');
-            end;
+            Sender.RegisterTextParameter('AudioFileUrl', '');
+            Sender.RegisterBooleanParameter('ShowMessage', false);
+            Sender.RegisterTextParameter('MessageText', '');
+            Sender.RegisterTextParameter('MessageHeader', 'You might want to know...');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
     end;
@@ -66,7 +65,7 @@ codeunit 6150786 "NPR POS Action - Play Sound"
         CaptionMessageText: Label 'Message Text';
         CaptionShowMessage: Label 'Show Message';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -89,7 +88,7 @@ codeunit 6150786 "NPR POS Action - Play Sound"
         DescMessageText: Label 'Define message detailed text';
         DescShowMessage: Label 'Set if you want to show a message to user';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -115,7 +114,7 @@ codeunit 6150786 "NPR POS Action - Play Sound"
         EanBoxEventModuleName: Label 'Global';
     begin
         if not EanBoxEvent.Get(ActionCode()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := ActionCode();
             EanBoxEvent."Module Name" := EanBoxEventModuleName;
             EanBoxEvent.Description := CopyStr(EanBoxEventDesc, 1, MaxStrLen(EanBoxEvent.Description));

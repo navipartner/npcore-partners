@@ -20,9 +20,9 @@ codeunit 6151093 "NPR Nc RapidConnect Imp. Look."
         if not FindConfPackages(NcImportEntry, TempConfigPackage) then
             exit;
 
-        TempConfigPackage.FindFirst;
+        TempConfigPackage.FindFirst();
         FirstPackageCode := TempConfigPackage.Code;
-        TempConfigPackage.FindLast;
+        TempConfigPackage.FindLast();
 
         if FirstPackageCode = TempConfigPackage.Code then begin
             PageId := PageMgt.GetDefaultCardPageID(DATABASE::"Config. Package");
@@ -41,17 +41,17 @@ codeunit 6151093 "NPR Nc RapidConnect Imp. Look."
     begin
         NcRapidConnectSetup.SetFilter("Package Code", '<>%1', '');
         NcRapidConnectSetup.SetRange("Import Type", NcImportEntry."Import Type");
-        if not NcRapidConnectSetup.FindSet then
+        if not NcRapidConnectSetup.FindSet() then
             exit;
 
         repeat
             if (not TempConfigPackage.Get(NcRapidConnectSetup."Package Code")) and ConfigPackage.Get(NcRapidConnectSetup."Package Code") then begin
-                TempConfigPackage.Init;
+                TempConfigPackage.Init();
                 TempConfigPackage := ConfigPackage;
-                TempConfigPackage.Insert;
+                TempConfigPackage.Insert();
             end;
-        until NcRapidConnectSetup.Next = 0;
-        exit(TempConfigPackage.FindFirst);
+        until NcRapidConnectSetup.Next() = 0;
+        exit(TempConfigPackage.FindFirst());
     end;
 }
 

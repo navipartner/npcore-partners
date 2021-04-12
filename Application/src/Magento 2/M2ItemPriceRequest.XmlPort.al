@@ -53,7 +53,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
 
                 trigger OnAfterInitRecord()
                 begin
-                    SalesPriceRequest.Init;
+                    SalesPriceRequest.Init();
                 end;
 
                 trigger OnBeforeInsertRecord()
@@ -68,7 +68,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
                         SalesPriceRequest.SetFilter("Request ID", '=%1', SalesPriceRequest."Request ID");
                         if (not SalesPriceRequest.IsEmpty()) then begin
                             ImportMessage += StrSubstNo('Skipping duplicate Request Id %1;', SalesPriceRequest."Request ID");
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                         end;
                     end;
 
@@ -83,7 +83,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
 
                     if (not SalesPriceRequest.IsEmpty()) then begin
                         ImportMessage += StrSubstNo('Skipping duplicate request %1;', SalesPriceRequest.RecordId);
-                        currXMLport.Skip;
+                        currXMLport.Skip();
                     end;
                 end;
             }

@@ -1,10 +1,8 @@
-codeunit 6151407 "NPR Magento Item Mgt."
+﻿codeunit 6151407 "NPR Magento Item Mgt."
 {
     var
         MagentoSetup: Record "NPR Magento Setup";
-        MagentoAttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
         MagentoFunctions: Codeunit "NPR Magento Functions";
-        Error001: Label '%1 should be less than or equal to %2';
         Text000: Label 'Replicating Special Prices to Sales Prices:';
 
     procedure DeleteMagentoData(var Item: Record Item)
@@ -17,26 +15,26 @@ codeunit 6151407 "NPR Magento Item Mgt."
         MagentoWebsiteLink: Record "NPR Magento Website Link";
     begin
         MagentoWebsiteLink.SetRange("Item No.", Item."No.");
-        MagentoWebsiteLink.DeleteAll;
+        MagentoWebsiteLink.DeleteAll();
 
         MagentoItemGroupLink.SetRange("Item No.", Item."No.");
-        MagentoItemGroupLink.DeleteAll;
+        MagentoItemGroupLink.DeleteAll();
 
         MagentoPictureLink.SetRange("Item No.", Item."No.");
-        MagentoPictureLink.DeleteAll;
+        MagentoPictureLink.DeleteAll();
 
         MagentoItemAttribute.SetRange("Item No.", Item."No.");
-        MagentoItemAttribute.DeleteAll;
+        MagentoItemAttribute.DeleteAll();
 
         MagentoItemAttributeValue.SetRange("Item No.", Item."No.");
-        MagentoItemAttributeValue.DeleteAll;
+        MagentoItemAttributeValue.DeleteAll();
 
-        MagentoProductRelation.Reset;
+        MagentoProductRelation.Reset();
         MagentoProductRelation.SetRange("From Item No.", Item."No.");
-        MagentoProductRelation.DeleteAll;
-        MagentoProductRelation.Reset;
+        MagentoProductRelation.DeleteAll();
+        MagentoProductRelation.Reset();
         MagentoProductRelation.SetRange("To Item No.", Item."No.");
-        MagentoProductRelation.DeleteAll;
+        MagentoProductRelation.DeleteAll();
     end;
 
     procedure SetupMagentoData(var Item: Record Item)
@@ -52,17 +50,17 @@ codeunit 6151407 "NPR Magento Item Mgt."
         if not Item."NPR Magento Item" then
             exit;
 
-        if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
 
         MagentoWebsite.SetRange("Default Website", true);
-        if not MagentoWebsite.FindFirst then
+        if not MagentoWebsite.FindFirst() then
             exit;
 
         MagentoWebsiteLink.SetRange("Item No.", Item."No.");
         MagentoWebsiteLink.SetRange("Variant Code", '');
-        if not MagentoWebsiteLink.FindFirst then begin
-            MagentoWebsiteLink.Init;
+        if not MagentoWebsiteLink.FindFirst() then begin
+            MagentoWebsiteLink.Init();
             MagentoWebsiteLink."Website Code" := MagentoWebsite.Code;
             MagentoWebsiteLink."Item No." := Item."No.";
             MagentoWebsiteLink.Insert(true);
@@ -73,7 +71,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
     begin
         if Item."NPR Seo Link" <> '' then
             exit(false);
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit(false);
 
         exit(not MagentoSetup."Auto Seo Link Disabled");
@@ -87,16 +85,16 @@ codeunit 6151407 "NPR Magento Item Mgt."
     begin
         if not Item."NPR Magento Item" then
             exit;
-        if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
         if not MagentoSetup."Multistore Enabled" then
             exit;
 
-        if MagentoStore.FindSet then
+        if MagentoStore.FindSet() then
             repeat
                 MagentoWebsite.Get(MagentoStore."Website Code");
                 if not MagentoStoreItem.Get(Item."No.", MagentoStore.Code) then begin
-                    MagentoStoreItem.Init;
+                    MagentoStoreItem.Init();
                     MagentoStoreItem."Item No." := Item."No.";
                     MagentoStoreItem."Store Code" := MagentoStore.Code;
                     MagentoStoreItem."Website Code" := MagentoStore."Website Code";
@@ -104,7 +102,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
                     MagentoStoreItem."Root Item Group No." := MagentoStore."Root Item Group No.";
                     MagentoStoreItem.Insert(true);
                 end;
-            until MagentoStore.Next = 0;
+            until MagentoStore.Next() = 0;
     end;
 
     procedure InitReplicateSpecialPrice2SalesPrices()
@@ -115,7 +113,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
         Counter: Integer;
         Total: Integer;
     begin
-        if not (MagentoSetup.Get and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
+        if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
             exit;
 
         Item.SetFilter("NPR Special Price", '>%1', 0);
@@ -124,26 +122,26 @@ codeunit 6151407 "NPR Magento Item Mgt."
 
         UseDialog := GuiAllowed;
         if UseDialog then begin
-            Total := Item.Count;
+            Total := Item.Count();
             Window.Open(Text000 + ' @1@@@@@@@@@@@@@@');
         end;
-        Item.FindSet;
+        Item.FindSet();
         repeat
             if UseDialog then begin
                 Counter += 1;
                 Window.Update(1, Round((Counter / Total) * 10000, 1));
             end;
             ReplicateSpecialPrice2SalesPrice(Item, false);
-        until Item.Next = 0;
+        until Item.Next() = 0;
         if UseDialog then
-            Window.Close;
+            Window.Close();
     end;
 
     local procedure ReplicateSpecialPrice2SalesPrice(Item: Record Item; DeleteTrigger: Boolean)
     var
         SalesPrice: Record "Sales Price";
     begin
-        if not (MagentoSetup.Get and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
+        if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
             exit;
 
         if Item."NPR Special Price" <= 0 then
@@ -160,13 +158,13 @@ codeunit 6151407 "NPR Magento Item Mgt."
                 SalesPrice.SetRange("Ending Date");
             end;
 
-            SalesPrice.DeleteAll;
+            SalesPrice.DeleteAll();
         end;
 
         if DeleteTrigger then
             exit;
         if (MagentoSetup."Replicate to Sales Type" <> MagentoSetup."Replicate to Sales Type"::"All Customers") and (MagentoSetup."Replicate to Sales Code" = '') then
-            SalesPrice.Init;
+            SalesPrice.Init();
         SalesPrice.Validate("Item No.", Item."No.");
         SalesPrice."Sales Type" := MagentoSetup."Replicate to Sales Type";
         if MagentoSetup."Replicate to Sales Type" <> MagentoSetup."Replicate to Sales Type"::"All Customers" then
@@ -182,7 +180,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
 
     local procedure FindSalesPrices(Item: Record Item; var SalesPrice: Record "Sales Price"): Boolean
     begin
-        if not (MagentoSetup.Get and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
+        if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
             exit(false);
 
         Clear(SalesPrice);
@@ -191,7 +189,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
         if MagentoSetup."Replicate to Sales Type" <> MagentoSetup."Replicate to Sales Type"::"All Customers" then
             SalesPrice.SetRange("Sales Code", MagentoSetup."Replicate to Sales Code");
         SalesPrice.SetRange("Variant Code", '');
-        exit(not SalesPrice.IsEmpty);
+        exit(not SalesPrice.IsEmpty());
     end;
 
     local procedure "--- Subscribers"()
@@ -248,7 +246,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        if MagentoSetup.Get then;
+        if MagentoSetup.Get() then;
         StockQty := CalcStockQty(ItemNo, VariantFilter, MagentoSetup."Inventory Location Filter");
         exit(StockQty);
     end;
@@ -293,7 +291,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
         VariantFilter := UpperCase(VariantFilter);
         LocationFilter := UpperCase(LocationFilter);
 
-        if MagentoSetup.Get then;
+        if MagentoSetup.Get() then;
         case MagentoSetup."Stock Calculation Method" of
             MagentoSetup."Stock Calculation Method"::"Function":
                 begin
@@ -320,7 +318,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
         end;
 
         ItemVariant.SetRange("Item No.", Item."No.");
-        if ItemVariant.FindSet then begin
+        if ItemVariant.FindSet() then begin
             StockQty := 0;
             VariantStockQty := 0;
             repeat
@@ -332,7 +330,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
                     VariantStockQty := 0;
 
                 StockQty += VariantStockQty;
-            until ItemVariant.Next = 0;
+            until ItemVariant.Next() = 0;
 
             exit(StockQty);
         end;
@@ -370,7 +368,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         Handled: Boolean;
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit;
 
         if MagentoSetup."Stock NpXml Template" = '' then
@@ -381,7 +379,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
             exit;
 
         NpXmlTemplateTrigger.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlTemplateTrigger.FindFirst then
+        if NpXmlTemplateTrigger.FindFirst() then
             NpXmlTemplateTrigger.DeleteAll(true);
 
         case MagentoSetup."Stock Calculation Method" of
@@ -402,18 +400,17 @@ codeunit 6151407 "NPR Magento Item Mgt."
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
-        "Field": Record "Field";
         LineNo: Integer;
     begin
         NpXmlTemplateTrigger.SetRange("Xml Template Code", NpXmlTemplate.Code);
         NpXmlTemplateTrigger.SetRange("Table No.", TableNo);
-        if not NpXmlTemplateTrigger.FindFirst then begin
+        if not NpXmlTemplateTrigger.FindFirst() then begin
             Clear(NpXmlTemplateTrigger);
             NpXmlTemplateTrigger.SetRange("Xml Template Code", NpXmlTemplate.Code);
-            if NpXmlTemplateTrigger.FindLast then;
+            if NpXmlTemplateTrigger.FindLast() then;
             LineNo := NpXmlTemplateTrigger."Line No." + 10000;
 
-            NpXmlTemplateTrigger.Init;
+            NpXmlTemplateTrigger.Init();
             NpXmlTemplateTrigger."Xml Template Code" := NpXmlTemplate.Code;
             NpXmlTemplateTrigger."Line No." := LineNo;
             NpXmlTemplateTrigger."Table No." := TableNo;
@@ -424,7 +421,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
             NpXmlTemplateTrigger."Delete Trigger" := TriggerOnDelete;
             NpXmlTemplateTrigger."Generic Parent Codeunit ID" := CurrCodeunitId();
             NpXmlTemplateTrigger."Generic Parent Function" := GetTriggerStockFunctionName();
-            NpXmlTemplateTrigger.Insert;
+            NpXmlTemplateTrigger.Insert();
         end else begin
             NpXmlTemplateTrigger."Parent Table No." := NpXmlTemplate."Table No.";
             NpXmlTemplateTrigger."Parent Line No." := 0;
@@ -433,7 +430,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
             NpXmlTemplateTrigger."Delete Trigger" := TriggerOnDelete;
             NpXmlTemplateTrigger."Generic Parent Codeunit ID" := CurrCodeunitId();
             NpXmlTemplateTrigger."Generic Parent Function" := GetTriggerStockFunctionName();
-            NpXmlTemplateTrigger.Modify;
+            NpXmlTemplateTrigger.Modify();
         end;
 
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
@@ -443,14 +440,14 @@ codeunit 6151407 "NPR Magento Item Mgt."
         NpXmlTemplateTriggerLink.SetRange("Link Type", NpXmlTemplateTriggerLink."Link Type"::TableLink);
         NpXmlTemplateTriggerLink.SetRange("Table No.", NpXmlTemplateTrigger."Table No.");
         NpXmlTemplateTriggerLink.SetRange("Field No.", LinkFieldNoChild);
-        if not NpXmlTemplateTriggerLink.FindFirst then begin
+        if not NpXmlTemplateTriggerLink.FindFirst() then begin
             Clear(NpXmlTemplateTriggerLink);
             NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
             NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
-            if NpXmlTemplateTriggerLink.FindLast then;
+            if NpXmlTemplateTriggerLink.FindLast() then;
             LineNo := NpXmlTemplateTriggerLink."Line No." + 10000;
 
-            NpXmlTemplateTriggerLink.Init;
+            NpXmlTemplateTriggerLink.Init();
             NpXmlTemplateTriggerLink."Xml Template Code" := NpXmlTemplateTrigger."Xml Template Code";
             NpXmlTemplateTriggerLink."Xml Template Trigger Line No." := NpXmlTemplateTrigger."Line No.";
             NpXmlTemplateTriggerLink."Line No." := LineNo;
@@ -482,7 +479,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
 
         Handled := true;
 
-        if MagentoSetup.Get then;
+        if MagentoSetup.Get() then;
         Trigger2Item(MagentoSetup, ChildLinkRecRef, TempItem);
 
         ParentRecRef.GetTable(TempItem);
@@ -500,7 +497,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
             exit;
 
         Clear(TempItem);
-        TempItem.DeleteAll;
+        TempItem.DeleteAll();
 
         case MagentoSetup."Stock Calculation Method" of
             MagentoSetup."Stock Calculation Method"::"Function":
@@ -517,7 +514,7 @@ codeunit 6151407 "NPR Magento Item Mgt."
                 begin
                     RecRef.SetTable(ItemLedgerEntry);
                     ItemLedgerEntry.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
-                    if not ItemLedgerEntry.Find then
+                    if not ItemLedgerEntry.Find() then
                         exit;
 
                     ItemNo := ItemLedgerEntry."Item No.";
@@ -527,14 +524,14 @@ codeunit 6151407 "NPR Magento Item Mgt."
                     if not RecRef2TempSalesLine(RecRef, TempSalesLine) then
                         exit;
 
-                    TempSalesLine.SetRecFilter;
+                    TempSalesLine.SetRecFilter();
                     TempSalesLine.FilterGroup(40);
                     TempSalesLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempSalesLine.SetRange("Document Type", TempSalesLine."Document Type"::Order);
                     TempSalesLine.SetFilter("Location Code", MagentoSetup."Inventory Location Filter");
                     TempSalesLine.SetRange(Type, TempSalesLine.Type::Item);
                     TempSalesLine.SetFilter("No.", '<>%1', '');
-                    if not TempSalesLine.FindFirst then
+                    if not TempSalesLine.FindFirst() then
                         exit;
 
                     ItemNo := TempSalesLine."No.";
@@ -549,9 +546,9 @@ codeunit 6151407 "NPR Magento Item Mgt."
         if not Item."NPR Magento Item" then
             exit;
 
-        TempItem.Init;
+        TempItem.Init();
         TempItem := Item;
-        TempItem.Insert;
+        TempItem.Insert();
     end;
 
     local procedure RecRef2TempSalesLine(RecRef: RecordRef; var TempSalesLine: Record "Sales Line" temporary): Boolean
@@ -560,17 +557,17 @@ codeunit 6151407 "NPR Magento Item Mgt."
     begin
         if RecRef.IsTemporary then begin
             RecRef.SetTable(TempSalesLine);
-            TempSalesLine.Insert;
+            TempSalesLine.Insert();
             exit(true);
         end;
 
         RecRef.SetTable(SalesLine);
-        if not SalesLine.Find then
+        if not SalesLine.Find() then
             exit(false);
 
-        TempSalesLine.Init;
+        TempSalesLine.Init();
         TempSalesLine := SalesLine;
-        TempSalesLine.Insert;
+        TempSalesLine.Insert();
         exit(true)
     end;
 

@@ -53,7 +53,7 @@ page 6060068 "NPR TM Ticket Rapid Packages"
                     PackageNamesFromFileNames := '';
                     RetailListPage.GetSelectionFilter(tmpRetailList);
                     tmpRetailList.MarkedOnly(true);
-                    if tmpRetailList.FindSet then
+                    if tmpRetailList.FindSet() then
                         repeat
                             PackageNameFromFileName := tmpRetailList.Value.Replace('.rapidstart', '');
                             if PackageNameFromFileName.Contains('_ver') then
@@ -66,7 +66,7 @@ page 6060068 "NPR TM Ticket Rapid Packages"
                             if StrLen(SelectedValues) > 0 then
                                 SelectedValues += ',';
                             SelectedValues += tmpRetailList.Value;
-                        until tmpRetailList.Next = 0;
+                        until tmpRetailList.Next() = 0;
 
                     CurrPage.Update(false);
                     exit(true);

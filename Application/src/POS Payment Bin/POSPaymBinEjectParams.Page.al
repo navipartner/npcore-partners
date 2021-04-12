@@ -31,7 +31,7 @@ page 6150622 "NPR POS Paym. Bin Eject Params"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -45,15 +45,15 @@ page 6150622 "NPR POS Paym. Bin Eject Params"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupValue();
-                        Modify;
+                        Rec.LookupValue();
+                        Rec.Modify();
                         SetParameterValue();
                     end;
 
                     trigger OnValidate()
                     begin
-                        Validate(Value, ParameterValue);
-                        Modify;
+                        Rec.Validate(Value, ParameterValue);
+                        Rec.Modify();
                         SetParameterValue();
                     end;
                 }
@@ -80,15 +80,15 @@ page 6150622 "NPR POS Paym. Bin Eject Params"
     local procedure SetParameterName()
     begin
         Clear(ParameterName);
-        OnGetParameterNameCaption(Rec, ParameterName);
+        Rec.OnGetParameterNameCaption(Rec, ParameterName);
         if ParameterName = '' then
-            ParameterName := Name;
+            ParameterName := Rec.Name;
     end;
 
     local procedure SetParameterDescription()
     begin
         Clear(ParameterDescription);
-        OnGetParameterDescriptionCaption(Rec, ParameterDescription);
+        Rec.OnGetParameterDescriptionCaption(Rec, ParameterDescription);
     end;
 
     local procedure SetParameterValue()
@@ -98,18 +98,18 @@ page 6150622 "NPR POS Paym. Bin Eject Params"
         Ordinal: Integer;
     begin
         Clear(ParameterValue);
-        if "Data Type" <> "Data Type"::Option then begin
-            ParameterValue := Value;
+        if Rec."Data Type" <> Rec."Data Type"::Option then begin
+            ParameterValue := Rec.Value;
             exit;
         end;
 
-        Evaluate(Ordinal, Value);
+        Evaluate(Ordinal, Rec.Value);
 
-        OnGetParameterOptionStringCaption(Rec, OptionStringCaption);
+        Rec.OnGetParameterOptionStringCaption(Rec, OptionStringCaption);
         if (OptionStringCaption <> '') then
-            TrySelectStr(Ordinal, OptionStringCaption, OptionCaption)
+            Rec.TrySelectStr(Ordinal, OptionStringCaption, OptionCaption)
         else
-            TrySelectStr(Ordinal, OptionString, OptionCaption);
+            Rec.TrySelectStr(Ordinal, Rec.OptionString, OptionCaption);
 
         ParameterValue := OptionCaption;
     end;

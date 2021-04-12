@@ -38,12 +38,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     Caption = 'All Orders';
                     Enabled = AllOrdersEnabled;
                     ToolTip = 'View all not fully posted sales orders, including sales orders with document dates in the future because of long delivery times, delays, or other reasons.';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetShowOrders(TrailingSalesOrdersSetup."Show Orders"::"All Orders");
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(OrdersUntilToday)
@@ -52,12 +52,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     Caption = 'Orders Until Today';
                     Enabled = OrdersUntilTodayEnabled;
                     ToolTip = 'View not fully posted sales orders with document dates up until today''s date.';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetShowOrders(TrailingSalesOrdersSetup."Show Orders"::"Orders Until Today");
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(DelayedOrders)
@@ -66,12 +66,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     Caption = 'Delayed Orders';
                     Enabled = DelayedOrdersEnabled;
                     ToolTip = 'View not fully posted sales orders with shipment dates that are before today''s date.';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetShowOrders(TrailingSalesOrdersSetup."Show Orders"::"Delayed Orders");
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
             }
@@ -90,7 +90,7 @@ page 6151261 "NPR Purchase Ord Chart"
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetPeriodLength(TrailingSalesOrdersSetup."Period Length"::Day);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(Week)
@@ -104,7 +104,7 @@ page 6151261 "NPR Purchase Ord Chart"
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetPeriodLength(TrailingSalesOrdersSetup."Period Length"::Week);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(Month)
@@ -118,7 +118,7 @@ page 6151261 "NPR Purchase Ord Chart"
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetPeriodLength(TrailingSalesOrdersSetup."Period Length"::Month);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(Quarter)
@@ -132,7 +132,7 @@ page 6151261 "NPR Purchase Ord Chart"
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetPeriodLength(TrailingSalesOrdersSetup."Period Length"::Quarter);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
                 action(Year)
@@ -146,7 +146,7 @@ page 6151261 "NPR Purchase Ord Chart"
                     trigger OnAction()
                     begin
                         TrailingSalesOrdersSetup.SetPeriodLength(TrailingSalesOrdersSetup."Period Length"::Year);
-                        UpdateStatus;
+                        UpdateStatus();
                     end;
                 }
             }
@@ -169,7 +169,7 @@ page 6151261 "NPR Purchase Ord Chart"
                         trigger OnAction()
                         begin
                             TrailingSalesOrdersSetup.SetValueToCalcuate(TrailingSalesOrdersSetup."Value to Calculate"::"Amount Excl. VAT");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(NoofOrders)
@@ -183,7 +183,7 @@ page 6151261 "NPR Purchase Ord Chart"
                         trigger OnAction()
                         begin
                             TrailingSalesOrdersSetup.SetValueToCalcuate(TrailingSalesOrdersSetup."Value to Calculate"::"No. of Orders");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                 }
@@ -202,7 +202,7 @@ page 6151261 "NPR Purchase Ord Chart"
                         trigger OnAction()
                         begin
                             TrailingSalesOrdersSetup.SetChartType(TrailingSalesOrdersSetup."Chart Type"::"Stacked Area");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(StackedAreaPct)
@@ -216,7 +216,7 @@ page 6151261 "NPR Purchase Ord Chart"
                         trigger OnAction()
                         begin
                             TrailingSalesOrdersSetup.SetChartType(TrailingSalesOrdersSetup."Chart Type"::"Stacked Area (%)");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(StackedColumn)
@@ -230,7 +230,7 @@ page 6151261 "NPR Purchase Ord Chart"
                         trigger OnAction()
                         begin
                             TrailingSalesOrdersSetup.SetChartType(TrailingSalesOrdersSetup."Chart Type"::"Stacked Column");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                     action(StackedColumnPct)
@@ -244,7 +244,7 @@ page 6151261 "NPR Purchase Ord Chart"
                         trigger OnAction()
                         begin
                             TrailingSalesOrdersSetup.SetChartType(TrailingSalesOrdersSetup."Chart Type"::"Stacked Column (%)");
-                            UpdateStatus;
+                            UpdateStatus();
                         end;
                     }
                 }
@@ -270,7 +270,6 @@ page 6151261 "NPR Purchase Ord Chart"
     trigger OnFindRecord(Which: Text): Boolean
     begin
         UpdateChart;
-        IsChartDataReady := true;
 
         if not IsChartAddInReady then
             SetActionsEnabled;
@@ -316,7 +315,6 @@ page 6151261 "NPR Purchase Ord Chart"
         [InDataSet]
         StackedColumnPctEnabled: Boolean;
         IsChartAddInReady: Boolean;
-        IsChartDataReady: Boolean;
 
     local procedure UpdateChart()
     begin
@@ -325,7 +323,7 @@ page 6151261 "NPR Purchase Ord Chart"
         if not IsChartAddInReady then
             exit;
         TrailingSalesOrdersMgt.UpdateData(Rec);
-        UpdateStatus;
+        UpdateStatus();
         NeedsUpdate := false;
     end;
 
@@ -351,7 +349,7 @@ page 6151261 "NPR Purchase Ord Chart"
     begin
         PAGE.RunModal(PAGE::"Trailing Sales Orders Setup", TrailingSalesOrdersSetup);
         TrailingSalesOrdersSetup.Get(UserId);
-        UpdateStatus;
+        UpdateStatus();
     end;
 
     procedure SetActionsEnabled()

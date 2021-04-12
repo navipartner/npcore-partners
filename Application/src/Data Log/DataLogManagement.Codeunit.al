@@ -1,4 +1,4 @@
-codeunit 6059899 "NPR Data Log Management"
+﻿codeunit 6059899 "NPR Data Log Management"
 {
     Permissions = TableData "NPR Data Log Setup (Table)" = rimd,
                   TableData "NPR Data Log Record" = rimd;
@@ -12,15 +12,12 @@ codeunit 6059899 "NPR Data Log Management"
         TempDataLogSetup: Record "NPR Data Log Setup (Table)" temporary;
         TempDataLogSetupField: Record "NPR Data Log Setup (Field)" temporary;
         TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
-        DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         DataLogChecked: Boolean;
         DataLogActivated: Boolean;
         MonitoredTablesLoaded: Boolean;
         DataLogDisabled: Boolean;
-        Text001: Label 'Error creating %1 - %2. It already exists.';
 
-        //--- Debug ---
-        StartTime: Time;
+    //--- Debug ---
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterGetDatabaseTableTriggerSetup', '', true, false)]
     procedure GetDatabaseTableTriggerSetup(TableId: Integer; var OnDatabaseInsert: Boolean; var OnDatabaseModify: Boolean; var OnDatabaseDelete: Boolean; var OnDatabaseRename: Boolean)
@@ -32,7 +29,7 @@ codeunit 6059899 "NPR Data Log Management"
 
         if not DataLogChecked then begin
             DataLogChecked := true;
-            DataLogActivated := not DataLogSetupTable.IsEmpty;
+            DataLogActivated := not DataLogSetupTable.IsEmpty();
         end;
 
         if not DataLogActivated then
@@ -119,8 +116,6 @@ codeunit 6059899 "NPR Data Log Management"
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseDelete', '', true, false)]
     procedure OnDatabaseDelete(RecRef: RecordRef)
     var
-        FieldRef1: FieldRef;
-        SkipDeletion: Boolean;
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
         Handled: Boolean;
@@ -214,14 +209,12 @@ codeunit 6059899 "NPR Data Log Management"
         RecRef: RecordRef;
     begin
         LoadMonTables;
-        with RecRef do begin
-            Open(TableID, false);
-            if FindSet(false) then
-                repeat
-                    OnDatabaseInsert(RecRef);
-                until Next = 0;
-            Close;
-        end;
+        RecRef.Open(TableID, false);
+        if RecRef.FindSet(false) then
+            repeat
+                OnDatabaseInsert(RecRef);
+            until RecRef.Next() = 0;
+        RecRef.Close();
     end;
 
     local procedure IsIntegrationRecord(TableID: Integer): Boolean
@@ -239,13 +232,13 @@ codeunit 6059899 "NPR Data Log Management"
         If Handled then
             exit;
 
-        TempDataLogSetup.DeleteAll;
-        if DataLogSetup.FindSet then
+        TempDataLogSetup.DeleteAll();
+        if DataLogSetup.FindSet() then
             repeat
-                TempDataLogSetup.Init;
+                TempDataLogSetup.Init();
                 TempDataLogSetup := DataLogSetup;
-                TempDataLogSetup.Insert;
-            until DataLogSetup.Next = 0;
+                TempDataLogSetup.Insert();
+            until DataLogSetup.Next() = 0;
 
         Clear(TempDataLogSubscriber);
         TempDataLogSubscriber.SetFilter("Company Name", '=%1', '');
@@ -279,15 +272,15 @@ codeunit 6059899 "NPR Data Log Management"
         CheckValueChanged := false;
         FieldValueChanged := false;
         if LogChanges then begin
-            xRecRef := RecRef.Duplicate;
-            CheckValueChanged := xRecRef.Find;
+            xRecRef := RecRef.Duplicate();
+            CheckValueChanged := xRecRef.Find();
         end;
         RecRefInit.Open(RecRef.Number);
 
-        Field.Reset;
+        Field.Reset();
         Field.SetRange(TableNo, RecRef.Number);
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
-        if Field.FindSet then
+        if Field.FindSet() then
             repeat
                 FieldRef := RecRef.Field(Field."No.");
                 if not IsIgnoredField(RecRef.Number, FieldRef.Number) then begin
@@ -299,7 +292,7 @@ codeunit 6059899 "NPR Data Log Management"
                     if (Format(FieldRef.Value, 0, 9) <> Format(FieldRefInit.Value, 0, 9)) or (FieldValueChanged) then begin
                         if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
                             FieldRef.CalcField;
-                        DataLogField.Init;
+                        DataLogField.Init();
                         DataLogField."Entry No." := 0;
                         DataLogField."Table ID" := RecRef.Number;
                         DataLogField."Log Date" := LastModified;
@@ -309,12 +302,12 @@ codeunit 6059899 "NPR Data Log Management"
                         DataLogField."Field Value Changed" := FieldValueChanged;
                         if FieldValueChanged then
                             DataLogField."Previous Field Value" := Format(xFieldRef.Value, 0, 9);
-                        DataLogField.Insert;
+                        DataLogField.Insert();
                     end;
                 end;
-            until Field.Next = 0;
+            until Field.Next() = 0;
 
-        RecRefInit.Close;
+        RecRefInit.Close();
     end;
 
     local procedure InsertPKDataFields(var RecRef: RecordRef; var XRecRef: RecordRef; RecordEntryNo: BigInteger; LastModified: DateTime; LogChanges: Boolean)
@@ -331,7 +324,7 @@ codeunit 6059899 "NPR Data Log Management"
         for i := 1 to KeyRef.FieldCount do begin
             FieldRef := KeyRef.FieldIndex(i);
             XFieldRef := XKeyRef.FieldIndex(i);
-            DataLogField.Init;
+            DataLogField.Init();
             DataLogField."Entry No." := 0;
             DataLogField."Table ID" := RecRef.Number;
             DataLogField."Log Date" := LastModified;
@@ -339,50 +332,45 @@ codeunit 6059899 "NPR Data Log Management"
             DataLogField."Field Value" := Format(FieldRef.Value, 0, 9);
             DataLogField."Previous Field Value" := Format(XFieldRef.Value, 0, 9);
             DataLogField."Data Log Record Entry No." := RecordEntryNo;
-            DataLogField.Insert;
+            DataLogField.Insert();
         end;
     end;
 
-    local procedure InsertDataRecord(var RecRef: RecordRef; LastModified: DateTime; TypeOfChange: Option Insert,Modify,Rename,Delete) RecordEntryNo: BigInteger
+    local procedure InsertDataRecord(var RecRef: RecordRef; LastModified: DateTime; TypeOfChange: Option Insert,Modify,Rename,Delete): BigInteger
     var
         DataLogRecord: Record "NPR Data Log Record";
     begin
-        with DataLogRecord do begin
-            Init;
-            "Entry No." := 0;
-            "Record ID" := RecRef.RecordId;
-            "Table ID" := RecRef.Number;
-            "Log Date" := LastModified;
-            "Type of Change" := TypeOfChange;
-            "User ID" := UserId;
-            Insert;
-        end;
+        DataLogRecord.Init();
+        DataLogRecord."Entry No." := 0;
+        DataLogRecord."Record ID" := RecRef.RecordId;
+        DataLogRecord."Table ID" := RecRef.Number;
+        DataLogRecord."Log Date" := LastModified;
+        DataLogRecord."Type of Change" := TypeOfChange;
+        DataLogRecord."User ID" := UserId;
+        DataLogRecord.Insert();
 
         exit(DataLogRecord."Entry No.");
     end;
 
-    local procedure InsertDataRecordRename(var RecRef: RecordRef; var XRecRef: RecordRef; LastModified: DateTime; TypeOfChange: Option Insert,Modify,Rename,Delete) RecordEntryNo: BigInteger
+    local procedure InsertDataRecordRename(var RecRef: RecordRef; var XRecRef: RecordRef; LastModified: DateTime; TypeOfChange: Option Insert,Modify,Rename,Delete): BigInteger
     var
         DataLogRecord: Record "NPR Data Log Record";
     begin
-        with DataLogRecord do begin
-            Init;
-            "Entry No." := 0;
-            "Record ID" := RecRef.RecordId;
-            "Old Record ID" := XRecRef.RecordId;
-            "Table ID" := RecRef.Number;
-            "Log Date" := LastModified;
-            "Type of Change" := TypeOfChange;
-            "User ID" := UserId;
-            Insert;
-        end;
+        DataLogRecord.Init();
+        DataLogRecord."Entry No." := 0;
+        DataLogRecord."Record ID" := RecRef.RecordId;
+        DataLogRecord."Old Record ID" := XRecRef.RecordId;
+        DataLogRecord."Table ID" := RecRef.Number;
+        DataLogRecord."Log Date" := LastModified;
+        DataLogRecord."Type of Change" := TypeOfChange;
+        DataLogRecord."User ID" := UserId;
+        DataLogRecord.Insert();
 
         exit(DataLogRecord."Entry No.");
     end;
 
     local procedure OnlyIgroredFieldsModified(var RecRef: RecordRef): Boolean
     var
-        DataLogSetupField: Record "NPR Data Log Setup (Field)";
         "Field": Record "Field";
         xRecRef: RecordRef;
         FldRef: FieldRef;
@@ -391,14 +379,14 @@ codeunit 6059899 "NPR Data Log Management"
         if NoIgnoreListIsSetupForTable(RecRef.Number) then
             exit(false);
 
-        xRecRef := RecRef.Duplicate;
-        if not xRecRef.Find then
+        xRecRef := RecRef.Duplicate();
+        if not xRecRef.Find() then
             exit(false);
 
         Field.SetRange(TableNo, RecRef.Number);
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
         Field.SetRange(Class, Field.Class::Normal);
-        if Field.FindSet then
+        if Field.FindSet() then
             repeat
                 FldRef := RecRef.Field(Field."No.");
                 xFldRef := xRecRef.Field(Field."No.");
@@ -406,7 +394,7 @@ codeunit 6059899 "NPR Data Log Management"
                     if not IsIgnoredField(RecRef.Number, FldRef.Number) then
                         exit(false);
                 end;
-            until Field.Next = 0;
+            until Field.Next() = 0;
 
         exit(true);
     end;

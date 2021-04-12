@@ -19,17 +19,17 @@ page 6014686 "NPR Create Out. Endpoint Query"
         {
             group(General)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table View"; "Table View")
+                field("Table View"; Rec."Table View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table View field';
@@ -51,7 +51,7 @@ page 6014686 "NPR Create Out. Endpoint Query"
 
                 trigger OnAction()
                 begin
-                    CurrPage.Close;
+                    CurrPage.Close();
                 end;
             }
         }
@@ -61,15 +61,15 @@ page 6014686 "NPR Create Out. Endpoint Query"
     var
         TextConfirmCreate: Label 'Would you like to create this Outgoing Endpoint Query?';
     begin
-        if (Name <> '') and ("Table No." <> 0) then
+        if (Rec.Name <> '') and (Rec."Table No." <> 0) then
             if Confirm(TextConfirmCreate) then
                 CreateEndpointQuery;
     end;
 
     trigger OnOpenPage()
     begin
-        "No." := 1;
-        Insert;
+        Rec."No." := 1;
+        Rec.Insert();
     end;
 
     var
@@ -78,18 +78,17 @@ page 6014686 "NPR Create Out. Endpoint Query"
 
     local procedure CreateEndpointQuery()
     var
-        EndpointManagement: Codeunit "NPR Endpoint Management";
         EndpointQuery: Record "NPR Endpoint Query";
     begin
-        TestField(Name);
-        TestField("Table No.");
-        EndpointQuery.Init;
+        Rec.TestField(Name);
+        Rec.TestField("Table No.");
+        EndpointQuery.Init();
         EndpointQuery.Insert(true);
         EndpointQuery.Validate(Direction, EndpointQuery.Direction::Outgoing);
-        EndpointQuery.Validate(Name, Name);
-        EndpointQuery.Validate("Endpoint Code", "Endpoint Code");
-        EndpointQuery.Validate("Table No.", "Table No.");
-        EndpointQuery.Validate("Table View", "Table View");
+        EndpointQuery.Validate(Name, Rec.Name);
+        EndpointQuery.Validate("Endpoint Code", Rec."Endpoint Code");
+        EndpointQuery.Validate("Table No.", Rec."Table No.");
+        EndpointQuery.Validate("Table View", Rec."Table View");
         EndpointQuery.Modify(true);
         Message(TextCreated, EndpointQuery."No.");
     end;

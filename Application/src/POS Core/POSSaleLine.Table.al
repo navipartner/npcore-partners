@@ -253,14 +253,9 @@ table 6014406 "NPR POS Sale Line"
 
             trigger OnValidate()
             var
-                ErrDisabled: Label 'Unit Cost is disabled';
-                ErrDisNo: Label 'Unit Cost is disabled for Quantity > 0';
-                ErrDisX: Label 'Unit Cost cannot be reduced';
                 ErrItemBelow: Label 'Price cannot be negative.';
                 Err001: Label 'A quantity must be specified on the line';
-                Err002: Label 'The creditvoucher cannot be changed';
                 Err003: Label 'The sales price cannot be changed for this item';
-                TotalAmount: Decimal;
             begin
                 POSUnitGlobal.Get("Register No.");
                 case Type of
@@ -351,7 +346,6 @@ table 6014406 "NPR POS Sale Line"
             trigger OnValidate()
             var
                 POSUnit: Record "NPR POS Unit";
-                SaleLinePOS: Record "NPR POS Sale Line";
                 ErrMin: Label 'Discount % cannot be negative.';
                 ErrMax: Label 'Discount % cannot exeed 100.';
                 POSSetup: Codeunit "NPR POS Setup";
@@ -702,8 +696,6 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                Customer: Record Customer;
             begin
                 if "Special price" = 0 then begin
                     GetItem;
@@ -1600,11 +1592,7 @@ table 6014406 "NPR POS Sale Line"
     trigger OnDelete()
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
-        ICommRec: Record "NPR I-Comm";
-        Err001: Label '%1 is not legal tender';
-        Err002: Label 'A financial account has not been selected for the purchase %1';
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
         if "EFT Approved" then
@@ -1617,32 +1605,32 @@ table 6014406 "NPR POS Sale Line"
             case "Discount Type" of
                 "Discount Type"::"BOM List":
                     begin
-                        SaleLinePOS.Reset;
+                        SaleLinePOS.Reset();
                         SaleLinePOS.SetRange("Register No.", "Register No.");
                         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                         SaleLinePOS.SetRange("Sale Type", "Sale Type");
                         SaleLinePOS.SetRange(Date, Date);
                         SaleLinePOS.SetRange("Discount Code", "Discount Code");
-                        if SaleLinePOS.FindSet then
+                        if SaleLinePOS.FindSet() then
                             repeat
                                 if SaleLinePOS.Type = Type::"BOM List" then
                                     SaleLinePOS.Validate("No.");
                                 if "Line No." <> SaleLinePOS."Line No." then
-                                    SaleLinePOS.Delete;
-                            until SaleLinePOS.Next = 0;
+                                    SaleLinePOS.Delete();
+                            until SaleLinePOS.Next() = 0;
                     end;
             end;
         end;
 
         if GiftCrtLine <> 0 then begin
-            SaleLinePOS.Reset;
+            SaleLinePOS.Reset();
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
             SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::"Out payment");
             SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"G/L Entry");
             SaleLinePOS.SetRange("Line No.", GiftCrtLine);
-            if SaleLinePOS.FindFirst then
-                SaleLinePOS.Delete;
+            if SaleLinePOS.FindFirst() then
+                SaleLinePOS.Delete();
         end;
 
         TicketRequestManager.OnDeleteSaleLinePos(Rec);
@@ -1743,9 +1731,9 @@ table 6014406 "NPR POS Sale Line"
                         SaleLinePOS."Discount Amount" := 0;
                         SaleLinePOS."Amount Including VAT" := 0;
                         SaleLinePOS.Validate("No.");
-                        SaleLinePOS.Modify;
+                        SaleLinePOS.Modify();
                     end;
-                until SaleLinePOS.Next = 0;
+                until SaleLinePOS.Next() = 0;
         end;
     end;
 
@@ -1834,10 +1822,10 @@ table 6014406 "NPR POS Sale Line"
         ItemLedgerEntry.SetRange(Open, true);
         ItemLedgerEntry.SetRange(Positive, true);
         ItemLedgerEntry.SetRange("Serial No.", SerialNo);
-        if ItemLedgerEntry.FindFirst then begin
+        if ItemLedgerEntry.FindFirst() then begin
             ItemLedgerEntry.CalcSums(Quantity);
             TotalItemLedgerEntryQuantity := ItemLedgerEntry.Quantity;
-            if ItemLedgerEntry.Count > 1 then
+            if ItemLedgerEntry.Count() > 1 then
                 Error(Text002 + Text003, FieldName("Serial No."), "Serial No.");
         end;
     end;
@@ -1848,7 +1836,6 @@ table 6014406 "NPR POS Sale Line"
         Err002: Label '%2 %1 has already been sold to a customer but is not yet posted';
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
-        p: Record "NPR POS Entry";
     begin
         POSSalesLine.SetRange("Item Entry No.", 0);
         POSSalesLine.SetRange("Serial No.", "Serial No.");
@@ -1870,7 +1857,7 @@ table 6014406 "NPR POS Sale Line"
         ServiceItem: Record "Service Item";
     begin
         GetPOSHeader;
-        ServiceItem.Init;
+        ServiceItem.Init();
         ServiceItem.Insert(true);
         ServiceItem.Validate("Item No.", "No.");
         ServiceItem.Validate("Serial No.", "Serial No.");
@@ -1880,7 +1867,7 @@ table 6014406 "NPR POS Sale Line"
         ServiceItem.Validate("Customer No.", SalePOS."Customer No.");
         ServiceItem.Validate("Unit of Measure Code", "Unit of Measure Code");
         ServiceItem.Validate("Sales Date", SalePOS.Date);
-        ServiceItem.Modify;
+        ServiceItem.Modify();
     end;
 
     procedure ExplodeBOM(ItemNo: Code[20]; StartLineNo: Integer; EndLineNo: Integer; var Level: Integer; UnitPrice: Decimal; "Sum": Decimal)
@@ -1895,13 +1882,13 @@ table 6014406 "NPR POS Sale Line"
             if Quantity = 0 then
                 Quantity := 1;
             StartLineNo := Rec."Line No.";
-            SaleLinePOS.Reset;
+            SaleLinePOS.Reset();
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
             SaleLinePOS.SetFilter("Sale Type", '%1|%2|%3', "Sale Type"::Sale, "Sale Type"::Deposit, "Sale Type"::"Out payment");
             SaleLinePOS.SetRange(Date, Date);
             SaleLinePOS.SetRange("Line No.", StartLineNo + 1, StartLineNo + 10000);
-            if SaleLinePOS.FindFirst then
+            if SaleLinePOS.FindFirst() then
                 EndLineNo := SaleLinePOS."Line No."
             else
                 EndLineNo := StartLineNo + 10000;
@@ -1911,14 +1898,14 @@ table 6014406 "NPR POS Sale Line"
         end;
 
         BOMComponent.SetRange("Parent Item No.", ItemNo);
-        if BOMComponent.FindSet then begin
+        if BOMComponent.FindSet() then begin
             Sum := 0;
             repeat
                 if BOMComponent."Assembly BOM" then begin
                     ExplodeBOM(BOMComponent."No.", StartLineNo, EndLineNo, Level, UnitPrice, Sum);
                 end else begin
                     Level += 1;
-                    SaleLinePOS.Init;
+                    SaleLinePOS.Init();
                     SaleLinePOS."Register No." := "Register No.";
                     SaleLinePOS."Sales Ticket No." := "Sales Ticket No.";
                     SaleLinePOS."Sale Type" := "Sale Type";
@@ -1940,10 +1927,10 @@ table 6014406 "NPR POS Sale Line"
 
                     ToLineNo := SaleLinePOS."Line No.";
                 end;
-            until BOMComponent.Next = 0;
+            until BOMComponent.Next() = 0;
 
             if (UnitPrice <> 0) and (Sum <> 0) then begin
-                SaleLinePOS.Reset;
+                SaleLinePOS.Reset();
                 SaleLinePOS.SetRange("Register No.", "Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                 SaleLinePOS.SetRange("Line No.", FromLineNo, ToLineNo);
@@ -1952,7 +1939,7 @@ table 6014406 "NPR POS Sale Line"
                         SaleLinePOS."Discount Code" := "Discount Code";
                         SaleLinePOS.Validate("Discount %", 100 - UnitPrice / Sum * 100);
                         SaleLinePOS.Modify(true);
-                    until SaleLinePOS.Next = 0;
+                    until SaleLinePOS.Next() = 0;
                 SaleLinePOS.ModifyAll("Discount Type", SaleLinePOS."Discount Type"::"BOM List");
             end;
         end;
@@ -2047,7 +2034,6 @@ table 6014406 "NPR POS Sale Line"
         TotalInvDiscAmount: Decimal;
         TotalAmount: Decimal;
         TotalAmountInclVAT: Decimal;
-        TotalQuantityBase: Decimal;
     begin
         SaleLinePOS2.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
@@ -2065,7 +2051,6 @@ table 6014406 "NPR POS Sale Line"
         TotalInvDiscAmount := 0;
         TotalAmount := 0;
         TotalAmountInclVAT := 0;
-        TotalQuantityBase := 0;
 
         if (SaleLinePOS."VAT Calculation Type" = SaleLinePOS."VAT Calculation Type"::"Sales Tax") or
            ((SaleLinePOS."VAT Calculation Type" in
@@ -2077,7 +2062,6 @@ table 6014406 "NPR POS Sale Line"
                 TotalInvDiscAmount := SaleLinePOS2."Invoice Discount Amount";
                 TotalAmount := SaleLinePOS2.Amount;
                 TotalAmountInclVAT := SaleLinePOS2."Amount Including VAT";
-                TotalQuantityBase := SaleLinePOS2."Quantity (Base)";
             end;
 
         SaleLinePOS.UpdateLineVatAmounts(
@@ -2212,7 +2196,7 @@ table 6014406 "NPR POS Sale Line"
         Customer.Get("No.");
         Customer.TestField("Customer Posting Group");
         if Customer."Currency Code" <> '' then begin
-            GLSetup.Get;
+            GLSetup.Get();
             Customer.TestField("Currency Code", GLSetup."LCY Code");
         end;
 
@@ -2280,7 +2264,6 @@ table 6014406 "NPR POS Sale Line"
     local procedure InitFromPaymentTypePOS()
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        GLAccount: Record "G/L Account";
     begin
         if "No." = '' then
             exit;
@@ -2334,12 +2317,12 @@ table 6014406 "NPR POS Sale Line"
         SaleLinePOS.SetRange(Type, Type::Payment);
         SaleLinePOS.SetFilter("Line No.", '<>%1', "Line No.");
         SaleLinePOS.SetFilter("No.", '<>%1', '');
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 POSPaymentMethod.Get(SaleLinePOS."No.");
                 if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CUSTOMER then
                     Error(Text000);
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
 
     end;
 
@@ -2364,9 +2347,7 @@ table 6014406 "NPR POS Sale Line"
     procedure GetUnitCostLCY(): Decimal
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
-        ItemUnitOfMeasure: Record "Item Unit of Measure";
         ItemTrackingCode: Record "Item Tracking Code";
-        PriceMult: Decimal;
         TxtNoSerial: Label 'No open Item Ledger Entry has been found with the Serial No. %2';
     begin
         if "Custom Cost" then
@@ -2382,7 +2363,7 @@ table 6014406 "NPR POS Sale Line"
                 ItemLedgerEntry.SetRange(Positive, true);
                 ItemLedgerEntry.SetRange("Item No.", "No.");
                 ItemLedgerEntry.SetRange("Serial No.", "Serial No.");
-                if not ItemLedgerEntry.FindFirst then begin
+                if not ItemLedgerEntry.FindFirst() then begin
                     Message(TxtNoSerial, "Serial No.");
                     exit(0);
                 end;
@@ -2416,9 +2397,9 @@ table 6014406 "NPR POS Sale Line"
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
                 SaleLinePOS.Silent := false;
                 SaleLinePOS.SetSkipCalcDiscount(true);
-                SaleLinePOS.Modify;
-            until SaleLinePOS.Next = 0;
-        SaleLinePOS.Reset;
+                SaleLinePOS.Modify();
+            until SaleLinePOS.Next() = 0;
+        SaleLinePOS.Reset();
 
         SaleLinePOS.SetFilter("Main Line No.", '=%1', 0); // STD will have "Main Line No." as 0 and this function should not interfer in TSD.
 
@@ -2434,9 +2415,9 @@ table 6014406 "NPR POS Sale Line"
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
                 SaleLinePOS.Silent := false;
                 SaleLinePOS.SetSkipCalcDiscount(true);
-                SaleLinePOS.Modify;
-            until SaleLinePOS.Next = 0;
-        SaleLinePOS.Reset;
+                SaleLinePOS.Modify();
+            until SaleLinePOS.Next() = 0;
+        SaleLinePOS.Reset();
 
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
@@ -2452,8 +2433,8 @@ table 6014406 "NPR POS Sale Line"
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
                 SaleLinePOS.Silent := false;
                 SaleLinePOS.SetSkipCalcDiscount(true);
-                SaleLinePOS.Modify;
-            until SaleLinePOS.Next = 0;
+                SaleLinePOS.Modify();
+            until SaleLinePOS.Next() = 0;
     end;
 
     procedure SerialNoLookup()
@@ -2490,11 +2471,11 @@ table 6014406 "NPR POS Sale Line"
         if ItemLedgerEntry.Find('-') then
             repeat
                 ItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");
-                ItemLedgerEntry.FindLast;
+                ItemLedgerEntry.FindLast();
                 TempItemLedgerEntry := ItemLedgerEntry;
-                TempItemLedgerEntry.Insert;
+                TempItemLedgerEntry.Insert();
                 ItemLedgerEntry.SetRange("Serial No.");
-            until ItemLedgerEntry.Next = 0;
+            until ItemLedgerEntry.Next() = 0;
 
         TempItemLedgerEntry.SetFilter("Expiration Date", '<>%1', 0D);
         if not TempItemLedgerEntry.IsEmpty then
@@ -2502,7 +2483,7 @@ table 6014406 "NPR POS Sale Line"
         TempItemLedgerEntry.SetRange("Expiration Date");
         if "Serial No." <> '' then
             TempItemLedgerEntry.SetRange("Serial No.", "Serial No.");
-        if TempItemLedgerEntry.FindFirst then;
+        if TempItemLedgerEntry.FindFirst() then;
         TempItemLedgerEntry.SetRange("Serial No.");
         if PAGE.RunModal(PAGE::"NPR Item - Series Number", TempItemLedgerEntry) <> ACTION::LookupOK then
             exit(false);
@@ -2522,12 +2503,8 @@ table 6014406 "NPR POS Sale Line"
     var
         SaleLinePOS2: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
-        ItemLedgerEntry: Record "Item Ledger Entry";
         ItemTrackingCode: Record "Item Tracking Code";
         Positive: Boolean;
-        Txt001: Label 'Quantity in a serial number sale must be 1 or -1!';
-        Txt002: Label '%2 %1 has already been used in another transaction! \';
-        Txt003: Label 'try to check saved receipts';
         Txt004: Label '%2 %1 has already sold!';
         Txt005: Label '%2 %1 is already in stock!';
         TotalNonAppliedQuantity: Decimal;
@@ -2546,13 +2523,13 @@ table 6014406 "NPR POS Sale Line"
 
         SaleLinePOS2.SetCurrentKey("Serial No.");
         SaleLinePOS2.SetRange("Serial No.", "Serial No.");
-        if SaleLinePOS2.FindSet then
+        if SaleLinePOS2.FindSet() then
             repeat
                 SalePOS.Get(SaleLinePOS2."Register No.", SaleLinePOS2."Sales Ticket No.");
                 if not SalePOS."Saved Sale" then
                     if (SaleLinePOS2."Sales Ticket No." <> "Sales Ticket No.") or (SaleLinePOS2."Line No." <> "Line No.") then
                         Error(Text004, FieldName("Serial No."), "Serial No.");
-            until SaleLinePOS2.Next = 0;
+            until SaleLinePOS2.Next() = 0;
 
         if Quantity <> Abs(1) then
             Quantity := 1 * (Quantity / Abs(Quantity));

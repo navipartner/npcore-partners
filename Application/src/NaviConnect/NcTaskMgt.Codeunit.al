@@ -1,4 +1,4 @@
-codeunit 6151501 "NPR Nc Task Mgt."
+﻿codeunit 6151501 "NPR Nc Task Mgt."
 {
     // NC1.00/MHA /20150113  CASE 199932 Refactored Object from Web Integration
     // NC1.01/MHA /20150126  CASE 199932 Added Cleanup
@@ -49,7 +49,6 @@ codeunit 6151501 "NPR Nc Task Mgt."
         DataLogSubScriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         Initialized: Boolean;
         Window: Dialog;
-        DataLogEntryNo: Integer;
         Text002: Label 'Company: #7#####################################\Finding new Data Log records: @1@@@@@@@@@@@@@@@@\Buffering Data Logs to Tasks: @2@@@@@@@@@@@@@@@@\    Task Quantity:            #5################\Removing Duplicate Tasks:     @3@@@@@@@@@@@@@@@@\    Removed Task Quantity:    #6################\Updating the Task List:       @4@@@@@@@@@@@@@@@@';
 
     local procedure TaskComplete(var NcTask: Record "NPR Nc Task")
@@ -59,7 +58,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
     begin
         //-NC2.22 [358499]
         LastErrorText := GetLastErrorText;
-        if not NcTask.Find then
+        if not NcTask.Find() then
             exit;
 
         NcTask."Last Processing Completed at" := CurrentDateTime;
@@ -71,7 +70,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
             NcTask.Response.CreateOutStream(OutStr, TEXTENCODING::UTF8);
             OutStr.Write(LastErrorText);
         end;
-        NcTask.Modify;
+        NcTask.Modify();
         //+NC2.22 [358499]
     end;
 
@@ -80,15 +79,14 @@ codeunit 6151501 "NPR Nc Task Mgt."
         TaskProcesLine: Record "NPR Nc Task Proces. Line";
         TempDataLogRecord: Record "NPR Data Log Record" temporary;
         TempTask: Record "NPR Nc Task" temporary;
-        RecordID: RecordID;
     begin
         if TaskProcessor.Code = '' then
             TaskProcessor.Code := 'NC';
         Initialize();
         Clear(TempDataLogRecord);
         Clear(TempTask);
-        TempDataLogRecord.DeleteAll;
-        TempTask.DeleteAll;
+        TempDataLogRecord.DeleteAll();
+        TempTask.DeleteAll();
         if UseDialog then
             Window.Open(Text001);
 
@@ -99,27 +97,27 @@ codeunit 6151501 "NPR Nc Task Mgt."
             //-NC2.07 [293599]
             InsertTempTasks(TaskProcessor, '', TempDataLogRecord, TempTask);
             //+NC2.07 [293599]
-            TempDataLogRecord.DeleteAll;
+            TempDataLogRecord.DeleteAll();
             //-NC2.07 [293599]
             DeleteDuplicates(TaskProcessor, TempTask);
             InsertTasks(TempTask);
             //+NC2.07 [293599]
-            Commit;
+            Commit();
         end;
 
         if UseDialog then
-            Window.Close;
+            Window.Close();
 
         Clear(TempDataLogRecord);
         Clear(TempTask);
-        TempDataLogRecord.DeleteAll;
-        TempTask.DeleteAll;
+        TempDataLogRecord.DeleteAll();
+        TempTask.DeleteAll();
 
         TaskProcesLine.SetRange("Task Processor Code", TaskProcessor.Code);
         TaskProcesLine.SetRange(Type, TaskProcesLine.Type::Company);
         TaskProcesLine.SetRange(Code, TaskProcesLine.DataLogCode());
         TaskProcesLine.SetFilter(Value, '<>%1&<>%2', '', CompanyName);
-        if TaskProcesLine.FindSet then begin
+        if TaskProcesLine.FindSet() then begin
             if UseDialog then
                 Window.Open(Text002);
             repeat
@@ -132,7 +130,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
                     //-NC2.07 [293599]
                     InsertTempTasks(TaskProcessor, TaskProcesLine.Value, TempDataLogRecord, TempTask);
                     //+NC2.07 [293599]
-                    TempDataLogRecord.DeleteAll;
+                    TempDataLogRecord.DeleteAll();
                     //-NC2.07 [293599]
                     DeleteDuplicates(TaskProcessor, TempTask);
                     InsertTasks(TempTask);
@@ -144,15 +142,15 @@ codeunit 6151501 "NPR Nc Task Mgt."
                 //CLEAR(TempTaskField);
                 //+NC2.07 [293599]
                 Clear(TempTask);
-                TempDataLogRecord.DeleteAll;
+                TempDataLogRecord.DeleteAll();
                 //-NC2.07 [293599]
-                //TempTaskField.DELETEALL;
+                //TempTaskField.DeleteAll();
                 //+NC2.07 [293599]
-                TempTask.DeleteAll;
-            until TaskProcesLine.Next = 0;
+                TempTask.DeleteAll();
+            until TaskProcesLine.Next() = 0;
 
             if UseDialog then
-                Window.Close;
+                Window.Close();
         end;
     end;
 
@@ -173,45 +171,45 @@ codeunit 6151501 "NPR Nc Task Mgt."
         // TaskField.SETCURRENTKEY("Log Date",Processed);
         // TaskField.SETFILTER("Log Date",'<%1',CURRENTDATETIME - NaviConnectSetup."Keep Tasks for");
         // TaskField.SETRANGE(Processed,TRUE);
-        // TaskField.DELETEALL;
+        // TaskField.DeleteAll();
         //+NC2.05 [280860]
 
         Clear(Task);
         Task.SetCurrentKey("Log Date", Processed);
         Task.SetFilter("Log Date", '<%1', CurrentDateTime - NaviConnectSetup."Keep Tasks for");
         Task.SetRange(Processed, true);
-        Task.DeleteAll;
+        Task.DeleteAll();
 
         Clear(Task);
         Clear(TaskField);
-        if Task.FindFirst then;
+        if Task.FindFirst() then;
         //-NC2.05 [280860]
         TaskField.SetCurrentKey("Task Entry No.");
         //+NC2.05 [280860]
         TaskField.SetFilter("Task Entry No.", '<%1', Task."Entry No.");
         //-NC2.05 [280860]
-        //TaskField.DELETEALL;
+        //TaskField.DeleteAll();
         if not TaskField.IsEmpty then
-            TaskField.DeleteAll;
+            TaskField.DeleteAll();
         //+NC2.05 [280860]
 
         //-NC2.05 [280860]
         Clear(TaskField);
         TaskField.SetRange("Task Exists", false);
         if not TaskField.IsEmpty then
-            TaskField.DeleteAll;
+            TaskField.DeleteAll();
         //+NC2.05 [280860]
 
         //-NC2.14 [308107]
         TaskOutput.SetCurrentKey("Task Entry No.");
         TaskOutput.SetFilter("Task Entry No.", '<%1', Task."Entry No.");
         if not TaskOutput.IsEmpty then
-            TaskField.DeleteAll;
+            TaskField.DeleteAll();
 
         Clear(TaskOutput);
         TaskOutput.SetRange("Task Exists", false);
         if not TaskOutput.IsEmpty then
-            TaskOutput.DeleteAll;
+            TaskOutput.DeleteAll();
         //+NC2.14 [308107]
     end;
 
@@ -242,40 +240,40 @@ codeunit 6151501 "NPR Nc Task Mgt."
 
         if UseDialog then begin
             Counter := 0;
-            Total := TempTask.Count;
+            Total := TempTask.Count();
         end;
 
         //-NC2.07 [292577]
         DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
         //+NC2.07 [292577]
 
-        if TempTask.FindSet then
+        if TempTask.FindSet() then
             repeat
                 if UseDialog then begin
                     Counter += 1;
                     Window.Update(4, Round((Counter / Total) * 10000, 1));
                 end;
-                Task.Init;
+                Task.Init();
                 Task := TempTask;
                 Task."Entry No." := 0;
                 Task.Insert(true);
 
                 //-NC2.07 [292577]
                 //TempTaskField.SETRANGE("Task Entry No.",TempTask."Entry No.");
-                //IF TempTaskField.FINDSET THEN
+                //IF TempTaskField.FindSet() THEN
                 //  REPEAT
-                //    TaskField.INIT;
+                //    TaskField.Init();
                 //    TaskField := TempTaskField;
                 //    TaskField."Entry No." := 0;
                 //    TaskField."Task Entry No." := Task."Entry No.";
                 //    TaskField.INSERT(TRUE);
-                //  UNTIL TempTaskField.NEXT = 0;
+                //  UNTIL TempTaskField.Next() = 0;
                 DataLogField.SetRange("Table ID", TempTask."Table No.");
                 DataLogField.SetRange("Data Log Record Entry No.", TempTask."Entry No.");
-                if DataLogField.FindSet then
+                if DataLogField.FindSet() then
                     repeat
                         DataLogField.CalcFields("Field Name");
-                        TaskField.Init;
+                        TaskField.Init();
                         TaskField."Entry No." := 0;
                         TaskField."Field No." := DataLogField."Field No.";
                         TaskField."Field Name" := DataLogField."Field Name";
@@ -287,10 +285,10 @@ codeunit 6151501 "NPR Nc Task Mgt."
                         //+NC2.24 [378811]
                         TaskField."Log Date" := DataLogField."Log Date";
                         TaskField."Task Entry No." := Task."Entry No.";
-                        TaskField.Insert;
-                    until DataLogField.Next = 0;
+                        TaskField.Insert();
+                    until DataLogField.Next() = 0;
             //+NC2.07 [292577]
-            until TempTask.Next = 0;
+            until TempTask.Next() = 0;
     end;
 
     local procedure InsertTempTasks(TaskProcessor: Record "NPR Nc Task Processor"; DataLogCompanyName: Text[30]; var TempDataLogRecord: Record "NPR Data Log Record" temporary; var TempTask: Record "NPR Nc Task" temporary)
@@ -324,17 +322,17 @@ codeunit 6151501 "NPR Nc Task Mgt."
             DataLogField.ChangeCompany(DataLogCompanyName);
         if UseDialog then begin
             Counter := 0;
-            Total := TempDataLogRecord.Count;
+            Total := TempDataLogRecord.Count();
         end;
-        if TempDataLogRecord.FindSet then begin
+        if TempDataLogRecord.FindSet() then begin
             DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
             TaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
-            if TaskSetup.FindSet then
+            if TaskSetup.FindSet() then
                 repeat
-                    TempTaskSetup.Init;
+                    TempTaskSetup.Init();
                     TempTaskSetup := TaskSetup;
-                    TempTaskSetup.Insert;
-                until TaskSetup.Next = 0;
+                    TempTaskSetup.Insert();
+                until TaskSetup.Next() = 0;
             repeat
                 if UseDialog then begin
                     Counter += 1;
@@ -342,7 +340,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
                 end;
                 TempTaskSetup.SetRange("Table No.", TempDataLogRecord."Table ID");
                 TempTaskSetup.SetFilter("Task Processor Code", '<>%1', '');
-                if TempTaskSetup.FindSet then
+                if TempTaskSetup.FindSet() then
                     repeat
                         i += 1;
                         if UseDialog then begin
@@ -353,7 +351,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
                         //-NC2.08 [298597]
                         if not TempTask.Get(TempDataLogRecord."Entry No.") then begin
                             //+NC2.08 [298597]
-                            TempTask.Init;
+                            TempTask.Init();
                             //-NC2.07 [293599]
                             //TempTask."Entry No." := i;
                             TempTask."Entry No." := TempDataLogRecord."Entry No.";
@@ -382,7 +380,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
                             //+NC2.14 [320762]
                             TempTask."Log Date" := TempDataLogRecord."Log Date";
                             TempTask."Record Value" := CopyStr(DelStr(Format(RecRef.RecordId), 1, StrLen(RecRef.Name) + 2), 1, MaxStrLen(TempTask."Record Value"));
-                            TempTask.Insert;
+                            TempTask.Insert();
                             //-NC2.08 [298597]
                         end;
                     //+NC2.08 [298597]
@@ -390,11 +388,11 @@ codeunit 6151501 "NPR Nc Task Mgt."
                     //DataLogField.SETRANGE("Table ID",TempDataLogRecord."Table ID");
                     //DataLogField.SETRANGE("Data Log Record Entry No.",TempDataLogRecord."Entry No.");
                     //DataLogField.SETRANGE("Field Value Changed");
-                    //IF DataLogField.FINDSET THEN
+                    //IF DataLogField.FindSet() THEN
                     //  REPEAT
                     //    j += 1;
                     //    DataLogField.CALCFIELDS("Field Name");
-                    //    TempTaskField.INIT;
+                    //    TempTaskField.Init();
                     //    TempTaskField."Entry No." := j;
                     //    TempTaskField."Field No." := DataLogField."Field No.";
                     //    TempTaskField."Field Name" := DataLogField."Field Name";
@@ -404,11 +402,11 @@ codeunit 6151501 "NPR Nc Task Mgt."
                     //      TempTaskField."Previous Value" := TempTaskField."New Value";
                     //    TempTaskField."Log Date" := DataLogField."Log Date";
                     //    TempTaskField."Task Entry No." := TempTask."Entry No.";
-                    //    TempTaskField.INSERT;
-                    //  UNTIL DataLogField.NEXT = 0;
+                    //    TempTaskField.Insert();
+                    //  UNTIL DataLogField.Next() = 0;
                     //+NC2.07 [293599]
-                    until TempTaskSetup.Next = 0;
-            until TempDataLogRecord.Next = 0;
+                    until TempTaskSetup.Next() = 0;
+            until TempDataLogRecord.Next() = 0;
         end;
     end;
 
@@ -446,11 +444,11 @@ codeunit 6151501 "NPR Nc Task Mgt."
 
         if UseDialog then begin
             Counter := 0;
-            Total := TempTask.Count;
+            Total := TempTask.Count();
         end;
 
         Counter2 := 0;
-        if TempTask.FindSet then
+        if TempTask.FindSet() then
             repeat
                 if UseDialog then begin
                     Counter += 1;
@@ -464,7 +462,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
                 UniqueTask := false;
                 IsUniqueTask(TaskProcessor, TempTask, UniqueTaskBuffer, UniqueTask, Checked);
                 if not Checked then begin
-                    NewUniqueTaskBuffer.Init;
+                    NewUniqueTaskBuffer.Init();
                     NewUniqueTaskBuffer."Table No." := TempTask."Table No.";
                     NewUniqueTaskBuffer."Task Processor Code" := TempTask."Task Processor Code";
                     NewUniqueTaskBuffer."Record Position" := TempTask."Record Position";
@@ -485,11 +483,11 @@ codeunit 6151501 "NPR Nc Task Mgt."
                     //-NC2.07 [293599]
                     //CLEAR(TempTaskField);
                     //TempTaskField.SETRANGE("Task Entry No.",TempTask."Entry No.");
-                    //TempTaskField.DELETEALL;
+                    //TempTaskField.DeleteAll();
                     //+NC2.07 [293599]
-                    TempTask.Delete;
+                    TempTask.Delete();
                 end;
-            until TempTask.Next = 0;
+            until TempTask.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
@@ -500,10 +498,10 @@ codeunit 6151501 "NPR Nc Task Mgt."
     procedure ReqisterUniqueTask(NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary) IsDuplicate: Boolean
     begin
         UniqueTaskBuffer.SetPosition(NewUniqueTaskBuffer.GetPosition(false));
-        if UniqueTaskBuffer.Find then
+        if UniqueTaskBuffer.Find() then
             exit;
 
-        UniqueTaskBuffer.Insert;
+        UniqueTaskBuffer.Insert();
         exit(true);
     end;
 
@@ -627,21 +625,21 @@ codeunit 6151501 "NPR Nc Task Mgt."
         Position := GetRecordPosition(Task);
         RecRefExisting.SetPosition(Position);
         //+NC2.14 [320762]
-        if RecRefExisting.Find then begin
-            RecRef := RecRefExisting.Duplicate;
+        if RecRefExisting.Find() then begin
+            RecRef := RecRefExisting.Duplicate();
 
             Clear(TaskField);
             TaskField.SetRange("Task Entry No.", Task."Entry No.");
             //-NC2.01 [242551]
             TaskField.SetFilter("Previous Value", '<>%1', '');
             //+NC2.01 [242551]
-            if TaskField.FindFirst then
+            if TaskField.FindFirst() then
                 repeat
                     if Fields.Get(Task."Table No.", TaskField."Field No.") then begin
                         FieldRef := RecRef.Field(TaskField."Field No.");
                         AssignValue(FieldRef, TaskField."Previous Value");
                     end;
-                until TaskField.Next = 0;
+                until TaskField.Next() = 0;
         end else begin
             //-NC2.07 [294737]
             //IF (Task."Company Name" = '') OR (Task."Company Name" = COMPANYNAME) THEN
@@ -651,7 +649,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
             Clear(RecRef);
             RecRef.Open(Task."Table No.", true);
             //+NC2.07 [294737]
-            RecRef.Init;
+            RecRef.Init();
             //-NC2.14 [320762]
             //RecRef.SETPOSITION(Task."Record Position");
             RecRef.SetPosition(Position);
@@ -659,15 +657,15 @@ codeunit 6151501 "NPR Nc Task Mgt."
 
             Clear(TaskField);
             TaskField.SetRange("Task Entry No.", Task."Entry No.");
-            if TaskField.FindFirst then
+            if TaskField.FindFirst() then
                 repeat
                     if Fields.Get(Task."Table No.", TaskField."Field No.") then begin
                         FieldRef := RecRef.Field(TaskField."Field No.");
                         AssignValue(FieldRef, TaskField."Previous Value");
                     end;
-                until TaskField.Next = 0;
+                until TaskField.Next() = 0;
             //-NC2.07 [294737]
-            RecRef.Insert;
+            RecRef.Insert();
             //+NC2.07 [294737]
         end;
         exit(true);
@@ -701,31 +699,31 @@ codeunit 6151501 "NPR Nc Task Mgt."
 
         RecordPosition := RecRef.GetPosition(false);
         RecRefExisting.SetPosition(RecordPosition);
-        if RecRefExisting.Find then begin
-            RecRef := RecRefExisting.Duplicate;
+        if RecRefExisting.Find() then begin
+            RecRef := RecRefExisting.Duplicate();
 
             DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
             DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
             DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
             DataLogField.SetRange("Field Value Changed", true);
-            if not DataLogField.FindSet then
+            if not DataLogField.FindSet() then
                 exit(true);
 
             repeat
                 FieldRef := RecRef.Field(DataLogField."Field No.");
                 AssignValue(FieldRef, DataLogField."Previous Field Value");
-            until DataLogField.Next = 0;
+            until DataLogField.Next() = 0;
 
             exit(true);
         end;
         Clear(RecRef);
         RecRef.Open(DataLogRecord."Table ID", true);
-        RecRef.Init;
+        RecRef.Init();
         RecRef.SetPosition(RecordPosition);
         DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
         DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
         DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
-        if not DataLogField.FindSet then
+        if not DataLogField.FindSet() then
             exit(false);
 
         repeat
@@ -734,9 +732,9 @@ codeunit 6151501 "NPR Nc Task Mgt."
                 AssignValue(FieldRef, DataLogField."Previous Field Value")
             else
                 AssignValue(FieldRef, DataLogField."Field Value");
-        until DataLogField.Next = 0;
+        until DataLogField.Next() = 0;
 
-        RecRef.Insert;
+        RecRef.Insert();
         exit(true);
         //+NC2.08 [301296]
     end;
@@ -758,7 +756,7 @@ codeunit 6151501 "NPR Nc Task Mgt."
         Position := GetRecordPosition(NaviConnectTask);
         RecRef.SetPosition(Position);
         //+NC2.14 [320762]
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
 
         RunSourceCardEvent(RecRef, RunCardExecuted);
         if RunCardExecuted then
@@ -779,9 +777,9 @@ codeunit 6151501 "NPR Nc Task Mgt."
     procedure Initialize()
     begin
         if not Initialized then begin
-            NaviConnectSetup.Get;
+            NaviConnectSetup.Get();
             //-NC2.12 [308107]
-            //NpXmlSetup.GET;
+            //NpXmlSetup.Get();
             //+NC2.12 [308107]
             Initialized := true;
         end;

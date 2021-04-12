@@ -14,32 +14,32 @@ page 6151013 "NPR NpRv Voucher Types"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("No. Series"; "No. Series")
+                field("No. Series"; Rec."No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. Series field';
                 }
-                field("Valid Period"; "Valid Period")
+                field("Valid Period"; Rec."Valid Period")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid Period field';
                 }
-                field("Voucher Qty. (Open)"; "Voucher Qty. (Open)")
+                field("Voucher Qty. (Open)"; Rec."Voucher Qty. (Open)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher Qty. (Open) field';
                 }
-                field("Arch. Voucher Qty."; "Arch. Voucher Qty.")
+                field("Arch. Voucher Qty."; Rec."Arch. Voucher Qty.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Archived Voucher Qty. field';

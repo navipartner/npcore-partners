@@ -1,4 +1,4 @@
-codeunit 85003 "NPR Library - POS Mock"
+﻿codeunit 85003 "NPR Library - POS Mock"
 {
     trigger OnRun()
     begin
@@ -179,8 +179,8 @@ codeunit 85003 "NPR Library - POS Mock"
         SaleLinePOS.Modify(true);
         POSSession.RequestRefreshData();
 
-        NpRvSalesLine.Init;
-        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
         NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
@@ -208,12 +208,12 @@ codeunit 85003 "NPR Library - POS Mock"
                 end;
         end;
 
-        NpRvSalesLine.Insert;
+        NpRvSalesLine.Insert();
 
         NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
         if NpRvSalesLineReference.IsEmpty then begin
-            NpRvSalesLineReference.Init;
-            NpRvSalesLineReference.Id := CreateGuid;
+            NpRvSalesLineReference.Init();
+            NpRvSalesLineReference.Id := CreateGuid();
             NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
             NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
             NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;

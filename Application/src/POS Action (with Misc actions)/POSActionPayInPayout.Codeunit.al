@@ -3,41 +3,39 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
     var
         ActionDescription: Label 'This built in function handles cash deposit / withdrawls from the till';
         PayOptionType: Option PAYIN,PAYOUT;
-        AmountPrompt: Label 'Enter Amount';
-        DescriptionPrompt: Label 'Enter Description';
-        VATSetupError: Label 'Pay-in and Pay-out are cash transactions that must not use accounts that post VAT. Check setup for account %1.';
+        AmountPrompt: Label 'Enter Amount.';
+        DescriptionPrompt: Label 'Enter Description.';
         ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('account', 'respond();');
-                RegisterWorkflowStep('amount', 'numpad (labels.Amount).cancel(abort);');
-                RegisterWorkflowStep('description', 'input({caption: labels.Description, value: context.accountdescription}).cancel(abort);');
-                RegisterWorkflowStep('handle', 'respond();');
-                RegisterWorkflowStep('FixedReasonCode', 'if (param.FixedReasonCode != "")  {respond()}');
-                RegisterWorkflowStep('LookupReasonCode', 'if (param.LookupReasonCode)  {respond()}');
-                RegisterWorkflow(false);
-                RegisterOptionParameter('Pay Option', 'Pay In,Payout', 'Payout');
-                RegisterTextParameter('FixedAccountCode', '');
-                RegisterTextParameter('FixedReasonCode', '');
-                RegisterBooleanParameter('LookupReasonCode', false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('account', 'respond();');
+            Sender.RegisterWorkflowStep('amount', 'numpad (labels.Amount).cancel(abort);');
+            Sender.RegisterWorkflowStep('description', 'input({caption: labels.Description, value: context.accountdescription}).cancel(abort);');
+            Sender.RegisterWorkflowStep('handle', 'respond();');
+            Sender.RegisterWorkflowStep('FixedReasonCode', 'if (param.FixedReasonCode != "")  {respond()}');
+            Sender.RegisterWorkflowStep('LookupReasonCode', 'if (param.LookupReasonCode)  {respond()}');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterOptionParameter('Pay Option', 'Pay In,Payout', 'Payout');
+            Sender.RegisterTextParameter('FixedAccountCode', '');
+            Sender.RegisterTextParameter('FixedReasonCode', '');
+            Sender.RegisterBooleanParameter('LookupReasonCode', false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'Amount', AmountPrompt);
-        Captions.AddActionCaption(ActionCode, 'Description', DescriptionPrompt);
+        Captions.AddActionCaption(ActionCode(), 'Amount', AmountPrompt);
+        Captions.AddActionCaption(ActionCode(), 'Description', DescriptionPrompt);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -49,7 +47,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         Description: Text;
         Amount: Decimal;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -140,7 +138,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         JSON.SetScopeRoot();
         JSON.SetContext('accountno', GLAccount."No.");
         JSON.SetContext('accountdescription', GLAccount.Name);
-        FrontEnd.SetActionContext(ActionCode, JSON);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
     local procedure RegisterAccountSales(POSSession: Codeunit "NPR POS Session"; AccountNo: Code[20]; Description: Text; Amount: Decimal; PayOption: Option)

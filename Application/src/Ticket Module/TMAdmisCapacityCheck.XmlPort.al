@@ -174,9 +174,6 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
 
                     trigger OnAfterGetRecord()
                     var
-                        MaxCapacity: Integer;
-                        CapacityControl: Option;
-                        Admission: Record "NPR TM Admission";
                         TicketManagement: Codeunit "NPR TM Ticket Management";
                         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
                         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -184,60 +181,57 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         VariantCode: Code[10];
                         ResolvingTable: Integer;
                     begin
-                        with TmpAdmScheduleEntryResponse do begin
 
-                            RemainingCapacity := 0;
-                            CapacityStatusCode := 1;
+                        RemainingCapacity := 0;
+                        CapacityStatusCode := 1;
 
-                            if ("Admission Code" = '') then
-                                CapacityStatusCode := -4;
+                        if (TmpAdmScheduleEntryResponse."Admission Code" = '') then
+                            CapacityStatusCode := -4;
 
-                            if ("Schedule Code" = '') then
-                                CapacityStatusCode := -4;
+                        if (TmpAdmScheduleEntryResponse."Schedule Code" = '') then
+                            CapacityStatusCode := -4;
 
-                            if ("Entry No." < 1) then
-                                CapacityStatusCode := -4;
+                        if (TmpAdmScheduleEntryResponse."Entry No." < 1) then
+                            CapacityStatusCode := -4;
 
-                            if ("Admission Is" = "Admission Is"::CLOSED) then
-                                CapacityStatusCode := -5;
+                        if (TmpAdmScheduleEntryResponse."Admission Is" = TmpAdmScheduleEntryResponse."Admission Is"::CLOSED) then
+                            CapacityStatusCode := -5;
 
-                            ItemNumber := '';
-                            VariantCode := '';
-                            if ("Schedule Code" <> '') then begin
+                        ItemNumber := '';
+                        VariantCode := '';
+                        if (TmpAdmScheduleEntryResponse."Schedule Code" <> '') then begin
 
-                                TicketRequestManager.TranslateBarcodeToItemVariant(gExternalItemNo, ItemNumber, VariantCode, ResolvingTable);
-                            end;
+                            TicketRequestManager.TranslateBarcodeToItemVariant(gExternalItemNo, ItemNumber, VariantCode, ResolvingTable);
+                        end;
 
-                            if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, Today, Time, RemainingCapacity)) then
-                                CapacityStatusCode := -1;
+                        if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, Today, Time, RemainingCapacity)) then
+                            CapacityStatusCode := -1;
 
-                            if (CapacityStatusCode <> 1) then
-                                exit;
+                        if (CapacityStatusCode <> 1) then
+                            exit;
 
-                            SetCapacityStatusCode();
+                        SetCapacityStatusCode();
 
-                            PriceOption := '';
-                            Amount := '';
-                            Percentage := '';
-                            IncludesVAT := '';
-                            if (AdmissionScheduleLines.Get("Admission Code", "Schedule Code")) then begin
-                                if (AdmissionScheduleLines."Price Scope" in [AdmissionScheduleLines."Price Scope"::API, AdmissionScheduleLines."Price Scope"::API_POS_M2]) then begin
-                                    case AdmissionScheduleLines."Pricing Option" of
-                                        AdmissionScheduleLines."Pricing Option"::NA:
-                                            PriceOption := '';
-                                        AdmissionScheduleLines."Pricing Option"::FIXED:
-                                            PriceOption := 'fixed_amount';
-                                        AdmissionScheduleLines."Pricing Option"::RELATIVE:
-                                            PriceOption := 'relative_amount';
-                                        AdmissionScheduleLines."Pricing Option"::PERCENT:
-                                            PriceOption := 'percentage'
-                                    end;
-                                    Amount := Format(AdmissionScheduleLines.Amount, 0, 9);
-                                    Percentage := Format(AdmissionScheduleLines.Percentage, 0, 9);
-                                    IncludesVAT := Format(AdmissionScheduleLines."Amount Includes VAT", 0, 9);
+                        PriceOption := '';
+                        Amount := '';
+                        Percentage := '';
+                        IncludesVAT := '';
+                        if (AdmissionScheduleLines.Get(TmpAdmScheduleEntryResponse."Admission Code", TmpAdmScheduleEntryResponse."Schedule Code")) then begin
+                            if (AdmissionScheduleLines."Price Scope" in [AdmissionScheduleLines."Price Scope"::API, AdmissionScheduleLines."Price Scope"::API_POS_M2]) then begin
+                                case AdmissionScheduleLines."Pricing Option" of
+                                    AdmissionScheduleLines."Pricing Option"::NA:
+                                        PriceOption := '';
+                                    AdmissionScheduleLines."Pricing Option"::FIXED:
+                                        PriceOption := 'fixed_amount';
+                                    AdmissionScheduleLines."Pricing Option"::RELATIVE:
+                                        PriceOption := 'relative_amount';
+                                    AdmissionScheduleLines."Pricing Option"::PERCENT:
+                                        PriceOption := 'percentage'
                                 end;
+                                Amount := Format(AdmissionScheduleLines.Amount, 0, 9);
+                                Percentage := Format(AdmissionScheduleLines.Percentage, 0, 9);
+                                IncludesVAT := Format(AdmissionScheduleLines."Amount Includes VAT", 0, 9);
                             end;
-
                         end;
                     end;
                 }
@@ -285,14 +279,13 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
     local procedure GetEntry(var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        StartDate: Date;
     begin
 
         if (TmpAdmissionScheduleEntry."Admission Code" = '') then begin
             AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TmpAdmissionScheduleEntry."External Schedule Entry No.");
             AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
 
-            TmpAdmissionScheduleEntry.Init;
+            TmpAdmissionScheduleEntry.Init();
             if (AdmissionScheduleEntry.FindFirst()) then
                 TmpAdmissionScheduleEntry.TransferFields(AdmissionScheduleEntry, true);
 

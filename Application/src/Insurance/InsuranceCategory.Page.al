@@ -13,12 +13,12 @@ page 6014539 "NPR Insurance Category"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Kategori; Kategori)
+                field(Kategori; Rec.Kategori)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Category field';
                 }
-                field("Calculation Type"; "Calculation Type")
+                field("Calculation Type"; Rec."Calculation Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Calculation Type field';

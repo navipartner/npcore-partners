@@ -14,51 +14,51 @@ page 6150726 "NPR POS Action Sequences"
         {
             repeater(Group)
             {
-                field("Reference Type"; "Reference Type")
+                field("Reference Type"; Rec."Reference Type")
                 {
                     ApplicationArea = All;
-                    Editable = "Source Type" = "Source Type"::Manual;
+                    Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
-                    StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Reference Type field';
                 }
-                field("Reference POS Action Code"; "Reference POS Action Code")
+                field("Reference POS Action Code"; Rec."Reference POS Action Code")
                 {
                     ApplicationArea = All;
-                    Editable = "Source Type" = "Source Type"::Manual;
+                    Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
-                    StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Reference POS Action Code field';
                 }
-                field("POS Action Code"; "POS Action Code")
+                field("POS Action Code"; Rec."POS Action Code")
                 {
                     ApplicationArea = All;
-                    Editable = "Source Type" = "Source Type"::Manual;
+                    Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
-                    StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the POS Action Code field';
                 }
-                field("Source Type"; "Source Type")
+                field("Source Type"; Rec."Source Type")
                 {
                     ApplicationArea = All;
                     Style = Subordinate;
-                    StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Source Type field';
                 }
-                field("Sequence No."; "Sequence No.")
+                field("Sequence No."; Rec."Sequence No.")
                 {
                     ApplicationArea = All;
-                    Editable = "Source Type" = "Source Type"::Manual;
+                    Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
-                    StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Sequence No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
-                    Editable = "Source Type" = "Source Type"::Manual;
+                    Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
-                    StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Description field';
                 }
             }
@@ -74,7 +74,7 @@ page 6150726 "NPR POS Action Sequences"
                 Caption = 'Discover Sequences';
                 Image = CopyBOM;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

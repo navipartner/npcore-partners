@@ -38,12 +38,12 @@ table 6150731 "NPR POS Sales Workflow Set"
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
     begin
         POSSalesWorkflowStep.SetRange("Set Code", Code);
-        if POSSalesWorkflowStep.FindFirst then
-            POSSalesWorkflowStep.DeleteAll;
+        if POSSalesWorkflowStep.FindFirst() then
+            POSSalesWorkflowStep.DeleteAll();
 
         POSSalesWorkflowSetEntry.SetRange("Set Code", Code);
-        if POSSalesWorkflowSetEntry.FindFirst then
-            POSSalesWorkflowSetEntry.DeleteAll;
+        if POSSalesWorkflowSetEntry.FindFirst() then
+            POSSalesWorkflowSetEntry.DeleteAll();
     end;
 }
 

@@ -16,37 +16,37 @@ page 6014422 "NPR Pacsoft Customs Item Rows"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Item Code"; "Item Code")
+                field("Item Code"; Rec."Item Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Code (Stat No.) field';
                 }
-                field("Line Information"; "Line Information")
+                field("Line Information"; Rec."Line Information")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Information field';
                 }
-                field(Copies; Copies)
+                field(Copies; Rec.Copies)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Copies field';
                 }
-                field("Customs Value"; "Customs Value")
+                field("Customs Value"; Rec."Customs Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customs Value field';
                 }
-                field("Entry Content"; Content)
+                field("Entry Content"; Rec.Content)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Content field';
                 }
-                field("Country of Origin"; "Country of Origin")
+                field("Country of Origin"; Rec."Country of Origin")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Country of Origin field';

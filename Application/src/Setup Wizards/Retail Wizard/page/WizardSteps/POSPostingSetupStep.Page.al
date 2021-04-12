@@ -80,17 +80,17 @@ page 6014688 "NPR POS Posting Setup Step"
                         end;
                     end;
                 }
-                field("Account Type"; "Account Type")
+                field("Account Type"; Rec."Account Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account Type field';
 
                     trigger OnValidate()
                     begin
-                        "Account No." := '';
+                        Rec."Account No." := '';
                     end;
                 }
-                field("Account No."; "Account No.")
+                field("Account No."; Rec."Account No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account No. field';
@@ -104,59 +104,59 @@ page 6014688 "NPR POS Posting Setup Step"
                         BankAccList: Page "Bank Account List";
                         GLAccList: Page "G/L Account List";
                     begin
-                        if "Account Type" = Rec."Account Type"::"G/L Account" then begin
+                        if Rec."Account Type" = Rec."Account Type"::"G/L Account" then begin
                             GLAccList.LookupMode := true;
 
-                            if "Account No." <> '' then
-                                if GLAcc.Get("Account No.") then
+                            if Rec."Account No." <> '' then
+                                if GLAcc.Get(Rec."Account No.") then
                                     GLAccList.SetRecord(GLAcc);
 
                             if GLAccList.RunModal() = Action::LookupOK then begin
                                 GLAccList.GetRecord(GLAcc);
-                                "Account No." := GLAcc."No.";
+                                Rec."Account No." := GLAcc."No.";
                             end;
                         end;
 
-                        if "Account Type" = Rec."Account Type"::"Bank Account" then begin
+                        if Rec."Account Type" = Rec."Account Type"::"Bank Account" then begin
                             BankAccList.LookupMode := true;
 
-                            if "Account No." <> '' then
-                                if BankAcc.Get("Account No.") then
+                            if Rec."Account No." <> '' then
+                                if BankAcc.Get(Rec."Account No.") then
                                     BankAccList.SetRecord(BankAcc);
 
                             if BankAccList.RunModal() = Action::LookupOK then begin
                                 BankAccList.GetRecord(BankAcc);
-                                "Account No." := BankAcc."No.";
+                                Rec."Account No." := BankAcc."No.";
                             end;
                         end;
 
-                        if "Account Type" = Rec."Account Type"::Customer then begin
+                        if Rec."Account Type" = Rec."Account Type"::Customer then begin
                             CustomerList.LookupMode := true;
 
-                            if "Account No." <> '' then
-                                if Customer.Get("Account No.") then
+                            if Rec."Account No." <> '' then
+                                if Customer.Get(Rec."Account No.") then
                                     CustomerList.SetRecord(Customer);
 
                             if CustomerList.RunModal() = Action::LookupOK then begin
                                 CustomerList.GetRecord(Customer);
-                                "Account No." := Customer."No.";
+                                Rec."Account No." := Customer."No.";
                             end;
                         end;
                     end;
                 }
-                field("Difference Account Type"; "Difference Account Type")
+                field("Difference Account Type"; Rec."Difference Account Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Difference Account Type field';
 
                     trigger OnValidate()
                     begin
-                        "Difference Acc. No." := '';
+                        Rec."Difference Acc. No." := '';
 
-                        "Difference Acc. No. (Neg)" := '';
+                        Rec."Difference Acc. No. (Neg)" := '';
                     end;
                 }
-                field("Difference Acc. No."; "Difference Acc. No.")
+                field("Difference Acc. No."; Rec."Difference Acc. No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Difference Acc. No. field';
@@ -170,47 +170,47 @@ page 6014688 "NPR POS Posting Setup Step"
                         BankAccList: Page "Bank Account List";
                         GLAccList: Page "G/L Account List";
                     begin
-                        if "Difference Account Type" = Rec."Difference Account Type"::"G/L Account" then begin
+                        if Rec."Difference Account Type" = Rec."Difference Account Type"::"G/L Account" then begin
                             GLAccList.LookupMode := true;
 
-                            if "Difference Acc. No." <> '' then
-                                if GLAcc.Get("Difference Acc. No.") then
+                            if Rec."Difference Acc. No." <> '' then
+                                if GLAcc.Get(Rec."Difference Acc. No.") then
                                     GLAccList.SetRecord(GLAcc);
 
                             if GLAccList.RunModal() = Action::LookupOK then begin
                                 GLAccList.GetRecord(GLAcc);
-                                "Difference Acc. No." := GLAcc."No.";
+                                Rec."Difference Acc. No." := GLAcc."No.";
                             end;
                         end;
 
-                        if "Difference Account Type" = Rec."Difference Account Type"::"Bank Account" then begin
+                        if Rec."Difference Account Type" = Rec."Difference Account Type"::"Bank Account" then begin
                             BankAccList.LookupMode := true;
 
-                            if "Difference Acc. No." <> '' then
-                                if BankAcc.Get("Difference Acc. No.") then
+                            if Rec."Difference Acc. No." <> '' then
+                                if BankAcc.Get(Rec."Difference Acc. No.") then
                                     BankAccList.SetRecord(BankAcc);
 
                             if BankAccList.RunModal() = Action::LookupOK then begin
                                 BankAccList.GetRecord(BankAcc);
-                                "Difference Acc. No." := BankAcc."No.";
+                                Rec."Difference Acc. No." := BankAcc."No.";
                             end;
                         end;
 
-                        if "Difference Account Type" = Rec."Difference Account Type"::Customer then begin
+                        if Rec."Difference Account Type" = Rec."Difference Account Type"::Customer then begin
                             CustomerList.LookupMode := true;
 
-                            if "Difference Acc. No." <> '' then
-                                if Customer.Get("Difference Acc. No.") then
+                            if Rec."Difference Acc. No." <> '' then
+                                if Customer.Get(Rec."Difference Acc. No.") then
                                     CustomerList.SetRecord(Customer);
 
                             if CustomerList.RunModal() = Action::LookupOK then begin
                                 CustomerList.GetRecord(Customer);
-                                "Difference Acc. No." := Customer."No.";
+                                Rec."Difference Acc. No." := Customer."No.";
                             end;
                         end;
                     end;
                 }
-                field("Difference Acc. No. (Neg)"; "Difference Acc. No. (Neg)")
+                field("Difference Acc. No. (Neg)"; Rec."Difference Acc. No. (Neg)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Difference Acc. No. (Neg) field';
@@ -224,42 +224,42 @@ page 6014688 "NPR POS Posting Setup Step"
                         BankAccList: Page "Bank Account List";
                         GLAccList: Page "G/L Account List";
                     begin
-                        if "Difference Account Type" = Rec."Difference Account Type"::"G/L Account" then begin
+                        if Rec."Difference Account Type" = Rec."Difference Account Type"::"G/L Account" then begin
                             GLAccList.LookupMode := true;
 
-                            if "Difference Acc. No. (Neg)" <> '' then
-                                if GLAcc.Get("Difference Acc. No. (Neg)") then
+                            if Rec."Difference Acc. No. (Neg)" <> '' then
+                                if GLAcc.Get(Rec."Difference Acc. No. (Neg)") then
                                     GLAccList.SetRecord(GLAcc);
 
                             if GLAccList.RunModal() = Action::LookupOK then begin
                                 GLAccList.GetRecord(GLAcc);
-                                "Difference Acc. No. (Neg)" := GLAcc."No.";
+                                Rec."Difference Acc. No. (Neg)" := GLAcc."No.";
                             end;
                         end;
 
-                        if "Difference Account Type" = Rec."Difference Account Type"::"Bank Account" then begin
+                        if Rec."Difference Account Type" = Rec."Difference Account Type"::"Bank Account" then begin
                             BankAccList.LookupMode := true;
 
-                            if "Difference Acc. No. (Neg)" <> '' then
-                                if BankAcc.Get("Difference Acc. No. (Neg)") then
+                            if Rec."Difference Acc. No. (Neg)" <> '' then
+                                if BankAcc.Get(Rec."Difference Acc. No. (Neg)") then
                                     BankAccList.SetRecord(BankAcc);
 
                             if BankAccList.RunModal() = Action::LookupOK then begin
                                 BankAccList.GetRecord(BankAcc);
-                                "Difference Acc. No. (Neg)" := BankAcc."No.";
+                                Rec."Difference Acc. No. (Neg)" := BankAcc."No.";
                             end;
                         end;
 
-                        if "Difference Account Type" = Rec."Difference Account Type"::Customer then begin
+                        if Rec."Difference Account Type" = Rec."Difference Account Type"::Customer then begin
                             CustomerList.LookupMode := true;
 
-                            if "Difference Acc. No. (Neg)" <> '' then
-                                if Customer.Get("Difference Acc. No. (Neg)") then
+                            if Rec."Difference Acc. No. (Neg)" <> '' then
+                                if Customer.Get(Rec."Difference Acc. No. (Neg)") then
                                     CustomerList.SetRecord(Customer);
 
                             if CustomerList.RunModal() = Action::LookupOK then begin
                                 CustomerList.GetRecord(Customer);
-                                "Difference Acc. No. (Neg)" := Customer."No.";
+                                Rec."Difference Acc. No. (Neg)" := Customer."No.";
                             end;
                         end;
                     end;

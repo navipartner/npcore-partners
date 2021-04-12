@@ -1,4 +1,4 @@
-page 6151481 "NPR Magento Retail Activities"
+﻿page 6151481 "NPR Magento Retail Activities"
 {
     Caption = 'NaviConnect Activities';
     PageType = CardPart;
@@ -138,11 +138,11 @@ page 6151481 "NPR Magento Retail Activities"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
-        Rec.SetFilter("Date Filter", '=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '=%1', WorkDate());
     end;
 }

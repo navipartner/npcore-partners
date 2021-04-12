@@ -1,4 +1,4 @@
-codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
+﻿codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 {
     trigger OnRun()
     var
@@ -51,23 +51,20 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         NpDcCoupon: Record "NPR NpDc Coupon";
         TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary;
     begin
-        if TempNpDcExtCouponBuffer.FindSet then
+        if TempNpDcExtCouponBuffer.FindSet() then
             repeat
                 if FindCoupon(TempNpDcExtCouponBuffer."Reference No.", NpDcCoupon) then begin
-                    TempNpDcExtCouponBuffer2.Init;
+                    TempNpDcExtCouponBuffer2.Init();
                     TempNpDcExtCouponBuffer2 := TempNpDcExtCouponBuffer;
                     Coupon2Buffer(NpDcCoupon, TempNpDcExtCouponBuffer2);
-                    TempNpDcExtCouponBuffer2.Insert;
+                    TempNpDcExtCouponBuffer2.Insert();
                 end;
-            until TempNpDcExtCouponBuffer.Next = 0;
+            until TempNpDcExtCouponBuffer.Next() = 0;
 
         TempNpDcExtCouponBuffer.Copy(TempNpDcExtCouponBuffer2, true);
     end;
 
     procedure ReserveCoupons(var TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary)
-    var
-        NpDcCoupon: Record "NPR NpDc Coupon";
-        TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary;
     begin
         RemoveCouponReservations(TempNpDcExtCouponBuffer);
         InsertCouponReservations(TempNpDcExtCouponBuffer);
@@ -80,20 +77,19 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 
     local procedure InsertPOSSale(var TempSalePOS: Record "NPR POS Sale" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var SalePOS: Record "NPR POS Sale")
     begin
-        TempSalePOS.FindFirst;
+        TempSalePOS.FindFirst();
         InsertSalePOS(TempSalePOS, SalePOS);
 
-        TempSaleLinePOS.FindSet;
+        TempSaleLinePOS.FindSet();
         repeat
             InsertSaleLinePOS(SalePOS, TempSaleLinePOS);
-        until TempSaleLinePOS.Next = 0;
+        until TempSaleLinePOS.Next() = 0;
     end;
 
     local procedure InsertSalePOS(TempSalePOS: Record "NPR POS Sale" temporary; var SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
-        POSSale: Codeunit "NPR POS Sale";
         SalesTicketNo: Code[20];
     begin
         if not POSUnit.Get('-_-') then begin
@@ -103,14 +99,14 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         end;
 
         if not UserSetup.Get(UserId) then begin
-            UserSetup.Init;
+            UserSetup.Init();
             UserSetup."User ID" := UserId;
             UserSetup."NPR Backoffice Register No." := POSUnit."No.";
-            UserSetup.Insert;
+            UserSetup.Insert();
         end else
             if UserSetup."NPR Backoffice Register No." = '' then begin
                 UserSetup."NPR Backoffice Register No." := POSUnit."No.";
-                UserSetup.Modify;
+                UserSetup.Modify();
             end;
 
         SalesTicketNo := DelChr(Format(CurrentDateTime, 0, 9), '=', ' -:.ZT');
@@ -130,10 +126,10 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         SaleLinePOS: Record "NPR POS Sale Line";
         UOMMgt: Codeunit "Unit of Measure Management";
     begin
-        SaleLinePOS.Init;
+        SaleLinePOS.Init();
         SaleLinePOS."Register No." := SalePOS."Register No.";
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        SaleLinePOS.Date := Today;
+        SaleLinePOS.Date := Today();
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
         SaleLinePOS."Line No." := TempSaleLinePOS."Line No.";
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
@@ -158,7 +154,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         if (not SaleLinePOS."Price Includes VAT") then
             SaleLinePOS.Amount := TempSaleLinePOS."Amount Including VAT";
 
-        SaleLinePOS.Insert;
+        SaleLinePOS.Insert();
     end;
 
     local procedure InsertCouponReservations(var TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary)
@@ -171,7 +167,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         NpDcModuleValidateDefault: Codeunit "NPR NpDc ModuleValid.: Defa.";
         LineNo: Integer;
     begin
-        if not TempNpDcExtCouponBuffer.FindSet then
+        if not TempNpDcExtCouponBuffer.FindSet() then
             exit;
 
         repeat
@@ -182,9 +178,9 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
             NpDcModuleValidateDefault.ValidateCoupon(SalePOS, NpDcCoupon);
 
             NpDcExtCouponSalesLine.SetRange("External Document No.", TempNpDcExtCouponBuffer."Document No.");
-            if NpDcExtCouponSalesLine.FindLast then;
+            if NpDcExtCouponSalesLine.FindLast() then;
             LineNo := NpDcExtCouponSalesLine."Line No." + 10000;
-            NpDcExtCouponSalesLine.Init;
+            NpDcExtCouponSalesLine.Init();
             NpDcExtCouponSalesLine."External Document No." := TempNpDcExtCouponBuffer."Document No.";
             NpDcExtCouponSalesLine."Line No." := LineNo;
             NpDcExtCouponSalesLine."Coupon No." := NpDcCoupon."No.";
@@ -193,11 +189,11 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
             NpDcExtCouponSalesLine."Reference No." := NpDcCoupon."Reference No.";
             NpDcExtCouponSalesLine.Insert(true);
 
-            TempNpDcExtCouponBuffer2.Init;
+            TempNpDcExtCouponBuffer2.Init();
             TempNpDcExtCouponBuffer2 := TempNpDcExtCouponBuffer;
             Coupon2Buffer(NpDcCoupon, TempNpDcExtCouponBuffer2);
-            TempNpDcExtCouponBuffer2.Insert;
-        until TempNpDcExtCouponBuffer.Next = 0;
+            TempNpDcExtCouponBuffer2.Insert();
+        until TempNpDcExtCouponBuffer.Next() = 0;
 
         TempNpDcExtCouponBuffer.Copy(TempNpDcExtCouponBuffer2, true);
     end;
@@ -208,7 +204,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv.";
         TempNpDcExtCouponBuffer2: Record "NPR NpDc Ext. Coupon Buffer" temporary;
     begin
-        if not TempNpDcExtCouponBuffer.FindSet then
+        if not TempNpDcExtCouponBuffer.FindSet() then
             exit;
 
         repeat
@@ -216,14 +212,14 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 
             NpDcExtCouponSalesLine.SetRange("External Document No.", TempNpDcExtCouponBuffer."Document No.");
             NpDcExtCouponSalesLine.SetRange("Reference No.", TempNpDcExtCouponBuffer."Reference No.");
-            if NpDcExtCouponSalesLine.FindFirst then
-                NpDcExtCouponSalesLine.Delete;
+            if NpDcExtCouponSalesLine.FindFirst() then
+                NpDcExtCouponSalesLine.Delete();
 
-            TempNpDcExtCouponBuffer2.Init;
+            TempNpDcExtCouponBuffer2.Init();
             TempNpDcExtCouponBuffer2 := TempNpDcExtCouponBuffer;
             Coupon2Buffer(NpDcCoupon, TempNpDcExtCouponBuffer2);
-            TempNpDcExtCouponBuffer2.Insert;
-        until TempNpDcExtCouponBuffer.Next = 0;
+            TempNpDcExtCouponBuffer2.Insert();
+        until TempNpDcExtCouponBuffer.Next() = 0;
 
         TempNpDcExtCouponBuffer.Copy(TempNpDcExtCouponBuffer2, true);
     end;
@@ -241,10 +237,10 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         POSSale.SetPosition(SalePOS.GetPosition(false));
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, POSSetup, POSFrontEndMgt);
-        TempNpDcExtCouponBuffer.FindSet;
+        TempNpDcExtCouponBuffer.FindSet();
         repeat
             NpDcCouponMgt.ScanCoupon(POSSession, TempNpDcExtCouponBuffer."Reference No.");
-        until TempNpDcExtCouponBuffer.Next = 0;
+        until TempNpDcExtCouponBuffer.Next() = 0;
     end;
 
     local procedure TransferPOSSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
@@ -252,23 +248,23 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(TempSaleLinePOS);
-        TempSaleLinePOS.DeleteAll;
+        TempSaleLinePOS.DeleteAll();
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
-                TempSaleLinePOS.Init;
+                TempSaleLinePOS.Init();
                 TempSaleLinePOS := SaleLinePOS;
-                TempSaleLinePOS.Insert;
-            until SaleLinePOS.Next = 0;
+                TempSaleLinePOS.Insert();
+            until SaleLinePOS.Next() = 0;
     end;
 
     [TryFunction]
     local procedure FindCoupon(ReferenceNo: Text; var NpDcCoupon: Record "NPR NpDc Coupon")
     begin
         NpDcCoupon.SetRange("Reference No.", ReferenceNo);
-        NpDcCoupon.FindFirst;
+        NpDcCoupon.FindFirst();
         NpDcCoupon.TestField("Reference No.");
     end;
 

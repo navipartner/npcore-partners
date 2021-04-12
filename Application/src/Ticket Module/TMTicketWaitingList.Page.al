@@ -131,7 +131,7 @@ page 6151138 "NPR TM Ticket Waiting List"
                 begin
 
                     TicketWaitingListMgr.CreateWaitingListNotification(Rec, TmpTicketNotificationEntry);
-                    Commit;
+                    Commit();
 
                     TmpTicketNotificationEntry.FindFirst();
                     TicketNotificationEntry.SetFilter("Entry No.", '=%1', TmpTicketNotificationEntry."Entry No.");

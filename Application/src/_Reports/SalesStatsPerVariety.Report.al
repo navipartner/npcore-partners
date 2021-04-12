@@ -238,15 +238,11 @@ report 6014615 "NPR Sales Stats Per Variety"
     var
         AllObj: Record AllObj;
         GLSetup: Record "General Ledger Setup";
-        InvPostingGroup: Record "Inventory Posting Group";
         ItemVariant: Record "Item Variant";
-        "Object": Record "Object";
         PrintAlsoWithoutSale: Boolean;
         PrintTotal: Boolean;
         AverageProfit: Decimal;
         AverageProfitPerc: Decimal;
-        AvgUnitCost: Decimal;
-        AvgUnitPrice: Decimal;
         COGSAmount: Decimal;
         ItemInventory: Decimal;
         ItemProfit: Decimal;
@@ -266,14 +262,12 @@ report 6014615 "NPR Sales Stats Per Variety"
         Text000: Label 'Period: %1';
         TextDateFilter: Text;
         TextItemFilter: Text;
-        ColorAndSize: Text[50];
 
     procedure CalculateVariantCost(var Item2: Record Item; ItemVariant: Record "Item Variant")
     var
         Item3: Record Item;
         ItemLedgEntry: Record "Item Ledger Entry";
         TempItemLedgEntry: Record "Item Ledger Entry" temporary;
-        Location: Record Location;
     begin
         TempItemLedgEntry.Init();
         ItemLedgEntry.Reset();

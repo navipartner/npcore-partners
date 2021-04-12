@@ -1,4 +1,4 @@
-page 6014589 "NPR Customer Stats Subpage"
+﻿page 6014589 "NPR Customer Stats Subpage"
 {
     Caption = 'Customer Statistics Subform';
     Editable = false;
@@ -14,12 +14,12 @@ page 6014589 "NPR Customer Stats Subpage"
             repeater(Control6150623)
             {
                 ShowCaption = false;
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
@@ -39,7 +39,7 @@ page 6014589 "NPR Customer Stats Subpage"
                         SetItemLedgerEntryFilter(AuxItemLedgerEntry);
                         AuxItemLedgerEntries.SetTableView(AuxItemLedgerEntry);
                         AuxItemLedgerEntries.Editable(false);
-                        AuxItemLedgerEntries.RunModal;
+                        AuxItemLedgerEntries.RunModal();
                     end;
                 }
                 field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
@@ -64,7 +64,7 @@ page 6014589 "NPR Customer Stats Subpage"
                         SetValueEntryFilter(AuxValueEntry);
                         AuxValueEntries.SetTableView(AuxValueEntry);
                         AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal;
+                        AuxValueEntries.RunModal();
                     end;
                 }
                 field("<Control61506191>"; -"LastYear Sale Amount")
@@ -117,8 +117,8 @@ page 6014589 "NPR Customer Stats Subpage"
     trigger OnOpenPage()
     begin
 
-        if (Periodestart = 0D) then Periodestart := Today;
-        if (Periodeslut = 0D) then Periodeslut := Today;
+        if (Periodestart = 0D) then Periodestart := Today();
+        if (Periodeslut = 0D) then Periodeslut := Today();
     end;
 
     var
@@ -145,8 +145,6 @@ page 6014589 "NPR Customer Stats Subpage"
         Periodestart: Date;
         Periodeslut: Date;
         LastYear: Boolean;
-        ShowSameWeekday: Boolean;
-        DateFilterLastYear: Text[50];
         CalcLastYear: Text[50];
 
     procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50])
@@ -169,7 +167,7 @@ page 6014589 "NPR Customer Stats Subpage"
             ItemCategoryFilter := ItemGroup;
         end;
 
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     procedure Calc()
@@ -217,7 +215,7 @@ page 6014589 "NPR Customer Stats Subpage"
         //SetItemLedgerEntryFilter
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
-        AuxItemLedgerEntry.SetRange("Source No.", "No.");
+        AuxItemLedgerEntry.SetRange("Source No.", Rec."No.");
         if not LastYear then
             AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -243,7 +241,7 @@ page 6014589 "NPR Customer Stats Subpage"
     begin
         //SetValueEntryFilter
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-        AuxValueEntry.SetRange("Source No.", "No.");
+        AuxValueEntry.SetRange("Source No.", Rec."No.");
         if not LastYear then
             AuxValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -276,7 +274,7 @@ page 6014589 "NPR Customer Stats Subpage"
     begin
         //ChangeEmptyFilter()
         HideEmpty := true;
-        ClearMarks;
+        Rec.ClearMarks;
         if HideEmpty then begin
             Current := Rec;
 
@@ -285,25 +283,25 @@ page 6014589 "NPR Customer Stats Subpage"
                 repeat
                     Count += 1;
                     Dlg.Update(1, Customer."No.");
-                    Dlg.Update(2, Round(Count / Customer.Count * 10000, 1, '='));
+                    Dlg.Update(2, Round(Count / Customer.Count() * 10000, 1, '='));
                     SetItemLedgerEntryFilter(AuxItemLedgerEntry);
                     AuxItemLedgerEntry.SetRange("Source No.", Customer."No.");
 
                     AuxItemLedgerEntry.CalcSums(Quantity);
                     if AuxItemLedgerEntry.Quantity <> 0 then begin
-                        Get(Customer."No.");
-                        Mark(true);
+                        Rec.Get(Customer."No.");
+                        Rec.Mark(true);
                     end;
-                until Customer.Next = 0;
-            Dlg.Close;
+                until Customer.Next() = 0;
+            Dlg.Close();
 
-            MarkedOnly(true);
+            Rec.MarkedOnly(true);
             Rec := Current;
         end else begin
-            MarkedOnly(false);
+            Rec.MarkedOnly(false);
         end;
 
-        CurrPage.Update;
+        CurrPage.Update();
 
         exit(HideEmpty);
     end;
@@ -311,11 +309,11 @@ page 6014589 "NPR Customer Stats Subpage"
     procedure InitForm()
     begin
         //InitForm()
-        Reset;
+        Rec.Reset();
         Dim1Filter := '';
         Dim2Filter := '';
-        Periodestart := Today;
-        Periodeslut := Today;
+        Periodestart := Today();
+        Periodeslut := Today();
         ItemCategoryFilter := '';
         HideEmpty := true;
     end;
@@ -326,16 +324,16 @@ page 6014589 "NPR Customer Stats Subpage"
         if HideEmpty then begin
             HideEmpty := false;
             ChangeEmptyFilter;
-            CurrPage.Update;
+            CurrPage.Update();
         end;
     end;
 
     procedure ReleaseLock()
     begin
         //ReleaseLock()
-        if Count = 0 then begin
-            MarkedOnly(false);
-            ClearMarks;
+        if Rec.Count() = 0 then begin
+            Rec.MarkedOnly(false);
+            Rec.ClearMarks;
         end;
     end;
 

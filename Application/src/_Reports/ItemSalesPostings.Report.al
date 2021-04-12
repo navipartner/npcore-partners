@@ -176,7 +176,6 @@ report 6014439 "NPR Item Sales Postings"
 
     var
         PrintAlsoWithoutSale: Boolean;
-        PrintUsingInclVAT: Boolean;
         ItemFilter: Text[250];
         Profit: Decimal;
         ItemProfitPct: Decimal;

@@ -1,8 +1,8 @@
 report 6150614 "NPR Posting Overview POS"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Posting Overview POS.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Posting Overview POS.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Posting Overview POS';
     PreviewMode = PrintLayout;
@@ -327,7 +327,6 @@ report 6150614 "NPR Posting Overview POS"
     var
         IncludeCreditCardTransaction: Boolean;
         TotalAmountInclTax: Decimal;
-        CustomerNoCaption: Label 'Customer No.';
         DateFilterCaption: Label 'Date Filter: %1';
         NoFilterCaption: Label 'No. Filter: %1';
         POSStoreFilterCaption: Label 'POS  Store Filter: %1';

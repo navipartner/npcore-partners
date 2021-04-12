@@ -1,4 +1,4 @@
-page 6151220 "NPR PrintNode Setup"
+﻿page 6151220 "NPR PrintNode Setup"
 {
     Caption = 'PrintNode Setup';
     PageType = Card;
@@ -12,7 +12,7 @@ page 6151220 "NPR PrintNode Setup"
         {
             group(General)
             {
-                field("API Key"; "API Key")
+                field("API Key"; Rec."API Key")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the API Key field';
@@ -31,7 +31,7 @@ page 6151220 "NPR PrintNode Setup"
                 Image = Confirm;
                 ApplicationArea = All;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Test Connection action';
 
@@ -47,7 +47,7 @@ page 6151220 "NPR PrintNode Setup"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
+        Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
             Rec.Insert(true);

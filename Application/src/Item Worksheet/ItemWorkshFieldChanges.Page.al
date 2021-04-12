@@ -81,14 +81,14 @@ page 6060055 "NPR Item Worksh. Field Changes"
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
-                    StyleExpr = Warning;
+                    StyleExpr = Rec.Warning;
                     ToolTip = 'Specifies the value of the Current Value field.';
                 }
                 field("New Value"; Rec."New Value")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
-                    StyleExpr = Warning;
+                    StyleExpr = Rec.Warning;
                     ToolTip = 'Specifies the value of the New Value field.';
                 }
                 field(Warning; Rec.Warning)

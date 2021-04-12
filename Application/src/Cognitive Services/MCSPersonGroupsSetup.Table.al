@@ -20,7 +20,7 @@ table 6059956 "NPR MCS Person Groups Setup"
         }
         field(12; "Person Groups Name"; Text[128])
         {
-            CalcFormula = Lookup ("NPR MCS Person Groups".Name WHERE(Id = FIELD("Person Groups Id")));
+            CalcFormula = Lookup("NPR MCS Person Groups".Name WHERE(Id = FIELD("Person Groups Id")));
             Caption = 'Person Groups Name';
             Editable = false;
             FieldClass = FlowField;

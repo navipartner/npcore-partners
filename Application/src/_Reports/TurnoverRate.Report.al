@@ -1,8 +1,8 @@
 report 6014427 "NPR Turnover Rate"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Turnover Rate.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Turnover Rate.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Turnover Rate';
     dataset
@@ -228,7 +228,6 @@ report 6014427 "NPR Turnover Rate"
         Amt1: Decimal;
         AvgBalanceCostPrice: Decimal;
         AvgCost: Decimal;
-        Inventory: Decimal;
         InventoryAmt: Decimal;
         PurchaseCostPrice: Decimal;
         SalesCost: Decimal;

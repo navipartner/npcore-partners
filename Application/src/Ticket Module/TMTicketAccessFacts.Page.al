@@ -53,7 +53,7 @@ page 6060114 "NPR TM Ticket Access Facts"
     begin
 
         CurrPage.SetSelectionFilter(Fact);
-        FactCount := Fact.Count;
+        FactCount := Fact.Count();
 
         if (FactCount > 0) then begin
             Fact.Find('-');
@@ -65,7 +65,7 @@ page 6060114 "NPR TM Ticket Access Facts"
                 LastFact := FirstFact;
                 More := (FactCount > 0);
                 while More do begin
-                    if Fact.Next = 0 then begin
+                    if Fact.Next() = 0 then begin
                         More := false;
                     end else begin
                         if not Fact.Mark then begin
@@ -87,7 +87,7 @@ page 6060114 "NPR TM Ticket Access Facts"
                     SelectionFilter := SelectionFilter + FirstFact + '..' + LastFact;
                 if FactCount > 0 then begin
                     Fact.MarkedOnly(true);
-                    Fact.Next;
+                    Fact.Next();
                 end;
             end;
 

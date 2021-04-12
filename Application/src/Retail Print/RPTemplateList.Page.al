@@ -15,32 +15,32 @@ page 6014639 "NPR RP Template List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Printer Type"; "Printer Type")
+                field("Printer Type"; Rec."Printer Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printer Type field';
                 }
-                field("Printer Device"; "Printer Device")
+                field("Printer Device"; Rec."Printer Device")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printer Device field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comments field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field("Last Modified At"; "Last Modified At")
+                field("Last Modified At"; Rec."Last Modified At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Modified At field';

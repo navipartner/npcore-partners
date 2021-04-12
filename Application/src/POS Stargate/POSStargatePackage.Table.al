@@ -25,7 +25,7 @@ table 6150713 "NPR POS Stargate Package"
         }
         field(4; Methods; Integer)
         {
-            CalcFormula = Count ("NPR POS Stargate Pckg. Method" WHERE("Package Name" = FIELD(Name)));
+            CalcFormula = Count("NPR POS Stargate Pckg. Method" WHERE("Package Name" = FIELD(Name)));
             Caption = 'Methods';
             Editable = false;
             FieldClass = FlowField;
@@ -48,7 +48,7 @@ table 6150713 "NPR POS Stargate Package"
         StargatePackageMethod: Record "NPR POS Stargate Pckg. Method";
     begin
         StargatePackageMethod.SetRange("Package Name", Name);
-        StargatePackageMethod.DeleteAll;
+        StargatePackageMethod.DeleteAll();
     end;
 }
 

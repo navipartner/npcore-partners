@@ -74,10 +74,6 @@ xmlport 6060138 "NPR MM Regret Member Timeframe"
                     }
 
                     trigger OnAfterGetRecord()
-                    var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-                        DateValidFromDate: Date;
-                        DateValidUntilDate: Date;
                     begin
                     end;
                 }

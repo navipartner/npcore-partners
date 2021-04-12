@@ -1,4 +1,4 @@
-page 6150620 "NPR POS Payment Bins"
+﻿page 6150620 "NPR POS Payment Bins"
 {
     // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
     // NPR5.36/BR/20170810 CASE 277096 Added Action to navigate to POS Posting Setup
@@ -21,32 +21,32 @@ page 6150620 "NPR POS Payment Bins"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("Attached to POS Unit No."; "Attached to POS Unit No.")
+                field("Attached to POS Unit No."; Rec."Attached to POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attached to POS Unit No. field';
                 }
-                field("Eject Method"; "Eject Method")
+                field("Eject Method"; Rec."Eject Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Eject Method field';
                 }
-                field("Bin Type"; "Bin Type")
+                field("Bin Type"; Rec."Bin Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bin Type field';
@@ -64,7 +64,7 @@ page 6150620 "NPR POS Payment Bins"
                 Caption = 'POS Posting Setup';
                 Image = GeneralPostingSetup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
@@ -77,7 +77,7 @@ page 6150620 "NPR POS Payment Bins"
                 Caption = 'Eject Method Parameters';
                 Image = Answers;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -101,7 +101,7 @@ page 6150620 "NPR POS Payment Bins"
                 Ellipsis = true;
                 Image = TransferFunds;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 Visible = false;
                 ApplicationArea = All;
@@ -109,7 +109,7 @@ page 6150620 "NPR POS Payment Bins"
 
                 trigger OnAction()
                 begin
-                    TransferContentsToBin("No.");
+                    TransferContentsToBin(Rec."No.");
                 end;
             }
             action("Insert Initial Float")
@@ -117,7 +117,7 @@ page 6150620 "NPR POS Payment Bins"
                 Caption = 'Insert Initial Float';
                 Image = TransferFunds;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -150,8 +150,8 @@ page 6150620 "NPR POS Payment Bins"
 
         //-NPR5.40 [307267]
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry('');
-        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint('', "No.", CheckpointEntryNo);
-        Commit;
+        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint('', Rec."No.", CheckpointEntryNo);
+        Commit();
 
         // Confirm amounts counted and float/bank/safe transfer
         POSPaymentBinCheckpoint.Reset();
@@ -162,7 +162,7 @@ page 6150620 "NPR POS Payment Bins"
         PaymentBinCheckpointPage.LookupMode(true);
         PaymentBinCheckpointPage.SetTransferMode();
         PageAction := PaymentBinCheckpointPage.RunModal();
-        Commit;
+        Commit();
 
         if (PageAction = ACTION::LookupOK) then begin
             POSPaymentBinCheckpoint.Reset();
@@ -171,7 +171,7 @@ page 6150620 "NPR POS Payment Bins"
             if (POSPaymentBinCheckpoint.FindFirst()) then begin
                 SalePOS."Register No." := 'TMP';
                 SalePOS."POS Store Code" := 'TMP';
-                SalePOS.Date := Today;
+                SalePOS.Date := Today();
                 SalePOS."Sales Ticket No." := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890'));
 
                 POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, true, CheckpointEntryNo);
@@ -191,25 +191,25 @@ page 6150620 "NPR POS Payment Bins"
         BinEntry: Record "NPR POS Bin Entry";
     begin
         //-NPR5.51 [353761]
-        POSUnit.Get("Attached to POS Unit No.");
+        POSUnit.Get(Rec."Attached to POS Unit No.");
 
         POSPayBinSetFloat.LookupMode := true;
         POSPayBinSetFloat.SetPaymentBin(Rec);
-        if POSPayBinSetFloat.RunModal = ACTION::LookupOK then begin
+        if POSPayBinSetFloat.RunModal() = ACTION::LookupOK then begin
             POSPayBinSetFloat.GetAmounts(POSPaymentMethodTemp);
 
             POSPaymentMethodTemp.Reset();
-            if POSPaymentMethodTemp.FindSet then begin
+            if POSPaymentMethodTemp.FindSet() then begin
 
-                POSWorkshiftCheckpoint.Init;
+                POSWorkshiftCheckpoint.Init();
                 POSWorkshiftCheckpoint."Entry No." := 0;
 
-                POSWorkshiftCheckpoint."POS Unit No." := "Attached to POS Unit No.";
+                POSWorkshiftCheckpoint."POS Unit No." := Rec."Attached to POS Unit No.";
                 POSWorkshiftCheckpoint."Created At" := CurrentDateTime;
                 POSWorkshiftCheckpoint.Open := false;
                 POSWorkshiftCheckpoint."POS Entry No." := 0;
                 POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::ZREPORT;
-                POSWorkshiftCheckpoint.Insert;
+                POSWorkshiftCheckpoint.Insert();
 
                 repeat
                     POSPaymentMethod.Get(POSPaymentMethodTemp.Code);
@@ -219,8 +219,8 @@ page 6150620 "NPR POS Payment Bins"
                     BinEntry."Entry No." := 0;
                     BinEntry."Created At" := CurrentDateTime();
                     BinEntry.Type := BinEntry.Type::CHECKPOINT;
-                    BinEntry."Payment Bin No." := "No.";
-                    BinEntry."Transaction Date" := Today;
+                    BinEntry."Payment Bin No." := Rec."No.";
+                    BinEntry."Transaction Date" := Today();
                     BinEntry."Transaction Time" := Time;
                     BinEntry."POS Unit No." := POSUnit."No.";
                     BinEntry."POS Store Code" := POSUnit."POS Store Code";
@@ -232,24 +232,24 @@ page 6150620 "NPR POS Payment Bins"
                     BinEntry."Transaction Currency Code" := POSPaymentMethod."Currency Code";
                     BinEntry.Insert();
 
-                    POSPaymentBinCheckpoint.Init;
+                    POSPaymentBinCheckpoint.Init();
                     POSPaymentBinCheckpoint."Entry No." := 0;
                     POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::ZREPORT;
                     POSPaymentBinCheckpoint."Float Amount" := POSPaymentMethodTemp."Rounding Precision";
                     POSPaymentBinCheckpoint."Calculated Amount Incl. Float" := POSPaymentMethodTemp."Rounding Precision";
                     POSPaymentBinCheckpoint."New Float Amount" := POSPaymentMethodTemp."Rounding Precision";
                     POSPaymentBinCheckpoint."Created On" := CurrentDateTime;
-                    POSPaymentBinCheckpoint."Checkpoint Date" := Today;
+                    POSPaymentBinCheckpoint."Checkpoint Date" := Today();
                     POSPaymentBinCheckpoint."Checkpoint Time" := Time;
                     POSPaymentBinCheckpoint.Description := InitialFloatDesc;
                     POSPaymentBinCheckpoint."Payment Method No." := POSPaymentMethod.Code;
                     POSPaymentBinCheckpoint."Currency Code" := POSPaymentMethod."Currency Code";
-                    POSPaymentBinCheckpoint."Payment Bin No." := "No.";
+                    POSPaymentBinCheckpoint."Payment Bin No." := Rec."No.";
                     POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::TRANSFERED;
                     POSPaymentBinCheckpoint."Workshift Checkpoint Entry No." := POSWorkshiftCheckpoint."Entry No.";
                     POSPaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
                     POSPaymentBinCheckpoint."Include In Counting" := POSPaymentBinCheckpoint."Include In Counting"::YES;
-                    POSPaymentBinCheckpoint.Insert;
+                    POSPaymentBinCheckpoint.Insert();
 
                     BinEntry."Bin Checkpoint Entry No." := POSPaymentBinCheckpoint."Entry No.";
                     BinEntry.Modify();
@@ -262,7 +262,7 @@ page 6150620 "NPR POS Payment Bins"
                     CalculateTransactionAmountLCY(BinEntry);
                     BinEntry.Insert();
 
-                until POSPaymentMethodTemp.Next = 0;
+                until POSPaymentMethodTemp.Next() = 0;
             end;
         end;
         //+NPR5.51 [353761]
@@ -270,9 +270,6 @@ page 6150620 "NPR POS Payment Bins"
 
     local procedure CalculateTransactionAmountLCY(var POSBinEntry: Record "NPR POS Bin Entry")
     var
-        Currency: Record Currency;
-        CurrencyFactor: Decimal;
-        CurrExchRate: Record "Currency Exchange Rate";
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
 
@@ -300,7 +297,7 @@ page 6150620 "NPR POS Payment Bins"
         // ** End Legacy
 
         // ** Future way
-        // IF (NOT Currency.GET (CurrencyCode)) THEN
+        // IF (NOT Currency.Get() (CurrencyCode)) THEN
         //  EXIT;
         //
         // EXIT (ROUND (CurrExchRate.ExchangeAmtFCYToLCY (TransactionDate, CurrencyCode, Amount,

@@ -15,23 +15,23 @@ page 6151557 "NPR NpXml Batch Filters"
         {
             repeater(Group)
             {
-                field("Filter Type"; "Filter Type")
+                field("Filter Type"; Rec."Filter Type")
                 {
                     ApplicationArea = All;
                     OptionCaption = ',Constant,Filter';
                     ToolTip = 'Specifies the value of the Filter Type field';
                 }
-                field("Parent Field No."; "Parent Field No.")
+                field("Parent Field No."; Rec."Parent Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Parent Field No. field';
                 }
-                field("Parent Field Name"; "Parent Field Name")
+                field("Parent Field Name"; Rec."Parent Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
-                field("Filter Value"; "Filter Value")
+                field("Filter Value"; Rec."Filter Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Value field';
@@ -42,8 +42,8 @@ page 6151557 "NPR NpXml Batch Filters"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Parent Table No." := ParentTableNo;
-        "Filter Type" := "Filter Type"::Constant;
+        Rec."Parent Table No." := ParentTableNo;
+        Rec."Filter Type" := Rec."Filter Type"::Constant;
     end;
 
     var

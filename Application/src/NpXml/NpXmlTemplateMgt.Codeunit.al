@@ -1,4 +1,4 @@
-codeunit 6151556 "NPR NpXml Template Mgt."
+﻿codeunit 6151556 "NPR NpXml Template Mgt."
 {
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -86,7 +86,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                     NpXmlElement.SetFilter(Comment, Comment);
                 NpXmlElement.SetRange("Parent Line No.", NpXmlElement."Line No.");
                 NpXmlElement.SetRange("Element Name", ElementName);
-                if not NpXmlElement.FindFirst then
+                if not NpXmlElement.FindFirst() then
                     exit(false);
             end else
                 ElementPath := DelStr(ElementPath, 1, Position);
@@ -101,7 +101,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         Position: Integer;
     begin
         NpXmlElement.Get(NpXmlElementParent."Xml Template Code", NpXmlElementParent."Line No.");
-        NpXmlElement.Reset;
+        NpXmlElement.Reset();
         while ElementPath <> '' do begin
             Position := StrPos(ElementPath, '/');
             if Position <> 1 then begin
@@ -116,7 +116,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                     NpXmlElement.SetFilter(Comment, Comment);
                 NpXmlElement.SetRange("Parent Line No.", NpXmlElement."Line No.");
                 NpXmlElement.SetRange("Element Name", ElementName);
-                if not NpXmlElement.FindFirst then
+                if not NpXmlElement.FindFirst() then
                     exit(false);
             end else
                 ElementPath := DelStr(ElementPath, 1, Position);
@@ -151,7 +151,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         NpXmlDomMgt.AddAttribute(XmlElementTable, 'table_name', Format(RecRef.Name, 0, 9));
 
         Field.SetRange(TableNo, RecRef.Number);
-        if Field.FindSet then
+        if Field.FindSet() then
             repeat
                 FieldRef := RecRef.Field(Field."No.");
                 NpXmlDomMgt.AddElement(XmlElementTable, 'F' + Format(FieldRef.Number, 0, 9), XmlElementField);
@@ -160,7 +160,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
 
                 CDATA := XmlCData.Create(Format(FieldRef.Value, 0, 9));
                 XmlElementField.Add(CDATA);
-            until Field.Next = 0;
+            until Field.Next() = 0;
     end;
 
     procedure ImportNpXmlTemplate(): Boolean
@@ -279,7 +279,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         //-=Temporary disabled as we haven't updated yet our xml templates with new table names=-
         /*
         if XmlElementTable.GetAttribute('table_name') <> Format(RecRef.Name, 0, 9) then begin
-            RecRef.Close;
+            RecRef.Close();
             exit;
         end;
         */
@@ -299,18 +299,17 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         end;
 
         if Format(RecRef.GetPosition(false), 0, 9) <> PrimaryKey then begin
-            RecRef.Close;
+            RecRef.Close();
             exit;
         end;
-        if RecRef.Insert then;
-        RecRef.Close;
+        if RecRef.Insert() then;
+        RecRef.Close();
     end;
 
     local procedure InsertNpXmlElement(NPXmlTemplate: Record "NPR NpXml Template"; Element: XmlElement; var LineNoPar: Integer; Level: Integer)
     var
         NPXmlAttribute: Record "NPR NpXml Attribute";
         NPXmlElement: Record "NPR NpXml Element";
-        ChildXmlElement: XmlElement;
         AttributeCollection: XmlAttributeCollection;
         Attribute: XmlAttribute;
         NodeList: XmlNodeList;
@@ -324,7 +323,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
             exit;
 
         if Level >= 0 then begin
-            NPXmlElement.Init;
+            NPXmlElement.Init();
             NPXmlElement."Xml Template Code" := NPXmlTemplate.Code;
             NPXmlElement."Line No." := LineNo;
             NPXmlElement."Element Name" := Element.Name;
@@ -333,7 +332,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
             NPXmlElement."Table No." := NPXmlTemplate."Table No.";
             Field.SetRange(TableNo, NPXmlElement."Table No.");
             Field.SetFilter(FieldName, '@' + ConvertStr(NPXmlElement."Element Name", '_', '*'));
-            if Field.FindFirst then
+            if Field.FindFirst() then
                 NPXmlElement."Field No." := Field."No.";
             NPXmlElement.Insert(true);
 
@@ -341,7 +340,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                 LineNo := 10000;
                 AttributeCollection := Element.Attributes();
                 foreach Attribute in AttributeCollection do begin
-                    NPXmlAttribute.Init;
+                    NPXmlAttribute.Init();
                     NPXmlAttribute."Xml Template Code" := NPXmlElement."Xml Template Code";
                     NPXmlAttribute."Xml Element Line No." := NPXmlElement."Line No.";
                     NPXmlAttribute."Line No." := LineNo;
@@ -350,7 +349,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                     NPXmlAttribute."Table No." := NPXmlElement."Table No.";
                     Field.SetRange(TableNo, NPXmlElement."Table No.");
                     Field.SetFilter(FieldName, '@' + NPXmlAttribute."Attribute Name");
-                    if Field.FindFirst then
+                    if Field.FindFirst() then
                         NPXmlAttribute."Attribute Field No." := Field."No.";
                     NPXmlAttribute.Insert(true);
                 end;
@@ -372,7 +371,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlAttribute.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlAttribute.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        NpXmlAttribute.DeleteAll;
+        NpXmlAttribute.DeleteAll();
     end;
 
     local procedure DeleteNpXmlElement(NpXmlElement: Record "NPR NpXml Element")
@@ -381,14 +380,14 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlElement2.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlElement2.SetRange("Parent Line No.", NpXmlElement."Line No.");
-        if NpXmlElement2.FindSet then
+        if NpXmlElement2.FindSet() then
             repeat
                 DeleteNpXmlElement(NpXmlElement2);
-            until NpXmlElement2.Next = 0;
+            until NpXmlElement2.Next() = 0;
 
         DeleteNpXmlAttributes(NpXmlElement);
         DeleteNpXmlFilters(NpXmlElement);
-        NpXmlElement.Delete;
+        NpXmlElement.Delete();
     end;
 
     procedure DeleteNpXmlElements(TemplateCode: Code[20]; ElementPath: Text; Comment: Text[250])
@@ -410,7 +409,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        NpXmlFilter.DeleteAll;
+        NpXmlFilter.DeleteAll();
     end;
 
     procedure SetChildNpXmlElementsActive(NpXmlElement: Record "NPR NpXml Element"; Active: Boolean)
@@ -419,14 +418,14 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlElement2.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlElement2.SetRange("Parent Line No.", NpXmlElement."Line No.");
-        if NpXmlElement2.FindSet then
+        if NpXmlElement2.FindSet() then
             repeat
                 if NpXmlElement2.Active <> Active then begin
                     NpXmlElement2.Active := Active;
-                    NpXmlElement2.Modify;
+                    NpXmlElement2.Modify();
                 end;
                 SetChildNpXmlElementsActive(NpXmlElement2, Active);
-            until NpXmlElement2.Next = 0;
+            until NpXmlElement2.Next() = 0;
     end;
 
     procedure SetNpXmlElementActive(TemplateCode: Code[20]; ElementPath: Text; Comment: Text[250]; Active: Boolean)
@@ -441,7 +440,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
 
         if NpXmlElement.Active <> Active then begin
             NpXmlElement.Active := Active;
-            NpXmlElement.Modify;
+            NpXmlElement.Modify();
         end;
         SetChildNpXmlElementsActive(NpXmlElement, Active);
     end;
@@ -467,16 +466,16 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         if NpXmlTemplate.VersionArchived() then
             exit(false);
 
-        if not NpXmlSetup.Get then
-            NpXmlSetup.Insert;
+        if not NpXmlSetup.Get() then
+            NpXmlSetup.Insert();
 
         if NpXmlTemplate."Version Description" = '' then
             Error(Text300);
         NpXmlTemplate.Archived := true;
-        NpXmlTemplate.Modify;
+        NpXmlTemplate.Modify();
 
         if NpXmlTemplateToBlob(NpXmlTemplate, TempBlob) then begin
-            NpXmlTemplateArchive.Init;
+            NpXmlTemplateArchive.Init();
             NpXmlTemplateArchive.Code := NpXmlTemplate.Code;
             NpXmlTemplateArchive."Version Description" := NpXmlTemplate."Version Description";
             NpXmlTemplateArchive."Template Version No." := NpXmlTemplate."Template Version";
@@ -487,7 +486,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
 
             NpXmlTemplateArchive."Archived by" := UserId;
             NpXmlTemplateArchive."Archived at" := CreateDateTime(Today, Time);
-            NpXmlTemplateArchive.Insert;
+            NpXmlTemplateArchive.Insert();
         end;
 
         NpXmlTemplateHistory.InsertHistory(NpXmlTemplate.Code, NpXmlTemplate."Template Version", NpXmlTemplateHistory."Event Type"::Archivation, NpXmlTemplate."Version Description");
@@ -505,22 +504,22 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
         NpXmlElement.SetRange("Xml Template Code", XMLTemplateCode);
-        if NpXmlElement.FindSet then
-            NpXmlElement.DeleteAll;
+        if NpXmlElement.FindSet() then
+            NpXmlElement.DeleteAll();
         NpXmlAttribute.SetRange("Xml Template Code", XMLTemplateCode);
-        if NpXmlAttribute.FindSet then
-            NpXmlAttribute.DeleteAll;
+        if NpXmlAttribute.FindSet() then
+            NpXmlAttribute.DeleteAll();
         NpXmlFilter.SetRange("Xml Template Code", XMLTemplateCode);
-        if NpXmlFilter.FindSet then
-            NpXmlFilter.DeleteAll;
+        if NpXmlFilter.FindSet() then
+            NpXmlFilter.DeleteAll();
         NpXmlTemplateTrigger.SetRange("Xml Template Code", XMLTemplateCode);
-        if NpXmlTemplateTrigger.FindSet then
-            NpXmlTemplateTrigger.DeleteAll;
+        if NpXmlTemplateTrigger.FindSet() then
+            NpXmlTemplateTrigger.DeleteAll();
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", XMLTemplateCode);
-        if NpXmlTemplateTriggerLink.FindSet then
-            NpXmlTemplateTriggerLink.DeleteAll;
+        if NpXmlTemplateTriggerLink.FindSet() then
+            NpXmlTemplateTriggerLink.DeleteAll();
         if NpXmlTemplate.Get(XMLTemplateCode) then
-            NpXmlTemplate.Delete;
+            NpXmlTemplate.Delete();
     end;
 
     procedure ExportArchivedNpXmlTemplate(NpXmlTemplateArchive: Record "NPR NpXml Template Arch.")
@@ -557,47 +556,47 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         ExportRecRefToXml(RecRef, Element);
 
         NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlElement.FindSet then
+        if NpXmlElement.FindSet() then
             repeat
                 RecRef.GetTable(NpXmlElement);
                 ExportRecRefToXml(RecRef, Element);
-            until NpXmlElement.Next = 0;
+            until NpXmlElement.Next() = 0;
         NpXmlAttribute.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlAttribute.FindSet then
+        if NpXmlAttribute.FindSet() then
             repeat
                 RecRef.GetTable(NpXmlAttribute);
                 ExportRecRefToXml(RecRef, Element);
-            until NpXmlAttribute.Next = 0;
+            until NpXmlAttribute.Next() = 0;
         NpXmlFilter.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlFilter.FindSet then
+        if NpXmlFilter.FindSet() then
             repeat
                 RecRef.GetTable(NpXmlFilter);
                 ExportRecRefToXml(RecRef, Element);
-            until NpXmlFilter.Next = 0;
+            until NpXmlFilter.Next() = 0;
         NpXmlTemplateTrigger.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlTemplateTrigger.FindSet then
+        if NpXmlTemplateTrigger.FindSet() then
             repeat
                 RecRef.GetTable(NpXmlTemplateTrigger);
                 ExportRecRefToXml(RecRef, Element);
-            until NpXmlTemplateTrigger.Next = 0;
+            until NpXmlTemplateTrigger.Next() = 0;
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlTemplateTriggerLink.FindSet then
+        if NpXmlTemplateTriggerLink.FindSet() then
             repeat
                 RecRef.GetTable(NpXmlTemplateTriggerLink);
                 ExportRecRefToXml(RecRef, Element);
-            until NpXmlTemplateTriggerLink.Next = 0;
+            until NpXmlTemplateTriggerLink.Next() = 0;
         NpXmlNamespaces.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlNamespaces.FindSet then
+        if NpXmlNamespaces.FindSet() then
             repeat
                 RecRef.GetTable(NpXmlNamespaces);
                 ExportRecRefToXml(RecRef, Element);
-            until NpXmlNamespaces.Next = 0;
+            until NpXmlNamespaces.Next() = 0;
         NpXmlApiHeader.SetRange("Xml Template Code", NpXmlTemplate.Code);
-        if NpXmlApiHeader.FindSet then
+        if NpXmlApiHeader.FindSet() then
             repeat
                 RecRef.GetTable(NpXmlApiHeader);
                 ExportRecRefToXml(RecRef, Element);
-            until NpXmlApiHeader.Next = 0;
+            until NpXmlApiHeader.Next() = 0;
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStr);
         Document.WriteTo(OutStr);
@@ -607,17 +606,13 @@ codeunit 6151556 "NPR NpXml Template Mgt."
 
     local procedure InsertRecRefFromArchiveXml(var XmlElementTable: XmlElement)
     var
-        NpXmlTemplate: Record "NPR NpXml Template";
         "Field": Record "Field";
         XmlElementField: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
         Attribute: XmlAttribute;
         RecRef: RecordRef;
-        RecRefTemplate: RecordRef;
-        RecID: RecordID;
         FieldReference: FieldRef;
-        FieldRefChanged: FieldRef;
         FieldId: Integer;
         TableId: Integer;
         PrimaryKey: Text;
@@ -635,7 +630,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         RecRef.Open(TableId);
         NpXmlDomMgt.GetAttributeFromElement(XmlElementTable, 'table_name', Attribute, true);
         if Attribute.Value <> Format(RecRef.Name, 0, 9) then begin
-            RecRef.Close;
+            RecRef.Close();
             exit;
         end;
 
@@ -654,12 +649,12 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         end;
 
         if Format(RecRef.GetPosition(false), 0, 9) <> PrimaryKey then begin
-            RecRef.Close;
+            RecRef.Close();
             exit;
         end;
 
         if RecRef.Insert(false) then;
-        RecRef.Close;
+        RecRef.Close();
     end;
 
     procedure RestoreArchivedNpXmlTemplate(TemplateCode: Code[20]; VersionCode: Code[20]): Boolean
@@ -672,13 +667,12 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         Node: XmlNode;
         Attribute: XmlAttribute;
         InStr: InStream;
-        i: Integer;
         NpXmlTemplateArchive: Record "NPR NpXml Template Arch.";
         NpXmlTemplateHistory: Record "NPR NpXml Template History";
     begin
         if NpXmlTemplateArchive.Get(TemplateCode, VersionCode) then begin
             NpXmlTemplateArchive.CalcFields("Archived Template");
-            if NpXmlTemplateArchive."Archived Template".HasValue then begin
+            if NpXmlTemplateArchive."Archived Template".HasValue() then begin
                 ClearTemplateVersion(TemplateCode);
                 NpXmlTemplateArchive."Archived Template".CreateInStream(InStr);
                 XmlDocument.ReadFrom(InStr, Document);
@@ -727,40 +721,40 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         NPXmlFilter.DeleteAll(true);
 
         NPXmlElement2.SetRange("Xml Template Code", NPXmlTemplate2.Code);
-        if NPXmlElement2.FindSet then
+        if NPXmlElement2.FindSet() then
             repeat
-                NPXmlElement.Init;
+                NPXmlElement.Init();
                 NPXmlElement := NPXmlElement2;
                 NPXmlElement."Xml Template Code" := NPXmlTemplate.Code;
                 NPXmlElement.Insert(true);
 
                 NPXmlAttribute2.SetRange("Xml Template Code", NPXmlElement2."Xml Template Code");
                 NPXmlAttribute2.SetRange("Xml Element Line No.", NPXmlElement2."Line No.");
-                if NPXmlAttribute2.FindSet then
+                if NPXmlAttribute2.FindSet() then
                     repeat
-                        NPXmlAttribute.Init;
+                        NPXmlAttribute.Init();
                         NPXmlAttribute := NPXmlAttribute2;
                         NPXmlAttribute."Xml Template Code" := NPXmlElement."Xml Template Code";
                         NPXmlAttribute.Insert(true);
-                    until NPXmlAttribute2.Next = 0;
+                    until NPXmlAttribute2.Next() = 0;
 
                 NPXmlFilter2.SetRange("Xml Template Code", NPXmlElement2."Xml Template Code");
                 NPXmlFilter2.SetRange("Xml Element Line No.", NPXmlElement2."Line No.");
-                if NPXmlFilter2.FindSet then
+                if NPXmlFilter2.FindSet() then
                     repeat
-                        NPXmlFilter.Init;
+                        NPXmlFilter.Init();
                         NPXmlFilter := NPXmlFilter2;
                         NPXmlFilter."Xml Template Code" := NPXmlElement."Xml Template Code";
                         NPXmlFilter.Insert(true);
-                    until NPXmlFilter2.Next = 0;
-            until NPXmlElement2.Next = 0;
+                    until NPXmlFilter2.Next() = 0;
+            until NPXmlElement2.Next() = 0;
     end;
 
     procedure InitNpXmlElementAbove(TemplateCode: Code[20]; CurrLineNo: Integer; var NewNpXmlElement: Record "NPR NpXml Element")
     var
         NpXmlElement: Record "NPR NpXml Element";
     begin
-        NewNpXmlElement.Init;
+        NewNpXmlElement.Init();
         NewNpXmlElement."Xml Template Code" := TemplateCode;
         if not NpXmlElement.Get(TemplateCode, CurrLineNo) then begin
             NewNpXmlElement."Line No." := 1000;
@@ -793,7 +787,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     var
         NpXmlElement: Record "NPR NpXml Element";
     begin
-        NewNpXmlElement.Init;
+        NewNpXmlElement.Init();
         NewNpXmlElement."Xml Template Code" := TemplateCode;
         if not NpXmlElement.Get(TemplateCode, CurrLineNo) then begin
             NewNpXmlElement."Line No." := 1000;
@@ -801,7 +795,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         end;
 
         NpXmlElement.SetRange("Xml Template Code", TemplateCode);
-        if NpXmlElement.Next = 0 then begin
+        if NpXmlElement.Next() = 0 then begin
             NewNpXmlElement."Line No." := NpXmlElement."Line No." + 10000;
             exit;
         end;
@@ -829,24 +823,24 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         if not Field.Get(TableNo, FieldNo) then
             exit;
 
-        TempNpXmlFieldValueBuffer.DeleteAll;
+        TempNpXmlFieldValueBuffer.DeleteAll();
         Clear(RecRef);
         RecRef.Open(TableNo);
         Fieldreference := RecRef.Field(FieldNo);
         case LowerCase(Format(Fieldreference.Type)) of
             'boolean':
                 begin
-                    TempNpXmlFieldValueBuffer.Init;
+                    TempNpXmlFieldValueBuffer.Init();
                     TempNpXmlFieldValueBuffer."Entry No." := 0;
                     TempNpXmlFieldValueBuffer."Field Value" := Format(false, 0, 9);
                     TempNpXmlFieldValueBuffer.Description := Format(false);
-                    TempNpXmlFieldValueBuffer.Insert;
+                    TempNpXmlFieldValueBuffer.Insert();
 
-                    TempNpXmlFieldValueBuffer.Init;
+                    TempNpXmlFieldValueBuffer.Init();
                     TempNpXmlFieldValueBuffer."Entry No." := 1;
                     TempNpXmlFieldValueBuffer."Field Value" := Format(true, 0, 9);
                     TempNpXmlFieldValueBuffer.Description := Format(true);
-                    TempNpXmlFieldValueBuffer.Insert;
+                    TempNpXmlFieldValueBuffer.Insert();
                 end;
             'option':
                 begin
@@ -858,7 +852,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                         if Position = 1 then
                             OptionCaption := DelStr(OptionCaption, 1, 1)
                         else begin
-                            TempNpXmlFieldValueBuffer.Init;
+                            TempNpXmlFieldValueBuffer.Init();
                             TempNpXmlFieldValueBuffer."Entry No." := i;
                             TempNpXmlFieldValueBuffer."Field Value" := Format(i);
                             if Position > 1 then begin
@@ -868,13 +862,13 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                                 TempNpXmlFieldValueBuffer.Description := OptionCaption;
                                 OptionCaption := '';
                             end;
-                            TempNpXmlFieldValueBuffer.Insert;
+                            TempNpXmlFieldValueBuffer.Insert();
                         end;
                     end;
                 end else
                         exit;
         end;
-        RecRef.Close;
+        RecRef.Close();
         Clear(RecRef);
 
         if TempNpXmlFieldValueBuffer.IsEmpty then
@@ -883,7 +877,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         if PAGE.RunModal(PAGE::"NPR NpXml Field Value Buffer", TempNpXmlFieldValueBuffer) = ACTION::LookupOK then
             FieldValue := TempNpXmlFieldValueBuffer."Field Value";
 
-        TempNpXmlFieldValueBuffer.DeleteAll;
+        TempNpXmlFieldValueBuffer.DeleteAll();
     end;
 
     local procedure InsertTempNpXmlAttribute(NpXmlElement: Record "NPR NpXml Element"; NpXmlElement2: Record "NPR NpXml Element"; var TempNpXmlAttribute: Record "NPR NpXml Attribute" temporary)
@@ -892,21 +886,21 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlAttribute.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlAttribute.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        if NpXmlAttribute.FindSet then
+        if NpXmlAttribute.FindSet() then
             repeat
-                TempNpXmlAttribute.Init;
+                TempNpXmlAttribute.Init();
                 TempNpXmlAttribute := NpXmlAttribute;
                 TempNpXmlAttribute."Xml Element Line No." := NpXmlElement2."Line No.";
-                TempNpXmlAttribute.Insert;
-            until NpXmlAttribute.Next = 0;
+                TempNpXmlAttribute.Insert();
+            until NpXmlAttribute.Next() = 0;
     end;
 
     local procedure InsertTempNpXmlElement(NpXmlElement: Record "NPR NpXml Element"; NpXmlElement2: Record "NPR NpXml Element"; var TempNpXmlElement: Record "NPR NpXml Element" temporary)
     begin
-        TempNpXmlElement.Init;
+        TempNpXmlElement.Init();
         TempNpXmlElement := NpXmlElement;
         TempNpXmlElement."Line No." := NpXmlElement2."Line No.";
-        TempNpXmlElement.Insert;
+        TempNpXmlElement.Insert();
     end;
 
     local procedure InsertTempNpXmlFilter(NpXmlElement: Record "NPR NpXml Element"; NpXmlElement2: Record "NPR NpXml Element"; var TempNpXmlFilter: Record "NPR NpXml Filter" temporary)
@@ -915,50 +909,50 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        if NpXmlFilter.FindSet then
+        if NpXmlFilter.FindSet() then
             repeat
-                TempNpXmlFilter.Init;
+                TempNpXmlFilter.Init();
                 TempNpXmlFilter := NpXmlFilter;
                 TempNpXmlFilter."Xml Element Line No." := NpXmlElement2."Line No.";
-                TempNpXmlFilter.Insert;
-            until NpXmlFilter.Next = 0;
+                TempNpXmlFilter.Insert();
+            until NpXmlFilter.Next() = 0;
     end;
 
     local procedure InsertNpXmlAttributes(var TempNpXmlAttribute: Record "NPR NpXml Attribute" temporary)
     var
         NpXmlAttribute: Record "NPR NpXml Attribute";
     begin
-        if TempNpXmlAttribute.FindSet then
+        if TempNpXmlAttribute.FindSet() then
             repeat
-                NpXmlAttribute.Init;
+                NpXmlAttribute.Init();
                 NpXmlAttribute := TempNpXmlAttribute;
-                NpXmlAttribute.Insert;
-            until TempNpXmlAttribute.Next = 0;
+                NpXmlAttribute.Insert();
+            until TempNpXmlAttribute.Next() = 0;
     end;
 
     local procedure InsertNpXmlElements(var TempNpXmlElement: Record "NPR NpXml Element" temporary)
     var
         NpXmlElement: Record "NPR NpXml Element";
     begin
-        if TempNpXmlElement.FindSet then
+        if TempNpXmlElement.FindSet() then
             repeat
-                NpXmlElement.Init;
+                NpXmlElement.Init();
                 NpXmlElement := TempNpXmlElement;
                 NpXmlElement.UpdateParentInfo();
-                NpXmlElement.Insert;
-            until TempNpXmlElement.Next = 0;
+                NpXmlElement.Insert();
+            until TempNpXmlElement.Next() = 0;
     end;
 
     local procedure InsertNpXmlFilters(var TempNpXmlFilter: Record "NPR NpXml Filter" temporary)
     var
         NpXmlFilter: Record "NPR NpXml Filter";
     begin
-        if TempNpXmlFilter.FindSet then
+        if TempNpXmlFilter.FindSet() then
             repeat
-                NpXmlFilter.Init;
+                NpXmlFilter.Init();
                 NpXmlFilter := TempNpXmlFilter;
-                NpXmlFilter.Insert;
-            until TempNpXmlFilter.Next = 0;
+                NpXmlFilter.Insert();
+            until TempNpXmlFilter.Next() = 0;
     end;
 
     procedure NormalizeNpXmlElementLineNo(TemplateCode: Code[20]; var CurrNpXmlElement: Record "NPR NpXml Element")
@@ -976,13 +970,13 @@ codeunit 6151556 "NPR NpXml Template Mgt."
 
         FormatedCurrNpXmlElement := Format(CurrNpXmlElement);
 
-        TempNpXmlAttribute.DeleteAll;
-        TempNpXmlFilter.DeleteAll;
-        TempNpXmlElement.DeleteAll;
+        TempNpXmlAttribute.DeleteAll();
+        TempNpXmlFilter.DeleteAll();
+        TempNpXmlElement.DeleteAll();
 
         LineNo := 0;
         NpXmlElement.SetRange("Xml Template Code", TemplateCode);
-        if NpXmlElement.FindSet then
+        if NpXmlElement.FindSet() then
             repeat
                 LineNo += 10000;
                 NpXmlElement2 := NpXmlElement;
@@ -995,16 +989,16 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                     CurrNpXmlElement := TempNpXmlElement;
                 DeleteNpXmlAttributes(NpXmlElement);
                 DeleteNpXmlFilters(NpXmlElement);
-                NpXmlElement.Delete;
-            until NpXmlElement.Next = 0;
+                NpXmlElement.Delete();
+            until NpXmlElement.Next() = 0;
 
         InsertNpXmlAttributes(TempNpXmlAttribute);
         InsertNpXmlFilters(TempNpXmlFilter);
         InsertNpXmlElements(TempNpXmlElement);
 
-        TempNpXmlAttribute.DeleteAll;
-        TempNpXmlFilter.DeleteAll;
-        TempNpXmlElement.DeleteAll;
+        TempNpXmlAttribute.DeleteAll();
+        TempNpXmlFilter.DeleteAll();
+        TempNpXmlElement.DeleteAll();
     end;
 
     procedure SwapNpXmlElementLineNo(NpXmlElement: Record "NPR NpXml Element"; NpXmlElement2: Record "NPR NpXml Element")
@@ -1015,9 +1009,9 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlElement.TestField("Xml Template Code", NpXmlElement2."Xml Template Code");
 
-        TempNpXmlAttribute.DeleteAll;
-        TempNpXmlFilter.DeleteAll;
-        TempNpXmlElement.DeleteAll;
+        TempNpXmlAttribute.DeleteAll();
+        TempNpXmlFilter.DeleteAll();
+        TempNpXmlElement.DeleteAll();
 
         InsertTempNpXmlElement(NpXmlElement, NpXmlElement2, TempNpXmlElement);
         InsertTempNpXmlElement(NpXmlElement2, NpXmlElement, TempNpXmlElement);
@@ -1030,16 +1024,16 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         DeleteNpXmlAttributes(NpXmlElement2);
         DeleteNpXmlFilters(NpXmlElement);
         DeleteNpXmlFilters(NpXmlElement2);
-        NpXmlElement.Delete;
-        NpXmlElement2.Delete;
+        NpXmlElement.Delete();
+        NpXmlElement2.Delete();
 
         InsertNpXmlAttributes(TempNpXmlAttribute);
         InsertNpXmlFilters(TempNpXmlFilter);
         InsertNpXmlElements(TempNpXmlElement);
 
-        TempNpXmlAttribute.DeleteAll;
-        TempNpXmlFilter.DeleteAll;
-        TempNpXmlElement.DeleteAll;
+        TempNpXmlAttribute.DeleteAll();
+        TempNpXmlFilter.DeleteAll();
+        TempNpXmlElement.DeleteAll();
     end;
 
     local procedure DeleteNpXmlTrigger(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger")
@@ -1047,7 +1041,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         NpXmlTemplateTrigger2: Record "NPR NpXml Template Trigger";
     begin
         NpXmlTemplateTrigger2.Get(NpXmlTemplateTrigger."Xml Template Code", NpXmlTemplateTrigger."Line No.");
-        NpXmlTemplateTrigger2.Delete;
+        NpXmlTemplateTrigger2.Delete();
     end;
 
     local procedure DeleteNpXmlTriggerLink(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger")
@@ -1056,15 +1050,15 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
         NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
-        NpXmlTemplateTriggerLink.DeleteAll;
+        NpXmlTemplateTriggerLink.DeleteAll();
     end;
 
     local procedure InsertTempNpXmlTrigger(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; NpXmlTemplateTrigger2: Record "NPR NpXml Template Trigger"; var TempNpXmlTemplateTrigger: Record "NPR NpXml Template Trigger" temporary)
     begin
-        TempNpXmlTemplateTrigger.Init;
+        TempNpXmlTemplateTrigger.Init();
         TempNpXmlTemplateTrigger := NpXmlTemplateTrigger;
         TempNpXmlTemplateTrigger."Line No." := NpXmlTemplateTrigger2."Line No.";
-        TempNpXmlTemplateTrigger.Insert;
+        TempNpXmlTemplateTrigger.Insert();
     end;
 
     local procedure InsertTempNpXmlTriggerLink(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; NpXmlTemplateTrigger2: Record "NPR NpXml Template Trigger"; var TempNpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link" temporary)
@@ -1073,38 +1067,38 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
         NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
-        if NpXmlTemplateTriggerLink.FindSet then
+        if NpXmlTemplateTriggerLink.FindSet() then
             repeat
-                TempNpXmlTemplateTriggerLink.Init;
+                TempNpXmlTemplateTriggerLink.Init();
                 TempNpXmlTemplateTriggerLink := NpXmlTemplateTriggerLink;
                 TempNpXmlTemplateTriggerLink."Xml Template Trigger Line No." := NpXmlTemplateTrigger2."Line No.";
-                TempNpXmlTemplateTriggerLink.Insert;
-            until NpXmlTemplateTriggerLink.Next = 0;
+                TempNpXmlTemplateTriggerLink.Insert();
+            until NpXmlTemplateTriggerLink.Next() = 0;
     end;
 
     local procedure InsertNpXmlTriggers(var TempNpXmlTemplateTrigger: Record "NPR NpXml Template Trigger" temporary)
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
     begin
-        if TempNpXmlTemplateTrigger.FindSet then
+        if TempNpXmlTemplateTrigger.FindSet() then
             repeat
-                NpXmlTemplateTrigger.Init;
+                NpXmlTemplateTrigger.Init();
                 NpXmlTemplateTrigger := TempNpXmlTemplateTrigger;
                 NpXmlTemplateTrigger.UpdateParentInfo();
-                NpXmlTemplateTrigger.Insert;
-            until TempNpXmlTemplateTrigger.Next = 0;
+                NpXmlTemplateTrigger.Insert();
+            until TempNpXmlTemplateTrigger.Next() = 0;
     end;
 
     local procedure InsertNpXmlTriggerLinks(var TempNpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link" temporary)
     var
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
     begin
-        if TempNpXmlTemplateTriggerLink.FindSet then
+        if TempNpXmlTemplateTriggerLink.FindSet() then
             repeat
-                NpXmlTemplateTriggerLink.Init;
+                NpXmlTemplateTriggerLink.Init();
                 NpXmlTemplateTriggerLink := TempNpXmlTemplateTriggerLink;
-                NpXmlTemplateTriggerLink.Insert;
-            until TempNpXmlTemplateTriggerLink.Next = 0;
+                NpXmlTemplateTriggerLink.Insert();
+            until TempNpXmlTemplateTriggerLink.Next() = 0;
     end;
 
     procedure SwapNpXmlTriggerLineNo(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; NpXmlTemplateTrigger2: Record "NPR NpXml Template Trigger")
@@ -1114,8 +1108,8 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     begin
         NpXmlTemplateTrigger.TestField("Xml Template Code", NpXmlTemplateTrigger2."Xml Template Code");
 
-        TempNpXmlTemplateTriggerLink.DeleteAll;
-        TempNpXmlTemplateTrigger.DeleteAll;
+        TempNpXmlTemplateTriggerLink.DeleteAll();
+        TempNpXmlTemplateTrigger.DeleteAll();
 
         InsertTempNpXmlTrigger(NpXmlTemplateTrigger, NpXmlTemplateTrigger2, TempNpXmlTemplateTrigger);
         InsertTempNpXmlTrigger(NpXmlTemplateTrigger2, NpXmlTemplateTrigger, TempNpXmlTemplateTrigger);
@@ -1130,8 +1124,8 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         InsertNpXmlTriggerLinks(TempNpXmlTemplateTriggerLink);
         InsertNpXmlTriggers(TempNpXmlTemplateTrigger);
 
-        TempNpXmlTemplateTriggerLink.DeleteAll;
-        TempNpXmlTemplateTrigger.DeleteAll;
+        TempNpXmlTemplateTriggerLink.DeleteAll();
+        TempNpXmlTemplateTrigger.DeleteAll();
     end;
 }
 

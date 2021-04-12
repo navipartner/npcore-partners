@@ -160,14 +160,11 @@ xmlport 6060123 "NPR TM Ticket Server Req."
     }
 
     var
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         GeneralLedgerSetup: Record "General Ledger Setup";
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        DefaultAdmissionCode: Code[20];
 
     procedure SetRequestEntryNo(Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
     var
@@ -208,7 +205,7 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                     end;
 
                     if (TmpTicket.Insert()) then begin
-                        Ticket."Printed Date" := Today;
+                        Ticket."Printed Date" := Today();
                         if (MarkTicketAsPrinted) then
                             Ticket.Modify();
                     end;

@@ -1,10 +1,10 @@
 table 6151364 "NPR CS Transf. Handl. Rfid"
 {
-   
+
     Caption = 'CS Transfer Handling Rfid';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields

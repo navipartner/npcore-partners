@@ -1,10 +1,10 @@
 table 6151383 "NPR CS Item Search Handl."
 {
-    
+
     Caption = 'CS Item Seach Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields

@@ -26,22 +26,20 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('PayAndPostDocument', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('PayAndPostDocument', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterBooleanParameter('PrintDocument', false);
-                RegisterBooleanParameter('OpenDocument', false);
-                RegisterBooleanParameter('SelectCustomer', true);
-                RegisterBooleanParameter('SendDocument', false);
-                RegisterBooleanParameter('Pdf2NavDocument', false);
-            end;
+            Sender.RegisterBooleanParameter('PrintDocument', false);
+            Sender.RegisterBooleanParameter('OpenDocument', false);
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
+            Sender.RegisterBooleanParameter('SendDocument', false);
+            Sender.RegisterBooleanParameter('Pdf2NavDocument', false);
         end;
     end;
 
@@ -56,7 +54,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         Send: Boolean;
         Pdf2Nav: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -104,7 +102,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -133,7 +131,6 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
 
     local procedure CreateDocumentPaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
-        JSON: Codeunit "NPR POS JSON Management";
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
@@ -149,7 +146,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -169,7 +166,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -189,7 +186,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

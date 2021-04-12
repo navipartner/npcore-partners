@@ -5,7 +5,6 @@ codeunit 6014676 "NPR NpXml Value Endp. Batch"
     trigger OnRun()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
-        NpXmlElement: Record "NPR NpXml Element";
     begin
         NpXmlTemplate.Get("Xml Template Code");
         if NpXmlTemplate."Table No." = DATABASE::"NPR Endpoint Request Batch" then begin
@@ -20,21 +19,21 @@ codeunit 6014676 "NPR NpXml Value Endp. Batch"
     var
         RecRef: RecordRef;
     begin
-        EndpointRequestBatch.LockTable;
+        EndpointRequestBatch.LockTable();
         Clear(RecRef);
         RecRef.Open(NpXmlCustomValueBuffer."Table No.");
         RecRef.SetPosition(NpXmlCustomValueBuffer."Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
         RecRef.SetTable(EndpointRequestBatch);
-        if EndpointRequestBatch.Find then begin
+        if EndpointRequestBatch.Find() then begin
             if EndpointRequestBatch.Status = EndpointRequestBatch.Status::"Ready to Send" then begin
                 EndpointRequestBatch.Validate(Status, EndpointRequestBatch.Status::Sent);
                 EndpointRequestBatch.Modify(true);
-                Commit;
+                Commit();
             end;
         end;
-        Commit;
+        Commit();
     end;
 }
 

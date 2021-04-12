@@ -13,17 +13,17 @@ page 6150734 "NPR POS Scenarios Set Entries"
         {
             repeater(Group)
             {
-                field("Workflow Code"; "Workflow Code")
+                field("Workflow Code"; Rec."Workflow Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Workflow Code field';
                 }
-                field("Workflow Description"; "Workflow Description")
+                field("Workflow Description"; Rec."Workflow Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Workflow Description field';
                 }
-                field(Control6014406; "Workflow Steps")
+                field(Control6014406; Rec."Workflow Steps")
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
@@ -42,7 +42,7 @@ page 6150734 "NPR POS Scenarios Set Entries"
                 Caption = 'POS Scenarios Steps';
                 Image = List;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Scenarios Steps";

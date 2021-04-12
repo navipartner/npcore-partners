@@ -12,21 +12,21 @@ table 6060158 "NPR Event Cue"
         }
         field(10; "Upcoming Events"; Integer)
         {
-            CalcFormula = Count (Job WHERE("NPR Event" = CONST(true),
+            CalcFormula = Count(Job WHERE("NPR Event" = CONST(true),
                                            "Starting Date" = FIELD("Date Filter")));
             Caption = 'Upcoming Events';
             FieldClass = FlowField;
         }
         field(20; "Completed Events"; Integer)
         {
-            CalcFormula = Count (Job WHERE("NPR Event" = CONST(true),
+            CalcFormula = Count(Job WHERE("NPR Event" = CONST(true),
                                            "NPR Event Status" = CONST(Completed)));
             Caption = 'Completed Events';
             FieldClass = FlowField;
         }
         field(30; "Cancelled Events"; Integer)
         {
-            CalcFormula = Count (Job WHERE("NPR Event" = CONST(true),
+            CalcFormula = Count(Job WHERE("NPR Event" = CONST(true),
                                            "NPR Event Status" = CONST(Completed)));
             Caption = 'Cancelled Events';
             FieldClass = FlowField;

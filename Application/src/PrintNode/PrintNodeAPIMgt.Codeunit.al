@@ -163,7 +163,7 @@ codeunit 6151220 "NPR PrintNode API Mgt."
         IStream: InStream;
         OStream: OutStream;
     begin
-        PrintNodeSetup.Get;
+        PrintNodeSetup.Get();
         PrintNodeSetup.TestField("API Key");
         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.WriteText(PrintNodeSetup."API Key" + ':');

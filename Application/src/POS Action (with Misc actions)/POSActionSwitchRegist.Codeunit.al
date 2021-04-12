@@ -13,7 +13,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         if Sender.DiscoverAction(
             ActionCode,
             ActionDescription,
-            ActionVersion,
+            ActionVersion(),
             Sender.Type::Generic,
             Sender."Subscriber Instances Allowed"::Multiple)
         then begin
@@ -29,7 +29,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'prompt', Prompt_EnterRegister);
+        Captions.AddActionCaption(ActionCode(), 'prompt', Prompt_EnterRegister);
     end;
 
     local procedure ActionCode(): Text
@@ -46,10 +46,9 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Confirmed: Boolean;
         NewRegisterNo: Code[10];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         case WorkflowStep of
@@ -133,7 +132,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
             exit;
 
         PSOUnit.Get(UnitNo);
-        PSOUnit.SetRecFilter;
+        PSOUnit.SetRecFilter();
         PSOUnit.FilterGroup(40);
         PSOUnit.SetFilter("No.", UserSetup."NPR Register Switch Filter");
         if not PSOUnit.FindFirst() then

@@ -1,4 +1,4 @@
-page 6059767 "NPR NaviDocs Setup"
+﻿page 6059767 "NPR NaviDocs Setup"
 {
     Caption = 'NaviDocs Setup';
     DeleteAllowed = false;
@@ -76,10 +76,10 @@ page 6059767 "NPR NaviDocs Setup"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
         ShowLogToActivityLog := not Rec."Log to Activity Log";

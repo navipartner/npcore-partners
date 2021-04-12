@@ -7,7 +7,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
 
     var
         NO_MEMBER: Label 'Member Number must not be blank when validating member ticket assignments.';
-        MEMBER_NOT_VALID: Label 'Member Number %1 is not valid.';
         TICKET_COUNT_EXCEEDED: Label 'A maximum of %1 tickets can be assigned for ticket type %2, membership code %3, admission code %4.';
         TOTAL_TICKETS_EXCEEDED: Label 'The total ticket count of %1 is exceeded, membership code %2, admission code %3.';
         TOKEN_NOT_FOUND: Label 'The token %1 was not found.';
@@ -39,7 +38,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
 
     procedure PreValidateMemberGuestTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; FailWithError: Boolean) Success: Boolean
     var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         MemberManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         MembershipEntryNo: Integer;
@@ -142,18 +140,12 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
-        Admission: Record "NPR TM Admission";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         TicketAttempCreate: Codeunit "NPR Ticket Attempt Create";
-        EntryNo: Integer;
         TicketRequestMini: Page "NPR TM Ticket Req. Mini";
         PageAction: Action;
         ResponseMessage: Text;
@@ -344,7 +336,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Membership: Record "NPR MM Membership";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ExternalItemNo: Code[20];
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
@@ -385,7 +376,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Method: Code[10];
         NotificationEngine: Option;
-        Address: Text[200];
     begin
 
         Admission.Get(AdmissionCode);

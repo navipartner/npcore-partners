@@ -20,6 +20,6 @@ codeunit 6151451 "NPR Magento NpXml Stock Qty"
 
         Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Rec.Modify;
+        Rec.Modify();
     end;
 }

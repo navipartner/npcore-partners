@@ -1,4 +1,4 @@
-table 6151529 "NPR Nc Collector Request"
+﻿table 6151529 "NPR Nc Collector Request"
 {
     // NC2.01\BR\20160909  CASE 250447 NaviConnect: Object created
     // NC2.16/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 220
@@ -106,7 +106,7 @@ table 6151529 "NPR Nc Collector Request"
                     if "Table View" <> '' then
                         FilterPageBuild.SetView(RecRef.Caption, "Table View");
                     FilterPageBuild.PageCaption := RecRef.Caption;
-                    FilterPageBuild.RunModal;
+                    FilterPageBuild.RunModal();
                     Validate("Table View", FilterPageBuild.GetView(RecRef.Caption));
                 end;
             end;
@@ -138,13 +138,13 @@ table 6151529 "NPR Nc Collector Request"
                 TableFilter.FilterGroup(0);
                 TableFilterPage.SetTableView(TableFilter);
                 TableFilterPage.SetSourceTable(Format("Table Filter"), "Table No.", '');
-                if ACTION::OK = TableFilterPage.RunModal then
+                if ACTION::OK = TableFilterPage.RunModal() then
                     Evaluate("Table Filter", TableFilterPage.CreateTextTableFilter(false));
             end;
         }
         field(220; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
@@ -179,7 +179,7 @@ table 6151529 "NPR Nc Collector Request"
 
         if "Database Name" = '' then begin
             ActiveSession.SetRange("Session ID", SessionId);
-            if ActiveSession.FindFirst then
+            if ActiveSession.FindFirst() then
                 "Database Name" := CopyStr("Database Name", 1, MaxStrLen("Database Name"));
         end;
 
@@ -218,16 +218,15 @@ table 6151529 "NPR Nc Collector Request"
     procedure CreateFilterTextFromFilterLines()
     var
         NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter";
-        LastTableNo: Integer;
         RecRef: RecordRef;
         FldRef: FieldRef;
     begin
         "Table No." := 0;
-        NcCollectorRequestFilter.Reset;
+        NcCollectorRequestFilter.Reset();
         NcCollectorRequestFilter.SetRange("Nc Collector Request No.", "No.");
         if NcCollectorRequestFilter.IsEmpty then
             exit;
-        if NcCollectorRequestFilter.FindFirst then
+        if NcCollectorRequestFilter.FindFirst() then
             repeat
                 //If there are mutiple tables in the filter, then it can't be stored in the Table Filter field on the query
                 if ("Table No." <> 0) and ("Table No." <> NcCollectorRequestFilter."Table No.") then begin
@@ -243,7 +242,7 @@ table 6151529 "NPR Nc Collector Request"
                     FldRef := RecRef.Field(NcCollectorRequestFilter."Field No.");
                     FldRef.SetFilter(NcCollectorRequestFilter."Filter Text");
                 end;
-            until NcCollectorRequestFilter.Next = 0;
+            until NcCollectorRequestFilter.Next() = 0;
         if StrLen(RecRef.GetView) <= MaxStrLen("Table View") then begin
             "Table View" := RecRef.GetView;
         end else begin
@@ -311,29 +310,29 @@ table 6151529 "NPR Nc Collector Request"
         RecRef.Open(NcCollector."Table No.");
         //Set the Request filters
         RecRef.FilterGroup(0);
-        NcCollectorRequestFilter.Reset;
+        NcCollectorRequestFilter.Reset();
         NcCollectorRequestFilter.SetRange("Nc Collector Request No.", "No.");
-        if NcCollectorRequestFilter.FindSet then
+        if NcCollectorRequestFilter.FindSet() then
             repeat
                 if NcCollectorRequestFilter."Field No." <> 0 then begin
                     FldRef := RecRef.Field(NcCollectorRequestFilter."Field No.");
                     FldRef.SetFilter(NcCollectorRequestFilter."Filter Text");
                 end;
-            until NcCollectorRequestFilter.Next = 0;
+            until NcCollectorRequestFilter.Next() = 0;
 
         //Set the Collector filters
         RecRef.FilterGroup(1);
-        NcCollectorFilter.Reset;
+        NcCollectorFilter.Reset();
         NcCollectorFilter.SetRange("Collector Code", NcCollector.Code);
-        if NcCollectorFilter.FindSet then
+        if NcCollectorFilter.FindSet() then
             repeat
                 if NcCollectorFilter."Field No." <> 0 then begin
                     FldRef := RecRef.Field(NcCollectorFilter."Field No.");
                     FldRef.SetFilter(NcCollectorFilter."Filter Text");
                 end;
-            until NcCollectorFilter.Next = 0;
+            until NcCollectorFilter.Next() = 0;
 
-        NoOfRecords := RecRef.Count;
+        NoOfRecords := RecRef.Count();
 
         if NoOfRecords = 0 then begin
             "Processing Comment" := TextNoRecords;
@@ -345,9 +344,9 @@ table 6151529 "NPR Nc Collector Request"
             exit(false);
         end;
 
-        if RecRef.FindFirst then
+        if RecRef.FindFirst() then
             repeat
-                NcCollectionLine.Init;
+                NcCollectionLine.Init();
                 NcCollectionLine."No." := 0;
                 NcCollectionLine."Collector Code" := NcCollector.Code;
                 NcCollectionLine."Collection No." := NcCollectorManagement.GetNcCollectionNo(NcCollector.Code);
@@ -359,7 +358,7 @@ table 6151529 "NPR Nc Collector Request"
                 NcCollectorManagement.PopulatePKFields(NcCollectionLine, RecRef);
                 NcCollectionLine.Insert(true);
                 NcCollectorManagement.MarkPreviousCollectionLinesAsObsolete(NcCollectionLine);
-            until RecRef.Next = 0;
+            until RecRef.Next() = 0;
         "Processing Comment" := StrSubstNo(TextCollectionLinesInserted, NoOfRecords);
         exit(true);
     end;
@@ -371,7 +370,7 @@ table 6151529 "NPR Nc Collector Request"
         if "Collector Code" <> '' then
             exit;
 
-        NcCollector.Reset;
+        NcCollector.Reset();
         case Matching of
             Matching::ByName:
                 NcCollector.SetFilter("Request Name", '=%1', Name);
@@ -381,47 +380,47 @@ table 6151529 "NPR Nc Collector Request"
         NcCollector.SetFilter("Allow Request from Database", '=%1', "Database Name");
         NcCollector.SetFilter("Allow Request from Company", '=%1', "Company Name");
         NcCollector.SetFilter("Allow Request from User ID", '=%1', "User ID");
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //Database, Company and user match
             exit(NcCollector.Code);
 
         NcCollector.SetFilter("Allow Request from User ID", '=%1', '');
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //Database and Company match, username blank
             exit(NcCollector.Code);
 
         NcCollector.SetFilter("Allow Request from Company", '=%1', '');
         NcCollector.SetFilter("Allow Request from User ID", '=%1', "User ID");
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //Database and User ID match, Company blank
             exit(NcCollector.Code);
 
         NcCollector.SetFilter("Allow Request from Database", '=%1', '');
         NcCollector.SetFilter("Allow Request from Company", '=%1', "Company Name");
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //Company and User ID match, database blank
             exit(NcCollector.Code);
 
         NcCollector.SetFilter("Allow Request from User ID", '=%1', '');
         NcCollector.SetFilter("Allow Request from Company", '=%1', "Company Name");
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //Company match, User ID and database blank
             exit(NcCollector.Code);
 
         NcCollector.SetFilter("Allow Request from Company", '=%1', '');
         NcCollector.SetFilter("Allow Request from Database", '=%1', "Database Name");
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //Database match, User ID and company blank
             exit(NcCollector.Code);
 
         NcCollector.SetFilter("Allow Request from Database", '=%1', '');
         NcCollector.SetFilter("Allow Request from User ID", '=%1', "User ID");
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //User ID match, Database and company blank
             exit(NcCollector.Code);
 
         NcCollector.SetFilter("Allow Request from User ID", '=%1', '');
-        if NcCollector.FindFirst then
+        if NcCollector.FindFirst() then
             //User ID, Database and company blank
             exit(NcCollector.Code);
 

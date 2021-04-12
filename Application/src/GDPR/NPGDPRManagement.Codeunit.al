@@ -1,4 +1,4 @@
-codeunit 6151060 "NPR NP GDPR Management"
+﻿codeunit 6151060 "NPR NP GDPR Management"
 {
     Permissions = TableData "Sales Shipment Header" = rm,
                   TableData "Sales Invoice Header" = rm,
@@ -66,22 +66,15 @@ codeunit 6151060 "NPR NP GDPR Management"
 
     procedure DoAnonymization(CustNo: Code[20]; var VarReason: Text): Boolean
     var
-        CLE: Record "Cust. Ledger Entry";
         GDPRSetup: Record "NPR Customer GDPR SetUp";
-        ReasonText: Text;
-        SalesHdr: Record "Sales Header";
         OpenDocFound: Boolean;
         TransactionFound: Boolean;
-        DateFormulaTxt: Text;
         VarPeriod: DateFormula;
         OpenTransactionFound: Boolean;
         GDPRLogEntry: Record "NPR Customer GDPR Log Entries";
         MemberFound: Boolean;
-        Membership: Record "NPR MM Membership";
         UserSetup: Record "User Setup";
-        ILE: Record "Item Ledger Entry";
         JournalFound: Boolean;
-        GenJnlLine: Record "Gen. Journal Line";
         AnonymizationResponseValue: Integer;
     begin
         if UserSetup.Get(UserId()) then
@@ -262,7 +255,7 @@ codeunit 6151060 "NPR NP GDPR Management"
             Contact."Phone No." := '';
             Contact."Fax No." := '';
             Contact."VAT Registration No." := '';
-            if Contact.Image.HasValue then
+            if Contact.Image.HasValue() then
                 Clear(Contact.Image);
             Contact."Post Code" := '';
             Contact."Country/Region Code" := '';
@@ -584,7 +577,7 @@ codeunit 6151060 "NPR NP GDPR Management"
     var
         Job: Record Job;
     begin
-        Job.Reset;
+        Job.Reset();
         Job.SetRange("Bill-to Customer No.", VarCustNo);
         if Job.IsEmpty() then
             exit;
@@ -613,19 +606,17 @@ codeunit 6151060 "NPR NP GDPR Management"
         DateFormulaTxt: Text[250];
         VarPeriod: DateFormula;
         VarEntryNo: Integer;
-        Window: Dialog;
         Customer: Record Customer;
         CLE: Record "Cust. Ledger Entry";
         CustToAnonymize: Record "NPR Customers to Anonymize";
         ILE: Record "Item Ledger Entry";
         NoCLE: Boolean;
         NoILE: Boolean;
-        VarDateToUse: Date;
         NoTrans: Boolean;
     begin
         CustToAnonymize.Reset();
         CustToAnonymize.DeleteAll();
-        if GDPRSetup.Get then;
+        if GDPRSetup.Get() then;
 
         DateFormulaTxt := '-' + Format(GDPRSetup."Anonymize After");
         Evaluate(VarPeriod, DateFormulaTxt);

@@ -13,17 +13,17 @@ page 6150649 "NPR POS Entity Groups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Sorting"; Sorting)
+                field("Sorting"; Rec.Sorting)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';
@@ -40,7 +40,7 @@ page 6150649 "NPR POS Entity Groups"
     var
         "Field": Record "Field";
     begin
-        if Field.Get("Table ID", "Field No.") then
+        if Field.Get(Rec."Table ID", Rec."Field No.") then
             exit(Field."Field Caption");
     end;
 }

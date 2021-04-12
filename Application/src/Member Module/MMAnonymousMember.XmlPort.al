@@ -57,8 +57,6 @@ xmlport 6060136 "NPR MM Anonymous Member"
         }
     }
 
-    var
-        OutStr: OutStream;
 
     procedure ClearResponse()
     begin

@@ -81,7 +81,6 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
 
             trigger OnLookup()
             var
-                ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
                 RecRef: RecordRef;
                 Fldref: FieldRef;
                 Variant: Variant;

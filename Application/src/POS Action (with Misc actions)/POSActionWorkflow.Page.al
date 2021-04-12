@@ -13,17 +13,17 @@ page 6150706 "NPR POS Action Workflow"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Action Code"; "Action Code")
+                field("Action Code"; Rec."Action Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action Code field';
                 }
-                field("Condition Type"; "Condition Type")
+                field("Condition Type"; Rec."Condition Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Condition Type field';

@@ -13,52 +13,52 @@ page 6150654 "NPR POS Paym. Line Subpage"
         {
             repeater(Group)
             {
-                field("POS Payment Method Code"; "POS Payment Method Code")
+                field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Method Code field';
                 }
-                field("POS Payment Bin Code"; "POS Payment Bin Code")
+                field("POS Payment Bin Code"; Rec."POS Payment Bin Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Bin Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Paid Currency Code field';
                 }
-                field("Amount (LCY)"; "Amount (LCY)")
+                field("Amount (LCY)"; Rec."Amount (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount (LCY) field';
                 }
-                field("Amount (Sales Currency)"; "Amount (Sales Currency)")
+                field("Amount (Sales Currency)"; Rec."Amount (Sales Currency)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount (Sales Currency) field';
                 }
-                field("External Document No."; "External Document No.")
+                field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Document No. field';
                 }
-                field("VAT Amount (LCY)"; "VAT Amount (LCY)")
+                field("VAT Amount (LCY)"; Rec."VAT Amount (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the VAT Amount (LCY) field';
                 }
-                field("VAT Base Amount (LCY)"; "VAT Base Amount (LCY)")
+                field("VAT Base Amount (LCY)"; Rec."VAT Base Amount (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the VAT Base Amount field';
@@ -80,7 +80,7 @@ page 6150654 "NPR POS Paym. Line Subpage"
 
                 trigger OnAction()
                 begin
-                    ShowDimensions;
+                    Rec.ShowDimensions;
                 end;
             }
         }

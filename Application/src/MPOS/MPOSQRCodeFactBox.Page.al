@@ -38,7 +38,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
                     fPath: Text[1024];
                     FileBlob: Codeunit "Temp Blob";
                 begin
-                    if Rec."QR code".HasValue then begin
+                    if Rec."QR code".HasValue() then begin
                         Rec.CalcFields("QR code");
                         if Rec.Company <> '' then
                             fPath := StringReplace(Rec."User ID" + '_' + Rec.Company) + '.png'

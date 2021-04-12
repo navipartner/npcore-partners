@@ -1,4 +1,4 @@
-page 6150720 "NPR POS Stargate Pkg Creator"
+﻿page 6150720 "NPR POS Stargate Pkg Creator"
 {
     UsageCategory = None;
     PageType = Card;
@@ -201,7 +201,6 @@ page 6150720 "NPR POS Stargate Pkg Creator"
     var
         [RunOnClient]
         Detector: DotNet NPRNetAssemblyDetector;
-        Dependency: Text;
     begin
         Rec.DeleteAll();
         Detector := Detector.AssemblyDetector();
@@ -229,7 +228,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
         Dependency: DotNet NPRNetDetectionResult;
     begin
         foreach Dependency in Dependencies do begin
-            Rec.Init;
+            Rec.Init();
             Rec."Assembly Name" := Dependency.AssemblyName;
             Rec.Status := Status;
             if Status = Rec.Status::Mapped then
@@ -238,7 +237,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 Rec.Status := Rec.Status::Known;
                 Rec.Path := '';
             end;
-            Rec.Insert;
+            Rec.Insert();
         end;
     end;
 
@@ -289,8 +288,6 @@ page 6150720 "NPR POS Stargate Pkg Creator"
         String: DotNet NPRNetString;
         [RunOnClient]
         Assembly: DotNet NPRNetAssembly;
-        [RunOnClient]
-        Detector: DotNet NPRNetAssemblyDetector;
         FilePath: Text;
     begin
         FilePath := FileMgt.OpenFileDialog(Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll');
@@ -298,7 +295,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
             exit;
 
         Assembly := Assembly.ReflectionOnlyLoadFrom(FilePath);
-        Rec.Init;
+        Rec.Init();
         Rec."Assembly Name" := Assembly.FullName;
         Rec.Status := Rec.Status::Additional;
         Rec.Path := FilePath;
@@ -324,13 +321,13 @@ page 6150720 "NPR POS Stargate Pkg Creator"
         Package.Name := PackageName;
         Package.Version := PackageVersion;
 
-        if Rec.FindSet then
+        if Rec.FindSet() then
             repeat
                 if Rec.Status in [Rec.Status::Mapped, Rec.Status::Additional] then begin
                     AssemblyContent := AssemblyContent.AssemblyPackageContent(Rec.Path);
                     Package.AddContent(AssemblyContent);
                 end;
-            until Rec.Next = 0;
+            until Rec.Next() = 0;
 
         Rec := Rec2;
 

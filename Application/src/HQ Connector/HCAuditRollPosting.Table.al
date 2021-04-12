@@ -652,17 +652,11 @@ table 6150903 "NPR HC Audit Roll Posting"
     }
 
     procedure TransferFromRev(var Revisionsrulle: Record "NPR HC Audit Roll"; var RevPost: Record "NPR HC Audit Roll Posting" temporary; var Dlg: Dialog): Integer
-    var
-        Total: Integer;
-        nCount: Integer;
     begin
         exit(DoTransferFromRev(Revisionsrulle, RevPost, Dlg, true));
     end;
 
     procedure TransferFromRevItemLedger(var Revisionsrulle: Record "NPR HC Audit Roll"; var RevPost: Record "NPR HC Audit Roll Posting" temporary; var Dlg: Dialog): Integer
-    var
-        Total: Integer;
-        nCount: Integer;
     begin
         exit(DoTransferFromRevItemLedger(Revisionsrulle, RevPost, Dlg, true));
     end;
@@ -680,18 +674,14 @@ table 6150903 "NPR HC Audit Roll Posting"
         Target.SetFilter("Shortcut Dimension 1 Code", Source.GetFilter("Shortcut Dimension 1 Code"));
         Target.SetFilter("Shortcut Dimension 2 Code", Source.GetFilter("Shortcut Dimension 2 Code"));
 
-        if Source.FindSet then
+        if Source.FindSet() then
             repeat
                 Target.TransferFields(Source);
-                Target.Insert;
-            until Source.Next = 0;
+                Target.Insert();
+            until Source.Next() = 0;
     end;
 
     procedure UpdateChanges(var Dlg: Dialog)
-    var
-        Revisionsrulle: Record "NPR HC Audit Roll";
-        Total: Integer;
-        nCount: Integer;
     begin
         DoUpdateChanges(Dlg, true);
     end;
@@ -731,7 +721,6 @@ table 6150903 "NPR HC Audit Roll Posting"
 
     procedure UpdateChangesSilent()
     var
-        Revisionsrulle: Record "NPR HC Audit Roll";
         Dlg: Dialog;
     begin
         DoUpdateChanges(Dlg, false);
@@ -756,17 +745,17 @@ table 6150903 "NPR HC Audit Roll Posting"
         RevPost.SetFilter("Shortcut Dimension 1 Code", Revisionsrulle.GetFilter("Shortcut Dimension 1 Code"));
         RevPost.SetFilter("Shortcut Dimension 2 Code", Revisionsrulle.GetFilter("Shortcut Dimension 2 Code"));
         if UpdateDialog then
-            Total := Revisionsrulle.Count;
+            Total := Revisionsrulle.Count();
         if Revisionsrulle.Find('-') then
             repeat
                 nCount += 1;
                 Revisionsrulle.Description := CopyStr(Revisionsrulle.Description, 1, 50);
                 RevPost.TransferFields(Revisionsrulle);
                 RevPost.ApplyDimensions();
-                RevPost.Insert;
+                RevPost.Insert();
                 if UpdateDialog then
                     Dlg.Update(100, Round(nCount / Total * 10000, 1));
-            until Revisionsrulle.Next = 0;
+            until Revisionsrulle.Next() = 0;
         Revisionsrulle.SetRange(Posted);
         if UpdateDialog then
             Dlg.Update(100, 10000);
@@ -793,17 +782,17 @@ table 6150903 "NPR HC Audit Roll Posting"
         RevPost.SetFilter("Shortcut Dimension 1 Code", Revisionsrulle.GetFilter("Shortcut Dimension 1 Code"));
         RevPost.SetFilter("Shortcut Dimension 2 Code", Revisionsrulle.GetFilter("Shortcut Dimension 2 Code"));
         if UpdateDialog then
-            Total := Revisionsrulle.Count;
+            Total := Revisionsrulle.Count();
         if Revisionsrulle.Find('-') then
             repeat
                 nCount += 1;
                 Revisionsrulle.Description := CopyStr(Revisionsrulle.Description, 1, 50);
                 RevPost.TransferFields(Revisionsrulle);
                 RevPost.ApplyDimensions();
-                RevPost.Insert;
+                RevPost.Insert();
                 if UpdateDialog then
                     Dlg.Update(100, Round(nCount / Total * 10000, 1));
-            until Revisionsrulle.Next = 0;
+            until Revisionsrulle.Next() = 0;
         Revisionsrulle.SetRange(Posted);
         if UpdateDialog then
             Dlg.Update(100, 10000);
@@ -826,8 +815,8 @@ table 6150903 "NPR HC Audit Roll Posting"
                 end;
                 Revisionsrulle.Get("Register No.", "Sales Ticket No.", "Sale Type", "Line No.", "No.", "Sale Date");
                 Revisionsrulle.TransferFields(Rec);
-                Revisionsrulle.Modify;
-            until Next = 0;
+                Revisionsrulle.Modify();
+            until Next() = 0;
         if UpdateDialog then
             Dlg.Update(103, 10000);
     end;
@@ -837,7 +826,7 @@ table 6150903 "NPR HC Audit Roll Posting"
         HCRetailSetup: Record "NPR HC Retail Setup";
         HCDimMgt: Codeunit "NPR HC Dimension Mgt.";
     begin
-        HCRetailSetup.Get;
+        HCRetailSetup.Get();
         case HCRetailSetup."Dimensions Posting Type" of
             HCRetailSetup."Dimensions Posting Type"::" ":
                 exit;
@@ -865,7 +854,7 @@ table 6150903 "NPR HC Audit Roll Posting"
         No: array[10] of Code[20];
         DimMgt: Codeunit DimensionManagement;
     begin
-        HCRetailSetup.Get;
+        HCRetailSetup.Get();
         TableID[1] := Type1;
         No[1] := No1;
         TableID[2] := Type2;

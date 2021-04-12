@@ -1,4 +1,4 @@
-codeunit 6060056 "NPR Item Wksht. Doc. Exch."
+﻿codeunit 6060056 "NPR Item Wksht. Doc. Exch."
 {
     procedure InsertItemWorksheetLine(ItemWorksheet: Record "NPR Item Worksheet"; var ItemWorksheetLine: Record "NPR Item Worksheet Line"; VendorNo: Code[20]; VendorItemNo: Text; VendorItemDescription: Text; ItemGroupText: Text; DirectUnitCost: Decimal)
     var
@@ -8,14 +8,14 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
     begin
         ItemWorksheetLine.SetRange("Worksheet Template Name", ItemWorksheet."Item Template Name");
         ItemWorksheetLine.SetRange("Worksheet Name", ItemWorksheet.Name);
-        if ItemWorksheetLine.FindLast then begin
+        if ItemWorksheetLine.FindLast() then begin
             LastItemWorksheetLine := ItemWorksheetLine;
             ItemWorksheetLineNo := ItemWorksheetLine."Line No." + 10000
         end else begin
-            LastItemWorksheetLine.Init;
+            LastItemWorksheetLine.Init();
             ItemWorksheetLineNo := 10000;
         end;
-        ItemWorksheetLine.Init;
+        ItemWorksheetLine.Init();
         ItemWorksheetLine.Validate("Worksheet Template Name", ItemWorksheet."Item Template Name");
         ItemWorksheetLine.Validate("Worksheet Name", ItemWorksheet.Name);
         ItemWorksheetLine.Validate("Line No.", ItemWorksheetLineNo);
@@ -54,7 +54,7 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
 
         NPRAttributeID.SetRange("Table ID", DATABASE::"NPR Item Worksheet Line");
         NPRAttributeID.SetRange("Shortcut Attribute ID", AttributeNo);
-        if NPRAttributeID.FindFirst then
+        if NPRAttributeID.FindFirst() then
             NPRAttributeManagement.SetWorksheetLineAttributeValue(
                     NPRAttributeID."Table ID", NPRAttributeID."Shortcut Attribute ID",
                     ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name",
@@ -74,10 +74,10 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
         ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksh. Variant Line");
         ErrorMessage.SetRange("Field Number", ItemWorksheetVariantLine.FieldNo(Description));
         ErrorMessage.SetRange(Description, ItemWorksheetLine."Vendor Item No.");
-        if not ErrorMessage.FindFirst then
+        if not ErrorMessage.FindFirst() then
             exit;
 
-        ItemWorksheetVariantLine.Init;
+        ItemWorksheetVariantLine.Init();
         ItemWorksheetVariantLine.Validate("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
         ItemWorksheetVariantLine.Validate("Worksheet Name", ItemWorksheetLine."Worksheet Name");
         ItemWorksheetVariantLine.Validate("Worksheet Line No.", ItemWorksheetLine."Line No.");
@@ -91,15 +91,15 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
         ErrorMessage2.SetRange("Context Record ID", IncomingDocument.RecordId);
         ErrorMessage2.SetRange("Table Number", DATABASE::"NPR Item Worksh. Variant Line");
         ErrorMessage2.SetRange("Record ID", ErrorMessage2."Record ID");
-        if ErrorMessage2.FindSet then
+        if ErrorMessage2.FindSet() then
             repeat
                 if ErrorMessage2."Field Number" <> ItemWorksheetVariantLine.FieldNo(Description) then begin
                     RecRef.Get(ItemWorksheetVariantLine.RecordId);
                     FldRef := RecRef.Field(ErrorMessage2."Field Number");
                     FldRef.Value := CopyStr(ErrorMessage2.Description, 1, FldRef.Length);
-                    RecRef.Modify;
+                    RecRef.Modify();
                 end;
-            until ErrorMessage2.Next = 0;
+            until ErrorMessage2.Next() = 0;
     end;
 
     procedure ItemWorksheetExists(ItemWorksheet: Record "NPR Item Worksheet"; ItemWorksheetLine: Record "NPR Item Worksheet Line"; VendorNo: Text; VendorItemNo: Text): Boolean
@@ -110,7 +110,7 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
         ItemWorksheetLine2.SetRange("Worksheet Name", ItemWorksheet.Name);
         ItemWorksheetLine2.SetFilter("Vendor No.", VendorNo);
         ItemWorksheetLine2.SetFilter("Vendor Item No.", VendorItemNo);
-        if ItemWorksheetLine2.FindLast then
+        if ItemWorksheetLine2.FindLast() then
             exit(true)
         else
             exit(false);
@@ -120,30 +120,10 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
     var
         ErrorMessage: Record "Error Message";
         ErrorMessage2: Record "Error Message";
-        ErrorMessage3: Record "Error Message";
-        Item: Record Item;
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
-        ItemWorksheet: Record "NPR Item Worksheet";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        ConfigValidateMgt: Codeunit "Config. Validate Management";
-        ItemWshtRegisterBatch: Codeunit "NPR Item Wsht.-Regist. Batch";
-        RecRef: RecordRef;
-        FldRef: FieldRef;
-        AutomaticProcessing: Boolean;
-        AutomaticQuery: Boolean;
         DirectUnitCost: Decimal;
         NoOfMissingItems: Integer;
-        ItemWSLinesNotCreatedErr: Label 'Item Worksheet Lines could not be created.';
-        ItemsCreatedErr: Label 'The item with %1 %2 could not be matched and has been created as Item %3. Please Check before creating the Purchase Invoice.',
-            Comment = '%1 = Vendor Item No. Caption; %2 = Vendor Item No.; %3=Item No.';
-        ItemCouldNotBeMatchedErr: Label 'The item with %1 %2 could not be matched to an existing item and has been added to Item Worksheet %3 %4.',
-            Comment = '%1 = Vendor Item No. Caption; %2 = Vendor Item No.; %3=Worksheet Template Name; %4= Worksheet Name';
-        ItemWSLineAlreadyCreatedErr: Label 'The item with %1 %2 could not be matched to an existing item but has already been added to Item Worksheet %3 %4.',
-            Comment = '%1 = Vendor Item No. Caption; %2 = Vendor Item No.; %3=Worksheet Template Name; %4= Worksheet Name';
-        Color: Text;
         ItemGroupText: Text;
-        ItemNo: Text;
-        Size: Text;
         VendorItemDescription: Text;
         VendorItemNo: Text;
         VendorNo: Text;
@@ -152,13 +132,13 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
         ErrorMessage.SetRange("Context Record ID", IncomingDocument.RecordId);
         ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
         ErrorMessage.SetRange("Field Number", ItemWorksheetLine.FieldNo("Vendor Item No."));
-        if ErrorMessage.FindSet then
+        if ErrorMessage.FindSet() then
             repeat
                 NoOfMissingItems := NoOfMissingItems + 1;
-                ErrorMessage2.Reset;
+                ErrorMessage2.Reset();
                 ErrorMessage2.SetRange("Context Record ID", IncomingDocument.RecordId);
                 ErrorMessage2.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
-                if ErrorMessage2.FindSet then
+                if ErrorMessage2.FindSet() then
                     repeat
                         if Format(ErrorMessage2."Record ID") = Format(ErrorMessage."Record ID") then begin
                             case ErrorMessage2."Field Number" of
@@ -174,10 +154,10 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
                                     VendorNo := ErrorMessage2.Description;
                             end;
                         end;
-                    until ErrorMessage2.Next = 0;
+                    until ErrorMessage2.Next() = 0;
                 ErrorMessage.Modify(true);
-            until ErrorMessage.Next = 0;
-        ErrorMessage.Reset;
+            until ErrorMessage.Next() = 0;
+        ErrorMessage.Reset();
         ErrorMessage.SetRange("Context Record ID", IncomingDocument.RecordId);
         ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
         ErrorMessage.SetFilter("Field Number", '<>%1', ItemWorksheetLine.FieldNo("Vendor Item No."));
@@ -197,7 +177,7 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
     begin
         ErrorMessage.SetRange("Context Record ID", Sender.RecordId);
         ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
-        if not ErrorMessage.FindFirst then
+        if not ErrorMessage.FindFirst() then
             exit;
         Sender.TestField(Released, false);
     end;

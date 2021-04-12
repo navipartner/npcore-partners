@@ -1,8 +1,8 @@
 report 6059900 "NPR Analyse Task Queue Usg."
 {
-DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    DefaultLayout = RDLC;
+    RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Analyse Task Queue Usage';
     dataset
@@ -214,7 +214,7 @@ DefaultLayout = RDLC;
                     TMPTaskQueue.Reset();
                     TMPTaskQueue.SetCurrentKey("Next Run time");
                     TMPTaskQueue.SetRange("Task Template", Format(TMPDateTimeGroup."Entry No."));
-                    SetRange(Number, 1, TMPTaskQueue.Count);
+                    SetRange(Number, 1, TMPTaskQueue.Count());
                 end;
             }
 
@@ -232,7 +232,7 @@ DefaultLayout = RDLC;
             trigger OnPreDataItem()
             begin
                 TMPDateTimeGroup.Reset();
-                SetRange(Number, 1, TMPDateTimeGroup.Count);
+                SetRange(Number, 1, TMPDateTimeGroup.Count());
             end;
         }
     }
@@ -300,7 +300,6 @@ DefaultLayout = RDLC;
 
     procedure BuildGroupTable(StartDateTime: DateTime; EndDateTime: DateTime)
     var
-        PeriodEndTime: DateTime;
         PeriodStartTime: DateTime;
         Dur: Duration;
         Counter: Integer;

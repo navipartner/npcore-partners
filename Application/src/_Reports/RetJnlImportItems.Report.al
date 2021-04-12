@@ -1,4 +1,4 @@
-report 6014424 "NPR Ret. Jnl. - Import Items"
+﻿report 6014424 "NPR Ret. Jnl. - Import Items"
 {
     Caption = 'Import Items';
     ProcessingOnly = true;
@@ -75,11 +75,11 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                             end;
 
 
-                            ItemReference.Reset;
+                            ItemReference.Reset();
                             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
                             ItemReference.SetRange("Item No.", Item."No.");
                             ItemReference.SetRange("Variant Code", ItemVariants.Code);
-                            if ItemReference.FindFirst then
+                            if ItemReference.FindFirst() then
                                 RetailJournalLine.Validate(Barcode, ItemReference."Reference No.");
 
                             RetailJournalLine.Modify();

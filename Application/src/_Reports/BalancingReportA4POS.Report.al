@@ -1,8 +1,8 @@
 report 6014459 "NPR Balancing Report A4 POS"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Balancing Report -A4 - POS';
 
@@ -831,12 +831,7 @@ report 6014459 "NPR Balancing Report A4 POS"
         Closinglbl: Label 'Closing';
         VATTaxSummarylbl: Label 'VAT & TAX Summary';
         AttachedPaymentBinslbl: Label 'Attached Payment Bins';
-        VarPrintAmt: Boolean;
-        VarPrintPerc: Boolean;
-        VarPrintTotal: Boolean;
-        Text000: Label 'You need to select Print Discount first.';
         CustomerPaymentLbl: Label 'Payment';
-        PrintDiscountlbl: Label 'Print Discount';
         Workshiftlbl: Label 'Workshift';
         CompanyInfo: Record "Company Information";
 }

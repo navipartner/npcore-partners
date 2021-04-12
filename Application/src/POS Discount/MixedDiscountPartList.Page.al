@@ -19,40 +19,40 @@ page 6014447 "NPR Mixed Discount Part List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Caption = 'Mix No.';
                     ToolTip = 'Specifies the value of the Mix No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Lot; Lot)
+                field(Lot; Rec.Lot)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Lot field';
                 }
-                field("Min. Quantity"; "Min. Quantity")
+                field("Min. Quantity"; Rec."Min. Quantity")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     ToolTip = 'Specifies the value of the Min. Quantity field';
                 }
-                field("Max. Quantity"; "Max. Quantity")
+                field("Max. Quantity"; Rec."Max. Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. Quantity field';
                 }
-                field("Created the"; "Created the")
+                field("Created the"; Rec."Created the")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Created Date field';
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     Visible = false;

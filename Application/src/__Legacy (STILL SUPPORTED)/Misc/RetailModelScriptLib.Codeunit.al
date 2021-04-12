@@ -22,7 +22,7 @@ codeunit 6150673 "NPR Retail Model Script Lib."
             Uri := Uri.Uri('https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js');
             MemoryStream := MemoryStream.MemoryStream(WebClient.DownloadData(Uri));
 
-            WebClientDependency.Init;
+            WebClientDependency.Init();
             WebClientDependency.Type := WebClientDependency.Type::JavaScript;
             WebClientDependency.Code := 'ANGULAR';
             WebClientDependency.Description := 'angular 1.7.5';
@@ -52,7 +52,7 @@ codeunit 6150673 "NPR Retail Model Script Lib."
             Uri := Uri.Uri('https://code.jquery.com/ui/1.12.1/jquery-ui.min.js');
             MemoryStream := MemoryStream.MemoryStream(WebClient.DownloadData(Uri));
 
-            WebClientDependency.Init;
+            WebClientDependency.Init();
             WebClientDependency.Type := WebClientDependency.Type::JavaScript;
             WebClientDependency.Code := 'JQUERY-UI';
             WebClientDependency.Description := 'jQuery-ui 1.12.1';
@@ -82,7 +82,7 @@ codeunit 6150673 "NPR Retail Model Script Lib."
             Uri := Uri.Uri('https://raw.githubusercontent.com/furf/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js');
             MemoryStream := MemoryStream.MemoryStream(WebClient.DownloadData(Uri));
 
-            WebClientDependency.Init;
+            WebClientDependency.Init();
             WebClientDependency.Type := WebClientDependency.Type::JavaScript;
             WebClientDependency.Code := 'TOUCHPUNCH';
             WebClientDependency.Description := 'touchpunch 0.2.3';

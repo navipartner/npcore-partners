@@ -7,7 +7,6 @@ codeunit 6060048 "NPR Item Wksht. WebService"
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        MasterDataSourceId: Code[10];
         OutStr: OutStream;
     begin
         SelectLatestVersion();
@@ -16,7 +15,7 @@ codeunit 6060048 "NPR Item Wksht. WebService"
         InsertImportEntry('CreateItemWorksheetLine', ImportEntry);
         ImportEntry."Document ID" := itemworksheetlines.GetMessageID();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('ItemWorksheetLine-%1.xml', Format(CurrentDateTime(), 0, 9));
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
@@ -43,10 +42,8 @@ codeunit 6060048 "NPR Item Wksht. WebService"
 
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
-    var
-        NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR Item Wksht. WebService", WebserviceFunction);
         if (ImportEntry."Import Type" = '') then begin
@@ -63,7 +60,7 @@ codeunit 6060048 "NPR Item Wksht. WebService"
         ImportEntry.Insert(true);
     end;
 
-    local procedure GetDocumentSequence(DocumentID: Text[100]) SequenceNo: Integer
+    local procedure GetDocumentSequence(DocumentID: Text[100]): Integer
     var
         ImportEntry: Record "NPR Nc Import Entry";
     begin
@@ -109,7 +106,7 @@ codeunit 6060048 "NPR Item Wksht. WebService"
     begin
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", CopyStr(WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));
-        if ImportType.FindFirst then
+        if ImportType.FindFirst() then
             exit(ImportType.Code);
 
         exit('');

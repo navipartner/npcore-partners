@@ -8,8 +8,6 @@ codeunit 6150707 "NPR POS Payment Line"
         FrontEnd: Codeunit "NPR POS Front End Management";
         RegisterNo: Code[20];
         SalesTicketNo: Code[20];
-        NotFound: Label '%1 %2 not found.';
-        PaymentTypeNotFound: Label '%1 %2 for POS unit %3 was not found.';
         DeleteNotAllowed: Label 'Payments approved by a 3-party must be cancelled, not deleted.';
         Initialized: Boolean;
         ErrVATCalcNotSupportInPOS: Label '%1 %2 not supported in POS';
@@ -20,13 +18,11 @@ codeunit 6150707 "NPR POS Payment Line"
     procedure Init(RegisterNoIn: Code[20]; SalesTicketNoIn: Code[20]; SaleIn: Codeunit "NPR POS Sale"; SetupIn: Codeunit "NPR POS Setup"; FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
         Clear(Rec);
-        with Rec do begin
-            FilterGroup(2);
-            SetRange(Type, Type::Payment);
-            SetRange("Register No.", RegisterNoIn);
-            SetRange("Sales Ticket No.", SalesTicketNoIn);
-            FilterGroup(0);
-        end;
+        Rec.FilterGroup(2);
+        Rec.SetRange(Type, Rec.Type::Payment);
+        Rec.SetRange("Register No.", RegisterNoIn);
+        Rec.SetRange("Sales Ticket No.", SalesTicketNoIn);
+        Rec.FilterGroup(0);
 
         Sale.Get(RegisterNoIn, SalesTicketNoIn);
 
@@ -50,7 +46,6 @@ codeunit 6150707 "NPR POS Payment Line"
     procedure ToDataset(CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         DataMgt: Codeunit "NPR POS Data Management";
-        DataSet: Codeunit "NPR Data Set";
         SaleAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
@@ -119,7 +114,7 @@ codeunit 6150707 "NPR POS Payment Line"
         SaleLinePOS.SetRange(SaleLinePOS."Register No.", RegisterNo);
         SaleLinePOS.SetRange(SaleLinePOS."Sales Ticket No.", SalesTicketNo);
         SaleLinePOS.SetFilter(SaleLinePOS.Type, '<>%1', SaleLinePOS.Type::Comment);
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 case true of
                     (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::Deposit]):
@@ -131,7 +126,7 @@ codeunit 6150707 "NPR POS Payment Line"
                     (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment):
                         PaidAmount += SaleLinePOS."Amount Including VAT";
                 end;
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
 
 
         Subtotal := SaleAmount - PaidAmount - RoundingAmount;
@@ -156,7 +151,7 @@ codeunit 6150707 "NPR POS Payment Line"
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
-        if SaleLinePOS.FindLast then;
+        if SaleLinePOS.FindLast() then;
 
         NextLineNo := SaleLinePOS."Line No." + 10000;
         exit(NextLineNo);
@@ -169,13 +164,11 @@ codeunit 6150707 "NPR POS Payment Line"
 
     local procedure SetPaymentLineType(var PaymentLinePOS: Record "NPR POS Sale Line")
     begin
-        with PaymentLinePOS do begin
-            "Register No." := Sale."Register No.";
-            "Sales Ticket No." := Sale."Sales Ticket No.";
-            Date := Sale.Date;
-            "Sale Type" := "Sale Type"::Payment;
-            Type := Type::Payment;
-        end;
+        PaymentLinePOS."Register No." := Sale."Register No.";
+        PaymentLinePOS."Sales Ticket No." := Sale."Sales Ticket No.";
+        PaymentLinePOS.Date := Sale.Date;
+        PaymentLinePOS."Sale Type" := PaymentLinePOS."Sale Type"::Payment;
+        PaymentLinePOS.Type := PaymentLinePOS.Type::Payment;
     end;
 
     procedure InsertPaymentLine(Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean
@@ -183,22 +176,20 @@ codeunit 6150707 "NPR POS Payment Line"
 
         ValidatePaymentLine(Line);
 
-        with Rec do begin
-            InitLine();
-            Rec.TransferFields(Line, false);
-            SetPaymentLineType(Rec);
+        InitLine();
+        Rec.TransferFields(Line, false);
+        SetPaymentLineType(Rec);
 
-            Validate("No.", Line."No.");
-            Quantity := 0;
+        Rec.Validate("No.", Line."No.");
+        Rec.Quantity := 0;
 
-            ApplyForeignAmountConversion(Rec, (ForeignCurrencyAmount <> 0), ForeignCurrencyAmount);
-            ReverseUnrealizedSalesVAT(Rec);
+        ApplyForeignAmountConversion(Rec, (ForeignCurrencyAmount <> 0), ForeignCurrencyAmount);
+        ReverseUnrealizedSalesVAT(Rec);
 
-            if Line.Description <> '' then
-                Description := Line.Description;
+        if Line.Description <> '' then
+            Rec.Description := Line.Description;
 
-            Return := Insert(true);
-        end;
+        Return := Rec.Insert(true);
 
         OnAfterInsertPaymentLine(Rec);
         POSSale.RefreshCurrent();
@@ -211,12 +202,10 @@ codeunit 6150707 "NPR POS Payment Line"
         if (Rec."EFT Approved") then
             Error(DeleteNotAllowed);
 
-        with Rec do begin
-            Delete(true);
-            OnAfterDeleteLine(Rec);
+        Rec.Delete(true);
+        OnAfterDeleteLine(Rec);
 
-            if not Find('><') then;
-        end;
+        if not Rec.Find('><') then;
 
         POSSale.RefreshCurrent();
     end;
@@ -260,41 +249,39 @@ codeunit 6150707 "NPR POS Payment Line"
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
     begin
 
-        with SaleLinePOS do begin
-            if not POSPaymentMethod.Get("No.") then
-                exit;
+        if not POSPaymentMethod.Get(SaleLinePOS."No.") then
+            exit;
 
-            Currency.InitRoundingPrecision();
+        Currency.InitRoundingPrecision();
 
-            if (POSPaymentMethod."Reverse Unrealized VAT") then begin
-                "Line Amount" := "Amount Including VAT";
+        if (POSPaymentMethod."Reverse Unrealized VAT") then begin
+            SaleLinePOS."Line Amount" := SaleLinePOS."Amount Including VAT";
 
-                case "VAT Calculation Type" of
-                    "VAT Calculation Type"::"Reverse Charge VAT",
-                    "VAT Calculation Type"::"Normal VAT":
-                        begin
-                            Amount := Round(("Line Amount") / (1 + "VAT %" / 100), Currency."Amount Rounding Precision");
-                            "VAT Base Amount" := Amount;
-                        end;
+            case SaleLinePOS."VAT Calculation Type" of
+                SaleLinePOS."VAT Calculation Type"::"Reverse Charge VAT",
+                SaleLinePOS."VAT Calculation Type"::"Normal VAT":
+                    begin
+                        SaleLinePOS.Amount := Round((SaleLinePOS."Line Amount") / (1 + SaleLinePOS."VAT %" / 100), Currency."Amount Rounding Precision");
+                        SaleLinePOS."VAT Base Amount" := SaleLinePOS.Amount;
+                    end;
 
-                    "VAT Calculation Type"::"Sales Tax":
-                        begin
-                            TestField("Tax Area Code");
-                            Amount := SalesTaxCalculate.ReverseCalculateTax(
-                              "Tax Area Code", "Tax Group Code", "Tax Liable", Rec.Date,
-                              "Amount Including VAT", "Quantity (Base)", 0);
+                SaleLinePOS."VAT Calculation Type"::"Sales Tax":
+                    begin
+                        SaleLinePOS.TestField("Tax Area Code");
+                        SaleLinePOS.Amount := SalesTaxCalculate.ReverseCalculateTax(
+                          SaleLinePOS."Tax Area Code", SaleLinePOS."Tax Group Code", SaleLinePOS."Tax Liable", Rec.Date,
+                          SaleLinePOS."Amount Including VAT", SaleLinePOS."Quantity (Base)", 0);
 
-                            if Amount <> 0 then
-                                "VAT %" := Round(100 * ("Amount Including VAT" - Amount) / Amount, 0.00001)
-                            else
-                                "VAT %" := 0;
-                            "Amount Including VAT" := Round("Amount Including VAT");
-                            Amount := Round(Amount);
-                            "VAT Base Amount" := Amount;
-                        end;
-                    else
-                        Error(ErrVATCalcNotSupportInPOS, FieldCaption("VAT Calculation Type"), "VAT Calculation Type");
-                end;
+                        if SaleLinePOS.Amount <> 0 then
+                            SaleLinePOS."VAT %" := Round(100 * (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount) / SaleLinePOS.Amount, 0.00001)
+                        else
+                            SaleLinePOS."VAT %" := 0;
+                        SaleLinePOS."Amount Including VAT" := Round(SaleLinePOS."Amount Including VAT");
+                        SaleLinePOS.Amount := Round(SaleLinePOS.Amount);
+                        SaleLinePOS."VAT Base Amount" := SaleLinePOS.Amount;
+                    end;
+                else
+                    Error(ErrVATCalcNotSupportInPOS, SaleLinePOS.FieldCaption("VAT Calculation Type"), SaleLinePOS."VAT Calculation Type");
             end;
         end;
     end;

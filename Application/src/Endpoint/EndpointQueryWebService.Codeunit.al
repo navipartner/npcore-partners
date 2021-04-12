@@ -9,29 +9,27 @@ codeunit 6014680 "NPR Endpoint Query WebService"
 
     var
         SETUP_MISSING: Label 'Setup is missing for %1';
-        FileMan: Codeunit "File Management";
 
     procedure Createendpointquery(var EndpointQueryWebImport: XMLport "NPR Endpoint Query Web Import")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
-        MasterDataSourceId: Code[10];
     begin
         SelectLatestVersion;
-        EndpointQueryWebImport.Import;
+        EndpointQueryWebImport.Import();
 
         InsertImportEntry('Createendpointquery', ImportEntry);
         ImportEntry."Document ID" := EndpointQueryWebImport.GetMessageID();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Name" := StrSubstNo('EndpointQuery-%1.xml', Format(CurrentDateTime(), 0, 9));
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         EndpointQueryWebImport.SetDestination(OutStr);
-        EndpointQueryWebImport.Export;
+        EndpointQueryWebImport.Export();
         Commit();
 
         ImportEntry.Modify(true);
@@ -55,11 +53,9 @@ codeunit 6014680 "NPR Endpoint Query WebService"
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
-    var
-        NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
 
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR Endpoint Query WebService", WebserviceFunction);
         if (ImportEntry."Import Type" = '') then begin
@@ -76,7 +72,7 @@ codeunit 6014680 "NPR Endpoint Query WebService"
         ImportEntry.Insert(true);
     end;
 
-    local procedure GetDocumentSequence(DocumentID: Text[100]) SequenceNo: Integer
+    local procedure GetDocumentSequence(DocumentID: Text[100]): Integer
     var
         ImportEntry: Record "NPR Nc Import Entry";
     begin
@@ -133,7 +129,7 @@ codeunit 6014680 "NPR Endpoint Query WebService"
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", '%1', CopyStr(WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));
 
-        if ImportType.FindFirst then
+        if ImportType.FindFirst() then
             exit(ImportType.Code);
 
         exit('');

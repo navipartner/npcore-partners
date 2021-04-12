@@ -56,7 +56,6 @@ codeunit 6151153 "NPR M2 Service Lib."
         CalendarManagement: Codeunit "Calendar Management";
         NonWorkingDescription: Text;
         CalendarCode: Code[10];
-        IsWorkingDay: Boolean;
         SearchLength: Integer;
         CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
     begin
@@ -97,7 +96,7 @@ codeunit 6151153 "NPR M2 Service Lib."
 
         case SourceType of
             SourceType::Company:
-                if CompanyInfo.Get then
+                if CompanyInfo.Get() then
                     exit(CompanyInfo."Base Calendar Code");
 
             SourceType::Customer:
@@ -113,7 +112,7 @@ codeunit 6151153 "NPR M2 Service Lib."
                     if Shippingagent.Get(SourceCode, AdditionalSourceCode) then
                         exit(Shippingagent."Base Calendar Code");
 
-                    if CompanyInfo.Get then
+                    if CompanyInfo.Get() then
                         exit(CompanyInfo."Base Calendar Code");
                 end;
 
@@ -122,12 +121,12 @@ codeunit 6151153 "NPR M2 Service Lib."
                     if Location.Get(SourceCode) then
                         if Location."Base Calendar Code" <> '' then
                             exit(Location."Base Calendar Code");
-                    if CompanyInfo.Get then
+                    if CompanyInfo.Get() then
                         exit(CompanyInfo."Base Calendar Code");
                 end;
 
             SourceType::Service:
-                if ServMgtSetup.Get then
+                if ServMgtSetup.Get() then
                     exit(ServMgtSetup."Base Calendar Code");
         end;
     end;

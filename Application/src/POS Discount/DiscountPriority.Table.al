@@ -30,7 +30,7 @@ table 6014417 "NPR Discount Priority"
                 SetupObjectNoList(TempObject);
                 TempObject."Object Type" := TempObject."Object Type"::Table;
                 TempObject."Object ID" := "Table ID";
-                if not TempObject.Find then
+                if not TempObject.Find() then
                     FieldError("Table ID");
             end;
         }
@@ -111,9 +111,9 @@ table 6014417 "NPR Discount Priority"
         Object.SetRange("Object Type", Object."Object Type"::Table);
         for Index := 1 to NumberOfObjects do begin
             Object.SetRange("Object ID", DiscountPriorities[Index]);
-            if Object.FindFirst then begin
+            if Object.FindFirst() then begin
                 TempObject := Object;
-                TempObject.Insert;
+                TempObject.Insert();
             end;
         end;
     end;

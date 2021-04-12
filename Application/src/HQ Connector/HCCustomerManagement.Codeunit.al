@@ -40,7 +40,7 @@ codeunit 6150907 "NPR HC Customer Management"
             UpdateCustomer(Node.AsXmlElement());
     end;
 
-    local procedure UpdateCustomer(ItemXmlElement: XmlElement) Imported: Boolean
+    local procedure UpdateCustomer(ItemXmlElement: XmlElement): Boolean
     var
         Customer: Record Customer;
     begin
@@ -49,14 +49,13 @@ codeunit 6150907 "NPR HC Customer Management"
 
         InsertCustomer(ItemXmlElement, Customer);
 
-        Commit;
+        Commit();
         exit(true);
     end;
 
     local procedure InsertCustomer(Element: XmlElement; var Customer: Record Customer)
     var
         TempCustomer: Record Customer temporary;
-        OStream: OutStream;
     begin
         Evaluate(TempCustomer."No.", NpXmlDomMgt.GetXmlText(Element, 'no', 0, false), 9);
         Evaluate(TempCustomer.Name, NpXmlDomMgt.GetXmlText(Element, 'name', 0, false), 9);
@@ -89,7 +88,7 @@ codeunit 6150907 "NPR HC Customer Management"
 
         //Record insert
         if not Customer.Get(TempCustomer."No.") then begin
-            Customer.Init;
+            Customer.Init();
             Customer."No." := TempCustomer."No.";
             Customer.Insert(true);
         end;

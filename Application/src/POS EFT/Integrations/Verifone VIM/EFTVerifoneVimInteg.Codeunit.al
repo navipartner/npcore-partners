@@ -1,4 +1,4 @@
-codeunit 6184526 "NPR EFT Verifone Vim Integ."
+﻿codeunit 6184526 "NPR EFT Verifone Vim Integ."
 {
     // NPR5.53/MMV /20191203 CASE 349520 Created object
     // NPR5.54/MMV /20200414 CASE 364340 Added card data for voids
@@ -31,27 +31,27 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
-        tmpEFTIntegrationType.Init;
+        tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := INTEGRATION_DESC;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT Verifone Vim Integ.";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
         tmpEFTAuxOperation.Description := BALANCE_CHECK_DEC;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
 
-        tmpEFTAuxOperation.Init;
+        tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
         tmpEFTAuxOperation.Description := RECONCILIATION;
-        tmpEFTAuxOperation.Insert;
+        tmpEFTAuxOperation.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
@@ -63,7 +63,7 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
             exit;
 
         GetPOSUnitParameters(EFTSetup, EFTVerifoneUnitParameter);
-        Commit;
+        Commit();
         PAGE.RunModal(PAGE::"NPR EFT Verifone Unit Param.", EFTVerifoneUnitParameter);
     end;
 
@@ -76,7 +76,7 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
             exit;
 
         GetPaymentTypeParameters(EFTSetup, EFTVerifonePaymentParameter);
-        Commit;
+        Commit();
         PAGE.RunModal(PAGE::"NPR EFT Verifone Paym. Param.", EFTVerifonePaymentParameter);
     end;
 
@@ -219,15 +219,14 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
     var
         EFTSetup: Record "NPR EFT Setup";
         POSSetup: Codeunit "NPR POS Setup";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         POSSession.GetSetup(POSSetup);
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
-        if not EFTSetup.FindFirst then begin
+        if not EFTSetup.FindFirst() then begin
             EFTSetup.SetRange("POS Unit No.", '');
-            if not EFTSetup.FindFirst then
+            if not EFTSetup.FindFirst() then
                 exit;
         end;
 
@@ -235,7 +234,7 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
             exit;
 
         tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert;
+        tmpEFTSetup.Insert();
     end;
 
     local procedure OnCreateBalanceEnquiryRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
@@ -284,9 +283,9 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
             Handled := true; //We have already printed the merchant receipt (1) during the purchase transaction. So we manually print only customer receipt at end of trx.
 
             CreditCardTransaction.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
-            CreditCardTransaction.FindFirst;
+            CreditCardTransaction.FindFirst();
             CreditCardTransaction.SetRange("Receipt No.", CreditCardTransaction."Receipt No." + 1);
-            CreditCardTransaction.FindSet;
+            CreditCardTransaction.FindSet();
             CreditCardTransaction.PrintTerminalReceipt();
         end;
     end;
@@ -329,9 +328,9 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
     local procedure GetPOSUnitParameters(EFTSetup: Record "NPR EFT Setup"; var EFTVerifoneUnitParameter: Record "NPR EFT Verifone Unit Param.")
     begin
         if not EFTVerifoneUnitParameter.Get(EFTSetup."POS Unit No.") then begin
-            EFTVerifoneUnitParameter.Init;
+            EFTVerifoneUnitParameter.Init();
             EFTVerifoneUnitParameter."POS Unit" := EFTSetup."POS Unit No.";
-            EFTVerifoneUnitParameter.Insert;
+            EFTVerifoneUnitParameter.Insert();
         end;
     end;
 
@@ -448,9 +447,9 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
         EFTSetup.TestField("Payment Type POS");
 
         if not EFTVerifonePaymentParameter.Get(EFTSetup."Payment Type POS") then begin
-            EFTVerifonePaymentParameter.Init;
+            EFTVerifonePaymentParameter.Init();
             EFTVerifonePaymentParameter."Payment Type POS" := EFTSetup."Payment Type POS";
-            EFTVerifonePaymentParameter.Insert;
+            EFTVerifonePaymentParameter.Insert();
         end;
     end;
 
@@ -570,7 +569,7 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
                 EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
             end;
             EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         if (EftTransactionRequest.Successful)

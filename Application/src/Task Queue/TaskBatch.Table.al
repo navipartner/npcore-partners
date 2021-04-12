@@ -40,7 +40,7 @@ table 6059901 "NPR Task Batch"
         }
         field(21; "Template Type"; Option)
         {
-            CalcFormula = Lookup ("NPR Task Template".Type WHERE(Name = FIELD("Journal Template Name")));
+            CalcFormula = Lookup("NPR Task Template".Type WHERE(Name = FIELD("Journal Template Name")));
             Caption = 'Template Type';
             Editable = false;
             FieldClass = FlowField;
@@ -131,7 +131,6 @@ table 6059901 "NPR Task Batch"
     var
         TaskTemplate: Record "NPR Task Template";
         TaskLine: Record "NPR Task Line";
-        Text002: Label 'Days';
 
     procedure SetupNewBatch()
     var
@@ -162,7 +161,7 @@ table 6059901 "NPR Task Batch"
 
     procedure ModifyLines(i: Integer)
     begin
-        TaskLine.LockTable;
+        TaskLine.LockTable();
         TaskLine.SetRange("Journal Template Name", "Journal Template Name");
         TaskLine.SetRange("Journal Batch Name", Name);
         if TaskLine.Find('-') then
@@ -170,7 +169,7 @@ table 6059901 "NPR Task Batch"
                 case i of
                 end;
                 TaskLine.Modify(true);
-            until TaskLine.Next = 0;
+            until TaskLine.Next() = 0;
     end;
 }
 

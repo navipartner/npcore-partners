@@ -14,20 +14,20 @@ page 6151584 "NPR Event Exch. Int. Mail Sum."
         {
             repeater(Group)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 ShowAsTree = true;
-                field("Exchange Item"; "Exchange Item")
+                field("Exchange Item"; Rec."Exchange Item")
                 {
                     ApplicationArea = All;
                     StyleExpr = ColorStyle;
                     ToolTip = 'Specifies the value of the Exchange Item field';
                 }
-                field("E-mail Account"; "E-mail Account")
+                field("E-mail Account"; Rec."E-mail Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-mail Account field';
                 }
-                field(Source; Source)
+                field(Source; Rec.Source)
                 {
                     ApplicationArea = All;
                     StyleExpr = ColorStyle;

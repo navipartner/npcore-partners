@@ -6,13 +6,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     EventSubscriberInstance = Manual;
 
     trigger OnRun()
-    var
-        Itt: Integer;
-        J: Integer;
-        cNUL: Char;
-        ff: File;
-        kc1: Char;
-        kc2: Char;
     begin
     end;
 
@@ -21,7 +14,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         ESC: Codeunit "NPR RP Escape Code Library";
         PrintBuffer: Text;
         MediaWidth: Option "80mm","58mm";
-        Error_InvalidDeviceSetting: Label 'Invalid device setting: %1';
         Error_UnsupportedFont: Label 'Unsupported font: %1';
 
     local procedure "// Interface implementation"()
@@ -53,8 +45,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
-        with POSPrintBuffer do
-            PrintData(Text, Font, Bold, Underline, DoubleStrike, Align, Width);
+        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Bold, POSPrintBuffer.Underline, POSPrintBuffer.DoubleStrike, POSPrintBuffer.Align, POSPrintBuffer.Width);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupFont', '', false, false)]
@@ -99,7 +90,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         tmpRetailList.Number += 1;
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     procedure "// ShortHandFunctions"()
@@ -115,8 +106,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     end;
 
     procedure PrintData(Data: Text[100]; FontType: Text[10]; Bold: Boolean; UnderLine: Boolean; DoubleStrike: Boolean; Align: Integer; Width: Integer)
-    var
-        BarcodeNo: Integer;
     begin
         if UpperCase(FontType) = 'CONTROL' then
             PrintControlChar(CopyStr(Data, 1, 1))
@@ -143,7 +132,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
 
     procedure PrintBarcode(BarcodeType: Text[30]; Text: Text; Width: Integer; Height: Integer)
     var
-        Int: Integer;
         Code128: Text;
     begin
         SelectJustification(1);
@@ -244,7 +232,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
 
     procedure SetFontStretch(Height: Integer; Width: Integer)
     var
-        Int: Integer;
         n: Char;
     begin
         TempPattern := '0' + ESC.GetBitPatternAndPad(Width, 3) + '0' + ESC.GetBitPatternAndPad(Height, 3);
@@ -582,8 +569,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     end;
 
     local procedure StoreGraphicsInBuffer(pL: Char; pH: Char; m: Char; fn: Char; a: Char; bx: Char; by: Char; c: Char; xL: Char; xH: Char; yL: Char; yH: Char; Image: Text)
-    var
-        TempPattern: Text;
     begin
         AddToBuffer('GS ( L');
         AddTextToBuffer(Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH) + Image);
@@ -721,7 +706,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         RetailList.Number += 1;
         RetailList.Choice := Choice;
         RetailList.Value := Value;
-        RetailList.Insert;
+        RetailList.Insert();
     end;
 
     local procedure "// Code 128 Functions"()
@@ -736,10 +721,8 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         Code128: Text;
         DummyDecimal: Decimal;
         ConsecutiveNumbers: Integer;
-        j: Integer;
         CurrentMode: Option " ",CodeA,CodeB,CodeC;
         Buffer: Text;
-        Beginning: Boolean;
     begin
         // This function builds a value using the following code128 code set logic:
         // Switch to Code C when: More than 4 digits at the start/end or 6 in the middle. Otherwise stay with last used code set if possible.

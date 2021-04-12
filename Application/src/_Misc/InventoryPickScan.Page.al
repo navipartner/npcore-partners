@@ -1,4 +1,4 @@
-page 6014460 "NPR Inventory Pick Scan"
+﻿page 6014460 "NPR Inventory Pick Scan"
 {
     Caption = 'Inventory Pick';
     PageType = Document;
@@ -125,7 +125,6 @@ page 6014460 "NPR Inventory Pick Scan"
                     var
                         ItemReference: Record "Item Reference";
                         WhseActivityLine: Record "Warehouse Activity Line";
-                        LastErrorText: Text;
                     begin
                         if Barcode = '' then
                             exit;
@@ -138,7 +137,7 @@ page 6014460 "NPR Inventory Pick Scan"
                         HasItemTracking(ItemReference."Item No.");
                         CheckQtyIsAvailable(ItemReference);
                         AssignQtyToHandle(ItemReference);
-                        CurrPage.Update;
+                        CurrPage.Update();
 
                     end;
                 }
@@ -151,7 +150,6 @@ page 6014460 "NPR Inventory Pick Scan"
 
                     trigger OnValidate()
                     begin
-                        FromSerialNo := true;
                     end;
                 }
                 field(LotNo; LotNo)
@@ -163,7 +161,6 @@ page 6014460 "NPR Inventory Pick Scan"
 
                     trigger OnValidate()
                     begin
-                        FromLotNo := true;
                     end;
                 }
             }
@@ -253,7 +250,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     var
                         WMSMgt: Codeunit "WMS Management";
                     begin
-                        WMSMgt.ShowSourceDocCard(Rec."Source Type", Rec."Source Subtype", "Source No.");
+                        WMSMgt.ShowSourceDocCard(Rec."Source Type", Rec."Source Subtype", Rec."Source No.");
                     end;
                 }
             }
@@ -386,8 +383,6 @@ page 6014460 "NPR Inventory Pick Scan"
         QtyToHandleGlobal := 1;
         SerialNo := '';
         LotNo := '';
-        FromLotNo := false;
-        FromSerialNo := false;
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -431,8 +426,6 @@ page 6014460 "NPR Inventory Pick Scan"
         LotNoCaption: Label 'Lot No.';
         QtyToHandleCaption: Label 'Qty. to Handle';
         SerialNoCaption: Label 'Serial No.';
-        FromLotNo: Boolean;
-        FromSerialNo: Boolean;
 
     local procedure AutofillQtyToHandle()
     begin
@@ -476,7 +469,7 @@ page 6014460 "NPR Inventory Pick Scan"
         WhseActivityLine: Record "Warehouse Activity Line";
     begin
         SetWhseActivityLineFilterFromItemReference(WhseActivityLine, ItemReference);
-        exit(not WhseActivityLine.IsEmpty);
+        exit(not WhseActivityLine.IsEmpty());
     end;
 
     local procedure HasItemTracking(ItemNo: Code[20]): Boolean
@@ -513,17 +506,17 @@ page 6014460 "NPR Inventory Pick Scan"
         if QtyToHandleGlobal = 0 then
             Error(QtyToHandleErr, QtyToHandleCaption);
         SetWhseActivityLineFilterFromItemReference(WhseActivityLine, ItemReference);
-        if WhseActivityLine.FindSet then
+        if WhseActivityLine.FindSet() then
             repeat
                 TotalQty += WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
-            until WhseActivityLine.Next = 0;
+            until WhseActivityLine.Next() = 0;
         if QtyToHandleGlobal > TotalQty then
             Error(CantDistributeQtyErr, TotalQty, QtyToHandleGlobal, QtyToHandleCaption);
     end;
 
     local procedure SetWhseActivityLineFilterFromItemReference(var WhseActivityLine: Record "Warehouse Activity Line"; ItemReference: Record "Item Reference")
     begin
-        WhseActivityLine.Reset;
+        WhseActivityLine.Reset();
         WhseActivityLine.SetRange("Activity Type", Rec.Type);
         WhseActivityLine.SetRange("No.", Rec."No.");
         WhseActivityLine.SetRange("Item No.", ItemReference."Item No.");
@@ -595,13 +588,13 @@ page 6014460 "NPR Inventory Pick Scan"
         QtyToWork: Decimal;
         NoLinesToHandle: Label 'There aren''t any more available lines to be handled.';
     begin
-        if WhseActivityLine.FindSet then begin
+        if WhseActivityLine.FindSet() then begin
             repeat
                 TempWhseActivLine := WhseActivityLine;
                 TempWhseActivLine.Insert;
-            until WhseActivityLine.Next = 0;
+            until WhseActivityLine.Next() = 0;
         end;
-        if WhseActivityLine.FindSet then
+        if WhseActivityLine.FindSet() then
             repeat
                 Splitted := (WhseActivityLine."Qty. (Base)" > WhseActivityLine."Qty. to Handle (Base)") and (WhseActivityLine."Qty. (Base)" > 1) and (WhseActivityLine."Qty. Outstanding (Base)" > 0);
                 if Splitted then begin
@@ -621,15 +614,15 @@ page 6014460 "NPR Inventory Pick Scan"
                         WhseActivityLine.Validate(WhseActivityLine."Lot No.", LotNo);
                     WhseActivityLine.Modify(true);
                 end;
-            until (WhseActivityLine.Next = 0) or Splitted;
+            until (WhseActivityLine.Next() = 0) or Splitted;
         if not Splitted then
             Error(NoLinesToHandle);
-        if WhseActivityLine.FindSet then
+        if WhseActivityLine.FindSet() then
             repeat
                 FoundNewLine := not TempWhseActivLine.Get(WhseActivityLine."Activity Type", WhseActivityLine."No.", WhseActivityLine."Line No.");
                 if FoundNewLine then
                     TempWhseActivLine := WhseActivityLine;
-            until (WhseActivityLine.Next = 0) or FoundNewLine;
+            until (WhseActivityLine.Next() = 0) or FoundNewLine;
 
         NewWhseActivityLine.Get(TempWhseActivLine."Activity Type", TempWhseActivLine."No.", TempWhseActivLine."Line No.");
         NewWhseActivityLine.Validate(NewWhseActivityLine."Qty. to Handle (Base)", SourceWhseActivityLine."Qty. to Handle (Base)");

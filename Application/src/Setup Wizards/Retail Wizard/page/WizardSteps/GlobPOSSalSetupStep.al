@@ -12,19 +12,17 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
 
                     trigger OnValidate()
-                    var
-                        TempPOSViewProfile: Record "NPR POS View Profile" temporary;
                     begin
-                        CheckIfNoAvailableInNpGlobalPOSSalesSetup(ExistingNpGlobalPOSSalesSetup, Code);
+                        CheckIfNoAvailableInNpGlobalPOSSalesSetup(ExistingNpGlobalPOSSalesSetup, Rec.Code);
                     end;
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
 
@@ -34,17 +32,17 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
                         NpGpPOSSalesSyncMgt: Codeunit "NPR NpGp POS Sales Sync Mgt.";
                         Url: Text;
                     begin
-                        if StrLen("Company Name") > MaxStrlen(Company.Name) then
+                        if StrLen(Rec."Company Name") > MaxStrlen(Company.Name) then
                             exit;
-                        if not Company.get("Company Name") then
+                        if not Company.get(Rec."Company Name") then
                             exit;
 
                         NpGpPOSSalesSyncMgt.InitGlobalPosSalesService();
                         Url := GetUrl(ClientType::SOAP, Company.Name, ObjectType::Codeunit, Codeunit::"NPR NpGp POS Sales WS");
-                        "Service Url" := CopyStr(Url, 1, MaxStrlen("Service Url"));
+                        Rec."Service Url" := CopyStr(Url, 1, MaxStrlen(Rec."Service Url"));
                     end;
                 }
-                field("Service Url"; "Service Url")
+                field("Service Url"; Rec."Service Url")
                 {
                     ApplicationArea = All;
                 }

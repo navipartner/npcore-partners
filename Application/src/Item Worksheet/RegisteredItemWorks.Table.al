@@ -31,8 +31,6 @@ table 6060045 "NPR Registered Item Works."
             TableRelation = Vendor;
 
             trigger OnValidate()
-            var
-                Vend: Record Vendor;
             begin
             end;
         }
@@ -49,10 +47,6 @@ table 6060045 "NPR Registered Item Works."
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                PurchLine: Record "Purchase Line";
-                Currency: Record Currency;
-                RecalculatePrice: Boolean;
             begin
             end;
         }

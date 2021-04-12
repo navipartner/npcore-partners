@@ -1,4 +1,4 @@
-page 6151262 "NPR SO Processor Act Ext"
+﻿page 6151262 "NPR SO Processor Act Ext"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -128,8 +128,7 @@ page 6151262 "NPR SO Processor Act Ext"
         DocExchServiceSetup: Record "Doc. Exch. Service Setup";
     begin
         CalculateCueFieldValues;
-        ShowDocumentsPendingDodExchService := false;
-        if DocExchServiceSetup.Get then
+        if DocExchServiceSetup.Get() then
             ShowDocumentsPendingDodExchService := DocExchServiceSetup.Enabled;
     end;
 
@@ -138,15 +137,15 @@ page 6151262 "NPR SO Processor Act Ext"
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
         Rec.SetRespCenterFilter;
-        Rec.SetRange("Date Filter", 0D, WorkDate - 1);
-        Rec.SetFilter("Date Filter2", '>=%1', WorkDate);
+        Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
+        Rec.SetFilter("Date Filter2", '>=%1', WorkDate());
         Rec.SetFilter("User ID Filter", UserId);
 
         RoleCenterNotificationMgt.ShowNotifications;

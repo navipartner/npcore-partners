@@ -41,10 +41,9 @@ codeunit 6150915 "NPR HC POS Entry Management"
             ProcessPOSEntry(Node.AsXmlElement());
     end;
 
-    local procedure ProcessPOSEntry(POSEntryXmlElement: XmlElement) Imported: Boolean
+    local procedure ProcessPOSEntry(POSEntryXmlElement: XmlElement): Boolean
     var
         POSEntry: Record "NPR POS Entry";
-        Element: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
     begin
@@ -74,9 +73,9 @@ codeunit 6150915 "NPR HC POS Entry Management"
                 InsertPOSBalancingLine(Node.AsXmlElement(), POSEntry);
 
         ResetPostingstatus(POSEntry);
-        POSEntry.Modify;
+        POSEntry.Modify();
 
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -85,7 +84,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         TempPOSEntry: Record "NPR POS Entry" temporary;
         DimensionManagement: Codeunit DimensionManagement;
-        OStream: OutStream;
         NodeList: XmlNodeList;
         Node: XmlNode;
     begin
@@ -157,20 +155,19 @@ codeunit 6150915 "NPR HC POS Entry Management"
         POSEntry.SetRange("From External Source", true);
         POSEntry.SetRange("External Source Name", TempPOSEntry."External Source Name");
         POSEntry.SetRange("External Source Entry No.", TempPOSEntry."External Source Entry No.");
-        if POSEntry.FindFirst then
+        if POSEntry.FindFirst() then
             Error(Text001, POSEntry.TableCaption, POSEntry.FieldCaption("External Source Name"), POSEntry."External Source Name", POSEntry.FieldCaption("External Source Entry No."), POSEntry."External Source Entry No.");
 
         POSEntry.TransferFields(TempPOSEntry);
         POSEntry."Entry No." := 0;
         POSEntry."From External Source" := true;
-        POSEntry.Insert;
+        POSEntry.Insert();
     end;
 
     local procedure UpdatePOSLedgerRegister(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         TempPOSPeriodRegister: Record "NPR POS Period Register" temporary;
-        OStream: OutStream;
     begin
         Evaluate(TempPOSPeriodRegister."External Source Entry No.", NpXmlDomMgt.GetXmlText(Element, 'posledgerregisterno', 0, false), 9);
         Evaluate(TempPOSPeriodRegister."Document No.", NpXmlDomMgt.GetXmlText(Element, 'posledgerregisterdocno', 0, false), 9);
@@ -186,14 +183,14 @@ codeunit 6150915 "NPR HC POS Entry Management"
         POSPeriodRegister.SetRange("From External Source", true);
         POSPeriodRegister.SetRange("External Source Name", POSEntry."External Source Name");
         POSPeriodRegister.SetRange("External Source Entry No.", TempPOSPeriodRegister."External Source Entry No.");
-        if not POSPeriodRegister.FindFirst then begin
+        if not POSPeriodRegister.FindFirst() then begin
             POSPeriodRegister."No." := 0;
             POSPeriodRegister."External Source Name" := POSEntry."External Source Name";
             POSPeriodRegister."From External Source" := true;
-            POSPeriodRegister.Insert;
+            POSPeriodRegister.Insert();
         end;
         POSPeriodRegister.TransferFields(TempPOSPeriodRegister, false);
-        POSPeriodRegister.Modify;
+        POSPeriodRegister.Modify();
 
         POSEntry."POS Period Register No." := POSPeriodRegister."No.";
     end;
@@ -203,7 +200,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
         TempPOSSalesLine: Record "NPR POS Entry Sales Line" temporary;
         POSSalesLine: Record "NPR POS Entry Sales Line";
         OrigPOSEntry: Record "NPR POS Entry";
-        OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
         NodeList: XmlNodeList;
@@ -309,7 +305,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
             OrigPOSEntry.SetRange("From External Source", true);
             OrigPOSEntry.SetRange("External Source Name", POSEntry."External Source Name");
             OrigPOSEntry.SetRange("External Source Entry No.", TempPOSSalesLine."Orig. POS Sale ID");
-            if OrigPOSEntry.FindFirst then begin
+            if OrigPOSEntry.FindFirst() then begin
                 POSSalesLine."Orig. POS Sale ID" := OrigPOSEntry."Entry No.";
                 POSSalesLine."Orig. POS Line No." := TempPOSSalesLine."Orig. POS Line No.";
             end else begin
@@ -317,7 +313,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
                 POSSalesLine."Orig. POS Line No." := 10000;
             end;
         end;
-        POSSalesLine.Insert;
+        POSSalesLine.Insert();
     end;
 
     local procedure InsertPOSPaymentLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
@@ -325,7 +321,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
         TempPOSPaymentLine: Record "NPR POS Entry Payment Line" temporary;
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         OrigPOSEntry: Record "NPR POS Entry";
-        OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
         NodeList: XmlNodeList;
@@ -386,7 +381,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
             OrigPOSEntry.SetRange("From External Source", true);
             OrigPOSEntry.SetRange("External Source Name", POSEntry."External Source Name");
             OrigPOSEntry.SetRange("External Source Entry No.", TempPOSPaymentLine."Orig. POS Sale ID");
-            if OrigPOSEntry.FindFirst then begin
+            if OrigPOSEntry.FindFirst() then begin
                 POSPaymentLine."Orig. POS Sale ID" := OrigPOSEntry."Entry No.";
                 POSPaymentLine."Orig. POS Line No." := TempPOSPaymentLine."Orig. POS Line No.";
             end else begin
@@ -394,7 +389,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
                 POSPaymentLine."Orig. POS Line No." := 10000;
             end;
         end;
-        POSPaymentLine.Insert;
+        POSPaymentLine.Insert();
     end;
 
     local procedure InsertPOSTaxAmountLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
@@ -444,14 +439,13 @@ codeunit 6150915 "NPR HC POS Entry Management"
         POSTaxAmountLine."Tax Type" := TempPOSTaxAmountLine."Tax Type";
         POSTaxAmountLine."Use Tax" := TempPOSTaxAmountLine."Use Tax";
         POSTaxAmountLine.Positive := TempPOSTaxAmountLine.Positive;
-        POSTaxAmountLine.Insert;
+        POSTaxAmountLine.Insert();
     end;
 
     local procedure InsertPOSBalancingLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
     var
         TempPOSBalancingLine: Record "NPR POS Balancing Line" temporary;
         POSBalancingLine: Record "NPR POS Balancing Line";
-        OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
         NodeList: XmlNodeList;
@@ -507,18 +501,14 @@ codeunit 6150915 "NPR HC POS Entry Management"
         POSBalancingLine."POS Unit No." := POSEntry."POS Unit No.";
         POSBalancingLine."Document No." := POSEntry."Document No.";
         POSBalancingLine."POS Period Register No." := POSEntry."POS Period Register No.";
-        POSBalancingLine.Insert;
+        POSBalancingLine.Insert();
     end;
 
     local procedure BuildDimensionBuffer(Element: XmlElement; var DimensionBuffer: Record "Dimension Buffer")
-    var
-        POSPeriodRegister: Record "NPR POS Period Register";
-        TempPOSPeriodRegister: Record "NPR POS Period Register" temporary;
-        OStream: OutStream;
     begin
         Evaluate(DimensionBuffer."Dimension Code", NpXmlDomMgt.GetXmlText(Element, 'dimensioncode', 0, false), 9);
         Evaluate(DimensionBuffer."Dimension Value Code", NpXmlDomMgt.GetXmlText(Element, 'dimensionvalue', 0, false), 9);
-        DimensionBuffer.Insert;
+        DimensionBuffer.Insert();
     end;
 
     local procedure ResetPostingstatus(var POSEntry: Record "NPR POS Entry")

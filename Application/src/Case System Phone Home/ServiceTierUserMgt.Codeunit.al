@@ -58,9 +58,7 @@ codeunit 6014590 "NPR Service Tier User Mgt."
     [TryFunction]
     local procedure TrySendRequest(serviceMethod: text; var responseMessage: Text)
     var
-        XmlDoc: XmlDocument;
         Client: HttpClient;
-        Request: HttpRequestMessage;
         Response: HttpResponseMessage;
         ContentHeaders: HttpHeaders;
         Content: HttpContent;
@@ -99,10 +97,7 @@ codeunit 6014590 "NPR Service Tier User Mgt."
     local procedure GetWebResponseResult(response: Text; ServiceMethod: Text) ResponseText: Text
     var
         XmlDoc: XmlDocument;
-        PersonXmlNode: XmlNode;
-        Text: Text;
         XmlNode: XMLNode;
-        XmlNodeList: XMLNodeList;
         XmlNamespace: XmlNamespaceManager;
     begin
         XmlDocument.ReadFrom(response, XmlDoc);
@@ -114,8 +109,6 @@ codeunit 6014590 "NPR Service Tier User Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
     local procedure OnBeforeLogInStart()
-    var
-        this: Codeunit "NPR Service Tier User Mgt.";
     begin
         if NavApp.IsInstalling() then
             exit;

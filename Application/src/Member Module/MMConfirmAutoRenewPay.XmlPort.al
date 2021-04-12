@@ -94,7 +94,6 @@ xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
 
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        AdmissionSetup: Record "NPR TM Admission";
 
     procedure ClearResponse()
     begin
@@ -104,20 +103,13 @@ xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
 
     procedure AddResponse(RequestMemberInfoCapture: Record "NPR MM Member Info Capture")
     var
-        Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
-        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        EntryNo: Integer;
-        IsValidOption: Boolean;
         StartDate: Date;
         EndDate: Date;
         UnitPrice: Decimal;
-        Item: Record Item;
         ResponseMessage: Text;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        TmpMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary;
         InfoEntryNo: Integer;
         MembershipEntry: Record "NPR MM Membership Entry";
     begin
@@ -159,8 +151,6 @@ xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)
-    var
-        totalTicketCardinality: Integer;
     begin
 
         errordescription := ErrorMessage;

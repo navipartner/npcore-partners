@@ -1,4 +1,4 @@
-codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
+﻿codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
 {
     var
         GlobalKitchenOrder: Record "NPR NPRE Kitchen Order";
@@ -20,13 +20,13 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
             SentDateTime := CurrentDateTime;
 
         WaiterPadLine.Copy(WaiterPadLineIn);
-        if WaiterPadLine.FindSet then
+        if WaiterPadLine.FindSet() then
             repeat
                 if SendWPLineToKitchen(WaiterPadLine, FlowStatusCode, PrintCategoryCode, RequestType, SentDateTime) then begin
                     RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine, RequestType, FlowStatusCode, PrintCategoryCode, SentDateTime, 1);
                     Success := true;
                 end;
-            until WaiterPadLine.Next = 0;
+            until WaiterPadLine.Next() = 0;
 
         exit(Success);
     end;
@@ -53,7 +53,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         FindKitchenRequests(KitchenRequest, KitchenReqSourceParam);
         HandleQtyChange(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam);
 
-        if KitchenRequest.FindSet then
+        if KitchenRequest.FindSet() then
             repeat
                 KitchenRequest2 := KitchenRequest;
                 if RequestType = RequestType::"Serving Request" then begin
@@ -61,17 +61,17 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
                     if KitchenRequest2."Line Status" = KitchenRequest2."Line Status"::Planned then
                         KitchenRequest2."Line Status" := KitchenRequest2."Line Status"::"Serving Requested";
                     UpdateRequestLineStatus(KitchenRequest2);
-                    KitchenRequest2.Modify;
+                    KitchenRequest2.Modify();
                 end;
 
-                KitchenStationBuffer.FindSet;
+                KitchenStationBuffer.FindSet();
                 repeat
                     KitchenStation.Get(KitchenStationBuffer."Production Restaurant Code", KitchenStationBuffer."Kitchen Station");
                     CreateKitchenStationRequest(KitchenRequest2, KitchenStation);
-                until KitchenStationBuffer.Next = 0;
+                until KitchenStationBuffer.Next() = 0;
 
                 UpdateOrderStatus(KitchenRequest2."Order ID");
-            until KitchenRequest.Next = 0;
+            until KitchenRequest.Next() = 0;
         exit(true);
     end;
 
@@ -79,7 +79,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
     var
         KitchenReqWSourceQry: Query "NPR NPRE Kitchen Req. w Source";
     begin
-        KitchenRequest.Reset;
+        KitchenRequest.Reset();
         KitchenRequest.SetAutoCalcFields(Quantity, "Quantity (Base)");
 
         KitchenReqWSourceQry.SetRange(Source_Document_Type, KitchenReqSourceParam."Source Document Type");
@@ -89,8 +89,8 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenReqWSourceQry.SetRange(Restaurant_Code, KitchenReqSourceParam."Restaurant Code");
         KitchenReqWSourceQry.SetRange(Serving_Step, KitchenReqSourceParam."Serving Step");
         KitchenReqWSourceQry.SetFilter(Line_Status, '<>%1', KitchenRequest."Line Status"::Cancelled);
-        KitchenReqWSourceQry.Open;
-        while KitchenReqWSourceQry.Read do begin
+        KitchenReqWSourceQry.Open();
+        while KitchenReqWSourceQry.Read() do begin
             KitchenRequest.Get(KitchenReqWSourceQry.Request_No);
             KitchenRequest.Mark(true);
         end;
@@ -110,18 +110,18 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
                 KitchenReqWSourceQry.SetRange(Source_Document_No, KitchenReqSourceLink."Source Document No.");
                 KitchenReqWSourceQry.SetRange(Order_Status, GlobalKitchenOrder.Status::Active, GlobalKitchenOrder.Status::Planned);
                 KitchenReqWSourceQry.SetFilter(Order_ID, '<>%1', 0);
-                KitchenReqWSourceQry.Open;
-                if KitchenReqWSourceQry.Read then
+                KitchenReqWSourceQry.Open();
+                if KitchenReqWSourceQry.Read() then
                     GlobalKitchenOrder.Get(KitchenReqWSourceQry.Order_ID);
             end;
 
             if GlobalKitchenOrder."Order ID" = 0 then begin
-                GlobalKitchenOrder.Init;
+                GlobalKitchenOrder.Init();
                 GlobalKitchenOrder.Status := GlobalKitchenOrder.Status::Planned;
                 GlobalKitchenOrder.Priority := DefaultPriority(KitchenRequest);
                 GlobalKitchenOrder."Created Date-Time" := KitchenRequest."Created Date-Time";
                 GlobalKitchenOrder."Restaurant Code" := KitchenRequest."Restaurant Code";
-                GlobalKitchenOrder.Insert;
+                GlobalKitchenOrder.Insert();
             end;
         end;
         exit(GlobalKitchenOrder."Order ID");
@@ -134,11 +134,11 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenRequest.SetFilter("Production Status", '<>%1', KitchenRequest."Production Status"::Cancelled);
         KitchenRequest.FilterGroup(0);
 
-        if KitchenRequest.FindSet then
+        if KitchenRequest.FindSet() then
             repeat
                 KitchenReqSourceParam.Quantity := KitchenReqSourceParam.Quantity - KitchenRequest.Quantity;
                 KitchenReqSourceParam."Quantity (Base)" := KitchenReqSourceParam."Quantity (Base)" - KitchenRequest."Quantity (Base)";
-            until KitchenRequest.Next = 0;
+            until KitchenRequest.Next() = 0;
         if KitchenReqSourceParam.Quantity = 0 then
             exit;
 
@@ -175,7 +175,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         if KitchenReqSourceParam.Quantity = 0 then
             exit;
 
-        if KitchenRequest.FindSet then
+        if KitchenRequest.FindSet() then
             repeat
                 if (KitchenRequest.Quantity > 0) or (KitchenReqSourceParam.Quantity > 0) then begin
                     xKitchenReqSourceParam := KitchenReqSourceParam;
@@ -191,7 +191,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
                     KitchenReqSourceParam.Quantity := xKitchenReqSourceParam.Quantity - KitchenReqSourceParam.Quantity;
                     KitchenReqSourceParam."Quantity (Base)" := xKitchenReqSourceParam."Quantity (Base)" - KitchenReqSourceParam."Quantity (Base)";
                 end;
-            until (KitchenRequest.Next = 0) or (KitchenReqSourceParam.Quantity = 0);
+            until (KitchenRequest.Next() = 0) or (KitchenReqSourceParam.Quantity = 0);
     end;
 
     local procedure SetQtyChanged(KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -204,7 +204,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
 
     procedure InitKitchenReqSourceFromWaiterPadLine(var KitchenReqSource: Record "NPR NPRE Kitchen Req.Src. Link"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RestaurantCode: Code[20]; ServingStep: Code[10]; SentDateTime: DateTime)
     begin
-        KitchenReqSource.Init;
+        KitchenReqSource.Init();
         KitchenReqSource.InitSource(WaiterPadLine.RecordId);
         KitchenReqSource."Restaurant Code" := RestaurantCode;
         KitchenReqSource."Serving Step" := ServingStep;
@@ -233,7 +233,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenReqSourceLink := KitchenReqSourceParam;
         KitchenReqSourceLink."Request No." := KitchenRequest."Request No.";
         KitchenReqSourceLink."Entry No." := 0;
-        KitchenReqSourceLink.Insert;
+        KitchenReqSourceLink.Insert();
     end;
 
     local procedure CreateKitchenStationRequest(KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenStation: Record "NPR NPRE Kitchen Station")
@@ -245,14 +245,14 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenOrdLineStation.SetRange("Kitchen Station", KitchenStation.Code);
         KitchenOrdLineStation.SetFilter("Production Status", '<>%1', KitchenOrdLineStation."Production Status"::Cancelled);
         if KitchenOrdLineStation.IsEmpty then begin
-            KitchenOrdLineStation.Init;
+            KitchenOrdLineStation.Init();
             KitchenOrdLineStation."Request No." := KitchenRequest."Request No.";
             KitchenOrdLineStation."Line No." := KitchenRequest.GetNextStationReqLineNo();
             KitchenOrdLineStation."Production Restaurant Code" := KitchenStation."Restaurant Code";
             KitchenOrdLineStation."Kitchen Station" := KitchenStation.Code;
             KitchenOrdLineStation."Production Status" := KitchenOrdLineStation."Production Status"::"Not Started";
             KitchenOrdLineStation."Order ID" := KitchenRequest."Order ID";
-            KitchenOrdLineStation.Insert;
+            KitchenOrdLineStation.Insert();
         end;
     end;
 
@@ -267,18 +267,18 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
             Error(MustBeTempMsg, 'CU6150674.FindKitchenStations');
 
         Clear(KitchenStationBuffer);
-        KitchenStationBuffer.DeleteAll;
+        KitchenStationBuffer.DeleteAll();
 
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
         SeatingWaiterPadLink.SetFilter("Seating Code", '<>%1', '');
         if SeatingWaiterPadLink.IsEmpty then
             SeatingWaiterPadLink.SetRange("Seating Code");
-        if SeatingWaiterPadLink.FindFirst then begin
+        if SeatingWaiterPadLink.FindFirst() then begin
             Seating.Get(SeatingWaiterPadLink."Seating Code");
             if not SeatingLocation.Get(Seating."Seating Location") then
-                SeatingLocation.Init;
+                SeatingLocation.Init();
 
-            KitchenStationSelection.Reset;
+            KitchenStationSelection.Reset();
             KitchenStationSelection."Restaurant Code" := SeatingLocation."Restaurant Code";
             KitchenStationSelection."Seating Location" := Seating."Seating Location";
             KitchenStationSelection."Serving Step" := FlowStatusCode;
@@ -291,9 +291,9 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
                     else
                         KitchenStationBuffer."Production Restaurant Code" := KitchenStationSelection."Production Restaurant Code";
                     KitchenStationBuffer."Kitchen Station" := KitchenStationSelection."Kitchen Station";
-                    if not KitchenStationBuffer.Find then
-                        KitchenStationBuffer.Insert;
-                until KitchenStationSelection.Next = 0;
+                    if not KitchenStationBuffer.Find() then
+                        KitchenStationBuffer.Insert();
+                until KitchenStationSelection.Next() = 0;
         end;
 
         exit(KitchenStationBuffer.FindSet);
@@ -361,7 +361,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenRequestStation."End Date-Time" := 0DT;
         KitchenRequestStation."On Hold" := false;
         KitchenRequestStation."Production Status" := KitchenRequestStation."Production Status"::Started;
-        KitchenRequestStation.Modify;
+        KitchenRequestStation.Modify();
         UpdateRequestStatusesFromStation(KitchenRequestStation);
     end;
 
@@ -374,7 +374,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenRequestStation."End Date-Time" := CurrentDateTime;
         KitchenRequestStation."On Hold" := false;
         KitchenRequestStation."Production Status" := KitchenRequestStation."Production Status"::Finished;
-        KitchenRequestStation.Modify;
+        KitchenRequestStation.Modify();
         UpdateRequestStatusesFromStation(KitchenRequestStation);
     end;
 
@@ -383,7 +383,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         if KitchenRequestStation."Qty. Change Not Accepted" then begin
             KitchenRequestStation."Qty. Change Not Accepted" := false;
             KitchenRequestStation."Last Qty. Change Accepted" := CurrentDateTime;
-            KitchenRequestStation.Modify;
+            KitchenRequestStation.Modify();
         end;
     end;
 
@@ -399,7 +399,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
     begin
         UpdateRequestProdStatus(KitchenRequest);
         UpdateRequestLineStatus(KitchenRequest);
-        KitchenRequest.Modify;
+        KitchenRequest.Modify();
 
         UpdateOrderStatus(KitchenRequest."Order ID");
     end;
@@ -410,7 +410,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         ProductionStatusUpdated: Boolean;
     begin
         KitchenRequestStation.SetRange("Request No.", KitchenRequest."Request No.");
-        if not KitchenRequestStation.FindSet then
+        if not KitchenRequestStation.FindSet() then
             exit;
 
         ProductionStatusUpdated := false;
@@ -434,7 +434,7 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
                             KitchenRequest."Production Status" := KitchenRequest."Production Status"::Started;
                         end;
                 end;
-        until KitchenRequestStation.Next = 0;
+        until KitchenRequestStation.Next() = 0;
     end;
 
     local procedure UpdateRequestLineStatus(var KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -463,14 +463,14 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenRequest.SetCurrentKey("Order ID");
         KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
         KitchenRequest.SetFilter("Line Status", '<>%1', KitchenRequest."Line Status"::Cancelled);
-        if KitchenRequest.FindSet then
+        if KitchenRequest.FindSet() then
             repeat
                 case KitchenRequest."Line Status" of
                     KitchenRequest."Line Status"::"Ready for Serving",
                     KitchenRequest."Line Status"::"Serving Requested":
                         begin
                             KitchenOrder.Status := KitchenOrder.Status::Active;
-                            KitchenOrder.Modify;
+                            KitchenOrder.Modify();
                             exit;
                         end;
 
@@ -481,29 +481,27 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
                         if KitchenOrder.Status = KitchenOrder.Status::Cancelled then
                             KitchenOrder.Status := KitchenOrder.Status::Finished;
                 end;
-            until KitchenRequest.Next = 0;
+            until KitchenRequest.Next() = 0;
 
-        KitchenOrder.Modify;
+        KitchenOrder.Modify();
     end;
 
     procedure SetRequestLinesAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request")
     var
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
     begin
-        if KitchenRequest.FindSet then
+        if KitchenRequest.FindSet() then
             repeat
                 KitchenRequest2 := KitchenRequest;
                 SetRequestLineAsServed(KitchenRequest);
-            until KitchenRequest.Next = 0;
+            until KitchenRequest.Next() = 0;
     end;
 
     local procedure SetRequestLineAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request")
-    var
-        KitchenOrder: Record "NPR NPRE Kitchen Order";
     begin
         KitchenRequest.TestField("Line Status", KitchenRequest."Line Status"::"Ready for Serving");
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::Served;
-        KitchenRequest.Modify;
+        KitchenRequest.Modify();
 
         UpdateOrderStatus(KitchenRequest."Order ID");
     end;
@@ -525,13 +523,13 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
         KitchenReqSourceLink.SetRange("Source Document Subtype", 0);
         KitchenReqSourceLink.SetRange("Source Document No.", FromWaiterPadLine."Waiter Pad No.");
         KitchenReqSourceLink.SetRange("Source Document Line No.", FromWaiterPadLine."Line No.");
-        if KitchenReqSourceLink.FindSet then
+        if KitchenReqSourceLink.FindSet() then
             repeat
                 if FullLineTransfer then begin
                     NewKitchenReqSourceLink := KitchenReqSourceLink;
                     NewKitchenReqSourceLink."Source Document No." := NewWaiterPadLine."Waiter Pad No.";
                     NewKitchenReqSourceLink."Source Document Line No." := NewWaiterPadLine."Line No.";
-                    NewKitchenReqSourceLink.Modify;
+                    NewKitchenReqSourceLink.Modify();
                 end else begin
                     KitchenReqSourceLink.SetRange("Serving Step", KitchenReqSourceLink."Serving Step");
                     RemainingQtyToMove := NewWaiterPadLine.Quantity;
@@ -548,23 +546,23 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
                             RemainingQtyToMove := RemainingQtyToMove + NewKitchenReqSourceLink.Quantity;
                             NewKitchenReqSourceLink.Context := NewKitchenReqSourceLink.Context::"Line Splitting";
                             NewKitchenReqSourceLink."Entry No." := 0;
-                            NewKitchenReqSourceLink.Insert;
+                            NewKitchenReqSourceLink.Insert();
 
                             NewKitchenReqSourceLink."Source Document No." := NewWaiterPadLine."Waiter Pad No.";
                             NewKitchenReqSourceLink."Source Document Line No." := NewWaiterPadLine."Line No.";
                             NewKitchenReqSourceLink.Quantity := -NewKitchenReqSourceLink.Quantity;
                             NewKitchenReqSourceLink."Quantity (Base)" := -NewKitchenReqSourceLink."Quantity (Base)";
                             NewKitchenReqSourceLink."Entry No." := 0;
-                            NewKitchenReqSourceLink.Insert;
+                            NewKitchenReqSourceLink.Insert();
                         end;
 
-                        KitchenReqSourceLink.FindLast;
+                        KitchenReqSourceLink.FindLast();
                         KitchenReqSourceLink.SetRange("Request No.");
-                    until (KitchenReqSourceLink.Next = 0) or (RemainingQtyToMove = 0);
-                    KitchenReqSourceLink.FindLast;
+                    until (KitchenReqSourceLink.Next() = 0) or (RemainingQtyToMove = 0);
+                    KitchenReqSourceLink.FindLast();
                     KitchenReqSourceLink.SetRange("Serving Step");
                 end;
-            until KitchenReqSourceLink.Next = 0;
+            until KitchenReqSourceLink.Next() = 0;
     end;
 
     procedure CancelKitchenOrder(var KitchenOrderIn: Record "NPR NPRE Kitchen Order")
@@ -574,14 +572,14 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
     begin
         KitchenOrder := KitchenOrderIn;
         KitchenOrder.Status := KitchenOrder.Status::Cancelled;
-        KitchenOrder.Modify;
+        KitchenOrder.Modify();
 
         KitchenRequest.SetCurrentKey("Order ID");
         KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
-        if KitchenRequest.FindSet then
+        if KitchenRequest.FindSet() then
             repeat
                 CancelKitchenRequest(KitchenRequest);
-            until KitchenRequest.Next = 0;
+            until KitchenRequest.Next() = 0;
     end;
 
     procedure CancelKitchenRequest(var KitchenRequestIn: Record "NPR NPRE Kitchen Request")
@@ -590,6 +588,6 @@ codeunit 6150674 "NPR NPRE Kitchen Order Mgt."
     begin
         KitchenRequest := KitchenRequestIn;
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::Cancelled;
-        KitchenRequest.Modify;
+        KitchenRequest.Modify();
     end;
 }

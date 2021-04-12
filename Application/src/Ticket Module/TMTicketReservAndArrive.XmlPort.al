@@ -171,7 +171,6 @@ xmlport 6060118 "NPR TM Ticket Reserv.AndArrive"
     var
         ExternalIdCount: Integer;
         QtySum: Integer;
-        n: Integer;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         BLANK_DOC_ID: Label 'Document ID may not be blank.';
 
@@ -200,7 +199,7 @@ xmlport 6060118 "NPR TM Ticket Reserv.AndArrive"
             tmpTicketReservationResponse.Insert();
         until (TicketReservationResponse.Next() = 0);
 
-        Commit;
+        Commit();
     end;
 }
 

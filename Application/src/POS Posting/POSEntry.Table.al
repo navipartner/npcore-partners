@@ -277,10 +277,6 @@ table 6150621 "NPR POS Entry"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                SalesLine: Record "Sales Line";
-                Currency: Record Currency;
-                RecalculatePrice: Boolean;
             begin
             end;
         }
@@ -446,15 +442,15 @@ table 6150621 "NPR POS Entry"
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         POSSalesLine.SetRange("POS Entry No.", "Entry No.");
-        POSSalesLine.DeleteAll;
+        POSSalesLine.DeleteAll();
         POSPaymentLine.SetRange("POS Entry No.", "Entry No.");
-        POSPaymentLine.DeleteAll;
+        POSPaymentLine.DeleteAll();
         POSBalancingLine.SetRange("POS Entry No.", "Entry No.");
-        POSBalancingLine.DeleteAll;
+        POSBalancingLine.DeleteAll();
         POSEntryCommentLine.SetRange("POS Entry No.", "Entry No.");
-        POSEntryCommentLine.DeleteAll;
+        POSEntryCommentLine.DeleteAll();
         POSTaxAmountLine.SetRange("POS Entry No.", "Entry No.");
-        POSTaxAmountLine.DeleteAll;
+        POSTaxAmountLine.DeleteAll();
     end;
 
     procedure Recalculate()

@@ -6,12 +6,7 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
 
     procedure CreateItemFromWorksheet(VendorNo: Code[20]; VendorItemNo: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]): Boolean
     var
-        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheet: Record "NPR Item Worksheet";
-        TempItemWorksheetWithPossibleMatch: Record "NPR Item Worksheet" temporary;
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        ItemWorksheets: Page "NPR Item Worksheets";
     begin
         //Search Vendor specific Worksheets
         ItemWorksheet.SetRange("Vendor No.", VendorNo);
@@ -33,7 +28,7 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
         LineNoFilter: Text;
     begin
         MatchToItemWorksheetLine(ItemWorksheet, VendorItemNo, TempItemWorksheetLine, TempItemWorksheetVariantLine);
-        if (TempItemWorksheetLine.Count = 1) and (TempItemWorksheetLine.Action = TempItemWorksheetLine.Action::CreateNew) then begin
+        if (TempItemWorksheetLine.Count() = 1) and (TempItemWorksheetLine.Action = TempItemWorksheetLine.Action::CreateNew) then begin
             //only one possible line
             TempItemWorksheetLine."Vendor No." := VendorNo;
             if GuiAllowed then begin
@@ -51,12 +46,12 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
         //more than one possible line: open the item worksheet filtered to these lines
         TempItemWorksheetLine.SetFilter("Worksheet Template Name", TempItemWorksheetLine."Worksheet Template Name");
         TempItemWorksheetLine.SetFilter("Worksheet Name", TempItemWorksheetLine."Worksheet Name");
-        if TempItemWorksheetLine.FindSet then
+        if TempItemWorksheetLine.FindSet() then
             repeat
                 if LineNoFilter <> '' then
                     LineNoFilter := LineNoFilter + '|';
                 LineNoFilter := LineNoFilter + Format(TempItemWorksheetLine."Line No.");
-            until (TempItemWorksheetLine.Next = 0) or (StrLen(LineNoFilter) >= 200);
+            until (TempItemWorksheetLine.Next() = 0) or (StrLen(LineNoFilter) >= 200);
         if LineNoFilter = '' then
             exit(false);
 
@@ -64,7 +59,7 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
         TempItemWorksheetLine.SetFilter("Worksheet Name", TempItemWorksheetLine."Worksheet Name");
         TempItemWorksheetLine.SetFilter("Line No.", LineNoFilter);
         ItemWorksheetPage.OpenFilteredView(TempItemWorksheetLine);
-        ItemWorksheetPage.Run;
+        ItemWorksheetPage.Run();
         exit(false);
     end;
 
@@ -81,8 +76,8 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
         ItemWorksheetLine.SetRange("Line No.", ItemWorksheetLine."Line No.");
         ItemWorksheetLine.FindFirst();
         ItemWorksheetLine."Vendor No." := TempItemWorksheetLine."Vendor No.";
-        ItemWorksheetLine.Modify;
-        Commit;
+        ItemWorksheetLine.Modify();
+        Commit();
         ItemNo := TempItemWorksheetLine."Item No.";
         Description := ItemWorksheetLine.Description;
         if not CODEUNIT.Run(CODEUNIT::"NPR Item Wsht.-Regist. Batch", ItemWorksheetLine) then
@@ -94,42 +89,40 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
             RegisteredItemWorksheet.Reset();
             RegisteredItemWorksheet.FindLast();
             RegisteredItemWorksheetLine.SetFilter(Description, Description);
-            if not RegisteredItemWorksheetLine.FindFirst then
+            if not RegisteredItemWorksheetLine.FindFirst() then
                 Error(RegisteredButNotFoundErr);
             ItemNo := RegisteredItemWorksheetLine."Item No.";
         end;
-        Commit;
+        Commit();
         exit(true);
     end;
 
     local procedure SelectItemWorksheet(var ItemWorksheet: Record "NPR Item Worksheet"; VendorItemNo: Text[50]): Boolean
     var
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         TempItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line" temporary;
         TempItemWorksheetWithPossibleMatch: Record "NPR Item Worksheet" temporary;
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
         TempItemWorksheetLine: Record "NPR Item Worksheet Line" temporary;
         ItemWorksheets: Page "NPR Item Worksheets";
     begin
-        case ItemWorksheet.Count of
+        case ItemWorksheet.Count() of
             0:
                 exit(false);
             1:
                 begin
-                    ItemWorksheet.FindFirst;
+                    ItemWorksheet.FindFirst();
                     exit(true);
                 end;
             else begin
                     //More than one item worksheet in the selection
-                    if ItemWorksheet.FindSet then
+                    if ItemWorksheet.FindSet() then
                         repeat
                             MatchToItemWorksheetLine(ItemWorksheet, VendorItemNo, TempItemWorksheetLine, TempItemWorksheetVariantLine);
-                            if (TempItemWorksheetVariantLine.Count > 0) or (TempItemWorksheetLine.Count > 0) then begin
+                            if (TempItemWorksheetVariantLine.Count() > 0) or (TempItemWorksheetLine.Count() > 0) then begin
                                 TempItemWorksheetWithPossibleMatch := ItemWorksheet;
                                 TempItemWorksheetWithPossibleMatch.Insert();
                             end;
                         until ItemWorksheet.Next() = 0;
-                    case TempItemWorksheetWithPossibleMatch.Count of
+                    case TempItemWorksheetWithPossibleMatch.Count() of
                         0:
                             exit(false);
                         1:
@@ -140,13 +133,13 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
                                 //More than one of these item worksheets contains a matching line
                                 if not GuiAllowed then
                                     exit(false);
-                                if TempItemWorksheetWithPossibleMatch.FindSet then
+                                if TempItemWorksheetWithPossibleMatch.FindSet() then
                                     repeat
                                         TempItemWorksheetWithPossibleMatch.Mark(true);
                                     until TempItemWorksheetWithPossibleMatch.Next() = 0;
                                 TempItemWorksheetWithPossibleMatch.MarkedOnly(true);
                                 ItemWorksheets.SetTableView(TempItemWorksheetWithPossibleMatch);
-                                if ItemWorksheets.RunModal <> ACTION::LookupOK then begin
+                                if ItemWorksheets.RunModal() <> ACTION::LookupOK then begin
                                     ItemWorksheets.GetRecord(ItemWorksheet);
                                     exit(true);
                                 end else
@@ -204,7 +197,7 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
 
     local procedure AddItemWorksheetLinesToTemp(var ItemWorksheetLine: Record "NPR Item Worksheet Line"; var TempItemWorksheetLine: Record "NPR Item Worksheet Line" temporary)
     begin
-        if ItemWorksheetLine.FindSet then
+        if ItemWorksheetLine.FindSet() then
             repeat
                 if not TempItemWorksheetLine.Get(ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.") then begin
                     TempItemWorksheetLine := ItemWorksheetLine;
@@ -217,7 +210,7 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
-        if ItemWorksheetVariantLine.FindSet then
+        if ItemWorksheetVariantLine.FindSet() then
             repeat
                 if not TempItemWorksheetVariantLine.Get(ItemWorksheetVariantLine."Worksheet Template Name", ItemWorksheetVariantLine."Worksheet Name", ItemWorksheetVariantLine."Worksheet Line No.", ItemWorksheetVariantLine."Line No.") then begin
                     TempItemWorksheetVariantLine := ItemWorksheetVariantLine;

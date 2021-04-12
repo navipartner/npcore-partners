@@ -141,7 +141,7 @@ report 6014540 "NPR Items With Low Sales"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not TempItemAmount.FindFirst then
+                    if not TempItemAmount.FindFirst() then
                         CurrReport.Break();
                 end else begin
                     if TempItemAmount.Next() = 0 then

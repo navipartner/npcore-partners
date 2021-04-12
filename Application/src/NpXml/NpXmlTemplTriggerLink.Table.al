@@ -81,8 +81,6 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                "Field": Record "Field";
             begin
             end;
         }
@@ -132,8 +130,6 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                "Field": Record "Field";
             begin
             end;
         }

@@ -1,4 +1,4 @@
-codeunit 6014434 "NPR Tax Free Execute"
+﻿codeunit 6014434 "NPR Tax Free Execute"
 {
     trigger OnRun()
     begin
@@ -144,7 +144,7 @@ codeunit 6014434 "NPR Tax Free Execute"
             If (OnRunTmpTaxFreeConsolidation.IsTemporary()) then
                 OnRunTmpTaxFreeConsolidation.DeleteAll();
 
-            tmpTaxFreeConsolidation.reset;
+            tmpTaxFreeConsolidation.Reset();
             if (tmpTaxFreeConsolidation.FindSet()) then begin
                 repeat
                     OnRunTmpTaxFreeConsolidation.TransferFields(tmpTaxFreeConsolidation, true);
@@ -153,7 +153,7 @@ codeunit 6014434 "NPR Tax Free Execute"
             end;
         end
         else begin
-            OnRunTmpTaxFreeConsolidation.reset;
+            OnRunTmpTaxFreeConsolidation.Reset();
             if (OnRunTmpTaxFreeConsolidation.FindSet()) then begin
                 repeat
                     TmpTaxFreeConsolidation.TransferFields(OnRunTmpTaxFreeConsolidation, true);

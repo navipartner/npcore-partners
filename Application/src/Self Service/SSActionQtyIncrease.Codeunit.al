@@ -36,7 +36,7 @@ codeunit 6151280 "NPR SS Action - Qty Increase"
         Qty: Decimal;
     begin
 
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;

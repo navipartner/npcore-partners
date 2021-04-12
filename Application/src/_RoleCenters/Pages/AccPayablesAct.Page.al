@@ -1,4 +1,4 @@
-page 6151254 "NPR Acc. Payables Act"
+﻿page 6151254 "NPR Acc. Payables Act"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -39,13 +39,13 @@ page 6151254 "NPR Acc. Payables Act"
             {
                 Caption = 'Document Approvals';
                 Visible = false;
-                field("POs Pending Approval"; "POs Pending Approval")
+                field("POs Pending Approval"; Rec."POs Pending Approval")
                 {
                     ApplicationArea = Suite;
                     DrillDownPageID = "Purchase Order List";
                     ToolTip = 'Specifies the number of purchase orders that are pending approval.';
                 }
-                field("Approved Purchase Orders"; "Approved Purchase Orders")
+                field("Approved Purchase Orders"; Rec."Approved Purchase Orders")
                 {
                     ApplicationArea = Suite;
                     DrillDownPageID = "Purchase Order List";
@@ -68,7 +68,7 @@ page 6151254 "NPR Acc. Payables Act"
                         UserTaskList: Page "User Task List";
                     begin
                         UserTaskList.SetPageToShowMyPendingUserTasks;
-                        UserTaskList.Run;
+                        UserTaskList.Run();
                     end;
                 }
             }
@@ -77,13 +77,13 @@ page 6151254 "NPR Acc. Payables Act"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
-        Rec.SetFilter("Due Date Filter", '<=%1', WorkDate);
+        Rec.SetFilter("Due Date Filter", '<=%1', WorkDate());
     end;
 
     var

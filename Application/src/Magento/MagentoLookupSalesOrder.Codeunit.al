@@ -1,4 +1,4 @@
-codeunit 6151414 "NPR Magento Lookup SalesOrder"
+﻿codeunit 6151414 "NPR Magento Lookup SalesOrder"
 {
     TableNo = "NPR Nc Import Entry";
 
@@ -20,14 +20,12 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         RecRef: RecordRef;
         XmlDoc: XmlDocument;
         XmlNodeList: XmlNodeList;
         Node: XmlNode;
         OrderNoAttribute: XmlAttribute;
         OrderNo: Code[20];
-        i: Integer;
     begin
         RecRef.GetTable(TempSalesHeader);
         if not RecRef.IsTemporary then
@@ -37,8 +35,8 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
         if not RecRef.IsTemporary then
             exit(false);
 
-        TempSalesHeader.DeleteAll;
-        TempSalesInvHeader.DeleteAll;
+        TempSalesHeader.DeleteAll();
+        TempSalesInvHeader.DeleteAll();
 
         if not ImportEntry.LoadXmlDoc(XmlDoc) then
             exit(false);
@@ -52,39 +50,39 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
             if (OrderNo <> '') and (StrLen(OrderNo) <= MaxStrLen(SalesHeader."NPR External Order No.")) then begin
                 SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
                 SalesHeader.SetRange("NPR External Order No.", OrderNo);
-                if SalesHeader.FindSet then
+                if SalesHeader.FindSet() then
                     repeat
                         if not TempSalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin
-                            TempSalesHeader.Init;
+                            TempSalesHeader.Init();
                             TempSalesHeader := SalesHeader;
-                            TempSalesHeader.Insert;
+                            TempSalesHeader.Insert();
                         end;
-                    until SalesHeader.Next = 0;
+                    until SalesHeader.Next() = 0;
                 SalesInvHeader.SetRange("NPR External Order No.", OrderNo);
-                if SalesInvHeader.FindSet then
+                if SalesInvHeader.FindSet() then
                     repeat
                         if not TempSalesInvHeader.Get(SalesInvHeader."No.") then begin
-                            TempSalesInvHeader.Init;
+                            TempSalesInvHeader.Init();
                             TempSalesInvHeader := SalesInvHeader;
-                            TempSalesInvHeader.Insert;
+                            TempSalesInvHeader.Insert();
                         end;
-                    until SalesInvHeader.Next = 0;
+                    until SalesInvHeader.Next() = 0;
             end;
         end;
 
-        exit(TempSalesHeader.FindSet or TempSalesInvHeader.FindSet);
+        exit(TempSalesHeader.FindSet() or TempSalesInvHeader.FindSet);
     end;
 
     procedure RunPageSalesOrder(var TempSalesHeader: Record "Sales Header" temporary): Boolean
     var
         SalesHeader: Record "Sales Header";
     begin
-        case TempSalesHeader.Count of
+        case TempSalesHeader.Count() of
             0:
                 exit(false);
             1:
                 begin
-                    TempSalesHeader.FindFirst;
+                    TempSalesHeader.FindFirst();
                     SalesHeader.Get(TempSalesHeader."Document Type", TempSalesHeader."No.");
                     PAGE.Run(PAGE::"Sales Order", SalesHeader);
                 end;
@@ -99,12 +97,12 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
     var
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        case TempSalesInvHeader.Count of
+        case TempSalesInvHeader.Count() of
             0:
                 exit(false);
             1:
                 begin
-                    TempSalesInvHeader.FindFirst;
+                    TempSalesInvHeader.FindFirst();
                     SalesInvHeader.Get(TempSalesInvHeader."No.");
                     PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
                 end;

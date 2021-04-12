@@ -8,7 +8,7 @@ codeunit 6059969 "NPR Description Control"
             exit;
 
 
-        DescriptionControl.LockTable;
+        DescriptionControl.LockTable();
 
         DescriptionControl.Code := 'VAR_FIRST';
         DescriptionControl."Setup Type" := DescriptionControl."Setup Type"::Simple;
@@ -16,7 +16,7 @@ codeunit 6059969 "NPR Description Control"
         DescriptionControl."Description 2 Var (Simple)" := DescriptionControl."Description 2 Var (Simple)"::ItemDescription1;
         DescriptionControl."Description 1 Std (Simple)" := DescriptionControl."Description 1 Std (Simple)"::ItemDescription1;
         DescriptionControl."Description 2 Std (Simple)" := DescriptionControl."Description 2 Std (Simple)"::ItemDescription2;
-        DescriptionControl.Insert;
+        DescriptionControl.Insert();
 
         DescriptionControl.Code := 'VAR_LAST';
         DescriptionControl."Setup Type" := DescriptionControl."Setup Type"::Simple;
@@ -24,7 +24,7 @@ codeunit 6059969 "NPR Description Control"
         DescriptionControl."Description 2 Var (Simple)" := DescriptionControl."Description 2 Var (Simple)"::VariantDescription1;
         DescriptionControl."Description 1 Std (Simple)" := DescriptionControl."Description 1 Std (Simple)"::ItemDescription1;
         DescriptionControl."Description 2 Std (Simple)" := DescriptionControl."Description 2 Std (Simple)"::ItemDescription2;
-        DescriptionControl.Insert;
+        DescriptionControl.Insert();
 
         DescriptionControl.Code := 'NO_VARIANT';
         DescriptionControl."Setup Type" := DescriptionControl."Setup Type"::Simple;
@@ -32,7 +32,7 @@ codeunit 6059969 "NPR Description Control"
         DescriptionControl."Description 2 Var (Simple)" := DescriptionControl."Description 2 Var (Simple)"::ItemDescription2;
         DescriptionControl."Description 1 Std (Simple)" := DescriptionControl."Description 1 Std (Simple)"::ItemDescription1;
         DescriptionControl."Description 2 Std (Simple)" := DescriptionControl."Description 2 Std (Simple)"::ItemDescription2;
-        DescriptionControl.Insert;
+        DescriptionControl.Insert();
 
         DescriptionControl.Code := 'VARIANT';
         DescriptionControl."Setup Type" := DescriptionControl."Setup Type"::Simple;
@@ -40,7 +40,7 @@ codeunit 6059969 "NPR Description Control"
         DescriptionControl."Description 2 Var (Simple)" := DescriptionControl."Description 2 Var (Simple)"::VariantDescription2;
         DescriptionControl."Description 1 Std (Simple)" := DescriptionControl."Description 1 Std (Simple)"::ItemDescription1;
         DescriptionControl."Description 2 Std (Simple)" := DescriptionControl."Description 2 Std (Simple)"::ItemDescription2;
-        DescriptionControl.Insert;
+        DescriptionControl.Insert();
 
     end;
 
@@ -50,7 +50,7 @@ codeunit 6059969 "NPR Description Control"
         Item: Record Item;
         ItemVariant: Record "Item Variant";
     begin
-        VRTSetup.Get;
+        VRTSetup.Get();
         Item.Get(ItemNo);
         if VariantCode = '' then begin
             case VRTSetup."Item Cross Ref. Description(I)" of

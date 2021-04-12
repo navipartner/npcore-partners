@@ -10,7 +10,7 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
                 Ellipsis = true;
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Print action';
@@ -20,7 +20,7 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
                 Caption = 'Price Label';
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

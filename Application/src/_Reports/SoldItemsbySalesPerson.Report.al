@@ -1,8 +1,8 @@
 report 6014412 "NPR Sold Items by Sales Person"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Sold Items By Sales Person';
     dataset
@@ -90,10 +90,8 @@ report 6014412 "NPR Sold Items by Sales Person"
     }
 
     var
-        CompanyInfo: Record "Company Information";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         ProfitPct: Decimal;
-        "Object": Record "Object";
         ObjectDetails: Text[100];
         SalespersonName: Text[30];
 }

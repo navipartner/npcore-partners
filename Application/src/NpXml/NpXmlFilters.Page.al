@@ -14,7 +14,7 @@ page 6151556 "NPR NpXml Filters"
         {
             repeater(Group)
             {
-                field("Filter Type"; "Filter Type")
+                field("Filter Type"; Rec."Filter Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Type field';
@@ -24,7 +24,7 @@ page 6151556 "NPR NpXml Filters"
                         SetEnabled();
                     end;
                 }
-                field("Parent Field No."; "Parent Field No.")
+                field("Parent Field No."; Rec."Parent Field No.")
                 {
                     ApplicationArea = All;
                     Enabled = ParentFieldNoEnabled;
@@ -32,22 +32,22 @@ page 6151556 "NPR NpXml Filters"
                     StyleExpr = NOT ParentFieldNoEnabled;
                     ToolTip = 'Specifies the value of the Parent Field No. field';
                 }
-                field("Parent Field Name"; "Parent Field Name")
+                field("Parent Field Name"; Rec."Parent Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Filter Value"; "Filter Value")
+                field("Filter Value"; Rec."Filter Value")
                 {
                     ApplicationArea = All;
                     Enabled = FilterValueEnabled;
@@ -71,8 +71,8 @@ page 6151556 "NPR NpXml Filters"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Table No." := TableNo;
-        "Parent Table No." := ParentTableNo;
+        Rec."Table No." := TableNo;
+        Rec."Parent Table No." := ParentTableNo;
     end;
 
     var
@@ -83,7 +83,7 @@ page 6151556 "NPR NpXml Filters"
 
     local procedure SetEnabled()
     begin
-        ParentFieldNoEnabled := "Filter Type" = "Filter Type"::TableLink;
+        ParentFieldNoEnabled := Rec."Filter Type" = Rec."Filter Type"::TableLink;
         FilterValueEnabled := not ParentFieldNoEnabled;
     end;
 

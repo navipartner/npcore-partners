@@ -2,7 +2,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 {
     var
         ActionDescription: Label 'Export current sale to a standard NAV sales document';
-        ERRCUSTNOTSET: Label 'Customer must be set before working with Sales Document.';
         ERRNOSALELINES: Label 'There are no sale lines to export';
         ERR_PREPAY: Label 'Sale was exported correctly but prepayment in new sale failed: %1';
         ERR_PAY: Label 'Sale was exported correctly but payment in new sale failed: %1';
@@ -22,12 +21,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionAskOperation: Label 'Ask Doc. Operation';
         CaptionPrint: Label 'Standard Print';
         CaptionInvoice: Label 'Invoice';
-        CaptionPost: Label 'Post';
         CaptionReceive: Label 'Receive';
         CaptionShip: Label 'Ship';
         CaptionDocType: Label 'Document Type';
         CaptionNegDocType: Label 'Negative Document Type';
-        CaptionOrderType: Label 'Order Type';
         CaptionCreationMsg: Label 'Show Creation Message';
         CaptionPrepaymentDlg: Label 'Prompt Prepayment';
         CaptionFixedPrepaymentValue: Label 'Fixed Prepayment Value';
@@ -36,7 +33,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionTransferDim: Label 'Transfer Dimensions';
         CaptionTransferPaymentMethod: Label 'Transfer Payment Method';
         CaptionTransferTaxSetup: Label 'Transfer Tax Setup';
-        CaptionTransferTranscData: Label 'Transfer Transaction Data';
         CaptionAutoResrvSalesLine: Label 'Auto Reserve Sales Line';
         CaptionSendPdf2Nav: Label 'Send PDF2NAV';
         CaptionRetailPrint: Label 'Retail Confirmation Print';
@@ -48,12 +44,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         DescAskOperation: Label 'Ask user to select posting type';
         DescPrint: Label 'Print standard NAV report after export & posting is done';
         DescInvoice: Label 'Invoice exported document';
-        DescPost: Label 'Post exported document';
         DescReceive: Label 'Receive exported document';
         DescShip: Label 'Ship exported sales document';
         DescDocType: Label 'Sales Document to create on positive sales balance';
         DescNegDocType: Label 'Sales Document to create on negative sales balance';
-        DescOrderType: Label 'Order type of exported document';
         DescCreationMsg: Label 'Show message confirming sales document created';
         DescPrepaymentDlg: Label 'Ask user for prepayment percentage. Will be paid in new sale.';
         DescFixedPrepaymentPct: Label 'Prepayment percentage to use either silently or as dialog default value.';
@@ -62,7 +56,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         DescTransferDim: Label 'Transfer dimensions from sale to exported document';
         DescTransferPaymentMethod: Label 'Transfer payment method from sale to exported document';
         DescTransferTaxSetup: Label 'Transfer tax setup from sale to exported document';
-        DescTransferTranscData: Label 'Transfer transaction data from sale to exported document';
         DescAutoResrvSalesLine: Label 'Automatically reserve items on exported document';
         DescSendPdf2Nav: Label 'Handle document output via PDF2NAV';
         DescRetailPrint: Label 'Print receipt confirming exported document';
@@ -70,7 +63,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         DescCheckCustCredit: Label 'Check the customer credit before export is done';
         OptionDocTypePozitive: Label 'Order,Invoice,Quote,Restrict';
         OptionDocTypeNegative: Label 'Return Order,Credit Memo,Restrict';
-        OptionOrderType: Label 'Not Set,Order,Lending';
         CaptionPrintPrepaymentDoc: Label 'Print Prepayment Document';
         DescPrintPrepaymentDoc: Label 'Print standard prepayment document after posting.';
         CaptionPayAndPostNext: Label 'Pay&Post Immediately';
@@ -191,22 +183,20 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'ExtDocNo', TextExtDocNoLabel);
-        Captions.AddActionCaption(ActionCode, 'Attention', TextAttentionLabel);
-        Captions.AddActionCaption(ActionCode, 'confirmTitle', TextConfirmTitle);
-        Captions.AddActionCaption(ActionCode, 'confirmLead', TextConfirmLead);
-        Captions.AddActionCaption(ActionCode, 'prepaymentDialogTitle', TextPrepaymentTitle);
-        Captions.AddActionCaption(ActionCode, 'prepaymentPctLead', TextPrepaymentPctLead);
-        Captions.AddActionCaption(ActionCode, 'prepaymentAmountLead', TextPrepaymentAmountLead);
+        Captions.AddActionCaption(ActionCode(), 'ExtDocNo', TextExtDocNoLabel);
+        Captions.AddActionCaption(ActionCode(), 'Attention', TextAttentionLabel);
+        Captions.AddActionCaption(ActionCode(), 'confirmTitle', TextConfirmTitle);
+        Captions.AddActionCaption(ActionCode(), 'confirmLead', TextConfirmLead);
+        Captions.AddActionCaption(ActionCode(), 'prepaymentDialogTitle', TextPrepaymentTitle);
+        Captions.AddActionCaption(ActionCode(), 'prepaymentPctLead', TextPrepaymentPctLead);
+        Captions.AddActionCaption(ActionCode(), 'prepaymentAmountLead', TextPrepaymentAmountLead);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -226,7 +216,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        Customer: Record Customer;
         SalesHeader: Record "Sales Header";
     begin
         POSSession.GetSale(POSSale);
@@ -237,7 +226,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        SalePOS.FindFirst;
+        SalePOS.FindFirst();
 
         if (JSON.GetBooleanParameter('SelectCustomer')) then begin
             if not SelectCustomer(SalePOS, POSSale) then
@@ -250,7 +239,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
 
-        Commit;
+        Commit();
 
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
         POSSession.StoreActionState('CreatedSalesHeader', SalesHeader);
@@ -401,7 +390,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
-        Commit;
+        Commit();
         POSSale.RefreshCurrent();
         exit(true);
     end;
@@ -486,7 +475,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
-        Commit;
+        Commit();
         if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment) then
             Message(ERR_PREPAY, GetLastErrorText);
         POSSession.RequestRefreshData();
@@ -497,7 +486,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
-        Commit;
+        Commit();
         if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment) then
             Message(ERR_PAY, GetLastErrorText);
         POSSession.RequestRefreshData();
@@ -509,7 +498,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        exit(not SaleLinePOS.IsEmpty);
+        exit(not SaleLinePOS.IsEmpty());
     end;
 
     local procedure SetPricesInclVAT(var SalePOS: Record "NPR POS Sale"; var JSON: Codeunit "NPR POS JSON Management")
@@ -559,7 +548,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -650,7 +639,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -741,7 +730,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -789,7 +778,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                         exit;
                     Location.SetRange("Use As In-Transit", false);
                     Location.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Location.Code));
-                    Location.Find;
+                    Location.Find();
                 end;
         end;
     end;

@@ -192,7 +192,7 @@ page 6150673 "NPR POS Audit Log"
 
         Rec.CalcFields("Electronic Signature", "Previous Electronic Signature", "Signature Base Value");
 
-        if Rec."Electronic Signature".HasValue then begin
+        if Rec."Electronic Signature".HasValue() then begin
             Rec."Electronic Signature".CreateInStream(InStream);
             while (not InStream.EOS) do begin
                 InStream.Read(Signature);
@@ -200,7 +200,7 @@ page 6150673 "NPR POS Audit Log"
             Clear(InStream);
         end;
 
-        if Rec."Previous Electronic Signature".HasValue then begin
+        if Rec."Previous Electronic Signature".HasValue() then begin
             Rec."Previous Electronic Signature".CreateInStream(InStream);
             while (not InStream.EOS) do begin
                 InStream.Read(PreviousSignature);
@@ -208,7 +208,7 @@ page 6150673 "NPR POS Audit Log"
             Clear(InStream);
         end;
 
-        if Rec."Signature Base Value".HasValue then begin
+        if Rec."Signature Base Value".HasValue() then begin
             Rec."Signature Base Value".CreateInStream(InStream);
             while (not InStream.EOS) do begin
                 InStream.Read(BaseValue);

@@ -66,8 +66,6 @@ xmlport 6151187 "NPR MM Block Membership Member"
         }
     }
 
-    var
-        NOT_FOUND: Label 'Filter combination removed all results.';
 
     procedure ClearResponse()
     begin
@@ -76,11 +74,6 @@ xmlport 6151187 "NPR MM Block Membership Member"
     end;
 
     procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[50])
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipRole: Record "NPR MM Membership Role";
-        Member: Record "NPR MM Member";
-        MemberCard: Record "NPR MM Member Card";
     begin
 
         errordescription := '';

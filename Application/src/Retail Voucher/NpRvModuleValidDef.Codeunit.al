@@ -42,7 +42,7 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
         if VoucherModule.Get(VoucherModule.Type::"Validate Voucher", ModuleCode()) then
             exit;
 
-        VoucherModule.Init;
+        VoucherModule.Init();
         VoucherModule.Type := VoucherModule.Type::"Validate Voucher";
         VoucherModule.Code := ModuleCode();
         VoucherModule.Description := Text000;

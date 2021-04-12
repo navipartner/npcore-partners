@@ -1,8 +1,8 @@
 report 6014490 "NPR Advanced Sales Stat."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Advanced Sales Statistics';
     UseSystemPrinter = true;
@@ -102,10 +102,7 @@ report 6014490 "NPR Advanced Sales Stat."
                 if Integer.Number = 0 then
                     exit
                 else begin
-                    if (Number / 2) = Round((Number / 2), 1) then
-                        Grey := false
-                    else
-                        Grey := true;
+
                 end;
                 Totals[1] += Buffer."Sales qty.";
                 Totals[2] += Buffer."Sales qty. last year";
@@ -121,7 +118,7 @@ report 6014490 "NPR Advanced Sales Stat."
                     Totals[8] := Totals[6] / Totals[4] * 100
                 else
                     Totals[8] := 0;
-                if Integer.Number = Buffer.Count then
+                if Integer.Number = Buffer.Count() then
                     CurrReport.Break();
                 if Integer.Number > 0 then
                     Buffer.Next();
@@ -252,7 +249,6 @@ report 6014490 "NPR Advanced Sales Stat."
     trigger OnInitReport()
     begin
         Clear(Totals);
-        hideEmptyLines := true;
         Lines := 30;
     end;
 
@@ -281,8 +277,6 @@ report 6014490 "NPR Advanced Sales Stat."
         FilterField: FieldRef;
         StartRef: FieldRef;
         TypeField: FieldRef;
-        Grey: Boolean;
-        hideEmptyLines: Boolean;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         ItemCategoryFilter: Code[20];
@@ -320,7 +314,6 @@ report 6014490 "NPR Advanced Sales Stat."
         CalcLastYear := LastYearCalc;
         Day := xDay;
         Type := xType;
-        hideEmptyLines := hide;
 
         if Type = Type::Period then begin
             PeriodeFilter := StrSubstNo('%1..', Periodestart);
@@ -333,7 +326,7 @@ report 6014490 "NPR Advanced Sales Stat."
     var
         NoTypeErr: Label 'No Type selected';
     begin
-        Buffer.DeleteAll;
+        Buffer.DeleteAll();
 
         case Type of
             Type::Period:
@@ -402,7 +395,7 @@ report 6014490 "NPR Advanced Sales Stat."
         Count := 0;
         // Henter de data vi skal bruge
         if Type <> Type::Period then
-            Lines := Record.Count - 1;
+            Lines := Record.Count() - 1;
 
         if Record.Find('-') then begin
             repeat

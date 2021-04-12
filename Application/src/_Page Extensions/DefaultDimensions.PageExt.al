@@ -1,4 +1,4 @@
-﻿pageextension 6014402 "NPR Default Dimensions" extends "Default Dimensions"
+pageextension 6014402 "NPR Default Dimensions" extends "Default Dimensions"
 {
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var

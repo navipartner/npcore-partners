@@ -5,7 +5,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         MinimumAmountLimit: Decimal;
         CountryCode: Integer;
         Error_PrintData: Label 'Invalid print data returned from service';
-        Error_InvalidResponse: Label 'Invalid webservice XML response';
         Error_MissingPrintSetup: Label 'Missing object output setup';
         Error_MissingParameters: Label 'Missing parameters for handler %1 on tax free unit %2';
         Error_NotSupported: Label 'Operation is not supported by tax free handler: %1';
@@ -13,7 +12,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         Error_Ineligible: Label 'Sale is not eligible.';
         Error_WrongIINDecision: Label 'The tax free service responded but it returned invalid data. Please double check the setup.';
         Error_MissingPrint: Label 'The voucher cannot be reprinted. Please void and create a new one.';
-        Error_RequestFailed: Label 'Webservice request failed';
         MerchantID: Text;
         VATNumber: Text;
 
@@ -36,7 +34,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     begin
         TaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
 
-        if not TaxFreeUnit."Handler Parameters".HasValue then
+        if not TaxFreeUnit."Handler Parameters".HasValue() then
             Error(Error_MissingParameters, TaxFreeUnit."Handler ID Enum", TaxFreeUnit."POS Unit No.");
 
         AddParameters(tmpHandlerParameters);
@@ -72,18 +70,9 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure VoucherIssue(var TaxFreeRequest: Record "NPR Tax Free Request"; var RecRef: RecordRef)
     var
-        VoucherNo: Text;
-        VoucherBarcode: Text;
-        PrintXML: Text;
-        VoucherTotalAmount: Text;
-        VoucherRefundAmount: Text;
-        TaxFreeVoucher: Record "NPR Tax Free Voucher";
-        ErrorDescription: Text;
-        Number: Code[20];
-        Type: Integer;
         Handeled: Boolean;
     begin
-        RecRef.FindSet;
+        RecRef.FindSet();
 
         //This is done with 2 external calls, so requesttype is set before each to make sure the log is specific in case of error.
         OnBeforeIssueVoucher(TaxFreeRequest, RecRef, Handeled);
@@ -115,10 +104,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     [TryFunction]
     local procedure TryPrintVoucher(var TaxFreeRequest: Record "NPR Tax Free Request")
-    var
-        InStream: InStream;
-        XML: Text;
-        Buffer: Text;
     begin
         case TaxFreeRequest."Print Type" of
             TaxFreeRequest."Print Type"::PDF:
@@ -130,8 +115,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure IsValidTerminalIIN(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text) Valid: Boolean
     var
-        ResponseMessage: Text;
-        Value: Text;
         Eligible: Text;
         XMLDoc: XmlDocument;
         IIN: Text;
@@ -155,7 +138,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure InsertInvoice(var TaxFreeRequest: Record "NPR Tax Free Request"; var RecRef: RecordRef): Boolean
     var
-        ResponseMessage: Text;
         ErrorNo: Text;
         XMLDoc: XmlDocument;
     begin
@@ -171,16 +153,13 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
 
     local procedure CreateVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; var RecRef: RecordRef)
     var
-        ResponseMessage: Text;
         ErrorNo: Text;
         VoucherNo: Text;
         VoucherBarcode: Text;
         VoucherTotalAmount: Text;
         VoucherRefundAmount: Text;
-        TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;
         XMLDoc: XmlDocument;
-        Decimal: Decimal;
         PrintXML: Text;
     begin
         CreateVoucherRequest(TaxFreeRequest, RecRef);
@@ -253,7 +232,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     begin
         XmlDocument.ReadFrom(PrintXML, XMLDoc);
         PrintLines := XMLDoc.GetDescendantElements('print_line');
-        if PrintLines.Count < 1 then
+        if PrintLines.Count() < 1 then
             Error(Error_PrintData);
 
         i := 1;
@@ -276,8 +255,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         POSSalesLine: Record "NPR POS Entry Sales Line";
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        Quantity: Decimal;
-        DateTime: DateTime;
     begin
         case RecRef.Number of
             DATABASE::"NPR POS Sale":
@@ -364,7 +341,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                     RecRef.SetTable(POSSalesLine);
                     POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
                     POSSalesLine.SetFilter(Quantity, '>0');
-                    if POSSalesLine.FindSet then
+                    if POSSalesLine.FindSet() then
                         repeat
 
                             ItemNo += 1;
@@ -390,7 +367,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                                        '  <item_quantity>' + ItemQuantity + '</item_quantity>' +
                                        '</line_item>';
 
-                        until POSSalesLine.Next = 0;
+                        until POSSalesLine.Next() = 0;
                 end;
             DATABASE::"NPR POS Sale":
                 begin
@@ -413,8 +390,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         SalesHeader: Record "Sales Header";
         PaymentMethod: Text;
         PaymentAmount: Text;
-        CardType: Text;
-        MaskedCardNo: Text;
         PaymentsXML: Text;
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -425,7 +400,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                 begin
                     RecRef.SetTable(POSSalesLine);
                     POSPaymentLine.SetRange("POS Entry No.", POSSalesLine."POS Entry No.");
-                    if POSPaymentLine.FindSet then
+                    if POSPaymentLine.FindSet() then
                         repeat
                             if POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code") then begin
                                 case POSPaymentMethod."Processing Type" of
@@ -446,7 +421,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                                                 '<amount>' + PaymentAmount + '</amount>' +
                                               '</payment_method_detail>';
                             end;
-                        until POSPaymentLine.Next = 0;
+                        until POSPaymentLine.Next() = 0;
                 end;
             DATABASE::"NPR POS Sale":
                 RecRef.SetTable(SalePOS);
@@ -473,12 +448,12 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                     RecRef.SetTable(POSSalesLine);
                     POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
                     POSSalesLine.SetFilter(Quantity, '>0');
-                    if POSSalesLine.FindSet then
+                    if POSSalesLine.FindSet() then
                         repeat
                             TotalGrossAmount += POSSalesLine."Amount Incl. VAT";
                             TotalNetAmount += POSSalesLine."Amount Excl. VAT";
                             TotalVATAmount += (POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT");
-                        until POSSalesLine.Next = 0;
+                        until POSSalesLine.Next() = 0;
 
                     TotalsXML := '<transaction_net_amount>' + Format(TotalNetAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_net_amount>' +
                                  '<transaction_gross_amount>' + Format(TotalGrossAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_gross_amount>' +
@@ -544,7 +519,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         i: Integer;
         OutputType: Integer;
         Line: Text;
-        LineBuffer: Text;
         Output: Text;
         XMLDoc: XmlDocument;
         XMLNode: XmlNode;
@@ -562,7 +536,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         XmlDocument.ReadFrom(InStream, XMLDoc);
 
         PrintLines := XMLDoc.GetDescendantElements('print_line');//Thermal Receipt Data
-        if PrintLines.Count < 1 then
+        if PrintLines.Count() < 1 then
             Error(Error_PrintData);
 
         Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
@@ -682,7 +656,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         XMLDoc.Load(MemoryStream);
 
         PrintLines := XMLDoc.GetElementsByTagName('FormData'); //Base64 pdf data
-        if PrintLines.Count <> 1 then
+        if PrintLines.Count() <> 1 then
             Error(Error_PrintData);
 
         XMLNode := PrintLines.ItemOf(0);
@@ -918,7 +892,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     local procedure HandleResponse(var TaxFreeRequest: Record "NPR Tax Free Request"; ResponseTagName: Text; var XMLDoc: XmlDocument)
     var
         InStream: InStream;
-        OutStream: OutStream;
         XMLMessage: Text;
         XMLDOMManagement: Codeunit "XML DOM Management";
     begin
@@ -977,7 +950,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
             Error(Error_Ineligible);
 
         POSSalesLine.SetRange("Document No.", SalesReceiptNo);
-        POSSalesLine.FindSet;
+        POSSalesLine.FindSet();
         RecRef.GetTable(POSSalesLine);
 
         VoucherIssue(TaxFreeRequest, RecRef);
@@ -1002,7 +975,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     procedure OnVoucherPrint(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; IsRecentVoucher: Boolean)
     begin
         if not IsRecentVoucher then
-            if not TaxFreeVoucher.Print.HasValue then
+            if not TaxFreeVoucher.Print.HasValue() then
                 Error(Error_MissingPrint);
 
         ClearLastError;
@@ -1011,8 +984,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     end;
 
     procedure OnVoucherConsolidate(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
-    var
-        tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
         InitializeHandler(TaxFreeRequest);
         Error(Error_NotSupported, Enum::"NPR Tax Free Handler ID"::PREMIER_PI);
@@ -1025,16 +996,12 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     end;
 
     procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
-    var
-        tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
         InitializeHandler(TaxFreeRequest);
         Eligible := IsActiveSaleEligible(SalesTicketNo);
     end;
 
     procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
-    var
-        tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
         InitializeHandler(TaxFreeRequest);
         Eligible := IsStoredSaleEligible(SalesTicketNo);

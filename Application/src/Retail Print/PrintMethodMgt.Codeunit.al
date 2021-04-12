@@ -76,7 +76,6 @@ codeunit 6014582 "NPR Print Method Mgt."
     procedure PrintViaEmail(PrinterName: Text; var Stream: InStream)
     var
         SmtpMail: Codeunit "SMTP Mail";
-        InStream: InStream;
         Separators: List of [Text];
     begin
         if Stream.EOS then

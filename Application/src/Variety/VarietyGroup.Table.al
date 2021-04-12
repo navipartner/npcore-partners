@@ -412,16 +412,16 @@ table 6059976 "NPR Variety Group"
         //-VRT1.10
         ToVRTTable."Lock Table" := false;
         //+VRT1.10
-        ToVRTTable.Insert;
+        ToVRTTable.Insert();
 
         FromVRTValue.SetRange(Type, Type);
         FromVRTValue.SetRange(Table, FromTable);
-        if FromVRTValue.FindSet then
+        if FromVRTValue.FindSet() then
             repeat
                 ToVRTValue.TransferFields(FromVRTValue, true);
                 ToVRTValue.Table := ToTable;
-                ToVRTValue.Insert;
-            until FromVRTValue.Next = 0;
+                ToVRTValue.Insert();
+            until FromVRTValue.Next() = 0;
     end;
 
     local procedure CheckMaxLength()
@@ -522,7 +522,7 @@ table 6059976 "NPR Variety Group"
                     VarietyValue.SetRange(Table, "Variety 4 Table");
                 end;
         end;
-        if VarietyValue.FindFirst then
+        if VarietyValue.FindFirst() then
             exit(VarietyValue.Value);
         exit('<>');
         //+NPR5.43 [317108]
@@ -530,7 +530,6 @@ table 6059976 "NPR Variety Group"
 
     local procedure FormatValues(Value1: Code[50]; Sep1: Text; Value2: Code[50]; Sep2: Text; Value3: Code[50]): Code[50]
     var
-        NewVariantCode: Code[50];
         NewVar1Code: Code[50];
         NewVar2Code: Code[50];
         NewVar3Code: Code[50];

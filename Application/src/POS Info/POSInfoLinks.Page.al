@@ -15,12 +15,12 @@ page 6150643 "NPR POS Info Links"
             repeater(Group)
             {
                 Caption = 'Group';
-                field("POS Info Code"; "POS Info Code")
+                field("POS Info Code"; Rec."POS Info Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Info Code field';
                 }
-                field("When to Use"; "When to Use")
+                field("When to Use"; Rec."When to Use")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the When to Use field';

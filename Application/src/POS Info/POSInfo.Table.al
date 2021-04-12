@@ -110,18 +110,18 @@ table 6150640 "NPR POS Info"
         POSInfoLookupSetup: Record "NPR POS Info Lookup Setup";
     begin
         POSInfoLinkTable.SetRange("POS Info Code", Rec.Code);
-        if POSInfoLinkTable.FindFirst then
+        if POSInfoLinkTable.FindFirst() then
             if not Confirm(StrSubstNo(ConfText001, Rec.TableCaption), true) then
                 Error(ErrText001);
 
         POSInfoSubcode.SetRange(Code, Rec.Code);
-        POSInfoSubcode.DeleteAll;
+        POSInfoSubcode.DeleteAll();
 
         POSInfoLinkTable.SetRange("POS Info Code", Code);
-        POSInfoLinkTable.DeleteAll;
+        POSInfoLinkTable.DeleteAll();
 
         POSInfoLookupSetup.SetRange("POS Info Code", Code);
-        POSInfoLookupSetup.DeleteAll;
+        POSInfoLookupSetup.DeleteAll();
     end;
 
     var

@@ -14,10 +14,6 @@ codeunit 6150763 "NPR Front-End: SetOption" implements "NPR Front-End Async Requ
     procedure GetJson() Json: JsonObject
     var
         JsonMgt: Codeunit "NPR POS JSON Management";
-        ValueAsText: Text;
-        ValueAsBoolean: Boolean;
-        ValueAsDecimal: Decimal;
-        ValueAsInteger: Integer;
     begin
         Json.Add('Method', 'SetOption');
         Json.Add('Content', _content);

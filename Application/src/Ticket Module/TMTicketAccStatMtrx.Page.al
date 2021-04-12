@@ -24,8 +24,6 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         ToolTip = 'Specifies the value of the Show as Lines field';
 
                         trigger OnLookup(var Text: Text): Boolean
-                        var
-                            NewCode: Text[30];
                         begin
                         end;
 
@@ -44,14 +42,10 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         ToolTip = 'Specifies the value of the Show as Columns field';
 
                         trigger OnLookup(var Text: Text): Boolean
-                        var
-                            NewCode: Text[30];
                         begin
                         end;
 
                         trigger OnValidate()
-                        var
-                            MATRIX_SetWanted: Option First,Previous,Same,Next;
                         begin
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                             UpdateMatrixSubForm;
@@ -176,8 +170,6 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     ToolTip = 'Specifies the value of the Item Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
-                    var
-                        ItemList: Page "Item List";
                     begin
 
                         exit(FactLookup(LineFactOption::ITEM, Text));
@@ -196,8 +188,6 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     ToolTip = 'Specifies the value of the Ticket Type Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
-                    var
-                        ItemList: Page "Item List";
                     begin
 
                         exit(FactLookup(LineFactOption::TICKET_TYPE, Text));
@@ -382,7 +372,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         FindPeriod('<');
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
 
-                        CurrPage.Update;
+                        CurrPage.Update();
                         UpdateMatrixSubForm;
                     end;
                 }
@@ -402,7 +392,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         FindPeriod('>');
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
 
-                        CurrPage.Update;
+                        CurrPage.Update();
                         UpdateMatrixSubForm;
                     end;
                 }
@@ -525,11 +515,8 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         DisplayOption: Option "COUNT",COUNT_TREND,TREND;
         TrendPeriodType: Option PERIOD,YEAR;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
-        TicketStatistics_delete: Record "NPR TM Ticket Access Stats";
         TicketStatisticsFilter: Record "NPR TM Ticket Access Stats";
         InternalDateFilter: Text[30];
-        LineFactCode: Code[20];
-        ColumnFactCode: Code[20];
         VerticalTotalText: Text[30];
         INVALID_FACTOPTION: Label 'Invalid FactOption';
         BlockedItemFactFilter: Text;
@@ -547,7 +534,6 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         RecRef: RecordRef;
         FieldRef: FieldRef;
         TicketFact: Record "NPR TM Ticket Access Fact";
-        ColumnFieldNo: Integer;
         HaveCaptions: Boolean;
         AccessStatistics: Record "NPR TM Ticket Access Stats";
     begin
@@ -649,7 +635,6 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 
     local procedure FindPeriod(SearchText: Code[10])
     var
-        Item: Record Item;
         Calendar: Record Date;
         PeriodFormMgt: Codeunit PeriodFormManagement;
         Date1: Date;
@@ -667,7 +652,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         end;
 
         if Calendar."Period Start" = 0D then
-            Calendar."Period Start" := Today;
+            Calendar."Period Start" := Today();
 
         PeriodFormMgt.FindDate(SearchText, Calendar, PeriodType);
         Date1 := Calendar."Period Start";
@@ -744,7 +729,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         FactList.SetTableView(TicketFact);
         FactList.SetSelection(TicketFact);
 
-        if FactList.RunModal = ACTION::LookupOK then begin
+        if FactList.RunModal() = ACTION::LookupOK then begin
             FactFilter := FactList.GetSelectionFilter;
             UpdateMatrixSubForm();
             exit(true);

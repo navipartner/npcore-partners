@@ -149,9 +149,9 @@ table 6014445 "NPR RP Template Line"
 
                 DataItem.SetRange(Code, "Template Code");
                 DataItem.SetFilter(Name, '@' + "Data Item Name");
-                if not DataItem.FindFirst then begin
+                if not DataItem.FindFirst() then begin
                     DataItem.SetFilter(Name, '@' + "Data Item Name" + '*');
-                    DataItem.FindFirst;
+                    DataItem.FindFirst();
                 end;
                 "Data Item Name" := DataItem.Name;
                 "Data Item Table" := DataItem."Table ID";
@@ -163,8 +163,6 @@ table 6014445 "NPR RP Template Line"
             DataClassification = CustomerContent;
 
             trigger OnLookup()
-            var
-                "fields": Record "Field";
             begin
             end;
 
@@ -183,9 +181,7 @@ table 6014445 "NPR RP Template Line"
 
             trigger OnLookup()
             var
-                DataItem: Record "NPR RP Data Items";
                 "Fields": Record "Field";
-                TableFilter: Text;
             begin
                 Fields.SetRange(TableNo, "Data Item Table");
                 if PAGE.RunModal(PAGE::"NPR Field Lookup", Fields) = ACTION::LookupOK then begin
@@ -196,9 +192,7 @@ table 6014445 "NPR RP Template Line"
 
             trigger OnValidate()
             var
-                DataItem: Record "NPR RP Data Items";
                 "Fields": Record "Field";
-                TableFilter: Text;
             begin
                 if "Field Name" = '' then begin
                     Field := 0;
@@ -207,9 +201,9 @@ table 6014445 "NPR RP Template Line"
 
                 Fields.SetRange(TableNo, "Data Item Table");
                 Fields.SetFilter(FieldName, '@' + "Field Name");
-                if not Fields.FindFirst then begin
+                if not Fields.FindFirst() then begin
                     Fields.SetFilter(FieldName, '@' + "Field Name" + '*');
-                    Fields.FindFirst;
+                    Fields.FindFirst();
                 end;
                 Field := Fields."No.";
                 "Field Name" := Fields.FieldName;
@@ -286,8 +280,6 @@ table 6014445 "NPR RP Template Line"
             DataClassification = CustomerContent;
 
             trigger OnLookup()
-            var
-                "fields": Record "Field";
             begin
             end;
 
@@ -306,9 +298,7 @@ table 6014445 "NPR RP Template Line"
 
             trigger OnLookup()
             var
-                DataItem: Record "NPR RP Data Items";
                 "Fields": Record "Field";
-                TableFilter: Text;
             begin
                 Fields.SetRange(TableNo, "Data Item Table");
                 if PAGE.RunModal(PAGE::"NPR Field Lookup", Fields) = ACTION::LookupOK then begin
@@ -319,9 +309,7 @@ table 6014445 "NPR RP Template Line"
 
             trigger OnValidate()
             var
-                DataItem: Record "NPR RP Data Items";
                 "Fields": Record "Field";
-                TableFilter: Text;
             begin
                 if "Field 2 Name" = '' then begin
                     "Field 2" := 0;
@@ -330,9 +318,9 @@ table 6014445 "NPR RP Template Line"
 
                 Fields.SetRange(TableNo, "Data Item Table");
                 Fields.SetFilter(FieldName, '@' + "Field 2 Name");
-                if not Fields.FindFirst then begin
+                if not Fields.FindFirst() then begin
                     Fields.SetFilter(FieldName, '@' + "Field 2 Name" + '*');
-                    Fields.FindFirst;
+                    Fields.FindFirst();
                 end;
                 "Field 2" := Fields."No.";
                 "Field 2 Name" := Fields.FieldName;
@@ -481,8 +469,6 @@ table 6014445 "NPR RP Template Line"
         ModifiedRec();
     end;
 
-    var
-        PrinterInterface: Codeunit "NPR RP Matrix Printer Interf.";
 
     local procedure "// Locals"()
     begin
@@ -495,7 +481,7 @@ table 6014445 "NPR RP Template Line"
         TemplateLine.SetRange("Template Code", "Template Code");
         TemplateLine.SetFilter("Line No.", '<%1', "Line No.");
         TemplateLine.SetFilter(Level, '<%1', Level);
-        if TemplateLine.FindLast then
+        if TemplateLine.FindLast() then
             "Parent Line No." := TemplateLine."Line No."
         else
             "Parent Line No." := 0;
@@ -518,13 +504,13 @@ table 6014445 "NPR RP Template Line"
         "Integer": Integer;
     begin
         DataItem.SetRange(Code, "Template Code");
-        if DataItem.FindSet then
+        if DataItem.FindSet() then
             repeat
                 TempRetailList.Number += 1;
                 TempRetailList.Choice := DataItem.Name;
                 TempRetailList.Value := Format(DataItem."Table ID");
-                TempRetailList.Insert;
-            until DataItem.Next = 0;
+                TempRetailList.Insert();
+            until DataItem.Next() = 0;
 
         if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then begin
             Evaluate(Integer, TempRetailList.Value);

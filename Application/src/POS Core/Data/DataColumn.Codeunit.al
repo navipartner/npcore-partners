@@ -182,7 +182,6 @@ codeunit 6150894 "NPR Data Column" implements "NPR IJsonSerializable"
 
     procedure Constructor(FromToken: JsonToken);
     var
-        Token: JsonToken;
         DataType: Enum "NPR Data Type";
     begin
         Initialize();

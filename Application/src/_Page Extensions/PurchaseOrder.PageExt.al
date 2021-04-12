@@ -31,7 +31,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                     LastPurchaseLine: Record "Purchase Line";
                     RetailItemList: Page "Item List";
                     InputDialog: Page "NPR Input Dialog";
-                    ReturntoPO: Boolean;
                     ViewText: Text;
                     InputQuantity: Decimal;
                 begin
@@ -40,7 +39,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                     RetailItemList.NPR_SetLocationCode(Rec."Location Code");
                     RetailItemList.NPR_SetVendorNo(Rec."Buy-from Vendor No.");
                     RetailItemList.LookupMode := true;
-                    while RetailItemList.RunModal = ACTION::LookupOK do begin
+                    while RetailItemList.RunModal() = ACTION::LookupOK do begin
                         RetailItemList.GetRecord(Item);
                         InputQuantity := 1;
                         InputDialog.SetAutoCloseOnValidate(true);

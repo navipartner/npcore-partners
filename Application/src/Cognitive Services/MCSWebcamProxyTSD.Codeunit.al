@@ -1,4 +1,4 @@
-codeunit 6059958 "NPR MCS Webcam Proxy TSD"
+﻿codeunit 6059958 "NPR MCS Webcam Proxy TSD"
 {
     SingleInstance = true;
 
@@ -7,7 +7,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
         Base64String: Text;
         IdentifyButtonText: Label 'Identify';
         CaptureButtonText: Label 'Capture';
-        FormClosed: Boolean;
 
     procedure InvokeDevice()
     var
@@ -117,7 +116,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
     local procedure CloseForm(Data: Text)
     var
         State: DotNet NPRNetState3;
-        JsonConvert: DotNet JsonConvert;
         PersonEntity: DotNet NPRNetPersonEntity1;
         FaceEntity: DotNet NPRNetFaceEntity1;
         MCSPerson: Record "NPR MCS Person";
@@ -126,7 +124,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
         Convert: DotNet NPRNetConvert;
         Bytes: DotNet NPRNetArray;
         MemoryStream: DotNet NPRNetMemoryStream;
-        FacesEntity: DotNet NPRNetFaceEntity1;
         MCSPersonBusinessEntities: Record "NPR MCS Person Bus. Entit.";
     begin
         State := State.Deserialize(Data);
@@ -142,14 +139,14 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
                 WebcamArgumentTable."Person Id" := PersonEntity.PersonId;
 
                 if not MCSPerson.Get(PersonEntity.PersonId) then begin
-                    MCSPerson.Init;
+                    MCSPerson.Init();
                     MCSPerson.PersonId := PersonEntity.PersonId;
                     MCSPerson.PersonGroupId := PersonEntity.PersonGroupId;
                     MCSPerson.Name := PersonEntity.Name;
                     MCSPerson.UserData := PersonEntity.UserData;
                     if MCSPerson.Insert(true) then begin
                         if (WebcamArgumentTable.Action <> WebcamArgumentTable.Action::IdentifyFaces) then begin
-                            MCSPersonBusinessEntities.Init;
+                            MCSPersonBusinessEntities.Init();
                             MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
                             MCSPersonBusinessEntities."Table Id" := WebcamArgumentTable."Table Id";
                             MCSPersonBusinessEntities.Key := WebcamArgumentTable.Key;
@@ -159,7 +156,7 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
                 end else begin
                     if (WebcamArgumentTable.Action <> WebcamArgumentTable.Action::IdentifyFaces) then begin
                         if not MCSPersonBusinessEntities.Get(MCSPerson.PersonId, WebcamArgumentTable."Table Id") then begin
-                            MCSPersonBusinessEntities.Init;
+                            MCSPersonBusinessEntities.Init();
                             MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
                             MCSPersonBusinessEntities."Table Id" := WebcamArgumentTable."Table Id";
                             MCSPersonBusinessEntities.Key := WebcamArgumentTable.Key;
@@ -176,7 +173,7 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
 
                 foreach FaceEntity in State.Faces do begin
 
-                    MCSFaces.Init;
+                    MCSFaces.Init();
                     MCSFaces.Age := Convert.ToDecimal(FaceEntity.Age);
                     MCSFaces.Beard := Convert.ToDecimal(FaceEntity.Beard);
                     MCSFaces.Created := CurrentDateTime;
@@ -206,7 +203,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
             end;
         end;
 
-        FormClosed := true;
     end;
     #endregion
     #region Protocol Event Handling

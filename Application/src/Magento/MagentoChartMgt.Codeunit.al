@@ -1,7 +1,6 @@
 codeunit 6151480 "NPR Magento Chart Mgt."
 {
     var
-        NoofPeriod: Integer;
         Text000: Label 'Margin';
         Text001: Label 'Turnover';
 
@@ -14,7 +13,7 @@ codeunit 6151480 "NPR Magento Chart Mgt."
         TotNoOfPeriod: Integer;
     begin
         if Period = Period::" " then begin
-            Enddate := Today;
+            Enddate := Today();
             BusChartBuf."Period Length" := PeriodType;
         end;
 
@@ -33,11 +32,11 @@ codeunit 6151480 "NPR Magento Chart Mgt."
         for I := 1 to TotNoOfPeriod do begin
             BusChartBuf.GetPeriodFromMapColumn(I - 1, StartDate, Enddate);
             Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
-            Query1.Open;
+            Query1.Open();
             Query1.Read;
             BusChartBuf.SetValue(Text000, I - 1, Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual);
             BusChartBuf.SetValue(Text001, I - 1, Query1.Sum_Sales_Amount_Actual);
-            Query1.Close;
+            Query1.Close();
         end;
     end;
 
@@ -57,11 +56,11 @@ codeunit 6151480 "NPR Magento Chart Mgt."
         end;
 
         if Enddate > Today then
-            Enddate := Today;
+            Enddate := Today();
 
         Date.SetRange("Period Type", PeriodType);
         Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<-%1%2>', 7, BusChartBuf.GetPeriodLength()), Enddate));
-        if Date.FindFirst then
+        if Date.FindFirst() then
             StartDate := Date."Period Start"
     end;
 }

@@ -1,11 +1,10 @@
-codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
+﻿codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 {
     // TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
     var
         ERRNoPadForSeating: Label 'No active waiter pad exists for seating %1.';
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadUI: Page "NPR NPRE Waiter Pad";
-        TXTQtyToMove: Label 'Enter quantity to move to sales ticket from line %1 with total quantity %2.';
         CFRM_Move_seating: Label 'Do you want to move waiter pad %1 %2 from seating %3 to %4?';
         ERRMergeToSelf: Label 'Waiter pad can not be merged into itself, choose another waiter pad.';
         TXTMerged: Label 'Waiter pad lines merged into waiter pad %1 - %2.';
@@ -29,7 +28,6 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        DeleteWPLine: Boolean;
     begin
         if not UIShowWaiterPadSplitBilForm(WaiterPad, TMPWaiterPadLine) then
             Error(SplitCancelled);
@@ -46,7 +44,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         WaiterPadMgt.DuplicateWaiterPadHdr(WaiterPad, NewWaiterPad);
         WaiterPadMgt.MoveNumberOfGuests(WaiterPad, NewWaiterPad, NumberOfGuests);
 
-        TMPWaiterPadLine.FindFirst;
+        TMPWaiterPadLine.FindFirst();
         repeat
             ChoosenWaiterPadLine.Get(TMPWaiterPadLine."Waiter Pad No.", TMPWaiterPadLine."Line No.");
             SplitWaiterPadLine(WaiterPad, ChoosenWaiterPadLine, TMPWaiterPadLine."Marked Qty", NewWaiterPad);
@@ -56,7 +54,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 
         if CopyToSale then begin
             POSSession.GetSaleLine(POSSaleLine);
-            POSSaleLine.DeleteAll;
+            POSSaleLine.DeleteAll();
 
             POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
@@ -117,7 +115,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
             FromWaiterPadLine."Amount Incl. VAT" := 0;
             FromWaiterPadLine."Amount Excl. VAT" := 0;
             FromWaiterPadLine."Discount Amount" := 0;
-            FromWaiterPadLine.Modify;
+            FromWaiterPadLine.Modify();
         end;
     end;
 
@@ -129,40 +127,40 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         NPHHospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
         SaleLinesExist: Boolean;
     begin
-        SaleLinePOS.Reset;
+        SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinesExist := SaleLinePOS.FindSet(CleanupSale);
         if SaleLinesExist then begin
-            TouchedWaiterPadLineTmp.DeleteAll;
+            TouchedWaiterPadLineTmp.DeleteAll();
             CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
             repeat
                 MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine);
                 TouchedWaiterPadLineTmp := WaiterPadLine;
-                TouchedWaiterPadLineTmp.Insert;
-            until SaleLinePOS.Next = 0;
+                TouchedWaiterPadLineTmp.Insert();
+            until SaleLinePOS.Next() = 0;
 
             WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
             WaiterPadLine.SetRange("Sale Retail ID", SalePOS."Retail ID");
             WaiterPadLine.SetAutoCalcFields("Kitchen Order Sent", "Serving Requested");
-            if WaiterPadLine.FindSet then
+            if WaiterPadLine.FindSet() then
                 repeat
                     TouchedWaiterPadLineTmp := WaiterPadLine;
-                    if not TouchedWaiterPadLineTmp.Find then begin
+                    if not TouchedWaiterPadLineTmp.Find() then begin
                         if (WaiterPadLine."Kitchen Order Sent" or WaiterPadLine."Serving Requested") and
                            (WaiterPadLine.Type = WaiterPadLine.Type::Item)
                         then begin
                             if WaiterPadLine.Quantity <> 0 then begin
                                 WaiterPadLine.Validate(Quantity, 0);
-                                WaiterPadLine.Modify;
+                                WaiterPadLine.Modify();
                                 WaiterPadLine.Mark := true;
                             end;
                         end else
                             WaiterPadLine.Delete(true);
                     end;
-                until WaiterPadLine.Next = 0;
+                until WaiterPadLine.Next() = 0;
         end;
 
         if CleanupSale then begin
@@ -179,7 +177,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
             NPHHospitalityPrint.SetWaiterPadPreReceiptPrinted(WaiterPad, false, true);
         OnAfterMoveSaleFromPosToWaiterPad(WaiterPad, WaiterPadLine);
 
-        Commit;
+        Commit();
         NPHHospitalityPrint.LinesAddedToWaiterPad(WaiterPad);
     end;
 
@@ -190,7 +188,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     begin
         WaiterPadLine2.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine2.SetRange("Sale Line Retail ID", SaleLinePOS."Retail ID");
-        NewLine := not WaiterPadLine2.FindFirst or IsNullGuid(SaleLinePOS."Retail ID");
+        NewLine := not WaiterPadLine2.FindFirst() or IsNullGuid(SaleLinePOS."Retail ID");
         if not NewLine then begin
             WaiterPadLine := WaiterPadLine2;
             WaiterPadLine.TestField(WaiterPadLine.Type, SaleLinePOS.Type);
@@ -200,12 +198,12 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
             WaiterPadLine.TestField(WaiterPadLine."Unit of Measure Code", SaleLinePOS."Unit of Measure Code");
             WaiterPadLine.TestField(WaiterPadLine."Qty. per Unit of Measure", SaleLinePOS."Qty. per Unit of Measure");
         end else begin
-            WaiterPadLine2.Init;
+            WaiterPadLine2.Init();
 
-            WaiterPadLine.Init;
+            WaiterPadLine.Init();
             WaiterPadLine."Waiter Pad No." := WaiterPad."No.";
             WaiterPadLine."Register No." := SaleLinePOS."Register No.";
-            WaiterPadLine."Start Date" := Today;
+            WaiterPadLine."Start Date" := Today();
             WaiterPadLine."Start Time" := Time;
 
             WaiterPadLine."Sale Type" := SaleLinePOS."Sale Type";
@@ -241,7 +239,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         WaiterPadLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
         WaiterPadLine."Order No. from Web" := SaleLinePOS."Order No. from Web";
         WaiterPadLine."Order Line No. from Web" := SaleLinePOS."Order Line No. from Web";
-        WaiterPadLine.Modify;
+        WaiterPadLine.Modify();
 
         WaiterPadLine.Mark := NewLine or (WaiterPadLine."Quantity (Base)" <> WaiterPadLine2."Quantity (Base)");
 
@@ -331,24 +329,24 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 
         WaiterPadLine."Sale Retail ID" := SalePOS."Retail ID";
         WaiterPadLine."Sale Line Retail ID" := SaleLinePOS."Retail ID";
-        WaiterPadLine.Modify;
+        WaiterPadLine.Modify();
     end;
 
-    local procedure WaiterPadExistsForSeating(SeatingCode: Code[20]; OpenOnly: Boolean; ExcludeWaiterPadNo: Code[20]) Exists: Boolean
+    local procedure WaiterPadExistsForSeating(SeatingCode: Code[20]; OpenOnly: Boolean; ExcludeWaiterPadNo: Code[20]): Boolean
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         Seating: Record "NPR NPRE Seating";
     begin
         Seating.Get(SeatingCode);
 
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
         if OpenOnly then
             SeatingWaiterPadLink.SetRange(Closed, false);
         if ExcludeWaiterPadNo <> '' then
             SeatingWaiterPadLink.SetFilter("Waiter Pad No.", '<>%1', ExcludeWaiterPadNo);
 
-        exit(not SeatingWaiterPadLink.IsEmpty);
+        exit(not SeatingWaiterPadLink.IsEmpty());
     end;
 
     local procedure GetWaiterPadForSeating(SeatingCode: Code[20]; OpenOnly: Boolean; ExcludeWaiterPadNo: Code[20]; var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -358,7 +356,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     begin
         Seating.Get(SeatingCode);
 
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
         if OpenOnly then
             SeatingWaiterPadLink.SetRange(Closed, false);
@@ -368,19 +366,19 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         if SeatingWaiterPadLink.IsEmpty then
             WaiterPadMgt.AddNewWaiterPadForSeating(Seating.Code, WaiterPad, SeatingWaiterPadLink);
 
-        if SeatingWaiterPadLink.Count > 1 then begin
-            SeatingWaiterPadLink.FindSet;
-            WaiterPad.Reset;
+        if SeatingWaiterPadLink.Count() > 1 then begin
+            SeatingWaiterPadLink.FindSet();
+            WaiterPad.Reset();
             repeat
                 WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.");
                 WaiterPad.Mark(true);
-            until SeatingWaiterPadLink.Next = 0;
+            until SeatingWaiterPadLink.Next() = 0;
             WaiterPad.MarkedOnly(true);
         end else begin
-            SeatingWaiterPadLink.FindFirst;
-            WaiterPad.Reset;
+            SeatingWaiterPadLink.FindFirst();
+            WaiterPad.Reset();
             WaiterPad.SetRange("No.", SeatingWaiterPadLink."Waiter Pad No.");
-            WaiterPad.FindFirst;
+            WaiterPad.FindFirst();
         end;
     end;
 
@@ -390,10 +388,10 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     begin
         WaiterPadList.SetTableView(WaiterPad);
         WaiterPadList.LookupMode := true;
-        if WaiterPadList.RunModal = ACTION::LookupOK then begin
+        if WaiterPadList.RunModal() = ACTION::LookupOK then begin
             WaiterPadList.GetRecord(WaiterPad);
             WaiterPad.SetRange("No.", WaiterPad."No.");
-            WaiterPad.FindFirst;
+            WaiterPad.FindFirst();
             LookUpOK := true;
         end else begin
             LookUpOK := false;
@@ -402,24 +400,24 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         exit(LookUpOK);
     end;
 
-    local procedure UIShowWaiterPadSplitBilForm(WaiterPad: Record "NPR NPRE Waiter Pad"; var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary) OK: Boolean
+    local procedure UIShowWaiterPadSplitBilForm(WaiterPad: Record "NPR NPRE Waiter Pad"; var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary): Boolean
     var
         POSWaiterPadLines: Page "NPR NPRE Tmp POSWaiterPadLines";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        WaiterPadLine.Reset;
+        WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
 
-        TMPWaiterPadLine.Reset;
-        TMPWaiterPadLine.DeleteAll;
+        TMPWaiterPadLine.Reset();
+        TMPWaiterPadLine.DeleteAll();
 
-        if WaiterPadLine.FindSet then
+        if WaiterPadLine.FindSet() then
             repeat
                 if WaiterPadLine.Quantity > WaiterPadLine."Billed Quantity" then begin
                     TMPWaiterPadLine.TransferFields(WaiterPadLine);
                     TMPWaiterPadLine.Marked := false;
                     TMPWaiterPadLine."Marked Qty" := 0;
-                    TMPWaiterPadLine.Insert;
+                    TMPWaiterPadLine.Insert();
                 end;
             until (0 = WaiterPadLine.Next);
 
@@ -430,7 +428,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 
         POSWaiterPadLines.Editable(false);
 
-        if POSWaiterPadLines.RunModal = ACTION::OK then begin
+        if POSWaiterPadLines.RunModal() = ACTION::OK then begin
             exit(true);
         end else begin
             exit(false);
@@ -440,7 +438,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     procedure UIShowWaiterPad(WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
         WaiterPadUI.SetRecord(WaiterPad);
-        WaiterPadUI.RunModal;
+        WaiterPadUI.RunModal();
     end;
 
     procedure GetQtyUI(OrgQty: Decimal; Description: Text; var ioChosenQty: Decimal) OK: Boolean
@@ -509,9 +507,9 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 
         GetWaiterPadForSeating(Seating.Code, true, WaiterPad."No.", MergeToWaiterPad);
 
-        if MergeToWaiterPad.Count = 0 then
+        if MergeToWaiterPad.Count() = 0 then
             exit(false);
-        if MergeToWaiterPad.Count > 1 then begin
+        if MergeToWaiterPad.Count() > 1 then begin
             if not UILookUpWaiterPad(MergeToWaiterPad) then
                 exit(false);
         end;
@@ -544,11 +542,11 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         if LocationFilter = '' then
             LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
         if (SeatingFilter <> '') or (LocationFilter <> '') then begin
-            NPRESeating.SetRecFilter;
+            NPRESeating.SetRecFilter();
             NPRESeating.FilterGroup(2);
             NPRESeating.SetFilter(Code, SeatingFilter);
             NPRESeating.SetFilter("Seating Location", LocationFilter);
-            NPRESeating.FindFirst;
+            NPRESeating.FindFirst();
         end;
     end;
 
@@ -591,19 +589,19 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         if NPRESeatingWaiterPadLink.IsEmpty then
             Error(ERRNoPadForSeating, NPRESeating.Code);
 
-        NPRESeatingWaiterPadLink.FindSet;
+        NPRESeatingWaiterPadLink.FindSet();
         repeat
             if NPREWaiterPad.Get(NPRESeatingWaiterPadLink."Waiter Pad No.") and not NPREWaiterPad.Closed then begin
-                TempNPREWaiterPad.Init;
+                TempNPREWaiterPad.Init();
                 TempNPREWaiterPad := NPREWaiterPad;
-                TempNPREWaiterPad.Insert;
+                TempNPREWaiterPad.Insert();
             end;
-        until NPRESeatingWaiterPadLink.Next = 0;
+        until NPRESeatingWaiterPadLink.Next() = 0;
 
-        TempNPREWaiterPad.FindLast;
+        TempNPREWaiterPad.FindLast();
         NPREWaiterPad."No." := TempNPREWaiterPad."No.";
 
-        TempNPREWaiterPad.FindFirst;
+        TempNPREWaiterPad.FindFirst();
         if NPREWaiterPad."No." <> TempNPREWaiterPad."No." then begin
             if PAGE.RunModal(0, TempNPREWaiterPad) <> ACTION::LookupOK then begin
                 Clear(NPREWaiterPad);
@@ -624,31 +622,31 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
         if ToWaiterPad then begin
-            if POSInfoTransaction.FindSet then
+            if POSInfoTransaction.FindSet() then
                 repeat
-                    POSInfoWaiterPadLink.Init;
+                    POSInfoWaiterPadLink.Init();
                     POSInfoWaiterPadLink."Waiter Pad No." := WaiterPadNo;
                     POSInfoWaiterPadLink."Waiter Pad Line No." := WaiterPadLineNo;
                     POSInfoWaiterPadLink."POS Info Code" := POSInfoTransaction."POS Info Code";
-                    if not POSInfoWaiterPadLink.Find then
-                        POSInfoWaiterPadLink.Insert;
+                    if not POSInfoWaiterPadLink.Find() then
+                        POSInfoWaiterPadLink.Insert();
                     POSInfoWaiterPadLink."POS Info" := POSInfoTransaction."POS Info";
-                    POSInfoWaiterPadLink.Modify;
-                until POSInfoTransaction.Next = 0;
+                    POSInfoWaiterPadLink.Modify();
+                until POSInfoTransaction.Next() = 0;
 
         end else begin
-            POSInfoTransaction.DeleteAll;
+            POSInfoTransaction.DeleteAll();
 
             POSInfoWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
             POSInfoWaiterPadLink.SetRange("Waiter Pad Line No.", WaiterPadLineNo);
-            if POSInfoWaiterPadLink.FindSet then
+            if POSInfoWaiterPadLink.FindSet() then
                 repeat
                     POSInfoTransaction.SetRange("POS Info Code", POSInfoWaiterPadLink."POS Info Code");
-                    if POSInfoTransaction.FindFirst then begin
+                    if POSInfoTransaction.FindFirst() then begin
                         POSInfoTransaction."POS Info" := POSInfoWaiterPadLink."POS Info";
-                        POSInfoTransaction.Modify;
+                        POSInfoTransaction.Modify();
                     end else begin
-                        POSInfoTransaction.Init;
+                        POSInfoTransaction.Init();
                         POSInfoTransaction."Register No." := SaleLinePOS."Register No.";
                         POSInfoTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
                         POSInfoTransaction."Sales Line No." := SaleLinePOS."Line No.";
@@ -659,7 +657,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
                         POSInfoTransaction."POS Info" := POSInfoWaiterPadLink."POS Info";
                         POSInfoTransaction.Insert(true);
                     end;
-                until POSInfoWaiterPadLink.Next = 0;
+                until POSInfoWaiterPadLink.Next() = 0;
         end;
     end;
 
@@ -680,14 +678,14 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     begin
         POSInfoWaiterPadLink.SetRange("Waiter Pad No.", FromWaiterPad."No.");
         POSInfoWaiterPadLink.SetRange("Waiter Pad Line No.", FromWaiterPadLineNo);
-        if POSInfoWaiterPadLink.FindSet then
+        if POSInfoWaiterPadLink.FindSet() then
             repeat
                 POSInfoWaiterPadLink2 := POSInfoWaiterPadLink;
-                if not POSInfoWaiterPadLink2.Find then
-                    POSInfoWaiterPadLink2.Insert;
+                if not POSInfoWaiterPadLink2.Find() then
+                    POSInfoWaiterPadLink2.Insert();
                 POSInfoWaiterPadLink2."POS Info" := POSInfoWaiterPadLink."POS Info";
-                POSInfoWaiterPadLink2.Modify;
-            until POSInfoWaiterPadLink.Next = 0;
+                POSInfoWaiterPadLink2.Modify();
+            until POSInfoWaiterPadLink.Next() = 0;
     end;
 
     procedure ClearSaleHdrNPREPresetFields(var SalePOS: Record "NPR POS Sale"; ModifyRec: Boolean)
@@ -696,7 +694,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         SalePOS."NPRE Pre-Set Seating Code" := '';
         SalePOS."NPRE Pre-Set Waiter Pad No." := '';
         if ModifyRec then
-            SalePOS.Modify;
+            SalePOS.Modify();
 
         ClearWPLineSaleHdrLinks(SalePOS);
     end;
@@ -751,7 +749,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         POSInfoWaiterPadLink.SetRange("Waiter Pad No.", Rec."Waiter Pad No.");
         POSInfoWaiterPadLink.SetRange("Waiter Pad Line No.", Rec."Line No.");
         if not POSInfoWaiterPadLink.IsEmpty then
-            POSInfoWaiterPadLink.DeleteAll;
+            POSInfoWaiterPadLink.DeleteAll();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, false)]
@@ -763,13 +761,13 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         if IsNullGuid(POSSalesLine."Retail ID") then
             exit;
         WaiterPadLine.SetRange("Sale Line Retail ID", POSSalesLine."Retail ID");
-        if WaiterPadLine.FindFirst then begin
+        if WaiterPadLine.FindFirst() then begin
             if POSSalesLine."Quantity (Base)" <> 0 then begin
                 if WaiterPadLine."Qty. per Unit of Measure" = POSSalesLine."Qty. per Unit of Measure" then
                     WaiterPadLine.Validate("Billed Quantity", WaiterPadLine."Billed Quantity" + POSSalesLine.Quantity)
                 else
                     WaiterPadLine.Validate("Billed Qty. (Base)", WaiterPadLine."Billed Qty. (Base)" + POSSalesLine."Quantity (Base)");
-                WaiterPadLine.Modify;
+                WaiterPadLine.Modify();
             end;
 
             if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then

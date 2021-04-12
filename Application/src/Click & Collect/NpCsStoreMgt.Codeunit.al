@@ -1,4 +1,4 @@
-//One DotNet variable left. Can be easy removed after upgrade to BC 17.2 Described in function CalcDistance (after that delete this comment)
+﻿//One DotNet variable left. Can be easy removed after upgrade to BC 17.2 Described in function CalcDistance (after that delete this comment)
 codeunit 6151204 "NPR NpCs Store Mgt."
 {
     procedure InitLocalStore(var NpCsStore: Record "NPR NpCs Store")
@@ -24,7 +24,7 @@ codeunit 6151204 "NPR NpCs Store Mgt."
             exit;
 
         if not WebService.Get(WebService."Object Type"::Codeunit, 'collect_in_store_service') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Object ID" := CollectWsCodeunitId();
             WebService."Service Name" := 'collect_in_store_service';
@@ -92,7 +92,7 @@ codeunit 6151204 "NPR NpCs Store Mgt."
             ErrorMessage := Response.ReasonPhrase;
             if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                    ErrorMessage := Node.AsXmlElement.InnerText();
+                    ErrorMessage := Node.AsXmlElement().InnerText();
             end;
             Error(ErrorMessage);
         end;
@@ -127,9 +127,7 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     var
         XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
-        Request: HttpRequestMessage;
         Response: HttpResponseMessage;
-        RequestHeaders: HttpHeaders;
         Document: XmlDocument;
         Node: XmlNode;
         ErrorMessage: Text;
@@ -144,7 +142,7 @@ codeunit 6151204 "NPR NpCs Store Mgt."
         ErrorMessage := XmlDomManagement.RemoveNamespaces(ErrorMessage);
         if XmlDocument.ReadFrom(ErrorMessage, Document) then
             if Document.SelectSingleNode('//faultstring', Node) then
-                Error(Node.AsXmlElement.InnerText());
+                Error(Node.AsXmlElement().InnerText());
 
         Error(ErrorMessage);
     end;
@@ -154,15 +152,15 @@ codeunit 6151204 "NPR NpCs Store Mgt."
         NpCsStore: Record "NPR NpCs Store";
     begin
         NpCsStore.SetFilter(Code, '<>%1', FromNpCsStore.Code);
-        if not NpCsStore.FindSet then
+        if not NpCsStore.FindSet() then
             exit;
 
         repeat
-            TempNpCsStore.Init;
+            TempNpCsStore.Init();
             TempNpCsStore := NpCsStore;
             TempNpCsStore."Distance (km)" := CalcDistance(FromNpCsStore, TempNpCsStore);
-            TempNpCsStore.Insert;
-        until NpCsStore.Next = 0;
+            TempNpCsStore.Insert();
+        until NpCsStore.Next() = 0;
     end;
 
     procedure GetCollectWSUrl(ServiceCompanyName: Text) Url: Text
@@ -200,9 +198,9 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     begin
         Clear(NpCsStore);
         NpCsStore.SetRange("Local Store", true);
-        NpCsStore.FindLast;
+        NpCsStore.FindLast();
         LastCode := NpCsStore.Code;
-        NpCsStore.FindFirst;
+        NpCsStore.FindFirst();
 
         if NpCsStore.Code = LastCode then
             exit(true);
@@ -251,11 +249,11 @@ codeunit 6151204 "NPR NpCs Store Mgt."
         if not FindBufferStores(NpCsStoreInventoryBuffer, TempNpCsStore) then
             exit;
 
-        TempNpCsStore.FindSet;
+        TempNpCsStore.FindSet();
         repeat
             Clear(NpCsStoreInventoryBuffer);
             SetBufferInventoryStore(TempNpCsStore.Code, NpCsStoreInventoryBuffer);
-        until TempNpCsStore.Next = 0;
+        until TempNpCsStore.Next() = 0;
 
         Clear(NpCsStoreInventoryBuffer);
     end;
@@ -290,11 +288,11 @@ codeunit 6151204 "NPR NpCs Store Mgt."
                   '<inv:location_filter>' + NpCsStore."Location Code" + '</inv:location_filter>' +
                   '<inv:products>';
 
-        NpCsStoreInventoryBuffer.FindSet;
+        NpCsStoreInventoryBuffer.FindSet();
         repeat
             ReqBody +=
                         '<inv:product sku="' + NpCsStoreInventoryBuffer.Sku + '" />';
-        until NpCsStoreInventoryBuffer.Next = 0;
+        until NpCsStoreInventoryBuffer.Next() = 0;
         ReqBody +=
                   '</inv:products>' +
                 '</local_inventory>' +
@@ -324,15 +322,15 @@ codeunit 6151204 "NPR NpCs Store Mgt."
             exit;
 
         Document.SelectSingleNode('//Body/GetLocalInventory_Result/local_inventory/products', Node);
-        if Node.AsXmlElement.IsEmpty() then
+        if Node.AsXmlElement().IsEmpty() then
             exit;
 
-        NpCsStoreInventoryBuffer.FindSet;
+        NpCsStoreInventoryBuffer.FindSet();
         repeat
             NpCsStoreInventoryBuffer.Inventory := GetElementDecimal(Node.AsXmlElement(), 'product[@sku="' + NpCsStoreInventoryBuffer.Sku + '"]/inventory');
             NpCsStoreInventoryBuffer."In Stock" := NpCsStoreInventoryBuffer.Quantity <= NpCsStoreInventoryBuffer.Inventory;
-            NpCsStoreInventoryBuffer.Modify;
-        until NpCsStoreInventoryBuffer.Next = 0;
+            NpCsStoreInventoryBuffer.Modify();
+        until NpCsStoreInventoryBuffer.Next() = 0;
     end;
 
     local procedure FindBufferStores(var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary; var TempNpCsStore: Record "NPR NpCs Store" temporary): Boolean
@@ -347,19 +345,19 @@ codeunit 6151204 "NPR NpCs Store Mgt."
             exit(false);
 
         NpCsStoreInventoryBuffer.SetFilter("Store Code", '<>%1', '');
-        while NpCsStoreInventoryBuffer.FindFirst do begin
+        while NpCsStoreInventoryBuffer.FindFirst() do begin
             if not TempNpCsStore.Get(NpCsStoreInventoryBuffer."Store Code") then begin
-                TempNpCsStore.Init;
+                TempNpCsStore.Init();
                 if NpCsStore.Get(NpCsStoreInventoryBuffer."Store Code") then
                     TempNpCsStore := NpCsStore;
                 TempNpCsStore.Code := NpCsStoreInventoryBuffer."Store Code";
-                TempNpCsStore.Insert;
+                TempNpCsStore.Insert();
             end;
 
             NpCsStoreInventoryBuffer.SetFilter("Store Code", '>%1', NpCsStoreInventoryBuffer."Store Code");
         end;
 
-        exit(TempNpCsStore.FindFirst);
+        exit(TempNpCsStore.FindFirst());
     end;
 
     local procedure GetElementDecimal(Element: XmlElement; Path: Text) Value: Decimal

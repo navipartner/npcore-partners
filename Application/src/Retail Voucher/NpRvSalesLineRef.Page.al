@@ -16,7 +16,7 @@ page 6151020 "NPR NpRv Sales Line Ref."
         {
             repeater(Group)
             {
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
@@ -27,7 +27,7 @@ page 6151020 "NPR NpRv Sales Line Ref."
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Sales Line Id" := NpRvSalesLine.Id;
+        Rec."Sales Line Id" := NpRvSalesLine.Id;
     end;
 
     trigger OnOpenPage()
@@ -50,7 +50,7 @@ page 6151020 "NPR NpRv Sales Line Ref."
     var
         RefNoQty: Decimal;
     begin
-        RefNoQty := Count;
+        RefNoQty := Rec.Count();
         if Quantity = RefNoQty then
             exit(true);
 
@@ -67,9 +67,9 @@ page 6151020 "NPR NpRv Sales Line Ref."
     var
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, Rec);
-        FilterGroup(0);
+        Rec.FilterGroup(0);
 
         if VoucherType.Get(NpRvSalesLine."Voucher Type") then;
     end;

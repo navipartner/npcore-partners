@@ -33,9 +33,6 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnRunNcTriggerTask', '', false, false)]
     local procedure OnRunNcTriggerTaskProcessExport(TriggerCode: Code[20]; var Output: Text; var NcTask: Record "NPR Nc Task"; var Handled: Boolean; var CurrentIteration: Integer; var MaxIterations: Integer; var Filename: Text; var Subject: Text; var Body: Text)
-    var
-        TxtSubject: Label 'This is the Subject of a sample email.';
-        TxtBody: Label 'This is the Body text of a sample email.';
     begin
         if Handled then
             exit;
@@ -52,7 +49,7 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
     begin
         if NcTrigger.Get(GetTriggerCode) then
             exit;
-        NcTrigger.Init;
+        NcTrigger.Init();
         NcTrigger.Validate(Code, GetTriggerCode);
         NcTrigger.Validate(Description, GetTriggerDescription);
         //-NC2.01 [261431]

@@ -1,4 +1,4 @@
-page 6151335 "NPR Restaurant Activities"
+﻿page 6151335 "NPR Restaurant Activities"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -88,7 +88,7 @@ page 6151335 "NPR Restaurant Activities"
                         UserTaskList: Page "User Task List";
                     begin
                         UserTaskList.SetPageToShowMyPendingUserTasks;
-                        UserTaskList.Run;
+                        UserTaskList.Run();
                     end;
                 }
             }
@@ -185,7 +185,7 @@ page 6151335 "NPR Restaurant Activities"
                     FilterPage: FilterPageBuilder;
                 begin
                     FilterPage.AddRecord(Restaurant.TableCaption, Restaurant);
-                    FilterPage.AddField(Restaurant.TableCaption, Restaurant.Code, GetFilter("Restaurant Filter"));
+                    FilterPage.AddField(Restaurant.TableCaption, Restaurant.Code, Rec.GetFilter("Restaurant Filter"));
                     if not FilterPage.RunModal() then
                         exit;
                     Restaurant.SetView(FilterPage.GetView(Restaurant.TableCaption));
@@ -211,10 +211,10 @@ page 6151335 "NPR Restaurant Activities"
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
         Rec.SetRange("Date Filter", WorkDate());
@@ -268,7 +268,7 @@ page 6151335 "NPR Restaurant Activities"
             Rec.SetFilter("Seating Location Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, SeatingLocation.FieldNo(Code)));
         end;
 
-        POSUnit.reset;
+        POSUnit.Reset();
         if Restaurant.FindSet() then
             repeat
                 POSRestProfile.SetRange("Restaurant Code", Restaurant.Code);
@@ -290,9 +290,8 @@ page 6151335 "NPR Restaurant Activities"
         POSUnit2: Record "NPR POS Unit";
         SelectionFilterMgt: Codeunit SelectionFilterManagement;
         RecRef: RecordRef;
-        TotalNoOfPOSUnits: Integer;
     begin
-        if POSUnit.Count = POSUnit2.Count then begin
+        if POSUnit.Count() = POSUnit2.Count() then begin
             Rec.SetRange("POS Unit Filter");
             exit;
         end;
@@ -330,11 +329,11 @@ page 6151335 "NPR Restaurant Activities"
         POSEntryQry.Close();
 
         if Rec."Total No. of Guests" <> 0 then
-            Rec."Average per Guest (LCY)" := Round("Turnover (LCY)" / "Total No. of Guests")
+            Rec."Average per Guest (LCY)" := Round(Rec."Turnover (LCY)" / Rec."Total No. of Guests")
         else
             Rec."Average per Guest (LCY)" := 0;
         if Rec."No. of Sales" <> 0 then
-            Rec."Average per Sale (LCY)" := Round("Turnover (LCY)" / "No. of Sales")
+            Rec."Average per Sale (LCY)" := Round(Rec."Turnover (LCY)" / Rec."No. of Sales")
         else
             Rec."Average per Sale (LCY)" := 0;
 

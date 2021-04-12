@@ -1,15 +1,10 @@
 codeunit 6150618 "NPR POS Entry Output Log Mgt."
 {
-    var
-        CAPTION_CODEUNIT: Label 'Codeunit';
-        CAPTION_REPORT: Label 'Report';
-        CAPTION_TEMPLATE: Label 'Print Template';
 
     local procedure CreatePOSEntryOutputLog(RecRef: RecordRef; ReportSelectionRetail: Record "NPR Report Selection Retail")
     var
         POSEntry: Record "NPR POS Entry";
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
-        FldRef: FieldRef;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSEntryOutputLog2: Record "NPR POS Entry Output Log";
         IsReprint: Boolean;
@@ -43,14 +38,14 @@ codeunit 6150618 "NPR POS Entry Output Log Mgt."
         end;
         POSEntryOutputLog."User ID" := UserId;
         POSEntryOutputLog."Output Method" := POSEntryOutputLog."Output Method"::Print;
-        POSEntryOutputLog.Insert;
+        POSEntryOutputLog.Insert();
 
         if POSEntryOutputLog."Output Type" in [POSEntryOutputLog."Output Type"::SalesReceipt, POSEntryOutputLog."Output Type"::LargeSalesReceipt] then begin
             POSEntryOutputLog2.SetRange("POS Entry No.", POSEntry."Entry No.");
             POSEntryOutputLog2.SetRange("Output Method", POSEntryOutputLog2."Output Method"::Print);
             POSEntryOutputLog2.SetFilter("Output Type", '=%1|=%2', POSEntryOutputLog2."Output Type"::SalesReceipt, POSEntryOutputLog2."Output Type"::LargeSalesReceipt);
             POSEntryOutputLog2.SetFilter("Entry No.", '<>%1', POSEntryOutputLog."Entry No.");
-            IsReprint := not POSEntryOutputLog2.IsEmpty;
+            IsReprint := not POSEntryOutputLog2.IsEmpty();
             if IsReprint then
                 POSAuditLogMgt.CreateEntry(POSEntryOutputLog.RecordId, POSAuditLog."Action Type"::RECEIPT_COPY, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.")
             else

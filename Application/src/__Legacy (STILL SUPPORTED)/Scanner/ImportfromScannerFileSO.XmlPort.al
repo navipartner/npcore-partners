@@ -28,8 +28,6 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
                 }
 
                 trigger OnBeforeInsertRecord()
-                var
-                    RecRef: RecordRef;
                 begin
                     ImportSalesLine(SalesHeader);
                 end;
@@ -73,12 +71,12 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindLast then
+        if SalesLine.FindLast() then
             NextLineNo := SalesLine."Line No." + 10000
         else
             NextLineNo := 10000;
 
-        SalesLine.Init;
+        SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := NextLineNo;
@@ -92,6 +90,6 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
         Evaluate(Qty, quantity);
         SalesLine.Validate(Quantity, Qty);
 
-        SalesLine.Insert;
+        SalesLine.Insert();
     end;
 }

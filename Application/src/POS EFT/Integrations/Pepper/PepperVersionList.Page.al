@@ -19,12 +19,12 @@ page 6184496 "NPR Pepper Version List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -35,7 +35,7 @@ page 6184496 "NPR Pepper Version List"
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasInstallFile field';
                 }
-                field("Pepper DLL Version"; "Pepper DLL Version")
+                field("Pepper DLL Version"; Rec."Pepper DLL Version")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -71,7 +71,7 @@ page 6184496 "NPR Pepper Version List"
 
                     trigger OnAction()
                     begin
-                        UploadZipFile(0);
+                        Rec.UploadZipFile(0);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -87,7 +87,7 @@ page 6184496 "NPR Pepper Version List"
 
                     trigger OnAction()
                     begin
-                        ClearZipFile(0);
+                        Rec.ClearZipFile(0);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -103,7 +103,7 @@ page 6184496 "NPR Pepper Version List"
 
                     trigger OnAction()
                     begin
-                        ExportZipFile(0);
+                        Rec.ExportZipFile(0);
                     end;
                 }
             }

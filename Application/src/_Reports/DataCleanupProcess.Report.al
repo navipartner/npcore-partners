@@ -1,8 +1,8 @@
 report 6060102 "NPR Data Cleanup Process"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Data Cleanup Process';
     dataset
@@ -33,8 +33,8 @@ report 6060102 "NPR Data Cleanup Process"
             }
 
             trigger OnAfterGetRecord()
-    var
-        SuccessLbl: Label 'SUCCESS';
+            var
+                SuccessLbl: Label 'SUCCESS';
             begin
 
                 DataCleanupCVI2.Get("Data Cleanup GCVI"."Cleanup Action", "Data Cleanup GCVI".Type, "Data Cleanup GCVI"."No.");
@@ -54,7 +54,7 @@ report 6060102 "NPR Data Cleanup Process"
                 if (not ProcessResult) or (ProcessResult and ("Data Cleanup GCVI".Type = "Data Cleanup GCVI"."Cleanup Action"::Delete)) then begin
                     DataCleanupCVI2.Retries := DataCleanupCVI2.Retries + 1;
                     DataCleanupCVI2.Modify(true);
-                    Commit;
+                    Commit();
                 end else begin
                     DataCleanupCVI2.Get("Data Cleanup GCVI"."Cleanup Action", "Data Cleanup GCVI".Type, "Data Cleanup GCVI"."NewNo.");
 
@@ -66,7 +66,7 @@ report 6060102 "NPR Data Cleanup Process"
 
                     DataCleanupCVI2.Retries := DataCleanupCVI2.Retries + 1;
                     DataCleanupCVI2.Modify(true);
-                    Commit;
+                    Commit();
                 end;
             end;
 

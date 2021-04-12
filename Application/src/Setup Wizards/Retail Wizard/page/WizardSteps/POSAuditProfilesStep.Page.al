@@ -12,17 +12,17 @@ page 6014654 "NPR POS Audit Profiles Step"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSAuditProfile(ExistingAuditProfiles, Code);
+                        CheckIfNoAvailableInPOSAuditProfile(ExistingAuditProfiles, Rec.Code);
                     end;
                 }
-                field("Sale Fiscal No. Series"; "Sale Fiscal No. Series")
+                field("Sale Fiscal No. Series"; Rec."Sale Fiscal No. Series")
                 {
                     ApplicationArea = All;
 
@@ -33,18 +33,18 @@ page 6014654 "NPR POS Audit Profiles Step"
                     begin
                         NoSeriesList.LookupMode := true;
 
-                        IF "Sale Fiscal No. Series" <> '' then
-                            if NoSeries.Get("Sale Fiscal No. Series") then
+                        IF Rec."Sale Fiscal No. Series" <> '' then
+                            if NoSeries.Get(Rec."Sale Fiscal No. Series") then
                                 NoSeriesList.SetRecord(NoSeries);
 
                         if NoSeriesList.RunModal() = Action::LookupOK then begin
                             NoSeriesList.GetRecord(NoSeries);
-                            "Sale Fiscal No. Series" := NoSeries.Code;
+                            Rec."Sale Fiscal No. Series" := NoSeries.Code;
                             NoSeries.TestField("Default Nos.", true);
                         end;
                     end;
                 }
-                field("Credit Sale Fiscal No. Series"; "Credit Sale Fiscal No. Series")
+                field("Credit Sale Fiscal No. Series"; Rec."Credit Sale Fiscal No. Series")
                 {
                     ApplicationArea = All;
 
@@ -55,18 +55,18 @@ page 6014654 "NPR POS Audit Profiles Step"
                     begin
                         NoSeriesList.LookupMode := true;
 
-                        if "Credit Sale Fiscal No. Series" <> '' then
-                            if NoSeries.Get("Credit Sale Fiscal No. Series") then
+                        if Rec."Credit Sale Fiscal No. Series" <> '' then
+                            if NoSeries.Get(Rec."Credit Sale Fiscal No. Series") then
                                 NoSeriesList.SetRecord(NoSeries);
 
                         if NoSeriesList.RunModal() = Action::LookupOK then begin
                             NoSeriesList.GetRecord(NoSeries);
-                            "Credit Sale Fiscal No. Series" := NoSeries.Code;
+                            Rec."Credit Sale Fiscal No. Series" := NoSeries.Code;
                             NoSeries.TestField("Default Nos.", true);
                         end;
                     end;
                 }
-                field("Balancing Fiscal No. Series"; "Balancing Fiscal No. Series")
+                field("Balancing Fiscal No. Series"; Rec."Balancing Fiscal No. Series")
                 {
                     ApplicationArea = All;
 
@@ -77,22 +77,22 @@ page 6014654 "NPR POS Audit Profiles Step"
                     begin
                         NoSeriesList.LookupMode := true;
 
-                        IF "Balancing Fiscal No. Series" <> '' then
-                            if NoSeries.Get("Balancing Fiscal No. Series") then
+                        IF Rec."Balancing Fiscal No. Series" <> '' then
+                            if NoSeries.Get(Rec."Balancing Fiscal No. Series") then
                                 NoSeriesList.SetRecord(NoSeries);
 
                         if NoSeriesList.RunModal() = Action::LookupOK then begin
                             NoSeriesList.GetRecord(NoSeries);
-                            "Balancing Fiscal No. Series" := NoSeries.Code;
+                            Rec."Balancing Fiscal No. Series" := NoSeries.Code;
                             NoSeries.TestField("Default Nos.", true);
                         end;
                     end;
                 }
-                field("Fill Sale Fiscal No. On"; "Fill Sale Fiscal No. On")
+                field("Fill Sale Fiscal No. On"; Rec."Fill Sale Fiscal No. On")
                 {
                     ApplicationArea = All;
                 }
-                field("Sales Ticket No. Series"; "Sales Ticket No. Series")
+                field("Sales Ticket No. Series"; Rec."Sales Ticket No. Series")
                 {
                     ApplicationArea = All;
                     Lookup = true;
@@ -104,22 +104,22 @@ page 6014654 "NPR POS Audit Profiles Step"
                     begin
                         NoSeriesList.LookupMode := true;
 
-                        IF "Sales Ticket No. Series" <> '' then
-                            if NoSeries.Get("Sales Ticket No. Series") then
+                        IF Rec."Sales Ticket No. Series" <> '' then
+                            if NoSeries.Get(Rec."Sales Ticket No. Series") then
                                 NoSeriesList.SetRecord(NoSeries);
 
                         if NoSeriesList.RunModal() = Action::LookupOK then begin
                             NoSeriesList.GetRecord(NoSeries);
-                            "Sales Ticket No. Series" := NoSeries.Code;
+                            Rec."Sales Ticket No. Series" := NoSeries.Code;
                             NoSeries.TestField("Default Nos.", true);
                         end;
                     end;
                 }
-                field("Audit Log Enabled"; "Audit Log Enabled")
+                field("Audit Log Enabled"; Rec."Audit Log Enabled")
                 {
                     ApplicationArea = All;
                 }
-                field("Audit Handler"; "Audit Handler")
+                field("Audit Handler"; Rec."Audit Handler")
                 {
                     ApplicationArea = All;
 
@@ -133,19 +133,19 @@ page 6014654 "NPR POS Audit Profiles Step"
                         Rec.TransferFields(POSAuditProfile);
                     end;
                 }
-                field("Allow Zero Amount Sales"; "Allow Zero Amount Sales")
+                field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")
                 {
                     ApplicationArea = All;
                 }
-                field("Print Receipt On Sale Cancel"; "Print Receipt On Sale Cancel")
+                field("Print Receipt On Sale Cancel"; Rec."Print Receipt On Sale Cancel")
                 {
                     ApplicationArea = All;
                 }
-                field("Do Not Print Receipt on Sale"; "Do Not Print Receipt on Sale")
+                field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
                 {
                     ApplicationArea = All;
                 }
-                field("Allow Printing Receipt Copy"; "Allow Printing Receipt Copy")
+                field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {
                     ApplicationArea = All;
                 }

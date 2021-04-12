@@ -49,7 +49,7 @@ page 6059826 "NPR Trx Email Setup Card"
                 Caption = 'Test Connection';
                 Image = Link;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Test Connection action';
 

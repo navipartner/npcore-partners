@@ -23,7 +23,7 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
             exit;
 
         if not WebService.Get(WebService."Object Type"::Codeunit, 'global_voucher_service') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Object ID" := GlobalVoucherWsCodeunitId();
             WebService."Service Name" := 'global_voucher_service';
@@ -81,7 +81,7 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
         ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
         if XmlDocument.ReadFrom(ErrorMessage, Document) then
             if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                ErrorMessage := Node.AsXmlElement.InnerText();
+                ErrorMessage := Node.AsXmlElement().InnerText();
         Error(CopyStr(ErrorMessage, 1, 1000));
     end;
 

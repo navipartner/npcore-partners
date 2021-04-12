@@ -223,12 +223,12 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
     var
         Customer: Record Customer;
     begin
-        TmpBillAgingBandBufferY2D.DeleteAll;
-        TmpBillAgingBandBufferCQ.DeleteAll;
-        TmpBillAgingBandBufferCM.DeleteAll;
-        TmpSellAgingBandBufferY2D.DeleteAll;
-        TmpSellAgingBandBufferCQ.DeleteAll;
-        TmpSellAgingBandBufferCM.DeleteAll;
+        TmpBillAgingBandBufferY2D.DeleteAll();
+        TmpBillAgingBandBufferCQ.DeleteAll();
+        TmpBillAgingBandBufferCM.DeleteAll();
+        TmpSellAgingBandBufferY2D.DeleteAll();
+        TmpSellAgingBandBufferCQ.DeleteAll();
+        TmpSellAgingBandBufferCM.DeleteAll();
 
         if (SalesPersonCode <> '') then
             Customer.SetFilter("Salesperson Code", '=%1', SalesPersonCode);
@@ -268,13 +268,13 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
 
         until (Customer.Next() = 0);
 
-        TmpBillAgingBandBufferY2D.Insert;
-        TmpBillAgingBandBufferCQ.Insert;
-        TmpBillAgingBandBufferCM.Insert;
+        TmpBillAgingBandBufferY2D.Insert();
+        TmpBillAgingBandBufferCQ.Insert();
+        TmpBillAgingBandBufferCM.Insert();
 
-        TmpSellAgingBandBufferY2D.Insert;
-        TmpSellAgingBandBufferCQ.Insert;
-        TmpSellAgingBandBufferCM.Insert;
+        TmpSellAgingBandBufferY2D.Insert();
+        TmpSellAgingBandBufferCQ.Insert();
+        TmpSellAgingBandBufferCM.Insert();
     end;
 
     local procedure CalculateBudgetAmount(CustomerNo: Code[20]; DateFilter: Text) SalesAmount: Decimal
@@ -287,10 +287,10 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         ItemBudgetEntry.SetFilter(Date, DateFilter);
         ItemBudgetEntry.SetRange("Source Type", ItemBudgetEntry."Source Type"::Customer);
         ItemBudgetEntry.SetRange("Source No.", CustomerNo);
-        if ItemBudgetEntry.FindSet then
+        if ItemBudgetEntry.FindSet() then
             repeat
                 SalesAmount += ItemBudgetEntry."Sales Amount";
-            until ItemBudgetEntry.Next = 0;
+            until ItemBudgetEntry.Next() = 0;
         exit(SalesAmount);
     end;
 
@@ -301,7 +301,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
 
         Customer.SetRange("No.", CustomerNo);
         Customer.SetFilter("Date Filter", DateFilter);
-        if Customer.FindFirst then begin
+        if Customer.FindFirst() then begin
             Customer.CalcFields("Net Change (LCY)");
             exit(Customer."Net Change (LCY)");
         end;
@@ -319,15 +319,15 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         else
             SalesLine.SetRange("Sell-to Customer No.", CustomerNo);
         SalesLine.SetFilter("Requested Delivery Date", DateFilter);
-        if SalesLine.FindSet then
+        if SalesLine.FindSet() then
             repeat
                 OutstandingAmt += CalculateOutstAmtExclVAT(SalesLine);
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
         SalesLine.SetRange("Requested Delivery Date", 0D);
-        if SalesLine.FindSet then
+        if SalesLine.FindSet() then
             repeat
                 OutstandingAmt += CalculateOutstAmtExclVAT(SalesLine);
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
         exit(OutstandingAmt);
     end;
 
@@ -345,7 +345,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         EndDate := CalcDate('<CY>', Today);
         ItemBudgetEntry.SetFilter(Date, '%1..%2', StartDate, EndDate);
         ItemBudgetEntry.SetRange("Source Type", ItemBudgetEntry."Source Type"::Customer);
-        if ItemBudgetEntry.FindFirst then
+        if ItemBudgetEntry.FindFirst() then
             exit(ItemBudgetEntry."Budget Name");
         exit('');
     end;
@@ -359,7 +359,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         EndDate := CalcDate('<CY>', Today);
         Date.SetRange("Period Type", Date."Period Type"::Year);
         Date.SetRange("Period End", ClosingDate(EndDate));
-        if Date.FindFirst then
+        if Date.FindFirst() then
             exit(StrSubstNo('%1..%2', Date."Period Start", Today));
     end;
 
@@ -372,7 +372,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         EndDate := CalcDate('<CQ>', Today);
         Date.SetRange("Period Type", Date."Period Type"::Quarter);
         Date.SetRange("Period End", ClosingDate(EndDate));
-        if Date.FindFirst then
+        if Date.FindFirst() then
             exit(StrSubstNo('%1..%2', Date."Period Start", EndDate));
     end;
 
@@ -385,7 +385,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         EndDate := CalcDate('<CM>', Today);
         Date.SetRange("Period Type", Date."Period Type"::Month);
         Date.SetRange("Period End", ClosingDate(EndDate));
-        if Date.FindFirst then
+        if Date.FindFirst() then
             exit(StrSubstNo('%1..%2', Date."Period Start", EndDate));
     end;
 

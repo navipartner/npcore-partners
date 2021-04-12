@@ -89,7 +89,7 @@ codeunit 6151535 "NPR Package Assert Error"
         SalesShptHdrNo: Code[20];
         IsShipment: Boolean;
         DocTypeAsInteger: Integer;
-        ResponseMessage, ErrorText : Text;
+        ResponseMessage: Text;
     begin
         ReadArgsForShipmentDocumentAddEntryDocPakkelabelsDKMgnt(JObject, IsShipment, DocTypeAsInteger, SalesShptHdrNo);
 

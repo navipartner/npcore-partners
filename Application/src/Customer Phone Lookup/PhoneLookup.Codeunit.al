@@ -21,7 +21,7 @@ codeunit 6014437 "NPR Phone Lookup"
 
         CODEUNIT.Run(IComm."Number Info Codeunit ID", TempPhoneLookupBuffer);
 
-        case TempPhoneLookupBuffer.Count of
+        case TempPhoneLookupBuffer.Count() of
             0:
                 exit(false);
             1:
@@ -37,7 +37,6 @@ codeunit 6014437 "NPR Phone Lookup"
     [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure ContactOnValidateNo(var Rec: Record Contact; var xRec: Record Contact; CurrFieldNo: Integer)
     var
-        ConfigTemplateHeader: Record "Config. Template Header";
         Cont: Record Contact;
         TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
@@ -60,14 +59,13 @@ codeunit 6014437 "NPR Phone Lookup"
         if not RunTrigger then
             exit;
 
-        Rec."Last Date Modified" := Today;
+        Rec."Last Date Modified" := Today();
         Rec.Modify(false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure CustomerOnValidateNo(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     var
-        ConfigTemplateHeader: Record "Config. Template Header";
         Cust: Record Customer;
         TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
@@ -90,7 +88,7 @@ codeunit 6014437 "NPR Phone Lookup"
         if not RunTrigger then
             exit;
 
-        Rec."Last Date Modified" := Today;
+        Rec."Last Date Modified" := Today();
         Rec.Modify(false);
     end;
 
@@ -98,7 +96,6 @@ codeunit 6014437 "NPR Phone Lookup"
     [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure VendorOnValidateNo(var Rec: Record Vendor; var xRec: Record Vendor; CurrFieldNo: Integer)
     var
-        ConfigTemplateHeader: Record "Config. Template Header";
         TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
         Vend: Record Vendor;
     begin
@@ -121,7 +118,7 @@ codeunit 6014437 "NPR Phone Lookup"
         if not RunTrigger then
             exit;
 
-        Rec."Last Date Modified" := Today;
+        Rec."Last Date Modified" := Today();
         Rec.Modify(false);
     end;
 
@@ -229,7 +226,6 @@ codeunit 6014437 "NPR Phone Lookup"
     local procedure CreateCustomer(var TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
     var
         Customer: Record Customer;
-        MarketingSetup: Record "Marketing Setup";
     begin
         if Customer.Get(TempTDCNamesNumbersBuffer."Phone No.") then
             exit;
@@ -275,14 +271,13 @@ codeunit 6014437 "NPR Phone Lookup"
         Commit();
 
         if (TempTDCNamesNumbersBuffer."Create Contact") and (not TempTDCNamesNumbersBuffer."Create Customer") then begin
-            Contact.SetRecFilter;
+            Contact.SetRecFilter();
             if (PAGE.RunModal(PAGE::"Contact Card", Contact) = ACTION::OK) then;
         end;
     end;
 
     local procedure CreateContactBusinessRel(TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary; LinkToTable: Enum "Contact Business Relation Link To Table")
     var
-        Contact: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
     begin
         if ContactBusinessRelation.Get(TempTDCNamesNumbersBuffer."Phone No.", '') then
@@ -318,7 +313,7 @@ codeunit 6014437 "NPR Phone Lookup"
         Commit();
 
 
-        Vendor.SetRecFilter;
+        Vendor.SetRecFilter();
         if (PAGE.RunModal(PAGE::"Vendor Card", Vendor) = ACTION::OK) then;
     end;
 
@@ -326,7 +321,7 @@ codeunit 6014437 "NPR Phone Lookup"
     begin
         if not Initialized then begin
             Initialized := true;
-            if not IComm.Get then
+            if not IComm.Get() then
                 exit(false);
         end;
 

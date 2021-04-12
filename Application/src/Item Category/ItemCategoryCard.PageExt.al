@@ -1,4 +1,4 @@
-﻿pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
+pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
 {
     layout
     {
@@ -144,7 +144,7 @@
                         VATPostingSetup: Record "VAT Posting Setup";
                         MissingSettingsErr: Label 'Enter VAT posting settings on item category card!';
                     begin
-                        if VATPostingSetup.Get("NPR VAT Bus. Posting Group", "NPR VAT Prod. Posting Group") then
+                        if VATPostingSetup.Get(Rec."NPR VAT Bus. Posting Group", Rec."NPR VAT Prod. Posting Group") then
                             PAGE.RunModal(PAGE::"VAT Posting Setup Card", VATPostingSetup)
                         else
                             Error(MissingSettingsErr);

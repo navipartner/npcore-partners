@@ -51,7 +51,7 @@ table 6059940 "NPR SMS Template Header"
                 Field.SetRange(TableNo, "Table No.");
                 SMSFieldList.LookupMode := true;
                 SMSFieldList.SetTableView(Field);
-                if SMSFieldList.RunModal = ACTION::OK then begin
+                if SMSFieldList.RunModal() = ACTION::OK then begin
                     SMSFieldList.GetRecord(Field);
                     Recipient := StrSubstNo('{%1}', Field."No.");
                 end;
@@ -93,7 +93,7 @@ table 6059940 "NPR SMS Template Header"
         SMSTemplateLine: Record "NPR SMS Template Line";
     begin
         SMSTemplateLine.SetRange("Template Code", Code);
-        SMSTemplateLine.DeleteAll;
+        SMSTemplateLine.DeleteAll();
     end;
 
     trigger OnModify()
@@ -129,7 +129,7 @@ table 6059940 "NPR SMS Template Header"
     var
         FiltersInStream: InStream;
     begin
-        if "Table Filters".HasValue then begin
+        if "Table Filters".HasValue() then begin
             CalcFields("Table Filters");
             "Table Filters".CreateInStream(FiltersInStream);
             FiltersInStream.Read(Filters);
@@ -171,7 +171,7 @@ table 6059940 "NPR SMS Template Header"
                 exit(false);
 
         FilterPageBuilder.PageCaption := StrSubstNo(SMSFilterCaption, TableMetadata.Caption);
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         ReturnFilters :=

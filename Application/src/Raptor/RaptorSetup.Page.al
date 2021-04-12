@@ -1,4 +1,4 @@
-page 6151491 "NPR Raptor Setup"
+﻿page 6151491 "NPR Raptor Setup"
 {
     // NPR5.51/CLVA/20190710 CASE 355871 Object created
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
@@ -22,22 +22,22 @@ page 6151491 "NPR Raptor Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Enable Raptor Functions"; "Enable Raptor Functions")
+                field("Enable Raptor Functions"; Rec."Enable Raptor Functions")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enable Raptor Functions field';
                 }
-                field("Base Url"; "Base Url")
+                field("Base Url"; Rec."Base Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Base Url field';
                 }
-                field("Customer ID"; "Customer ID")
+                field("Customer ID"; Rec."Customer ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer ID field';
                 }
-                field("API Key"; "API Key")
+                field("API Key"; Rec."API Key")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the API Key field';
@@ -46,38 +46,38 @@ page 6151491 "NPR Raptor Setup"
             group(Tracking)
             {
                 Caption = 'Tracking';
-                field("Send Data to Raptor"; "Send Data to Raptor")
+                field("Send Data to Raptor"; Rec."Send Data to Raptor")
                 {
                     ApplicationArea = All;
-                    Enabled = "Enable Raptor Functions";
+                    Enabled = Rec."Enable Raptor Functions";
                     ToolTip = 'Specifies the value of the Send Data to Raptor field';
                 }
-                field("Tracking Service Url"; "Tracking Service Url")
+                field("Tracking Service Url"; Rec."Tracking Service Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tracking Service Url field';
                 }
-                field("Tracking Service Type"; "Tracking Service Type")
+                field("Tracking Service Type"; Rec."Tracking Service Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tracking Service Type field';
                 }
-                field("Exclude Webshop Sales"; "Exclude Webshop Sales")
+                field("Exclude Webshop Sales"; Rec."Exclude Webshop Sales")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Exclude Webshop Sales field';
                 }
-                field("Webshop Salesperson Filter"; "Webshop Salesperson Filter")
+                field("Webshop Salesperson Filter"; Rec."Webshop Salesperson Filter")
                 {
                     ApplicationArea = All;
-                    Enabled = "Exclude Webshop Sales";
+                    Enabled = Rec."Exclude Webshop Sales";
                     ToolTip = 'Specifies the value of the Webshop Salesperson Filter field';
 
                     trigger OnAssistEdit()
                     var
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-                        RaptorMgt.SelectWebShopSalespersons("Webshop Salesperson Filter");  //NPR5.55 [400925]
+                        RaptorMgt.SelectWebShopSalespersons(Rec."Webshop Salesperson Filter");  //NPR5.55 [400925]
                     end;
                 }
             }
@@ -93,7 +93,7 @@ page 6151491 "NPR Raptor Setup"
                 Caption = 'Set up Raptor Actions';
                 Image = XMLSetup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Raptor Actions";
@@ -109,16 +109,16 @@ page 6151491 "NPR Raptor Setup"
 
                 trigger OnAction()
                 begin
-                    InitUrls(true);
+                    Rec.InitUrls(true);
                 end;
             }
             action(JobQueueEntry)
             {
                 Caption = 'Job Queue Entry';
-                Enabled = "Send Data to Raptor";
+                Enabled = Rec."Send Data to Raptor";
                 Image = JobListSetup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'View or edit the job that sends tracking data to Raptor. For example, you can see the status or change when and how often the data is sent.';
                 ApplicationArea = All;
@@ -137,10 +137,10 @@ page 6151491 "NPR Raptor Setup"
     var
         RaptorManagement: Codeunit "NPR Raptor Management";
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert(true);
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert(true);
             RaptorManagement.InitializeDefaultActions(false, false);
         end;
     end;

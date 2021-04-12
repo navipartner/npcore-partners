@@ -4,7 +4,7 @@ page 6060060 "NPR Item Worksh. Vrty. Mapping"
     PageType = List;
     SourceTable = "NPR Item Worksh. Vrty Mapping";
     UsageCategory = Lists;
-    ApplicationArea = All; 
+    ApplicationArea = All;
     layout
     {
         area(content)

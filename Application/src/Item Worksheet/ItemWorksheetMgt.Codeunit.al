@@ -23,7 +23,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
     begin
         JnlSelected := true;
 
-        case ItemWorksheetTemplate.Count of
+        case ItemWorksheetTemplate.Count() of
             0:
                 begin
                     ItemWorksheetTemplate.Init();
@@ -31,7 +31,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
                     Commit();
                 end;
             1:
-                ItemWorksheetTemplate.FindFirst;
+                ItemWorksheetTemplate.FindFirst();
             else
                 JnlSelected := PAGE.RunModal(0, ItemWorksheetTemplate) = ACTION::LookupOK;
         end;
@@ -97,9 +97,9 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
         JnlSelected := true;
         if ItemWorksheet.GetFilter("Item Template Name") <> '' then
             ItemWorksheetTemplate.SetRange(Name, ItemWorksheet.GetFilter("Item Template Name"));
-        case ItemWorksheetTemplate.Count of
+        case ItemWorksheetTemplate.Count() of
             1:
-                ItemWorksheetTemplate.FindFirst;
+                ItemWorksheetTemplate.FindFirst();
             else
                 JnlSelected := PAGE.RunModal(0, ItemWorksheetTemplate) = ACTION::LookupOK;
         end;
@@ -204,7 +204,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
         ItemWorksheetLine.SetFilter("Worksheet Template Name", '=%1', ItemWorksheet."Item Template Name");
         ItemWorksheetLine.SetFilter("Worksheet Name", '=%1', ItemWorksheet.Name);
         LineCount := 0;
-        NoOfRecords := ItemWorksheetLine.Count;
+        NoOfRecords := ItemWorksheetLine.Count();
         if GuiAllowed then
             Window.Open(CheckingLinesLbl);
         if ItemWorksheetLine.FindSet() then
@@ -222,10 +222,10 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
                     CombineLine(ItemWorksheetLine, CombineBy);
             until ItemWorksheetLine.Next() = 0;
         if GuiAllowed then
-            Window.Close;
+            Window.Close();
         Commit();
         if GuiAllowed then begin
-            NoOfRecords := ItemWorksheetLine.Count;
+            NoOfRecords := ItemWorksheetLine.Count();
             Window.Open(UpdatingHeaderslbl);
         end;
         LineCount := 0;
@@ -350,10 +350,10 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
                         ItemWorksheetVarietyValue.Type := ItemWorksheetVarietyValue2.Type;
                         ItemWorksheetVarietyValue.Table := ItemWorksheetVarietyValue2.Table;
                         ItemWorksheetVarietyValue.Value := ItemWorksheetVarietyValue2.Value;
-                        if ItemWorksheetVarietyValue.Insert then;
+                        if ItemWorksheetVarietyValue.Insert() then;
                     until ItemWorksheetVarietyValue2.Next() = 0;
             until ItemWorksheetLine2.Next() = 0;
-        LineCount := LineCount + ItemWorksheetLine2.Count;
+        LineCount := LineCount + ItemWorksheetLine2.Count();
         //+NPR5.22
         ItemWorksheetLine2.DeleteAll(true);
     end;
@@ -365,7 +365,6 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
         "Key": Record "Key";
         MissingSetupRecord: Record "NPR Missing Setup Record";
         MissingSetupTable: Record "NPR Missing Setup Table";
-        ObjectRecord: Record "Object";
         RecRef: RecordRef;
         RelatedRecRef: RecordRef;
         FieldR: FieldRef;
@@ -395,7 +394,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
                         MissingSetupTable."Related Table ID" := FieldRecord.RelationTableNo;
                         MissingSetupTable."Related Field No." := FieldRecord.RelationFieldNo;
                         MissingSetupTable."Create New" := not MultipleFieldsinPrimaryKey;
-                        if MissingSetupTable.Insert then;
+                        if MissingSetupTable.Insert() then;
                         RecRef.Open(AllObj."Object ID");
                         if RecRef.FindSet() then
                             repeat
@@ -426,7 +425,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
                                         MissingSetupRecord."Related Table ID" := FieldRecord.RelationTableNo;
                                         MissingSetupRecord."Related Field No." := RelatedFieldRef.Number;
                                         MissingSetupRecord.Value := FieldR.Value;
-                                        if MissingSetupRecord.Insert then;
+                                        if MissingSetupRecord.Insert() then;
                                     end;
                                 end;
                                 RelatedRecRef.Close();
@@ -748,7 +747,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
             repeat
                 //Find the setup on Template, Worksheet or General
                 ItemWorksheetFieldSetup.SetRange("Field Number", ItemWorksheetFieldSetup."Field Number");
-                ItemWorksheetFieldSetup.FindLast;
+                ItemWorksheetFieldSetup.FindLast();
                 ItemWorksheetFieldSetup.SetRange("Field Number");
                 ItemWorksheetExcelColumn.Reset();
                 ItemWorksheetExcelColumn.SetRange("Worksheet Template Name", ItemWorksheetTemplate);

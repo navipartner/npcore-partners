@@ -111,10 +111,10 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
         SkipVariousItemsLbl: Label 'SKIPVARIOUSITEMS';
     begin
         DataLogMgt.DisableDataLog(true);
-        ItemApplnEntry.LockTable;
+        ItemApplnEntry.LockTable();
         if not ItemApplnEntry.FindLast() then
             exit;
-        ItemLedgEntry.LockTable;
+        ItemLedgEntry.LockTable();
         if not ItemLedgEntry.FindLast() then
             exit;
         AvgCostAdjmtEntryPoint.LockTable();

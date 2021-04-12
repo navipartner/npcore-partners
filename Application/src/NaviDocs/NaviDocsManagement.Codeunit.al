@@ -1,11 +1,11 @@
-codeunit 6059767 "NPR NaviDocs Management"
+﻿codeunit 6059767 "NPR NaviDocs Management"
 {
     TableNo = "NPR NaviDocs Entry";
 
     trigger OnRun()
     var
     begin
-        if not (NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs" and (Rec.Status <> 2)) then
+        if not (NaviDocsSetup.Get() and NaviDocsSetup."Enable NaviDocs" and (Rec.Status <> 2)) then
             exit;
         if (Rec."Delay sending until" <> 0DT) and (Rec."Delay sending until" > CurrentDateTime) then
             exit;
@@ -38,7 +38,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         ManagementStatus: Boolean;
 
     begin
-        if not (NaviDocsSetup.Get and
+        if not (NaviDocsSetup.Get() and
                 NaviDocsSetup."Enable NaviDocs" and
                 (NaviDocsEntry.Status <> 2)) then
             exit;
@@ -47,7 +47,7 @@ codeunit 6059767 "NPR NaviDocs Management"
 
         NaviDocsEntry."Processed Qty." += 1;
         NaviDocsEntry.Status := 1;
-        NaviDocsEntry.Modify;
+        NaviDocsEntry.Modify();
         Commit();
         ManagementStatus := NaviDocsManagement.Run(NaviDocsEntry);
         if (not ManagementStatus) and (GetLastErrorText <> '') then begin
@@ -68,24 +68,17 @@ codeunit 6059767 "NPR NaviDocs Management"
     var
         TempHandlingProfile: Record "NPR NaviDocs Handling Profile" temporary;
     begin
-        if not NaviDocsSetup.Get then
+        if not NaviDocsSetup.Get() then
             exit;
         OnAddHandlingProfilesToLibrary;
         GetMasterTableHandlingProfiles(RecRef, TempHandlingProfile);
-        if TempHandlingProfile.FindSet then
+        if TempHandlingProfile.FindSet() then
             repeat
                 AddDocumentEntryWithHandlingProfile(RecRef, TempHandlingProfile.Code, ReportNo, TempHandlingProfile.Description, 0DT);
-            until TempHandlingProfile.Next = 0;
+            until TempHandlingProfile.Next() = 0;
     end;
 
     procedure AddDocumentEntryWithHandlingProfile(RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text; DelayUntil: DateTime)
-    var
-        NaviDocsEntry: Record "NPR NaviDocs Entry";
-        TableMetadata: Record "Table Metadata";
-        InsertIsHandled: Boolean;
-        PrimaryKey: KeyRef;
-        I: Integer;
-        DocType: Integer;
     begin
         AddDocumentEntryWithHandlingProfileExt(RecRef, HandlingProfile, ReportNo, Recipient, '', DelayUntil);
     end;
@@ -97,10 +90,9 @@ codeunit 6059767 "NPR NaviDocs Management"
         InsertIsHandled: Boolean;
         PrimaryKey: KeyRef;
         I: Integer;
-        DocType: Integer;
         InsertedEntryNo: BigInteger;
     begin
-        if not NaviDocsSetup.Get then
+        if not NaviDocsSetup.Get() then
             exit;
         if not NaviDocsSetup."Enable NaviDocs" then
             exit;
@@ -114,7 +106,7 @@ codeunit 6059767 "NPR NaviDocs Management"
             exit(InsertedEntryNo);
 
         if RecRef.Get(RecRef.RecordId) then begin
-            NaviDocsEntry.Init;
+            NaviDocsEntry.Init();
             NaviDocsEntry."Entry No." := 0;
             NaviDocsEntry.Validate("Record ID", RecRef.RecordId);
 
@@ -150,13 +142,13 @@ codeunit 6059767 "NPR NaviDocs Management"
         NewEntryNo := AddDocumentEntryWithHandlingProfileExt(RecRef, HandlingProfile, ReportNo, Recipient, TemplateCode, DelayUntil);
         if NewEntryNo = 0 then
             exit(false);
-        if Attachments.FindSet then
+        if Attachments.FindSet() then
             repeat
                 Attachments.CalcFields(Data);
                 NaviDocsEntryAttachment := Attachments;
                 NaviDocsEntryAttachment."NaviDocs Entry No." := NewEntryNo;
                 NaviDocsEntryAttachment.Insert(true);
-            until Attachments.Next = 0;
+            until Attachments.Next() = 0;
     end;
 
     local procedure TransferFromTable(var NaviDocsEntry: Record "NPR NaviDocs Entry"; RecRef: RecordRef)
@@ -367,24 +359,13 @@ codeunit 6059767 "NPR NaviDocs Management"
     var
         Error002: Label 'Posted Sales Invoice %1 does not exist!';
         Succes001: Label 'Handled succesfully by %1.';
-        Customer: Record Customer;
-        Vendor: Record Vendor;
-        IssuedReminderHeader: Record "Issued Reminder Header";
-        IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
-        SalesShipmentHeader: Record "Sales Shipment Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        SalesHeader: Record "Sales Header";
-        PurchHeader: Record "Purchase Header";
-        PurchInvoiceHeader: Record "Purch. Inv. Header";
-        PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
         NaviDocsHandlingProfile: Record "NPR NaviDocs Handling Profile";
         RecRef: RecordRef;
         ReportID: Integer;
         IsDocHandled: Boolean;
         ErrorMessage: Text;
     begin
-        if not (NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs") then
+        if not (NaviDocsSetup.Get() and NaviDocsSetup."Enable NaviDocs") then
             exit(false);
 
         if (NaviDocsEntry."Delay sending until" <> 0DT) and (NaviDocsEntry."Delay sending until" > CurrentDateTime) then
@@ -444,12 +425,9 @@ codeunit 6059767 "NPR NaviDocs Management"
 
     local procedure DocManagePrint(NaviDocsEntry: Record "NPR NaviDocs Entry"; RecRef: RecordRef; ReportID: Integer): Boolean
     var
-        ReportLayoutSelection: Record "Report Layout Selection";
-        CustomReportLayout: Record "Custom Report Layout";
         ErrorMessage: Text[1024];
-        UseCustomReportLayout: Boolean;
     begin
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         SetCustomReportLayout(RecRef, ReportID);
         ErrorMessage := PrintDoc(ReportID, false, false, RecRef);
         ClearCustomReportLayout;
@@ -462,12 +440,9 @@ codeunit 6059767 "NPR NaviDocs Management"
 
     local procedure DocManageMail(NaviDocsEntry: Record "NPR NaviDocs Entry"; RecRef: RecordRef; ReportID: Integer): Boolean
     var
-        ReportLayoutSelection: Record "Report Layout Selection";
-        CustomReportLayout: Record "Custom Report Layout";
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         EmailDocumentManagement: Codeunit "NPR E-mail Doc. Mgt.";
         ErrorMessage: Text[1024];
-        UseCustomReportLayout: Boolean;
     begin
         if NaviDocsEntry."E-mail (Recipient)" = '' then
             if ReportID <> 0 then
@@ -498,7 +473,6 @@ codeunit 6059767 "NPR NaviDocs Management"
     var
         Customer: Record Customer;
         CustomerDocumentSendingProfile: Record "Document Sending Profile";
-        ErrorMessage: Text[1024];
     begin
         if NaviDocsEntry."Type (Recipient)" <> NaviDocsEntry."Type (Recipient)"::Customer then begin
             InsertComment(NaviDocsEntry, StrSubstNo(Error015, NaviDocsEntry.FieldCaption("Type (Recipient)")), true);
@@ -527,7 +501,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         ReportDistributionManagement: Codeunit "Report Distribution Management";
         PostedDocumentVariant: Variant;
     begin
-        TempDocumentSendingProfile.Init;
+        TempDocumentSendingProfile.Init();
         TempDocumentSendingProfile."Electronic Document" := TempDocumentSendingProfile."Electronic Document"::"Through Document Exchange Service";
         TempDocumentSendingProfile."Electronic Format" := DocumentSendingProfile."Electronic Format";
 
@@ -551,7 +525,7 @@ codeunit 6059767 "NPR NaviDocs Management"
             CustomReportSelection.SetRange("Source Type", DATABASE::Customer);
             CustomReportSelection.SetRange("Source No.", Format(RecRef.Field(4).Value));
             CustomReportSelection.SetRange("Report ID", ReportID);
-            if CustomReportSelection.FindFirst then
+            if CustomReportSelection.FindFirst() then
                 if CustomReportSelection."Custom Report Layout Code" <> '' then
                     exit(CustomReportLayout.Get(CustomReportSelection."Custom Report Layout Code"));
         end;
@@ -577,7 +551,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         if NaviDocsHandlingProfile.Get(Code) then
             exit;
 
-        NaviDocsHandlingProfile.Init;
+        NaviDocsHandlingProfile.Init();
         NaviDocsHandlingProfile.Code := Code;
         NaviDocsHandlingProfile.Description := Description;
         NaviDocsHandlingProfile."Report Required" := ReportRequired;
@@ -602,7 +576,7 @@ codeunit 6059767 "NPR NaviDocs Management"
     begin
         if not TempHandlingProfiles.IsTemporary then
             Error(DevMsgNotTemporaryErr);
-        TempHandlingProfiles.DeleteAll;
+        TempHandlingProfiles.DeleteAll();
         CustomerNo := '';
 
         case RecRef.Number of
@@ -643,10 +617,10 @@ codeunit 6059767 "NPR NaviDocs Management"
 
         if DocumentSendingProfile.Printer <> DocumentSendingProfile.Printer::No then begin
             NaviDocsHandlingProfile.SetRange("Default for Print", true);
-            if NaviDocsHandlingProfile.FindFirst then begin
+            if NaviDocsHandlingProfile.FindFirst() then begin
                 TempHandlingProfiles := NaviDocsHandlingProfile;
                 TempHandlingProfiles.Description := '';
-                if TempHandlingProfiles.Insert then;
+                if TempHandlingProfiles.Insert() then;
             end;
             NaviDocsHandlingProfile.SetRange("Default for Print");
         end;
@@ -654,19 +628,19 @@ codeunit 6059767 "NPR NaviDocs Management"
             ((DocumentSendingProfile."E-Mail Attachment" = DocumentSendingProfile."E-Mail Attachment"::PDF) or
             (DocumentSendingProfile."E-Mail Attachment" = DocumentSendingProfile."E-Mail Attachment"::"PDF & Electronic Document")) then begin
             NaviDocsHandlingProfile.SetRange("Default for E-Mail", true);
-            if NaviDocsHandlingProfile.FindFirst then begin
+            if NaviDocsHandlingProfile.FindFirst() then begin
                 TempHandlingProfiles := NaviDocsHandlingProfile;
                 TempHandlingProfiles.Description := Customer."E-Mail";
-                if TempHandlingProfiles.Insert then;
+                if TempHandlingProfiles.Insert() then;
             end;
             NaviDocsHandlingProfile.SetRange("Default for E-Mail");
         end;
         if DocumentSendingProfile."Electronic Document" = DocumentSendingProfile."Electronic Document"::"Through Document Exchange Service" then begin
             NaviDocsHandlingProfile.SetRange("Default Electronic Document", true);
-            if NaviDocsHandlingProfile.FindFirst then begin
+            if NaviDocsHandlingProfile.FindFirst() then begin
                 TempHandlingProfiles := NaviDocsHandlingProfile;
                 TempHandlingProfiles.Description := Customer."No.";
-                if TempHandlingProfiles.Insert then;
+                if TempHandlingProfiles.Insert() then;
             end;
         end;
         exit(true);
@@ -675,13 +649,12 @@ codeunit 6059767 "NPR NaviDocs Management"
     local procedure GetVendorHandlingProfiles(RecRef: RecordRef; var TempHandlingProfiles: Record "NPR NaviDocs Handling Profile" temporary): Boolean
     var
         Vendor: Record Vendor;
-        DocumentSendingProfile: Record "Document Sending Profile";
         NaviDocsHandlingProfile: Record "NPR NaviDocs Handling Profile";
         VendorNo: Code[20];
     begin
         if not TempHandlingProfiles.IsTemporary then
             Error(DevMsgNotTemporaryErr);
-        TempHandlingProfiles.DeleteAll;
+        TempHandlingProfiles.DeleteAll();
         VendorNo := '';
         case RecRef.Number of
             DATABASE::Vendor:
@@ -703,10 +676,10 @@ codeunit 6059767 "NPR NaviDocs Management"
             exit(true);
 
         NaviDocsHandlingProfile.SetRange("Default for E-Mail", true);
-        if NaviDocsHandlingProfile.FindFirst then begin
+        if NaviDocsHandlingProfile.FindFirst() then begin
             TempHandlingProfiles := NaviDocsHandlingProfile;
             TempHandlingProfiles.Description := Vendor."E-Mail";
-            if TempHandlingProfiles.Insert then;
+            if TempHandlingProfiles.Insert() then;
         end;
         exit(true);
     end;
@@ -723,14 +696,14 @@ codeunit 6059767 "NPR NaviDocs Management"
         LineNo: Integer;
         ActivityLogStatus: Option Success,Failed;
     begin
-        NaviDocsSetup.Get;
+        NaviDocsSetup.Get();
         if not NaviDocsSetup."Log to Activity Log" then begin
-            NaviDocsEntryComment.LockTable;
+            NaviDocsEntryComment.LockTable();
             NaviDocsEntryComment.SetRange("Entry No.", NaviDocsEntry."Entry No.");
-            if NaviDocsEntryComment.FindLast then;
+            if NaviDocsEntryComment.FindLast() then;
             LineNo := NaviDocsEntryComment."Line No." + 10000;
 
-            NaviDocsEntryComment.Init;
+            NaviDocsEntryComment.Init();
             NaviDocsEntryComment."Entry No." := NaviDocsEntry."Entry No.";
             NaviDocsEntryComment."Table No." := NaviDocsEntry."Table No.";
             NaviDocsEntryComment."Document Type" := NaviDocsEntry."Document Type";
@@ -764,7 +737,7 @@ codeunit 6059767 "NPR NaviDocs Management"
             exit(false);
         end;
 
-        if NaviDocsEntry.Find then begin
+        if NaviDocsEntry.Find() then begin
             NaviDocsEntry.Status := Status;
             NaviDocsEntry."Processed Qty." := 0;
             NaviDocsEntry.Modify(true);
@@ -792,9 +765,9 @@ codeunit 6059767 "NPR NaviDocs Management"
             exit(false);
         end;
 
-        NaviDocsSetup.Get;
+        NaviDocsSetup.Get();
 
-        if NaviDocsEntry.Find then begin
+        if NaviDocsEntry.Find() then begin
             NaviDocsEntry.Status := Status;
             NaviDocsEntry."Processed Qty." := NaviDocsSetup."Max Retry Qty";
             NaviDocsEntry.Modify(true);
@@ -897,14 +870,14 @@ codeunit 6059767 "NPR NaviDocs Management"
     begin
         if not Confirm(ConvertOldLogEntryText) then
             exit;
-        if NaviDocsEntry.FindSet then
+        if NaviDocsEntry.FindSet() then
             repeat
                 NaviDocsEntryComment.SetRange("Table No.", NaviDocsEntry."Table No.");
                 NaviDocsEntryComment.SetRange("Document Type", NaviDocsEntry."Document Type");
                 NaviDocsEntryComment.SetRange("Document No.", NaviDocsEntry."No.");
-                if NaviDocsEntryComment.FindSet then
+                if NaviDocsEntryComment.FindSet() then
                     repeat
-                        ActivityLog.Init;
+                        ActivityLog.Init();
                         ActivityLog.ID := 0;
                         ActivityLog."Record ID" := NaviDocsEntry.RecordId;
                         ActivityLog."Activity Date" := CreateDateTime(NaviDocsEntryComment."Insert Date", NaviDocsEntryComment."Insert Time");
@@ -917,8 +890,8 @@ codeunit 6059767 "NPR NaviDocs Management"
                         ActivityLog.Description := 'Converted';
                         ActivityLog."Activity Message" := NaviDocsEntryComment.Description;
                         ActivityLog.Insert(true);
-                    until NaviDocsEntryComment.Next = 0;
-            until NaviDocsEntry.Next = 0;
+                    until NaviDocsEntryComment.Next() = 0;
+            until NaviDocsEntry.Next() = 0;
         Message(ConvertCompleteText);
     end;
 
@@ -937,7 +910,7 @@ codeunit 6059767 "NPR NaviDocs Management"
             else
                 CustomReportSelection.SetRange("Source No.", Format(RecRef.Field(4).Value));
             CustomReportSelection.SetRange("Report ID", ReportID);
-            if CustomReportSelection.FindFirst then begin
+            if CustomReportSelection.FindFirst() then begin
                 EmailNaviDocsMgtWrapper.GetCustomReportLayoutVariant(CustomReportSelection, CustomReportLayoutVariant);
                 if CustomReportLayout.Get(CustomReportLayoutVariant) then
                     ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutVariant);
@@ -964,13 +937,13 @@ codeunit 6059767 "NPR NaviDocs Management"
     begin
         NaviDocsEntryAttachment.SetRange("NaviDocs Entry No.", NaviDocsEntry."Entry No.");
         NaviDocsEntryAttachment.SetRange("Internal Type", NaviDocsEntryAttachment."Internal Type"::"Report Parameters");
-        if NaviDocsEntryAttachment.FindSet then
+        if NaviDocsEntryAttachment.FindSet() then
             repeat
                 NaviDocsEntryAttachment.CalcFields(Data);
                 NaviDocsEntryAttachment.Data.CreateInStream(InStr);
                 InStr.ReadText(Parameters);
                 MailAndDocumentHandling.StoreRequestParameters(ReportID, Parameters);
-            until NaviDocsEntryAttachment.Next = 0;
+            until NaviDocsEntryAttachment.Next() = 0;
     end;
 
     local procedure ClearReportReqParameters(ReportID: Integer)
@@ -1005,14 +978,6 @@ codeunit 6059767 "NPR NaviDocs Management"
 
     procedure PageDocumentCard(NaviDocsEntry: Record "NPR NaviDocs Entry")
     var
-        IssuedReminderHeader: Record "Issued Reminder Header";
-        IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
-        SalesHeader: Record "Sales Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        PurchHeader: Record "Purchase Header";
-        PurchInvoiceHeader: Record "Purch. Inv. Header";
-        PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
         RecRef: RecordRef;
         RecVariant: Variant;
         PageManagement: Codeunit "Page Management";
@@ -1024,15 +989,8 @@ codeunit 6059767 "NPR NaviDocs Management"
 
     procedure PageMailAndDocCard(NaviDocsEntry: Record "NPR NaviDocs Entry")
     var
-        IssuedReminderHeader: Record "Issued Reminder Header";
-        IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
         MailAndDocumentHeader: Record "NPR E-mail Template Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesHeader: Record "Sales Header";
-        SalesShipmentHeader: Record "Sales Shipment Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         EmailManagement: Codeunit "NPR E-mail Management";
-        RecRef: RecordRef;
         Handled: Boolean;
     begin
         OnShowTemplate(Handled, NaviDocsEntry);
@@ -1045,7 +1003,7 @@ codeunit 6059767 "NPR NaviDocs Management"
             MailAndDocumentHeader.SetRange("Table No.", NaviDocsEntry."Table No.");
             MailAndDocumentHeader.SetRange("Report ID", NaviDocsEntry."Report No.");
             MailAndDocumentHeader.SetFilter(Group, '%1', EmailManagement.GetDefaultGroupFilter);
-            if not MailAndDocumentHeader.FindFirst then
+            if not MailAndDocumentHeader.FindFirst() then
                 MailAndDocumentHeader.SetRange("Report ID");
         end;
         PAGE.RunModal(PAGE::"NPR E-mail Template", MailAndDocumentHeader);
@@ -1088,7 +1046,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         ReportID: Integer;
         Recipient: Text;
     begin
-        if not NaviDocsSetup.Get then
+        if not NaviDocsSetup.Get() then
             exit;
         if not (NaviDocsSetup."Enable NaviDocs" and NaviDocsSetup."Pdf2Nav Send pdf") then
             exit;
@@ -1099,7 +1057,7 @@ codeunit 6059767 "NPR NaviDocs Management"
             TestNumber.SetFilter(Number, NaviDocsSetup."Pdf2Nav Table Filter");
             TestNumber.FilterGroup(0);
             TestNumber.SetRange(Number, RecRef.Number);
-            if not TestNumber.FindFirst then
+            if not TestNumber.FindFirst() then
                 exit;
         end;
         NaviDocsHandlingProfile.Get(HandlingTypeMailCode);
@@ -1132,7 +1090,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         if not POSEntry.Get(RecRef.RecordId) then
             exit;
 
-        NaviDocsEntry.Init;
+        NaviDocsEntry.Init();
         NaviDocsEntry."Entry No." := 0;
         NaviDocsEntry.Validate("Record ID", RecRef.RecordId);
         NaviDocsEntry.Validate("Table No.", RecRef.Number);
@@ -1182,7 +1140,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         Txt001: Label 'NaviDocs Error %1 - %2 %3';
 
     begin
-        NaviDocsSetup.Get;
+        NaviDocsSetup.Get();
         if not NaviDocsSetup."Send Warming E-mail" then
             exit;
         if not SmtpMail.IsEnabled() then
@@ -1200,7 +1158,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         NaviDocsEntryComment.SetRange("Table No.", NaviDocsEntry."Table No.");
         NaviDocsEntryComment.SetRange("Document Type", NaviDocsEntry."Document Type");
         NaviDocsEntryComment.SetRange("Document No.", NaviDocsEntry."No.");
-        if NaviDocsEntryComment.FindLast then
+        if NaviDocsEntryComment.FindLast() then
             SmtpMail.AppendBody(NaviDocsEntryComment.Description + '<br><br>');
         SmtpMail.Send();
     end;

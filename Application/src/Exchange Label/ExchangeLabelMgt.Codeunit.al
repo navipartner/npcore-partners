@@ -1,11 +1,7 @@
-codeunit 6014498 "NPR Exchange Label Mgt."
+﻿codeunit 6014498 "NPR Exchange Label Mgt."
 {
     var
         Text00001: Label 'The item was not found. Use manual procedure in order to return the item.';
-        Text00002: Label 'The function can only be used with a POS Sale.';
-        t002: Label 'What date should the exchange label be valid from?';
-        ExitOnFindLabel: Boolean;
-        Text000: Label 'Exchange Label';
 
     local procedure CreateExchLabelLineFromRecRef(var RecRef: RecordRef; ValidFromDate: Date; LabelBatchNumber: Integer; PackagedBatch: Boolean): Code[7]
     var
@@ -15,7 +11,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         POSUnit: Record "NPR POS Unit";
     begin
         ExchangeLabelSetup.Get();
-        ExchangeLabel.Init;
+        ExchangeLabel.Init();
 
         if POSUnit.Get(POSUnit.GetCurrentPOSUnit()) then;
 
@@ -73,17 +69,15 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     begin
         ExchangeLabelSetup.Get();
 
-        with ExchangeLabel do begin
-            LabelCode := String.PadStrLeft("No.", 7, '0', false);
-            exit(CreateEAN(StoreCode + LabelCode, ExchangeLabelSetup."EAN Prefix Exhange Label"));
-        end;
+        LabelCode := String.PadStrLeft(ExchangeLabel."No.", 7, '0', false);
+        exit(CreateEAN(StoreCode + LabelCode, ExchangeLabelSetup."EAN Prefix Exhange Label"));
     end;
 
     local procedure GetLabelFromLabelNo(LabelNo: Code[7]; var ExchangeLabel: Record "NPR Exchange Label")
     begin
         ExchangeLabel.SetCurrentKey("No.");
         ExchangeLabel.SetRange("No.", LabelNo);
-        ExchangeLabel.FindFirst;
+        ExchangeLabel.FindFirst();
     end;
 
     local procedure PrintLabels(PrintType: Option Single,LineQuantity,All,Selection,Package; var LineRef: RecordRef; ValidFromDate: Date): Boolean
@@ -94,16 +88,8 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         SalePOS: Record "NPR POS Sale";
         t001: Label 'No lines to print exchange labels from';
         FieldRef: FieldRef;
-        Dialog: Dialog;
-        Validering: Text[30];
-        ID: Integer;
         LabelBatchNumber: Integer;
         LineCount: Integer;
-        FieldNo: Integer;
-        "-- temp": Integer;
-        reccount: Integer;
-        Cancelled: Boolean;
-        Date1: Date;
     begin
         if LineRef.IsEmpty then
             Error(t001);
@@ -127,30 +113,30 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                     FieldRef.SetRange();
                     FieldRef := LineRef.Field(GetFieldNo(LineRef, 'Sale Type'));
                     FieldRef.SetRange();
-                    if LineRef.FindSet then
+                    if LineRef.FindSet() then
                         repeat
                             AssignIntegerFieldValue(LineCount, LineRef, 'Quantity');
                             while LineCount > 0 do begin
                                 PrintLabelFromRecRef(LineRef, ValidFromDate, 0);
                                 LineCount -= 1;
                             end;
-                        until LineRef.Next = 0;
+                        until LineRef.Next() = 0;
                 end;
             PrintType::Selection, PrintType::Package:
                 begin
                     LineRef.SetTable(SaleLinePOS);
                     LabelBatchNumber := GetLabelGroupBatchNo(SaleLinePOS);
 
-                    if LineRef.FindSet then
+                    if LineRef.FindSet() then
                         repeat
                             CreateExchLabelLineFromRecRef(LineRef, ValidFromDate, LabelBatchNumber, (PrintType = PrintType::Package));
-                        until LineRef.Next = 0;
+                        until LineRef.Next() = 0;
 
                     ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
                     ExchangeLabel.SetRange("Register No.", SaleLinePOS."Register No.");
                     ExchangeLabel.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
                     ExchangeLabel.SetRange("Batch No.", LabelBatchNumber);
-                    ExchangeLabel.FindSet;
+                    ExchangeLabel.FindSet();
                     PrintLabel(ExchangeLabel);
                 end;
         end;
@@ -173,7 +159,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
 
         LabelNo := CreateExchLabelLineFromRecRef(RecRef, ValidFromDate, LabelBatchNumber, false);
         GetLabelFromLabelNo(LabelNo, ExchangeLabel);
-        Commit;
+        Commit();
         PrintLabel(ExchangeLabel);
     end;
 
@@ -189,17 +175,17 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         RetailReportSelectionMgt.SetRegisterNo(POSUnit.GetCurrentPOSUnit());
 
         ExchangeLabel.SetRange("Packaged Batch", false);
-        if ExchangeLabel.FindSet then
+        if ExchangeLabel.FindSet() then
             repeat
                 ExchangeLabelRec := ExchangeLabel;
-                ExchangeLabelRec.SetRecFilter;
+                ExchangeLabelRec.SetRecFilter();
                 RecRef.GetTable(ExchangeLabelRec);
                 RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
                 Clear(RecRef);
-            until ExchangeLabel.Next = 0;
+            until ExchangeLabel.Next() = 0;
 
         ExchangeLabel.SetRange("Packaged Batch", true);
-        if ExchangeLabel.FindSet then begin
+        if ExchangeLabel.FindSet() then begin
             RecRef.GetTable(ExchangeLabel);
             RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
         end;
@@ -220,7 +206,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
             ExchangeLabel.SetCurrentKey(Barcode);
             ExchangeLabel.SetRange(Barcode, CopyValidering);
 
-            if ExchangeLabel.FindFirst then begin
+            if ExchangeLabel.FindFirst() then begin
                 if ExchangeLabel."Packaged Batch" then begin
                     ExchangeLabel.SetRange(Barcode);
                     ExchangeLabel.SetRange("Batch No.", ExchangeLabel."Batch No.");
@@ -228,12 +214,12 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                     ExchangeLabel.SetRange("Register No.", ExchangeLabel."Register No.");
                     ExchangeLabel.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
                     ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
-                    ExchangeLabel.FindSet;
+                    ExchangeLabel.FindSet();
                 end;
                 repeat
                     SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
                     SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-                    if SaleLinePOS.FindLast then
+                    if SaleLinePOS.FindLast() then
                         LineNo := SaleLinePOS."Line No." + 10000
                     else
                         LineNo := 10000;
@@ -241,7 +227,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                     if not Item.Get(ExchangeLabel."Item No.") then
                         Error(Text00001);
 
-                    SaleLinePOS.Init;
+                    SaleLinePOS.Init();
                     SaleLinePOS."Register No." := SalePOS."Register No.";
                     SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
                     SaleLinePOS."Line No." := LineNo;
@@ -273,10 +259,10 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                         SaleLinePOS.Validate("Unit Price", SalesPrice)
                     else
                         SaleLinePOS.Validate("Amount Including VAT", ExchangeLabel."Sales Price Incl. Vat" * SaleLinePOS.Quantity);
-                    SaleLinePOS.Modify;
+                    SaleLinePOS.Modify();
                     Validering := '';
                     Found := true;
-                until ExchangeLabel.Next = 0;
+                until ExchangeLabel.Next() = 0;
             end;
         end;
     end;
@@ -287,7 +273,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     begin
         Field.SetRange(TableNo, RecRef.Number);
         Field.SetRange(FieldName, Name);
-        if Field.FindFirst then
+        if Field.FindFirst() then
             FieldNo := Field."No.";
         exit(FieldNo)
     end;
@@ -362,7 +348,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
         ExchangeLabel.SetRange("Register No.", SaleLinePOS."Register No.");
         ExchangeLabel.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        if ExchangeLabel.FindLast then
+        if ExchangeLabel.FindLast() then
             exit(ExchangeLabel."Batch No." + 1)
         else
             exit(1);
@@ -427,6 +413,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         FieldRef := RecordRef.Field(FieldNo);
         CodeVal := FieldRef.Value;
     end;
+
     local procedure AssignDecimalFieldValue(var DecimalVal: Decimal; RecordRef: RecordRef; FieldName: Text[50])
     var
         FieldRef: FieldRef;

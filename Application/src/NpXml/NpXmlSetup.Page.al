@@ -13,17 +13,17 @@ page 6151550 "NPR NpXml Setup"
         {
             group(Generelt)
             {
-                field("NpXml Enabled"; "NpXml Enabled")
+                field("NpXml Enabled"; Rec."NpXml Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NpXml Enabled field';
                 }
-                field("Template Version Prefix"; "Template Version Prefix")
+                field("Template Version Prefix"; Rec."Template Version Prefix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Version Prefix field';
                 }
-                field("Template Version No."; "Template Version No.")
+                field("Template Version No."; Rec."Template Version No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Version No. field';
@@ -34,8 +34,8 @@ page 6151550 "NPR NpXml Setup"
 
     trigger OnOpenPage()
     begin
-        if not Get then
-            Insert;
+        if not Rec.Get() then
+            Rec.Insert();
     end;
 }
 

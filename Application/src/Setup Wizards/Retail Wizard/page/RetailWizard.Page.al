@@ -761,7 +761,6 @@ page 6014651 "NPR Retail Wizard"
         TopBannerVisible: Boolean;
         EmptyVar: Integer;
         AllDataFilledIn: Boolean;
-        IntroDataToCreate: Boolean;
         CompanyInfoDataToCreate: Boolean;
         POSStoreDataToCreate: Boolean;
         POSProfileDataToCreate: Boolean;
@@ -795,7 +794,6 @@ page 6014651 "NPR Retail Wizard"
         POSPaymentMethodLabel: Label '- POS Payment Method';
         POSPostingSetupLabel: Label '- POS Posting Setup';
         SalespersonLabel: Label '- Salespeople';
-        UserLabel: Label '- User';
         UserSetupLabel: Label '- User Setup';
 
     local procedure EnableControls();

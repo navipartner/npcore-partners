@@ -3,7 +3,6 @@ codeunit 6014446 "NPR M2 Demo Picture Mgt2"
     [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnGetMagentoUrl', '', true, true)]
     local procedure GetM2DemoPictureUrl(var Sender: Record "NPR Magento Picture"; var MagentoUrl: Text; var Handled: Boolean)
     var
-        MagentoSetup: Record "NPR Magento Setup";
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin

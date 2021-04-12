@@ -47,12 +47,11 @@ page 6014523 "NPR Customer Mapping WP"
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PostCode: Record "Post Code";
-                        TempPostCode: Record "Post Code" temporary;
                         PostCodes: Page "Post Codes";
                     begin
                         PostCodes.LookupMode := true;
 
-                        PostCode.SetRange("Country/Region Code", "Country/Region Code");
+                        PostCode.SetRange("Country/Region Code", Rec."Country/Region Code");
                         if PostCode.FindSet() then;
 
                         if Rec."Post Code" <> '' then begin

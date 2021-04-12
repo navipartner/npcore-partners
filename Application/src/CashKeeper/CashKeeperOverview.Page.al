@@ -19,42 +19,42 @@ page 6059961 "NPR CashKeeper Overview"
         {
             repeater(Group)
             {
-                field("Transaction No."; "Transaction No.")
+                field("Transaction No."; Rec."Transaction No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction No. field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Total Amount"; "Total Amount")
+                field("Total Amount"; Rec."Total Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Value In Cents"; "Value In Cents")
+                field("Value In Cents"; Rec."Value In Cents")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value In Cents field';
                 }
-                field(Salesperson; Salesperson)
+                field(Salesperson; Rec.Salesperson)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson field';
                 }
-                field("User Id"; "User Id")
+                field("User Id"; Rec."User Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User Id field';
                 }
-                field("Lookup Timestamp"; "Lookup Timestamp")
+                field("Lookup Timestamp"; Rec."Lookup Timestamp")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Lookup Timestamp field';
                 }
-                field("CashKeeper IP"; "CashKeeper IP")
+                field("CashKeeper IP"; Rec."CashKeeper IP")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the CashKeeper IP field';

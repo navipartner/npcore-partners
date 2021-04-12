@@ -148,7 +148,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     LastSalesLine: Record "Sales Line";
                     RetailItemList: Page "Item List";
                     InputDialog: Page "NPR Input Dialog";
-                    ReturntoSO: Boolean;
                     ViewText: Text;
                     InputQuantity: Decimal;
                 begin
@@ -157,7 +156,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     RetailItemList.NPR_SetLocationCode(Rec."Location Code");
                     RetailItemList.NPR_SetBlocked(2);
                     RetailItemList.LookupMode := true;
-                    while RetailItemList.RunModal = ACTION::LookupOK do begin
+                    while RetailItemList.RunModal() = ACTION::LookupOK do begin
                         RetailItemList.GetRecord(Item);
 
                         InputQuantity := 1;

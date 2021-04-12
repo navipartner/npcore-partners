@@ -179,7 +179,7 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := HandlerCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     procedure HandlerCode(): Text

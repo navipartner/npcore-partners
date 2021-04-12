@@ -85,7 +85,7 @@ report 6014529 "NPR Vendor/Salesperson"
                         Varegruppetemp."Item No." := "Salesperson/Purchaser".Code;
                         Varegruppetemp.Amount := TotalSale;
                         Varegruppetemp."Amount 2" := TotalCOGS;
-                        if Varegruppetemp.Insert then;
+                        if Varegruppetemp.Insert() then;
 
                     end else
                         CurrReport.Skip();
@@ -196,7 +196,6 @@ report 6014529 "NPR Vendor/Salesperson"
 
             trigger OnPreDataItem()
             begin
-                numberOfSalesPeople := 0;
 
                 d.Open(Text001 + Text002, navn, taeller);
                 d.Update(1, '');
@@ -210,9 +209,6 @@ report 6014529 "NPR Vendor/Salesperson"
         firmaoplysninger.Get();
         firmaoplysninger.CalcFields(Picture);
 
-        viskunhovedtal := false;
-        sortSalesPerson := true;
-        visantal := 25;
     end;
 
     trigger OnPreReport()
@@ -226,8 +222,6 @@ report 6014529 "NPR Vendor/Salesperson"
         Item: Record Item;
         Varegruppetemp: Record "Item Amount" temporary;
         SalesPerson: Record "Salesperson/Purchaser";
-        sortSalesPerson: Boolean;
-        viskunhovedtal: Boolean;
         db: Decimal;
         dbalt: Decimal;
         dbtotal: Decimal;
@@ -242,10 +236,8 @@ report 6014529 "NPR Vendor/Salesperson"
         totalTurnover: Decimal;
         d: Dialog;
         currentRec: Integer;
-        numberOfSalesPeople: Integer;
         taeller: Integer;
         totalRec: Integer;
-        visantal: Integer;
         Text002: Label '@2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@';
         Cost_Caption_Lbl: Label 'Cost';
         CRPct_Caption_Lbl: Label 'CR%';

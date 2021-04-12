@@ -1,4 +1,4 @@
-codeunit 6060107 "NPR POS Input Box Evt Handler"
+﻿codeunit 6060107 "NPR POS Input Box Evt Handler"
 {
     var
         Text000: Label 'Ambigous input, please specify.';
@@ -63,20 +63,20 @@ codeunit 6060107 "NPR POS Input Box Evt Handler"
     begin
         EanBoxSetupEvent.SetRange("Setup Code", EanBoxSetup.Code);
         EanBoxSetupEvent.SetRange(Enabled, true);
-        if not EanBoxSetupEvent.FindSet then
+        if not EanBoxSetupEvent.FindSet() then
             exit;
 
         repeat
             InScope := false;
             SetEanBoxEventInScope(EanBoxSetupEvent, EanBoxValue, InScope);
             if InScope then begin
-                TempEanBoxSetupEvent.Init;
+                TempEanBoxSetupEvent.Init();
                 TempEanBoxSetupEvent := EanBoxSetupEvent;
-                TempEanBoxSetupEvent.Insert;
+                TempEanBoxSetupEvent.Insert();
             end;
-        until EanBoxSetupEvent.Next = 0;
+        until EanBoxSetupEvent.Next() = 0;
 
-        exit(TempEanBoxSetupEvent.FindFirst);
+        exit(TempEanBoxSetupEvent.FindFirst());
     end;
 
     [IntegrationEvent(false, false)]
@@ -93,28 +93,28 @@ codeunit 6060107 "NPR POS Input Box Evt Handler"
     begin
         UpdatePriority(TempEanBoxSetupEvent);
         TempEanBoxSetupEvent.SetCurrentKey(Priority);
-        if not TempEanBoxSetupEvent.FindFirst then
+        if not TempEanBoxSetupEvent.FindFirst() then
             exit(false);
         TempEanBoxSetupEvent.SetRange(Priority, TempEanBoxSetupEvent.Priority);
-        case TempEanBoxSetupEvent.Count of
+        case TempEanBoxSetupEvent.Count() of
             0:
                 exit(false);
             1:
                 exit(true);
         end;
 
-        TempEanBoxSetupEvent.FindSet;
+        TempEanBoxSetupEvent.FindSet();
         repeat
             TempEanBoxSetupEvent.CalcFields("Event Description", "Module Name");
             MenuString += TempEanBoxSetupEvent."Event Description" + ' (' + TempEanBoxSetupEvent."Module Name" + '),';
 
             i += 1;
-            TempRetailList.Init;
+            TempRetailList.Init();
             TempRetailList.Number := i;
             TempRetailList.Choice := TempEanBoxSetupEvent."Setup Code";
             TempRetailList.Value := TempEanBoxSetupEvent."Event Code";
-            TempRetailList.Insert;
-        until TempEanBoxSetupEvent.Next = 0;
+            TempRetailList.Insert();
+        until TempEanBoxSetupEvent.Next() = 0;
         MenuString := DelStr(MenuString, StrLen(MenuString));
 
         MenuSelected := StrMenu(MenuString, 1, Text000);
@@ -128,15 +128,15 @@ codeunit 6060107 "NPR POS Input Box Evt Handler"
     var
         EanBoxSetupEvent: Record "NPR Ean Box Setup Event";
     begin
-        if not TempEanBoxSetupEvent.FindSet then
+        if not TempEanBoxSetupEvent.FindSet() then
             exit;
 
         repeat
             if EanBoxSetupEvent.Get(TempEanBoxSetupEvent."Setup Code", TempEanBoxSetupEvent."Event Code") then begin
                 TempEanBoxSetupEvent.Priority := EanBoxSetupEvent.Priority;
-                TempEanBoxSetupEvent.Modify;
+                TempEanBoxSetupEvent.Modify();
             end;
-        until TempEanBoxSetupEvent.Next = 0;
+        until TempEanBoxSetupEvent.Next() = 0;
     end;
 
     procedure InvokePOSAction(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
@@ -159,12 +159,12 @@ codeunit 6060107 "NPR POS Input Box Evt Handler"
     begin
         EanBoxParameter.SetRange("Setup Code", EanBoxSetupEvent."Setup Code");
         EanBoxParameter.SetRange("Event Code", EanBoxSetupEvent."Event Code");
-        if not EanBoxParameter.FindSet then
+        if not EanBoxParameter.FindSet() then
             exit;
 
         repeat
             SetPOSActionParameter(EanBoxValue, EanBoxParameter, POSAction, FrontEnd);
-        until EanBoxParameter.Next = 0;
+        until EanBoxParameter.Next() = 0;
     end;
 
     local procedure SetPOSActionParameter(EanBoxValue: Text; EanBoxParameter: Record "NPR Ean Box Parameter"; var POSAction: Record "NPR POS Action"; FrontEnd: Codeunit "NPR POS Front End Management")

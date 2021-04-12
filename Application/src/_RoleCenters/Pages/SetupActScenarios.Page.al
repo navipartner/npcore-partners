@@ -1,4 +1,4 @@
-page 6151247 "NPR Setup Act - Scenarios"
+﻿page 6151247 "NPR Setup Act - Scenarios"
 {
     Caption = 'NP Retail - POS Scenarios Setups';
     PageType = CardPart;
@@ -71,18 +71,18 @@ page 6151247 "NPR Setup Act - Scenarios"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
         ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
     end;
-    
+
     var
         ClientTypeManagement: Codeunit "Client Type Management";
         ShowProductVideosActivities: Boolean;
-       
+
 }
 

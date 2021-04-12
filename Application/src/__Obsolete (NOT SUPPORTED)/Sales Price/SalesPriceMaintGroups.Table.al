@@ -26,8 +26,6 @@ table 6059782 "NPR Sales Price Maint. Groups"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                Item: Record Item;
             begin
             end;
         }

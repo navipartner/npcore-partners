@@ -69,9 +69,9 @@ table 6151201 "NPR NpCs Document Mapping"
                         begin
                             ItemReference.SetRange("Reference No.", "To No.");
                             ItemReference.SetRange("Discontinue Bar Code", false);
-                            if not ItemReference.FindFirst then
+                            if not ItemReference.FindFirst() then
                                 ItemReference.SetRange("Discontinue Bar Code");
-                            ItemReference.FindFirst;
+                            ItemReference.FindFirst();
                             Item.Get(ItemReference."Item No.");
                             if ItemVariant.Get(ItemReference."Item No.", ItemReference."Variant Code") then;
                             "To Description" := Item.Description;

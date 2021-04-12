@@ -48,7 +48,7 @@ table 6150710 "NPR POS View"
     var
         InStream: InStream;
     begin
-        if not Markup.HasValue then
+        if not Markup.HasValue() then
             exit;
 
         CalcFields(Markup);
@@ -77,8 +77,8 @@ table 6150710 "NPR POS View"
         end;
 
         DefaultView.SetRange(Type, ViewType);
-        DefaultView.SetFilter("Starting Date", '%1|<=%2', 0D, WorkDate);
-        DefaultView.SetFilter("Ending Date", '%1|>=%2', 0D, WorkDate);
+        DefaultView.SetFilter("Starting Date", '%1|<=%2', 0D, WorkDate());
+        DefaultView.SetFilter("Ending Date", '%1|>=%2', 0D, WorkDate());
         case Date2DWY(WorkDate, 1) of
             1:
                 DefaultView.SetRange(Monday, true);
@@ -182,7 +182,7 @@ table 6150710 "NPR POS View"
         if SalespersonCode <> '' then begin
             if Salesperson.Get(SalespersonCode) then begin
                 SalespersonTemp := Salesperson;
-                SalespersonTemp.Insert;
+                SalespersonTemp.Insert();
             end;
         end;
 

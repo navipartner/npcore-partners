@@ -1,4 +1,4 @@
-codeunit 6150683 "NPR NPRE RVA: Save Layout"
+﻿codeunit 6150683 "NPR NPRE RVA: Save Layout"
 {
     local procedure ActionCode(): Text;
     begin
@@ -25,7 +25,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
     var
         NPREFrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -107,7 +107,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
-        LocationLayout.INIT;
+        LocationLayout.Init();
         LocationLayout.Code := GetStringValue(ComponentObject, 'id', MaxStrLen(LocationLayout.Code));
         if LocationLayout.Find() then begin
             RestaurantSetup.Get();
@@ -116,7 +116,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
                 RestaurantSetup.Modify();
             end;
 
-            LocationLayout.INIT;
+            LocationLayout.Init();
 
             LocationLayout.Code := NoSeriesManagement.GetNextNo(RestaurantSetup."Component No. Series", Today, true);
 
@@ -175,7 +175,6 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
     local procedure TransferToSeating(ComponentObject: JsonObject; var Seating: Record "NPR NPRE Seating");
     var
         SeatingLocation: Record "NPR NPRE Seating Location";
-        OutStr: OutStream;
         JToken: JsonToken;
     begin
         SeatingLocation.Get(GetStringValue(ComponentObject, 'locationId', MaxStrLen(Seating."Seating Location")));
@@ -294,7 +293,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
         if not NoSeriesLine.Get(NoSeriesCode, 10000) then begin
             NoSeriesLine."Series Code" := NoSeriesCode;
             NoSeriesLine."Line No." := 10000;
-            NoSeriesLine."Starting Date" := TODAY;
+            NoSeriesLine."Starting Date" := Today();
             NoSeriesLine."Starting No." := StartNumber;
             NoSeriesLine."Increment-by No." := 1;
             NoSeriesLine.Insert();

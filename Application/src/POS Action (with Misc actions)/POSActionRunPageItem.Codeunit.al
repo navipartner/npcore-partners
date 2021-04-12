@@ -19,29 +19,26 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('run_page_item', 'respond();');
-                RegisterWorkflow(false);
-                RegisterDataSourceBinding('BUILTIN_SALELINE');
-                RegisterCustomJavaScriptLogic('enable', 'return row.getField(' + Format(SaleLinePOS.FieldNo(Type)) + ').rawValue == 1;');
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('run_page_item', 'respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
+            Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField(' + Format(SaleLinePOS.FieldNo(Type)) + ').rawValue == 1;');
 
-                RegisterIntegerParameter('PageId', PAGE::"Item Availability by Location");
-            end;
+            Sender.RegisterIntegerParameter('PageId', PAGE::"Item Availability by Location");
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        Context: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -57,7 +54,7 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);

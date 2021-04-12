@@ -89,7 +89,7 @@ xmlport 6151199 "NPR NpCs Local Inventory"
 
         ItemVariant."Item No." := CopyStr(ItemNo, 1, MaxStrLen(ItemVariant."Item No."));
         ItemVariant.Code := CopyStr(VariantCode, 1, MaxStrLen(ItemVariant.Code));
-        if ItemVariant.Find then
+        if ItemVariant.Find() then
             exit;
 
         ItemRefNo := Sku;
@@ -97,7 +97,7 @@ xmlport 6151199 "NPR NpCs Local Inventory"
             NpCsDocumentMapping.SetRange("From No.", Sku);
             NpCsDocumentMapping.SetRange(Type, NpCsDocumentMapping.Type::"Item Cross Reference No.");
             NpCsDocumentMapping.SetFilter("To No.", '<>%1', '');
-            if NpCsDocumentMapping.FindFirst then
+            if NpCsDocumentMapping.FindFirst() then
                 ItemRefNo := NpCsDocumentMapping."To No.";
         end;
 
@@ -105,7 +105,7 @@ xmlport 6151199 "NPR NpCs Local Inventory"
             ItemReference.SetRange("Reference No.", ItemRefNo);
             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetRange("Discontinue Bar Code", false);
-            if ItemReference.FindFirst then begin
+            if ItemReference.FindFirst() then begin
                 ItemVariant."Item No." := ItemReference."Item No.";
                 ItemVariant.Code := ItemReference."Variant Code";
                 exit;

@@ -35,14 +35,6 @@ page 6014411 "NPR Turnover Statistics"
         DateFilterLast: Text[30];
         NettoLast: Decimal;
         Netto: Decimal;
-        CostOfGoodsSoldLast: Decimal;
-        CostOfGoodsSold: Decimal;
-        DBLast: Decimal;
-        DB: Decimal;
-        DGLast: Decimal;
-        DG: Decimal;
-        TurnoverIndex: Decimal;
-        DBIndex: Decimal;
         BarPct: Decimal;
         MidPct: Decimal;
         Label: Decimal;
@@ -87,7 +79,7 @@ page 6014411 "NPR Turnover Statistics"
                     end;
                 7:
                     begin
-                        EndDate := Today;
+                        EndDate := Today();
                         Weekday := Date2DWY(Today, 1);
                         Week := Date2DWY(Today, 2);
                         Year := Date2DWY(Today, 3);
@@ -107,7 +99,7 @@ page 6014411 "NPR Turnover Statistics"
                     end;
                 31:
                     begin
-                        EndDate := Today;
+                        EndDate := Today();
                         Weekday := Date2DMY(Today, 1);
                         Month := Date2DMY(Today, 2);
                         Year := Date2DMY(Today, 3);
@@ -120,7 +112,7 @@ page 6014411 "NPR Turnover Statistics"
                     end;
                 12:
                     begin
-                        EndDate := Today;
+                        EndDate := Today();
                         Year := Date2DMY(Today, 3);
                         StartDate := DMY2Date(1, 1, Year);
                         DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
@@ -133,7 +125,7 @@ page 6014411 "NPR Turnover Statistics"
             case Value of
                 7:
                     begin
-                        EndDate := Today;
+                        EndDate := Today();
                         StartDate := CalcDate(Text10600000, EndDate);
                         DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
                         Weekday := Date2DWY(EndDate, 1);
@@ -155,7 +147,7 @@ page 6014411 "NPR Turnover Statistics"
                     end;
                 31:
                     begin
-                        EndDate := Today;
+                        EndDate := Today();
                         StartDate := CalcDate(Text10600001, EndDate);
                         DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
                         StartDateLast := CalcDate('<-1Y>', StartDate);
@@ -164,7 +156,7 @@ page 6014411 "NPR Turnover Statistics"
                     end;
                 12:
                     begin
-                        EndDate := Today;
+                        EndDate := Today();
                         StartDate := CalcDate(Text10600002, EndDate);
                         DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
                         StartDateLast := CalcDate('<-1Y>', StartDate);
@@ -182,12 +174,10 @@ page 6014411 "NPR Turnover Statistics"
         AuxValueEntry: Record "NPR Aux. Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalesAmountActual: Decimal;
-        CostAmountActual: Decimal;
     begin
         AuxValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Category Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
 
         SalesAmountActual := 0;
-        CostAmountActual := 0;
         if SalespersonPurchaser.Find('-') then
             repeat
                 AuxValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
@@ -196,15 +186,9 @@ page 6014411 "NPR Turnover Statistics"
                 AuxValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
                 AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
                 SalesAmountActual += AuxValueEntry."Sales Amount (Actual)";
-                CostAmountActual += -AuxValueEntry."Cost Amount (Actual)";
-            until SalespersonPurchaser.Next = 0;
+            until SalespersonPurchaser.Next() = 0;
         Netto := SalesAmountActual;
-        CostOfGoodsSold := CostAmountActual;
-        DB := Netto - CostOfGoodsSold;
-        if Netto <> 0 then
-            DG := DB * 100 / Netto
-        else
-            DG := 0;
+
     end;
 
     procedure CalculateLastYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
@@ -212,13 +196,9 @@ page 6014411 "NPR Turnover Statistics"
         AuxValueEntry: Record "NPR Aux. Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalesAmountActual: Decimal;
-        CostAmountActual: Decimal;
     begin
-        TurnoverIndex := 0;
-        DBIndex := 0;
         AuxValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Category Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
         SalesAmountActual := 0;
-        CostAmountActual := 0;
         if SalespersonPurchaser.Find('-') then
             repeat
                 AuxValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
@@ -227,19 +207,9 @@ page 6014411 "NPR Turnover Statistics"
                 AuxValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
                 AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
                 SalesAmountActual += AuxValueEntry."Sales Amount (Actual)";
-                CostAmountActual += -AuxValueEntry."Cost Amount (Actual)";
-            until SalespersonPurchaser.Next = 0;
+            until SalespersonPurchaser.Next() = 0;
         NettoLast := SalesAmountActual;
-        CostOfGoodsSoldLast := CostAmountActual;
-        DBLast := NettoLast - CostOfGoodsSoldLast;
-        if NettoLast <> 0 then
-            DGLast := DBLast * 100 / NettoLast
-        else
-            DGLast := 0;
-        if NettoLast <> 0 then
-            TurnoverIndex := Netto * 100 / NettoLast;
-        if DBLast <> 0 then
-            DBIndex := DB * 100 / DBLast;
+
 
         I := 0;
         if NettoLast <> 0 then
@@ -260,10 +230,8 @@ page 6014411 "NPR Turnover Statistics"
                 BarPct := Abs(BarPct) / 2;
             until Abs(BarPct) < 100;
         if MidPct < 0 then begin
-            Bar2 := 0;
             Bar1 := Abs(Round(BarPct, 0.01)) * 100;
         end else begin
-            Bar1 := 0;
             Bar2 := Abs(Round(BarPct, 1)) * 100;
         end;
         BarPct := Round(MidPct, 0.01);

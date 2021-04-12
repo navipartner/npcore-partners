@@ -22,7 +22,7 @@ table 6150619 "NPR POS Unit to Bin Relation"
         }
         field(10; "POS Unit Status"; Option)
         {
-            CalcFormula = Lookup ("NPR POS Unit".Status WHERE("No." = FIELD("POS Unit No.")));
+            CalcFormula = Lookup("NPR POS Unit".Status WHERE("No." = FIELD("POS Unit No.")));
             Caption = 'POS Unit Status';
             Editable = false;
             FieldClass = FlowField;
@@ -31,14 +31,14 @@ table 6150619 "NPR POS Unit to Bin Relation"
         }
         field(11; "POS Unit Name"; Text[50])
         {
-            CalcFormula = Lookup ("NPR POS Unit".Name WHERE("No." = FIELD("POS Unit No.")));
+            CalcFormula = Lookup("NPR POS Unit".Name WHERE("No." = FIELD("POS Unit No.")));
             Caption = 'POS Unit Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(20; "POS Payment Bin Status"; Option)
         {
-            CalcFormula = Lookup ("NPR POS Payment Bin".Status WHERE("No." = FIELD("POS Payment Bin No.")));
+            CalcFormula = Lookup("NPR POS Payment Bin".Status WHERE("No." = FIELD("POS Payment Bin No.")));
             Caption = 'POS Payment Bin Status';
             Editable = false;
             FieldClass = FlowField;
@@ -47,7 +47,7 @@ table 6150619 "NPR POS Unit to Bin Relation"
         }
         field(21; "POS Payment Bin Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR POS Payment Bin".Description WHERE("No." = FIELD("POS Payment Bin No.")));
+            CalcFormula = Lookup("NPR POS Payment Bin".Description WHERE("No." = FIELD("POS Payment Bin No.")));
             Caption = 'POS Payment Bin Description';
             Enabled = false;
             FieldClass = FlowField;

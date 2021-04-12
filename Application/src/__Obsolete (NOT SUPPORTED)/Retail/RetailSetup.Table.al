@@ -1842,8 +1842,8 @@ table 6014400 "NPR Retail Setup"
         IComm: Record "NPR I-Comm";
     begin
         if IComm.ReadPermission then
-            if not IComm.Get then begin
-                IComm.Init;
+            if not IComm.Get() then begin
+                IComm.Init();
                 IComm.Insert(true);
             end;
 
@@ -1856,13 +1856,5 @@ table 6014400 "NPR Retail Setup"
     end;
 
     var
-        Text1060006: Label 'Rounding precision must be divisible by 1.';
-        Text1060007: Label 'Example: 0,25 * 4 = 1';
-        Text1060008: Label 'No. Series cannot be changed!';
-        Text1060009: Label 'The field cannot be modified when there is payment choise.';
-        Text1060017: Label 'Due to missing index, this option can delay the sales. Accept?';
-        Text1060018: Label 'The update was cancelled by the user.';
         recRef: RecordRef;
-        TextAuditRollWillBeDisabled: Label 'Warning: this will disable the creation of Audit Roll records. Do you want to continue?';
-        AllObj: Record AllObj;
 }

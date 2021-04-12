@@ -28,12 +28,12 @@ page 6014516 "NPR I-Comm"
                 group(SMTP)
                 {
                     Caption = 'SMTP';
-                    field("Local E-Mail Address"; "Local E-Mail Address")
+                    field("Local E-Mail Address"; Rec."Local E-Mail Address")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Local E-Mail Adress field';
                     }
-                    field("Local SMTP Pickup Library"; "Local SMTP Pickup Library")
+                    field("Local SMTP Pickup Library"; Rec."Local SMTP Pickup Library")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Local SMTP ''Pickup'' library field';
@@ -43,47 +43,47 @@ page 6014516 "NPR I-Comm"
             group(SMS)
             {
                 Caption = 'SMS';
-                field("SMS-Address Postfix"; "SMS-Address Postfix")
+                field("SMS-Address Postfix"; Rec."SMS-Address Postfix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the SMS-Address Postfix field';
                 }
-                field("E-Club Sender"; "E-Club Sender")
+                field("E-Club Sender"; Rec."E-Club Sender")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Club Sender field';
                 }
-                field("Tailor Message"; "Tailor Message")
+                field("Tailor Message"; Rec."Tailor Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tailor Message field';
                 }
-                field("Rental Message"; "Rental Message")
+                field("Rental Message"; Rec."Rental Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rental Message field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Reg. Turnover Mobile No."; "Reg. Turnover Mobile No.")
+                field("Reg. Turnover Mobile No."; Rec."Reg. Turnover Mobile No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Reg. Turnover Mobile No. field';
                 }
-                field("Register Turnover Mobile 2"; "Register Turnover Mobile 2")
+                field("Register Turnover Mobile 2"; Rec."Register Turnover Mobile 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Register Turnover Mobile 2 field';
                 }
-                field("Register Turnover Mobile 3"; "Register Turnover Mobile 3")
+                field("Register Turnover Mobile 3"; Rec."Register Turnover Mobile 3")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Register Turnover Mobile 3 field';
                 }
-                field("SMS Type"; "SMS Type")
+                field("SMS Type"; Rec."SMS Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sms type field';
@@ -91,14 +91,14 @@ page 6014516 "NPR I-Comm"
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    Visible = ("SMS Type" = "SMS Type"::Endpoint);
-                    field("SMS Endpoint"; "SMS Endpoint")
+                    Visible = (Rec."SMS Type" = Rec."SMS Type"::Endpoint);
+                    field("SMS Endpoint"; Rec."SMS Endpoint")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the SMS Endpoint field';
                     }
                 }
-                field("SMS Provider"; "SMS Provider")
+                field("SMS Provider"; Rec."SMS Provider")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the SMS Provider field';
@@ -110,17 +110,17 @@ page 6014516 "NPR I-Comm"
                 group(PhoneNoLookup)
                 {
                     Caption = 'Phone No. Lookup';
-                    field("Use Auto. Cust. Lookup"; "Use Auto. Cust. Lookup")
+                    field("Use Auto. Cust. Lookup"; Rec."Use Auto. Cust. Lookup")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Enable Number Info Lookup field';
                     }
-                    field("Tunnel URL Address"; "Tunnel URL Address")
+                    field("Tunnel URL Address"; Rec."Tunnel URL Address")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Tunnel URL Address field';
                     }
-                    field("Number Info Codeunit ID"; "Number Info Codeunit ID")
+                    field("Number Info Codeunit ID"; Rec."Number Info Codeunit ID")
                     {
                         ApplicationArea = All;
                         LookupPageID = "All Objects with Caption";
@@ -133,13 +133,13 @@ page 6014516 "NPR I-Comm"
                             //-NPR5.23 [226819]
                             GetPhoneLookupCU(TempAllObjWithCaption);
                             if PAGE.RunModal(PAGE::"All Objects with Caption", TempAllObjWithCaption) = ACTION::LookupOK then begin
-                                "Number Info Codeunit ID" := TempAllObjWithCaption."Object ID";
-                                "Number Info Codeunit Name" := TempAllObjWithCaption."Object Name";
+                                Rec."Number Info Codeunit ID" := TempAllObjWithCaption."Object ID";
+                                Rec."Number Info Codeunit Name" := TempAllObjWithCaption."Object Name";
                             end;
                             //+NPR5.23 [226819]
                         end;
                     }
-                    field("Number Info Codeunit Name"; "Number Info Codeunit Name")
+                    field("Number Info Codeunit Name"; Rec."Number Info Codeunit Name")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -153,12 +153,12 @@ page 6014516 "NPR I-Comm"
                 group(Control6150683)
                 {
                     ShowCaption = false;
-                    field("NAS - Enabled"; "NAS - Enabled")
+                    field("NAS - Enabled"; Rec."NAS - Enabled")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NAS - Enabled field';
                     }
-                    field("NAS - Administrator CRM"; "NAS - Administrator CRM")
+                    field("NAS - Administrator CRM"; Rec."NAS - Administrator CRM")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NAS - Administrator CRM field';
@@ -171,7 +171,7 @@ page 6014516 "NPR I-Comm"
                 group("Document Clearing")
                 {
                     Caption = 'Document Clearing';
-                    field("Clearing - SQL"; "Clearing - SQL")
+                    field("Clearing - SQL"; Rec."Clearing - SQL")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Clearing through SQL field';
@@ -181,7 +181,7 @@ page 6014516 "NPR I-Comm"
             group("Virtual PDF")
             {
                 Caption = 'Virtual PDF';
-                field("Turnover - Email Addresses"; "Turnover - Email Addresses")
+                field("Turnover - Email Addresses"; Rec."Turnover - Email Addresses")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Turnover - Email Addresses field';
@@ -209,10 +209,6 @@ page 6014516 "NPR I-Comm"
         }
     }
 
-    var
-        msgConfigFilePDFAppCreate: Label 'Config File successfully created for PDF Application.';
-        errConfigFilePDFAppCreate: Label 'Error creating Config File for PDF Application.';
-        TextPhoneLook: Label 'Please select appropriate Phone Lookup codeunit ';
 
     [IntegrationEvent(TRUE, FALSE)]
     procedure GetPhoneLookupCU(var tmpAllObjWithCaption: Record AllObjWithCaption temporary)

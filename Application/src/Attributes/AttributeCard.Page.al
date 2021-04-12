@@ -17,94 +17,94 @@ page 6014604 "NPR Attribute Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Code Caption"; "Code Caption")
+                field("Code Caption"; Rec."Code Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code Caption field';
                 }
-                field("Filter Caption"; "Filter Caption")
+                field("Filter Caption"; Rec."Filter Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Caption field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field(Global; Global)
+                field(Global; Rec.Global)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global field';
                 }
-                field("Value Datatype"; "Value Datatype")
+                field("Value Datatype"; Rec."Value Datatype")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value Datatype field';
                 }
-                field("On Validate"; "On Validate")
+                field("On Validate"; Rec."On Validate")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the On Validate field';
                 }
-                field("On Format"; "On Format")
+                field("On Format"; Rec."On Format")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the On Format field';
                 }
-                field("LookUp Table"; "LookUp Table")
+                field("LookUp Table"; Rec."LookUp Table")
                 {
                     ApplicationArea = All;
                     ToolTip = 'LookUp Table overide manual set lookup value.';
                 }
-                field("LookUp Table Id"; "LookUp Table Id")
+                field("LookUp Table Id"; Rec."LookUp Table Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the LookUp Table Id field';
                 }
-                field("LookUp Table Name"; "LookUp Table Name")
+                field("LookUp Table Name"; Rec."LookUp Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the LookUp Table Name field';
                 }
-                field("LookUp Value Field Id"; "LookUp Value Field Id")
+                field("LookUp Value Field Id"; Rec."LookUp Value Field Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the LookUp Value Field Id field';
                 }
-                field("LookUp Value Field Name"; "LookUp Value Field Name")
+                field("LookUp Value Field Name"; Rec."LookUp Value Field Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the LookUp Value Field Name field';
                 }
-                field("LookUp Description Field Id"; "LookUp Description Field Id")
+                field("LookUp Description Field Id"; Rec."LookUp Description Field Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the LookUp Description Field Id field';
                 }
-                field("LookUp Description Field Name"; "LookUp Description Field Name")
+                field("LookUp Description Field Name"; Rec."LookUp Description Field Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the LookUp Description Field Name field';
                 }
-                field("Import File Column No."; "Import File Column No.")
+                field("Import File Column No."; Rec."Import File Column No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Import File Column No. field';

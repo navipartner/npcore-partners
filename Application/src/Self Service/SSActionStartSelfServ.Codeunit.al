@@ -39,7 +39,7 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         SalespersonCode: Code[20];
         LanguageCode: Code[10];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;

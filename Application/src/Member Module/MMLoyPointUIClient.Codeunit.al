@@ -205,7 +205,6 @@ codeunit 6151163 "NPR MM Loy. Point UI (Client)"
 
     local procedure AbortTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTSetup: Record "NPR EFT Setup";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";

@@ -57,7 +57,7 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
             ItemWorksheetLine.Validate("Item No.", '');
     end;
 
-    local procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]) found: Boolean
+    local procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]): Boolean
     var
         ItemRef: Record "Item Reference";
         Item: Record Item;
@@ -67,7 +67,7 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
             if OurVendorNo <> '' then
                 ItemRef.SetRange("Reference Type No.", OurVendorNo);
             ItemRef.SetRange("Reference No.", ItemRefNo);
-            if ItemRef.FindFirst then begin
+            if ItemRef.FindFirst() then begin
                 OurItemNo := ItemRef."Item No.";
                 OurVariantCode := ItemRef."Variant Code";
                 exit(true);
@@ -78,7 +78,7 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
             Item.SetRange("Vendor Item No.", VendorsItemNo);
             if OurVendorNo <> '' then
                 Item.SetRange("Vendor No.", OurVendorNo);
-            if Item.FindFirst then begin
+            if Item.FindFirst() then begin
                 OurItemNo := Item."No.";
                 OurVariantCode := '';
                 exit(true);

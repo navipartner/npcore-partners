@@ -237,7 +237,7 @@ table 6014411 "NPR Mixed Discount"
             trigger OnValidate()
             begin
                 ValidateShortcutDimCode(1, "Global Dimension 1 Code");
-                Modify;
+                Modify();
             end;
         }
         field(317; "Global Dimension 2 Code"; Code[20])
@@ -250,7 +250,7 @@ table 6014411 "NPR Mixed Discount"
             trigger OnValidate()
             begin
                 ValidateShortcutDimCode(2, "Global Dimension 2 Code");
-                Modify;
+                Modify();
             end;
         }
         field(318; "Campaign Ref."; Code[20])
@@ -312,10 +312,10 @@ table 6014411 "NPR Mixed Discount"
         DimMgt: Codeunit DimensionManagement;
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-        "Created the" := Today;
+        "Created the" := Today();
         DatePeriod.SetRange("Period Type", DatePeriod."Period Type"::Date);
-        "Starting date" := Today;
-        if DatePeriod.FindLast then
+        "Starting date" := Today();
+        if DatePeriod.FindLast() then
             "Ending date" := DatePeriod."Period Start";
 
         if Code = '' then
@@ -330,7 +330,7 @@ table 6014411 "NPR Mixed Discount"
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
         UpdateLines();
     end;
 
@@ -338,7 +338,6 @@ table 6014411 "NPR Mixed Discount"
         Text000: Label 'Checking Item No.: #1########\Mix Line:          #2######## of #3########';
         Text001: Label 'The following Lines are already active on other Mixed Discounts:\ %1\\Continue?';
         Text002: Label '\  - %1 %2 (%3)';
-        Text1060000: Label 'This field cannot be changed. Modification is done via NPK Retail configuration!';
         StatusErr: Label 'Mix discount configuration not activated.';
 
     procedure Assistedit(MixedDiscount: Record "NPR Mixed Discount"): Boolean
@@ -374,11 +373,11 @@ table 6014411 "NPR Mixed Discount"
             if MixedDiscountLine.IsEmpty then
                 exit(0);
 
-            MixedDiscountLine.FindSet;
+            MixedDiscountLine.FindSet();
             repeat
                 if MixedDiscount.Get(MixedDiscountLine."No.") then
                     MinQty += MixedDiscount.CalcMinQty();
-            until MixedDiscountLine.Next = 0;
+            until MixedDiscountLine.Next() = 0;
             exit(MinQty);
         end;
 
@@ -418,11 +417,11 @@ table 6014411 "NPR Mixed Discount"
             exit;
 
         Counter := 0;
-        Total := MixedDiscountLine.Count;
+        Total := MixedDiscountLine.Count();
         Window.Open(Text000);
         Window.Update(3, Total);
 
-        MixedDiscountLine.FindSet;
+        MixedDiscountLine.FindSet();
         repeat
             Counter += 1;
             Window.Update(1, MixedDiscountLine."No.");
@@ -432,28 +431,28 @@ table 6014411 "NPR Mixed Discount"
             MixedDiscountLine2.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type");
             MixedDiscountLine2.SetRange("No.", MixedDiscountLine."No.");
             MixedDiscountLine2.SetRange(Status, MixedDiscountLine2.Status::Active);
-            if MixedDiscountLine2.FindSet then begin
+            if MixedDiscountLine2.FindSet() then begin
                 repeat
                     if (MixedDiscount.Get(MixedDiscountLine2.Code)) and (MixedDiscount."Starting date" <= Today) and (MixedDiscount."Ending date" >= Today) then begin
-                        TempMixedDiscountLine.Init;
+                        TempMixedDiscountLine.Init();
                         TempMixedDiscountLine := MixedDiscountLine2;
-                        TempMixedDiscountLine.Insert;
+                        TempMixedDiscountLine.Insert();
 
-                        MixedDiscountLine2.FindLast;
+                        MixedDiscountLine2.FindLast();
                     end;
-                until MixedDiscountLine2.Next = 0;
+                until MixedDiscountLine2.Next() = 0;
             end;
-        until MixedDiscountLine.Next = 0;
-        Window.Close;
+        until MixedDiscountLine.Next() = 0;
+        Window.Close();
 
         if TempMixedDiscountLine.IsEmpty then
             exit;
 
-        TempMixedDiscountLine.FindSet;
+        TempMixedDiscountLine.FindSet();
         repeat
             LineText += StrSubstNo(Text002, TempMixedDiscountLine."Disc. Grouping Type", TempMixedDiscountLine."No.", TempMixedDiscountLine.Code);
-        until TempMixedDiscountLine.Next = 0;
-        TempMixedDiscountLine.DeleteAll;
+        until TempMixedDiscountLine.Next() = 0;
+        TempMixedDiscountLine.DeleteAll();
 
         if not Confirm(StrSubstNo(Text001, LineText), true) then
             Error(StatusErr);
@@ -467,7 +466,7 @@ table 6014411 "NPR Mixed Discount"
         //-NPR5.31 [263093]
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR Mixed Discount", Code, FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
         //+NPR5.31 [263093]
     end;
 
@@ -481,14 +480,14 @@ table 6014411 "NPR Mixed Discount"
             exit;
 
         MixedDiscountLine.SetRange(Code, Code);
-        if MixedDiscountLine.FindSet then
+        if MixedDiscountLine.FindSet() then
             repeat
                 MixedDiscountLine."Starting Date" := "Starting date";
                 MixedDiscountLine."Ending Date" := "Ending date";
                 MixedDiscountLine.Status := Status;
                 MixedDiscountLine."Starting Time" := "Starting time";
                 MixedDiscountLine."Ending Time" := "Ending time";
-                MixedDiscountLine.Modify;
+                MixedDiscountLine.Modify();
 
                 //-NPR5.45 [327277]
                 if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::"Mix Discount" then begin
@@ -501,7 +500,7 @@ table 6014411 "NPR Mixed Discount"
                     MixedDiscountPart.Modify(true);
                 end;
             //+NPR5.45 [327277]
-            until MixedDiscountLine.Next = 0;
+            until MixedDiscountLine.Next() = 0;
         //+NPR5.40 [294655]
     end;
 }

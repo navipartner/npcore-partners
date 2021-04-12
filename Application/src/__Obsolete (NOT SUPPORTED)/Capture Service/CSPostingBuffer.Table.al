@@ -1,10 +1,10 @@
 table 6151397 "NPR CS Posting Buffer"
 {
-   
+
     Caption = 'CS Posting Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -35,7 +35,7 @@ table 6151397 "NPR CS Posting Buffer"
             TableRelation = User."User Name";
             ValidateTableRelation = false;
 
-           
+
         }
         field(13; Created; DateTime)
         {
@@ -67,7 +67,7 @@ table 6151397 "NPR CS Posting Buffer"
             OptionCaption = ' ,Scheduled for Posting,Error,Posting';
             OptionMembers = " ","Scheduled for Posting",Error,Posting;
 
-           
+
         }
         field(18; "Job Queue Entry ID"; Guid)
         {
@@ -91,7 +91,7 @@ table 6151397 "NPR CS Posting Buffer"
             InitValue = 1000;
             MinValue = 0;
 
-           
+
         }
         field(21; "Session Id"; Text[30])
         {
@@ -111,7 +111,7 @@ table 6151397 "NPR CS Posting Buffer"
     {
     }
 
-   
-   
+
+
 }
 

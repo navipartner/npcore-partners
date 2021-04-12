@@ -16,10 +16,6 @@ codeunit 6150734 "NPR POS WF 2.0: State"
         ActionStateRecRefCounter: Integer;
 
     procedure Constructor(FrontEndIn: Codeunit "NPR POS Front End Management"; ActionCodeIn: Text)
-    var
-        JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
-        OldPOSSession: Codeunit "NPR POS Session";
-        OldFrontEnd: Codeunit "NPR POS Front End Management";
     begin
         FrontEnd := FrontEndIn;
         ActionCode := ActionCodeIn;

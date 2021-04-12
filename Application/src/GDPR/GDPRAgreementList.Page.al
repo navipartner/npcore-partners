@@ -15,23 +15,23 @@ page 6151121 "NPR GDPR Agreement List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Latest Version"; "Latest Version")
+                field("Latest Version"; Rec."Latest Version")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Latest Version field';
                 }
-                field("Current Version"; "Current Version")
+                field("Current Version"; Rec."Current Version")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Current Version field';
@@ -46,8 +46,8 @@ page 6151121 "NPR GDPR Agreement List"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange("Date Filter", Today);
-        CalcFields("Current Version");
+        Rec.SetRange("Date Filter", Today);
+        Rec.CalcFields("Current Version");
     end;
 }
 

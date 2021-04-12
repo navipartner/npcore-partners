@@ -30,38 +30,36 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('QuantityPrompt', 'param.PromptQuantity && intpad({caption: labels.EftGiftcardCaptionQuantity, value: 1}).cancel(abort);');
-                RegisterWorkflowStep('AmountPrompt', 'numpad({caption: labels.EftGiftcardCaptionAmount}).cancel(abort);');
-                RegisterWorkflowStep('DiscountPctPrompt', 'param.PromptDiscountPct && numpad({caption: labels.EftGiftcardCaptionDiscount}).cancel(abort);');
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('QuantityPrompt', 'param.PromptQuantity && intpad({caption: labels.EftGiftcardCaptionQuantity, value: 1}).cancel(abort);');
+            Sender.RegisterWorkflowStep('AmountPrompt', 'numpad({caption: labels.EftGiftcardCaptionAmount}).cancel(abort);');
+            Sender.RegisterWorkflowStep('DiscountPctPrompt', 'param.PromptDiscountPct && numpad({caption: labels.EftGiftcardCaptionDiscount}).cancel(abort);');
 
-                RegisterWorkflowStep('PrepareGiftCardLoop', 'respond();');
-                RegisterWorkflowStep('LoadGiftCardAndInsertLine', 'respond();');
-                RegisterWorkflowStep('InsertDiscountLine', 'respond();');
-                RegisterWorkflowStep('GiftCardLoopIterate', 'respond();');
+            Sender.RegisterWorkflowStep('PrepareGiftCardLoop', 'respond();');
+            Sender.RegisterWorkflowStep('LoadGiftCardAndInsertLine', 'respond();');
+            Sender.RegisterWorkflowStep('InsertDiscountLine', 'respond();');
+            Sender.RegisterWorkflowStep('GiftCardLoopIterate', 'respond();');
 
-                RegisterWorkflowStep('RefreshUI', 'respond()');
-                RegisterWorkflow(false);
+            Sender.RegisterWorkflowStep('RefreshUI', 'respond()');
+            Sender.RegisterWorkflow(false);
 
-                RegisterTextParameter('PaymentType', '');
-                RegisterBooleanParameter('PromptDiscountPct', false);
-                RegisterBooleanParameter('PromptQuantity', false);
-            end;
+            Sender.RegisterTextParameter('PaymentType', '');
+            Sender.RegisterBooleanParameter('PromptDiscountPct', false);
+            Sender.RegisterBooleanParameter('PromptQuantity', false);
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'EftGiftcardCaptionAmount', GIFTCARD_CAPTION_AMOUNT);
-        Captions.AddActionCaption(ActionCode, 'EftGiftcardCaptionDiscount', GIFTCARD_CAPTION_DISCOUNT);
-        Captions.AddActionCaption(ActionCode, 'EftGiftcardCaptionQuantity', GIFTCARD_CAPTION_QTY);
+        Captions.AddActionCaption(ActionCode(), 'EftGiftcardCaptionAmount', GIFTCARD_CAPTION_AMOUNT);
+        Captions.AddActionCaption(ActionCode(), 'EftGiftcardCaptionDiscount', GIFTCARD_CAPTION_DISCOUNT);
+        Captions.AddActionCaption(ActionCode(), 'EftGiftcardCaptionQuantity', GIFTCARD_CAPTION_QTY);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -74,7 +72,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -264,7 +262,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -280,7 +278,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -298,7 +296,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -316,7 +314,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

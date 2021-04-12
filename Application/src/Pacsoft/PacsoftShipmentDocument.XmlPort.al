@@ -814,8 +814,6 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     {
 
                         trigger OnBeforePassVariable()
-                        var
-                            PacsoftPackage: Record "NPR Pacsoft Package Code";
                         begin
                             if (ShipmentDocument."Parcel Qty." = 1) then
                                 type := 'parcel';
@@ -1253,7 +1251,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                                 PacsoftShipmentDocServices.SetRange("Entry No.", ShipmentDocument."Entry No.");
                                 PacsoftShipmentDocServices.SetRange("Shipping Agent Code", ShipmentDocument."Shipping Agent Code");
                                 PacsoftShipmentDocServices.SetRange("Shipping Agent Service Code", PacsoftSetup."Shipping Agent Services Code");
-                                if PacsoftShipmentDocServices.FindFirst then
+                                if PacsoftShipmentDocServices.FindFirst() then
                                     optid2 := PacsoftSetup."Shipping Agent Services Code";
                             end;
                         }
@@ -1335,8 +1333,8 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
 
     trigger OnInitXmlPort()
     begin
-        CompanyInfo.Get;
-        PacsoftSetup.Get;
+        CompanyInfo.Get();
+        PacsoftSetup.Get();
     end;
 
     var

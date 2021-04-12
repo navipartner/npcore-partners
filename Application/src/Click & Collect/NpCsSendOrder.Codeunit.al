@@ -15,7 +15,6 @@ codeunit 6151197 "NPR NpCs Send Order"
         ContentText: Text;
         Response: HttpResponseMessage;
         Document: XmlDocument;
-        Element: XmlElement;
         Node: XmlNode;
         ExceptionMessage: Text;
     begin
@@ -44,7 +43,7 @@ codeunit 6151197 "NPR NpCs Send Order"
             ExceptionMessage := Response.ReasonPhrase;
             if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                    ExceptionMessage := Node.AsXmlElement.InnerText();
+                    ExceptionMessage := Node.AsXmlElement().InnerText();
             end;
 
             Error(CopyStr(ExceptionMessage, 1, 1020));
@@ -147,7 +146,7 @@ codeunit 6151197 "NPR NpCs Send Order"
 
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindSet then
+        if SalesLine.FindSet() then
             repeat
                 Content +=
                           '<sales_line line_no="' + Format(SalesLine."Line No.", 0, 9) + '">' +
@@ -165,7 +164,7 @@ codeunit 6151197 "NPR NpCs Send Order"
                             '<vat_pct>' + Format(SalesLine."VAT %", 0, 9) + '</vat_pct>' +
                             '<line_amount>' + Format(SalesLine."Line Amount", 0, 9) + '</line_amount>' +
                           '</sales_line>';
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
 
         Content +=
                     '</sales_lines>' +
@@ -227,7 +226,7 @@ codeunit 6151197 "NPR NpCs Send Order"
         if NpCsWorkflowModule.Get(NpCsWorkflowModule.Type::"Send Order", WorkflowCode()) then
             exit;
 
-        NpCsWorkflowModule.Init;
+        NpCsWorkflowModule.Init();
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
         NpCsWorkflowModule.Code := WorkflowCode();
         NpCsWorkflowModule.Description := CopyStr(Text000, 1, MaxStrLen(NpCsWorkflowModule.Description));
@@ -240,7 +239,7 @@ codeunit 6151197 "NPR NpCs Send Order"
         exit(CODEUNIT::"NPR NpCs Send Order");
     end;
 
-    local procedure GetItemRefNo(SalesLine: Record "Sales Line") ItemRefNo: Code[50]
+    local procedure GetItemRefNo(SalesLine: Record "Sales Line"): Code[50]
     var
         ItemRef: Record "Item Reference";
     begin
@@ -254,9 +253,9 @@ codeunit 6151197 "NPR NpCs Send Order"
         ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
         ItemRef.SetFilter("Reference No.", '<>%1', '');
         ItemRef.SetRange("Discontinue Bar Code", false);
-        if not ItemRef.FindFirst then
+        if not ItemRef.FindFirst() then
             ItemRef.SetRange("Discontinue Bar Code");
-        if ItemRef.FindFirst then
+        if ItemRef.FindFirst() then
             exit(ItemRef."Reference No.");
 
         exit('');

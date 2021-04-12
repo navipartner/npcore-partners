@@ -14,12 +14,12 @@ page 6184473 "NPR EFT Trx Log Factbox"
         {
             repeater(Group)
             {
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Logged At"; "Logged At")
+                field("Logged At"; Rec."Logged At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logged At field';
@@ -54,11 +54,11 @@ page 6184473 "NPR EFT Trx Log Factbox"
                     InStream: InStream;
                     FileName: Text;
                 begin
-                    if not Log.HasValue then
+                    if not Log.HasValue() then
                         exit;
-                    CalcFields(Log);
+                    Rec.CalcFields(Log);
                     Log.CreateInStream(InStream);
-                    FileName := StrSubstNo('EFT_Log_%1_%2', "Transaction Entry No.", "Log Entry No.");
+                    FileName := StrSubstNo('EFT_Log_%1_%2', Rec."Transaction Entry No.", Rec."Log Entry No.");
                     DownloadFromStream(InStream, 'Log Download', '', 'All Files (*.*)|*.*', FileName);
                 end;
             }

@@ -1,4 +1,4 @@
-codeunit 6014401 "NPR Dimension Mgt."
+﻿codeunit 6014401 "NPR Dimension Mgt."
 {
     var
         TempDimBuf1: Record "Dimension Buffer" temporary;
@@ -14,7 +14,7 @@ codeunit 6014401 "NPR Dimension Mgt."
         GLSetup: Record "General Ledger Setup";
     begin
         if not HasGotGLSetup then begin
-            GLSetup.Get;
+            GLSetup.Get();
             GLSetupShortcutDimCode[1] := GLSetup."Shortcut Dimension 1 Code";
             GLSetupShortcutDimCode[2] := GLSetup."Shortcut Dimension 2 Code";
             GLSetupShortcutDimCode[3] := GLSetup."Shortcut Dimension 3 Code";
@@ -42,12 +42,12 @@ codeunit 6014401 "NPR Dimension Mgt."
         NPRLineDimension.SetRange("Sale Type", SaleType);
         NPRLineDimension.SetRange("Line No.", LineNo);
         NPRLineDimension.SetRange("No.", No);
-        NPRLineDimension.DeleteAll;
+        NPRLineDimension.DeleteAll();
         GlobalDim1Code := '';
         GlobalDim2Code := '';
         if TempDimBuf2.FindSet() then begin
             repeat
-                NPRLineDimension.Init;
+                NPRLineDimension.Init();
                 NPRLineDimension.Validate("Table ID", TableID);
                 NPRLineDimension.Validate("Register No.", RegisterNo);
                 NPRLineDimension.Validate("Sales Ticket No.", SalesTicketNo);
@@ -57,16 +57,16 @@ codeunit 6014401 "NPR Dimension Mgt."
                 NPRLineDimension.Validate("No.", No);
                 NPRLineDimension."Dimension Code" := TempDimBuf2."Dimension Code";
                 NPRLineDimension."Dimension Value Code" := TempDimBuf2."Dimension Value Code";
-                NPRLineDimension.Insert;
+                NPRLineDimension.Insert();
                 RecRef.GetTable(NPRLineDimension);
                 ChangeLogMgt.LogInsertion(RecRef);
                 if NPRLineDimension."Dimension Code" = GLSetupShortcutDimCode[1] then
                     GlobalDim1Code := NPRLineDimension."Dimension Value Code";
                 if NPRLineDimension."Dimension Code" = GLSetupShortcutDimCode[2] then
                     GlobalDim2Code := NPRLineDimension."Dimension Value Code";
-            until TempDimBuf2.Next = 0;
-            TempDimBuf2.Reset;
-            TempDimBuf2.DeleteAll;
+            until TempDimBuf2.Next() = 0;
+            TempDimBuf2.Reset();
+            TempDimBuf2.DeleteAll();
         end;
     end;
     #endregion
@@ -81,14 +81,14 @@ codeunit 6014401 "NPR Dimension Mgt."
         NoFilter: array[2] of Code[20];
     begin
         GetGLSetup;
-        TempDimBuf2.Reset;
-        TempDimBuf2.DeleteAll;
+        TempDimBuf2.Reset();
+        TempDimBuf2.DeleteAll();
         if TempDimBuf1.FindSet() then begin
             repeat
-                TempDimBuf2.Init;
+                TempDimBuf2.Init();
                 TempDimBuf2 := TempDimBuf1;
-                TempDimBuf2.Insert;
-            until TempDimBuf1.Next = 0;
+                TempDimBuf2.Insert();
+            until TempDimBuf1.Next() = 0;
         end;
         NoFilter[2] := '';
         for i := 1 to ArrayLen(TableID) do begin
@@ -104,44 +104,44 @@ codeunit 6014401 "NPR Dimension Mgt."
                             then begin
                                 TempDimBuf2.SetRange("Dimension Code", DefaultDim."Dimension Code");
                                 if not TempDimBuf2.FindSet() then begin
-                                    TempDimBuf2.Init;
+                                    TempDimBuf2.Init();
                                     TempDimBuf2."Table ID" := DefaultDim."Table ID";
                                     TempDimBuf2."Entry No." := 0;
                                     TempDimBuf2."Dimension Code" := DefaultDim."Dimension Code";
                                     TempDimBuf2."Dimension Value Code" := DefaultDim."Dimension Value Code";
-                                    TempDimBuf2.Insert;
+                                    TempDimBuf2.Insert();
                                 end else begin
                                     if (TempDimBuf2."Dimension Value Code" = '') and (DefaultDim."Dimension Value Code" <> '') then begin
                                         TempDimBuf2."Dimension Value Code" := DefaultDim."Dimension Value Code";
-                                        TempDimBuf2.Modify;
+                                        TempDimBuf2.Modify();
                                     end else
                                         if DefaultDimPriority1.Get(SourceCode, DefaultDim."Table ID") then begin
                                             if DefaultDimPriority2.Get(SourceCode, TempDimBuf2."Table ID") then begin
                                                 if DefaultDimPriority1.Priority < DefaultDimPriority2.Priority then begin
-                                                    TempDimBuf3.Init;
+                                                    TempDimBuf3.Init();
                                                     TempDimBuf3 := TempDimBuf2;
                                                     TempDimBuf3."Table ID" := DefaultDim."Table ID";
                                                     TempDimBuf3."Entry No." := 0;
                                                     TempDimBuf3."Dimension Value Code" := DefaultDim."Dimension Value Code";
-                                                    TempDimBuf3.Insert;
-                                                    TempDimBuf2.Delete;
-                                                    TempDimBuf2.Init;
+                                                    TempDimBuf3.Insert();
+                                                    TempDimBuf2.Delete();
+                                                    TempDimBuf2.Init();
                                                     TempDimBuf2 := TempDimBuf3;
-                                                    TempDimBuf2.Insert;
-                                                    TempDimBuf3.Delete;
+                                                    TempDimBuf2.Insert();
+                                                    TempDimBuf3.Delete();
                                                 end;
                                             end else begin
-                                                TempDimBuf3.Init;
+                                                TempDimBuf3.Init();
                                                 TempDimBuf3 := TempDimBuf2;
                                                 TempDimBuf3."Table ID" := DefaultDim."Table ID";
                                                 TempDimBuf3."Entry No." := 0;
                                                 TempDimBuf3."Dimension Value Code" := DefaultDim."Dimension Value Code";
-                                                TempDimBuf3.Insert;
-                                                TempDimBuf2.Delete;
-                                                TempDimBuf2.Init;
+                                                TempDimBuf3.Insert();
+                                                TempDimBuf2.Delete();
+                                                TempDimBuf2.Init();
                                                 TempDimBuf2 := TempDimBuf3;
-                                                TempDimBuf2.Insert;
-                                                TempDimBuf3.Delete;
+                                                TempDimBuf2.Insert();
+                                                TempDimBuf3.Delete();
                                             end;
                                         end;
                                 end;
@@ -150,12 +150,12 @@ codeunit 6014401 "NPR Dimension Mgt."
                                 if GLSetupShortcutDimCode[2] = TempDimBuf2."Dimension Code" then
                                     GlobalDim2Code := TempDimBuf2."Dimension Value Code";
                             end;
-                        until DefaultDim.Next = 0;
+                        until DefaultDim.Next() = 0;
                     end;
                 end;
             end;
         end;
-        TempDimBuf2.Reset;
+        TempDimBuf2.Reset();
     end;
     #endregion
     #region TypeToTableEksp
@@ -221,7 +221,7 @@ codeunit 6014401 "NPR Dimension Mgt."
         NPRLineDimension.SetRange("Sale Type", SaleType);
         NPRLineDimension.SetRange("Line No.", LineNo);
         NPRLineDimension.SetRange("No.", No);
-        NPRLineDimension.DeleteAll;
+        NPRLineDimension.DeleteAll();
     end;
     #endregion
     #region LookupDimValueCode
@@ -268,7 +268,7 @@ codeunit 6014401 "NPR Dimension Mgt."
             if NPRLineDim.Get(TableID, RegisterNo, SalesTicketNo, Date2, SaleType, LineNo, No, GLSetupShortcutDimCode[FieldNumber]) then begin
                 xRecRef.GetTable(NPRLineDim);
                 NPRLineDim.Validate("Dimension Value Code", ShortcutDimCode);
-                NPRLineDim.Modify;
+                NPRLineDim.Modify();
                 /* This has been commented by NE, as it only updates
                   From Sale POS to Lines which i not applicable if you
                   want individual dimensions on lines.
@@ -277,7 +277,7 @@ codeunit 6014401 "NPR Dimension Mgt."
                 RecRef.GetTable(NPRLineDim);
                 ChangeLogMgt.LogModification(RecRef);
             end else begin
-                NPRLineDim.Init;
+                NPRLineDim.Init();
                 NPRLineDim.Validate("Table ID", TableID);
                 NPRLineDim.Validate("Register No.", RegisterNo);
                 NPRLineDim.Validate("Sales Ticket No.", SalesTicketNo);
@@ -296,7 +296,7 @@ codeunit 6014401 "NPR Dimension Mgt."
             if NPRLineDim.Get(TableID, RegisterNo, SalesTicketNo, Date2, SaleType, LineNo, No, GLSetupShortcutDimCode[FieldNumber]) then begin
                 xRecRef.GetTable(NPRLineDim);
                 NPRLineDim."Dimension Value Code" := '';
-                NPRLineDim.Modify;
+                NPRLineDim.Modify();
                 RecRef.GetTable(NPRLineDim);
                 ChangeLogMgt.LogModification(RecRef);
                 NPRLineDim.UpdateLineDim(NPRLineDim, true);
@@ -313,19 +313,19 @@ codeunit 6014401 "NPR Dimension Mgt."
         if ShortcutDimCode <> '' then begin
             if TempDimBuf2.FindFirst() then begin
                 TempDimBuf2.Validate("Dimension Value Code", ShortcutDimCode);
-                TempDimBuf2.Modify;
+                TempDimBuf2.Modify();
             end else begin
-                TempDimBuf2.Init;
+                TempDimBuf2.Init();
                 TempDimBuf2.Validate("Table ID", 0);
                 TempDimBuf2.Validate("Entry No.", 0);
                 TempDimBuf2.Validate("Dimension Code", GLSetupShortcutDimCode[FieldNumber]);
                 TempDimBuf2.Validate("Dimension Value Code", ShortcutDimCode);
-                TempDimBuf2.Insert;
+                TempDimBuf2.Insert();
             end;
         end else
             if TempDimBuf2.FindFirst() then begin
                 TempDimBuf2."Dimension Value Code" := '';
-                TempDimBuf2.Modify;
+                TempDimBuf2.Modify();
             end;
     end;
     #endregion

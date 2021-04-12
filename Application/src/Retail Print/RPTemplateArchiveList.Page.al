@@ -15,27 +15,27 @@ page 6014631 "NPR RP Template Archive List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field("Archived at"; "Archived at")
+                field("Archived at"; Rec."Archived at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Archived at field';
                 }
-                field("Archived by"; "Archived by")
+                field("Archived by"; Rec."Archived by")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Archived by field';
                 }
-                field("Version Comments"; "Version Comments")
+                field("Version Comments"; Rec."Version Comments")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version Comments field';
@@ -59,7 +59,7 @@ page 6014631 "NPR RP Template Archive List"
                 Caption = 'Restore Version';
                 Image = Restore;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -70,7 +70,7 @@ page 6014631 "NPR RP Template Archive List"
                     RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
                 begin
                     RPTemplateMgt.RollbackVersion(Rec);
-                    CurrPage.Close;
+                    CurrPage.Close();
                 end;
             }
             action(Export)
@@ -78,7 +78,7 @@ page 6014631 "NPR RP Template Archive List"
                 Caption = 'Export Version';
                 Image = Export;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

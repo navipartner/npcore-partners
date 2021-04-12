@@ -1,4 +1,4 @@
-codeunit 6060046 "NPR Item Wsht.Register Line"
+﻿codeunit 6060046 "NPR Item Wsht.Register Line"
 {
     Permissions = TableData "NPR Registered Item Works." = imd,
                   TableData "NPR Regist. Item Worksh Line" = imd,
@@ -86,13 +86,13 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                     end;
             end;
 
-            ItemWkshVariantLine.Reset;
+            ItemWkshVariantLine.Reset();
             ItemWkshVariantLine.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
             ItemWkshVariantLine.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
             ItemWkshVariantLine.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
             ItemWkshVariantLine.SetFilter("Heading Text", '%1', '');
             //Skip Headers
-            if ItemWkshVariantLine.FindSet then
+            if ItemWkshVariantLine.FindSet() then
                 repeat
                     if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
                         OnBeforeRegisterVariantLine(ItemWkshVariantLine);
@@ -132,7 +132,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                     ItemWkshVariantLine.Modify(true);
                     if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
                         OnAfterRegisterVariantLine(ItemWkshVariantLine);
-                until ItemWkshVariantLine.Next = 0;
+                until ItemWkshVariantLine.Next() = 0;
             ItemWkshLine.Validate(ItemWkshLine.Status, ItemWkshLine.Status::Processed);
             if not CalledFromTest then
                 ItemWkshLine.Modify(true);
@@ -161,7 +161,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         if Item."Unit Cost" = 0 then
             Item."Unit Cost" := ItemWkshLine."Direct Unit Cost";
         if (ItemWkshLine."Sales Price Currency Code" = '') then
-            if ItemWkshLine."Sales Price Start Date" <= WorkDate then
+            if ItemWkshLine."Sales Price Start Date" <= WorkDate() then
                 Item.Validate(Item."Unit Price", ItemWkshLine."Sales Price");
         if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Base Unit of Measure")) then
             Item.Validate(Item."Base Unit of Measure", ItemWkshLine."Base Unit of Measure");
@@ -253,7 +253,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         VarietyGroup: Record "NPR Variety Group";
         NewVarietyTable: Record "NPR Variety Table";
         VarietyTableOld: Record "NPR Variety Table";
-        VarietyValue: Record "NPR Variety Value";
         IsUpdated: Boolean;
         NewTableCode: Code[40];
         PrefixCode: Code[40];
@@ -314,19 +313,19 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
 
         //Copy Worksheet Values
         if CopyValues then begin
-            ItemWorksheetVarietyValue.Reset;
+            ItemWorksheetVarietyValue.Reset();
             ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
             ItemWorksheetVarietyValue.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
             ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
             ItemWorksheetVarietyValue.SetRange(Type, Variety);
-            if ItemWorksheetVarietyValue.FindSet then
+            if ItemWorksheetVarietyValue.FindSet() then
                 repeat
                     IsUpdated := false;
                     ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
                     ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
                     ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
                     ItemWorksheetVariantLineToCreate.SetRange(Action, ItemWorksheetVariantLineToCreate.Action::CreateNew);
-                    if ItemWorksheetVariantLineToCreate.FindSet then
+                    if ItemWorksheetVariantLineToCreate.FindSet() then
                         repeat
                             if ((ItemWorksheetVariantLineToCreate."Variety 1" = ItemWorksheetVarietyValue.Type) and
                                 (ItemWorksheetVariantLineToCreate."Variety 1 Value" = ItemWorksheetVarietyValue.Value)) or
@@ -337,7 +336,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                                ((ItemWorksheetVariantLineToCreate."Variety 4" = ItemWorksheetVarietyValue.Type) and
                                 (ItemWorksheetVariantLineToCreate."Variety 4 Value" = ItemWorksheetVarietyValue.Value)) then
                                 IsUpdated := true;
-                        until (ItemWorksheetVariantLineToCreate.Next = 0) or IsUpdated;
+                        until (ItemWorksheetVariantLineToCreate.Next() = 0) or IsUpdated;
                     if IsUpdated then
                         UpdateVarietyValue(Variety, NewTableCode, ItemWorksheetVarietyValue.Value, ItemWorksheetVarietyValue."Sort Order", ItemWorksheetVarietyValue.Description);
                 until ItemWorksheetVarietyValue.Next() = 0;
@@ -396,7 +395,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
 
     local procedure UpdateAndCopyVariety(Variety: Code[20]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; VarietyValue: Code[50])
     var
-        VarietyTable: Record "NPR Variety Table";
         ExistingVarityValue: Record "NPR Variety Value";
         NewVarietyValue: Record "NPR Variety Value";
     begin
@@ -421,7 +419,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
 
     local procedure UpdateVarietyValue(ParType: Code[10]; ParTable: Code[40]; ParValue: Code[50]; ParSortOrder: Integer; ParDescription: Text[30])
     var
-        VarietyTable: Record "NPR Variety Table";
         VarietyValue: Record "NPR Variety Value";
     begin
         if ParType <> '' then begin
@@ -434,7 +431,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                     VarietyValue.Value := ParValue;
                     VarietyValue.Description := ParDescription;
                     VarietyValue."Sort Order" := ParSortOrder;
-                    VarietyValue.Insert;
+                    VarietyValue.Insert();
                 end;
             end;
         end;
@@ -496,7 +493,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         AttributeKey: Record "NPR Attribute Key";
         AttributeValueSet: Record "NPR Attribute Value Set";
         AttributeManagement: Codeunit "NPR Attribute Management";
-        WorksheetReference: Integer;
         TxtAttributeNotSetUp: Label 'Attribute %1 is not set up on the Item table, so it cannot be used with item %2.';
     begin
         AttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
@@ -507,15 +503,15 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         AttributeKey.SetFilter("MDR Line 2 PK", '=%1', 0);
 
         // Fill array
-        if AttributeKey.FindFirst then begin
-            AttributeValueSet.Reset;
+        if AttributeKey.FindFirst() then begin
+            AttributeValueSet.Reset();
             AttributeValueSet.SetRange("Attribute Set ID", AttributeKey."Attribute Set ID");
-            if AttributeValueSet.FindSet then
+            if AttributeValueSet.FindSet() then
                 repeat
                     if not AttributeID.Get(DATABASE::Item, AttributeValueSet."Attribute Code") then
                         Error(StrSubstNo(TxtAttributeNotSetUp, AttributeValueSet."Attribute Code", ItemWkshLine."Item No."));
                     AttributeManagement.SetMasterDataAttributeValue(DATABASE::Item, AttributeID."Shortcut Attribute ID", ItemWkshLine."Item No.", AttributeValueSet."Text Value");
-                until AttributeValueSet.Next = 0;
+                until AttributeValueSet.Next() = 0;
         end;
     end;
 
@@ -531,7 +527,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             if ItemWkshVariantLine.FindSet() then
                 repeat
                     CopyToRegisteredWorksheetVariantLine();
-                until ItemWkshVariantLine.Next = 0;
+                until ItemWkshVariantLine.Next() = 0;
 
             ItemWorksheetVarietyValue.Reset();
             ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
@@ -540,7 +536,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             if ItemWorksheetVarietyValue.FindSet() then
                 repeat
                     CopyToRegisteredWorksheetVarietyValueLine();
-                until ItemWorksheetVarietyValue.Next = 0;
+                until ItemWorksheetVarietyValue.Next() = 0;
         end;
     end;
 
@@ -769,7 +765,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
 
     local procedure ProcessLineSalesPrices()
     var
-        ItemWorksheeVarieties: Record "NPR Item Worksh. Variety Value";
         SalesPrice: Record "Sales Price";
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         SalesUnitOfMeasure: Code[10];
@@ -781,7 +776,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         GetItem(ItemWkshLine."Item No.");
         if ItemWkshLine."Sales Price" <> Item."Unit Price" then begin
             if ItemWkshLine."Sales Price Currency Code" = '' then begin
-                if ItemWkshLine."Sales Price Start Date" <= WorkDate then begin
+                if ItemWkshLine."Sales Price Start Date" <= WorkDate() then begin
                     Item.Validate("Unit Price", ItemWkshLine."Sales Price");
                     Item.Modify(true);
                 end;
@@ -796,7 +791,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         else
             SalesUnitOfMeasure := Item."Sales Unit of Measure";
 
-        SalesPrice.Reset;
+        SalesPrice.Reset();
         SalesPrice.SetRange("Sales Type", SalesPrice."Sales Type"::"All Customers");
         SalesPrice.SetRange("Item No.", ItemWkshLine."Item No.");
         SalesPrice.SetRange("Variant Code", '');
@@ -815,11 +810,11 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Date",
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant+Date":
                 begin
-                    SalesPriceStartDate := WorkDate;
+                    SalesPriceStartDate := WorkDate();
                     if ItemWkshLine."Sales Price Start Date" <> 0D then
                         SalesPriceStartDate := ItemWkshLine."Sales Price Start Date";
                     SalesPrice.SetFilter("Starting Date", '>%1', SalesPriceStartDate);
-                    if SalesPrice.FindFirst then
+                    if SalesPrice.FindFirst() then
                         SalesPriceEndDate := SalesPrice."Starting Date" - 1
                     else
                         SalesPriceEndDate := 0D;
@@ -855,7 +850,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         case ItemWorksheetTemplate."Sales Price Handling" of
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant":
                 begin
-                    CloseRelatedSalesPrices(SalesPrice, WorkDate - 1);
+                    CloseRelatedSalesPrices(SalesPrice, WorkDate() - 1);
                 end;
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Date",
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant+Date":
@@ -868,7 +863,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
 
     local procedure ProcessVariantLineSalesPrice()
     var
-        ItemWorksheeVarieties: Record "NPR Item Worksh. Variety Value";
         SalesPrice: Record "Sales Price";
         SalesPriceMaster: Record "Sales Price";
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
@@ -894,7 +888,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         else
             SalesUnitOfMeasure := Item."Sales Unit of Measure";
 
-        SalesPrice.Reset;
+        SalesPrice.Reset();
         SalesPrice.SetRange("Sales Type", SalesPrice."Sales Type"::"All Customers");
         SalesPrice.SetRange("Item No.", ItemWkshVariantLine."Item No.");
         SalesPrice.SetRange("Variant Code", ItemWkshVariantLine."Variant Code");
@@ -915,18 +909,18 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                 end;
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant+Date":
                 begin
-                    SalesPriceStartDate := WorkDate;
+                    SalesPriceStartDate := WorkDate();
                     if ItemWkshLine."Sales Price Start Date" <> 0D then
                         SalesPriceStartDate := ItemWkshLine."Sales Price Start Date";
                     SalesPrice.SetFilter("Starting Date", '>%1', SalesPriceStartDate);
-                    if SalesPrice.FindFirst then
+                    if SalesPrice.FindFirst() then
                         SalesPriceEndDate := SalesPrice."Starting Date" - 1
                     else
                         SalesPriceEndDate := 0D;
                 end;
         end;
         SalesPrice.SetRange("Starting Date", SalesPriceStartDate);
-        if SalesPrice.FindFirst then begin
+        if SalesPrice.FindFirst() then begin
             if not OnlyCloseExistingPrices then begin
                 if SalesPrice."Ending Date" <> SalesPriceEndDate then begin
                     SalesPrice.Validate("Ending Date", SalesPriceEndDate);
@@ -937,7 +931,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                 SalesPrice.Modify(true);
             end;
         end else begin
-            SalesPriceMaster.Reset;
+            SalesPriceMaster.Reset();
             SalesPriceMaster.SetRange("Sales Type", SalesPriceMaster."Sales Type"::"All Customers");
             SalesPriceMaster.SetRange("Item No.", ItemWkshLine."Item No.");
             SalesPriceMaster.SetRange("Starting Date", SalesPriceStartDate);
@@ -953,7 +947,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                 repeat
                     if MasterLineMapMgt.IsMaster(Database::"Sales Price", SalesPriceMaster.SystemId) then begin
                         MasterLineFound := true;
-                        break;
+                        Break;
                     end;
                 until SalesPriceMaster.Next() = 0;
             // SalesPriceMaster.SetRange("NPR Is Master", true);
@@ -987,7 +981,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         case ItemWorksheetTemplate."Sales Price Handling" of
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant":
                 begin
-                    CloseRelatedSalesPrices(SalesPrice, WorkDate - 1);
+                    CloseRelatedSalesPrices(SalesPrice, WorkDate() - 1);
                 end;
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant+Date":
                 begin
@@ -1006,7 +1000,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         SalesPrice2: Record "Sales Price";
     begin
         GetItem(SalesPrice."Item No.");
-        SalesPrice2.Reset;
+        SalesPrice2.Reset();
         SalesPrice2.SetRange("Sales Type", SalesPrice2."Sales Type"::"All Customers");
         SalesPrice2.SetRange("Item No.", SalesPrice."Item No.");
         SalesPrice2.SetRange("Variant Code", SalesPrice."Variant Code");
@@ -1017,7 +1011,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             SalesPrice2.SetRange("Unit of Measure Code", SalesPrice."Unit of Measure Code");
         SalesPrice2.SetRange("Starting Date", 0D, EndingDate);
         SalesPrice2.SetRange("Minimum Quantity", 0, 1);
-        if SalesPrice2.FindSet then
+        if SalesPrice2.FindSet() then
             repeat
                 if (SalesPrice2."Ending Date" = 0D) or (SalesPrice2."Ending Date" > EndingDate) then
                     if (SalesPrice2."Item No." <> SalesPrice."Item No.") or
@@ -1031,7 +1025,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                         SalesPrice2."Ending Date" := EndingDate;
                         SalesPrice2.Modify(true);
                     end;
-            until SalesPrice2.Next = 0;
+            until SalesPrice2.Next() = 0;
     end;
 
     procedure ProcessLinePurchasePrices()
@@ -1048,7 +1042,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             end;
             exit;
         end;
-        PurchasePrice.Reset;
+        PurchasePrice.Reset();
         PurchasePrice.SetRange("Vendor No.", ItemWkshLine."Vendor No.");
         PurchasePrice.SetRange("Item No.", ItemWkshLine."Item No.");
         PurchasePrice.SetRange("Variant Code", '');
@@ -1056,36 +1050,36 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         if ItemWkshLine."Purchase Price Start Date" <> 0D then
             PurchasePrice.SetRange("Starting Date", ItemWkshLine."Purchase Price Start Date")
         else
-            PurchasePrice.SetRange("Starting Date", 0D, WorkDate);
-        if PurchasePrice.FindLast then begin
+            PurchasePrice.SetRange("Starting Date", 0D, WorkDate());
+        if PurchasePrice.FindLast() then begin
             //Found Purchase Price
             if PurchasePrice."Direct Unit Cost" <> ItemWkshLine."Direct Unit Cost" then begin
-                if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PurchasePrice."Starting Date" = WorkDate) or
+                if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PurchasePrice."Starting Date" = WorkDate()) or
                   (ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
                     PurchasePrice.Validate("Direct Unit Cost", ItemWkshLine."Direct Unit Cost");
                     PurchasePrice.Modify(true);
                 end else begin
-                    PurchasePrice.Validate("Ending Date", WorkDate - 1);
+                    PurchasePrice.Validate("Ending Date", WorkDate() - 1);
                     PurchasePrice.Modify(true);
                     PurchasePrice.Validate("Ending Date", 0D);
                     PurchasePrice.Validate("Direct Unit Cost", ItemWkshLine."Direct Unit Cost");
                     if ItemWkshLine."Purchase Price Start Date" <> 0D then
                         PurchasePrice.Validate("Starting Date", ItemWkshLine."Purchase Price Start Date")
                     else
-                        PurchasePrice.Validate("Starting Date", WorkDate);
+                        PurchasePrice.Validate("Starting Date", WorkDate());
                     PurchasePrice.Insert(true);
                 end;
             end;
         end else begin
             //Create a new Purchase Price
-            PurchasePrice.Init;
+            PurchasePrice.Init();
             PurchasePrice.Validate("Vendor No.", ItemWkshLine."Vendor No.");
             PurchasePrice.Validate("Item No.", ItemWkshLine."Item No.");
             PurchasePrice.Validate("Unit of Measure Code", Item."Purch. Unit of Measure");
             PurchasePrice.Validate("Direct Unit Cost", ItemWkshLine."Direct Unit Cost");
             PurchasePrice.Validate("Currency Code", ItemWkshLine."Purchase Price Currency Code");
             if (ItemWorksheetTemplate."Purchase Price Handling" <> ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") then
-                PurchasePrice.Validate("Starting Date", WorkDate);
+                PurchasePrice.Validate("Starting Date", WorkDate());
             if ItemWkshLine."Purchase Price Start Date" <> 0D then
                 PurchasePrice.Validate("Starting Date", ItemWkshLine."Purchase Price Start Date");
             PurchasePrice.Insert(true);
@@ -1096,13 +1090,12 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
     var
         PurchasePrice: Record "Purchase Price";
         PurchasePriceItem: Record "Purchase Price";
-        RecRef: RecordRef;
     begin
         if ItemWkshVariantLine."Direct Unit Cost" = 0 then
             exit;
         if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Date" then
             exit;
-        PurchasePrice.Reset;
+        PurchasePrice.Reset();
         PurchasePrice.SetRange("Vendor No.", ItemWkshLine."Vendor No.");
         PurchasePrice.SetRange("Item No.", ItemWkshVariantLine."Item No.");
         PurchasePrice.SetRange("Variant Code", ItemWkshVariantLine."Variant Code");
@@ -1110,33 +1103,33 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         if ItemWkshLine."Purchase Price Start Date" <> 0D then
             PurchasePrice.SetRange("Starting Date", ItemWkshLine."Purchase Price Start Date")
         else
-            PurchasePrice.SetRange("Starting Date", 0D, WorkDate);
-        if PurchasePrice.FindLast then begin
+            PurchasePrice.SetRange("Starting Date", 0D, WorkDate());
+        if PurchasePrice.FindLast() then begin
             //existing variant price found
             if ItemWkshVariantLine."Direct Unit Cost" <> PurchasePrice."Direct Unit Cost" then begin
-                if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PurchasePrice."Starting Date" = WorkDate) or
+                if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PurchasePrice."Starting Date" = WorkDate()) or
                   (ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
                     PurchasePrice.Validate("Direct Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
                     PurchasePrice.Modify(true);
                 end else begin
-                    PurchasePrice.Validate("Ending Date", WorkDate - 1);
+                    PurchasePrice.Validate("Ending Date", WorkDate() - 1);
                     PurchasePrice.Modify(true);
                     PurchasePrice.Validate("Ending Date", 0D);
                     PurchasePrice.Validate("Direct Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
-                    PurchasePrice.Validate("Starting Date", WorkDate);
+                    PurchasePrice.Validate("Starting Date", WorkDate());
                     PurchasePrice.Insert(true);
                 end;
             end;
         end else begin
-            PurchasePriceItem.Reset;
+            PurchasePriceItem.Reset();
             PurchasePriceItem.SetRange("Vendor No.", ItemWkshLine."Vendor No.");
             PurchasePriceItem.SetRange("Item No.", ItemWkshVariantLine."Item No.");
             PurchasePriceItem.SetRange("Currency Code", ItemWkshLine."Purchase Price Currency Code");
             if ItemWkshLine."Purchase Price Start Date" <> 0D then
                 PurchasePrice.SetRange("Starting Date", ItemWkshLine."Purchase Price Start Date")
             else
-                PurchasePrice.SetRange("Starting Date", 0D, WorkDate);
-            if PurchasePrice.FindLast then begin
+                PurchasePrice.SetRange("Starting Date", 0D, WorkDate());
+            if PurchasePrice.FindLast() then begin
                 //existing item price
                 if PurchasePriceItem."Direct Unit Cost" <> ItemWkshVariantLine."Direct Unit Cost" then begin
                     PurchasePrice.Init();
@@ -1145,7 +1138,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                     PurchasePrice.Validate("Direct Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
                     PurchasePrice.Validate("Currency Code", ItemWkshLine."Purchase Price Currency Code");
                     if (ItemWorksheetTemplate."Purchase Price Handling" <> ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") then
-                        PurchasePrice.Validate("Starting Date", WorkDate);
+                        PurchasePrice.Validate("Starting Date", WorkDate());
                     PurchasePrice.Insert(true);
                 end;
             end else begin
@@ -1158,7 +1151,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                 PurchasePrice.Validate("Direct Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
                 PurchasePrice.Validate("Currency Code", ItemWkshLine."Purchase Price Currency Code");
                 if (ItemWorksheetTemplate."Purchase Price Handling" <> ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") then
-                    PurchasePrice.Validate("Starting Date", WorkDate);
+                    PurchasePrice.Validate("Starting Date", WorkDate());
                 if ItemWkshLine."Purchase Price Start Date" <> 0D then
                     PurchasePrice.Validate("Starting Date", ItemWkshLine."Purchase Price Start Date");
                 PurchasePrice.Insert(true);
@@ -1193,21 +1186,21 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         ItemRecRef.Get(VarItem.RecordId);
         ItemWorksheetRecRef.Get(VarItemWkshLine.RecordId);
 
-        ItemWorksheetFieldChange.Reset;
+        ItemWorksheetFieldChange.Reset();
         ItemWorksheetFieldChange.SetRange("Worksheet Template Name", VarItemWkshLine."Worksheet Template Name");
         ItemWorksheetFieldChange.SetRange("Worksheet Name", VarItemWkshLine."Worksheet Name");
         ItemWorksheetFieldChange.SetRange("Worksheet Line No.", VarItemWkshLine."Line No.");
-        ItemWorksheetFieldChange.DeleteAll;
+        ItemWorksheetFieldChange.DeleteAll();
 
-        ItemWorksheetFieldSetup.Reset;
+        ItemWorksheetFieldSetup.Reset();
         ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '%1|%2', VarItemWkshLine."Worksheet Template Name", '');
         ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '%1|%2', VarItemWkshLine."Worksheet Name", '');
         ItemWorksheetFieldSetup.SetRange("Table No.", DATABASE::"NPR Item Worksheet Line");
-        if ItemWorksheetFieldSetup.FindSet then
+        if ItemWorksheetFieldSetup.FindSet() then
             repeat
                 //Find the setup on Template, Worksheet or General
                 ItemWorksheetFieldSetup.SetRange("Field Number", ItemWorksheetFieldSetup."Field Number");
-                ItemWorksheetFieldSetup.FindLast;
+                ItemWorksheetFieldSetup.FindLast();
                 ItemWorksheetFieldSetup.SetRange("Field Number");
                 case VarItemWkshLine.Action of
                     VarItemWkshLine.Action::CreateNew:
@@ -1298,7 +1291,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                             end;
                         end;
                 end;
-            until ItemWorksheetFieldSetup.Next = 0;
+            until ItemWorksheetFieldSetup.Next() = 0;
         if DoValidateFields then
             ItemRecRef.Modify(true);
         VarItem.Get(VarItem."No.");
@@ -1316,14 +1309,14 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '%1|%2', ItemWkshLine."Worksheet Name", '');
         ItemWorksheetFieldSetup.SetRange("Table No.", DATABASE::"NPR Item Worksheet Line");
         ItemWorksheetFieldSetup.SetRange("Field Number", SourceFieldNo);
-        if not ItemWorksheetFieldSetup.FindLast then
+        if not ItemWorksheetFieldSetup.FindLast() then
             exit(false);
         ItemRecRef.Get(VarItem.RecordId);
         ItemWorksheetRecRef.Get(ItemWkshLine.RecordId);
         ItemWorksheetFldRef := ItemWorksheetRecRef.Field(SourceFieldNo);
         ItemFldRef := ItemRecRef.Field(ItemWorksheetFieldSetup."Target Field Number Create");
         if MapField(ItemWorksheetFieldSetup, ItemWorksheetFldRef, ItemFldRef) then begin
-            ItemRecRef.Modify;
+            ItemRecRef.Modify();
             exit(true);
         end else
             exit(false);
@@ -1338,22 +1331,22 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         ItemWorksheetFieldMapping.SetRange("Worksheet Name", ItemWorksheetFieldSetup."Worksheet Name");
         ItemWorksheetFieldMapping.SetRange("Table No.", ItemWorksheetFieldSetup."Table No.");
         ItemWorksheetFieldMapping.SetRange("Field Number", ItemWorksheetFieldSetup."Field Number");
-        if ItemWorksheetFieldMapping.FindSet then
+        if ItemWorksheetFieldMapping.FindSet() then
             repeat
                 RecRef := SourceFldRef.Record;
-                RecRef.SetRecFilter;
+                RecRef.SetRecFilter();
                 //Exact
                 case ItemWorksheetFieldMapping.Matching of
                     ItemWorksheetFieldMapping.Matching::Exact:
                         begin
                             if ItemWorksheetFieldMapping."Case Sensitive" then begin
                                 ItemWorksheetFieldMapping.SetFilter("Source Value", Format(SourceFldRef.Value));
-                                if ItemWorksheetFieldMapping.FindFirst then
+                                if ItemWorksheetFieldMapping.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end else begin
                                 SourceFldRef.SetFilter('@' + Format(ItemWorksheetFieldMapping."Source Value"));
-                                if RecRef.FindFirst then
+                                if RecRef.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end;
@@ -1362,13 +1355,13 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                         begin
                             if ItemWorksheetFieldMapping."Case Sensitive" then begin
                                 SourceFldRef.SetFilter(Format(ItemWorksheetFieldMapping."Source Value") + '*');
-                                if RecRef.FindFirst then
+                                if RecRef.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end else begin
                                 ItemWorksheetFieldMapping.SetFilter("Source Value", '@' + Format(SourceFldRef.Value) + '*');
                                 SourceFldRef.SetFilter(Format(ItemWorksheetFieldMapping."Source Value") + '*');
-                                if RecRef.FindFirst then
+                                if RecRef.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end;
@@ -1377,12 +1370,12 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                         begin
                             if ItemWorksheetFieldMapping."Case Sensitive" then begin
                                 SourceFldRef.SetFilter('*' + Format(ItemWorksheetFieldMapping."Source Value"));
-                                if RecRef.FindFirst then
+                                if RecRef.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end else begin
                                 SourceFldRef.SetFilter('*@' + Format(ItemWorksheetFieldMapping."Source Value"));
-                                if RecRef.FindFirst then
+                                if RecRef.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end;
@@ -1391,12 +1384,12 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                         begin
                             if ItemWorksheetFieldMapping."Case Sensitive" then begin
                                 SourceFldRef.SetFilter('*' + Format(ItemWorksheetFieldMapping."Source Value") + '*');
-                                if RecRef.FindFirst then
+                                if RecRef.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end else begin
                                 SourceFldRef.SetFilter('*@' + Format(ItemWorksheetFieldMapping."Source Value") + '*');
-                                if RecRef.FindFirst then
+                                if RecRef.FindFirst() then
                                     if ValidateFieldText(ItemWorksheetFieldMapping."Target Value", TargetFldRef) then
                                         exit(true);
                             end;
@@ -1408,7 +1401,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
 
     local procedure ValidateFieldRef(SourceFldRef: FieldRef; TargetFldRef: FieldRef): Boolean
     var
-        ItemWorksheetFieldMapping: Record "NPR Item Worksh. Field Mapping";
         TmpDateFormula: DateFormula;
         TmpBool: Boolean;
         TmpDate: Date;

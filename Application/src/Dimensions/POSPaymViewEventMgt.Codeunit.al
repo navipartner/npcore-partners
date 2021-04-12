@@ -46,33 +46,33 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         POSPaymentViewLogEntry.SetCurrentKey("POS Unit", "Sales Ticket No.");
         POSPaymentViewLogEntry.SetRange("POS Unit", SalePOS."Register No.");
         POSPaymentViewLogEntry.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if not POSPaymentViewLogEntry.FindFirst then begin
+        if not POSPaymentViewLogEntry.FindFirst() then begin
             Clear(POSPaymentViewLogEntry);
             case POSPaymentViewEventSetup."Popup per" of
                 POSPaymentViewEventSetup."Popup per"::All:
                     begin
                         POSPaymentViewLogEntry.SetCurrentKey("POS Sales No.");
-                        if POSPaymentViewLogEntry.FindLast then;
+                        if POSPaymentViewLogEntry.FindLast() then;
                         POSSalesNo := POSPaymentViewLogEntry."POS Sales No." + 1;
                     end;
                 POSPaymentViewEventSetup."Popup per"::"POS Store":
                     begin
                         POSPaymentViewLogEntry.SetCurrentKey("POS Store", "POS Sales No.");
                         POSPaymentViewLogEntry.SetRange("POS Store", SalePOS."POS Store Code");
-                        if POSPaymentViewLogEntry.FindLast then;
+                        if POSPaymentViewLogEntry.FindLast() then;
                         POSSalesNo := POSPaymentViewLogEntry."POS Sales No." + 1;
                     end;
                 POSPaymentViewEventSetup."Popup per"::"POS Unit":
                     begin
                         POSPaymentViewLogEntry.SetCurrentKey("POS Unit", "POS Sales No.");
                         POSPaymentViewLogEntry.SetRange("POS Unit", SalePOS."Register No.");
-                        if POSPaymentViewLogEntry.FindLast then;
+                        if POSPaymentViewLogEntry.FindLast() then;
                         POSSalesNo := POSPaymentViewLogEntry."POS Sales No." + 1;
                     end;
             end;
 
             Clear(POSPaymentViewLogEntry);
-            POSPaymentViewLogEntry.Init;
+            POSPaymentViewLogEntry.Init();
             POSPaymentViewLogEntry."Entry No." := 0;
             POSPaymentViewLogEntry."POS Store" := SalePOS."POS Store Code";
             POSPaymentViewLogEntry."POS Unit" := SalePOS."Register No.";
@@ -81,7 +81,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
             if POSPaymentViewEventSetup."Popup every" > 0 then
                 POSPaymentViewLogEntry."Post Code Popup" := (POSPaymentViewLogEntry."POS Sales No." mod POSPaymentViewEventSetup."Popup every" = 0);
             POSPaymentViewLogEntry."Log Date" := CurrentDateTime;
-            POSPaymentViewLogEntry.Insert;
+            POSPaymentViewLogEntry.Insert();
         end;
 
         if not POSPaymentViewLogEntry."Post Code Popup" then
@@ -116,7 +116,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
     local procedure SkipPopup(SalePOS: Record "NPR POS Sale"; var POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup"): Boolean
     begin
 
-        if not POSPaymentViewEventSetup.Get then
+        if not POSPaymentViewEventSetup.Get() then
             exit(true);
 
         if not POSPaymentViewEventSetup."Dimension Popup Enabled" then
@@ -179,7 +179,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
             exit(false);
         DimensionSetEntry.SetRange("Dimension Set ID", SalePOS."Dimension Set ID");
         DimensionSetEntry.SetRange("Dimension Code", DimensionCode);
-        if not DimensionSetEntry.FindFirst then
+        if not DimensionSetEntry.FindFirst() then
             exit(false);
 
         exit(DimensionSetEntry."Dimension Value Code" <> '');

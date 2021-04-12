@@ -32,7 +32,7 @@ codeunit 6150685 "NPR NPRE RVA: Set Table Status"
         NewStatusCode: Code[10];
         SeatingCode: Code[20];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -44,7 +44,7 @@ codeunit 6150685 "NPR NPRE RVA: Set Table Status"
 
         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::Seating);
         FlowStatus.SetRange(Code, NewStatusCode);
-        FlowStatus.FindFirst;
+        FlowStatus.FindFirst();
 
         SeatingMgt.SetSeatingStatus(SeatingCode, NewStatusCode);
     end;

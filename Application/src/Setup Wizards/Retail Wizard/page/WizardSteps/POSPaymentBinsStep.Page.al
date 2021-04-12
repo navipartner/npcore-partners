@@ -95,34 +95,34 @@ page 6014684 "NPR POS Payment Bins Step"
             }
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("Attached to POS Unit No."; "Attached to POS Unit No.")
+                field("Attached to POS Unit No."; Rec."Attached to POS Unit No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Attached to POS Unit No. field';
                 }
-                field("Eject Method"; "Eject Method")
+                field("Eject Method"; Rec."Eject Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Eject Method field';
                 }
-                field("Bin Type"; "Bin Type")
+                field("Bin Type"; Rec."Bin Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bin Type field';
@@ -162,7 +162,6 @@ page 6014684 "NPR POS Payment Bins Step"
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
         i: Integer;
         LastNoUsed: Code[10];
-        RecRef: RecordRef;
     begin
         Rec.Reset();
 
@@ -207,7 +206,7 @@ page 6014684 "NPR POS Payment Bins Step"
             repeat
                 TempPOSPaymentBin := Rec;
                 TempPOSPaymentBin.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure SetRec(var TempPOSPaymentBin: Record "NPR POS Payment Bin")

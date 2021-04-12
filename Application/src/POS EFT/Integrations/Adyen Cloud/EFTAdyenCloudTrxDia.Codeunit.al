@@ -1,4 +1,4 @@
-codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
+﻿codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
 {
     // NPR5.48/MMV /20190124 CASE 341237 Created object
     // NPR5.49/MMV /20190305 CASE 345188 Added support for AcquireCard
@@ -18,23 +18,12 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
     var
         Model: DotNet NPRNetModel;
         ActiveModelID: Guid;
-        ProtocolError: Label 'An unexpected error ocurred in the %1 protocol:\%2';
-        ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for %1 payment. ';
-        ERROR_INVOKE: Label 'Error: Service endpoint responded with HTTP status %1';
         TransactionEntryNo: Integer;
-        ERROR_WS_SESSION: Label 'Error: Could not start background session for Adyen webservice invoke';
         Done: Boolean;
-        ERROR_RECEIPT: Label 'Error: Could not create terminal receipt data';
-        ERROR_HEADER_CATEGORY: Label 'Error: Header category %1, expected %2';
-        VOID_SUCCESS: Label 'Transaction %1 was successfully voided';
-        VOID_FAILURE: Label 'Transaction %1 could not be voided: %2\%3';
-        DIAGNOSE: Label 'Terminal Status: %1\Terminal Connection: %2\Host Connection: %3';
-        UNKNOWN: Label 'Unknown';
         TXT_ABORT: Label 'Abort';
         AbortRequested: Boolean;
         ModelAmount: Decimal;
         TXT_FORCE_ABORT: Label 'Force Abort';
-        TransactionStartTime: DateTime;
         FirstAbortRequestedTime: DateTime;
         CONFIRM_FORCE_ABORT: Label 'WARNING:\Force abort will close the transaction dialog without receiving transaction result. This should only be used if the terminal has frozen or is unresponsive. Use lookup afterwards to recover any approved transactions!\Continue with force abort?';
 
@@ -48,7 +37,6 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
         TransactionEntryNo := EFTTransactionRequest."Entry No.";
         ModelAmount := GetAmount(EFTTransactionRequest);
         //-NPR5.53 [377533]
-        TransactionStartTime := EFTTransactionRequest.Started;
         //+NPR5.53 [377533]
 
         ConstructTransactionDialog(EFTTransactionRequest);
@@ -65,9 +53,6 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', false, false)]
     local procedure OnTransactionDialogResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
-    var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
     begin
         if ModelID <> ActiveModelID then
             exit;
@@ -89,7 +74,6 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
     local procedure CheckResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         ContinueOnTransactionEntryNo: Integer;
         EFTAdyenCloudBackgndResp: Codeunit "NPR EFT Adyen Backgnd. Resp.";
@@ -107,7 +91,7 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
         //Response was found with a lock, i.e. no dirty read. Process it and close dialog regardless of success status.
         //Display any uncaught errors (extremely critical as payment might have been processed. Will need to be handled via trx lookup, assuming error was transient or missing config).
 
-        EFTTransactionRequest.Reset;
+        EFTTransactionRequest.Reset();
         EFTTransactionRequest."Entry No." := TransactionEntryNo;
         EFTAdyenCloudBackgndResp.SetRunMode(1);
         if not EFTAdyenCloudBackgndResp.Run(EFTTransactionRequest) then begin
@@ -129,7 +113,6 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
             TransactionEntryNo := ContinueOnTransactionEntryNo; //Switch to waiting for Payment Transaction
 
             //-NPR5.53 [377533]
-            TransactionStartTime := EFTTransactionRequest.Started;
             Clear(FirstAbortRequestedTime);
             //+NPR5.53 [377533]
             Clear(AbortRequested);
@@ -143,7 +126,6 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
     local procedure RequestAbort(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
     begin
         EFTTransactionRequest.Get(TransactionEntryNo);

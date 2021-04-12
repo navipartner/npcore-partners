@@ -1,4 +1,4 @@
-codeunit 6150728 "NPR POS View Change WF Mgt."
+﻿codeunit 6150728 "NPR POS View Change WF Mgt."
 {
     TableNo = "NPR POS Sales Workflow Step";
 
@@ -8,7 +8,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
     begin
         POSSession.GetSession(POSSession, true);
         OnAfterLogin(Rec, POSSession);
-        Commit;
+        Commit();
     end;
 
     var
@@ -46,7 +46,6 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         SalePOS: Record "NPR POS Sale";
         StartTime: DateTime;
         POSSale: Codeunit "NPR POS Sale";
-        FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         StartTime := CurrentDateTime;
 
@@ -58,12 +57,12 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", OnPaymentViewCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
-        if not POSSalesWorkflowStep.FindSet then
+        if not POSSalesWorkflowStep.FindSet() then
             exit;
 
         repeat
             OnPaymentView(POSSalesWorkflowStep, POSSession);
-        until POSSalesWorkflowStep.Next = 0;
+        until POSSalesWorkflowStep.Next() = 0;
 
         POSSession.AddServerStopwatch('PAYMENT_VIEW_WORKFLOWS', CurrentDateTime - StartTime);
     end;
@@ -95,7 +94,6 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         SalePOS: Record "NPR POS Sale";
         StartTime: DateTime;
         POSSale: Codeunit "NPR POS Sale";
-        FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         StartTime := CurrentDateTime;
 
@@ -107,12 +105,12 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", OnAfterLoginCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
-        if not POSSalesWorkflowStep.FindSet then
+        if not POSSalesWorkflowStep.FindSet() then
             exit;
 
         repeat
             OnAfterLogin_OnRun(POSSalesWorkflowStep, POSSession);
-        until POSSalesWorkflowStep.Next = 0;
+        until POSSalesWorkflowStep.Next() = 0;
 
         POSSession.AddServerStopwatch('AFTER_LOGIN_WORKFLOWS', CurrentDateTime - StartTime);
     end;
@@ -162,7 +160,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
 
     local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     begin
-        if not TempSaleLinePOS.FindSet then
+        if not TempSaleLinePOS.FindSet() then
             exit(false);
 
         repeat
@@ -170,10 +168,10 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
             if TempSaleLinePOS."MR Anvendt antal" >= TempSaleLinePOS."Quantity (Base)" then
                 TempSaleLinePOS.Delete
             else
-                TempSaleLinePOS.Modify;
-        until TempSaleLinePOS.Next = 0;
+                TempSaleLinePOS.Modify();
+        until TempSaleLinePOS.Next() = 0;
 
-        exit(TempSaleLinePOS.FindFirst);
+        exit(TempSaleLinePOS.FindFirst());
     end;
 
     local procedure CalcInventory(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Decimal
@@ -199,7 +197,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
             exit(false);
 
         Clear(TempSaleLinePOS);
-        TempSaleLinePOS.DeleteAll;
+        TempSaleLinePOS.DeleteAll();
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -210,13 +208,13 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         if SaleLinePOS.IsEmpty then
             exit(false);
 
-        SaleLinePOS.FindSet;
+        SaleLinePOS.FindSet();
         repeat
             SetupSalesItem(SaleLinePOS, TempSaleLinePOS);
-        until SaleLinePOS.Next = 0;
-        TempSaleLinePOS.Reset;
+        until SaleLinePOS.Next() = 0;
+        TempSaleLinePOS.Reset();
 
-        exit(TempSaleLinePOS.FindFirst);
+        exit(TempSaleLinePOS.FindFirst());
     end;
 
     local procedure SetupSalesItem(SaleLinePOS: Record "NPR POS Sale Line"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
@@ -235,28 +233,28 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         TempSaleLinePOS.SetRange("No.", SaleLinePOS."No.");
         TempSaleLinePOS.SetRange("Variant Code", SaleLinePOS."Variant Code");
         TempSaleLinePOS.SetRange("Location Code", SaleLinePOS."Location Code");
-        if TempSaleLinePOS.FindFirst then begin
+        if TempSaleLinePOS.FindFirst() then begin
             TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
             TempSaleLinePOS."Quantity (Base)" += SaleLinePOS."Quantity (Base)";
-            TempSaleLinePOS.Modify;
+            TempSaleLinePOS.Modify();
         end else begin
-            TempSaleLinePOS.Init;
+            TempSaleLinePOS.Init();
             TempSaleLinePOS := SaleLinePOS;
-            TempSaleLinePOS.Insert;
+            TempSaleLinePOS.Insert();
         end;
     end;
 
     local procedure GetInventoryErrorMessage(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) ErrorMessage: Text
     begin
         ErrorMessage := Text002;
-        if TempSaleLinePOS.FindSet then
+        if TempSaleLinePOS.FindSet() then
             repeat
                 ErrorMessage += NewLine() + TempSaleLinePOS."No.";
                 ErrorMessage += ' ' + TempSaleLinePOS.Description;
                 if TempSaleLinePOS."Description 2" <> '' then
                     ErrorMessage += ' ' + TempSaleLinePOS."Description 2";
                 ErrorMessage += ': ' + Format(TempSaleLinePOS."MR Anvendt antal");
-            until TempSaleLinePOS.Next = 0;
+            until TempSaleLinePOS.Next() = 0;
 
         exit(ErrorMessage);
     end;

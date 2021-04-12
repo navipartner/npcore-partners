@@ -70,7 +70,6 @@ xmlport 6060116 "NPR TM Ticket Cancel"
         ReservationID: Text[100];
         ExternalIdCount: Integer;
         QtySum: Integer;
-        n: Integer;
 
     procedure GetToken(): Text[100]
     begin
@@ -83,8 +82,6 @@ xmlport 6060116 "NPR TM Ticket Cancel"
     end;
 
     procedure SetReservationResult(DocumentID: Text[100]; Success: Boolean)
-    var
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
         tmpTicketReservationResponse.DeleteAll();
 

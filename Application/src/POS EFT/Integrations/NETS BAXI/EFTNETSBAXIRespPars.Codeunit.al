@@ -12,7 +12,6 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
         SerializedResponse: Text;
         EftTransactionEntryNo: Integer;
         ERR_RESPONSE_TYPE: Label 'Critical error:\Unknown NETS BAXI response type: %1\Cannot establish response context';
-        ERR_SIGNATURE_PRINT: Label 'Could not parse signature receipt response';
         CARD_BALANCE: Label 'Card Balance: %1';
 
     local procedure ParseResponse()
@@ -426,7 +425,6 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
 
     local procedure ParseReceipt(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; Receipt: Text; var LastReceiptNo: Integer; var LastReceiptEntryNo: Integer; WriteToStream: OutStream)
     var
-        JToken: DotNet NPRNetJToken;
         StringReader: DotNet NPRNetStringReader;
         ReceiptLine: DotNet NPRNetString;
     begin
@@ -469,8 +467,8 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
     var
         CreditCardTransaction: Record "NPR EFT Receipt";
     begin
-        CreditCardTransaction.Init;
-        CreditCardTransaction.Date := Today;
+        CreditCardTransaction.Init();
+        CreditCardTransaction.Date := Today();
         CreditCardTransaction."Transaction Time" := Time;
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
         CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
@@ -478,7 +476,7 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
         CreditCardTransaction."Receipt No." := ReceiptNo;
         CreditCardTransaction.Text := CopyStr(Line, 1, MaxStrLen(CreditCardTransaction.Text));
         CreditCardTransaction."Entry No." := EntryNo;
-        CreditCardTransaction.Insert;
+        CreditCardTransaction.Insert();
     end;
 
     local procedure ParseOptionalData(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; OptionalData: Text)

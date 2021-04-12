@@ -16,49 +16,49 @@ page 6151493 "NPR Raptor Actions"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Raptor Module Code"; "Raptor Module Code")
+                field("Raptor Module Code"; Rec."Raptor Module Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Raptor Module Code field';
                 }
-                field("Raptor Module API Req. String"; "Raptor Module API Req. String")
+                field("Raptor Module API Req. String"; Rec."Raptor Module API Req. String")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Raptor Module API Req. String field';
                 }
-                field("Data Type Description"; "Data Type Description")
+                field("Data Type Description"; Rec."Data Type Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Type Description field';
                 }
-                field("Number of Entries to Return"; "Number of Entries to Return")
+                field("Number of Entries to Return"; Rec."Number of Entries to Return")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Number of Entries to Return field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field';
                 }
-                field("User Identifier Param. Name"; "User Identifier Param. Name")
+                field("User Identifier Param. Name"; Rec."User Identifier Param. Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the User Identifier Param. Name field';
                 }
-                field("Show Date-Time Created"; "Show Date-Time Created")
+                field("Show Date-Time Created"; Rec."Show Date-Time Created")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Date-Time Created field';
                 }
-                field("Show Priority"; "Show Priority")
+                field("Show Priority"; Rec."Show Priority")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Priority field';
@@ -83,7 +83,7 @@ page 6151493 "NPR Raptor Actions"
                 Caption = 'Add Default Actions';
                 Image = AddAction;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

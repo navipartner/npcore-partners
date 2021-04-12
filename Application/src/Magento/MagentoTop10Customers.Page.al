@@ -67,7 +67,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Week)
@@ -80,7 +80,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Week;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Month)
@@ -93,7 +93,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Month;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Quarter)
@@ -106,7 +106,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Quarter;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Year)
@@ -119,7 +119,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Year;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
             }
@@ -129,8 +129,8 @@ page 6151483 "NPR Magento Top 10 Customers"
     trigger OnOpenPage()
     begin
         PeriodType := PeriodType::Year;
-        CurrDate := Today;
-        UpdateList;
+        CurrDate := Today();
+        UpdateList();
     end;
 
     var
@@ -143,22 +143,22 @@ page 6151483 "NPR Magento Top 10 Customers"
 
     local procedure UpdateList()
     begin
-        Rec.DeleteAll;
+        Rec.DeleteAll();
         Setdate;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
-        Query1.Open;
-        while Query1.Read do begin
+        Query1.Open();
+        while Query1.Read() do begin
             Cust.Get(Query1.Source_No);
             Rec.TransferFields(Cust);
-            if not Rec.Insert then;
+            if not Rec.Insert() then;
             Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
 
             Rec.CalcFields("Sales (LCY)");
             Rec."Search Name" := Format(-Rec."Sales (LCY)" * 100, 20, 1);
             Rec."Search Name" := PadStr('', 15 - StrLen(Rec."Search Name"), '0') + Rec."Search Name";
-            Rec.Modify;
+            Rec.Modify();
         end;
-        Query1.Close;
+        Query1.Close();
     end;
 
     local procedure Setdate()

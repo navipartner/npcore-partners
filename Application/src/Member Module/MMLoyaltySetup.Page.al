@@ -13,17 +13,17 @@ page 6060105 "NPR MM Loyalty Setup"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Collection Period"; "Collection Period")
+                field("Collection Period"; Rec."Collection Period")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Collection Period field';
@@ -35,7 +35,7 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     end;
                 }
-                field("Fixed Period Start"; "Fixed Period Start")
+                field("Fixed Period Start"; Rec."Fixed Period Start")
                 {
                     ApplicationArea = All;
                     Style = Attention;
@@ -49,7 +49,7 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     end;
                 }
-                field("Collection Period Length"; "Collection Period Length")
+                field("Collection Period Length"; Rec."Collection Period Length")
                 {
                     ApplicationArea = All;
                     Style = Attention;
@@ -63,7 +63,7 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     end;
                 }
-                field("Expire Uncollected Points"; "Expire Uncollected Points")
+                field("Expire Uncollected Points"; Rec."Expire Uncollected Points")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Expire Uncollected Points field';
@@ -75,7 +75,7 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     end;
                 }
-                field("Expire Uncollected After"; "Expire Uncollected After")
+                field("Expire Uncollected After"; Rec."Expire Uncollected After")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Expire Uncollected After field';
@@ -125,47 +125,47 @@ page 6060105 "NPR MM Loyalty Setup"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Expire Points At field';
                 }
-                field("Voucher Point Source"; "Voucher Point Source")
+                field("Voucher Point Source"; Rec."Voucher Point Source")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher Point Source field';
                 }
-                field("Voucher Point Threshold"; "Voucher Point Threshold")
+                field("Voucher Point Threshold"; Rec."Voucher Point Threshold")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher Point Threshold field';
                 }
-                field("Voucher Creation"; "Voucher Creation")
+                field("Voucher Creation"; Rec."Voucher Creation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher Creation field';
                 }
-                field("Point Base"; "Point Base")
+                field("Point Base"; Rec."Point Base")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Point Base field';
                 }
-                field("Amount Base"; "Amount Base")
+                field("Amount Base"; Rec."Amount Base")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Base field';
                 }
-                field("Points On Discounted Sales"; "Points On Discounted Sales")
+                field("Points On Discounted Sales"; Rec."Points On Discounted Sales")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Points On Discounted Sales field';
                 }
-                field("Amount Factor"; "Amount Factor")
+                field("Amount Factor"; Rec."Amount Factor")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Factor field';
                 }
-                field("Point Rate"; "Point Rate")
+                field("Point Rate"; Rec."Point Rate")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Point Rate field';
                 }
-                field("Auto Upgrade Point Source"; "Auto Upgrade Point Source")
+                field("Auto Upgrade Point Source"; Rec."Auto Upgrade Point Source")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto Upgrade Point Source field';
@@ -194,7 +194,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Ellipsis = true;
                 Image = LineDiscount;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Point Setup";
                 RunPageLink = Code = FIELD(Code);
@@ -207,7 +207,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Ellipsis = true;
                 Image = CalculateInvoiceDiscount;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loy. Item Point Setup";
                 RunPageLink = Code = FIELD(Code);
@@ -222,7 +222,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Caption = 'Auto Upgrade Threshold';
                 Image = UserCertificate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Alter Members.";
                 RunPageLink = "Loyalty Code" = FIELD(Code);
@@ -293,25 +293,25 @@ page 6060105 "NPR MM Loyalty Setup"
             LoyaltyPointManagement.CalcultatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
 
             ExpirePointsAt := 0D;
-            if ("Expire Uncollected Points") then
-                if (Format("Expire Uncollected After") <> '') then
+            if (Rec."Expire Uncollected Points") then
+                if (Format(Rec."Expire Uncollected After") <> '') then
                     if (CollectionPeriodEnd <> 0D) then
-                        ExpirePointsAt := CalcDate("Expire Uncollected After", CollectionPeriodEnd);
+                        ExpirePointsAt := CalcDate(Rec."Expire Uncollected After", CollectionPeriodEnd);
 
             PeriodCalculationIssue := not LoyaltyPointManagement.ValidateFixedPeriodCalculation(Rec, ReasonText);
         end;
 
         if (Rec."Collection Period" = Rec."Collection Period"::AS_YOU_GO) then begin
-            if ("Expire Uncollected Points") then
-                if (Format("Expire Uncollected After") <> '') then
-                    ExpirePointsAt := CalcDate("Expire Uncollected After", Today);
+            if (Rec."Expire Uncollected Points") then
+                if (Format(Rec."Expire Uncollected After") <> '') then
+                    ExpirePointsAt := CalcDate(Rec."Expire Uncollected After", Today);
         end;
 
     end;
 
     trigger OnInit()
     begin
-        TestDate := Today;
+        TestDate := Today();
     end;
 
     var
@@ -319,8 +319,6 @@ page 6060105 "NPR MM Loyalty Setup"
         CollectionPeriodEnd: Date;
         ExpirePointsAt: Date;
         TestDate: Date;
-        DF_PROBLEM_PREV: Label 'Check your dateformulas - the previous period is not calculating correctly.';
-        DF_PROBLEM_NEXT: Label 'Check your dateformulas - the next period is not calculating correctly.';
         PeriodCalculationIssue: Boolean;
         ReasonText: Text;
 

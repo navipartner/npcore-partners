@@ -141,27 +141,26 @@ xmlport 6060145 "NPR MM Get Loy. Statement"
                                 trigger OnBeforePassVariable()
                                 begin
 
-                                    with MembershipPointsEntry do
-                                        case "Entry Type" of
-                                            "Entry Type"::CAPTURE:
-                                                type := 'capture';
-                                            "Entry Type"::EXPIRED:
-                                                type := 'expired';
-                                            "Entry Type"::POINT_DEPOSIT:
-                                                type := 'deposit';
-                                            "Entry Type"::POINT_WITHDRAW:
-                                                if (Points > 0) then
-                                                    type := 'withdrawal (reversed)' else
-                                                    type := 'withdrawal';
-                                            "Entry Type"::REFUND:
-                                                type := 'refund';
-                                            "Entry Type"::RESERVE:
-                                                type := 'reserve';
-                                            "Entry Type"::SYNCHRONIZATION:
-                                                type := 'synchronization';
-                                            "Entry Type"::SALE:
-                                                type := 'sale';
-                                        end;
+                                    case MembershipPointsEntry."Entry Type" of
+                                        MembershipPointsEntry."Entry Type"::CAPTURE:
+                                            type := 'capture';
+                                        MembershipPointsEntry."Entry Type"::EXPIRED:
+                                            type := 'expired';
+                                        MembershipPointsEntry."Entry Type"::POINT_DEPOSIT:
+                                            type := 'deposit';
+                                        MembershipPointsEntry."Entry Type"::POINT_WITHDRAW:
+                                            if (MembershipPointsEntry.Points > 0) then
+                                                type := 'withdrawal (reversed)' else
+                                                type := 'withdrawal';
+                                        MembershipPointsEntry."Entry Type"::REFUND:
+                                            type := 'refund';
+                                        MembershipPointsEntry."Entry Type"::RESERVE:
+                                            type := 'reserve';
+                                        MembershipPointsEntry."Entry Type"::SYNCHRONIZATION:
+                                            type := 'synchronization';
+                                        MembershipPointsEntry."Entry Type"::SALE:
+                                            type := 'sale';
+                                    end;
                                 end;
                             }
                             fieldelement(reference; MembershipPointsEntry."Document No.")
@@ -219,9 +218,6 @@ xmlport 6060145 "NPR MM Get Loy. Statement"
     procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        Member: Record "NPR MM Member";
-        MembershipRole: Record "NPR MM Membership Role";
     begin
 
         responsemessage := '';

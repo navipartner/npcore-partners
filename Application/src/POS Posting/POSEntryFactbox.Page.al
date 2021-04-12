@@ -1,4 +1,4 @@
-page 6150671 "NPR POS Entry Factbox"
+﻿page 6150671 "NPR POS Entry Factbox"
 {
     Caption = 'POS Entry Factbox';
     PageType = CardPart;
@@ -10,12 +10,12 @@ page 6150671 "NPR POS Entry Factbox"
     {
         area(content)
         {
-            field("Currency Code"; "Currency Code")
+            field("Currency Code"; Rec."Currency Code")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Currency Code field';
             }
-            field("Item Sales (LCY)"; "Item Sales (LCY)")
+            field("Item Sales (LCY)"; Rec."Item Sales (LCY)")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Item Sales (LCY) field';
@@ -25,33 +25,33 @@ page 6150671 "NPR POS Entry Factbox"
                     SaleDetail(1);
                 end;
             }
-            field("Customer Sales (LCY)"; "Customer Sales (LCY)")
+            field("Customer Sales (LCY)"; Rec."Customer Sales (LCY)")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Customer Sales (LCY) field';
             }
-            field("G/L Sales (LCY)"; "G/L Sales (LCY)")
+            field("G/L Sales (LCY)"; Rec."G/L Sales (LCY)")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the G/L Sales (LCY) field';
             }
-            field("Discount Amount"; "Discount Amount")
+            field("Discount Amount"; Rec."Discount Amount")
             {
                 ApplicationArea = All;
                 Caption = 'Disc. Amt Excl. VAT';
                 ToolTip = 'Specifies the value of the Disc. Amt Excl. VAT field';
             }
-            field("Amount Incl. Tax"; "Amount Incl. Tax")
+            field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Amount Incl. Tax field';
             }
-            field("Amount Excl. Tax"; "Amount Excl. Tax")
+            field("Amount Excl. Tax"; Rec."Amount Excl. Tax")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Amount Excl. Tax field';
             }
-            field("Tax Amount"; "Tax Amount")
+            field("Tax Amount"; Rec."Tax Amount")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Tax Amount field';
@@ -61,44 +61,44 @@ page 6150671 "NPR POS Entry Factbox"
                     TaxDetail;
                 end;
             }
-            field("Rounding Amount (LCY)"; "Rounding Amount (LCY)")
+            field("Rounding Amount (LCY)"; Rec."Rounding Amount (LCY)")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Rounding Amount (LCY) field';
             }
-            field("Payment Amount"; "Payment Amount")
+            field("Payment Amount"; Rec."Payment Amount")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Payment Amount field';
             }
-            field("Sales Quantity"; "Sales Quantity")
+            field("Sales Quantity"; Rec."Sales Quantity")
             {
                 ApplicationArea = All;
                 DecimalPlaces = 0 : 2;
                 ToolTip = 'Specifies the value of the Sales Quantity field';
             }
-            field("Return Sales Quantity"; "Return Sales Quantity")
+            field("Return Sales Quantity"; Rec."Return Sales Quantity")
             {
                 ApplicationArea = All;
                 DecimalPlaces = 0 : 2;
                 ToolTip = 'Specifies the value of the Return Sales Quantity field';
             }
-            field("Sale Lines"; "Sale Lines")
+            field("Sale Lines"; Rec."Sale Lines")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Sale Lines field';
             }
-            field("Payment Lines"; "Payment Lines")
+            field("Payment Lines"; Rec."Payment Lines")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Payment Lines field';
             }
-            field("Tax Lines"; "Tax Lines")
+            field("Tax Lines"; Rec."Tax Lines")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Tax Lines field';
             }
-            field("No. of Print Output Entries"; "No. of Print Output Entries")
+            field("No. of Print Output Entries"; Rec."No. of Print Output Entries")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the No. of Print Output Entries field';
@@ -112,7 +112,7 @@ page 6150671 "NPR POS Entry Factbox"
 
     trigger OnAfterGetRecord()
     begin
-        if "Discount Amount" = 0 then
+        if Rec."Discount Amount" = 0 then
             UpdateDiscountAmt;
     end;
 
@@ -120,8 +120,8 @@ page 6150671 "NPR POS Entry Factbox"
     var
         TaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
-        TaxAmountLine.Reset;
-        TaxAmountLine.SetRange("POS Entry No.", "Entry No.");
+        TaxAmountLine.Reset();
+        TaxAmountLine.SetRange("POS Entry No.", Rec."Entry No.");
         PAGE.Run(0, TaxAmountLine);
     end;
 
@@ -129,8 +129,8 @@ page 6150671 "NPR POS Entry Factbox"
     var
         SalesLine: Record "NPR POS Entry Sales Line";
     begin
-        SalesLine.Reset;
-        SalesLine.SetRange("POS Entry No.", "Entry No.");
+        SalesLine.Reset();
+        SalesLine.SetRange("POS Entry No.", Rec."Entry No.");
         case Type of
             1:
                 SalesLine.SetRange(Type, SalesLine.Type::Item);
@@ -142,12 +142,12 @@ page 6150671 "NPR POS Entry Factbox"
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
-        POSSalesLine.Reset;
-        POSSalesLine.SetRange("POS Entry No.", "Entry No.");
-        if POSSalesLine.FindSet then begin
+        POSSalesLine.Reset();
+        POSSalesLine.SetRange("POS Entry No.", Rec."Entry No.");
+        if POSSalesLine.FindSet() then begin
             repeat
-                "Discount Amount" += POSSalesLine."Line Discount Amount Excl. VAT";
-            until POSSalesLine.Next = 0;
+                Rec."Discount Amount" += POSSalesLine."Line Discount Amount Excl. VAT";
+            until POSSalesLine.Next() = 0;
         end;
     end;
 }

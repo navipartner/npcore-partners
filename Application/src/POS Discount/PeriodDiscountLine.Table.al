@@ -349,7 +349,7 @@ table 6014414 "NPR Period Discount Line"
         field(215; "Page no. in advert"; Integer)
         {
             Caption = 'Page no. in advert';
-            ObsoleteState = Removed; 
+            ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore';
             ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
@@ -364,7 +364,7 @@ table 6014414 "NPR Period Discount Line"
         field(219; "Pagenumber in paper"; Text[30])
         {
             Caption = 'Pagenumber in paper';
-            ObsoleteState = Removed; 
+            ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore';
             ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
@@ -373,7 +373,7 @@ table 6014414 "NPR Period Discount Line"
         field(220; Photo; Boolean)
         {
             Caption = 'Photo';
-            ObsoleteState = Removed; 
+            ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore';
             ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
@@ -408,7 +408,7 @@ table 6014414 "NPR Period Discount Line"
         RetailComment.SetRange("Table ID", 6014414);
         RetailComment.SetRange("No.", Code);
         RetailComment.SetRange("No. 2", "Item No.");
-        RetailComment.DeleteAll;
+        RetailComment.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -426,7 +426,7 @@ table 6014414 "NPR Period Discount Line"
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
 
         UpdatePeriodDiscount;
 
@@ -456,8 +456,8 @@ table 6014414 "NPR Period Discount Line"
                     if not RetailComment2.Insert(true) then
                         RetailComment2.Modify(true);
                 end;
-            until RetailComment.Next = 0;
-        RetailComment.DeleteAll;
+            until RetailComment.Next() = 0;
+        RetailComment.DeleteAll();
 
         UpdateLine();
     end;
@@ -467,7 +467,6 @@ table 6014414 "NPR Period Discount Line"
         Item: Record Item;
         Text1060005: Label 'This items includes multi unit prices, which will be controlled by period discounts';
         VATPostingSetup: Record "VAT Posting Setup";
-        DG: Decimal;
         VATPct: Decimal;
 
     procedure UpdatePeriodDiscount()
@@ -475,8 +474,8 @@ table 6014414 "NPR Period Discount Line"
         PeriodDiscount: Record "NPR Period Discount";
     begin
         if PeriodDiscount.Get(Rec.Code) then begin
-            PeriodDiscount."Last Date Modified" := Today;
-            PeriodDiscount.Modify;
+            PeriodDiscount."Last Date Modified" := Today();
+            PeriodDiscount.Modify();
         end;
     end;
 

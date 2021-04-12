@@ -16,8 +16,6 @@ codeunit 6014426 "NPR NaviPartner Send SMS" implements "NPR Send SMS"
         HttpResp: HttpResponseMessage;
         ForeignPhone: Boolean;
         ServiceCode: Code[20];
-        ResponseString: Text;
-        ErrorHandled: Boolean;
     begin
         SMSSetup.Get();
 

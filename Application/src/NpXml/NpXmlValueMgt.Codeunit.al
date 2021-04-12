@@ -5,7 +5,6 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         TempBlob: Codeunit "Temp Blob";
         FieldRef: FieldRef;
         InStr: InStream;
-        DateBuffer: Date;
         DecBuffer: Decimal;
         IntBuffer: Integer;
         OptionString: Text;
@@ -90,18 +89,17 @@ codeunit 6151555 "NPR NpXml Value Mgt."
     local procedure SetRecRefCalcFieldFilter(NpXmlElement: Record "NPR NpXml Element"; RecRef: RecordRef; var RecRef2: RecordRef)
     var
         NpXmlFilter: Record "NPR NpXml Filter";
-        FieldRef: FieldRef;
         FieldRef2: FieldRef;
         BufferDecimal: Decimal;
         BufferInteger: Integer;
     begin
         Clear(RecRef2);
         RecRef2.Open(RecRef.Number);
-        RecRef2 := RecRef.Duplicate;
+        RecRef2 := RecRef.Duplicate();
 
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        if NpXmlFilter.FindSet then
+        if NpXmlFilter.FindSet() then
             repeat
                 FieldRef2 := RecRef2.Field(NpXmlFilter."Field No.");
                 case NpXmlFilter."Filter Type" of
@@ -131,31 +129,31 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                             FieldRef2.SetFilter(NpXmlFilter."Filter Value");
                         end;
                 end;
-            until NpXmlFilter.Next = 0;
+            until NpXmlFilter.Next() = 0;
 
         case NpXmlElement."Iteration Type" of
             NpXmlElement."Iteration Type"::First:
                 begin
-                    if RecRef2.FindFirst then
-                        RecRef2.SetRecFilter;
+                    if RecRef2.FindFirst() then
+                        RecRef2.SetRecFilter();
                 end;
             NpXmlElement."Iteration Type"::Last:
                 begin
-                    if RecRef2.FindLast then
-                        RecRef2.SetRecFilter;
+                    if RecRef2.FindLast() then
+                        RecRef2.SetRecFilter();
                 end;
         end;
     end;
 
     procedure FillCustomValueBuffer(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element"; var TempNpXmlCustomValueBuffer: Record "NPR NpXml Custom Val. Buffer" temporary)
     begin
-        TempNpXmlCustomValueBuffer.DeleteAll;
-        TempNpXmlCustomValueBuffer.Init;
+        TempNpXmlCustomValueBuffer.DeleteAll();
+        TempNpXmlCustomValueBuffer.Init();
         TempNpXmlCustomValueBuffer."Table No." := RecRef.Number;
         TempNpXmlCustomValueBuffer."Record Position" := RecRef.GetPosition(false);
         TempNpXmlCustomValueBuffer."Xml Template Code" := NPXmlElement."Xml Template Code";
         TempNpXmlCustomValueBuffer."Xml Element Line No." := NPXmlElement."Line No.";
-        TempNpXmlCustomValueBuffer.Insert;
+        TempNpXmlCustomValueBuffer.Insert();
     end;
 
     procedure GetCustomFieldValue(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element") Value: Text
@@ -236,7 +234,6 @@ codeunit 6151555 "NPR NpXml Value Mgt."
 
     local procedure GetSpecialFieldValue(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element"; FieldNo: Integer) Value: Text
     var
-        FieldRef: FieldRef;
         RecRef2: RecordRef;
     begin
         SetRecRefCalcFieldFilter(NPXmlElement, RecRef, RecRef2);
@@ -247,7 +244,7 @@ codeunit 6151555 "NPR NpXml Value Mgt."
             NPXmlElement."Field Type"::PrimaryKey:
                 Value := GetPrimaryKeyValue(RecRef);
         end;
-        RecRef2.Close;
+        RecRef2.Close();
         exit(Value);
     end;
 }

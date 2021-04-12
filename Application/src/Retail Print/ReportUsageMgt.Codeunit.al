@@ -44,12 +44,12 @@ codeunit 6014487 "NPR Report Usage Mgt."
         AllObj: Record AllObj;
     begin
         EntryNo := 1;
-        if ReportUsageLogEntry.FindLast then
+        if ReportUsageLogEntry.FindLast() then
             EntryNo := ReportUsageLogEntry."Entry No." + 1;
         ActiveSession.SetRange("Server Instance ID", ServiceInstanceId);
         ActiveSession.SetRange("Session ID", SessionId);
-        ActiveSession.FindFirst;
-        ReportUsageLogEntry.Init;
+        ActiveSession.FindFirst();
+        ReportUsageLogEntry.Init();
         ReportUsageLogEntry."Entry No." := EntryNo;
         ReportUsageLogEntry."Database Name" := ActiveSession."Database Name";
         ReportUsageLogEntry."Tenant Id" := TenantId;
@@ -66,7 +66,7 @@ codeunit 6014487 "NPR Report Usage Mgt."
         ReportUsageLogEntry."Enabled/Disabled Entry" := ReportID = 0;
         ReportUsageLogEntry."User Id" := UserId;
         ReportUsageLogEntry."Used on" := CurrentDateTime;
-        ReportUsageLogEntry.Insert;
+        ReportUsageLogEntry.Insert();
     end;
 }
 

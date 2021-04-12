@@ -25,63 +25,60 @@ codeunit 6150808 "NPR POS Action: Quantity"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('ValidatePositiveConstraint', 'if ((param.Constraint == param.Constraint["Positive Quantity Only"]) && (parseFloat (data("12")) < 0)) { message (labels.MustBePositive);abort();};');
-                RegisterWorkflowStep('ValidateNegativeConstraint', 'if ((param.Constraint == param.Constraint["Negative Quantity Only"]) && (parseFloat (data("12")) > 0)) { message (labels.MustBeNegative);abort();};');
-                RegisterWorkflowStep('PromptQuantity',
-                  'switch(param.InputType + "") {' +
-                  '  case "0":' +
-                  '    numpad({caption: labels.QtyCaption, value: Math.abs(parseFloat(data("12")))}).cancel(abort);' +
-                  '    break;' +
-                  '  case "1":' +
-                  '    if (param.ChangeToQuantity.substring(param.ChangeToQuantity.length - 1) == "*") {' +
-                  '      param.ChangeToQuantity = param.ChangeToQuantity.substring(0,param.ChangeToQuantity.length - 1);' +
-                  '    }' +
-                  '    context.$PromptQuantity = {"numpad": param.ChangeToQuantity};' +
-                  '    break;' +
-                  '  case "2":' +
-                  '    var qty = parseFloat(data("12")) + param.IncrementQuantity;' +
-                  '    context.$PromptQuantity = {"numpad": qty};' +
-                  '    break;' +
-                  '  default:' +
-                  '    goto("EndOfWorkflow");' +
-                  '}');
-                RegisterWorkflowStep('PromptUnitPrice',
-                  'if ((param.PromptUnitPriceOnNegativeInput) && (param.NegativeInput ? context.$PromptQuantity.numpad * -1 < 0 : context.$PromptQuantity.numpad < 0)) {' +
-                  '  numpad({caption: labels.PriceCaption, value: data("15")})' +
-                  '};');
-                RegisterWorkflowStep('AskForReturnReason', 'context.PromptForReason && respond();');
-                RegisterWorkflowStep('EndOfWorkflow', 'respond()');
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('ValidatePositiveConstraint', 'if ((param.Constraint == param.Constraint["Positive Quantity Only"]) && (parseFloat (data("12")) < 0)) { message (labels.MustBePositive);abort();};');
+            Sender.RegisterWorkflowStep('ValidateNegativeConstraint', 'if ((param.Constraint == param.Constraint["Negative Quantity Only"]) && (parseFloat (data("12")) > 0)) { message (labels.MustBeNegative);abort();};');
+            Sender.RegisterWorkflowStep('PromptQuantity',
+              'switch(param.InputType + "") {' +
+              '  case "0":' +
+              '    numpad({caption: labels.QtyCaption, value: Math.abs(parseFloat(data("12")))}).cancel(abort);' +
+              '    break;' +
+              '  case "1":' +
+              '    if (param.ChangeToQuantity.substring(param.ChangeToQuantity.length - 1) == "*") {' +
+              '      param.ChangeToQuantity = param.ChangeToQuantity.substring(0,param.ChangeToQuantity.length - 1);' +
+              '    }' +
+              '    context.$PromptQuantity = {"numpad": param.ChangeToQuantity};' +
+              '    break;' +
+              '  case "2":' +
+              '    var qty = parseFloat(data("12")) + param.IncrementQuantity;' +
+              '    context.$PromptQuantity = {"numpad": qty};' +
+              '    break;' +
+              '  default:' +
+              '    goto("EndOfWorkflow");' +
+              '}');
+            Sender.RegisterWorkflowStep('PromptUnitPrice',
+              'if ((param.PromptUnitPriceOnNegativeInput) && (param.NegativeInput ? context.$PromptQuantity.numpad * -1 < 0 : context.$PromptQuantity.numpad < 0)) {' +
+              '  numpad({caption: labels.PriceCaption, value: data("15")})' +
+              '};');
+            Sender.RegisterWorkflowStep('AskForReturnReason', 'context.PromptForReason && respond();');
+            Sender.RegisterWorkflowStep('EndOfWorkflow', 'respond()');
 
-                RegisterWorkflow(true);
-                RegisterDataBinding();
+            Sender.RegisterWorkflow(true);
+            Sender.RegisterDataBinding();
 
-                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-                RegisterOptionParameter('InputType', 'Ask,Fixed,Increment', 'Ask');
-                RegisterDecimalParameter('IncrementQuantity', 0);
-                RegisterOptionParameter('Constraint', 'No Constraint,Positive Quantity Only,Negative Quantity Only', 'No Constraint');
-                RegisterTextParameter('ChangeToQuantity', '0');
-                RegisterBooleanParameter('NegativeInput', false);
-                RegisterBooleanParameter('PromptUnitPriceOnNegativeInput', true);
-            end;
+            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+            Sender.RegisterOptionParameter('InputType', 'Ask,Fixed,Increment', 'Ask');
+            Sender.RegisterDecimalParameter('IncrementQuantity', 0);
+            Sender.RegisterOptionParameter('Constraint', 'No Constraint,Positive Quantity Only,Negative Quantity Only', 'No Constraint');
+            Sender.RegisterTextParameter('ChangeToQuantity', '0');
+            Sender.RegisterBooleanParameter('NegativeInput', false);
+            Sender.RegisterBooleanParameter('PromptUnitPriceOnNegativeInput', true);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'QtyCaption', QtyCaption);
-        Captions.AddActionCaption(ActionCode, 'PriceCaption', PriceCaption);
-        Captions.AddActionCaption(ActionCode, 'MustBePositive', MUST_BE_POSITIVE);
-        Captions.AddActionCaption(ActionCode, 'MustBeNegative', MUST_BE_NEGATIVE);
+        Captions.AddActionCaption(ActionCode(), 'QtyCaption', QtyCaption);
+        Captions.AddActionCaption(ActionCode(), 'PriceCaption', PriceCaption);
+        Captions.AddActionCaption(ActionCode(), 'MustBePositive', MUST_BE_POSITIVE);
+        Captions.AddActionCaption(ActionCode(), 'MustBeNegative', MUST_BE_NEGATIVE);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, false)]
@@ -90,7 +87,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         Context: Codeunit "NPR POS JSON Management";
         NegativeInput: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -103,7 +100,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
 
         Context.SetContext('PromptForReason', true);
 
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -112,8 +109,6 @@ codeunit 6150808 "NPR POS Action: Quantity"
         SaleLinePOS: Record "NPR POS Sale Line";
         JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        ChangeToQuantity: Decimal;
         Quantity: Decimal;
         UnitPrice: Decimal;
         ConstraintOption: Integer;
@@ -122,7 +117,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         QtyCheck: Boolean;
         POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -132,7 +127,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         if WorkflowStep = 'AskForReturnReason' then begin
             ReturnReasonCode := SelectReturnReason();
             JSON.SetContext('ReturnReasonCode', ReturnReasonCode);
-            FrontEnd.SetActionContext(ActionCode, JSON);
+            FrontEnd.SetActionContext(ActionCode(), JSON);
             exit;
         end;
 
@@ -220,7 +215,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if not EanBoxEvent.Get(EventCodeQtyStar()) then begin
-            EanBoxEvent.Init;
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeQtyStar();
             EanBoxEvent."Module Name" := SaleLinePOS.TableCaption;
             EanBoxEvent.Description := CopyStr(SaleLinePOS.FieldCaption(Quantity), 1, MaxStrLen(EanBoxEvent.Description));
@@ -246,7 +241,6 @@ codeunit 6150808 "NPR POS Action: Quantity"
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeQtyStar(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
-        MMMemberCard: Record "NPR MM Member Card";
         Position: Integer;
         DecBuffer: Decimal;
     begin

@@ -41,7 +41,6 @@ codeunit 6151121 "NPR MM GDPR Management"
     [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterInsertMembershipEntry', '', true, true)]
     local procedure OnNewMembershipTimeEntry(MembershipEntry: Record "NPR MM Membership Entry")
     var
-        MembershipRole: Record "NPR MM Membership Role";
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
 
@@ -139,7 +138,6 @@ codeunit 6151121 "NPR MM GDPR Management"
         MembershipSetup: Record "NPR MM Membership Setup";
         GDPRAgreement: Record "NPR GDPR Agreement";
         PointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
-        ValidUntil: Date;
         AnonymizationDate: Date;
     begin
 
@@ -185,7 +183,6 @@ codeunit 6151121 "NPR MM GDPR Management"
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipRoleGuardian: Record "NPR MM Membership Role";
-        Anonymize: Boolean;
     begin
 
         Member.Get(MemberEntryNo);
@@ -243,7 +240,6 @@ codeunit 6151121 "NPR MM GDPR Management"
     local procedure DoAnonymizeMember(MemberEntryNo: Integer)
     var
         Member: Record "NPR MM Member";
-        MembershipRole: Record "NPR MM Membership Role";
         MemberCard: Record "NPR MM Member Card";
     begin
 
@@ -335,7 +331,6 @@ codeunit 6151121 "NPR MM GDPR Management"
 
     local procedure ValidateAnonymizeMembership(MembershipEntryNo: Integer; var ReasonText: Text): Boolean
     var
-        MembershipRole: Record "NPR MM Membership Role";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -392,9 +387,6 @@ codeunit 6151121 "NPR MM GDPR Management"
     local procedure GetMembershipValidUntil(MembershipEntryNo: Integer) ValidUntil: Date
     var
         MembershipEntry: Record "NPR MM Membership Entry";
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        AgreementDateformula: DateFormula;
     begin
         ValidUntil := 0D;
 
@@ -452,7 +444,6 @@ codeunit 6151121 "NPR MM GDPR Management"
     local procedure CreateLogEntryMembership(GDPRAgreementNo: Code[20]; GDPRMode: Option; MembershipEntryNo: Integer)
     var
         MembershipRole: Record "NPR MM Membership Role";
-        MembershipSetup: Record "NPR MM Membership Setup";
     begin
 
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
@@ -491,7 +482,7 @@ codeunit 6151121 "NPR MM GDPR Management"
 
             MembershipRole."GDPR Agreement No." := GDPRAgreementNo;
             if (MembershipRole."GDPR Data Subject Id" = '') then
-                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
             MembershipRole.Modify();
         end;
 
@@ -513,11 +504,9 @@ codeunit 6151121 "NPR MM GDPR Management"
 
     local procedure CheckLogEntry(GDPRAgreementNo: Code[20]; GDPRMode: Option; MembershipEntryNo: Integer; MemberEntryNo: Integer)
     var
-        Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipRole: Record "NPR MM Membership Role";
         GDPRManagement: Codeunit "NPR GDPR Management";
-        GDPRConsentLog: Record "NPR GDPR Consent Log";
     begin
 
         if (GDPRMode = MembershipSetup."GDPR Mode"::NA) then
@@ -531,7 +520,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         if ((MembershipRole."GDPR Agreement No." <> MembershipSetup."GDPR Agreement No.") or (MembershipRole."GDPR Data Subject Id" = '')) then begin
             MembershipRole."GDPR Agreement No." := GDPRAgreementNo;
             if (MembershipRole."GDPR Data Subject Id" = '') then
-                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
             MembershipRole.Modify();
         end;
 

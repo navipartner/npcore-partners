@@ -75,24 +75,24 @@ table 6151411 "NPR Magento Picture"
             Type::Item:
                 begin
                     MagentoPictureLink.SetRange("Picture Name", Name);
-                    if MagentoPictureLink.FindFirst then
-                        MagentoPictureLink.DeleteAll;
+                    if MagentoPictureLink.FindFirst() then
+                        MagentoPictureLink.DeleteAll();
                 end;
             Type::Brand:
                 begin
                     MagentoBrand.SetRange(Picture, Name);
-                    if MagentoBrand.FindFirst then
+                    if MagentoBrand.FindFirst() then
                         MagentoBrand.ModifyAll(Picture, '');
 
                     Clear(MagentoBrand);
                     MagentoBrand.SetRange("Logo Picture", Name);
-                    if MagentoBrand.FindFirst then
+                    if MagentoBrand.FindFirst() then
                         MagentoBrand.ModifyAll("Logo Picture", '');
                 end;
             Type::"Item Group":
                 begin
                     MagentoItemGroup.SetRange(Picture, Name);
-                    if MagentoItemGroup.FindFirst then
+                    if MagentoItemGroup.FindFirst() then
                         MagentoItemGroup.ModifyAll(Picture, '');
                 end;
         end;
@@ -103,14 +103,14 @@ table 6151411 "NPR Magento Picture"
         TestPictureSize();
         "Entry No." := 0;
 
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
         "Last Time Modified" := Time;
     end;
 
     trigger OnModify()
     begin
         TestPictureSize();
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
         "Last Time Modified" := Time;
     end;
 
@@ -174,7 +174,7 @@ table 6151411 "NPR Magento Picture"
     begin
         Value := '';
 
-        if Picture.HasValue then begin
+        if Picture.HasValue() then begin
             CalcFields(Picture);
             Picture.CreateInStream(InStr);
             Value := Convert.ToBase64(InStr);
@@ -212,7 +212,7 @@ table 6151411 "NPR Magento Picture"
             exit('');
 
         if MagentoSetup."Magento Url" = '' then
-            MagentoSetup.Get;
+            MagentoSetup.Get();
         MagentoUrl := MagentoSetup."Magento Url" + 'media/catalog/' + GetMagentoType() + '/api/' + Name;
         exit(MagentoUrl);
     end;

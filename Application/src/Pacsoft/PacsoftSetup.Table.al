@@ -132,7 +132,7 @@ table 6014574 "NPR Pacsoft Setup"
         }
         field(157; "Package ServiceCodeunit Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
                                                                            "Object ID" = FIELD("Package Service Codeunit ID")));
             Caption = 'Package ServiceCodeunit Name';
             Editable = false;

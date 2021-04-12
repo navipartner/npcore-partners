@@ -2,8 +2,6 @@ codeunit 6150844 "NPR POS Action: Postcode Stats"
 {
     var
         ActionDescription: Label 'This action prompts for a post code and store it on the sales header';
-        ValueSelection: Option LIST,"FIXED";
-        DimensionSource: Option SHORTCUT1,SHORTCUT2,ANY;
         Title: Label 'We need more information.';
         Caption: Label 'Post Code';
 
@@ -38,15 +36,14 @@ codeunit 6150844 "NPR POS Action: Postcode Stats"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'Title', Title);
-        Captions.AddActionCaption(ActionCode, 'Caption', Caption);
+        Captions.AddActionCaption(ActionCode(), 'Title', Title);
+        Captions.AddActionCaption(ActionCode(), 'Caption', Caption);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "NPR POS JSON Management";
-        JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
     begin
@@ -58,7 +55,7 @@ codeunit 6150844 "NPR POS Action: Postcode Stats"
         POSSale.GetCurrentSale(SalePOS);
         Context.SetContext('DefaultValue', SalePOS."Stats - Customer Post Code");
 
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
         Handled := true;
     end;
 

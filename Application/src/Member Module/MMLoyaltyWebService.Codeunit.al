@@ -153,7 +153,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         POSEntry.Get(ReceiptEntryNo);
         POSEntry.TestField("Customer No.", Membership."Customer No.");
-        POSEntry.SetRecFilter;
+        POSEntry.SetRecFilter();
 
         Filename := TemporaryPath + 'Receipt-' + Format(ReceiptEntryNo, 0, 9) + '.pdf';
 
@@ -184,7 +184,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         TmpPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
-        LoyaltyWebServiceMgr: Codeunit "NPR MM Loyalty WebService Mgr";
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
@@ -236,7 +235,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         TmpPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
-        LoyaltyWebServiceMgr: Codeunit "NPR MM Loyalty WebService Mgr";
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
@@ -291,7 +289,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
-        LoyaltyWebServiceMgr: Codeunit "NPR MM Loyalty WebService Mgr";
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
@@ -351,7 +348,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         OutStr: OutStream;
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         ResponseMessage: Text;
-        ResponseMessageId: Text;
     begin
 
         LoyaltyCouponEligibility.Import();
@@ -412,7 +408,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         OutStr: OutStream;
         ResponseMessage: Text;
-        ResponseMessageId: Text;
         MembershipEntryNo: Integer;
     begin
 
@@ -449,12 +444,11 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
                         TmpLoyaltyPointsSetup.TransferFields(TmpLoyaltyPointsSetupEligible, true);
 
-                        with TmpMemberInfoCapture do
-                            if (Coupon.Get(LoyaltyPointManagement.IssueOneCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, "Document No.", "Document Date", "Amount Incl VAT"))) then begin
+                        if (Coupon.Get(LoyaltyPointManagement.IssueOneCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Document No.", TmpMemberInfoCapture."Document Date", TmpMemberInfoCapture."Amount Incl VAT"))) then begin
 
-                                TmpCoupon.TransferFields(Coupon, true);
-                                TmpCoupon.Insert();
-                            end;
+                            TmpCoupon.TransferFields(Coupon, true);
+                            TmpCoupon.Insert();
+                        end;
                     end;
                 until (TmpLoyaltyPointsSetup.Next() = 0);
             end;
@@ -492,7 +486,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         OutStr: OutStream;
         ResponseMessage: Text;
-        ResponseMessageId: Text;
         MembershipEntryNo: Integer;
     begin
 
@@ -564,15 +557,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
     var
         ImportEntry: Record "NPR Nc Import Entry";
         Coupon: Record "NPR NpDc Coupon";
-        TmpCoupon: Record "NPR NpDc Coupon" temporary;
         Membership: Record "NPR MM Membership";
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcExtCouponReservation: Record "NPR NpDc Ext. Coupon Reserv.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         OutStr: OutStream;
-        ResponseMessage: Text;
-        ResponseMessageId: Text;
         MembershipEntryNo: Integer;
         ExternalMembershipNo: Code[20];
         CouponReferenceNo: Text[30];
@@ -615,10 +605,10 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
                         NpDcSaleLinePOSCoupon.SetFilter(Type, '=%1', NpDcSaleLinePOSCoupon.Type::Coupon);
                         NpDcSaleLinePOSCoupon.SetFilter("Coupon No.", '=%1', Coupon."No.");
-                        CurrSaleCouponCount := NpDcSaleLinePOSCoupon.COUNT;
+                        CurrSaleCouponCount := NpDcSaleLinePOSCoupon.Count();
 
                         NpDcExtCouponReservation.SetFilter("Coupon No.", '=%1', Coupon."No.");
-                        CurrSaleCouponCount += NpDcExtCouponReservation.COUNT;
+                        CurrSaleCouponCount += NpDcExtCouponReservation.Count();
 
                         if (CurrSaleCouponCount > 0) then begin
                             LoyaltyDeleteCoupon.AddErrorResponse('Coupon has been applied to a sale, coupon reservation must be cancelled before it can be deleted.');
@@ -655,8 +645,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
-    var
-        NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
         ImportEntry.Init();
         ImportEntry."Entry No." := 0;
@@ -740,7 +728,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         FileHandle.Open(Filename);
         FileHandle.CreateInStream(InStr);
         B64String := Base64Convert.ToBase64(InStr);
-        FileHandle.Close;
+        FileHandle.Close();
         exit(B64String);
     end;
 }

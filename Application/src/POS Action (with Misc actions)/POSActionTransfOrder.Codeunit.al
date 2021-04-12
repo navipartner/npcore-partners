@@ -1,4 +1,4 @@
-codeunit 6150731 "NPR POS Action: Transf. Order"
+﻿codeunit 6150731 "NPR POS Action: Transf. Order"
 {
     var
         ActionDescription: Label 'This is a built-in action for handling Transfer Orders';
@@ -32,7 +32,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         if Sender.DiscoverAction(
           ActionCode,
           ActionDescription,
-          ActionVersion,
+          ActionVersion(),
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Single)
         then begin
@@ -56,13 +56,11 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         UsePOSLocationAs: Integer;
         TransferFromFilter: Text;
         TransferToFilter: Text;
-        TemplateMgt: Codeunit "NPR RP Template Mgt.";
-        ReportSelection: Record "Report Selections";
         Template: Text;
         TransferOrderList: Page "Transfer Orders";
         Codeunit6059823: Codeunit "NPR TransferOrder-Post + Print";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -96,9 +94,9 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
             if TransferToFilter <> '' then
                 TransferHeader.SetFilter("Transfer-to Code", TransferToFilter);
 
-            ReportSelectionRetail.Reset;
+            ReportSelectionRetail.Reset();
             ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Transfer Order");
-            if ReportSelectionRetail.FindFirst then begin
+            if ReportSelectionRetail.FindFirst() then begin
                 Template := ReportSelectionRetail."Print Template";
                 Codeunit6059823.SetValues(true);
             end;
@@ -116,7 +114,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -138,7 +136,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
     var
         TransferHeader: Record "Transfer Header";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -158,7 +156,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -193,7 +191,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                     Clear(LocationList);
                     LocationList.SetTableView(Location);
                     LocationList.LookupMode(true);
-                    if LocationList.RunModal = ACTION::LookupOK then
+                    if LocationList.RunModal() = ACTION::LookupOK then
                         POSParameterValue.Value := CopyStr(LocationList.GetSelectionFilter(), 1, MaxStrLen(POSParameterValue.Value));
                 end;
 
@@ -224,7 +222,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                         exit;
                     Location.SetRange("Use As In-Transit", false);
                     Location.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Location.Code));
-                    Location.Find;
+                    Location.Find();
                 end;
         end;
     end;
@@ -243,9 +241,9 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
             if not Location."Use As In-Transit" and (TransferHeader."Transfer-from Code" <> Location.Code) then
                 TransferHeader.Validate("Transfer-to Code", TransferToCodeString);
         TransferHeader.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");  //Why only 1st global dim?
-        TransferHeader.Modify;
+        TransferHeader.Modify();
 
         TransferOrder.SetRecord(TransferHeader);
-        TransferOrder.Run;
+        TransferOrder.Run();
     end;
 }

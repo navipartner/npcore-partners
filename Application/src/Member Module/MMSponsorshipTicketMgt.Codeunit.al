@@ -38,8 +38,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 
     local procedure MakeTicket(MembershipRole: Record "NPR MM Membership Role"; SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup"; var ResponseMessage: Text): Boolean
     var
-        Ticket: Record "NPR TM Ticket";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Member: Record "NPR MM Member";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text;
@@ -62,15 +60,10 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 
     local procedure CreateTicketRequest(Token: Text; MembershipRole: Record "NPR MM Membership Role"; SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup")
     var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
-        TicketSetup: Record "NPR TM Ticket Setup";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Admission: Record "NPR TM Admission";
-        Method: Code[10];
-        Address: Text[200];
     begin
 
         MembershipRole.CalcFields("External Member No.");
@@ -105,13 +98,9 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         SponsorshipTicketEntry: Record "NPR MM Sponsors. Ticket Entry";
         SponsorshipTicketEntryWork: Record "NPR MM Sponsors. Ticket Entry";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        Ticket: Record "NPR TM Ticket";
         Member: Record "NPR MM Member";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        FromDate: Date;
-        UntilDate: Date;
     begin
 
         SponsorshipTicketEntry.SetCurrentKey("Membership Entry No.");
@@ -543,7 +532,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         // Only when adding first member
         MembershipRole.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
         MembershipRole.SetFilter(Blocked, '=%1', false);
-        if (MembershipRole.Count <> 1) then
+        if (MembershipRole.Count() <> 1) then
             exit;
 
         MembershipRole.Get(Membership."Entry No.", Member."Entry No.");

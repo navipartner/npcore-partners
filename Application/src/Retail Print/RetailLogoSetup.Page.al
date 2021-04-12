@@ -17,27 +17,27 @@ page 6014566 "NPR Retail Logo Setup"
         {
             repeater(Group)
             {
-                field(Sequence; Sequence)
+                field(Sequence; Rec.Sequence)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sequence field';
                 }
-                field(Keyword; Keyword)
+                field(Keyword; Rec.Keyword)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Keyword field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Start Date"; "Start Date")
+                field("Start Date"; Rec."Start Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Date field';
                 }
-                field("End Date"; "End Date")
+                field("End Date"; Rec."End Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End Date field';
@@ -81,7 +81,7 @@ page 6014566 "NPR Retail Logo Setup"
                     RetailLogoMgt: Codeunit "NPR Retail Logo Mgt.";
                 begin
                     if RetailLogoMgt.UploadLogoFromFile('') then
-                        FindLast;
+                        Rec.FindLast();
                 end;
             }
             action("Export Logo")

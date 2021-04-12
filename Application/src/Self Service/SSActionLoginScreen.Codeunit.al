@@ -42,8 +42,6 @@ codeunit 6151283 "NPR SS Action: Login Screen"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
         Captions.AddActionCaption(ActionCode(), 'ConfirmTitle', ConfirmTitle);
         Captions.AddActionCaption(ActionCode(), 'ConfirmMessage', ConfirmMessage);
@@ -54,7 +52,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
     var
         WorkflowResponseJson: Text;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -128,11 +126,9 @@ codeunit 6151283 "NPR SS Action: Login Screen"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
 
-        with Line do begin
-            Type := Type::Comment;
-            Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
-            "Sale Type" := "Sale Type"::Cancelled;
-        end;
+        Line.Type := Line.Type::Comment;
+        Line.Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
+        Line."Sale Type" := Line."Sale Type"::Cancelled;
         POSSaleLine.InsertLine(Line);
 
         POSSession.GetSale(POSSale);

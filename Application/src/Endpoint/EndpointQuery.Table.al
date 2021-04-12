@@ -1,4 +1,4 @@
-table 6014678 "NPR Endpoint Query"
+﻿table 6014678 "NPR Endpoint Query"
 {
     // NPR5.25/BR  /20160801  CASE 234602 Object created
     // NPR5.38/MHA /20180104  CASE 301054 Corrected Calcformula for field 220 "Table Name"
@@ -109,7 +109,7 @@ table 6014678 "NPR Endpoint Query"
                     if "Table View" <> '' then
                         FilterPageBuild.SetView(RecRef.Caption, "Table View");
                     FilterPageBuild.PageCaption := RecRef.Caption;
-                    FilterPageBuild.RunModal;
+                    FilterPageBuild.RunModal();
                     Validate("Table View", FilterPageBuild.GetView(RecRef.Caption));
                 end;
             end;
@@ -141,13 +141,13 @@ table 6014678 "NPR Endpoint Query"
                 TableFilter.FilterGroup(0);
                 TableFilterPage.SetTableView(TableFilter);
                 TableFilterPage.SetSourceTable(Format("Table Filter"), "Table No.", '');
-                if ACTION::OK = TableFilterPage.RunModal then
+                if ACTION::OK = TableFilterPage.RunModal() then
                     Evaluate("Table Filter", TableFilterPage.CreateTextTableFilter(false));
             end;
         }
         field(220; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Description = 'NPR5.38';
@@ -181,7 +181,6 @@ table 6014678 "NPR Endpoint Query"
 
     trigger OnDelete()
     var
-        EndpointRequest: Record "NPR Endpoint Request";
         EndpointQueryFilter: Record "NPR Endpoint Query Filter";
     begin
         EndpointQueryFilter.SetRange("Endpoint Query No.", "No.");
@@ -196,7 +195,7 @@ table 6014678 "NPR Endpoint Query"
 
         if "Database Name" = '' then begin
             ActiveSession.SetRange("Session ID", SessionId);
-            if ActiveSession.FindFirst then
+            if ActiveSession.FindFirst() then
                 "Database Name" := CopyStr("Database Name", 1, MaxStrLen("Database Name"));
         end;
 
@@ -235,16 +234,15 @@ table 6014678 "NPR Endpoint Query"
     procedure CreateFilterTextFromFilterLines()
     var
         EndpointQueryFilter: Record "NPR Endpoint Query Filter";
-        LastTableNo: Integer;
         RecRef: RecordRef;
         FldRef: FieldRef;
     begin
         "Table No." := 0;
-        EndpointQueryFilter.Reset;
+        EndpointQueryFilter.Reset();
         EndpointQueryFilter.SetRange("Endpoint Query No.", "No.");
         if EndpointQueryFilter.IsEmpty then
             exit;
-        if EndpointQueryFilter.FindFirst then
+        if EndpointQueryFilter.FindFirst() then
             repeat
                 //If there are mutiple tables in the filter, then it can't be stored in the Table Filter field on the query
                 if ("Table No." <> 0) and ("Table No." <> EndpointQueryFilter."Table No.") then begin
@@ -260,7 +258,7 @@ table 6014678 "NPR Endpoint Query"
                     FldRef := RecRef.Field(EndpointQueryFilter."Field No.");
                     FldRef.SetFilter(EndpointQueryFilter."Filter Text");
                 end;
-            until EndpointQueryFilter.Next = 0;
+            until EndpointQueryFilter.Next() = 0;
         if StrLen(RecRef.GetView) <= MaxStrLen("Table View") then begin
             "Table View" := RecRef.GetView
         end else begin
@@ -328,29 +326,29 @@ table 6014678 "NPR Endpoint Query"
         RecRef.Open(Endpoint."Table No.");
         //Set the Query filters
         RecRef.FilterGroup(0);
-        EndpointQueryFilter.Reset;
+        EndpointQueryFilter.Reset();
         EndpointQueryFilter.SetRange("Endpoint Query No.", "No.");
-        if EndpointQueryFilter.FindSet then
+        if EndpointQueryFilter.FindSet() then
             repeat
                 if EndpointQueryFilter."Field No." <> 0 then begin
                     FldRef := RecRef.Field(EndpointQueryFilter."Field No.");
                     FldRef.SetFilter(EndpointQueryFilter."Filter Text");
                 end;
-            until EndpointQueryFilter.Next = 0;
+            until EndpointQueryFilter.Next() = 0;
 
         //Set the Endpoint filters
         RecRef.FilterGroup(1);
-        EndpointFilter.Reset;
+        EndpointFilter.Reset();
         EndpointFilter.SetRange("Endpoint Code", Endpoint.Code);
-        if EndpointQueryFilter.FindSet then
+        if EndpointQueryFilter.FindSet() then
             repeat
                 if EndpointQueryFilter."Field No." <> 0 then begin
                     FldRef := RecRef.Field(EndpointQueryFilter."Field No.");
                     FldRef.SetFilter(EndpointQueryFilter."Filter Text");
                 end;
-            until EndpointQueryFilter.Next = 0;
+            until EndpointQueryFilter.Next() = 0;
 
-        NoOfRecords := RecRef.Count;
+        NoOfRecords := RecRef.Count();
 
         if NoOfRecords = 0 then begin
             "Processing Comment" := TextNoRecords;
@@ -362,9 +360,9 @@ table 6014678 "NPR Endpoint Query"
             exit(false);
         end;
 
-        if RecRef.FindFirst then
+        if RecRef.FindFirst() then
             repeat
-                EndpointRequest.Init;
+                EndpointRequest.Init();
                 EndpointRequest."No." := 0;
                 EndpointRequest."Endpoint Code" := Endpoint.Code;
                 EndpointRequest."Request Batch No." := EndpointManagement.GetEndpointRequestBatchNo(Endpoint.Code);
@@ -376,7 +374,7 @@ table 6014678 "NPR Endpoint Query"
                 EndpointManagement.PopulatePKFields(EndpointRequest, RecRef);
                 EndpointRequest.Insert(true);
                 EndpointManagement.MarkPreviousRequestsAsObsolete(EndpointRequest);
-            until RecRef.Next = 0;
+            until RecRef.Next() = 0;
         "Processing Comment" := StrSubstNo(TextRequestsInserted, NoOfRecords);
         exit(true);
     end;
@@ -388,7 +386,7 @@ table 6014678 "NPR Endpoint Query"
         if "Endpoint Code" <> '' then
             exit;
 
-        Endpoint.Reset;
+        Endpoint.Reset();
         case Matching of
             Matching::ByName:
                 Endpoint.SetFilter("Query Name", '=%1', Name);
@@ -398,47 +396,47 @@ table 6014678 "NPR Endpoint Query"
         Endpoint.SetFilter("Allow Query from Database", '=%1', "Database Name");
         Endpoint.SetFilter("Allow Query from Company Name", '=%1', "Company Name");
         Endpoint.SetFilter("Allow Query from User ID", '=%1', "User ID");
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //Database, Company and user match
             exit(Endpoint.Code);
 
         Endpoint.SetFilter("Allow Query from User ID", '=%1', '');
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //Database and Company match, username blank
             exit(Endpoint.Code);
 
         Endpoint.SetFilter("Allow Query from Company Name", '=%1', '');
         Endpoint.SetFilter("Allow Query from User ID", '=%1', "User ID");
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //Database and User ID match, Company blank
             exit(Endpoint.Code);
 
         Endpoint.SetFilter("Allow Query from Database", '=%1', '');
         Endpoint.SetFilter("Allow Query from Company Name", '=%1', "Company Name");
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //Company and User ID match, database blank
             exit(Endpoint.Code);
 
         Endpoint.SetFilter("Allow Query from User ID", '=%1', '');
         Endpoint.SetFilter("Allow Query from Company Name", '=%1', "Company Name");
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //Company match, User ID and database blank
             exit(Endpoint.Code);
 
         Endpoint.SetFilter("Allow Query from Company Name", '=%1', '');
         Endpoint.SetFilter("Allow Query from Database", '=%1', "Database Name");
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //Database match, User ID and company blank
             exit(Endpoint.Code);
 
         Endpoint.SetFilter("Allow Query from Database", '=%1', '');
         Endpoint.SetFilter("Allow Query from User ID", '=%1', "User ID");
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //User ID match, Database and company blank
             exit(Endpoint.Code);
 
         Endpoint.SetFilter("Allow Query from User ID", '=%1', '');
-        if Endpoint.FindFirst then
+        if Endpoint.FindFirst() then
             //User ID, Database and company blank
             exit(Endpoint.Code);
 

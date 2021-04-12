@@ -27,17 +27,17 @@ page 6014690 "NPR User Setup Step"
                         end;
                     end;
                 }
-                field("Allow Posting From"; "Allow Posting From")
+                field("Allow Posting From"; Rec."Allow Posting From")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the earliest date on which the user is allowed to post to the company.';
                 }
-                field("Allow Posting To"; "Allow Posting To")
+                field("Allow Posting To"; Rec."Allow Posting To")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the last date on which the user is allowed to post to the company.';
                 }
-                field("POS Unit Time"; "Register Time")
+                field("POS Unit Time"; Rec."Register Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies whether to register the user''s time usage defined as the time spent from when the user logs in to when the user logs out. Unexpected interruptions, such as idle session timeout, terminal server idle session timeout, or a client crash are not recorded.';
@@ -57,7 +57,7 @@ page 6014690 "NPR User Setup Step"
                         end;
                     end;
                 }
-                field("Sales Resp. Ctr. Filter"; "Sales Resp. Ctr. Filter")
+                field("Sales Resp. Ctr. Filter"; Rec."Sales Resp. Ctr. Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the responsibility center to which you want to assign the user.';
@@ -66,15 +66,15 @@ page 6014690 "NPR User Setup Step"
                     var
                         RespCenter: Record "Responsibility Center";
                     begin
-                        if "Sales Resp. Ctr. Filter" <> '' then
-                            if RespCenter.Get("Sales Resp. Ctr. Filter") then;
+                        if Rec."Sales Resp. Ctr. Filter" <> '' then
+                            if RespCenter.Get(Rec."Sales Resp. Ctr. Filter") then;
 
                         if Page.RunModal(Page::"Responsibility Center List", RespCenter) = Action::LookupOK then
-                            "Sales Resp. Ctr. Filter" := RespCenter.Code
+                            Rec."Sales Resp. Ctr. Filter" := RespCenter.Code
                     end;
                 }
 
-                field("Purchase Resp. Ctr. Filter"; "Purchase Resp. Ctr. Filter")
+                field("Purchase Resp. Ctr. Filter"; Rec."Purchase Resp. Ctr. Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the responsibility center to which you want to assign the user.';
@@ -83,14 +83,14 @@ page 6014690 "NPR User Setup Step"
                     var
                         RespCenter: Record "Responsibility Center";
                     begin
-                        if "Purchase Resp. Ctr. Filter" <> '' then
-                            if RespCenter.Get("Purchase Resp. Ctr. Filter") then;
+                        if Rec."Purchase Resp. Ctr. Filter" <> '' then
+                            if RespCenter.Get(Rec."Purchase Resp. Ctr. Filter") then;
 
                         if Page.RunModal(Page::"Responsibility Center List", RespCenter) = Action::LookupOK then
-                            "Purchase Resp. Ctr. Filter" := RespCenter.Code
+                            Rec."Purchase Resp. Ctr. Filter" := RespCenter.Code
                     end;
                 }
-                field("Service Resp. Ctr. Filter"; "Service Resp. Ctr. Filter")
+                field("Service Resp. Ctr. Filter"; Rec."Service Resp. Ctr. Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the responsibility center you want to assign to the user. The user will only be able to see service documents for the responsibility center specified in the field. This responsibility center will also be the default responsibility center when the user creates new service documents.';
@@ -99,19 +99,19 @@ page 6014690 "NPR User Setup Step"
                     var
                         RespCenter: Record "Responsibility Center";
                     begin
-                        if "Service Resp. Ctr. Filter" <> '' then
-                            if RespCenter.Get("Service Resp. Ctr. Filter") then;
+                        if Rec."Service Resp. Ctr. Filter" <> '' then
+                            if RespCenter.Get(Rec."Service Resp. Ctr. Filter") then;
 
                         if Page.RunModal(Page::"Responsibility Center List", RespCenter) = Action::LookupOK then
-                            "Service Resp. Ctr. Filter" := RespCenter.Code
+                            Rec."Service Resp. Ctr. Filter" := RespCenter.Code
                     end;
                 }
-                field("Time Sheet Admin."; "Time Sheet Admin.")
+                field("Time Sheet Admin."; Rec."Time Sheet Admin.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies if a user is a time sheet administrator. A time sheet administrator can access any time sheet and then edit, change, or delete it.';
                 }
-                field("Backoffice POS Unit No."; "NPR Backoffice Register No.")
+                field("Backoffice POS Unit No."; Rec."NPR Backoffice Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Backoffice POS Unit No. field';
@@ -125,32 +125,32 @@ page 6014690 "NPR User Setup Step"
                         POSUnitsList.SetPOSUnitMode(true);
                         POSUnitsList.SetRec(TempAllPOSUnit);
 
-                        if "NPR Backoffice Register No." <> '' then
-                            if TempAllPOSUnit.Get("NPR Backoffice Register No.") then
+                        if Rec."NPR Backoffice Register No." <> '' then
+                            if TempAllPOSUnit.Get(Rec."NPR Backoffice Register No.") then
                                 POSUnitsList.SetRecord(TempAllPOSUnit);
 
                         if POSUnitsList.RunModal() = Action::LookupOK then
-                            "NPR Backoffice Register No." := TempAllPOSUnit."No.";
+                            Rec."NPR Backoffice Register No." := TempAllPOSUnit."No.";
 
                         POSUnitsList.SetPOSUnitMode(false);
                     end;
                 }
-                field("Allow POS Unit Switch"; "NPR Allow Register Switch")
+                field("Allow POS Unit Switch"; Rec."NPR Allow Register Switch")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Allow POS Unit Switch field';
                 }
-                field("POS Unit Switch Filter"; "NPR Register Switch Filter")
+                field("POS Unit Switch Filter"; Rec."NPR Register Switch Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR POS Unit Switch Filter field';
                 }
-                field(Email; "E-Mail")
+                field(Email; Rec."E-Mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the user''s email address.';
                 }
-                field("Anonymize Customers"; "NPR Anonymize Customers")
+                field("Anonymize Customers"; Rec."NPR Anonymize Customers")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Anonymize Customers field';

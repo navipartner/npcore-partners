@@ -15,22 +15,22 @@ page 6184482 "NPR Pepper EFT Trx Subtype"
         {
             repeater(Group)
             {
-                field("Integration Type Code"; "Integration Type Code")
+                field("Integration Type Code"; Rec."Integration Type Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Integration Type Code field';
                 }
-                field("Transaction Type Code"; "Transaction Type Code")
+                field("Transaction Type Code"; Rec."Transaction Type Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Code field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

@@ -9,11 +9,8 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
 
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
-        BatchStarted: Boolean;
 
     procedure CheckRunBatch(NPXmlTemplate: Record "NPR NpXml Template"): Boolean
-    var
-        RunDatetime: DateTime;
     begin
         if not NPXmlTemplate."Batch Task" then
             exit(false);
@@ -47,13 +44,13 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
         NPXmlTemplate."Runtime Error" := true;
         NPXmlTemplate."Last Error Message" := '';
         NPXmlTemplate.Modify(true);
-        Commit;
+        Commit();
 
         Clear(NpXmlMgt);
         SetRecRefXmlTemplateFilter(NPXmlTemplate, RecRef);
         NpXmlMgt.Initialize(NPXmlTemplate, RecRef, '', false);
         NpXmlMgt.CreateXml();
-        RecRef.Close;
+        RecRef.Close();
 
         NPXmlTemplate.Get(NPXmlTemplate.Code);
         NPXmlTemplate."Runtime Error" := false;
@@ -65,13 +62,11 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
         Clear(NpXmlTemplate);
-        if NpXmlTemplate.FindSet then
+        if NpXmlTemplate.FindSet() then
             repeat
-                BatchStarted := true;
                 if CheckRunBatch(NpXmlTemplate) then
                     RunSingleBatch(NpXmlTemplate);
-                BatchStarted := false;
-            until NpXmlTemplate.Next = 0;
+            until NpXmlTemplate.Next() = 0;
     end;
 
     local procedure SetRecRefXmlTemplateFilter(NpXmlTemplate: Record "NPR NpXml Template"; var RecRef: RecordRef)
@@ -88,7 +83,7 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
         NpXmlFilter.SetFilter("Xml Element Line No.", '=%1', -1);
         NpXmlFilter.SetRange("Filter Type", NpXmlFilter."Filter Type"::Constant);
         NpXmlFilter.SetFilter("Filter Value", '<>%1', '');
-        if NpXmlFilter.FindSet then
+        if NpXmlFilter.FindSet() then
             repeat
                 FieldRef := RecRef.Field(NpXmlFilter."Parent Field No.");
                 case LowerCase(Format(FieldRef.Type)) of
@@ -107,14 +102,14 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
                     else
                         FieldRef.SetRange(NpXmlFilter."Filter Value");
                 end;
-            until NpXmlFilter.Next = 0;
+            until NpXmlFilter.Next() = 0;
 
         NpXmlFilter.SetRange("Filter Type", NpXmlFilter."Filter Type"::Filter);
-        if NpXmlFilter.FindSet then
+        if NpXmlFilter.FindSet() then
             repeat
                 FieldRef := RecRef.Field(NpXmlFilter."Parent Field No.");
                 FieldRef.SetFilter(NpXmlFilter."Filter Value");
-            until NpXmlFilter.Next = 0;
+            until NpXmlFilter.Next() = 0;
     end;
 
     local procedure CalcNextBatchDatetime(NPXmlTemplate: Record "NPR NpXml Template"): DateTime

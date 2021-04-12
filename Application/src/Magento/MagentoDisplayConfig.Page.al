@@ -45,7 +45,7 @@ page 6151443 "NPR Magento Display Config"
                             Rec.Type::Item:
                                 begin
                                     ItemList.LookupMode := true;
-                                    if ItemList.RunModal = ACTION::LookupOK then
+                                    if ItemList.RunModal() = ACTION::LookupOK then
                                         Text := ItemList.GetSelectionFilter
                                     else
                                         exit(false);
@@ -53,7 +53,7 @@ page 6151443 "NPR Magento Display Config"
                             Rec.Type::"Item Group":
                                 begin
                                     ItemGroups.LookupMode := true;
-                                    if ItemGroups.RunModal = ACTION::LookupOK then
+                                    if ItemGroups.RunModal() = ACTION::LookupOK then
                                         Text := ItemGroups.GetSelectionFilter
                                     else
                                         exit(false);
@@ -61,7 +61,7 @@ page 6151443 "NPR Magento Display Config"
                             Rec.Type::Brand:
                                 begin
                                     Brands.LookupMode := true;
-                                    if Brands.RunModal = ACTION::LookupOK then
+                                    if Brands.RunModal() = ACTION::LookupOK then
                                         Text := Brands.GetSelectionFilter
                                     else
                                         exit(false);
@@ -142,7 +142,6 @@ page 6151443 "NPR Magento Display Config"
         ItemTypeFilter: Enum "NPR Mag. Display Config Type";
         NumberFilter: Text[250];
         NumberFilterCtrlEnabled: Boolean;
-        SalesCodeEnabled: Boolean;
 
     procedure GetRecFilters()
     var
@@ -190,10 +189,7 @@ page 6151443 "NPR Magento Display Config"
     begin
         GetRecFilters;
 
-        if Rec."Sales Type" <> Rec."Sales Type"::"All Customers" then
-            SalesCodeEnabled := true
-        else
-            SalesCodeEnabled := false;
+
 
         SourceTableName := '';
         case ItemTypeFilter of

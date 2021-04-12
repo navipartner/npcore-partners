@@ -1,4 +1,4 @@
-page 6014597 "NPR Prod. Group Code Stats"
+﻿page 6014597 "NPR Prod. Group Code Stats"
 {
     Caption = 'Product Group Code Statistics';
     Editable = false;
@@ -14,12 +14,12 @@ page 6014597 "NPR Prod. Group Code Stats"
             repeater(Control6150623)
             {
                 ShowCaption = false;
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -39,7 +39,7 @@ page 6014597 "NPR Prod. Group Code Stats"
                         SetItemLedgerEntryFilter(ItemledgerEntry);
                         ItemledgerEntryForm.SetTableView(ItemledgerEntry);
                         ItemledgerEntryForm.Editable(false);
-                        ItemledgerEntryForm.RunModal;
+                        ItemledgerEntryForm.RunModal();
                     end;
                 }
                 field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
@@ -63,7 +63,7 @@ page 6014597 "NPR Prod. Group Code Stats"
                         SetValueEntryFilter(AuxValueEntry);
                         ValueEntryForm.SetTableView(AuxValueEntry);
                         ValueEntryForm.Editable(false);
-                        ValueEntryForm.RunModal;
+                        ValueEntryForm.RunModal();
                     end;
                 }
                 field(SalesAmt; SalesAmt)
@@ -105,7 +105,7 @@ page 6014597 "NPR Prod. Group Code Stats"
                     Visible = LPA;
                     ToolTip = 'Specifies the value of the Last Year Proifit Amount field';
                 }
-                field("Profit %"; "Profit %")
+                field("Profit %"; Rec."Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit %';
@@ -134,9 +134,9 @@ page 6014597 "NPR Prod. Group Code Stats"
     trigger OnOpenPage()
     begin
         if (Periodestart = 0D) then
-            Periodestart := Today;
+            Periodestart := Today();
         if (Periodeslut = 0D) then
-            Periodeslut := Today;
+            Periodeslut := Today();
     end;
 
     var
@@ -154,7 +154,6 @@ page 6014597 "NPR Prod. Group Code Stats"
         "LastYear Sale Amount": Decimal;
         "Profit Amount": Decimal;
         "LastYear Profit Amount": Decimal;
-        "Profit %": Decimal;
         "LastYear Profit %": Decimal;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
@@ -162,13 +161,10 @@ page 6014597 "NPR Prod. Group Code Stats"
         Periodestart: Date;
         Periodeslut: Date;
         LastYear: Boolean;
-        ShowSameWeekday: Boolean;
-        DateFilterLastYear: Text[50];
         CalcLastYear: Text[50];
         CostAmt: Decimal;
         "Last Year CostAmt": Decimal;
         SalesAmt: Decimal;
-        ItemNo: Code[20];
         ItemLedgerEntryNo: Integer;
         ItemCategoryCode: Code[20];
 
@@ -184,8 +180,7 @@ page 6014597 "NPR Prod. Group Code Stats"
         Periodeslut := DatoEnd;
         CalcLastYear := LastYearCalc;
         ItemCategoryCode := ItemCategoryFilter;
-        ItemNo := ItemNoFilter;
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     procedure Calc()
@@ -213,9 +208,9 @@ page 6014597 "NPR Prod. Group Code Stats"
         //+NPR4.12
 
         if "Sale Amount" <> 0 then
-            "Profit %" := "Profit Amount" / "Sale Amount" * 100
+            Rec."Profit %" := "Profit Amount" / "Sale Amount" * 100
         else
-            "Profit %" := 0;
+            Rec."Profit %" := 0;
 
         // Calc last year
         LastYear := true;
@@ -250,12 +245,12 @@ page 6014597 "NPR Prod. Group Code Stats"
         else
             ItemLedgerEntry.SetRange("Item Category Code");
 
-        ItemLedgerEntry.SetRange("Item No.", "No.");
+        ItemLedgerEntry.SetRange("Item No.", Rec."No.");
         if not LastYear then
             ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
             ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
-        if not ItemLedgerEntry.FindSet then
+        if not ItemLedgerEntry.FindSet() then
             exit;
 
         if Dim1Filter <> '' then
@@ -273,7 +268,7 @@ page 6014597 "NPR Prod. Group Code Stats"
     begin
         //SetValueEntryFilter
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-        AuxValueEntry.SetRange("Item No.", "No.");
+        AuxValueEntry.SetRange("Item No.", Rec."No.");
         if not LastYear then
             AuxValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -308,7 +303,7 @@ page 6014597 "NPR Prod. Group Code Stats"
     begin
         HideEmpty := true;
 
-        ClearMarks;
+        Rec.ClearMarks;
         if HideEmpty then begin
             Current := Rec;
             Dlg.Open(txtDlg);
@@ -316,36 +311,36 @@ page 6014597 "NPR Prod. Group Code Stats"
                 repeat
                     Count += 1;
                     Dlg.Update(1, Item."No.");
-                    Dlg.Update(2, Round(Count / Item.Count * 10000, 1, '='));
+                    Dlg.Update(2, Round(Count / Item.Count() * 10000, 1, '='));
                     SetItemLedgerEntryFilter(ItemLedgerEntry);
                     ItemLedgerEntry.SetRange("Item No.", Item."No.");
                     ItemLedgerEntry.CalcSums(Quantity);
                     if ItemLedgerEntry.Quantity <> 0 then begin
-                        Get(Item."No.");
-                        Mark(true);
+                        Rec.Get(Item."No.");
+                        Rec.Mark(true);
                     end;
-                until Item.Next = 0;
-            Dlg.Close;
+                until Item.Next() = 0;
+            Dlg.Close();
 
-            MarkedOnly(true);
+            Rec.MarkedOnly(true);
             Rec := Current;
         end else begin
-            MarkedOnly(false);
+            Rec.MarkedOnly(false);
         end;
 
-        //CurrForm.UPDATE;
-        CurrPage.Update;
+        //CurrForm.Update();
+        CurrPage.Update();
         exit(HideEmpty);
     end;
 
     procedure InitForm()
     begin
         //InitForm()
-        Reset;
+        Rec.Reset();
         Dim1Filter := '';
         Dim2Filter := '';
-        Periodestart := Today;
-        Periodeslut := Today;
+        Periodestart := Today();
+        Periodeslut := Today();
         ItemCategoryCode := '';
 
         HideEmpty := true;
@@ -357,16 +352,16 @@ page 6014597 "NPR Prod. Group Code Stats"
         if HideEmpty then begin
             HideEmpty := false;
             ChangeEmptyFilter;
-            CurrPage.Update;
+            CurrPage.Update();
         end;
     end;
 
     procedure ReleaseLock()
     begin
         //ReleaseLock()
-        if Count = 0 then begin
-            MarkedOnly(false);
-            ClearMarks;
+        if Rec.Count() = 0 then begin
+            Rec.MarkedOnly(false);
+            Rec.ClearMarks;
         end;
     end;
 

@@ -135,9 +135,6 @@ xmlport 6060131 "NPR MM Update Member"
         }
     }
 
-    var
-        OutStr: OutStream;
-        EntryNo: Integer;
 
     procedure ClearResponse()
     begin

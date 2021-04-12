@@ -14,12 +14,12 @@ page 6151564 "NPR NpXml Namespaces"
         {
             repeater(Group)
             {
-                field(Alias; Alias)
+                field(Alias; Rec.Alias)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Alias field';
                 }
-                field(Namespace; Namespace)
+                field(Namespace; Rec.Namespace)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Namespace field';

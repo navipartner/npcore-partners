@@ -1,4 +1,4 @@
-page 6014670 "NPR Dependency Mgt. Setup"
+﻿page 6014670 "NPR Dependency Mgt. Setup"
 {
     Caption = 'Dependency Management Setup';
     PageType = Card;
@@ -15,7 +15,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 group(Configuration)
                 {
                     Caption = 'Configuration';
-                    field("Disable Deployment"; "Disable Deployment")
+                    field("Disable Deployment"; Rec."Disable Deployment")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Disable Deployment field';
@@ -24,7 +24,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 group(Filtering)
                 {
                     Caption = 'Filtering';
-                    field("Accept Statuses"; "Accept Statuses")
+                    field("Accept Statuses"; Rec."Accept Statuses")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Accept Dependency Statuses field';
@@ -60,10 +60,10 @@ page 6014670 "NPR Dependency Mgt. Setup"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

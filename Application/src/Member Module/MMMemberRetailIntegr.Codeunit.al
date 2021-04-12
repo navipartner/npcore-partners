@@ -2,8 +2,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 {
 
     var
-        MEMBER_MANAGEMENT: Label 'Member Services';
-        MEMBER_CARD_NO: Label 'Member Card Number';
         MEMBER_NOT_RECOGNIZED: Label 'Can''t identify member.';
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
         MEMBERSHIP_NOT_VALID: Label 'The membership %1 is not valid for today.';
@@ -20,7 +18,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MEMBERCARD_EXPIRED: Label 'The membercard %1 has expired.';
         gLastMessage: Text;
         Text000: Label 'Print Membership';
-        INVALID_TICKET_ITEM: Label 'Ticket Item specified on %1 %2, is not valid. ';
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s)?';
         CONFIRM_CARD_BLOCKED: Label 'This membercard is blocked, do you want to continue anyway?';
 
@@ -33,24 +30,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
 
     procedure POS_ValidateMemberCardNo(FailWithError: Boolean; AllowVerboseMode: Boolean; InputMode: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; ActivateMembership: Boolean; var ExternalMemberCardNo: Text[100]): Boolean
-    var
-        MembershipEntryNo: Integer;
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        Member: Record "NPR MM Member";
-        MemberEntryNo: Integer;
-        MemberCard: Record "NPR MM Member Card";
-        NotFoundReasonText: Text;
-        MustActivate: Boolean;
-        POSMemberCard: Page "NPR MM POS Member Card";
-        ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
-        ForeignCardIsValid: Boolean;
-        ForeignMembershipEntryNo: Integer;
-        ForeignCommunityCode: Code[20];
-        ForeignManagerCode: Code[20];
-        FormatedCardNumber: Text[50];
-        FormatedForeignCardNumber: Text[50];
     begin
 
         exit(
@@ -80,12 +59,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
         ForeignCardIsValid: Boolean;
         ForeignMembershipEntryNo: Integer;
-        ForeignCommunityCode: Code[20];
-        ForeignManagerCode: Code[20];
         FormatedCardNumber: Text[100];
         FormatedForeignCardNumber: Text[100];
         ShowMemberDialog: Boolean;
-        PageAction: Action;
     begin
 
         case InputMode of
@@ -232,14 +208,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     end;
 
     procedure PrintMembershipOnEndOfSales(SalesReceiptNo: Code[20])
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipEntry: Record "NPR MM Membership Entry";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        ShouldPrint: Boolean;
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MemberCard: Record "NPR MM Member Card";
     begin
 
         PrintMembershipOnEndOfSalesWorker(SalesReceiptNo, false);
@@ -484,7 +452,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         TicketType: Record "NPR TM Ticket Type";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
-        TMDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
         Item.Get(ItemNo);
@@ -709,17 +676,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
     local procedure IssueMembershipFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; SalesDate: Date; UnitPrice: Decimal; Amount_LCY: Decimal; AmountInclVat_LCY: Decimal; Description: Text; Quantity: Decimal)
     var
-        Membership: Record "NPR MM Membership";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
-        MemberNotification: Codeunit "NPR MM Member Notification";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
-        MembershipStartDate: Date;
-        MembershipUntilDate: Date;
         ResponseMessage: Text;
-        ReasonCode: Integer;
-        LogEntryNo: Integer;
     begin
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
@@ -760,18 +719,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
     local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ReasonText: Text): Boolean;
     var
-        Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
-        MembershipSetup: Record "NPR MM Membership Setup";
         AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketVariantCode: Code[10];
-        TicketItemNo: Code[20];
         LogEntryNo: Integer;
         ReasonCode: Integer;
-        ResolvingTable: Integer;
-        Token: Text[100];
     begin
 
         MemberInfoCapture.FindSet();
@@ -909,7 +861,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        ItemVariant: Record "Item Variant";
     begin
 
         ResolvingTable := 0;

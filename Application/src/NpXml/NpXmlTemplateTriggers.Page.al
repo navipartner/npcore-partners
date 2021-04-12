@@ -1,4 +1,4 @@
-page 6151558 "NPR NpXml Template Triggers"
+﻿page 6151558 "NPR NpXml Template Triggers"
 {
     AutoSplitKey = true;
     Caption = 'Xml Template Triggers';
@@ -15,54 +15,54 @@ page 6151558 "NPR NpXml Template Triggers"
         {
             repeater(Group)
             {
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Insert Trigger"; "Insert Trigger")
+                field("Insert Trigger"; Rec."Insert Trigger")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Insert Trigger field';
                 }
-                field("Modify Trigger"; "Modify Trigger")
+                field("Modify Trigger"; Rec."Modify Trigger")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Modify Trigger field';
                 }
-                field("Delete Trigger"; "Delete Trigger")
+                field("Delete Trigger"; Rec."Delete Trigger")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete Trigger field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Comment field';
                 }
-                field("Generic Parent Function"; "Generic Parent Function")
+                field("Generic Parent Function"; Rec."Generic Parent Function")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Generic Parent Function field';
                 }
-                field("Generic Parent Codeunit ID"; "Generic Parent Codeunit ID")
+                field("Generic Parent Codeunit ID"; Rec."Generic Parent Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Generic Parent Codeunit ID field';
                 }
-                field("Generic Parent Codeunit Name"; "Generic Parent Codeunit Name")
+                field("Generic Parent Codeunit Name"; Rec."Generic Parent Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -89,7 +89,7 @@ page 6151558 "NPR NpXml Template Triggers"
                 begin
                     Clear(NpXmlTemplateTriggerLinks);
                     NpXmlTemplateTriggerLinks.SetTemplateTriggerView(Rec);
-                    NpXmlTemplateTriggerLinks.Run;
+                    NpXmlTemplateTriggerLinks.Run();
                 end;
             }
             action("Move Up")
@@ -155,19 +155,18 @@ page 6151558 "NPR NpXml Template Triggers"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Parent Line No." := GetParentLineNo();
+        Rec."Parent Line No." := Rec.GetParentLineNo();
     end;
 
     var
-        NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
         [InDataSet]
         HasNoLinks: Boolean;
 
     local procedure IndentTableName()
     begin
-        if Level > 0 then
-            "Table Name" := PadStr('', Level * 3, ' ') + "Table Name";
+        if Rec.Level > 0 then
+            Rec."Table Name" := PadStr('', Rec.Level * 3, ' ') + Rec."Table Name";
     end;
 
     procedure MoveDown()
@@ -177,23 +176,23 @@ page 6151558 "NPR NpXml Template Triggers"
     begin
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
-        if not NpXmlTemplateTrigger.FindSet then
+        if not NpXmlTemplateTrigger.FindSet() then
             exit;
 
-        if Next = 0 then
+        if Rec.Next() = 0 then
             exit;
 
-        TempNpXmlTemplateTrigger.DeleteAll;
+        TempNpXmlTemplateTrigger.DeleteAll();
         repeat
-            TempNpXmlTemplateTrigger.Init;
+            TempNpXmlTemplateTrigger.Init();
             TempNpXmlTemplateTrigger := NpXmlTemplateTrigger;
-            TempNpXmlTemplateTrigger.Insert;
-        until NpXmlTemplateTrigger.Next = 0;
+            TempNpXmlTemplateTrigger.Insert();
+        until NpXmlTemplateTrigger.Next() = 0;
 
-        NpXmlTemplateTrigger.Reset;
+        NpXmlTemplateTrigger.Reset();
         NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
         NpXmlTemplateTrigger.SetRange("Xml Template Code", TempNpXmlTemplateTrigger."Xml Template Code");
-        if NpXmlTemplateTrigger.Next = 0 then
+        if NpXmlTemplateTrigger.Next() = 0 then
             exit;
 
         repeat
@@ -210,21 +209,21 @@ page 6151558 "NPR NpXml Template Triggers"
     begin
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
-        if not NpXmlTemplateTrigger.FindLast then
+        if not NpXmlTemplateTrigger.FindLast() then
             exit;
 
-        if Next(-1) = 0 then
+        if Rec.Next(-1) = 0 then
             exit;
-        LineNo := "Line No.";
+        LineNo := Rec."Line No.";
 
-        TempNpXmlTemplateTrigger.DeleteAll;
+        TempNpXmlTemplateTrigger.DeleteAll();
         repeat
-            TempNpXmlTemplateTrigger.Init;
+            TempNpXmlTemplateTrigger.Init();
             TempNpXmlTemplateTrigger := NpXmlTemplateTrigger;
-            TempNpXmlTemplateTrigger.Insert;
+            TempNpXmlTemplateTrigger.Insert();
         until NpXmlTemplateTrigger.Next(-1) = 0;
 
-        NpXmlTemplateTrigger.Reset;
+        NpXmlTemplateTrigger.Reset();
         NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
         NpXmlTemplateTrigger.SetRange("Xml Template Code", TempNpXmlTemplateTrigger."Xml Template Code");
         if NpXmlTemplateTrigger.Next(-1) = 0 then
@@ -233,33 +232,33 @@ page 6151558 "NPR NpXml Template Triggers"
         repeat
             NpXmlTemplateMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger, NpXmlTemplateTrigger);
             NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
-        until TempNpXmlTemplateTrigger.Next = 0;
+        until TempNpXmlTemplateTrigger.Next() = 0;
 
-        FindFirst;
-        Get("Xml Template Code", LineNo);
+        Rec.FindFirst();
+        Rec.Get(Rec."Xml Template Code", LineNo);
     end;
 
     local procedure UpdateLevel(Steps: Integer)
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
     begin
-        NpXmlTemplateTrigger.Reset;
+        NpXmlTemplateTrigger.Reset();
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
-        if NpXmlTemplateTrigger.FindSet then
+        if NpXmlTemplateTrigger.FindSet() then
             repeat
                 NpXmlTemplateTrigger.Level += Steps;
                 if NpXmlTemplateTrigger.Level < 0 then
                     NpXmlTemplateTrigger.Level := 0;
                 NpXmlTemplateTrigger.Modify(true);
-            until NpXmlTemplateTrigger.Next = 0;
+            until NpXmlTemplateTrigger.Next() = 0;
 
-        NpXmlTemplateTrigger.Reset;
-        NpXmlTemplateTrigger.SetRange("Xml Template Code", "Xml Template Code");
-        if NpXmlTemplateTrigger.FindSet then
+        NpXmlTemplateTrigger.Reset();
+        NpXmlTemplateTrigger.SetRange("Xml Template Code", Rec."Xml Template Code");
+        if NpXmlTemplateTrigger.FindSet() then
             repeat
                 NpXmlTemplateTrigger.UpdateParentInfo();
-                NpXmlTemplateTrigger.Modify;
-            until NpXmlTemplateTrigger.Next = 0;
+                NpXmlTemplateTrigger.Modify();
+            until NpXmlTemplateTrigger.Next() = 0;
 
         CurrPage.Update(false);
     end;
@@ -268,9 +267,9 @@ page 6151558 "NPR NpXml Template Triggers"
     var
         NpXmlTemplateTriggerLinks: Record "NPR NpXml Templ.Trigger Link";
     begin
-        NpXmlTemplateTriggerLinks.SetRange("Xml Template Code", "Xml Template Code");
-        NpXmlTemplateTriggerLinks.SetRange("Xml Template Trigger Line No.", "Line No.");
-        HasNoLinks := ("Parent Table No." <> "Table No.") and NpXmlTemplateTriggerLinks.IsEmpty;
+        NpXmlTemplateTriggerLinks.SetRange("Xml Template Code", Rec."Xml Template Code");
+        NpXmlTemplateTriggerLinks.SetRange("Xml Template Trigger Line No.", Rec."Line No.");
+        HasNoLinks := (Rec."Parent Table No." <> Rec."Table No.") and NpXmlTemplateTriggerLinks.IsEmpty();
     end;
 }
 

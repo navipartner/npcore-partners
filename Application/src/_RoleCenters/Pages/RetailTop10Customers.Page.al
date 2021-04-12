@@ -101,7 +101,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Week)
@@ -114,7 +114,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Week;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Month)
@@ -127,7 +127,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Month;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Quarter)
@@ -140,7 +140,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Quarter;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Year)
@@ -153,7 +153,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Year;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
             }
@@ -163,8 +163,8 @@ page 6059814 "NPR Retail Top 10 Customers"
     trigger OnOpenPage()
     begin
         PeriodType := PeriodType::Year;
-        CurrDate := Today;
-        UpdateList;
+        CurrDate := Today();
+        UpdateList();
     end;
 
     var
@@ -172,10 +172,8 @@ page 6059814 "NPR Retail Top 10 Customers"
         Cust: Record Customer;
         StartDate: Date;
         Enddate: Date;
-        Err000: Label 'End Date should be after Start Date';
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         CurrDate: Date;
-        sales: Decimal;
 
     local procedure UpdateList()
     begin
@@ -185,26 +183,24 @@ page 6059814 "NPR Retail Top 10 Customers"
 
     local procedure ExecuteQuery()
     begin
-        Rec.DeleteAll;
+        Rec.DeleteAll();
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
-        Query1.Open;
-        while Query1.Read do begin
+        Query1.Open();
+        while Query1.Read() do begin
             if Cust.Get(Query1.Source_No) then begin
                 Rec.TransferFields(Cust);
-                if not Rec.Insert then;
+                if not Rec.Insert() then;
                 Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
                 Rec.CalcFields("Sales (LCY)");
                 Rec."Search Name" := Format(-Rec."Sales (LCY)" * 100, 20, 1);
                 Rec."Search Name" := PadStr('', 15 - StrLen(Rec."Search Name"), '0') + Rec."Search Name";
-                Rec.Modify;
+                Rec.Modify();
             end;
         end;
-        Query1.Close;
+        Query1.Close();
     end;
 
     local procedure Setdate()
-    var
-        DatePeriod: Record Date;
     begin
         case PeriodType of
             PeriodType::Day:

@@ -8,13 +8,13 @@ codeunit 6151094 "NPR Nc RapidConnect Apply Pckg"
         DataLogMgt: Codeunit "NPR Data Log Management";
     begin
         NcRapidConnectSetup.Copy(Rec);
-        if not NcRapidConnectSetup.FindSet then
+        if not NcRapidConnectSetup.FindSet() then
             exit;
 
         repeat
             DataLogMgt.DisableDataLog(NcRapidConnectSetup."Disable Data Log on Import");
             ApplyXmlPackage(NcRapidConnectSetup);
-        until NcRapidConnectSetup.Next = 0;
+        until NcRapidConnectSetup.Next() = 0;
 
         DataLogMgt.DisableDataLog(false);
     end;
@@ -23,9 +23,7 @@ codeunit 6151094 "NPR Nc RapidConnect Apply Pckg"
     var
         ConfigPackage: Record "Config. Package";
         ConfigPackageTable: Record "Config. Package Table";
-        TempConfigPackageTable: Record "Config. Package Table" temporary;
         ConfigPackageMgt: Codeunit "Config. Package Management";
-        TempBlob: Codeunit "Temp Blob";
     begin
         if NcRapidConnectSetup."Package Code" = '' then
             exit;

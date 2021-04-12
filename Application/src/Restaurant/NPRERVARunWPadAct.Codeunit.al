@@ -32,7 +32,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
         POSSale: Codeunit "NPR POS Sale";
         ReturnToDefaultView: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -65,7 +65,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
         WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
         WPadAction := Context.GetIntegerParameterOrFail('WaiterPadAction', ActionCode());
 
-        WaiterPad.Find;
+        WaiterPad.Find();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter("Sale Retail ID", '<>%1', WaiterPadPOSMgt.GetNullGuid());
         if not WaiterPadLine.IsEmpty then
@@ -145,10 +145,10 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
                         exit;
                     FlowStatus."Status Object" := FlowStatus."Status Object"::WaiterPadLineMealFlow;
                     FlowStatus.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(FlowStatus.Code));
-                    if not FlowStatus.Find then begin
+                    if not FlowStatus.Find() then begin
                         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);
                         FlowStatus.SetFilter(Code, CopyStr(StrSubstNo('@%1*', POSParameterValue.Value), 1, MaxStrLen(FlowStatus.Code)));
-                        FlowStatus.FindFirst;
+                        FlowStatus.FindFirst();
                     end;
                     POSParameterValue.Value := FlowStatus.Code;
                 end;
@@ -164,7 +164,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
         CaptionWaiterPadAction: Label 'Waiter Pad Action';
         CaptionWaiterPadCode: Label 'Waiter Pad Code';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -190,7 +190,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
         DescWaiterPadAction: Label 'Defines which waiter pad action is to be run by the POS action';
         DescWaiterPadCode: Label 'Defines waiter pad number the action is to be run upon. The parameter is set automatically by the system on the runtime';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -213,7 +213,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
         OptionLinesToSend: Label 'New/Updated,All';
         OptionWaiterPadAction: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

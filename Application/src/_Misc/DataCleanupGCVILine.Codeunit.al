@@ -124,20 +124,8 @@ codeunit 6060100 "NPR Data Cleanup GCVI Line"
     procedure MoveCustEntriesTest(Cust: Record Customer): Boolean
     var
         AccountingPeriod: Record "Accounting Period";
-        AvgCostAdjmt: Record "Avg. Cost Adjmt. Entry Point";
-        BankAccLedgEntry: Record "Bank Account Ledger Entry";
-        CheckLedgEntry: Record "Check Ledger Entry";
         CustLedgEntry: Record "Cust. Ledger Entry";
-        InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
-        ItemLedgEntry: Record "Item Ledger Entry";
-        JobLedgEntry: Record "Job Ledger Entry";
-        PurchOrderLine: Record "Purchase Line";
-        ReminderEntry: Record "Reminder/Fin. Charge Entry";
-        ResLedgEntry: Record "Res. Ledger Entry";
         ServLedgEntry: Record "Service Ledger Entry";
-        ValueEntry: Record "Value Entry";
-        VendLedgEntry: Record "Vendor Ledger Entry";
-        WarrantyLedgEntry: Record "Warranty Ledger Entry";
     begin
         CustLedgEntry.SetCurrentKey("Customer No.", "Posting Date");
         CustLedgEntry.SetRange("Customer No.", Cust."No.");
@@ -187,20 +175,7 @@ codeunit 6060100 "NPR Data Cleanup GCVI Line"
     procedure MoveVendorEntriesTest(Vend: Record Vendor): Boolean
     var
         AccountingPeriod: Record "Accounting Period";
-        AvgCostAdjmt: Record "Avg. Cost Adjmt. Entry Point";
-        BankAccLedgEntry: Record "Bank Account Ledger Entry";
-        CheckLedgEntry: Record "Check Ledger Entry";
-        CustLedgEntry: Record "Cust. Ledger Entry";
-        InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
-        ItemLedgEntry: Record "Item Ledger Entry";
-        JobLedgEntry: Record "Job Ledger Entry";
-        PurchOrderLine: Record "Purchase Line";
-        ReminderEntry: Record "Reminder/Fin. Charge Entry";
-        ResLedgEntry: Record "Res. Ledger Entry";
-        ServLedgEntry: Record "Service Ledger Entry";
-        ValueEntry: Record "Value Entry";
         VendLedgEntry: Record "Vendor Ledger Entry";
-        WarrantyLedgEntry: Record "Warranty Ledger Entry";
     begin
         VendLedgEntry.SetCurrentKey("Vendor No.", "Posting Date");
         VendLedgEntry.SetRange("Vendor No.", Vend."No.");
@@ -225,19 +200,8 @@ codeunit 6060100 "NPR Data Cleanup GCVI Line"
     var
         AccountingPeriod: Record "Accounting Period";
         AvgCostAdjmt: Record "Avg. Cost Adjmt. Entry Point";
-        BankAccLedgEntry: Record "Bank Account Ledger Entry";
-        CheckLedgEntry: Record "Check Ledger Entry";
-        CustLedgEntry: Record "Cust. Ledger Entry";
-        InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
         ItemLedgEntry: Record "Item Ledger Entry";
-        JobLedgEntry: Record "Job Ledger Entry";
-        PurchOrderLine: Record "Purchase Line";
-        ReminderEntry: Record "Reminder/Fin. Charge Entry";
-        ResLedgEntry: Record "Res. Ledger Entry";
         ServLedgEntry: Record "Service Ledger Entry";
-        ValueEntry: Record "Value Entry";
-        VendLedgEntry: Record "Vendor Ledger Entry";
-        WarrantyLedgEntry: Record "Warranty Ledger Entry";
     begin
         ItemLedgEntry.SetCurrentKey("Item No.");
         ItemLedgEntry.SetRange("Item No.", Item."No.");
@@ -308,7 +272,6 @@ codeunit 6060100 "NPR Data Cleanup GCVI Line"
     procedure MoveGLEntriesTest(GLAccount: Record "G/L Account"): Boolean
     var
         AccountingPeriod: Record "Accounting Period";
-        BankAccLedgEntry: Record "Bank Account Ledger Entry";
         GLEntry: Record "G/L Entry";
     begin
         GLEntry.SetCurrentKey("G/L Account No.");

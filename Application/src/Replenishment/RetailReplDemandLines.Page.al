@@ -1,4 +1,4 @@
-page 6151070 "NPR Retail Repl. Demand Lines"
+﻿page 6151070 "NPR Retail Repl. Demand Lines"
 {
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
     // NPR5.39/JKL /20180222 CASE 299436  added units per parcel
@@ -16,137 +16,137 @@ page 6151070 "NPR Retail Repl. Demand Lines"
         {
             repeater(Group)
             {
-                field(Confirmed; Confirmed)
+                field(Confirmed; Rec.Confirmed)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Confirmed field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Demanded Quantity"; "Demanded Quantity")
+                field("Demanded Quantity"; Rec."Demanded Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Due Date"; "Due Date")
+                field("Due Date"; Rec."Due Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Due Date field';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Inventory field';
                 }
-                field("Qty. on Purch. Order"; "Qty. on Purch. Order")
+                field("Qty. on Purch. Order"; Rec."Qty. on Purch. Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty. on Purch. Order field';
                 }
-                field("Qty. on Sales Order"; "Qty. on Sales Order")
+                field("Qty. on Sales Order"; Rec."Qty. on Sales Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty. on Sales Order field';
                 }
-                field("Reordering Policy"; "Reordering Policy")
+                field("Reordering Policy"; Rec."Reordering Policy")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reordering Policy field';
                 }
-                field("Needed Quantity"; "Needed Quantity")
+                field("Needed Quantity"; Rec."Needed Quantity")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Needed Quantity field';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vendor No. field';
                 }
-                field("Vendor Item No."; "Vendor Item No.")
+                field("Vendor Item No."; Rec."Vendor Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vendor Item No. field';
                 }
-                field(Photo; Photo)
+                field(Photo; Rec.Photo)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Photo field';
                 }
-                field("Page no. in advert"; "Page no. in advert")
+                field("Page no. in advert"; Rec."Page no. in advert")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Page no. in advert field';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Priority field';
                 }
-                field("Qty. per Unit of Measure"; "Qty. per Unit of Measure")
+                field("Qty. per Unit of Measure"; Rec."Qty. per Unit of Measure")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty. per Unit of Measure field';
                 }
-                field("Campaign Unit Price"; "Campaign Unit Price")
+                field("Campaign Unit Price"; Rec."Campaign Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Price field';
                 }
-                field("Campaign Unit Cost"; "Campaign Unit Cost")
+                field("Campaign Unit Cost"; Rec."Campaign Unit Cost")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Cost field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Demand Type"; "Demand Type")
+                field("Demand Type"; Rec."Demand Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Demand Type field';
                 }
-                field("Demand Date"; "Demand Date")
+                field("Demand Date"; Rec."Demand Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Demand Date field';
                 }
-                field("Demand Quantity"; "Demand Quantity")
+                field("Demand Quantity"; Rec."Demand Quantity")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Demand Quantity field';
                 }
-                field("Units per Parcel"; "Units per Parcel")
+                field("Units per Parcel"; Rec."Units per Parcel")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Units per Parcel field';
@@ -209,8 +209,8 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 var
                     DistributionSetup: Record "NPR Distribution Setup";
                 begin
-                    DistributionSetup.Reset;
-                    DistributionSetup.SetFilter("Item Hiearachy", GetFilter("Item Hierachy"));
+                    DistributionSetup.Reset();
+                    DistributionSetup.SetFilter("Item Hiearachy", Rec.GetFilter("Item Hierachy"));
                     PAGE.RunModal(6151062, DistributionSetup);
                 end;
             }
@@ -237,8 +237,8 @@ page 6151070 "NPR Retail Repl. Demand Lines"
 
                 trigger OnAction()
                 begin
-                    ModifyAll(Confirmed, true, true);
-                    CurrPage.Update;
+                    Rec.ModifyAll(Confirmed, true, true);
+                    CurrPage.Update();
                 end;
             }
             action("DeConfirm All")
@@ -250,8 +250,8 @@ page 6151070 "NPR Retail Repl. Demand Lines"
 
                 trigger OnAction()
                 begin
-                    ModifyAll(Confirmed, false, true);
-                    CurrPage.Update;
+                    Rec.ModifyAll(Confirmed, false, true);
+                    CurrPage.Update();
                 end;
             }
             action("Create Retail Campaign Orders")

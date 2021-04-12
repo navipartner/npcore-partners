@@ -10,7 +10,6 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         JSON: Codeunit "NPR POS JSON Management";
         Request: Codeunit "NPR Front-End: Generic";
         RequestMethod: Text;
-        RequestId: Guid;
         Success: Boolean;
     begin
         if Method <> 'Wysiwyg' then
@@ -94,14 +93,12 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
             // TODO: Report error to front end
             exit;
 
-        with POSMenuButton do begin
-            "Menu Code" := MenuCode;
-            Level := 0;
-            if ParentKeyId > 0 then
-                Validate("Parent ID", ParentKeyId);
-            Insert(true);
-            SaveExistingButton(POSMenuButton, JSON);
-        end;
+        POSMenuButton."Menu Code" := MenuCode;
+        POSMenuButton.Level := 0;
+        if ParentKeyId > 0 then
+            POSMenuButton.Validate("Parent ID", ParentKeyId);
+        POSMenuButton.Insert(true);
+        SaveExistingButton(POSMenuButton, JSON);
     end;
 
     local procedure SaveExistingButton(POSMenuButton: Record "NPR POS Menu Button"; JSON: Codeunit "NPR POS JSON Management")
@@ -165,13 +162,13 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
                     if JSON.HasProperty('columns') then begin
                         ParamValue.GetParameter(POSMenuButton.RecordId, POSMenuButton.ID, 'Columns');
                         ParamValue.Validate(Value, JSON.GetString('columns'));
-                        ParamValue.Modify;
+                        ParamValue.Modify();
                     end;
 
                     if JSON.HasProperty('rows') then begin
                         ParamValue.GetParameter(POSMenuButton.RecordId, POSMenuButton.ID, 'Rows');
                         ParamValue.Validate(Value, JSON.GetString('rows'));
-                        ParamValue.Modify;
+                        ParamValue.Modify();
                     end;
                 end;
         end;
@@ -243,7 +240,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
 
         POSActions.LookupMode := true;
         POSActions.SetRecord(POSAction);
-        if POSActions.RunModal = ACTION::LookupOK then begin
+        if POSActions.RunModal() = ACTION::LookupOK then begin
             POSActions.GetRecord(POSAction);
             Request.GetContent().Add('actionCode', POSAction.Code);
             exit(true);
@@ -277,7 +274,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
 
         Items.LookupMode := true;
         Items.SetRecord(Item);
-        if Items.RunModal = ACTION::LookupOK then begin
+        if Items.RunModal() = ACTION::LookupOK then begin
             Items.GetRecord(Item);
             Request.GetContent().Add('itemNo', Item."No.");
             Request.GetContent().Add('itemDesc', Item.Description);
@@ -312,7 +309,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
 
         Customers.LookupMode := true;
         Customers.SetRecord(Cust);
-        if Customers.RunModal = ACTION::LookupOK then begin
+        if Customers.RunModal() = ACTION::LookupOK then begin
             Customers.GetRecord(Cust);
             Request.GetContent().Add('custNo', Cust."No.");
             Request.GetContent().Add('custName', Cust.Name);
@@ -325,7 +322,6 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         POSAction: Record "NPR POS Action";
         POSParam: Record "NPR POS Action Parameter";
         TempParam: Record "NPR POS Parameter Value" temporary;
-        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
         JObject: JsonObject;
         JToken: JsonToken;
         ParamStr: Text;
@@ -340,7 +336,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
             ParamStr := '{}';
         JObject.ReadFrom(ParamStr);
 
-        if TempParam.FindSet then
+        if TempParam.FindSet() then
             repeat
                 if POSParam.Get(POSAction.Code, TempParam.Name) then begin
                     if (JObject.Get(TempParam.Name, JToken)) then begin
@@ -349,14 +345,14 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
                         TempParam.Modify(false);
                     end;
                 end;
-            until TempParam.Next = 0;
+            until TempParam.Next() = 0;
 
         EditParametersDirect(TempParam);
         Clear(JObject);
-        if TempParam.FindSet then
+        if TempParam.FindSet() then
             repeat
                 TempParam.AddParameterToJObject(JObject);
-            until TempParam.Next = 0;
+            until TempParam.Next() = 0;
 
         JObject.WriteTo(JsonText);
         Request.GetContent().Add('parameters', JsonText);
@@ -391,7 +387,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
 
         POSMenus.LookupMode := true;
         POSMenus.SetRecord(POSMenu);
-        if POSMenus.RunModal = ACTION::LookupOK then begin
+        if POSMenus.RunModal() = ACTION::LookupOK then begin
             POSMenus.GetRecord(POSMenu);
             Request.GetContent().Add('menuCode', POSMenu.Code);
             Request.GetContent().Add('caption', POSMenu.Caption);
@@ -403,9 +399,6 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
     var
         TempParam: Record "NPR POS Parameter Value" temporary;
         Param: Record "NPR POS Parameter Value";
-        JToken: JsonObject;
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
         ScopeID: Guid;
     begin
         CopyParametersFromActionToTempParam(POSMenuButton."Action Code", TempParam);
@@ -413,7 +406,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         if not JSON.SetScope('parameters') then
             exit(false);
 
-        if TempParam.FindSet then
+        if TempParam.FindSet() then
             repeat
                 Param.Init();
                 Param."Table No." := DATABASE::"NPR POS Menu Button";
@@ -421,13 +414,13 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
                 Param.ID := POSMenuButton.ID;
                 Param."Record ID" := POSMenuButton.RecordId;
                 Param.Name := TempParam.Name;
-                if not Param.Find then
-                    Param.Insert;
+                if not Param.Find() then
+                    Param.Insert();
                 Param."Action Code" := TempParam."Action Code";
                 Param."Data Type" := TempParam."Data Type";
                 Param.Validate(Value, JSON.GetString(TempParam.Name));
                 Param.Modify(false);
-            until TempParam.Next = 0;
+            until TempParam.Next() = 0;
 
         JSON.RestoreScope(ScopeID);
         exit(true);
@@ -437,17 +430,15 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
     var
         ActionParam: Record "NPR POS Action Parameter";
     begin
-        with ActionParam do begin
-            SetRange("POS Action Code", ActionCode);
-            if FindSet then
-                repeat
-                    TempParam."Action Code" := ActionCode;
-                    TempParam.Name := Name;
-                    TempParam."Data Type" := "Data Type";
-                    TempParam.Value := "Default Value";
-                    TempParam.Insert;
-                until Next = 0;
-        end;
+        ActionParam.SetRange("POS Action Code", ActionCode);
+        if ActionParam.FindSet() then
+            repeat
+                TempParam."Action Code" := ActionCode;
+                TempParam.Name := ActionParam.Name;
+                TempParam."Data Type" := ActionParam."Data Type";
+                TempParam.Value := ActionParam."Default Value";
+                TempParam.Insert();
+            until ActionParam.Next() = 0;
     end;
 
     procedure EditParametersDirect(var TempParam: Record "NPR POS Parameter Value" temporary)

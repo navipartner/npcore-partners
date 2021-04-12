@@ -17,7 +17,6 @@ codeunit 6060073 "NPR CSV Splitter"
         InputFile: File;
         Instr: InStream;
         HeaderRows: Integer;
-        LineFileNo: array[1000] of Integer;
         MaxNoOfColumns: Integer;
         NumberOfFiles: Integer;
         NumberOfLines: Integer;
@@ -27,7 +26,6 @@ codeunit 6060073 "NPR CSV Splitter"
         ImportFileLbl: Label 'Import Excel File';
         SplitMethod: Option "0",GroupByColumn,SplitOnValueFirstField;
         FileTextEncoding: Option "MS-DOS","UTF-8","UTF-16",WINDOWS;
-        ClientSelectedFilename: Text;
         ColumnValue: array[99] of Text;
         FileName: Text;
         InputFileName: Text;
@@ -116,7 +114,7 @@ codeunit 6060073 "NPR CSV Splitter"
         ExcelBuffer.LockTable();
         ExcelBuffer.OpenBook(InputFileName, SheetName);
         ExcelBuffer.ReadSheet();
-        if not ExcelBuffer.FindLast then
+        if not ExcelBuffer.FindLast() then
             Error(NoRowsReadErr);
         NumberOfLines := ExcelBuffer."Row No.";
         ExcelBuffer.CloseBook();
@@ -170,7 +168,7 @@ codeunit 6060073 "NPR CSV Splitter"
         exit(FieldEnumerator);
     end;
 
-    local procedure NextField(var VarLineOfText: Text) rField: Text
+    local procedure NextField(var VarLineOfText: Text): Text
     begin
         exit(ForwardTokenizer(VarLineOfText, FieldSeparator, FieldDelimiter));
     end;
@@ -179,8 +177,6 @@ codeunit 6060073 "NPR CSV Splitter"
     var
         IsNextField: Boolean;
         IsQuoted: Boolean;
-        Quote: Char;
-        Separator: Char;
         NextFieldPos: Integer;
         InputText: Text;
         NextByte: Text[1];
@@ -253,8 +249,6 @@ codeunit 6060073 "NPR CSV Splitter"
 
     local procedure AssignLinetoFile(LineEnumerator: Integer)
     var
-        FileFound: Boolean;
-        I: Integer;
         FieldValue: Text;
     begin
         if ExcelBuffer.Get(LineEnumerator, SplitOnColumn) then
@@ -263,7 +257,7 @@ codeunit 6060073 "NPR CSV Splitter"
             FieldValue := '';
         ExcelBuffer.Reset();
         ExcelBuffer.SetRange("Row No.", LineEnumerator);
-        if ExcelBuffer.FindLast then begin
+        if ExcelBuffer.FindLast() then begin
             if MaxNoOfColumns < ExcelBuffer."Column No." then
                 MaxNoOfColumns := ExcelBuffer."Column No.";
         end;
@@ -429,7 +423,7 @@ codeunit 6060073 "NPR CSV Splitter"
         if not GuiAllowed then
             exit;
         if (WindowText = '') and WindowIsOpen then begin
-            Window.Close;
+            Window.Close();
             WindowIsOpen := false;
             exit;
         end;

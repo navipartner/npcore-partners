@@ -73,7 +73,7 @@ table 6014641 "NPR Tax Free POS Unit"
             trigger OnValidate()
             begin
                 if ("Handler ID Enum" <> xRec."Handler ID Enum") then
-                    if "Handler Parameters".HasValue then
+                    if "Handler Parameters".HasValue() then
                         if not Confirm(Confirm_ClearParameter, false, xRec."Handler ID Enum") then
                             Error('');
 

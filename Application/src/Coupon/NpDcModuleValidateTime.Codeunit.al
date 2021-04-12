@@ -14,15 +14,15 @@ codeunit 6151599 "NPR NpDc Module Validate: Time"
         NpDcModuleValidateDefault.ValidateCoupon(SalePOS, Coupon);
 
         NpDcValidTimeInterval.SetRange("Coupon Type", Coupon."Coupon Type");
-        if not NpDcValidTimeInterval.FindSet then
+        if not NpDcValidTimeInterval.FindSet() then
             Error(Text001);
 
         CheckTime := Time;
-        CheckDate := Today;
+        CheckDate := Today();
         repeat
             if IsValidTimeInterval(NpDcValidTimeInterval, CheckTime, CheckDate) then
                 exit;
-        until NpDcValidTimeInterval.Next = 0;
+        until NpDcValidTimeInterval.Next() = 0;
 
         Error(Text001);
     end;
@@ -74,7 +74,7 @@ codeunit 6151599 "NPR NpDc Module Validate: Time"
         if CouponModule.Get(CouponModule.Type::"Validate Coupon", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Validate Coupon";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := Text000;

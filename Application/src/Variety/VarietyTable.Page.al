@@ -16,38 +16,38 @@ page 6059972 "NPR Variety Table"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Use in Variant Description"; "Use in Variant Description")
+                field("Use in Variant Description"; Rec."Use in Variant Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Use in Variant Description field';
                 }
-                field("Pre tag In Variant Description"; "Pre tag In Variant Description")
+                field("Pre tag In Variant Description"; Rec."Pre tag In Variant Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pre tag In Variant Description field';
                 }
-                field("Use Description field"; "Use Description field")
+                field("Use Description field"; Rec."Use Description field")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Use Description field field';
                 }
-                field("Lock Table"; "Lock Table")
+                field("Lock Table"; Rec."Lock Table")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Lock Table field';
@@ -65,7 +65,7 @@ page 6059972 "NPR Variety Table"
                 Caption = 'Values';
                 Image = "Table";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Variety Value";
@@ -81,7 +81,7 @@ page 6059972 "NPR Variety Table"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         //-VRT1.11
-        SetupNewLine;
+        Rec.SetupNewLine;
         //+VRT1.11
     end;
 }

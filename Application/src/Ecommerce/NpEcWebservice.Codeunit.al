@@ -45,12 +45,12 @@ codeunit 6151300 "NPR NpEc Webservice"
     begin
         InitImportType('PostSalesOrder', 'POST_SALES_ORDER', PostSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Import (Post)", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
 
-        sales_orders.Import;
+        sales_orders.Import();
         InsertImportEntry(NcImportType, ImportEntry);
         ImportEntry."Document Name" := sales_orders.GetOrderNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_orders.SetDestination(OutStr);
-        sales_orders.Export;
+        sales_orders.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -65,12 +65,12 @@ codeunit 6151300 "NPR NpEc Webservice"
     begin
         InitImportType('DeleteSalesOrder', 'DELETE_SALES_ORDER', DeleteSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Imp. Delete", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
 
-        sales_orders.Import;
+        sales_orders.Import();
         InsertImportEntry(NcImportType, ImportEntry);
         ImportEntry."Document Name" := sales_orders.GetOrderNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_orders.SetDestination(OutStr);
-        sales_orders.Export;
+        sales_orders.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -85,7 +85,7 @@ codeunit 6151300 "NPR NpEc Webservice"
     begin
         InitImportType('CreatePurchaseInvoice', 'CREATE_PURCH_ORDER', CreatePurchOrderDescLbl, CODEUNIT::"NPR NpEc P.Invoice Imp. Create", CODEUNIT::"NPR NpEc P.Invoice Look.", NcImportType);
 
-        purchase_invoices.Import;
+        purchase_invoices.Import();
         InsertImportEntry(NcImportType, ImportEntry);
         ImportEntry."Document Name" := purchase_invoices.GetInvoiceNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -114,7 +114,7 @@ codeunit 6151300 "NPR NpEc Webservice"
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
         NcImportType.Code := NcSetupMgt.GetImportTypeCode(CurrCodeunitId(), WebserviceFunction);
-        if (NcImportType.Code <> '') and NcImportType.Find then
+        if (NcImportType.Code <> '') and NcImportType.Find() then
             exit;
 
         if NcImportType.Get(ImportTypeCode) then begin

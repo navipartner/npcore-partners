@@ -172,7 +172,7 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        if POSPostingProfile.FindFirst then begin
+        if POSPostingProfile.FindFirst() then begin
             POSPaymentMethod."Rounding Gains Account" := POSPostingProfile."POS Sales Rounding Account";
             POSPaymentMethod."Rounding Losses Account" := POSPostingProfile."POS Sales Rounding Account";
         end;

@@ -105,8 +105,8 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
     begin
         if NPRESetupRead then
             exit;
-        if not NPRESetup.Get then
-            NPRESetup.Init;
+        if not NPRESetup.Get() then
+            NPRESetup.Init();
         NPRESetupRead := true;
     end;
 

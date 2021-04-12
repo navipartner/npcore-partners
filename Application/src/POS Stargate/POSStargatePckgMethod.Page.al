@@ -13,12 +13,12 @@ page 6150714 "NPR POS Stargate Pckg Method"
         {
             repeater(Group)
             {
-                field("Method Name"; "Method Name")
+                field("Method Name"; Rec."Method Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Method Name field';
                 }
-                field("Package Name"; "Package Name")
+                field("Package Name"; Rec."Package Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Package Name field';

@@ -1,8 +1,8 @@
 report 6060126 "NPR TM Admission List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'TM Admission List';
     dataset
@@ -77,8 +77,6 @@ report 6060126 "NPR TM Admission List"
                         }
 
                         trigger OnAfterGetRecord()
-                        var
-                            ShowRecord: Boolean;
                         begin
                             if not ((ShowOpenReservations and (Type = Type::RESERVATION) and Open) or
                               (ShowOpenAdmitted and (Type = Type::ADMITTED) and Open) or
@@ -178,8 +176,6 @@ report 6060126 "NPR TM Admission List"
         ShowTicketsWithoutMembers: Boolean;
         EndDateTime: DateTime;
         StartDateTime: DateTime;
-        Admissions___ListCaptionLbl: Label 'Admissions - List';
-        CurrReport_PAGENOCaptionLbl: Label 'Page';
         TxtUnknown: Label 'Unknown';
         AccessEmail: Text;
         AccessName: Text;

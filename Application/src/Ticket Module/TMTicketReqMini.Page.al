@@ -1,4 +1,4 @@
-page 6060101 "NPR TM Ticket Req. Mini"
+﻿page 6060101 "NPR TM Ticket Req. Mini"
 {
     Caption = 'Ticket Request Mini';
     InsertAllowed = false;
@@ -68,7 +68,7 @@ page 6060101 "NPR TM Ticket Req. Mini"
 
     procedure GetTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     begin
-        Rec.Reset;
+        Rec.Reset();
         if Rec.FindSet() then
             repeat
                 TmpTicketReservationRequest.TransferFields(Rec, true);

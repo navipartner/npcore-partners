@@ -129,11 +129,6 @@ codeunit 6184514 "NPR EFT MobilePay Prot."
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', false, false)]
     local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
-    var
-        WebClientDependency: Record "NPR Web Client Dependency";
-        ModelIDVar: Variant;
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTInterface: Codeunit "NPR EFT Interface";
     begin
         if ModelID <> ActiveModelID then
             exit;
@@ -181,7 +176,6 @@ codeunit 6184514 "NPR EFT MobilePay Prot."
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         PaymentStatus: Text;
-        LastErrorText: Text;
         WebClientDependency: Record "NPR Web Client Dependency";
     begin
         EFTTransactionRequest.Get(EntryNo);

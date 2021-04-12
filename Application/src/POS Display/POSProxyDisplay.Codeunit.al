@@ -1,4 +1,4 @@
-codeunit 6151002 "NPR POS Proxy - Display"
+﻿codeunit 6151002 "NPR POS Proxy - Display"
 {
     trigger OnRun()
     begin
@@ -81,7 +81,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
     local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
-        TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
@@ -112,7 +111,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
     local procedure CU6150706OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
-        TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
@@ -147,7 +145,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
     local procedure CU6150706OnUpdateLine(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
-        TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
@@ -173,7 +170,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
     local procedure CU6150706OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
-        TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
@@ -199,7 +195,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
     local procedure CU6150707OnAfterDeleteLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
-        TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
@@ -234,7 +229,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
     local procedure CU6150707OnAfterInsertPaymentLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
-        TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
@@ -345,34 +339,32 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Line1: Text;
         Line2: Text;
     begin
-        with Rec do begin
-            if not (Type in [Type::"G/L Entry", Type::Item, Type::Customer, Type::"BOM List"]) then
-                exit;
+        if not (Rec.Type in [Rec.Type::"G/L Entry", Rec.Type::Item, Rec.Type::Customer, Rec.Type::"BOM List"]) then
+            exit;
 
-            if "No." = '' then
-                exit;
+        if Rec."No." = '' then
+            exit;
 
-            if (Type = Type::Item) and ("Discount Type" = "Discount Type"::"BOM List") then
-                exit;
+        if (Rec.Type = Rec.Type::Item) and (Rec."Discount Type" = Rec."Discount Type"::"BOM List") then
+            exit;
 
-            Line1 := PadStr(Description, 20);
-            Total := ' = ' + Format("Amount Including VAT", 0, '<Precision,0:2><Standard Format,0>');
+        Line1 := PadStr(Rec.Description, 20);
+        Total := ' = ' + Format(Rec."Amount Including VAT", 0, '<Precision,0:2><Standard Format,0>');
 
-            if ("Discount Type" <> "Discount Type"::" ") and ("Discount %" <> 0) then begin
-                if Amount <> 0 then
-                    Sign := (Amount / Abs(Amount))
-                else
-                    Sign := 1;
+        if (Rec."Discount Type" <> Rec."Discount Type"::" ") and (Rec."Discount %" <> 0) then begin
+            if Rec.Amount <> 0 then
+                Sign := (Rec.Amount / Abs(Rec.Amount))
+            else
+                Sign := 1;
 
-                case Sign of
-                    1:
-                        Line2 := PadStr('x' + Format(Abs(Quantity)) + ' - ' + Format("Discount %", 0, '<Precision,0:2><Standard Format,0>') + '%', 20 - StrLen(Total)) + Total;
-                    -1:
-                        Line2 := PadStr('x' + Format(Abs(Quantity)) + ' + ' + Format("Discount %", 0, '<Precision,0:2><Standard Format,0>') + '%', 20 - StrLen(Total)) + Total;
-                end;
-            end else
-                Line2 := PadStr('x' + Format(Abs(Quantity)), 20 - StrLen(Total)) + Total;
-        end;
+            case Sign of
+                1:
+                    Line2 := PadStr('x' + Format(Abs(Rec.Quantity)) + ' - ' + Format(Rec."Discount %", 0, '<Precision,0:2><Standard Format,0>') + '%', 20 - StrLen(Total)) + Total;
+                -1:
+                    Line2 := PadStr('x' + Format(Abs(Rec.Quantity)) + ' + ' + Format(Rec."Discount %", 0, '<Precision,0:2><Standard Format,0>') + '%', 20 - StrLen(Total)) + Total;
+            end;
+        end else
+            Line2 := PadStr('x' + Format(Abs(Rec.Quantity)), 20 - StrLen(Total)) + Total;
 
         UpdateDisplay(Line1, Line2);
     end;
@@ -392,11 +384,11 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 begin
                     Clear(ObjectOutputSelection);
                     ObjectOutputSelection.SetRange("Output Path", 'DisplayBixolon');
-                    if ObjectOutputSelection.FindSet then begin
+                    if ObjectOutputSelection.FindSet() then begin
                         repeat
                             if (ObjectOutputSelection."User ID" = UserId) or (ObjectOutputSelection."User ID" = '') then
                                 BixolonSetupFound := true;
-                        until ObjectOutputSelection.Next = 0;
+                        until ObjectOutputSelection.Next() = 0;
 
                         if not BixolonSetupFound then begin
                             Message(BixolonError);
@@ -473,20 +465,20 @@ codeunit 6151002 "NPR POS Proxy - Display"
                     end;
                 Action::Payment:
                     begin
-                        SaleLinePOS.Reset;
+                        SaleLinePOS.Reset();
                         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
                         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-                        if SaleLinePOS.FindSet then
+                        if SaleLinePOS.FindSet() then
                             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action, NewQuantity)
                         else
                             Clear(FrontEnd);
                     end;
                 Action::EndSale:
                     begin
-                        SaleLinePOS.Reset;
+                        SaleLinePOS.Reset();
                         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
                         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-                        if SaleLinePOS.FindSet then
+                        if SaleLinePOS.FindSet() then
                             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action, NewQuantity)
                         else
                             Clear(FrontEnd);
@@ -513,7 +505,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
         GrandTotalTxt: Text;
         Payment: Decimal;
         PaymentTxt: Text;
-        TextValueDec: Decimal;
         LineCounter: Integer;
         ChangeTxt: Text;
         Change: Decimal;
@@ -539,11 +530,11 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 DisplayCustomContent.NewQuantity := NewQuantity;
                 CODEUNIT.Run(DisplaySetup."Custom Display Codeunit", DisplayCustomContent);
             end else begin
-                SaleLinePOS.Reset;
+                SaleLinePOS.Reset();
                 SaleLinePOS.SetRange("Register No.", Rec."Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
                 SaleLinePOS.SetRange(Date, Rec.Date);
-                if SaleLinePOS.FindSet then begin
+                if SaleLinePOS.FindSet() then begin
                     repeat
                         ShowLine := true;
 
@@ -602,7 +593,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
                                     Line2 := Line1 + ' ' + PadStr('x' + Format(Abs(SaleLinePOS.Quantity)), DisplaySetup."Receipt Total Padding" - StrLen(Total)) + Total;
 
                                 if ReceiptText = '' then begin
-                                    GLSetup.Get;
+                                    GLSetup.Get();
                                     ReceiptText := PadStr('', DisplaySetup."Receipt GrandTotal Padding" - StrLen(GLSetup.GetCurrencyCode('')) - 2) + GLSetup.GetCurrencyCode('') + '#NEWLINE#';
                                 end;
                                 ReceiptText := ReceiptText + Line2 + '#NEWLINE#';
@@ -616,7 +607,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
                                 end;
                             end;
                         end;
-                    until SaleLinePOS.Next = 0;
+                    until SaleLinePOS.Next() = 0;
                 end;
 
                 GrandTotalTxt := Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>');
@@ -698,18 +689,18 @@ codeunit 6151002 "NPR POS Proxy - Display"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        SaleLinePOS.Reset;
+        SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", Rec."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, Rec.Date);
-        if SaleLinePOS.FindSet then begin
+        if SaleLinePOS.FindSet() then begin
             repeat
                 if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
                     Payment := Payment + SaleLinePOS."Amount Including VAT"
                 end else begin
                     GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
                 end;
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
         end;
 
         Change := 0;
@@ -855,7 +846,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         ContentHtml: Text;
     begin
         DisplayContentLines.SetRange("Content Code", ContentCode);
-        if DisplayContentLines.FindFirst then begin
+        if DisplayContentLines.FindFirst() then begin
             ContentHtml += '<!DOCTYPE html>';
             ContentHtml += '<html>';
             ContentHtml += '<head>';
@@ -882,7 +873,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
             DisplaySetup."Image Rotation Interval" := 3000;
 
         DisplayContentLines.SetRange("Content Code", ContentCode);
-        if DisplayContentLines.FindSet then begin
+        if DisplayContentLines.FindSet() then begin
             ContentHtml += '<!DOCTYPE html>';
             ContentHtml += '<html>';
             ContentHtml += '<head>';
@@ -902,7 +893,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 MediaDictionary.Add(ImageCounter, Format(ImageCounter) + '.' + CurrExtension);
                 Base64Dictionary.Add(ImageCounter, CurrBase64);
                 ImageCounter += 1;
-            until DisplayContentLines.Next = 0;
+            until DisplayContentLines.Next() = 0;
             ContentHtml += '  </div>';
             ContentHtml += '  <script>';
             ContentHtml += '    var myIndex = 0;';
@@ -932,7 +923,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         VideoCounter: Integer;
     begin
         DisplayContentLines.SetRange("Content Code", ContentCode);
-        if DisplayContentLines.FindSet then begin
+        if DisplayContentLines.FindSet() then begin
             ContentHtml += '<!DOCTYPE html>';
             ContentHtml += '<html>';
             ContentHtml += '<head>';
@@ -950,7 +941,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 ContentHtml += '    <source src="video' + Format(VideoCounter) + '.mp4" type="video/mp4">';
                 MediaDictionary.Add(VideoCounter, DisplayContentLines.Url);
                 VideoCounter += 1;
-            until DisplayContentLines.Next = 0;
+            until DisplayContentLines.Next() = 0;
             ContentHtml += '  </video>';
             ContentHtml += '  <script>';
             ContentHtml += '    video_count = 1;';
@@ -999,7 +990,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Converter: DotNet NPRNetImageConverter;
     begin
         DisplayContentLines.CalcFields(Image);
-        if DisplayContentLines.Image.HasValue then begin
+        if DisplayContentLines.Image.HasValue() then begin
             DisplayContentLines.Image.CreateInStream(InS);
 
             MemoryStream := MemoryStream.MemoryStream();

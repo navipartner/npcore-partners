@@ -161,7 +161,6 @@ codeunit 6150700 "NPR POS Session"
     local procedure InitializeDataSources()
     var
         JS: Codeunit "NPR POS JavaScript Interface";
-        DataSource: Codeunit "NPR Data Source";
         DataSources: JsonArray;
     begin
         Clear(DataStore);
@@ -171,7 +170,7 @@ codeunit 6150700 "NPR POS Session"
 
         OnInitializeDataSource(DataStore);
 
-        if DataStore.DataSources.Count > 0 then begin
+        if DataStore.DataSources.Count() > 0 then begin
             RequestRefreshData();
             JS.RefreshData(This, FrontEnd);
         end;
@@ -194,13 +193,11 @@ codeunit 6150700 "NPR POS Session"
         POSKeyboardBindingMgt: Codeunit "NPR POS Keyboard Binding Mgt.";
     begin
         POSKeyboardBindingMgt.DiscoverKeyboardBindings(KeyboardBindings);
-        if KeyboardBindings.Count > 0 then
+        if KeyboardBindings.Count() > 0 then
             FrontEnd.ConfigureKeyboardBindings(KeyboardBindings);
     end;
 
     procedure StartPOSSession()
-    var
-        CultureInfo: DotNet NPRNetCultureInfo;
     begin
         InitializePOSSession();
         ChangeViewLogin();
@@ -227,7 +224,7 @@ codeunit 6150700 "NPR POS Session"
             OnFinalize(FrontEnd);
             UnbindSubscription(FrontEndKeeper);
             ClearAll;
-            SessionActions.DeleteAll;
+            SessionActions.DeleteAll();
             Finalized := true;
         end;
     end;
@@ -291,8 +288,6 @@ codeunit 6150700 "NPR POS Session"
     //#region  Workflows Session Storage
 
     procedure StartTransaction()
-    var
-        TransactionNo: Text;
     begin
         Clear(Sale);
         Sale.InitializeNewSale(POSUnit, FrontEnd, Setup, Sale);
@@ -402,12 +397,12 @@ codeunit 6150700 "NPR POS Session"
     procedure DiscoverSessionAction(var ActionIn: Record "NPR POS Action" temporary)
     begin
         SessionActions := ActionIn;
-        if not SessionActions.Insert then begin
+        if not SessionActions.Insert() then begin
             ActionIn.CalcFields(Workflow);
             SessionActions.Workflow := ActionIn.Workflow;
             ActionIn.CalcFields("Custom JavaScript Logic");
             SessionActions."Custom JavaScript Logic" := ActionIn."Custom JavaScript Logic";
-            SessionActions.Modify;
+            SessionActions.Modify();
         end;
     end;
 
@@ -480,7 +475,7 @@ codeunit 6150700 "NPR POS Session"
 
     procedure ProcessKeyPress(KeyPress: Text) Handled: Boolean
     begin
-        if (KeyboardBindings.Count = 0) and (not KeyboardBindings.Contains(KeyPress)) then
+        if (KeyboardBindings.Count() = 0) and (not KeyboardBindings.Contains(KeyPress)) then
             exit(false);
 
         OnKeyPress(KeyPress, This, Setup, FrontEnd, Handled);

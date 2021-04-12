@@ -15,10 +15,6 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
     var
         TempSalesLine: Record "Sales Line" temporary;
         SalesPostPrepmt: Codeunit "Sales-Post Prepayments";
-        PrepmtTotalAmount: Decimal;
-        TempVATAmountLine: Record "VAT Amount Line" temporary;
-        PrepmtVATAmount: Decimal;
-        PrepmtVATAmountText: Text;
         GLSetup: Record "General Ledger Setup";
     begin
         //Returns the prepayment amount that would be deducted on post.
@@ -28,7 +24,7 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
         SalesHeader.TestField("Prices Including VAT", true);
 
         if SalesHeader."Currency Code" <> '' then begin
-            GLSetup.Get;
+            GLSetup.Get();
             SalesHeader.TestField("Currency Code", GLSetup."LCY Code");
         end;
 
@@ -40,7 +36,6 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
     procedure SetPrepaymentAmountToPayInclVAT(SalesHeader: Record "Sales Header"; Persist: Boolean; Amount: Decimal)
     var
         SalesLine: Record "Sales Line";
-        TotalAmount: Decimal;
         LineCount: Integer;
         i: Integer;
         Currency: Record Currency;
@@ -53,7 +48,7 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
             Currency.InitRoundingPrecision()
         end else begin
             Currency.Get(SalesHeader."Currency Code");
-            GLSetup.Get;
+            GLSetup.Get();
             SalesHeader.TestField("Currency Code", GLSetup."LCY Code");
         end;
 
@@ -76,7 +71,7 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
             SalesLine.Validate("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv."); //Set prepayment amount back to invoiced, in case someone modified it without posting.
             RemainingDocumentAmount += (SalesLine."Line Amount" - SalesLine."Prepmt Amt Deducted" - SalesLine."Prepmt Amt to Deduct");
             LineCount += 1;
-        until SalesLine.Next = 0;
+        until SalesLine.Next() = 0;
 
         SplitPercentage := 100 / (RemainingDocumentAmount / Amount);
 
@@ -95,9 +90,9 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
 
             if Persist then
                 SalesLine.Modify(true);
-        until SalesLine.Next = 0;
+        until SalesLine.Next() = 0;
 
-        // LineCount := SalesLine.COUNT;
+        // LineCount := SalesLine.Count();
         // RemainingAmount := Amount;
 
         // REPEAT
@@ -113,7 +108,7 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
         //
         //  IF Persist THEN
         //    SalesLine.MODIFY(TRUE);
-        // UNTIL SalesLine.NEXT = 0;
+        // UNTIL SalesLine.Next() = 0;
         //+NPR5.53 [352473]
     end;
 
@@ -124,7 +119,7 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
         PrepaymentAmountDiff: Decimal;
     begin
         if SalesHeader."Currency Code" <> '' then begin
-            GLSetup.Get;
+            GLSetup.Get();
             SalesHeader.TestField("Currency Code", GLSetup."LCY Code");
         end;
 
@@ -146,7 +141,7 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
 
                 if Persist then
                     SalesLine.Modify(true);
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
 
         exit(PrepaymentAmountDiff);
     end;

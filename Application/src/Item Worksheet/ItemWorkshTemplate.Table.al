@@ -1,4 +1,4 @@
-table 6060040 "NPR Item Worksh. Template"
+﻿table 6060040 "NPR Item Worksh. Template"
 {
     Caption = 'Item Worksheet Template';
     DataClassification = CustomerContent;
@@ -67,18 +67,18 @@ table 6060040 "NPR Item Worksh. Template"
             begin
                 if "Item No. Prefix" <> "Item No. Prefix"::"From Worksheet" then begin
                     "Prefix Code" := '';
-                    ItemWorksheet.Reset;
+                    ItemWorksheet.Reset();
                     ItemWorksheet.SetRange("Item Template Name", Name);
                     ItemWorksheet.SetFilter("Prefix Code", '<>%1', '');
-                    if ItemWorksheet.Count > 1 then begin
+                    if ItemWorksheet.Count() > 1 then begin
                         if not Confirm(ClearAllWorksheetPrefixesQst) then
                             Error(StoppedErr)
                         else begin
-                            if ItemWorksheet.FindSet then
+                            if ItemWorksheet.FindSet() then
                                 repeat
                                     ItemWorksheet."Prefix Code" := '';
-                                    ItemWorksheet.Modify;
-                                until ItemWorksheet.Next = 0;
+                                    ItemWorksheet.Modify();
+                                until ItemWorksheet.Next() = 0;
                         end;
                     end;
                 end;
@@ -178,10 +178,10 @@ table 6060040 "NPR Item Worksh. Template"
                 WebServiceTemplateExistsErr: Label '%1 is already activated on %2. Only one %3 can be active.';
             begin
                 if "Allow Web Service Update" then begin
-                    ItemWorksheetTemplate.Reset;
+                    ItemWorksheetTemplate.Reset();
                     ItemWorksheetTemplate.SetRange("Allow Web Service Update", true);
                     ItemWorksheetTemplate.SetFilter(Name, '<>%1', Name);
-                    if ItemWorksheetTemplate.FindFirst then
+                    if ItemWorksheetTemplate.FindFirst() then
                         Error(WebServiceTemplateExistsErr, FieldCaption("Allow Web Service Update"), ItemWorksheetTemplate.Description, TableCaption);
                 end;
             end;

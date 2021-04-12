@@ -16,43 +16,43 @@ page 6151124 "NPR GDPR Consent Log"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Entry Approval State"; "Entry Approval State")
+                field("Entry Approval State"; Rec."Entry Approval State")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Approval State field';
                 }
-                field("State Change"; "State Change")
+                field("State Change"; Rec."State Change")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the State Change field';
                 }
-                field("Valid From Date"; "Valid From Date")
+                field("Valid From Date"; Rec."Valid From Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid From Date field';
                 }
-                field("Agreement No."; "Agreement No.")
+                field("Agreement No."; Rec."Agreement No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Agreement No. field';
                 }
-                field("Agreement Version"; "Agreement Version")
+                field("Agreement Version"; Rec."Agreement Version")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Agreement Version field';
                 }
-                field("Data Subject Id"; "Data Subject Id")
+                field("Data Subject Id"; Rec."Data Subject Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Subject Id field';
                 }
-                field("Last Changed By"; "Last Changed By")
+                field("Last Changed By"; Rec."Last Changed By")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Changed By field';
@@ -70,7 +70,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Caption = 'Accept';
                 Image = Approval;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -78,15 +78,15 @@ page 6151124 "NPR GDPR Consent Log"
 
                 trigger OnAction()
                 begin
-                    FilterGroup(2);
-                    if ("Agreement No." = '') then
-                        "Agreement No." := GetFilter("Agreement No.");
+                    Rec.FilterGroup(2);
+                    if (Rec."Agreement No." = '') then
+                        Rec."Agreement No." := Rec.GetFilter("Agreement No.");
 
-                    if ("Data Subject Id" = '') then
-                        "Data Subject Id" := GetFilter("Data Subject Id");
-                    FilterGroup(0);
+                    if (Rec."Data Subject Id" = '') then
+                        Rec."Data Subject Id" := Rec.GetFilter("Data Subject Id");
+                    Rec.FilterGroup(0);
 
-                    GDPRManagement.CreateAgreementAcceptEntry("Agreement No.", 0, "Data Subject Id");
+                    GDPRManagement.CreateAgreementAcceptEntry(Rec."Agreement No.", 0, Rec."Data Subject Id");
                 end;
             }
             action(Reject)
@@ -94,7 +94,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Caption = 'Reject';
                 Image = Reject;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -103,15 +103,15 @@ page 6151124 "NPR GDPR Consent Log"
                 trigger OnAction()
                 begin
 
-                    FilterGroup(2);
-                    if ("Agreement No." = '') then
-                        "Agreement No." := GetFilter("Agreement No.");
+                    Rec.FilterGroup(2);
+                    if (Rec."Agreement No." = '') then
+                        Rec."Agreement No." := Rec.GetFilter("Agreement No.");
 
-                    if ("Data Subject Id" = '') then
-                        "Data Subject Id" := GetFilter("Data Subject Id");
-                    FilterGroup(0);
+                    if (Rec."Data Subject Id" = '') then
+                        Rec."Data Subject Id" := Rec.GetFilter("Data Subject Id");
+                    Rec.FilterGroup(0);
 
-                    GDPRManagement.CreateAgreementRejectEntry("Agreement No.", 0, "Data Subject Id");
+                    GDPRManagement.CreateAgreementRejectEntry(Rec."Agreement No.", 0, Rec."Data Subject Id");
                 end;
             }
             action(Pending)
@@ -119,7 +119,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Caption = 'Pending';
                 Image = Questionaire;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -128,15 +128,15 @@ page 6151124 "NPR GDPR Consent Log"
                 trigger OnAction()
                 begin
 
-                    FilterGroup(2);
-                    if ("Agreement No." = '') then
-                        "Agreement No." := GetFilter("Agreement No.");
+                    Rec.FilterGroup(2);
+                    if (Rec."Agreement No." = '') then
+                        Rec."Agreement No." := Rec.GetFilter("Agreement No.");
 
-                    if ("Data Subject Id" = '') then
-                        "Data Subject Id" := GetFilter("Data Subject Id");
-                    FilterGroup(0);
+                    if (Rec."Data Subject Id" = '') then
+                        Rec."Data Subject Id" := Rec.GetFilter("Data Subject Id");
+                    Rec.FilterGroup(0);
 
-                    GDPRManagement.CreateAgreementPendingEntry("Agreement No.", 0, "Data Subject Id");
+                    GDPRManagement.CreateAgreementPendingEntry(Rec."Agreement No.", 0, Rec."Data Subject Id");
                 end;
             }
         }

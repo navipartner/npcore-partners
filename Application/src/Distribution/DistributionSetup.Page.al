@@ -12,38 +12,38 @@ page 6151062 "NPR Distribution Setup"
         {
             repeater(Group)
             {
-                field("Distribution Group"; "Distribution Group")
+                field("Distribution Group"; Rec."Distribution Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Group field';
                 }
-                field("Item Hiearachy"; "Item Hiearachy")
+                field("Item Hiearachy"; Rec."Item Hiearachy")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Hiearachy field';
                 }
-                field("Distribution Type"; "Distribution Type")
+                field("Distribution Type"; Rec."Distribution Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Distribution Type field';
                 }
-                field("Required Delivery Date"; "Required Delivery Date")
+                field("Required Delivery Date"; Rec."Required Delivery Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Required Delivery Date field';
                 }
-                field("Replenishment Grace Period"; "Replenishment Grace Period")
+                field("Replenishment Grace Period"; Rec."Replenishment Grace Period")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Replenishment Grace Period field';
                 }
-                field("Create SKU Per Location"; "Create SKU Per Location")
+                field("Create SKU Per Location"; Rec."Create SKU Per Location")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create SKU Per Location field';
                 }
-                field("Default SKU Repl. Setup"; "Default SKU Repl. Setup")
+                field("Default SKU Repl. Setup"; Rec."Default SKU Repl. Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default SKU Repl. Setup field';
@@ -80,7 +80,7 @@ page 6151062 "NPR Distribution Setup"
                 var
                     ReplenishmentMgmt: Codeunit "NPR Retail Replenish. Mgt.";
                 begin
-                    ReplenishmentMgmt.CreateDemandLines("Item Hiearachy", "Distribution Group");
+                    ReplenishmentMgmt.CreateDemandLines(Rec."Item Hiearachy", Rec."Distribution Group");
                     Message(TextCreated);
                 end;
             }

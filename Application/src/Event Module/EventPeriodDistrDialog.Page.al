@@ -81,8 +81,6 @@ page 6059831 "NPR Event Period Distr. Dialog"
                     ToolTip = 'Specifies the value of the Days Of The Week field';
 
                     trigger OnValidate()
-                    var
-                        i: Integer;
                     begin
                         case DaysOfWeekOption of
                             DaysOfWeekOption::All:

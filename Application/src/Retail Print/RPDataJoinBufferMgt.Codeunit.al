@@ -1,4 +1,4 @@
-codeunit 6014558 "NPR RP Data Join Buffer Mgt."
+﻿codeunit 6014558 "NPR RP Data Join Buffer Mgt."
 {
     var
         Buffer: Record "NPR RP Data Join Buffer" temporary;
@@ -19,7 +19,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         ParentDataItem.SetRange(Code, Template);
         ParentDataItem.SetRange(Level, 0);
         ParentDataItem.SetRange("Parent Line No.", 0);
-        if ParentDataItem.FindSet then begin
+        if ParentDataItem.FindSet() then begin
             if not (ParentDataItem."Table ID" = RecRefIn.Number) then
                 Error(Error_InvalidTable, Template, ParentDataItem."Table ID");
 
@@ -45,24 +45,24 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
 
                 First := false;
                 RecRef.Close();
-            until ParentDataItem.Next = 0;
+            until ParentDataItem.Next() = 0;
         end;
     end;
 
     procedure IsEmpty(): Boolean
     begin
-        exit(Buffer.IsEmpty);
+        exit(Buffer.IsEmpty());
     end;
 
     procedure DeleteSet()
     begin
-        Buffer.DeleteAll;
+        Buffer.DeleteAll();
     end;
 
     procedure FindBufferSet(DataItemName: Text; var CurrentRecNo: Integer) Result: Boolean
     begin
         Buffer.SetRange("Data Item Name", DataItemName);
-        Result := Buffer.FindFirst;
+        Result := Buffer.FindFirst();
         if Result then
             CurrentRecNo := Buffer."Unique Record No.";
         Buffer.SetRange("Data Item Name");
@@ -82,7 +82,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         else
             Buffer.SetRange("Unique Record No.", CurrentRecNo + 1, UpperBound);
 
-        if Buffer.FindFirst then
+        if Buffer.FindFirst() then
             NewUpperBound := Buffer."Unique Record No." - 1
         else
             NewUpperBound := 0;
@@ -95,7 +95,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
     begin
         Buffer.SetRange("Data Item Name", DataItemName);
         Buffer.SetRange("Field No.", FieldNo);
-        if Buffer.FindFirst then
+        if Buffer.FindFirst() then
             Value := Buffer.Value;
         Buffer.SetRange("Data Item Name");
         Buffer.SetRange("Field No.");
@@ -137,7 +137,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
             exit(false);
 
         Buffer.SetRange("Data Item Name", DataItemName);
-        Result := Buffer.FindFirst;
+        Result := Buffer.FindFirst();
         if Result then begin
             RecIDBuffer.Get(Buffer."Unique Record No.");
             RecIDOut := RecIDBuffer."Buffer Record ID";
@@ -187,7 +187,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
             Buffer.SetFilter("Unique Record No.", '>%1', CurrentRecNo)
         else
             Buffer.SetRange("Unique Record No.", CurrentRecNo + 1, UpperBound);
-        Result := Buffer.FindFirst;
+        Result := Buffer.FindFirst();
         if Result then
             CurrentRecNo := Buffer."Unique Record No.";
         Buffer.SetRange("Data Item Name");
@@ -233,7 +233,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         TempRecordNo: Integer;
         i: Integer;
     begin
-        Buffer.Reset;
+        Buffer.Reset();
         if not (FindBufferSet(DataItemName, TempRecordNo)) then
             exit(false);
         if IterationNo > 1 then
@@ -249,7 +249,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
     begin
         FieldMap."Data Item Name" := DataItemName;
         FieldMap."Data Item Field No." := FieldNo;
-        if FieldMap.Insert then;
+        if FieldMap.Insert() then;
     end;
 
     procedure SetDecimalRounding(DecimalRoundingIn: Option "2","3","4","5")
@@ -261,10 +261,9 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
     begin
     end;
 
-    local procedure ProcessDataItem(ParentDataItem: Record "NPR RP Data Items"; var ParentRecRef: RecordRef) ContinueProcessing: Boolean
+    local procedure ProcessDataItem(ParentDataItem: Record "NPR RP Data Items"; var ParentRecRef: RecordRef): Boolean
     var
         ChildDataItems: Record "NPR RP Data Items";
-        DataItemLinks: Record "NPR RP Data Item Links";
         ChildRecRef: RecordRef;
         StringList: List of [Text];
         String: Text;
@@ -287,24 +286,24 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
             ParentDataItem."Iteration Type"::"Distinct Values",
           //+NPR5.50 [353588]
           ParentDataItem."Iteration Type"::" ":
-                if not ParentRecRef.FindSet then
+                if not ParentRecRef.FindSet() then
                     exit(ShouldProcessingContinue(ParentDataItem, false));
 
             ParentDataItem."Iteration Type"::First:
-                if ParentRecRef.FindFirst then
+                if ParentRecRef.FindFirst() then
                     ParentRecRef.SetRecFilter
                 else
                     exit(ShouldProcessingContinue(ParentDataItem, false));
 
             ParentDataItem."Iteration Type"::Last:
-                if ParentRecRef.FindLast then
+                if ParentRecRef.FindLast() then
                     ParentRecRef.SetRecFilter
                 else
                     exit(ShouldProcessingContinue(ParentDataItem, false));
 
             ParentDataItem."Iteration Type"::Total:
                 begin
-                    if ParentRecRef.FindFirst then; //Attempt fill of non-totalled fields with first record of set to allow printing of these as well.
+                    if ParentRecRef.FindFirst() then; //Attempt fill of non-totalled fields with first record of set to allow printing of these as well.
 
                     StringList := ParentDataItem."Total Fields".Split(',');
                     foreach String in StringList do begin
@@ -312,12 +311,12 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                         FieldRef := ParentRecRef.Field(IntegerBuffer);
                         FieldRef.CalcSum();
                     end;
-                    ParentRecRef.SetRecFilter;
+                    ParentRecRef.SetRecFilter();
                 end;
             //-NPR5.51 [354694]
             ParentDataItem."Iteration Type"::"Field Value":
                 begin
-                    if ParentRecRef.FindFirst then
+                    if ParentRecRef.FindFirst() then
                         ParentRecRef.SetRecFilter
                     else
                         exit(ShouldProcessingContinue(ParentDataItem, false));
@@ -339,13 +338,13 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                 ChildDataItems.SetRange(Level, ParentDataItem.Level + 1);
                 ChildDataItems.SetRange("Parent Line No.", ParentDataItem."Line No.");
 
-                if ChildDataItems.FindSet then
+                if ChildDataItems.FindSet() then
                     repeat
                         SetupTableJoin(ParentDataItem, ChildDataItems, ParentRecRef, ChildRecRef);
                         if not ProcessDataItem(ChildDataItems, ChildRecRef) then
                             exit(false);
-                        ChildRecRef.Close;
-                    until ChildDataItems.Next = 0;
+                        ChildRecRef.Close();
+                    until ChildDataItems.Next() = 0;
             end;
 
             //-NPR5.51 [354694]
@@ -354,10 +353,10 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
             if ParentDataItem."Iteration Type" = ParentDataItem."Iteration Type"::"Field Value" then
                 StopIterating := FieldValue = Itt
             else
-                StopIterating := ParentRecRef.Next = 0;
+                StopIterating := ParentRecRef.Next() = 0;
 
         until StopIterating;
-        //UNTIL ParentRecRef.NEXT = 0;
+        //UNTIL ParentRecRef.Next() = 0;
         //+NPR5.51 [354694]
 
         exit(ShouldProcessingContinue(ParentDataItem, DataProcessed));
@@ -368,7 +367,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         FieldRef: FieldRef;
     begin
         FieldMap.SetRange("Data Item Name", ParentDataItem.Name);
-        if FieldMap.FindSet then begin
+        if FieldMap.FindSet() then begin
             Buffer."Unique Record No." += 1;
             repeat
                 Buffer."Field No." := FieldMap."Data Item Field No.";
@@ -394,14 +393,14 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                         Buffer.Value := Format(FieldRef.Value);
                 end else
                     Clear(Buffer.Value);
-                Buffer.Insert;
-            until FieldMap.Next = 0;
+                Buffer.Insert();
+            until FieldMap.Next() = 0;
 
             RecIDBuffer."Unique Record No." := Buffer."Unique Record No.";
             RecIDBuffer."Buffer Record ID" := RecRef.RecordId;
-            RecIDBuffer.Insert;
+            RecIDBuffer.Insert();
         end;
-        FieldMap.Reset;
+        FieldMap.Reset();
     end;
 
     local procedure SetupTableJoin(ParentRecord: Record "NPR RP Data Items"; ChildRecord: Record "NPR RP Data Items"; var ParentRecRef: RecordRef; var ChildRecRef: RecordRef)
@@ -409,7 +408,6 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         DataItemLinks: Record "NPR RP Data Item Links";
         ParentFieldRef: FieldRef;
         ChildFieldRef: FieldRef;
-        Value: Variant;
     begin
         if ChildRecRef.Number = 0 then //If not OPEN already
             ChildRecRef.Open(ChildRecord."Table ID");
@@ -422,7 +420,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         DataItemLinks.SetRange("Child Line No.", ChildRecord."Line No.");
         DataItemLinks.SetRange("Parent Table ID", ParentRecRef.Number);
         DataItemLinks.SetRange("Table ID", ChildRecRef.Number);
-        if DataItemLinks.FindSet then
+        if DataItemLinks.FindSet() then
             repeat
                 ChildFieldRef := ChildRecRef.Field(DataItemLinks."Field ID");
                 case DataItemLinks."Filter Type" of
@@ -434,7 +432,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                     DataItemLinks."Filter Type"::"Fixed Filter":
                         ChildFieldRef.SetFilter(DataItemLinks."Filter Value");
                 end;
-            until DataItemLinks.Next = 0;
+            until DataItemLinks.Next() = 0;
     end;
 
     local procedure TestConstraint(DataItem: Record "NPR RP Data Items"; var RecRefIn: RecordRef) Result: Boolean
@@ -452,12 +450,12 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
 
         DataItemConstraint.SetRange("Data Item Code", DataItem.Code);
         DataItemConstraint.SetRange("Data Item Line No.", DataItem."Line No.");
-        if DataItemConstraint.FindSet then
+        if DataItemConstraint.FindSet() then
             repeat
                 RecRef.Open(DataItemConstraint."Table ID");
                 DataItemConstraintLinks.SetRange("Data Item Code", DataItemConstraint."Data Item Code");
                 DataItemConstraintLinks.SetRange("Constraint Line No.", DataItemConstraint."Line No.");
-                DataItemConstraintLinks.FindSet;
+                DataItemConstraintLinks.FindSet();
                 repeat
                     FieldRef := RecRef.Field(DataItemConstraintLinks."Field ID");
                     case DataItemConstraintLinks."Filter Type" of
@@ -469,16 +467,16 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                         DataItemConstraintLinks."Filter Type"::"Fixed Filter":
                             FieldRef.SetFilter(DataItemConstraintLinks."Filter Value");
                     end;
-                until DataItemConstraintLinks.Next = 0;
+                until DataItemConstraintLinks.Next() = 0;
 
                 case DataItemConstraint."Constraint Type" of
                     DataItemConstraint."Constraint Type"::IsEmpty:
-                        Result := Result and RecRef.IsEmpty;
+                        Result := Result and RecRef.IsEmpty();
                     DataItemConstraint."Constraint Type"::IsNotEmpty:
-                        Result := Result and (not RecRef.IsEmpty);
+                        Result := Result and (not RecRef.IsEmpty());
                 end;
-                RecRef.Close;
-            until (DataItemConstraint.Next = 0) or (not Result);
+                RecRef.Close();
+            until (DataItemConstraint.Next() = 0) or (not Result);
 
         exit(Result);
     end;
@@ -497,10 +495,10 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
             exit(false);
 
         tmpDistinctValueList.SetRange(Value);
-        if tmpDistinctValueList.FindLast then;
+        if tmpDistinctValueList.FindLast() then;
         tmpDistinctValueList.Number += 1;
         tmpDistinctValueList.Value := Format(FieldRef.Value, 0, 9);
-        tmpDistinctValueList.Insert;
+        tmpDistinctValueList.Insert();
         exit(true);
         //+NPR5.50 [353588]
     end;
@@ -545,14 +543,13 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         RecRef: RecordRef;
         KeyRef: KeyRef;
         FieldRef: FieldRef;
-        i: Integer;
     begin
         AddFieldToMap(ParentDataItem.Name, 0);
 
         TemplateLine.SetRange("Template Code", Template);
         TemplateLine.SetFilter(Type, '%1|%2', TemplateLine.Type::Data, TemplateLine.Type::Loop);
         TemplateLine.SetFilter("Data Item Name", '<>%1', '');
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 RecRef.Open(TemplateLine."Data Item Table");
                 KeyRef := RecRef.KeyIndex(RecRef.CurrentKeyIndex());
@@ -562,7 +559,7 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                 AddFieldToMap(TemplateLine."Data Item Name", TemplateLine.Field);
                 if TemplateLine."Field 2" > 0 then
                     AddFieldToMap(TemplateLine."Data Item Name", TemplateLine."Field 2");
-            until TemplateLine.Next = 0;
+            until TemplateLine.Next() = 0;
     end;
 
     local procedure ShouldProcessingContinue(DataItem: Record "NPR RP Data Items"; DataFound: Boolean): Boolean

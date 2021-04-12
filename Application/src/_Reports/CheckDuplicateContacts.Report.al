@@ -1,8 +1,8 @@
-report 6060112 "NPR Check Duplicate Contacts"
+﻿report 6060112 "NPR Check Duplicate Contacts"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Check Duplicate Contacts';
     dataset
@@ -60,18 +60,18 @@ report 6060112 "NPR Check Duplicate Contacts"
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then begin
-                            if not TMPCont.FindFirst then
+                            if not TMPCont.FindFirst() then
                                 CurrReport.Break
                         end else
-                            if TMPCont.Next = 0 then
-                                CurrReport.Break;
+                            if TMPCont.Next() = 0 then
+                                CurrReport.Break();
                     end;
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    TMPCont.DeleteAll;
-                    Cont2.Reset;
+                    TMPCont.DeleteAll();
+                    Cont2.Reset();
                     Cont2.SetFilter("No.", '<>%1', "No.");
 
                     if CheckName then
@@ -81,14 +81,14 @@ report 6060112 "NPR Check Duplicate Contacts"
                     if CheckPhone then
                         Cont2.SetRange("Phone No.", "Phone No.");
 
-                    if Cont2.FindSet then
+                    if Cont2.FindSet() then
                         repeat
-                            TMPCont.Init;
+                            TMPCont.Init();
                             TMPCont.TransferFields(Cont2);
-                            TMPCont.Insert;
-                        until Cont2.Next = 0
+                            TMPCont.Insert();
+                        until Cont2.Next() = 0
                     else
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
             }
 

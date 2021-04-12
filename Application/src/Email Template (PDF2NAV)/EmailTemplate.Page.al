@@ -10,69 +10,69 @@ page 6059791 "NPR E-mail Template"
         {
             group(Generelt)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Style = Standard;
                     StyleExpr = TRUE;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field(Filename; Filename)
+                field(Filename; Rec.Filename)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filename field';
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Subject field';
                 }
-                field("Verify Recipient"; "Verify Recipient")
+                field("Verify Recipient"; Rec."Verify Recipient")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Verify Recipient field';
                 }
-                field("Sender as bcc"; "Sender as bcc")
+                field("Sender as bcc"; Rec."Sender as bcc")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sender as bcc field';
                 }
-                field("From E-mail Name"; "From E-mail Name")
+                field("From E-mail Name"; Rec."From E-mail Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the From E-mail Name field';
                 }
-                field("From E-mail Address"; "From E-mail Address")
+                field("From E-mail Address"; Rec."From E-mail Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the From E-mail Address field';
                 }
-                field("Default Recipient Address"; "Default Recipient Address")
+                field("Default Recipient Address"; Rec."Default Recipient Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default recipient e-mail address field';
                 }
-                field("Default Recipient Address CC"; "Default Recipient Address CC")
+                field("Default Recipient Address CC"; Rec."Default Recipient Address CC")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default recipient e-mail address (CC) field';
                 }
-                field("Default Recipient Address BCC"; "Default Recipient Address BCC")
+                field("Default Recipient Address BCC"; Rec."Default Recipient Address BCC")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default recipient e-mail address (BCC) field';
                 }
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report ID field';
@@ -80,8 +80,8 @@ page 6059791 "NPR E-mail Template"
                 group(Control6150644)
                 {
                     ShowCaption = false;
-                    Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
-                    field("Use HTML Template"; "Use HTML Template")
+                    Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
+                    field("Use HTML Template"; Rec."Use HTML Template")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Use HTML Template field';
@@ -96,44 +96,43 @@ page 6059791 "NPR E-mail Template"
                         trigger OnAssistEdit()
                         var
                             TextEditorPage: Page "NPR E-mail Txt Editor Dlg";
-                            TempBlob: Codeunit "Temp Blob";
                             HtmlText: Text;
                             Instream: InStream;
                             Outstream: OutStream;
                         begin
                             Clear(TextEditorPage);
-                            CalcFields("HTML Template");
+                            Rec.CalcFields("HTML Template");
                             HtmlText := '';
                             "HTML Template".CreateInStream(Instream, TEXTENCODING::UTF8);
                             Instream.ReadText(HtmlText);
                             if TextEditorPage.EditText(HtmlText) then begin
-                                Clear("HTML Template");
+                                Clear(Rec."HTML Template");
                                 "HTML Template".CreateOutStream(Outstream, TEXTENCODING::UTF8);
                                 Outstream.WriteText(HtmlText);
-                                Modify;
+                                Rec.Modify();
                             end;
                         end;
                     }
                 }
-                field("Fieldnumber Start Tag"; "Fieldnumber Start Tag")
+                field("Fieldnumber Start Tag"; Rec."Fieldnumber Start Tag")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Fieldnumber Start Tag field';
                 }
-                field("Fieldnumber End Tag"; "Fieldnumber End Tag")
+                field("Fieldnumber End Tag"; Rec."Fieldnumber End Tag")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Fieldnumber End Tag field';
                 }
-                field(Group; Group)
+                field(Group; Rec.Group)
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Group field';
                 }
-                field("Transactional E-mail"; "Transactional E-mail")
+                field("Transactional E-mail"; Rec."Transactional E-mail")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
@@ -142,8 +141,8 @@ page 6059791 "NPR E-mail Template"
                 group(Control6150643)
                 {
                     ShowCaption = false;
-                    Visible = ("Transactional E-mail" = 1);
-                    field("Transactional E-mail Code"; "Transactional E-mail Code")
+                    Visible = (Rec."Transactional E-mail" = 1);
+                    field("Transactional E-mail Code"; Rec."Transactional E-mail Code")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
@@ -157,7 +156,7 @@ page 6059791 "NPR E-mail Template"
                 ShowFilter = false;
                 SubPageLink = "E-mail Template Code" = FIELD(Code);
                 SubPageView = SORTING("E-mail Template Code", "Line No.");
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
             }
         }
@@ -182,7 +181,7 @@ page 6059791 "NPR E-mail Template"
             {
                 Caption = 'View HTML Template';
                 Image = View;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the View HTML Template action';
 
@@ -197,7 +196,7 @@ page 6059791 "NPR E-mail Template"
             {
                 Caption = 'Import HTML Template';
                 Image = Import;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import HTML Template action';
 
@@ -213,7 +212,7 @@ page 6059791 "NPR E-mail Template"
             {
                 Caption = 'Export HTML Template';
                 Image = Export;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Export HTML Template action';
 
@@ -228,7 +227,7 @@ page 6059791 "NPR E-mail Template"
             {
                 Caption = 'Copy From E-Mail Template';
                 Image = Copy;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Copy From E-Mail Template action';
 
@@ -243,7 +242,7 @@ page 6059791 "NPR E-mail Template"
             {
                 Caption = 'Delete HTML Template';
                 Image = Delete;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Delete HTML Template action';
 

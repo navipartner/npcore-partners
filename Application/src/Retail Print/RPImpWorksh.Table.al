@@ -142,7 +142,6 @@ table 6014569 "NPR RP Imp. Worksh."
         VersionArray: DotNet NPRNetArray;
         Regex: DotNet NPRNetRegex;
         Version: DotNet NPRNetString;
-        TemplateHeader: Record "NPR RP Template Header";
         VersionPos: Integer;
         EndOfString: Boolean;
         Length: Integer;

@@ -28,16 +28,16 @@ codeunit 6151051 "NPR Distribution Mgmt"
                     DistributionLines.SetRange("Distribution Id", DistributionId);
                     if not DistributionLines.IsEmpty then
                         if Confirm(ConfirmDeleteText, false, true) then
-                            DistributionLines.DeleteAll;
+                            DistributionLines.DeleteAll();
                     DistributionGroupMembers.SetRange(DistributionGroupMembers."Distribution Group", DistributionGroups.Code);
-                    if DistributionGroupMembers.FindSet then begin
+                    if DistributionGroupMembers.FindSet() then begin
                         repeat
                             //Determine if Distribution Setup allows!!!
                             ItemHierarchyLine.SetRange("Item Hierarchy Code", ItemHierarchy."Hierarchy Code");
-                            if ItemHierarchyLine.FindSet then begin
+                            if ItemHierarchyLine.FindSet() then begin
                                 repeat
                                     //delete if found
-                                    DistributionLines.Init;
+                                    DistributionLines.Init();
                                     LineNo := LineNo + 10000;
                                     DistributionLines."Distribution Id" := DistributionId;
                                     DistributionLines."Distribution Line" := LineNo;
@@ -64,7 +64,7 @@ codeunit 6151051 "NPR Distribution Mgmt"
                                         ReplenishmentDemandLine.SetRange(Confirmed, true);
                                         ReplenishmentDemandLine.SetFilter("Due Date", '..%1', DistributionHeaders."Required Date");
                                         ReplenishmentDemandLine.SetRange("Location Code", DistributionGroupMembers.Location);
-                                        if ReplenishmentDemandLine.FindSet then begin
+                                        if ReplenishmentDemandLine.FindSet() then begin
                                             DistributionLines."Demanded Quantity" := DistributionLines."Demanded Quantity" + ReplenishmentDemandLine."Demanded Quantity";
                                         end;
 
@@ -79,10 +79,10 @@ codeunit 6151051 "NPR Distribution Mgmt"
                                         DistributionLines."Org. Distribution Quantity" := DistributionLines."Distribution Quantity";
                                     end else
                                         DistributionLines.Description := CopyStr(ItemHierarchyLine."Item Hierachy Description", 1, 50);
-                                    DistributionLines.Insert;
-                                until ItemHierarchyLine.Next = 0;
+                                    DistributionLines.Insert();
+                                until ItemHierarchyLine.Next() = 0;
                             end;
-                        until DistributionGroupMembers.Next = 0;
+                        until DistributionGroupMembers.Next() = 0;
                     end else
                         Message(NoLocationText, DistributionGroups.Code);
                 end;
@@ -95,11 +95,9 @@ codeunit 6151051 "NPR Distribution Mgmt"
 
     procedure CreateDistributionDocuments(var DistributionHeaders: Record "NPR Distribution Headers")
     var
-        Item: Record Item;
         DistributionLines: Record "NPR Distribution Lines";
         PurchaseLine: Record "Purchase Line";
         DistribTableMap: Record "NPR Distribution Map";
-        TransferLine: Record "Transfer Line";
         DistributionGroups: Record "NPR Distrib. Group";
         StockkeepingUnit: Record "Stockkeeping Unit";
         QtyToDist: Decimal;
@@ -107,7 +105,7 @@ codeunit 6151051 "NPR Distribution Mgmt"
         //IF status closed - error
         DistributionLines.SetCurrentKey(DistributionLines.Location, DistributionLines."Distribution Item");
         DistributionLines.SetRange(DistributionLines."Distribution Id", DistributionHeaders."Distribution Id");
-        if DistributionLines.FindSet then begin
+        if DistributionLines.FindSet() then begin
             repeat
                 //Find purchase orders to location
                 QtyToDist := DistributionLines."Distribution Quantity";
@@ -155,7 +153,7 @@ codeunit 6151051 "NPR Distribution Mgmt"
 
                     //IF inventory > DistributionHeaders THEN CREATE transfer else create purchse
                 end;
-            until DistributionLines.Next = 0;
+            until DistributionLines.Next() = 0;
         end;
 
         //Per Item process on line per location
@@ -166,28 +164,14 @@ codeunit 6151051 "NPR Distribution Mgmt"
     procedure CreateTransfOrders(var DistributionLines: Record "NPR Distribution Lines"; TransferQuantity: Decimal)
     var
         ReplenSetup: Record "NPR Retail Replenishment Setup";
-        TransferHeaderTEMP: Record "Transfer Header" temporary;
         DistribTableMap: Record "NPR Distribution Map";
-        Text001: Label 'Allocating Transfer Order Numbers';
-        Text002: Label 'Reserving No. for Trans. Order #1#######';
-        Text003: Label 'Transfer Order No. #2###################';
         TransferHeader: Record "Transfer Header";
         TransferLine: Record "Transfer Line";
-        lItem: Record Item;
         DistributionHeaders: Record "NPR Distribution Headers";
         DistributionGroups: Record "NPR Distrib. Group";
-        Window: Dialog;
-        NoOfTransfOrders: Integer;
-        Text004: Label 'Processing #1#############################';
-        Text005: Label 'Creating Transfer Order #2##### of #3#####';
-        Text006: Label '@4@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@';
-        TransfOrderNo: Integer;
-        TransferMultiple: Decimal;
         Text007: Label 'The Transfer Route between Locations %1 and %2 has not been defined. The %3 in the %4 has not been filled out.';
-        lReplDataSource: Text[30];
-        lReleaseTransferDocument: Codeunit "Release Transfer Document";
     begin
-        ReplenSetup.Get;
+        ReplenSetup.Get();
         DistributionHeaders.Get(DistributionLines."Distribution Id");
         DistributionGroups.Get(DistributionHeaders."Distribution Group");
         DistributionGroups.TestField("Warehouse Location");
@@ -210,7 +194,7 @@ codeunit 6151051 "NPR Distribution Mgmt"
         TransferLine.SetRange("Document No.", TransferHeader."No.");
         TransferLine.SetRange("Item No.", DistributionLines."Distribution Item");
         TransferLine.SetRange("Variant Code", DistributionLines."Item Variant");
-        if not TransferLine.FindFirst then begin
+        if not TransferLine.FindFirst() then begin
             TransferLine."Line No." := TransferLine."Line No." + 10000;
             TransferLine.Insert(true);
             TransferLine.Quantity := 0;

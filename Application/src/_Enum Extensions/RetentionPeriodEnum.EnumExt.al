@@ -1,4 +1,4 @@
-﻿enumextension 6014401 "NPR Retention Period Enum" extends "Retention Period Enum"
+enumextension 6014401 "NPR Retention Period Enum" extends "Retention Period Enum"
 {
     value(6014400; "14 Days")
     {

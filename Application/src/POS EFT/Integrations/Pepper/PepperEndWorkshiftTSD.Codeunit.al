@@ -12,7 +12,6 @@ codeunit 6184493 "NPR Pepper End Workshift TSD"
         InitializedResponse: Boolean;
         EndWorkShiftRequest: DotNet NPRNetEndWorkshiftRequest0;
         EndWorkShiftResponse: DotNet NPRNetEndWorkshiftResponse0;
-        EndOfDayPa: Integer;
         LastRestCode: Integer;
         Labels: DotNet NPRNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "NPR Pepper Term. Captions TSD";
@@ -141,7 +140,6 @@ codeunit 6184493 "NPR Pepper End Workshift TSD"
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
-        PaymentRequest: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
 

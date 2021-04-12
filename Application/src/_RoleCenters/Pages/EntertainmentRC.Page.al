@@ -260,7 +260,7 @@ page 6151249 "NPR Entertainment RC"
                     RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Ticket Access Statistics Matrix action';
-                    Image = ShowMatrix; 
+                    Image = ShowMatrix;
                 }
             }
             group(ActionGroup18)
@@ -272,7 +272,7 @@ page 6151249 "NPR Entertainment RC"
                     Caption = 'GDPR Setup';
                     RunObject = Page "NPR GDPR Setup";
                     ToolTip = 'Executes the GDPR Setup action';
-                    Image = Setup; 
+                    Image = Setup;
                 }
                 action("Recurring Payment Setup")
                 {
@@ -280,7 +280,7 @@ page 6151249 "NPR Entertainment RC"
                     Caption = 'Recurring Payment Setup';
                     RunObject = Page "NPR MM Recur. Payment Setup";
                     ToolTip = 'Executes the Recurring Payment Setup action';
-                    Image = SetupPayment; 
+                    Image = SetupPayment;
                 }
             }
             group(ActionGroup14)
@@ -292,11 +292,12 @@ page 6151249 "NPR Entertainment RC"
                     RunObject = Page "NPR NPRE Restaurant Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Restaurant Setup action';
-                    Image = Setup; 
+                    Image = Setup;
                 }
             }
         }
-        area(Creation){
+        area(Creation)
+        {
             action("Import List")
             {
                 Caption = 'Import List';

@@ -11,7 +11,6 @@ codeunit 6014594 "NPR RapidStart Base Data Mgt."
 
     local procedure TableObjectExists(TableID: Integer): Boolean
     var
-        tableMetadata: Record "Table Metadata";
         configXmlExc: Codeunit "Config. XML Exchange";
     begin
         exit(configXmlExc.TableObjectExists(TableID));
@@ -21,7 +20,6 @@ codeunit 6014594 "NPR RapidStart Base Data Mgt."
     var
         ConfigPackageField: Record "Config. Package Field";
         Field: Record Field;
-        FCounter: Integer;
     begin
         Field.SetRange(TableNo, TableId);
         if Field.FindSet() then begin
@@ -30,7 +28,7 @@ codeunit 6014594 "NPR RapidStart Base Data Mgt."
                 ConfigPackageField."Package Code" := PackageCode;
                 ConfigPackageField."Table ID" := Field.TableNo;
                 ConfigPackageField."Field ID" := Field."No.";
-                if not ConfigPackageField.insert then;
+                if not ConfigPackageField.Insert() then;
             until Field.Next() = 0;
         end;
     end;
@@ -43,7 +41,6 @@ codeunit 6014594 "NPR RapidStart Base Data Mgt."
         inStream: InStream;
         XMLNode: XmlNode;
         XMLNodeList: XmlNodeList;
-        XMLInnerNode: XmlNode;
     begin
         httpClient.Get(URL, httpResponseMessage);
         httpResponseMessage.Content.ReadAs(inStream);
@@ -68,9 +65,7 @@ codeunit 6014594 "NPR RapidStart Base Data Mgt."
         inStream: InStream;
         outStream: OutStream;
         httpClient: HttpClient;
-        httpRequestMessage: HttpRequestMessage;
         httpResponseMessage: HttpResponseMessage;
-        file: Text;
         ConfirmImportQst: Label 'WARNING:\This will import test data in base & NPR tables.\Are you sure you want to continue?';
     begin
         if GuiAllowed then
@@ -110,7 +105,7 @@ codeunit 6014594 "NPR RapidStart Base Data Mgt."
                 if not TableObjectExists(ConfigPackageTable."Table ID") then begin
                     ConfigPackageTable.Delete();
                 end;
-            until ConfigPackageTable.Next = 0;
+            until ConfigPackageTable.Next() = 0;
         end;
     end;
 }

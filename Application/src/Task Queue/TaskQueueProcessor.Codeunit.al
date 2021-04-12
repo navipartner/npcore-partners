@@ -38,10 +38,8 @@ codeunit 6059902 "NPR Task Queue Processor"
         MailTaskStatus: Codeunit "NPR Mail Task Status";
         CurrExecRunTime: DateTime;
         NextRunTime: DateTime;
-        TaskExecuted: Boolean;
         NewEnabled: Boolean;
         Success: Boolean;
-        LastCheckInterval: Integer;
         CurrLangID: Integer;
     begin
         TaskLine.Get(TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
@@ -50,19 +48,19 @@ codeunit 6059902 "NPR Task Queue Processor"
             //Calculate a new runtime and stop executing the task now
             NextRunTime := CalculateNextRunTime(TaskLine, false, NewEnabled);
             TaskLine.Enabled := NewEnabled;
-            TaskLine.Modify;
+            TaskLine.Modify();
 
             //-TQ1.34 [326930]
-            TaskQueue.LockTable;
+            TaskQueue.LockTable();
             //+TQ1.34 [326930]
             TaskQueue.Get(TaskQueue.Company, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
             TaskQueue."Next Run time" := NextRunTime;
             TaskQueue."Estimated Duration" := TaskLine.GetExpectedDuration;
             TaskQueue.Validate(Status, TaskQueue.Status::Awaiting);
-            TaskQueue.Modify;
+            TaskQueue.Modify();
 
             TaskLog.AddMovedTask(TaskQueue, TaskLine);
-            Commit;
+            Commit();
             exit;
         end;
 
@@ -70,7 +68,7 @@ codeunit 6059902 "NPR Task Queue Processor"
 
         if not MailTaskStatus.Run(TaskLine) then begin
             TaskLog.AddLogOtherFailure(TaskQueue, TaskLine);
-            Commit;
+            Commit();
         end;
 
         if (TaskLine."Language ID" <> 0) and (TaskLine."Language ID" <> GlobalLanguage) then
@@ -90,21 +88,21 @@ codeunit 6059902 "NPR Task Queue Processor"
         NextRunTime := CalculateNextRunTime(TaskLine, Success, NewEnabled);
         if TaskLine.Enabled <> NewEnabled then begin
             TaskLine.Validate(Enabled, NewEnabled); //Update Task Queue line
-            TaskLine.Modify;
+            TaskLine.Modify();
             //-TQ1.29
             TaskQueue.Get(TaskQueue.Company, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
             //+TQ1.29
         end;
 
         //-TQ1.34 [326930]
-        TaskQueue.LockTable;
+        TaskQueue.LockTable();
         TaskQueue.Get(TaskQueue.Company, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
         //+TQ1.34 [326930]
         TaskQueue."Next Run time" := NextRunTime;
         TaskQueue."Estimated Duration" := TaskLine.GetExpectedDuration;
-        TaskQueue.Modify;
+        TaskQueue.Modify();
         //-TQ1.34 [326930]
-        Commit;
+        Commit();
         //+TQ1.34 [326930]
         InsertChildrensInTaskQueue(TaskLine, Success);
 
@@ -112,17 +110,17 @@ codeunit 6059902 "NPR Task Queue Processor"
 
         if not MailTaskStatus.Run(TaskLine) then begin
             TaskLog.AddLogOtherFailure(TaskQueue, TaskLine);
-            Commit;
+            Commit();
         end;
 
         if Success then begin
             if TaskLine."Error Counter" <> 0 then begin
                 TaskLine."Error Counter" := 0;
-                TaskLine.Modify;
+                TaskLine.Modify();
             end;
         end else begin
             TaskLine."Error Counter" += 1;
-            TaskLine.Modify;
+            TaskLine.Modify();
         end;
 
         //-TQ1.29
@@ -173,19 +171,18 @@ codeunit 6059902 "NPR Task Queue Processor"
     procedure StartTask(var TaskQueue: Record "NPR Task Queue"; TaskLine: Record "NPR Task Line")
     var
         TaskLog: Record "NPR Task Log (Task)";
-        TaskQueueManager: Codeunit "NPR Task Queue Manager";
     begin
-        TaskQueue.LockTable;
+        TaskQueue.LockTable();
         TaskQueue.Get(TaskQueue.Company, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
         TaskQueue.Validate(Status, TaskQueue.Status::Started);
-        TaskQueue.Modify;
+        TaskQueue.Modify();
 
         TaskLogEntryNo := TaskLog.AddLogInit(TaskQueue, TaskLine);
         //-TQ1.29
         //TaskQueueManager.SetCurrentLogEntryNo(TaskLogEntryNo);
         //+TQ1.29
 
-        Commit;
+        Commit();
     end;
 
     procedure EndTask(TaskLine: Record "NPR Task Line"; TaskQueue: Record "NPR Task Queue"; Success: Boolean; CurrExecRunTime: DateTime)
@@ -193,7 +190,7 @@ codeunit 6059902 "NPR Task Queue Processor"
         TaskLog: Record "NPR Task Log (Task)";
         TaskQueueAdd2Log: Codeunit "NPR Task Queue: SingleInstance";
     begin
-        TaskQueue.LockTable;
+        TaskQueue.LockTable();
         if (TaskLine.Recurrence = TaskLine.Recurrence::None) or (TaskQueue."Next Run time" = 0DT) then
             TaskQueue.Delete(true)
         else begin
@@ -207,62 +204,57 @@ codeunit 6059902 "NPR Task Queue Processor"
                 TaskQueue."Last Execution Status" := TaskQueue."Last Execution Status"::Succes;
             end else
                 TaskQueue."Last Execution Status" := TaskQueue."Last Execution Status"::Error;
-            TaskQueue.Modify;
+            TaskQueue.Modify();
         end;
         TaskLog.AddLogFinal(TaskQueue, Success, TaskLogEntryNo);
-        Commit;
+        Commit();
     end;
 
     procedure CheckValid2RunNow(TaskLine: Record "NPR Task Line"; TaskQueue: Record "NPR Task Queue"): Boolean
-    var
-        ProposedTime: Time;
     begin
-        with TaskLine do begin
-            if Indentation > 0 then
-                exit(true);
-            //-NPR5.45 [314491]
-            if TaskQueue."Next Run time" <> 0DT then
-                //+NPR5.45 [314491]
-                //weekday check
-                case Date2DWY(DT2Date(TaskQueue."Next Run time"), 1) of
-                    1:
-                        if not "Run on Monday" then
-                            exit(false);
-                    2:
-                        if not "Run on Tuesday" then
-                            exit(false);
-                    3:
-                        if not "Run on Wednesday" then
-                            exit(false);
-                    4:
-                        if not "Run on Thursday" then
-                            exit(false);
-                    5:
-                        if not "Run on Friday" then
-                            exit(false);
-                    6:
-                        if not "Run on Saturday" then
-                            exit(false);
-                    7:
-                        if not "Run on Sunday" then
-                            exit(false);
-                end;
-
-            //time check
-            if ("Valid After" <> 0T) and ("Valid Until" <> 0T) then begin
-                if "Valid After" < "Valid Until" then begin
-                    //not crossing midnight
-                    if (Time < "Valid After") or
-                       (Time > "Valid Until") then
+        if TaskLine.Indentation > 0 then
+            exit(true);
+        //-NPR5.45 [314491]
+        if TaskQueue."Next Run time" <> 0DT then
+            //+NPR5.45 [314491]
+            //weekday check
+            case Date2DWY(DT2Date(TaskQueue."Next Run time"), 1) of
+                1:
+                    if not TaskLine."Run on Monday" then
                         exit(false);
-                end else begin
-                    //crossing midnight
-                    if (Time < "Valid After") and
-                       (Time > "Valid Until") then
+                2:
+                    if not TaskLine."Run on Tuesday" then
                         exit(false);
-                end;
+                3:
+                    if not TaskLine."Run on Wednesday" then
+                        exit(false);
+                4:
+                    if not TaskLine."Run on Thursday" then
+                        exit(false);
+                5:
+                    if not TaskLine."Run on Friday" then
+                        exit(false);
+                6:
+                    if not TaskLine."Run on Saturday" then
+                        exit(false);
+                7:
+                    if not TaskLine."Run on Sunday" then
+                        exit(false);
             end;
 
+        //time check
+        if (TaskLine."Valid After" <> 0T) and (TaskLine."Valid Until" <> 0T) then begin
+            if TaskLine."Valid After" < TaskLine."Valid Until" then begin
+                //not crossing midnight
+                if (Time < TaskLine."Valid After") or
+                   (Time > TaskLine."Valid Until") then
+                    exit(false);
+            end else begin
+                //crossing midnight
+                if (Time < TaskLine."Valid After") and
+                   (Time > TaskLine."Valid Until") then
+                    exit(false);
+            end;
         end;
         exit(true);
     end;
@@ -271,7 +263,6 @@ codeunit 6059902 "NPR Task Queue Processor"
     var
         TaskQueue: Record "NPR Task Queue";
         CurrDate: Date;
-        CurrTime: Time;
         NextDateTime: DateTime;
         NoOfPassedIntervals: Integer;
     begin
@@ -284,124 +275,122 @@ codeunit 6059902 "NPR Task Queue Processor"
         NewEnabled := true;
         TaskQueue.Get(CompanyName, TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.");
 
-        with TaskLine do begin
-            if Indentation > 0 then
-                exit;
+        if TaskLine.Indentation > 0 then
+            exit;
 
-            //temp fix to update existing cust
-            if "Recurrence Calc. Interval" = 0 then
-                "Recurrence Calc. Interval" := "Recurrence Interval";
-            //-TQ1.33 [327207]
-            if "Recurrence Calc. Interval" = 0 then
-                "Recurrence Calc. Interval" := 1000 * 60;
-            //+TQ1.33 [327207]
+        //temp fix to update existing cust
+        if TaskLine."Recurrence Calc. Interval" = 0 then
+            TaskLine."Recurrence Calc. Interval" := TaskLine."Recurrence Interval";
+        //-TQ1.33 [327207]
+        if TaskLine."Recurrence Calc. Interval" = 0 then
+            TaskLine."Recurrence Calc. Interval" := 1000 * 60;
+        //+TQ1.33 [327207]
 
-            if Succesfull or ("Retry Interval (On Error)" = 0) then begin
-                case "Recurrence Method" of
-                    "Recurrence Method"::Static:
-                        begin
-                            case Recurrence of
-                                Recurrence::" ":
-                                    begin
-                                        NewEnabled := false;
-                                        TaskQueue.Get(CompanyName, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
-                                    end;
-                                Recurrence::Hourly,
-                                Recurrence::Daily,
-                                Recurrence::Weekly,
-                                Recurrence::Custom:
-                                    begin
-                                        if Succesfull and (TaskLine."Error Counter" <> 0) and (TaskQueue."Last Successfull Run" <> 0DT) then begin
-                                            //calculate how many recurrence Intervals that have passed since last syccesfull run
-                                            NoOfPassedIntervals := Round((CurrentDateTime - TaskQueue."Last Successfull Run") / "Recurrence Interval", 1, '<');
-                                            NextDateTime := TaskQueue."Last Successfull Run" + ("Recurrence Interval" * (NoOfPassedIntervals + 1));
-                                        end else
-                                            NextDateTime := TaskQueue."Next Run time" + "Recurrence Interval";
-                                        while not IsValidDate(TaskLine, NextDateTime, true) do begin
-                                            NextDateTime := NextDateTime + "Recurrence Calc. Interval";
-                                        end;
-                                    end;
-                                Recurrence::DateFormula:
-                                    begin
-                                        CurrDate := Today;
-                                        repeat
-                                            CurrDate := CalcDate(TaskLine."Recurrence Formula", CurrDate);
-                                            NextDateTime := CreateDateTime(CurrDate, TaskLine."Recurrence Time");
-                                        until IsValidDate(TaskLine, NextDateTime, true);
-                                    end;
-                                Recurrence::None:
-                                    begin
-                                        //not needed - will be deleted after job is finished
-                                    end;
-                            end;
-                        end;
-                    "Recurrence Method"::Dynamic:
-                        begin
-                            case Recurrence of
-                                Recurrence::" ":
-                                    begin
-                                        NewEnabled := false;
-                                        TaskQueue.Get(CompanyName, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
-                                    end;
-                                Recurrence::Hourly,
-                                Recurrence::Daily,
-                                Recurrence::Weekly,
-                                Recurrence::Custom:
-                                    begin
-                                        NextDateTime := CurrentDateTime;
-                                        repeat
-                                            NextDateTime := NextDateTime + "Recurrence Calc. Interval";
-                                        until IsValidDate(TaskLine, NextDateTime, true);
-                                    end;
-                                Recurrence::DateFormula:
-                                    begin
-                                        CurrDate := Today;
-                                        repeat
-                                            CurrDate := CalcDate(TaskLine."Recurrence Formula", CurrDate);
-                                            NextDateTime := CreateDateTime(CurrDate, TaskLine."Recurrence Time");
-                                        until IsValidDate(TaskLine, NextDateTime, true);
-                                    end;
-                                Recurrence::None:
-                                    begin
-                                        //not needed - will be deleted after job is finished
-                                    end;
-                            end;
-                        end;
-                end;
-            end else begin
-                if "Max No. Of Retries (On Error)" <> 0 then begin
-                    if "Error Counter" < "Max No. Of Retries (On Error)" then begin
-                        if "Recurrence Method" = "Recurrence Method"::Static then
-                            NextDateTime := TaskQueue."Next Run time"
-                        else
-                            NextDateTime := CurrentDateTime;
-                        repeat
-                            NextDateTime := NextDateTime + "Retry Interval (On Error)";
-                        until IsValidDate(TaskLine, NextDateTime, true);
-                    end else begin
-                        case "Action After Max. No. of Retri" of
-                            "Action After Max. No. of Retri"::Reschedule2NextRuntime:
-                                begin
-                                    exit(CalculateNextRunTime(TaskLine, true, NewEnabled));
-                                end;
-                            "Action After Max. No. of Retri"::StopTask:
+        if Succesfull or (TaskLine."Retry Interval (On Error)" = 0) then begin
+            case TaskLine."Recurrence Method" of
+                TaskLine."Recurrence Method"::Static:
+                    begin
+                        case TaskLine.Recurrence of
+                            TaskLine.Recurrence::" ":
                                 begin
                                     NewEnabled := false;
                                     TaskQueue.Get(CompanyName, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
                                 end;
+                            TaskLine.Recurrence::Hourly,
+                            TaskLine.Recurrence::Daily,
+                            TaskLine.Recurrence::Weekly,
+                            TaskLine.Recurrence::Custom:
+                                begin
+                                    if Succesfull and (TaskLine."Error Counter" <> 0) and (TaskQueue."Last Successfull Run" <> 0DT) then begin
+                                        //calculate how many recurrence Intervals that have passed since last syccesfull run
+                                        NoOfPassedIntervals := Round((CurrentDateTime - TaskQueue."Last Successfull Run") / TaskLine."Recurrence Interval", 1, '<');
+                                        NextDateTime := TaskQueue."Last Successfull Run" + (TaskLine."Recurrence Interval" * (NoOfPassedIntervals + 1));
+                                    end else
+                                        NextDateTime := TaskQueue."Next Run time" + TaskLine."Recurrence Interval";
+                                    while not IsValidDate(TaskLine, NextDateTime, true) do begin
+                                        NextDateTime := NextDateTime + TaskLine."Recurrence Calc. Interval";
+                                    end;
+                                end;
+                            TaskLine.Recurrence::DateFormula:
+                                begin
+                                    CurrDate := Today();
+                                    repeat
+                                        CurrDate := CalcDate(TaskLine."Recurrence Formula", CurrDate);
+                                        NextDateTime := CreateDateTime(CurrDate, TaskLine."Recurrence Time");
+                                    until IsValidDate(TaskLine, NextDateTime, true);
+                                end;
+                            TaskLine.Recurrence::None:
+                                begin
+                                    //not needed - will be deleted after job is finished
+                                end;
                         end;
                     end;
-                end else begin
-                    if "Recurrence Method" = "Recurrence Method"::Static then
+                TaskLine."Recurrence Method"::Dynamic:
+                    begin
+                        case TaskLine.Recurrence of
+                            TaskLine.Recurrence::" ":
+                                begin
+                                    NewEnabled := false;
+                                    TaskQueue.Get(CompanyName, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
+                                end;
+                            TaskLine.Recurrence::Hourly,
+                            TaskLine.Recurrence::Daily,
+                            TaskLine.Recurrence::Weekly,
+                            TaskLine.Recurrence::Custom:
+                                begin
+                                    NextDateTime := CurrentDateTime;
+                                    repeat
+                                        NextDateTime := NextDateTime + TaskLine."Recurrence Calc. Interval";
+                                    until IsValidDate(TaskLine, NextDateTime, true);
+                                end;
+                            TaskLine.Recurrence::DateFormula:
+                                begin
+                                    CurrDate := Today();
+                                    repeat
+                                        CurrDate := CalcDate(TaskLine."Recurrence Formula", CurrDate);
+                                        NextDateTime := CreateDateTime(CurrDate, TaskLine."Recurrence Time");
+                                    until IsValidDate(TaskLine, NextDateTime, true);
+                                end;
+                            TaskLine.Recurrence::None:
+                                begin
+                                    //not needed - will be deleted after job is finished
+                                end;
+                        end;
+                    end;
+            end;
+        end else begin
+            if TaskLine."Max No. Of Retries (On Error)" <> 0 then begin
+                if TaskLine."Error Counter" < TaskLine."Max No. Of Retries (On Error)" then begin
+                    if TaskLine."Recurrence Method" = TaskLine."Recurrence Method"::Static then
                         NextDateTime := TaskQueue."Next Run time"
                     else
                         NextDateTime := CurrentDateTime;
-                    if not IsValidDate(TaskLine, NextDateTime + "Retry Interval (On Error)", true) then
-                        TestField("Retry Interval (On Error)");
                     repeat
-                        NextDateTime := NextDateTime + "Retry Interval (On Error)";
+                        NextDateTime := NextDateTime + TaskLine."Retry Interval (On Error)";
                     until IsValidDate(TaskLine, NextDateTime, true);
+                end else begin
+                    case TaskLine."Action After Max. No. of Retri" of
+                        TaskLine."Action After Max. No. of Retri"::Reschedule2NextRuntime:
+                            begin
+                                exit(CalculateNextRunTime(TaskLine, true, NewEnabled));
+                            end;
+                        TaskLine."Action After Max. No. of Retri"::StopTask:
+                            begin
+                                NewEnabled := false;
+                                TaskQueue.Get(CompanyName, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
+                            end;
+                    end;
                 end;
+            end else begin
+                if TaskLine."Recurrence Method" = TaskLine."Recurrence Method"::Static then
+                    NextDateTime := TaskQueue."Next Run time"
+                else
+                    NextDateTime := CurrentDateTime;
+                if not IsValidDate(TaskLine, NextDateTime + TaskLine."Retry Interval (On Error)", true) then
+                    TaskLine.TestField("Retry Interval (On Error)");
+                repeat
+                    NextDateTime := NextDateTime + TaskLine."Retry Interval (On Error)";
+                until IsValidDate(TaskLine, NextDateTime, true);
             end;
         end;
 
@@ -413,8 +402,6 @@ codeunit 6059902 "NPR Task Queue Processor"
 
     procedure IsValidDate(TaskLine: Record "NPR Task Line"; ProposedDateTime: DateTime; CheckTime: Boolean): Boolean
     var
-        WeekdayNo: Integer;
-        MonthNo: Integer;
         ProposedTime: Time;
     begin
         if ProposedDateTime = 0DT then
@@ -429,49 +416,46 @@ codeunit 6059902 "NPR Task Queue Processor"
             exit(true); //make it stop
         end;
 
-        with TaskLine do begin
-            //weekday check
-            case Date2DWY(DT2Date(ProposedDateTime), 1) of
-                1:
-                    if not "Run on Monday" then
-                        exit(false);
-                2:
-                    if not "Run on Tuesday" then
-                        exit(false);
-                3:
-                    if not "Run on Wednesday" then
-                        exit(false);
-                4:
-                    if not "Run on Thursday" then
-                        exit(false);
-                5:
-                    if not "Run on Friday" then
-                        exit(false);
-                6:
-                    if not "Run on Saturday" then
-                        exit(false);
-                7:
-                    if not "Run on Sunday" then
-                        exit(false);
+        //weekday check
+        case Date2DWY(DT2Date(ProposedDateTime), 1) of
+            1:
+                if not TaskLine."Run on Monday" then
+                    exit(false);
+            2:
+                if not TaskLine."Run on Tuesday" then
+                    exit(false);
+            3:
+                if not TaskLine."Run on Wednesday" then
+                    exit(false);
+            4:
+                if not TaskLine."Run on Thursday" then
+                    exit(false);
+            5:
+                if not TaskLine."Run on Friday" then
+                    exit(false);
+            6:
+                if not TaskLine."Run on Saturday" then
+                    exit(false);
+            7:
+                if not TaskLine."Run on Sunday" then
+                    exit(false);
+        end;
+
+        //time check
+        if (CheckTime) and (TaskLine."Valid After" <> 0T) and (TaskLine."Valid Until" <> 0T) then begin
+            ProposedTime := DT2Time(ProposedDateTime);
+            if TaskLine."Valid After" < TaskLine."Valid Until" then begin
+                //not crossing midnight
+                if (ProposedTime < TaskLine."Valid After") or
+                   (ProposedTime > TaskLine."Valid Until") then
+                    exit(false);
+
+            end else begin
+                //crossing midnight
+                if (ProposedTime < TaskLine."Valid After") and
+                   (ProposedTime > TaskLine."Valid Until") then
+                    exit(false);
             end;
-
-            //time check
-            if (CheckTime) and ("Valid After" <> 0T) and ("Valid Until" <> 0T) then begin
-                ProposedTime := DT2Time(ProposedDateTime);
-                if "Valid After" < "Valid Until" then begin
-                    //not crossing midnight
-                    if (ProposedTime < "Valid After") or
-                       (ProposedTime > "Valid Until") then
-                        exit(false);
-
-                end else begin
-                    //crossing midnight
-                    if (ProposedTime < "Valid After") and
-                       (ProposedTime > "Valid Until") then
-                        exit(false);
-                end;
-            end;
-
         end;
         exit(true);
     end;
@@ -485,12 +469,12 @@ codeunit 6059902 "NPR Task Queue Processor"
         TaskLine2.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
         TaskLine2.SetFilter("Line No.", '>%1', TaskLine."Line No.");
         TaskLine2.SetRange(Indentation, TaskLine.Indentation);
-        if TaskLine2.FindFirst then
+        if TaskLine2.FindFirst() then
             MaxLineNo := TaskLine2."Line No."
         else begin
             TaskLine2.SetRange("Line No.");
             TaskLine2.SetRange(Indentation);
-            TaskLine2.FindLast;
+            TaskLine2.FindLast();
             MaxLineNo := TaskLine2."Line No.";
         end;
         TaskLine2.SetRange("Line No.", TaskLine."Line No." + 1, MaxLineNo);
@@ -500,11 +484,11 @@ codeunit 6059902 "NPR Task Queue Processor"
         else
             TaskLine2.SetRange("Dependence Type", TaskLine2."Dependence Type"::Error);
 
-        if TaskLine2.FindSet then
+        if TaskLine2.FindSet() then
             repeat
                 if TaskLine2.Enabled then
                     TaskLine2.SetNextRuntime(CurrentDateTime, true);
-            until TaskLine2.Next = 0;
+            until TaskLine2.Next() = 0;
     end;
 }
 

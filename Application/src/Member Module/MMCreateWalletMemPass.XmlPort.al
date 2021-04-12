@@ -50,13 +50,12 @@ xmlport 6060143 "NPR MM Create Wallet Mem. Pass"
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    with TmpNotificationEntry do
-                                        case "Notification Trigger" of
-                                            "Notification Trigger"::WALLET_CREATE:
-                                                type := 'CREATE';
-                                            "Notification Trigger"::WALLET_UPDATE:
-                                                type := 'UPDATE';
-                                        end;
+                                    case TmpNotificationEntry."Notification Trigger" of
+                                        TmpNotificationEntry."Notification Trigger"::WALLET_CREATE:
+                                            type := 'CREATE';
+                                        TmpNotificationEntry."Notification Trigger"::WALLET_UPDATE:
+                                            type := 'UPDATE';
+                                    end;
                                 end;
                             }
                             fieldattribute(id; TmpNotificationEntry."Wallet Pass Id")

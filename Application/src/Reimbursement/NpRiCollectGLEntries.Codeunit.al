@@ -1,4 +1,4 @@
-codeunit 6151109 "NPR NpRi Collect G/L Entries"
+﻿codeunit 6151109 "NPR NpRi Collect G/L Entries"
 {
     var
         Text000: Label 'G/L Entries';
@@ -12,7 +12,7 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         if NpRiModule.Get(ModuleCode()) then
             exit;
 
-        NpRiModule.Init;
+        NpRiModule.Init();
         NpRiModule.Code := ModuleCode();
         NpRiModule.Description := Text000;
         NpRiModule.Type := NpRiModule.Type::"Data Collection";
@@ -70,17 +70,17 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         if not TempTableMetadata.Get(DATABASE::Customer) then begin
             TableMetadata.Get(DATABASE::Customer);
 
-            TempTableMetadata.Init;
+            TempTableMetadata.Init();
             TempTableMetadata := TableMetadata;
-            TempTableMetadata.Insert;
+            TempTableMetadata.Insert();
         end;
 
         if not TempTableMetadata.Get(DATABASE::Vendor) then begin
             TableMetadata.Get(DATABASE::Customer);
 
-            TempTableMetadata.Init;
+            TempTableMetadata.Init();
             TempTableMetadata := TableMetadata;
-            TempTableMetadata.Insert;
+            TempTableMetadata.Insert();
         end;
     end;
 
@@ -109,17 +109,17 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         if not FindGLEntries(NpRiReimbursement, GLEntry) then
             exit;
 
-        Total := GLEntry.Count;
+        Total := GLEntry.Count();
         NpRiDataCollectionMgt.OpenWindow(Text001);
 
-        GLEntry.FindSet;
+        GLEntry.FindSet();
         repeat
             Counter += 1;
             NpRiDataCollectionMgt.UpdateWindow(1, Round((Counter / Total) * 10000, 1));
 
             if NpRiDataCollectionMgt.InsertEntry(NpRiReimbursement, GLEntry.Amount, GLEntry, NpRiReimbursementEntry) then
                 UpdateEntry(GLEntry, NpRiReimbursementEntry);
-        until GLEntry.Next = 0;
+        until GLEntry.Next() = 0;
 
         NpRiDataCollectionMgt.CloseWindow();
     end;
@@ -145,7 +145,7 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         GLEntry.SetFilter("Entry No.", '>%1', NpRiReimbursement."Last Data Collect Entry No.");
         GLEntry.FilterGroup(0);
 
-        exit(GLEntry.FindFirst);
+        exit(GLEntry.FindFirst());
     end;
 
     local procedure UpdateEntry(GLEntry: Record "G/L Entry"; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry")

@@ -1,4 +1,4 @@
-codeunit 6151108 "NPR NpRi Collect Loy. Points"
+﻿codeunit 6151108 "NPR NpRi Collect Loy. Points"
 {
 
     var
@@ -13,7 +13,7 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         if NpRiModule.Get(MemberLoyaltyPointsCode()) then
             exit;
 
-        NpRiModule.Init;
+        NpRiModule.Init();
         NpRiModule.Code := MemberLoyaltyPointsCode();
         NpRiModule.Description := Text000;
         NpRiModule.Type := NpRiModule.Type::"Data Collection";
@@ -66,9 +66,9 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
 
         TableMetadata.Get(DATABASE::Customer);
 
-        TempTableMetadata.Init;
+        TempTableMetadata.Init();
         TempTableMetadata := TableMetadata;
-        TempTableMetadata.Insert;
+        TempTableMetadata.Insert();
     end;
 
     //Data Collect
@@ -95,24 +95,23 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         if not FindMemberLoyaltyPoints(NpRiReimbursement, MMMembershipPointsEntry) then
             exit;
 
-        Total := MMMembershipPointsEntry.Count;
+        Total := MMMembershipPointsEntry.Count();
         NpRiDataCollectionMgt.OpenWindow(Text001);
 
-        MMMembershipPointsEntry.FindSet;
+        MMMembershipPointsEntry.FindSet();
         repeat
             Counter += 1;
             NpRiDataCollectionMgt.UpdateWindow(1, Round((Counter / Total) * 10000, 1));
 
             if NpRiDataCollectionMgt.InsertEntry(NpRiReimbursement, MMMembershipPointsEntry.Points, MMMembershipPointsEntry, NpRiReimbursementEntry) then
                 UpdateEntry(MMMembershipPointsEntry, NpRiReimbursementEntry);
-        until MMMembershipPointsEntry.Next = 0;
+        until MMMembershipPointsEntry.Next() = 0;
 
         NpRiDataCollectionMgt.CloseWindow();
     end;
 
     local procedure FindMemberLoyaltyPoints(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var MMMembershipPointsEntry: Record "NPR MM Members. Points Entry"): Boolean
     var
-        NpRiParty: Record "NPR NpRi Party";
         NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.";
         NpRiDataCollectionMgt: Codeunit "NPR NpRi Data Collection Mgt.";
         TableView: Text;
@@ -128,7 +127,7 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         if NpRiDataCollectionMgt.GetTableView(TableViewName, NpRiReimbursementTemplate, TableView) then
             MMMembershipPointsEntry.SetView(TableView);
 
-        exit(MMMembershipPointsEntry.FindFirst);
+        exit(MMMembershipPointsEntry.FindFirst());
     end;
 
     local procedure UpdateEntry(MMMembershipPointsEntry: Record "NPR MM Members. Points Entry"; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry")

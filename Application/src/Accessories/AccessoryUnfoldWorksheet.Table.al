@@ -1,4 +1,4 @@
-table 6014507 "NPR Accessory Unfold Worksheet"
+﻿table 6014507 "NPR Accessory Unfold Worksheet"
 {
     Caption = 'Accessory Unfold Worksheet';
     DataClassification = CustomerContent;
@@ -22,8 +22,6 @@ table 6014507 "NPR Accessory Unfold Worksheet"
             ValidateTableRelation = false;
 
             trigger OnValidate()
-            var
-                ItemLedgEntry: Record "Item Ledger Entry";
             begin
                 TestUnfoldEntry();
                 UpdateQty();
@@ -38,9 +36,6 @@ table 6014507 "NPR Accessory Unfold Worksheet"
                                                                      "Unfold in Worksheet" = CONST(true));
 
             trigger OnValidate()
-            var
-                AccessorySparePart: Record "NPR Accessory/Spare Part";
-                ItemLedgEntry: Record "Item Ledger Entry";
             begin
                 UpdateQty();
             end;
@@ -193,12 +188,12 @@ table 6014507 "NPR Accessory Unfold Worksheet"
         ItemLedgEntry.TestField("Entry Type", ItemLedgEntry."Entry Type"::Sale);
 
         AccessoryUnfoldEntry.SetRange("Item Ledger Entry No.", "Item Ledger Entry No.");
-        if AccessoryUnfoldEntry.FindFirst then
+        if AccessoryUnfoldEntry.FindFirst() then
             Error(Text000, "Item Ledger Entry No.");
 
-        AccessoryUnfoldEntry.Reset;
+        AccessoryUnfoldEntry.Reset();
         AccessoryUnfoldEntry.SetRange("Unfold Item Ledger Entry No.", "Item Ledger Entry No.");
-        if AccessoryUnfoldEntry.FindFirst then
+        if AccessoryUnfoldEntry.FindFirst() then
             Error(Text001, "Item Ledger Entry No.");
     end;
 
@@ -251,7 +246,7 @@ table 6014507 "NPR Accessory Unfold Worksheet"
         end;
 
         AccessorySparePart2.SetRange(Code, AccessorySparePart.Code);
-        AccessorySparePart2.FindSet;
+        AccessorySparePart2.FindSet();
         repeat
             if AccessorySparePart2."Use Alt. Price" then
                 SalesAmountTotal += AccessorySparePart2."Alt. Price" * AccessorySparePart2.Quantity
@@ -259,7 +254,7 @@ table 6014507 "NPR Accessory Unfold Worksheet"
                 AccessorySparePart2.CalcFields("Unit Price");
                 SalesAmountTotal += AccessorySparePart2."Unit Price" * AccessorySparePart2.Quantity;
             end;
-        until AccessorySparePart2.Next = 0;
+        until AccessorySparePart2.Next() = 0;
 
         if SalesAmountTotal <> 0 then
             exit(SalesAmount / SalesAmountTotal);
@@ -268,6 +263,6 @@ table 6014507 "NPR Accessory Unfold Worksheet"
         if AccessorySparePart2.Quantity <> 0 then
             exit(AccessorySparePart.Quantity / AccessorySparePart2.Quantity);
 
-        exit(1 / AccessorySparePart2.Count);
+        exit(1 / AccessorySparePart2.Count());
     end;
 }

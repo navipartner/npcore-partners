@@ -105,16 +105,16 @@ table 6184601 "NPR Consignor Entry"
     begin
         if not CheckSalesHeader(InCode) then
             exit;
-        Init;
+        Init();
         Type := Type::Order;
         SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
         SalesLine.SetRange("Document No.", InCode);
         SalesLine.SetRange(Type, SalesLine.Type::Item);
         SalesLine.SetFilter("Net Weight", '<>0');
-        if SalesLine.FindSet then
+        if SalesLine.FindSet() then
             repeat
                 TempWeight += SalesLine."Net Weight" * SalesLine.Quantity;
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
         Weight := TempWeight;
         InsertHeader(InCode);
     end;
@@ -126,15 +126,15 @@ table 6184601 "NPR Consignor Entry"
     begin
         if not CheckShipmentHeader(InCode) then
             exit;
-        Init;
+        Init();
         Type := Type::Shipment;
         SalesShipmentLine.SetRange("Document No.", InCode);
         SalesShipmentLine.SetRange(Type, SalesShipmentLine.Type::Item);
         SalesShipmentLine.SetFilter("Net Weight", '<>0');
-        if SalesShipmentLine.FindSet then
+        if SalesShipmentLine.FindSet() then
             repeat
                 TempWeight += SalesShipmentLine."Net Weight" * SalesShipmentLine.Quantity;
-            until SalesShipmentLine.Next = 0;
+            until SalesShipmentLine.Next() = 0;
 
         Weight := TempWeight;
         InsertHeader(InCode);
@@ -147,15 +147,15 @@ table 6184601 "NPR Consignor Entry"
     begin
         if not CheckPostedInvoiceHeader(InCode) then
             exit;
-        Init;
+        Init();
         Type := Type::Invoice;
         SalesInvoiceLine.SetRange("Document No.", InCode);
         SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
         SalesInvoiceLine.SetFilter("Net Weight", '<>0');
-        if SalesInvoiceLine.FindSet then
+        if SalesInvoiceLine.FindSet() then
             repeat
                 TempWeight += SalesInvoiceLine."Net Weight" * SalesInvoiceLine.Quantity;
-            until SalesInvoiceLine.Next = 0;
+            until SalesInvoiceLine.Next() = 0;
         Weight := TempWeight;
         InsertHeader(InCode);
     end;
@@ -164,7 +164,7 @@ table 6184601 "NPR Consignor Entry"
     var
         PacsoftSetup: Record "NPR Pacsoft Setup";
     begin
-        if not PacsoftSetup.Get then
+        if not PacsoftSetup.Get() then
             exit;
 
         if not PacsoftSetup."Use Consignor" then

@@ -15,18 +15,18 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
         Clear(RecRef);
         RecRef.Open(Rec."Table No.");
         RecRef.SetPosition(Rec."Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
 
         SetRecRefCalcFieldFilter(NpXmlElement, RecRef, RecRef2);
         CustomValue := Format(GetLastname(RecRef2, NpXmlElement."Field No."), 0, 9);
-        RecRef.Close;
-        RecRef2.Close;
+        RecRef.Close();
+        RecRef2.Close();
         Clear(RecRef);
 
         Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     procedure GetLastname(RecRef: RecordRef; FieldNo: Integer) Lastname: Text
@@ -52,18 +52,17 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
     local procedure SetRecRefCalcFieldFilter(NpXmlElement: Record "NPR NpXml Element"; RecRef: RecordRef; var RecRef2: RecordRef)
     var
         NpXmlFilter: Record "NPR NpXml Filter";
-        FieldRef: FieldRef;
         FieldRef2: FieldRef;
         BufferDecimal: Decimal;
         BufferInteger: Integer;
     begin
         Clear(RecRef2);
         RecRef2.Open(RecRef.Number);
-        RecRef2 := RecRef.Duplicate;
+        RecRef2 := RecRef.Duplicate();
 
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        if NpXmlFilter.FindSet then
+        if NpXmlFilter.FindSet() then
             repeat
                 FieldRef2 := RecRef2.Field(NpXmlFilter."Field No.");
                 case NpXmlFilter."Filter Type" of
@@ -93,18 +92,18 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
                             FieldRef2.SetFilter(NpXmlFilter."Filter Value");
                         end;
                 end;
-            until NpXmlFilter.Next = 0;
+            until NpXmlFilter.Next() = 0;
 
         case NpXmlElement."Iteration Type" of
             NpXmlElement."Iteration Type"::First:
                 begin
-                    if RecRef2.FindFirst then
-                        RecRef2.SetRecFilter;
+                    if RecRef2.FindFirst() then
+                        RecRef2.SetRecFilter();
                 end;
             NpXmlElement."Iteration Type"::Last:
                 begin
-                    if RecRef2.FindLast then
-                        RecRef2.SetRecFilter;
+                    if RecRef2.FindLast() then
+                        RecRef2.SetRecFilter();
                 end;
         end;
     end;

@@ -12,17 +12,17 @@ page 6151028 "NPR NpRv Partner Relations"
         {
             repeater(Group)
             {
-                field("Partner Code"; "Partner Code")
+                field("Partner Code"; Rec."Partner Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Partner Code field';
                 }
-                field("Partner Name"; "Partner Name")
+                field("Partner Name"; Rec."Partner Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Partner Name field';
                 }
-                field("Voucher Type"; "Voucher Type")
+                field("Voucher Type"; Rec."Voucher Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voucher Type field';

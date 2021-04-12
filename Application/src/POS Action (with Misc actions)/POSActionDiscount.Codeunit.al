@@ -49,9 +49,9 @@ codeunit 6150792 "NPR POS Action - Discount"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-            ActionCode,
+            ActionCode(),
             ActionDescription,
-            ActionVersion,
+            ActionVersion(),
             Sender.Type::Generic,
             Sender."Subscriber Instances Allowed"::Multiple)
         then begin
@@ -111,7 +111,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -151,7 +151,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         TotalPrice: Decimal;
         PresetMultiLineDiscTarget: Integer;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -300,7 +300,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     begin
         SalespersonPassword := JSON.GetStringOrFail('SalespersonPassword', StrSubstNo(ReadingErr, 'OnActionSalespersonPassword', ActionCode()));
         Salesperson.SetRange("NPR Register Password", SalespersonPassword);
-        if not Salesperson.FindFirst then
+        if not Salesperson.FindFirst() then
             Error(Text004);
 
         JSON.SetContext('approvedBySalesperson', Salesperson.Code);
@@ -320,7 +320,7 @@ codeunit 6150792 "NPR POS Action - Discount"
 
         Salesperson.SetRange(Code, SalePOS."Salesperson Code");
         Salesperson.SetRange("NPR Register Password", SalespersonPassword);
-        if not Salesperson.FindFirst then
+        if not Salesperson.FindFirst() then
             Error(Text004);
 
         JSON.SetContext('approvedBySalesperson', Salesperson.Code);
@@ -335,7 +335,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         SupervisorPassword := JSON.GetStringOrFail('SupervisorPassword', StrSubstNo(ReadingErr, 'OnActionSupervisorPassword', ActionCode()));
         Salesperson.SetRange("NPR Register Password", SupervisorPassword);
         Salesperson.SetRange("NPR Supervisor POS", true);
-        if not Salesperson.FindFirst then
+        if not Salesperson.FindFirst() then
             Error(Text004);
 
         JSON.SetContext('approvedBySalesperson', Salesperson.Code);
@@ -402,7 +402,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         CaptionReasonCodeMandatory: Label 'Reason: Mandatory';
         CaptionTotalDiscTargetLines: Label 'Total Discount Target';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -425,7 +425,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         DescReasonCodeMandatory: Label 'Defines whether a reason code must be selected in order for the discount to be successfully applied to sale lines';
         DescTotalDiscTargetLines: Label 'Select target lines multi-line discounts to be applied to';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -445,7 +445,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     var
         OptionTotalDiscTargetLines: Label 'Auto,Positive quantity lines only,Negative quantity lines only,All non-zero quantity lines,Ask';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -497,12 +497,12 @@ codeunit 6150792 "NPR POS Action - Discount"
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
-        if not SaleLinePOS.FindSet then
+        if not SaleLinePOS.FindSet() then
             exit;
 
         repeat
             ApplyDiscountOnLine(SaleLinePOS, DiscountType, Discount);
-        until SaleLinePOS.Next = 0;
+        until SaleLinePOS.Next() = 0;
     end;
 
     local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
@@ -551,7 +551,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         ApplyAdditionalParams(SaleLinePOS);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if PrevRec <> Format(SaleLinePOS) then
-            SaleLinePOS.Modify;
+            SaleLinePOS.Modify();
 
         // Recalculate VAT Difference rounding error distribution on all lines
         UpdateSalesVAT(SaleLinePOS."Orig. POS Sale ID");
@@ -587,10 +587,10 @@ codeunit 6150792 "NPR POS Action - Discount"
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
 
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 TotalLineValue += GetSingleLineTotalDiscountableValue(SaleLinePOS, false);
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
 
     end;
 
@@ -658,13 +658,13 @@ codeunit 6150792 "NPR POS Action - Discount"
         RelativeDiscountPct: Decimal;
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
-        if not SaleLinePOS.FindSet then
+        if not SaleLinePOS.FindSet() then
             exit;
 
         repeat
             RelativeDiscountPct := (1 - (1 - SaleLinePOS."Discount %" / 100) * (1 - DiscountPct / 100)) * 100;
             ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountPct", RelativeDiscountPct);
-        until SaleLinePOS.Next = 0;
+        until SaleLinePOS.Next() = 0;
     end;
 
     local procedure SetDiscountPctExtra(SalePOS: Record "NPR POS Sale"; ExtraDiscountPct: Decimal)
@@ -673,13 +673,13 @@ codeunit 6150792 "NPR POS Action - Discount"
         NewDiscountPct: Decimal;
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
-        if not SaleLinePOS.FindSet then
+        if not SaleLinePOS.FindSet() then
             exit;
 
         repeat
             NewDiscountPct := SaleLinePOS."Discount %" + ExtraDiscountPct;
             ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountPct", NewDiscountPct);
-        until SaleLinePOS.Next = 0;
+        until SaleLinePOS.Next() = 0;
     end;
 
     procedure SetLineAmount(var SaleLinePOS: Record "NPR POS Sale Line"; LineAmount: Decimal)
@@ -728,7 +728,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         ApplyAdditionalParams(SaleLinePOS);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if PrevRec <> Format(SaleLinePOS) then
-            SaleLinePOS.Modify;
+            SaleLinePOS.Modify();
 
         // Recalculate VAT Difference rounding error distribution on all lines
         UpdateSalesVAT(SaleLinePOS."Orig. POS Sale ID");
@@ -771,7 +771,7 @@ codeunit 6150792 "NPR POS Action - Discount"
             if not ((DimensionSetEntry."Dimension Value Code" <> DimensionValueCode) or (DimensionValueCode = '')) then
                 exit;
 
-            DimensionSetEntry.Delete;
+            DimensionSetEntry.Delete();
         end;
 
         if DimensionValueCode <> '' then begin
@@ -782,7 +782,7 @@ codeunit 6150792 "NPR POS Action - Discount"
             DimensionSetEntry."Dimension Value Code" := DimensionValueCode;
             DimensionSetEntry."Dimension Value ID" := DimensionValue."Dimension Value ID";
 
-            DimensionSetEntry.Insert;
+            DimensionSetEntry.Insert();
         end;
     end;
 
@@ -816,11 +816,11 @@ codeunit 6150792 "NPR POS Action - Discount"
 
         MultiLineDiscTarget := MultiLineDiscTarget::"Positive Only";
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
-        NoOfPositiveLines := SaleLinePOS.Count;
+        NoOfPositiveLines := SaleLinePOS.Count();
 
         MultiLineDiscTarget := MultiLineDiscTarget::"Negative Only";
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
-        NoOfNegativeLines := SaleLinePOS.Count;
+        NoOfNegativeLines := SaleLinePOS.Count();
 
         if PresetMultiLineDiscTarget in [PresetMultiLineDiscTarget::"Positive Only", PresetMultiLineDiscTarget::"Negative Only"] then begin
             MultiLineDiscTarget := PresetMultiLineDiscTarget;

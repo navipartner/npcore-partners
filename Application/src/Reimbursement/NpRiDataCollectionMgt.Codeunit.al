@@ -1,4 +1,4 @@
-codeunit 6151101 "NPR NpRi Data Collection Mgt."
+﻿codeunit 6151101 "NPR NpRi Data Collection Mgt."
 {
     TableNo = "NPR NpRi Reimbursement";
 
@@ -33,10 +33,10 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
         if TempField.Get(RecRef.Number, RequestFieldNo) then
             exit;
 
-        TempField.Init;
+        TempField.Init();
         TempField.TableNo := RecRef.Number;
         TempField."No." := RequestFieldNo;
-        TempField.Insert;
+        TempField.Insert();
     end;
 
     procedure RunRequestPage(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var RecRef: RecordRef; var RecRef2: RecordRef; var TempField: Record "Field" temporary): Boolean
@@ -47,7 +47,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
             exit(false);
 
         InitRequestPage(NpRiReimbursementTemplate, RecRef, RecRef2, TempField, FilterPageBuilder);
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         SaveTableView(RecRef, RecRef2, NpRiReimbursementTemplate, FilterPageBuilder);
@@ -80,10 +80,10 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
         FilterPageBuilder.AddRecordRef(TableViewName, RecRef);
         Clear(TempField);
         TempField.SetRange(TableNo, RecRef.Number);
-        if TempField.FindSet then
+        if TempField.FindSet() then
             repeat
                 FilterPageBuilder.AddFieldNo(TableViewName, TempField."No.");
-            until TempField.Next = 0;
+            until TempField.Next() = 0;
     end;
 
     procedure GetTableViewName(RecVariant: Variant): Text
@@ -119,7 +119,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
 
         XMLNode: XmlNode;
     begin
-        if not NpRiReimbursementTemplate."Data Collection Filters".HasValue then
+        if not NpRiReimbursementTemplate."Data Collection Filters".HasValue() then
             exit(false);
 
         NpRiReimbursementTemplate.CalcFields("Data Collection Filters");
@@ -195,13 +195,13 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
 
     procedure RunDataCollections(var NpRiReimbursement: Record "NPR NpRi Reimbursement")
     begin
-        if NpRiReimbursement.FindSet then
+        if NpRiReimbursement.FindSet() then
             repeat
                 if not NpRiReimbursement.Deactivated then begin
                     RunDataCollection(NpRiReimbursement);
-                    Commit;
+                    Commit();
                 end;
-            until NpRiReimbursement.Next = 0;
+            until NpRiReimbursement.Next() = 0;
     end;
 
     procedure RunDataCollection(var NpRiReimbursement: Record "NPR NpRi Reimbursement")
@@ -215,7 +215,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
             Error(Text001, NpRiReimbursement."Data Collection Module");
 
         NpRiReimbursement2 := NpRiReimbursement;
-        NpRiReimbursement.Find;
+        NpRiReimbursement.Find();
         NpRiReimbursement := NpRiReimbursement2;
         NpRiReimbursement."Last Data Collection at" := CurrentDateTime;
         NpRiReimbursement.Modify(true);
@@ -251,7 +251,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
         DataTypeMgt: Codeunit "Data Type Management";
         FieldRef: FieldRef;
     begin
-        NpRiReimbursementEntry.Init;
+        NpRiReimbursementEntry.Init();
         NpRiReimbursementEntry."Entry No." := 0;
         NpRiReimbursementEntry."Party Type" := NpRiReimbursement."Party Type";
         NpRiReimbursementEntry."Party No." := NpRiReimbursement."Party No.";
@@ -290,7 +290,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
             NpRiReimbursementEntry2.SetRange("Entry Type", NpRiReimbursementEntry."Entry Type");
             NpRiReimbursementEntry2.SetRange("Source Table No.", NpRiReimbursementEntry."Source Table No.");
             NpRiReimbursementEntry2.SetRange("Source Entry No.", NpRiReimbursementEntry."Source Entry No.");
-            exit(NpRiReimbursementEntry2.FindFirst);
+            exit(NpRiReimbursementEntry2.FindFirst());
         end;
 
         NpRiReimbursementEntry2.SetCurrentKey("Party Type", "Party No.", "Template Code", "Posting Date", "Entry Type", "Source Company Name", "Source Record ID");
@@ -300,7 +300,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
         NpRiReimbursementEntry2.SetRange("Posting Date", NpRiReimbursementEntry."Posting Date");
         NpRiReimbursementEntry2.SetRange("Entry Type", NpRiReimbursementEntry."Entry Type");
         NpRiReimbursementEntry2.SetRange("Source Record ID", NpRiReimbursementEntry."Source Record ID");
-        exit(NpRiReimbursementEntry2.FindFirst);
+        exit(NpRiReimbursementEntry2.FindFirst());
     end;
 
     //Aux
@@ -335,7 +335,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
         if not (UseWindow() and WindowOpened) then
             exit;
 
-        Window.Close;
+        Window.Close();
         WindowOpened := false;
     end;
 }

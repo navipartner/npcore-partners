@@ -14,7 +14,6 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
     procedure PrintItem(Item: Record Item; ReportType: Integer)
     var
         LabelLibrary: Codeunit "NPR Label Library";
-        Success: Boolean;
         This: Codeunit "NPR RFID Two-way Printer Mgt.";
     begin
         BindSubscription(This);
@@ -27,7 +26,6 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
     procedure PrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
     var
         LabelLibrary: Codeunit "NPR Label Library";
-        Success: Boolean;
         This: Codeunit "NPR RFID Two-way Printer Mgt.";
     begin
         BindSubscription(This);
@@ -66,7 +64,7 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
     begin
         PreparePrintBufferEntry(JournalLine);
         RecRef.GetTable(JournalLine);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
 
         RetailReportSelectionMgt.SetMatrixPrintIterationFieldNo(JournalLine.FieldNo("Quantity to Print"));
         RetailReportSelectionMgt.SetRequestWindow(true);
@@ -129,22 +127,19 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
 
         for i := 1 to NoOfPrints do begin
             tmpRFIDPrintBuffer."Tag No." += 1;
-            tmpRFIDPrintBuffer.Insert;
+            tmpRFIDPrintBuffer.Insert();
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014413, 'OnBeforePrintRetailJournal', '', false, false)]
     local procedure OnBeforePrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
-    var
-        RetailJournalLine: Record "NPR Retail Journal Line";
-        i: Integer;
     begin
         Skip := true;
 
-        if JournalLine.FindSet then
+        if JournalLine.FindSet() then
             repeat
                 PrintRetailJournalLineRecord(JournalLine, ReportType);
-            until JournalLine.Next = 0;
+            until JournalLine.Next() = 0;
     end;
 }
 

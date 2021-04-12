@@ -1,4 +1,4 @@
-table 6184492 "NPR Pepper Terminal"
+﻿table 6184492 "NPR Pepper Terminal"
 {
     Caption = 'Pepper Terminal';
     DataClassification = CustomerContent;
@@ -272,7 +272,6 @@ table 6184492 "NPR Pepper Terminal"
         TxtTerminalTypeNotLicensed: Label 'Warning: the license is valid for Terminal Type code %1. Please check the Terminal Type code or upload a new license.';
         TxtCaptionAdditionalParameters: Label 'Pepper Additional Parameters';
         TxtCaptionLicense: Label 'Pepper License';
-        TxtDescription: Label 'XML File';
         TxtXMLfilefilter: Label '*.xml';
         TxtXMLfileDescription: Label 'XML Files (*.xml)|*.xml';
         CaptionText: Text;
@@ -296,16 +295,16 @@ table 6184492 "NPR Pepper Terminal"
                 begin
                     CalcFields("Additional Parameters File");
                     Clear("Additional Parameters File");
-                    Modify;
+                    Modify();
                     CalcFields("Additional Parameters File");
 
                     RecRef.GetTable(Rec);
                     TempBlob.ToRecordRef(RecRef, FieldNo("Additional Parameters File"));
                     RecRef.SetTable(Rec);
 
-                    Modify;
+                    Modify();
 
-                    if not "Additional Parameters File".HasValue then
+                    if not "Additional Parameters File".HasValue() then
                         Error(TxtNotStored);
                 end;
 
@@ -313,7 +312,7 @@ table 6184492 "NPR Pepper Terminal"
                 begin
                     CalcFields("License File");
                     Clear("License File");
-                    Modify;
+                    Modify();
                     CalcFields("License File");
 
                     RecRef.GetTable(Rec);
@@ -331,8 +330,8 @@ table 6184492 "NPR Pepper Terminal"
                                     Message(TxtTerminalTypeNotLicensed, LicensedTerminalType);
                     end;
 
-                    Modify;
-                    if not "License File".HasValue then
+                    Modify();
+                    if not "License File".HasValue() then
                         Error(TxtNotStored);
                 end;
 
@@ -341,9 +340,6 @@ table 6184492 "NPR Pepper Terminal"
 
     procedure ClearFile(FileType: Option License,AdditionalParameters)
     var
-        FileManagement: Codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        UploadResult: Text[250];
         TxtNoLicense: Label 'Are you sure you want to delete the additional parameters?';
         TxtNoAdditionalParameters: Label 'No addtional parameters are configured.';
         TxtConfirmClearLicense: Label 'No addtional parameters are configured.';
@@ -356,23 +352,23 @@ table 6184492 "NPR Pepper Terminal"
             FileType::License:
                 begin
                     CalcFields("License File");
-                    if not "License File".HasValue then
+                    if not "License File".HasValue() then
                         Error(TxtNoLicense);
                     if not Confirm(TxtConfirmClearLicense) then
                         exit;
                     Clear("License File");
-                    Modify;
+                    Modify();
                     Message(TxtLicenseCleared);
                 end;
             FileType::AdditionalParameters:
                 begin
                     CalcFields("Additional Parameters File");
-                    if not "Additional Parameters File".HasValue then
+                    if not "Additional Parameters File".HasValue() then
                         Error(TxtNoAdditionalParameters);
                     if not Confirm(TxtConfirmClearAdditionalParameters) then
                         exit;
                     Clear("Additional Parameters File");
-                    Modify;
+                    Modify();
                     Message(TxtAdditionalParametersCleared);
                 end;
         end;
@@ -390,7 +386,7 @@ table 6184492 "NPR Pepper Terminal"
             OptFileType::AdditionalParameters:
                 begin
                     CalcFields("Additional Parameters File");
-                    if not "Additional Parameters File".HasValue then
+                    if not "Additional Parameters File".HasValue() then
                         Message(TxtNoAddParam, "Configuration Code");
                     Message(PepperConfigManagement.GetTerminalText(Rec, OptFileType));
 
@@ -398,7 +394,7 @@ table 6184492 "NPR Pepper Terminal"
             OptFileType::License:
                 begin
                     CalcFields("License File");
-                    if not "License File".HasValue then
+                    if not "License File".HasValue() then
                         Message(TxtNoLicense, "Configuration Code");
                     Message(PepperConfigManagement.GetTerminalText(Rec, OptFileType));
                 end;
@@ -409,7 +405,6 @@ table 6184492 "NPR Pepper Terminal"
     procedure ExportFile(OptFileType: Option License,AdditionalParameters)
     var
         TxtNoAddParam: Label 'This Pepper Terminal does not have Additional Parameters set up. The Addition Parameters will be taken from Pepper Configuration %1.';
-        TxtNoLicense: Label 'This Pepper Terminal does not have License set up. The License will be taken from Pepper Configuration %1.';
         TxtNoLicenseToExport: Label 'This Pepper Terminal does not have License set up.';
         TxtFileName: Label 'AdditionalParameters.xml';
         ExportName: Text;
@@ -423,7 +418,7 @@ table 6184492 "NPR Pepper Terminal"
             OptFileType::License:
                 begin
                     CalcFields("License File");
-                    if not "License File".HasValue then
+                    if not "License File".HasValue() then
                         Error(TxtNoLicenseToExport);
 
                     ExportName := TxtFileNameLicense;
@@ -431,7 +426,7 @@ table 6184492 "NPR Pepper Terminal"
                     DownloadFromStream(StreamIn, TxtTitle, '', TxtXMLFileFilter, ExportName);
                 end;
             OptFileType::AdditionalParameters:
-                if not "Additional Parameters File".HasValue then begin
+                if not "Additional Parameters File".HasValue() then begin
                     Message(TxtNoAddParam, "Configuration Code");
                 end else begin
                     ExportName := TxtFileName;
@@ -450,14 +445,14 @@ table 6184492 "NPR Pepper Terminal"
         TerminalsLinked: Label 'There are %1 other terminals already linked to Register %2. Are you sure you want to link this register to this terminal?';
         NotLinked: Label 'Terminal not linked to Register.';
     begin
-        PepperTerminal.Reset;
+        PepperTerminal.Reset();
         PepperTerminal.SetRange("Register No.", "Register No.");
         PepperTerminal.SetFilter(Code, '<>%1', Code);
-        NoOtherTerminalsLinkedtoRegister := PepperTerminal.Count;
+        NoOtherTerminalsLinkedtoRegister := PepperTerminal.Count();
         if NoOtherTerminalsLinkedtoRegister = 0 then
             exit;
         if NoOtherTerminalsLinkedtoRegister = 1 then begin
-            PepperTerminal.FindFirst;
+            PepperTerminal.FindFirst();
             if not Confirm(TerminalLinked, true, PepperTerminal.Code, "Register No.") then
                 Error(NotLinked);
             exit;
@@ -499,7 +494,6 @@ table 6184492 "NPR Pepper Terminal"
 
     local procedure GetOfflineAllowed(): Boolean
     var
-        PepperInstance: Record "NPR Pepper Instance";
         PepperConfiguration: Record "NPR Pepper Config.";
     begin
 
@@ -519,12 +513,12 @@ table 6184492 "NPR Pepper Terminal"
             exit(false);
         CalcFields("License File");
         Clear("License File");
-        Modify;
+        Modify();
         CalcFields("License File");
         BText.AddText(LicenseString);
         "License File".CreateOutStream(Ostream);
         BText.Write(Ostream);
-        Modify;
+        Modify();
         exit(true);
 
     end;

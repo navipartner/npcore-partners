@@ -115,7 +115,7 @@ page 6151127 "NPR NpIa Item AddOn Subform"
                 Caption = 'Select Options';
                 Image = List;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpIa ItemAddOn Line Opt.";
@@ -130,7 +130,7 @@ page 6151127 "NPR NpIa Item AddOn Subform"
             {
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasBeforeInsertSetup;

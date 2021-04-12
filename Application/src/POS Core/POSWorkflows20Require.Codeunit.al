@@ -69,13 +69,12 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         JavaScriptJson: JsonObject;
         InStr: InStream;
         ActionCode: Code[20];
-        WorkflowJson: JsonObject;
     begin
         JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
         ActionCode := JSON.GetStringOrFail('action', StrSubstNo(ReadingErr, MethodName()));
 
         if not POSSession.RetrieveSessionAction(ActionCode, POSAction) then begin
-            if not POSAction.Get(ActionCode) or (POSAction."Workflow Engine Version" <> '2.0') or not POSAction.Workflow.HasValue then
+            if not POSAction.Get(ActionCode) or (POSAction."Workflow Engine Version" <> '2.0') or not POSAction.Workflow.HasValue() then
                 exit;
             POSAction.CalcFields(Workflow);
         end;
@@ -85,7 +84,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         Workflow.DeserializeFromJsonStream(InStr);
         if POSAction."Bound to DataSource" then
             WorkflowAction.Content.Add('DataBinding', true);
-        if POSAction."Custom JavaScript Logic".HasValue then begin
+        if POSAction."Custom JavaScript Logic".HasValue() then begin
             JavaScriptJson := POSAction.GetCustomJavaScriptLogic();
             WorkflowAction.Content.Add('CustomJavaScript', JavaScriptJson);
         end;
@@ -93,14 +92,14 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
             WorkflowAction.Content.Add('Description', POSAction.Description);
 
         POSActionParam.SetRange("POS Action Code", POSAction.Code);
-        if POSActionParam.FindSet then
+        if POSActionParam.FindSet() then
             repeat
                 POSParam."Action Code" := POSAction.Code;
                 POSParam.Name := POSActionParam.Name;
                 POSParam."Data Type" := POSActionParam."Data Type";
                 POSParam.Value := POSActionParam."Default Value";
                 POSParam.AddParameterToAction(WorkflowAction);
-            until POSActionParam.Next = 0;
+            until POSActionParam.Next() = 0;
 
         FrontEnd.RequireResponse(ID, WorkflowAction.GetJson());
     end;

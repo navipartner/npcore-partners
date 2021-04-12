@@ -14,17 +14,17 @@ page 6184492 "NPR Pepper Instances"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the ID field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Configuration Code"; "Configuration Code")
+                field("Configuration Code"; Rec."Configuration Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Configuration Code field';

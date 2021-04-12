@@ -73,7 +73,7 @@ codeunit 6150634 "NPR POS Give Change"
         POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::CASH);
         POSPaymentMethod.SetRange("Block POS Payment", false);
         POSPaymentMethod.SetRange(Code, POSPaymentMethod."Return Payment Method Code");
-        if POSPaymentMethod.FindFirst then
+        if POSPaymentMethod.FindFirst() then
             exit(POSPaymentMethod.Code);
 
         Error(TextNoReturnPaymentType, POSPaymentMethod.TableCaption());

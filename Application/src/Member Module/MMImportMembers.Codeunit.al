@@ -20,21 +20,11 @@ codeunit 6060132 "NPR MM Import Members"
 
     var
         _TempBlob: Codeunit "Temp Blob";
-        GFileName: Text[250];
-        GMessage: Text[250];
         GMemberInfo: Record "NPR MM Member Info Capture";
-        GInvalidMemberCount: Integer;
-        GValidMemberCount: Integer;
-        GMembershipEntryNo1: Integer;
         GDateMask: Code[20];
         GLineCount: Integer;
         REQUIRED: Integer;
         OPTIONAL: Integer;
-        AsciiStr: Text[250];
-        AnsiStr: Text[250];
-        InternalVars: Boolean;
-        CharVar: array[32] of Char;
-        "--FileFields": Integer;
         FldMemberNo: Text;
         FldFirstName: Text;
         FldMiddleName: Text;
@@ -43,7 +33,6 @@ codeunit 6060132 "NPR MM Import Members"
         FldSSN: Text;
         FldAddress: Text;
         FldPostCode: Text;
-        FldCity: Text;
         FldCountryCode: Text;
         FldCountry: Text;
         FldGender: Text;
@@ -69,7 +58,6 @@ codeunit 6060132 "NPR MM Import Members"
         IMPORT_MESSAGE_DIALOG: Label 'Importing :\#1#######################################################';
         PROCESS_INFO: Label 'Processing: (%1) %2 %3';
         SUCCESS_MSG: Label '%1 members imported successfully.';
-        FILE_FILTER: Label 'CSV Files (*.csv)|*.csv|All Files (*.*)|*.*';
         SELECT_FILE_CAPTION: Label 'Member Import';
         NOT_IMPLEMENTED: Label 'Support for %1 %2 is not implemented.';
         DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
@@ -84,7 +72,6 @@ codeunit 6060132 "NPR MM Import Members"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         IComm: Record "NPR I-Comm";
-        SMSSetup: Record "NPR SMS Setup";
     begin
 
         // xxx
@@ -181,7 +168,7 @@ codeunit 6060132 "NPR MM Import Members"
         FldExternalCardNoValidUntilDate := nextField(PLine);
     end;
 
-    local procedure isValidMember() isValid: Boolean
+    local procedure isValidMember(): Boolean
     var
         Member: Record "NPR MM Member";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
@@ -450,7 +437,7 @@ codeunit 6060132 "NPR MM Import Members"
         exit(rMoney);
     end;
 
-    local procedure nextField(var VarLineOfText: Text[1024]) rField: Text[1024]
+    local procedure nextField(var VarLineOfText: Text[1024]): Text[1024]
     begin
 
         exit(forwardTokenizer(VarLineOfText, ';', '"'));
@@ -458,8 +445,6 @@ codeunit 6060132 "NPR MM Import Members"
 
     local procedure forwardTokenizer(var VarText: Text[1024]; PSeparator: Char; PQuote: Char) RField: Text[1024]
     var
-        Separator: Char;
-        Quote: Char;
         IsQuoted: Boolean;
         InputText: Text[1024];
         NextFieldPos: Integer;
@@ -513,8 +498,6 @@ codeunit 6060132 "NPR MM Import Members"
 
     local procedure reverseTokenizer(var varText: Text[1024]; pSeparator: Char; pQuote: Char) rField: Text[1024]
     var
-        Separator: Char;
-        Quote: Char;
         IsQuoted: Boolean;
         LText: Text[1024];
         NextFieldPos: Integer;

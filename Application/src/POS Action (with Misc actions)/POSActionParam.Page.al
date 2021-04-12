@@ -13,12 +13,12 @@ page 6150704 "NPR POS Action Param."
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Type field';
@@ -28,13 +28,13 @@ page 6150704 "NPR POS Action Param."
                         SetOptionsEditable();
                     end;
                 }
-                field(Options; Options)
+                field(Options; Rec.Options)
                 {
                     ApplicationArea = All;
                     Editable = OptionsEditable;
                     ToolTip = 'Specifies the value of the Options field';
                 }
-                field("Default Value"; "Default Value")
+                field("Default Value"; Rec."Default Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default Value field';
@@ -57,7 +57,7 @@ page 6150704 "NPR POS Action Param."
 
     local procedure SetOptionsEditable()
     begin
-        OptionsEditable := "Data Type" = "Data Type"::Option;
+        OptionsEditable := Rec."Data Type" = Rec."Data Type"::Option;
     end;
 }
 

@@ -16,22 +16,22 @@ page 6184495 "NPR Pepper Terminal Types"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the ID field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active field';
                 }
-                field(Deprecated; Deprecated)
+                field(Deprecated; Rec.Deprecated)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Deprecated field';

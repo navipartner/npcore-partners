@@ -51,12 +51,12 @@ page 6014634 "NPR Retail Downl. HW Connector"
                     SelectedValues := '';
                     RetailListPage.GetSelectionFilter(tmpRetailList);
                     tmpRetailList.MarkedOnly(true);
-                    if tmpRetailList.FindSet then
+                    if tmpRetailList.FindSet() then
                         repeat
                             if StrLen(SelectedValues) > 0 then
                                 SelectedValues += ',';
                             SelectedValues += tmpRetailList.Value;
-                        until tmpRetailList.Next = 0;
+                        until tmpRetailList.Next() = 0;
 
                     CurrPage.Update(false);
                     exit(true);
@@ -109,7 +109,6 @@ page 6014634 "NPR Retail Downl. HW Connector"
 
                 trigger OnAction()
                 var
-                    rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
                     AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
                     ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
                     BaseUri: Text;

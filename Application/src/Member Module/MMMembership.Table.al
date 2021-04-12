@@ -162,7 +162,7 @@ table 6060127 "NPR MM Membership"
         }
         field(100; "Awarded Points (Sale)"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
                                                                          "Entry Type" = CONST(SALE),
                                                                          "Posting Date" = FIELD("Date Filter")));
             Caption = 'Awarded Points (Sale)';
@@ -171,7 +171,7 @@ table 6060127 "NPR MM Membership"
         }
         field(101; "Awarded Points (Refund)"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
                                                                          "Entry Type" = CONST(REFUND),
                                                                          "Posting Date" = FIELD("Date Filter")));
             Caption = 'Awarded Points (Refund)';
@@ -180,7 +180,7 @@ table 6060127 "NPR MM Membership"
         }
         field(102; "Redeemed Points (Withdrawl)"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
                                                                          "Entry Type" = CONST(POINT_WITHDRAW),
                                                                          "Posting Date" = FIELD("Date Filter")));
             Caption = 'Redeemed Points (Withdrawl)';
@@ -189,7 +189,7 @@ table 6060127 "NPR MM Membership"
         }
         field(103; "Redeemed Points (Deposit)"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
                                                                          "Entry Type" = CONST(POINT_DEPOSIT),
                                                                          "Posting Date" = FIELD("Date Filter")));
             Caption = 'Redeemed Points (Deposit)';
@@ -198,7 +198,7 @@ table 6060127 "NPR MM Membership"
         }
         field(104; "Expired Points"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
                                                                          "Entry Type" = CONST(EXPIRED),
                                                                          "Posting Date" = FIELD("Date Filter")));
             Caption = 'Expired Points';
@@ -207,7 +207,7 @@ table 6060127 "NPR MM Membership"
         }
         field(110; "Remaining Points"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),
                                                                          "Posting Date" = FIELD("Date Filter")));
             Caption = 'Remaining Points';
             Editable = false;
@@ -240,7 +240,7 @@ table 6060127 "NPR MM Membership"
         }
         field(1000; "Has Membership Entry"; Boolean)
         {
-            CalcFormula = Exist ("NPR MM Membership Entry" WHERE("Membership Entry No." = FIELD("Entry No."),
+            CalcFormula = Exist("NPR MM Membership Entry" WHERE("Membership Entry No." = FIELD("Entry No."),
                                                              Blocked = CONST(false),
                                                              Context = CONST(NEW)));
             Caption = 'Has Membership Entry';
@@ -272,11 +272,6 @@ table 6060127 "NPR MM Membership"
     trigger OnDelete()
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipRole: Record "NPR MM Membership Role";
-        MembershipLedgerEntry: Record "NPR MM Membership Entry";
-        MemberCard: Record "NPR MM Member Card";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        MembershipPointsEntry: Record "NPR MM Members. Points Entry";
     begin
 
         MembershipManagement.DeleteMembership("Entry No.", false);
@@ -285,7 +280,6 @@ table 6060127 "NPR MM Membership"
     trigger OnModify()
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipRole: Record "NPR MM Membership Role";
         Community: Record "NPR MM Member Community";
     begin
 
@@ -297,10 +291,10 @@ table 6060127 "NPR MM Membership"
                 exit;
 
         // MembershipRole.SetFilter ("Member Entry No.", '=%1', "Entry No.");
-        // IF (MembershipRole.FindSet ()) THEN BEGIN
+        // IF (MembershipRole.FindSet() ()) THEN BEGIN
         //  REPEAT
         //    MembershipManagement.SynchronizeCustomerAndContact (MembershipRole."Membership Entry No.");
-        //  UNTIL (MembershipRole.NEXT () = 0);
+        //  UNTIL (MembershipRole.Next() () = 0);
         // END;
         MembershipManagement.SynchronizeCustomerAndContact(Rec."Entry No.");
 

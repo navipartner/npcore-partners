@@ -1,4 +1,4 @@
-﻿tableextension 6014439 "NPR Config. Template Line" extends "Config. Template Line"
+tableextension 6014439 "NPR Config. Template Line" extends "Config. Template Line"
 {
     trigger OnAfterModify()
     var

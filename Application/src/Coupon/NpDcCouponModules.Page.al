@@ -14,27 +14,27 @@ page 6151595 "NPR NpDc Coupon Modules"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Event Codeunit ID"; "Event Codeunit ID")
+                field("Event Codeunit ID"; Rec."Event Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Event Codeunit ID field';
                 }
-                field("Event Codeunit Name"; "Event Codeunit Name")
+                field("Event Codeunit Name"; Rec."Event Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Event Codeunit Name field';

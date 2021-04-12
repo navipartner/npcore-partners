@@ -1,4 +1,4 @@
-codeunit 6151052 "NPR Retail Replenish. Mgt."
+﻿codeunit 6151052 "NPR Retail Replenish. Mgt."
 {
     trigger OnRun()
     begin
@@ -12,32 +12,27 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
         ItemHierarchyLine: Record "NPR Item Hierarchy Line";
         DistributionGroupMembers: Record "NPR Distrib. Group Members";
         DistributionSetup: Record "NPR Distribution Setup";
-        BlockedError: Label 'This distribution setup is blocked for distribution!';
         ReplenishmentDemandLine: Record "NPR Retail Repl. Demand Line";
-        RetailCampaignHeader: Record "NPR Retail Campaign Header";
-        RetailCampaignLine: Record "NPR Retail Campaign Line";
         PeriodDiscountLine: Record "NPR Period Discount Line";
-        MixedDiscountLine: Record "NPR Mixed Discount Line";
         RetailComment: Record "NPR Retail Comment";
-        CreateStockkeepingUnit: Report "Create Stockkeeping Unit";
         LineNo: Integer;
     begin
         DistributionSetup.Get(DistributionGroup, ItemHierachyID);
-        RetailReplenishmentSetup.Get;
+        RetailReplenishmentSetup.Get();
 
-        if ReplenishmentDemandLine.FindLast then
+        if ReplenishmentDemandLine.FindLast() then
             LineNo := ReplenishmentDemandLine."Entry No."
         else
             LineNo := 0;
 
         Clear(DistributionGroupMembers);
         DistributionGroupMembers.SetRange(DistributionGroupMembers."Distribution Group", DistributionGroup);
-        if DistributionGroupMembers.FindSet then begin
+        if DistributionGroupMembers.FindSet() then begin
             //IF demandlines exsist and not - error or delete..
             repeat
                 ItemHierarchyLine.SetRange("Item Hierarchy Code", ItemHierachyID);
                 ItemHierarchyLine.SetFilter("Item No.", '<>%1', '');
-                if ItemHierarchyLine.FindSet then begin
+                if ItemHierarchyLine.FindSet() then begin
                     repeat
                         LineNo := LineNo + 10000;
                         Clear(Item);
@@ -54,7 +49,7 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                         ReplenishmentDemandLine.SetRange("Distribution Group", DistributionGroup);
                         ReplenishmentDemandLine.SetRange("Item Hierachy", ItemHierachyID);
                         if ReplenishmentDemandLine.IsEmpty then begin
-                            ReplenishmentDemandLine.Init;
+                            ReplenishmentDemandLine.Init();
                             ReplenishmentDemandLine."Entry No." := LineNo;
                             ReplenishmentDemandLine."Item No." := ItemHierarchyLine."Item No.";
                             ReplenishmentDemandLine.Description := Item.Description;
@@ -78,7 +73,7 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                                                 RetailComment.SetRange("Table ID", 6014414);
                                                 RetailComment.SetRange("No.", PeriodDiscountLine.Code);
                                                 RetailComment.SetRange("No. 2", PeriodDiscountLine."Item No.");
-                                                if RetailComment.FindFirst then
+                                                if RetailComment.FindFirst() then
                                                     ReplenishmentDemandLine."Discount Comment" := CopyStr(RetailComment.Comment, 1, 50);
                                             end;
                                         end;
@@ -88,7 +83,7 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                                         end;
                                 end;
                             end;
-                            ReplenishmentDemandLine.Insert;
+                            ReplenishmentDemandLine.Insert();
 
                             //Calc demand qty
                             if RetailReplenishmentSetup."Item Demand Calc. Codeunit" > 0 then begin
@@ -106,11 +101,11 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                             else
                                 ReplenishmentDemandLine."Demanded Quantity" := Abs(ReplenishmentDemandLine."Demanded Quantity");
                             ReplenishmentDemandLine."Unit of Measure Code" := Item."Base Unit of Measure";
-                            ReplenishmentDemandLine.Modify;
+                            ReplenishmentDemandLine.Modify();
                         end;
-                    until ItemHierarchyLine.Next = 0;
+                    until ItemHierarchyLine.Next() = 0;
                 end;
-            until DistributionGroupMembers.Next = 0;
+            until DistributionGroupMembers.Next() = 0;
         end;
     end;
 
@@ -126,7 +121,6 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
         DailyDemand: Decimal;
         StartSalesHistDate: Date;
         SpreadDays: Integer;
-        DemandDays: Integer;
     begin
         Item.Get(RetaiReplDemandLine."Item No.");
         Location.Get(RetaiReplDemandLine."Location Code");
@@ -165,7 +159,6 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
             DailyDemand := 0;
 
         if ((DailyDemand < 0) and (Item.Inventory > 0)) then begin
-            DemandDays := (Item.Inventory div DailyDemand);
         end;
 
         RetaiReplDemandLine."Due Date" := CalcDate(Item."Lead Time Calculation", Today);
@@ -185,7 +178,6 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
         PurchaseHeader: Record "Purchase Header";
         NewPurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        RetailCampaignHeader: Record "NPR Retail Campaign Header";
         LineNo: Integer;
         MissingDiscFilter: Label 'Direct order must have a filter on dist. group and item hiearacy!';
     begin
@@ -202,15 +194,15 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                     PurchaseHeader.SetRange("Campaign No.", RetaiReplDemandLine."Item Hierachy");
                     PurchaseHeader.SetRange("Requested Receipt Date", RetaiReplDemandLine."Due Date");
                     PurchaseHeader.SetRange("Location Code", RetaiReplDemandLine."Location Code");
-                    if PurchaseHeader.FindFirst then begin
+                    if PurchaseHeader.FindFirst() then begin
                         PurchaseHeader.TestField("Buy-from Vendor No.");
                         PurchaseHeader.TestField("Campaign No.");
                         PurchaseHeader.TestField(Status, PurchaseHeader.Status::Open);
                         PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
                         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
-                        if PurchaseLine.FindLast then
+                        if PurchaseLine.FindLast() then
                             LineNo := PurchaseLine."Line No.";
-                        PurchaseLine.Init;
+                        PurchaseLine.Init();
                         PurchaseLine."Document Type" := PurchaseHeader."Document Type";
                         PurchaseLine."Document No." := PurchaseHeader."No.";
                         PurchaseLine."Line No." := LineNo + 10000;
@@ -226,7 +218,7 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                         PurchaseLine.Modify(true);
                     end else begin
                         Clear(NewPurchaseHeader);
-                        NewPurchaseHeader.Init;
+                        NewPurchaseHeader.Init();
                         NewPurchaseHeader.Validate("Document Type", NewPurchaseHeader."Document Type"::Order);
                         NewPurchaseHeader.Validate("Buy-from Vendor No.", RetaiReplDemandLine."Vendor No.");
                         NewPurchaseHeader.Insert(true);
@@ -238,7 +230,7 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                         NewPurchaseHeader.Validate("Expected Receipt Date", RetaiReplDemandLine."Due Date");
                         NewPurchaseHeader.Modify(true);
 
-                        PurchaseLine.Init;
+                        PurchaseLine.Init();
                         PurchaseLine."Document Type" := NewPurchaseHeader."Document Type";
                         PurchaseLine."Document No." := NewPurchaseHeader."No.";
                         PurchaseLine."Line No." := 10000;
@@ -254,8 +246,8 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                         PurchaseLine.Modify(true);
                     end;
                     RetaiReplDemandLine.Status := RetaiReplDemandLine.Status::"9";
-                    RetaiReplDemandLine.Modify;
-                until RetaiReplDemandLine.Next = 0;
+                    RetaiReplDemandLine.Modify();
+                until RetaiReplDemandLine.Next() = 0;
             end;
         end else
             Error(MissingDiscFilter);

@@ -16,9 +16,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     procedure SendRawPrintRequest(PrinterName: Text; PrintBytes: Text; TargetCodepage: Integer)
     var
         Base64: Codeunit "Base64 Convert";
-        Success: Boolean;
         Content: JsonObject;
-        Encoding: TextEncoding;
     begin
         PrintBytes := Base64.ToBase64(PrintBytes, TextEncoding::Windows, TargetCodepage);
 
@@ -35,7 +33,6 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     procedure SendRawBytesPrintRequest(PrinterName: Text; var TempBlob: Codeunit "Temp Blob")
     var
         Base64: Codeunit "Base64 Convert";
-        Success: Boolean;
         InStream: InStream;
         Content: JsonObject;
         PrintBytes: Text;
@@ -65,7 +62,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
 
     procedure SendGenericRequest(RequestType: Text; Content: JsonObject; WindowCaption: Text)
     begin
-        Commit;
+        Commit();
 
         if not TrySendGenericRequest(RequestType, Content, WindowCaption) then
             Message(GetLastErrorText);
@@ -75,7 +72,6 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     [TryFunction]
     local procedure TrySendGenericRequest(Handler: Text; JsonContent: JsonObject; Caption: Text)
     var
-        POSSession: Codeunit "NPR POS Session";
         Content: Text;
     begin
         JsonContent.WriteTo(Content);
@@ -101,7 +97,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
             '}' +
           '}))', Caption);
 
-        HardwareConnector.RunModal;
+        HardwareConnector.RunModal();
         if HardwareConnector.DidAutoClose() then begin
             HardwareConnector.GetResponse(ResponseMethod, ResponseOut);
 
