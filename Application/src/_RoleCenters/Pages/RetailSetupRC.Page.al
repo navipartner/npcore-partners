@@ -663,20 +663,6 @@ page 6151245 "NPR Retail Setup RC"
                 Caption = 'Open POS';
                 RunObject = Codeunit "NPR Open POS Page";
             }
-            action(DownloadMajorTom)
-            {
-                ApplicationArea = All;
-                Caption = 'Download Major Tom';
-                ToolTip = 'Download Major Tom installation (setup.exe) file from Azure Blob Storage.';
-                RunObject = Page "NPR Retail Download Major Tom";
-            }
-            action(DownloadHWConnector)
-            {
-                ApplicationArea = All;
-                Caption = 'Download HW Connector';
-                ToolTip = 'Download Hardware Connector installation (setup.exe) file from Azure Blob Storage.';
-                RunObject = Page "NPR Retail Downl. HW Connector";
-            }
         }
     }
 }
