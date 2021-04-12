@@ -283,11 +283,11 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         if not (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::AUXILIARY, EftTransactionRequest."Processing Type"::OPEN, EftTransactionRequest."Processing Type"::CLOSE, EftTransactionRequest."Processing Type"::OTHER, EftTransactionRequest."Processing Type"::SETUP]) then
             EftTransactionRequest.FieldError("Processing Type");
 
-        POSSession.GetSession(POSSession, true);
-        POSSession.GetFrontEnd(POSFrontEnd, true);
-        POSSession.RequestRefreshData();
-
-        ResumeFrontEndAfterEFTRequest(EftTransactionRequest, POSFrontEnd);
+        if POSSession.GetSession(POSSession, false) then begin
+            POSSession.GetFrontEnd(POSFrontEnd, true);
+            POSSession.RequestRefreshData();
+            ResumeFrontEndAfterEFTRequest(EftTransactionRequest, POSFrontEnd);
+        end;
     end;
 
     procedure LookupTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -434,7 +434,6 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     begin
         EFTSetup.TestField("EFT Integration Type");
         EFTSetup.TestField("Payment Type POS");
-        SalePOS.Get(POSUnitNo, SalesReceiptNo);
         EFTTransactionRequest."Integration Type" := EFTSetup."EFT Integration Type";
         EFTTransactionRequest."POS Payment Type Code" := EFTSetup."Payment Type POS"; //This one might be switched later depending on transaction context, ie. card type.
         EFTTransactionRequest."Original POS Payment Type Code" := EFTSetup."Payment Type POS"; //This one will keep pointing to EFTSetup value.
@@ -443,7 +442,11 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         EFTTransactionRequest."User ID" := UserId;
         EFTTransactionRequest.Started := CurrentDateTime;
         EFTTransactionRequest.Token := CreateGuid();
-        EFTTransactionRequest."Sales ID" := SalePOS."Retail ID";
+
+        if (POSUnitNo <> '') and (SalesReceiptNo <> '') then begin
+            SalePOS.Get(POSUnitNo, SalesReceiptNo);
+            EFTTransactionRequest."Sales ID" := SalePOS."Retail ID";
+        end;
     end;
 
     local procedure EndGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")

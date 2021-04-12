@@ -1,0 +1,71 @@
+codeunit 6014524 "NPR MobilePayV10 GetPOSList"
+{
+    // GET  /v10/pointofsales
+    TableNo = "NPR EFT Setup";
+
+    var
+        _request: text;
+        _response: text;
+        _responseHttpCode: Integer;
+        _filter: text;
+
+    trigger OnRun()
+    var
+        rawResponse: JsonObject;
+    begin
+        clear(_request);
+        clear(_response);
+        clear(_responseHttpCode);
+        SendRequest(Rec);
+    end;
+
+    internal procedure SetFilter(filter: Text)
+    begin
+        _filter := filter;
+    end;
+
+    internal procedure GetResponse(): text
+    begin
+        exit(_response);
+    end;
+
+    local procedure SendRequest(var eftSetup: Record "NPR EFT Setup")
+    var
+        reqMessage: HttpRequestMessage;
+        httpClient: HttpClient;
+        respMessage: HttpResponseMessage;
+        mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
+        jsonResponse: JsonObject;
+        jsonRequest: JsonObject;
+        mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
+        posUnit: Record "NPR POS Unit";
+        beaconTypes: JsonArray;
+        httpRequestHelper: Codeunit "NPR HttpRequest Helper";
+    begin
+        mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
+
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+
+        reqMessage.Method := 'GET';
+        reqMessage.SetRequestUri(mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/pointofsales?' + _filter);
+
+        mobilePayProtocol.SendAndPreHandleTheRequest(httpClient, reqMessage, respMessage, httpRequestHelper);
+
+        _responseHttpCode := respMessage.HttpStatusCode;
+        respMessage.Content.ReadAs(_response);
+
+        ParseResponse(reqMessage, respMessage);
+    end;
+
+    local procedure ParseResponse(var reqMessage: HttpRequestMessage; respMessage: HttpResponseMessage)
+    var
+        jsonToken: JsonToken;
+        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
+        jsonResponse: JsonObject;
+        stream: InStream;
+        errorCode: Text;
+        mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
+    begin
+        mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
+    end;
+}
