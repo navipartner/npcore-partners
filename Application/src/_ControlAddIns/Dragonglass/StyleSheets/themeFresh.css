@@ -1,156 +1,54 @@
 :root {
-  --color-primary: #549ad3;
-  --color-secondary: #ffffff;
+  --color-primary-100: #0074bd;
+  --color-primary-200: #3390ca;
+  --color-primary-300: #caddf0;
+  --color-secondary-100: #ffffff;
+  --color-secondary-200: #f0f0f0;
+  --color-text-100: #253a52;
+  --color-text-200: #f0f0f0;
+  --color-text-300: #cccccc;
+  --color-text-400: #a7a7a7;
+  --color-accent-100: #f64e00;
+  --color-accent-200: #f9834d;
+  --color-danger: #db3439;
+  --box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  --box-shadow-light: rgba(60, 64, 67, 0.15) 0px 1px 2px 0px, rgba(60, 64, 67, 0.07) 0px 1px 3px 1px;
+  --box-shadow-top: rgba(60, 64, 67, 0.3) 0px -1px 2px 0px, rgba(60, 64, 67, 0.15) 0px -1px 3px 1px;
+  --primary: var(--color-primary-100);
+  --secondary: var(--color-secondary-100);
   --green: #5eb267;
   --red: #db3439;
   --dark-red: #982420;
   --gray: #a4b4c8;
-  --light-gray: #555555;
+  --light-gray: #cad3df;
   --purple: #80588c;
   --indigo: #655093;
-  --yellow: #e5d736;
+  --yellow: #d3c100;
   --orange: #f0aa35;
   --white: #d8d8d8;
-  --dark-gray: #222222;
-  --blue: #0f1011;
-  --dark-blue: #24323f;
-  --light-blue: #4a5560;
-  --color-primary-hover: #29578d;
-  --color-secondary-hover: #555555;
-  --green-hover: #34803c;
-  --red-hover: #b30d13;
-  --dark-red-hover: #6c1714;
-  --gray-hover: #76889c;
-  --purple-hover: #5e3b69;
-  --indigo-hover: #45346a;
-  --yellow-hover: #aea115;
-  --orange-hover: #a76b07;
-  --white-hover: #9c9c9c;
-  --light-gray-hover: #686868;
-  --dark-gray-hover: #363636;
-  --blue-hover: #415467;
-  --dark-blue-hover: #314355;
-  --light-blue-hover: #596877;
+  --dark-gray: #6b727a;
+  --blue: #1a4c95;
+  --dark-blue: #0d326b;
+  --light-blue: #5c85c2;
+  --primary-hover: var(--color-primary-200);
+  --secondary-hover: var(--color-secondary-200);
+  --green-hover: #7dc784;
+  --red-hover: #e74d52;
+  --dark-red-hover: #b33e3a;
+  --gray-hover: #bcc8d6;
+  --purple-hover: #9a77a5;
+  --indigo-hover: #7e6aaa;
+  --yellow-hover: #dbcc1f;
+  --orange-hover: #fdc25b;
+  --white-hover: #ebebeb;
+  --light-gray-hover: #e2e6ec;
+  --dark-gray-hover: #969a9e;
+  --blue-hover: #2e60aa;
+  --dark-blue-hover: #1b4585;
+  --light-blue-hover: #7097d1;
   --primary-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --light-font: "Segoe UI Light" Tahoma, Geneva, Verdana, sans-serif;
-  --default-font-size: 1.6rem;
-  --text-color: #494949;
-  --text-color-secondary: #cccccc;
-  --text-color-disabled: #dedede20;
-  --input-text-color: #494949;
-  --login-left-width: 60%;
-  --login-right-width: 40%;
-  --last-sale-text-color: #eee;
-  --last-sale-bg: #4b4b4b;
-  --login-bg: #ffffff;
-  --login-button-grid-padding: 0;
-  --login-padding: 0;
-  --input-with-caption-bg: #549ad3;
-  --view-padding: 1em;
-  --container--space: 1.25em;
-  --button-space: 0.3em;
-  --button-padding: 0.5em;
-  --button-bg-disabled: #caddf0;
-  --button-text-color: #ffffff;
-  --button-color-disabled: #ffffff;
-  --button-shadow: none;
-  --button-shadow-disabled: none;
-  --button-bg: #549ad3;
-  --button-bg-hover: #21659c;
-  --button-switch-bg: #d8d8d8;
-  --label-bg-color: inherit;
-  --label-padding: 0;
-  --label-color: #ffffff;
-  --input-border: none;
-  --input-erase-bg: #549ad3;
-  --input-bg: #ffffff;
-  --input-selection-bg: #549ad3;
-  --input-selection-color: #ffffff;
-  --info-box-title-height: 2.25em;
-  --info-box-caption-height: 1.17em;
-  --info-box-color: #444;
-  --info-box-bg: #ffffff;
-  --caption-box-bg: #e9e9e9;
-  --info-box-border-color: #c7c7c7;
-  --grid-head-color: #ffffff;
-  --grid-column-border: none;
-  --grid-column-padding: 0.5% 1%;
-  --grid-column-width: 11%;
-  --grid-first-column-width: 45%;
-  --grid-row-border: 1px solid #f1f4fa;
-  --grid-row-highlight-bg: #a3d5fd;
-  --grid-text-color: #444;
-  --subtotal-color: #ffffff;
-  --subtotal-padding: 5px;
-  --popup-max-height: 75%;
-  --popup-max-width: 60%;
-  --popup-min-width: 40%;
-  --popup-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.47);
-  --popup-title-bg: #dfdfdf;
-  --popup-title-height: 40px;
-  --popup-title-color: #6f6f6f;
-  --popup-title-font-size: 1.5em;
-  --popup-body-bg: #f3f3f3;
-  --popup-button-bg: #e4e4e4;
-  --popup-button-height: 100px;
-  --popup-button-width: 115px;
-  --popup-body-text-color: #494949;
-  --date-picker-height: 300px;
-  --statusbar-color: #eee;
-  --statusbar-shadow: none;
-  --danger: firebrick;
-  --overlay-bg: rgba(224, 224, 224, 0.3);
-  --shadow: none;
-  --border-radius: 3px;
-  --body-bg: #ffffff;
-  --dot-width: 5px;
-  --dot-height: 5px;
-  --left-pos: -9999px;
-  --lookup-row-shadow: none;
-  --lookup-row-hover: #cee5f9;
-  --lookup-row-selected: #cee5f9;
-  --lookup-row-selected-hover: #b4d0e9;
-  --lookup-row-text-dark: #626262;
-  --lookup-row-text-light: #868686; }
-
-.transcendence .input__holder {
-  border-radius: 6px !important;
-  box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.25) !important; }
-
-.transcendence .grid {
-  background-color: #e5ecf3 !important;
-  border-radius: 6px !important; }
-
-.transcendence .grid__table table tbody tr.tr-highlight {
-  border-bottom: 1px solid #a2d1f8 !important;
-  background-color: #bce1ff !important;
-  box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.15) !important; }
-
-.transcendence .grid__table table tbody tr.tr-highlight td {
-  color: #1e374b !important; }
-
-.transcendence .dialog__body .input__holder {
-  border: 0;
-  box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.25) !important; }
-
-.transcendence .dialog__container {
-  border-radius: 8px !important; }
-
-.transcendence .notifications-panel {
-  background-color: #3c79ab !important; }
-
-.transcendence .notification__entry {
-  background-color: #1f425e !important;
-  color: #dddddd !important;
-  border-radius: 6px;
-  box-shadow: none !important; }
-
-.transcendence .notification-toast {
-  background-color: #1f425e !important;
-  color: #dddddd !important;
-  border-radius: 6px;
-  box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.25) !important;
-  margin: 0.5em 1em !important; }
+  --font-mobile: "Raleway", sans-serif; }
 
 
-/*# sourceMappingURL=themeFresh.css.map*/
+/*# sourceMappingURL=themeDefault.css.map*/

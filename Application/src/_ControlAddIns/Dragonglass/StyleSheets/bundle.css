@@ -1,77 +1,130 @@
-.transcendence .button .button--color-default,
-.transcendence .button.image-below .button--color-default .button__caption,
-.transcendence .button.image-above .button--color-default .button__caption {
-  background-color: var(--color-primary) !important; }
+.transcendence .button .button--color-primary,
+.transcendence .button.image-below .button--color-primary .button__caption,
+.transcendence .button.image-above .button--color-primary .button__caption {
+  background-color: var(--primary) !important; }
+
+.mobile-view .mobile-button.mobile-button--primary .mobile-button__icon {
+  background-color: var(--primary); }
+
+.transcendence .button .button--color-secondary,
+.transcendence .button.image-below .button--color-secondary .button__caption,
+.transcendence .button.image-above .button--color-secondary .button__caption {
+  background-color: var(--secondary) !important; }
+
+.mobile-view .mobile-button.mobile-button--secondary .mobile-button__icon {
+  background-color: var(--secondary); }
 
 .transcendence .button .button--color-green,
 .transcendence .button.image-below .button--color-green .button__caption,
 .transcendence .button.image-above .button--color-green .button__caption {
   background-color: var(--green) !important; }
 
+.mobile-view .mobile-button.mobile-button--green .mobile-button__icon {
+  background-color: var(--green); }
+
 .transcendence .button .button--color-red,
 .transcendence .button.image-below .button--color-red .button__caption,
 .transcendence .button.image-above .button--color-red .button__caption {
   background-color: var(--red) !important; }
+
+.mobile-view .mobile-button.mobile-button--red .mobile-button__icon {
+  background-color: var(--red); }
 
 .transcendence .button .button--color-dark-red,
 .transcendence .button.image-below .button--color-dark-red .button__caption,
 .transcendence .button.image-above .button--color-dark-red .button__caption {
   background-color: var(--dark-red) !important; }
 
+.mobile-view .mobile-button.mobile-button--dark-red .mobile-button__icon {
+  background-color: var(--dark-red); }
+
 .transcendence .button .button--color-gray,
 .transcendence .button.image-below .button--color-gray .button__caption,
 .transcendence .button.image-above .button--color-gray .button__caption {
   background-color: var(--gray) !important; }
+
+.mobile-view .mobile-button.mobile-button--gray .mobile-button__icon {
+  background-color: var(--gray); }
 
 .transcendence .button .button--color-light-gray,
 .transcendence .button.image-below .button--color-light-gray .button__caption,
 .transcendence .button.image-above .button--color-light-gray .button__caption {
   background-color: var(--light-gray) !important; }
 
+.mobile-view .mobile-button.mobile-button--light-gray .mobile-button__icon {
+  background-color: var(--light-gray); }
+
 .transcendence .button .button--color-purple,
 .transcendence .button.image-below .button--color-purple .button__caption,
 .transcendence .button.image-above .button--color-purple .button__caption {
   background-color: var(--purple) !important; }
+
+.mobile-view .mobile-button.mobile-button--purple .mobile-button__icon {
+  background-color: var(--purple); }
 
 .transcendence .button .button--color-indigo,
 .transcendence .button.image-below .button--color-indigo .button__caption,
 .transcendence .button.image-above .button--color-indigo .button__caption {
   background-color: var(--indigo) !important; }
 
+.mobile-view .mobile-button.mobile-button--indigo .mobile-button__icon {
+  background-color: var(--indigo); }
+
 .transcendence .button .button--color-yellow,
 .transcendence .button.image-below .button--color-yellow .button__caption,
 .transcendence .button.image-above .button--color-yellow .button__caption {
   background-color: var(--yellow) !important; }
+
+.mobile-view .mobile-button.mobile-button--yellow .mobile-button__icon {
+  background-color: var(--yellow); }
 
 .transcendence .button .button--color-orange,
 .transcendence .button.image-below .button--color-orange .button__caption,
 .transcendence .button.image-above .button--color-orange .button__caption {
   background-color: var(--orange) !important; }
 
+.mobile-view .mobile-button.mobile-button--orange .mobile-button__icon {
+  background-color: var(--orange); }
+
 .transcendence .button .button--color-white,
 .transcendence .button.image-below .button--color-white .button__caption,
 .transcendence .button.image-above .button--color-white .button__caption {
   background-color: var(--white) !important; }
+
+.mobile-view .mobile-button.mobile-button--white .mobile-button__icon {
+  background-color: var(--white); }
 
 .transcendence .button .button--color-dark-gray,
 .transcendence .button.image-below .button--color-dark-gray .button__caption,
 .transcendence .button.image-above .button--color-dark-gray .button__caption {
   background-color: var(--dark-gray) !important; }
 
+.mobile-view .mobile-button.mobile-button--dark-gray .mobile-button__icon {
+  background-color: var(--dark-gray); }
+
 .transcendence .button .button--color-blue,
 .transcendence .button.image-below .button--color-blue .button__caption,
 .transcendence .button.image-above .button--color-blue .button__caption {
   background-color: var(--blue) !important; }
+
+.mobile-view .mobile-button.mobile-button--blue .mobile-button__icon {
+  background-color: var(--blue); }
 
 .transcendence .button .button--color-dark-blue,
 .transcendence .button.image-below .button--color-dark-blue .button__caption,
 .transcendence .button.image-above .button--color-dark-blue .button__caption {
   background-color: var(--dark-blue) !important; }
 
+.mobile-view .mobile-button.mobile-button--dark-blue .mobile-button__icon {
+  background-color: var(--dark-blue); }
+
 .transcendence .button .button--color-light-blue,
 .transcendence .button.image-below .button--color-light-blue .button__caption,
 .transcendence .button.image-above .button--color-light-blue .button__caption {
   background-color: var(--light-blue) !important; }
+
+.mobile-view .mobile-button.mobile-button--light-blue .mobile-button__icon {
+  background-color: var(--light-blue); }
 
 .transcendence .button .button--color-default:hover,
 .transcendence .button.image-below .button--color-default:hover .button__caption,
@@ -183,43 +236,6 @@
     transform: translateY(0);
     opacity: 0.4; } }
 
-@keyframes dotPulseBefore {
-  0% {
-    box-shadow: -var(--left-pos)-var(--dot-width)var(--dot-width)/2 0 0 -5px var(--color-primary); }
-  30% {
-    box-shadow: -var(--left-pos)-var(--dot-width)var(--dot-width)/2 0 0 2px var(--color-primary); }
-  60%,
-  100% {
-    box-shadow: -var(--left-pos)-var(--dot-width)var(--dot-width)/2 0 0 -5px var(--color-primary); } }
-
-@keyframes dotPulse {
-  0% {
-    box-shadow: -var(--left-pos) 0 0 -5px var(--color-primary); }
-  30% {
-    box-shadow: -var(--left-pos) 0 0 2px var(--color-primary); }
-  60%,
-  100% {
-    box-shadow: -var(--left-pos) 0 0 -5px var(--color-primary); } }
-
-@keyframes dotPulseAfter {
-  0% {
-    box-shadow: -var(--left-pos)var(--dot-width)var(--dot-width)/2 0 0 -5px var(--color-primary); }
-  30% {
-    box-shadow: -var(--left-pos)var(--dot-width)var(--dot-width)/2 0 0 2px var(--color-primary); }
-  60%,
-  100% {
-    box-shadow: -var(--left-pos)var(--dot-width)var(--dot-width)/2 0 0 -5px var(--color-primary); } }
-
-@keyframes shake {
-  20% {
-    transform: translate3d(4px, 0, 0); }
-  40% {
-    transform: translate3d(-1px, 0, 0); }
-  60% {
-    transform: translate3d(3px, 0, 0); }
-  80% {
-    transform: translate3d(-3px, 0, 0); } }
-
 @keyframes bounce-show {
   0% {
     transform: scale(0.9);
@@ -231,14 +247,6 @@
   100% {
     transform: scale(1);
     opacity: 1; } }
-
-@keyframes closing-animation {
-  0% {
-    transform: scale(1);
-    opacity: 1; }
-  100% {
-    transform: scale(0.97) translate3d(0, 3vh, 0);
-    opacity: 0; } }
 
 @keyframes spin {
   from {
@@ -374,9 +382,9 @@
   font-size: 128px; }
 
 .transcendence .input-with-binding, .transcendence .plus-minus-editor, .transcendence .switch {
-  border: 1px solid var(--color-primary);
-  margin: 1.5em;
-  padding: 10px; }
+  padding: 10px;
+  background: var(--color-secondary-100);
+  box-shadow: var(--box-shadow-light); }
 
 .np-fontsize-x-small {
   font-size: 0.6em; }
@@ -477,37 +485,6 @@
     text-align: center;
     transform: rotateZ(-45deg);
     font-size: 10em !important; }
-
-.loading span {
-  position: relative;
-  left: var(--left-pos);
-  margin: 0 auto;
-  width: var(--dot-width);
-  height: var(--dot-height);
-  border-radius: var(--dot-width)/2;
-  background-color: var(--color-primary);
-  color: var(--color-primary);
-  box-shadow: -var(--left-pos) 0 0 -5px var(--color-primary);
-  animation: dotPulse 1.5s infinite linear;
-  animation-delay: 0.25s; }
-  .loading span::before, .loading span::after {
-    content: "";
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    width: var(--dot-width);
-    height: var(--dot-height);
-    border-radius: var(--dot-width)/2;
-    background-color: var(--color-primary);
-    color: var(--color-primary); }
-  .loading span::before {
-    box-shadow: -var(--left-pos)-var(--dot-width)var(--dot-width)/2 0 0 -5px var(--color-primary);
-    animation: dotPulseBefore 1.5s infinite linear;
-    animation-delay: 0s; }
-  .loading span::after {
-    box-shadow: -var(--left-pos)var(--dot-width)var(--dot-width)/2 0 0 -5px var(--color-primary);
-    animation: dotPulseAfter 1.5s infinite linear;
-    animation-delay: 0.5s; }
 
 @media only screen and (min-width: 600px) {
   body .body.transcendence,
@@ -3013,16 +2990,6 @@
   100% {
     opacity: 1; } }
 
-@keyframes shake {
-  20% {
-    transform: translate3d(4px, 0, 0); }
-  40% {
-    transform: translate3d(-1px, 0, 0); }
-  60% {
-    transform: translate3d(3px, 0, 0); }
-  80% {
-    transform: translate3d(-3px, 0, 0); } }
-
 @keyframes bounce-show {
   0% {
     transform: scale(0.9);
@@ -3534,7 +3501,7 @@ body {
     .dragonglass .datepickers-container {
       display: none; } }
   .dragonglass .datepicker {
-    background: #fff;
+    background: var(--color-secondary-100);
     border: 1px solid #dbdbdb;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: 4px;
@@ -3587,7 +3554,7 @@ body {
     display: none; }
   .dragonglass .datepicker--pointer {
     position: absolute;
-    background: #fff;
+    background: var(--color-secondary-100);
     border-top: 1px solid #dbdbdb;
     border-right: 1px solid #dbdbdb;
     width: 10px;
@@ -3673,7 +3640,7 @@ body {
     -webkit-justify-content: space-between;
     -ms-flex-pack: justify;
     justify-content: space-between;
-    border-bottom: 1px solid #efefef;
+    border-bottom: 1px solid var(--color-primary-300);
     min-height: 32px;
     padding: 4px; }
   .dragonglass .-only-timepicker- .datepicker--nav {
@@ -3895,7 +3862,7 @@ body {
     width: 12px;
     border-radius: 3px;
     border: 1px solid #dedede;
-    background: #fff;
+    background: var(--color-secondary-100);
     cursor: pointer;
     transition: background 0.2s; }
   .dragonglass .datepicker--time-row input[type="range"]::-moz-range-thumb {
@@ -3904,7 +3871,7 @@ body {
     width: 12px;
     border-radius: 3px;
     border: 1px solid #dedede;
-    background: #fff;
+    background: var(--color-secondary-100);
     cursor: pointer;
     transition: background 0.2s; }
   .dragonglass .datepicker--time-row input[type="range"]::-ms-thumb {
@@ -3913,7 +3880,7 @@ body {
     width: 12px;
     border-radius: 3px;
     border: 1px solid #dedede;
-    background: #fff;
+    background: var(--color-secondary-100);
     cursor: pointer;
     transition: background 0.2s; }
   .dragonglass .datepicker--time-row input[type="range"]::-webkit-slider-thumb {
@@ -4767,38 +4734,21 @@ body {
   height: 100%;
   justify-content: center; }
 
-.dragonglass.super-ux .dialog-host {
-  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1), pointer-events 0s; }
-
-.dragonglass.super-ux .dialog-host--show {
-  backdrop-filter: blur(1px) grayscale(33%); }
-
-.dragonglass.super-ux .dialog__container--opening.is-overshoot {
-  animation: bounce-show 0.3s; }
-
-.dragonglass.super-ux .dialog__container--closing {
-  animation: closing-animation 0.3s cubic-bezier(0.31, 1.02, 0.43, 0.93) forwards; }
-
-.dragonglass.super-ux .dialog__container--invalid {
-  animation: shake 0.3s cubic-bezier(0.5, 0.25, 0.5, 1) both;
-  transform: translate3d(0, 0, 0); }
-
 .dragonglass .dialog-host {
   align-items: center;
   display: flex;
   height: 100vh;
   justify-content: center;
-  opacity: 0;
   position: absolute;
   width: 100%;
   z-index: 0;
-  pointer-events: none; }
-
-.dragonglass .dialog-host--show {
-  pointer-events: initial;
-  background: rgba(224, 224, 224, 0.3);
-  opacity: 1;
-  z-index: 1000; }
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1), pointer-events 0s; }
+  .dragonglass .dialog-host--show {
+    pointer-events: initial;
+    background: rgba(224, 224, 224, 0.3);
+    z-index: 1000;
+    backdrop-filter: blur(1px) grayscale(33%); }
 
 .dragonglass .dialog__container {
   background-color: rgba(255, 255, 255, 0.85);
@@ -4956,11 +4906,8 @@ body {
           .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder input:focus {
             box-shadow: 0px 0px 3px 2px rgba(71, 194, 255, 0.45);
             outline: 0 none; }
-        .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder.input__holder--invalid {
-          animation: shake 0.3s cubic-bezier(0.5, 0.25, 0.5, 1) both;
-          transform: translate3d(0, 0, 0); }
-          .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder.input__holder--invalid input:focus {
-            box-shadow: 0px 0px 4px 0px rgba(255, 0, 0, 0.45); }
+        .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder.input__holder--invalid input:focus {
+          box-shadow: 0px 0px 4px 0px rgba(255, 0, 0, 0.45); }
         .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder .input__erase {
           background-color: #0277bd;
           border-radius: 3px;
@@ -5019,7 +4966,7 @@ body {
   display: flex;
   flex-flow: column;
   font-family: var(--primary-font);
-  font-size: var(--default-font-size);
+  font-size: 1.6rem;
   height: 100vh;
   margin: 0;
   overflow: hidden;
@@ -5028,6 +4975,19 @@ body {
   @media (min-width: 320px) and (max-width: 768px) {
     body {
       font-size: 1.2rem !important; } }
+
+::-webkit-scrollbar {
+  width: 1em; }
+
+::-webkit-scrollbar-track {
+  background: var(--color-secondary-100); }
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-secondary-200);
+  border-radius: 20px; }
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-300); }
 
 #controlAddIn {
   display: flex;
@@ -5041,7 +5001,7 @@ body {
   height: 100%; }
 
 .transcendence .view {
-  padding: var(--view-padding);
+  padding: 1em;
   position: relative; }
   @media (min-width: 320px) and (max-width: 768px) {
     .transcendence .view {
@@ -5068,12 +5028,12 @@ body {
   justify-content: center; }
   .transcendence .container > .container:not(:first-child),
   .transcendence .container.flow-horizontal > .container:not(:first-child) {
-    margin: 0 0 0 var(--container--space); }
+    margin: 0 0 0 1.25em; }
   .transcendence .container.flow-vertical > .container:not(:first-child) {
-    margin: var(--container--space) 0 0; }
+    margin: 1.25em 0 0; }
 
 .transcendence.body {
-  background: var(--body-bg);
+  background: var(--color-secondary-200);
   width: 100%; }
   body .transcendence.body,
   .transcendence.body input,
@@ -5096,25 +5056,25 @@ body {
 
 .transcendence .dragonglass__slide-in-right {
   animation: slide-in-from-right 0.2s ease-in-out forwards;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-100);
   box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.25);
   height: 100%;
   margin: 0 !important;
-  padding: var(--container--space);
+  padding: 1.25em;
   position: absolute;
   right: 0;
   top: 0;
   z-index: 100; }
 
 .transcendence .dragonglass__no-padding-title {
-  background: var(--color-secondary);
-  color: var(--text-color);
-  margin: -var(--container--space);
+  background: var(--color-secondary-100);
+  color: var(--color-text-100);
+  margin: -1.25em;
   margin-bottom: 0;
-  padding: 1em var(--container--space); }
+  padding: 1em 1.25em; }
 
 .transcendence .cart-view__container {
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-100);
   border-radius: 50px;
   box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.35);
   height: 100px;
@@ -5126,7 +5086,7 @@ body {
   z-index: 100; }
 
 .transcendence .cart-view__container--collapsed:hover {
-  background-color: var(--color-primary-hover); }
+  background-color: var(--color-primary-200); }
 
 .transcendence .cart-view__container--expanded {
   border-radius: 3px;
@@ -5135,7 +5095,7 @@ body {
 
 .transcendence .cart-view__icon {
   align-items: center;
-  color: var(--text-color);
+  color: var(--color-text-100);
   cursor: pointer;
   display: flex;
   font-size: 32px;
@@ -5162,7 +5122,7 @@ body {
   animation: fadeIn 0.3s forwards;
   background-color: #2f2f2f;
   border: 0;
-  color: var(--text-color);
+  color: var(--color-text-100);
   font-size: 20px;
   font-weight: 300;
   min-height: 40px;
@@ -5205,58 +5165,43 @@ body {
     margin-right: 1.25em;
     opacity: 0; }
 
-.transcendence.super-ux .dialog-host {
-  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1), pointer-events 0s; }
-
-.transcendence.super-ux .dialog-host--show {
-  backdrop-filter: blur(1px) grayscale(33%);
-  background: rgba(24, 24, 24, 0.67); }
-
-.transcendence.super-ux .dialog__container--opening.is-overshoot {
-  animation: bounce-show 0.3s; }
-
-.transcendence.super-ux .dialog__container--invalid {
-  animation: shake 0.3s cubic-bezier(0.5, 0.25, 0.5, 1) both;
-  transform: translate3d(0, 0, 0); }
-
-.transcendence.super-ux .dialog__container--closing {
-  animation: closing-animation 0.3s cubic-bezier(0.31, 1.02, 0.43, 0.93) forwards; }
-
 .transcendence .dialog-host {
   align-items: center;
   display: flex;
   height: 100vh;
   justify-content: center;
-  opacity: 0;
   position: absolute;
   width: 100%;
   z-index: 1000;
-  pointer-events: none; }
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1), pointer-events 0s; }
+  .transcendence .dialog-host .dialog__swipe-handle {
+    display: none; }
   .transcendence .dialog-host .button > div {
-    background-color: var(--button-bg);
-    color: var(--button-text-color); }
+    background-color: var(--color-primary-100);
+    color: var(--color-text-200); }
     .transcendence .dialog-host .button > div.button--selected {
-      background-color: var(--color-primary-hover); }
+      background-color: var(--color-primary-200); }
     .transcendence .dialog-host .button > div:hover {
-      background-color: var(--button-bg-hover); }
-
-.transcendence .dialog-host--show {
-  pointer-events: initial;
-  background: var(--overlay-bg);
-  opacity: 1; }
+      background-color: var(--color-primary-200); }
+  .transcendence .dialog-host--show {
+    pointer-events: initial;
+    backdrop-filter: blur(1px) grayscale(33%);
+    background: rgba(24, 24, 24, 0.67); }
 
 .transcendence .dialog__container {
   align-items: center;
-  background: var(--popup-body-bg);
-  box-shadow: var(--popup-shadow);
+  background: var(--color-secondary-200);
+  box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.47);
   display: flex;
   flex-flow: column;
-  max-height: var(--popup-max-height);
-  max-width: var(--popup-max-width);
-  min-width: var(--popup-min-width);
+  max-height: 75%;
+  max-width: 60%;
+  min-width: 40%;
   position: absolute;
-  border-radius: var(--border-radius);
-  overflow: hidden; }
+  border-radius: 8px;
+  overflow: hidden;
+  padding-bottom: 1em; }
   @media (min-width: 320px) and (max-width: 768px) {
     .transcendence .dialog__container {
       width: 100%;
@@ -5265,15 +5210,14 @@ body {
       max-width: 100%; } }
 
 .transcendence .dialog__titlebar {
-  background-color: var(--popup-title-bg);
+  background-color: var(--color-primary-100);
   border: 0;
-  color: var(--popup-title-color);
-  font-size: var(--popup-title-font-size);
-  min-height: var(--popup-title-height);
+  color: var(--color-text-200);
+  font-size: 1.5em;
   text-align: left;
   width: 100%;
   font-weight: 300;
-  padding: 12px;
+  padding: 0.75em;
   flex: 0 0 auto; }
   .transcendence .dialog__titlebar span {
     display: flex;
@@ -5284,11 +5228,17 @@ body {
     min-height: inherit; }
 
 .transcendence .dialog__body {
+  height: 100%;
   min-height: 20vh;
-  padding: var(--view-padding);
+  padding: 2em 1em;
   width: 100%;
-  background-color: var(--popup-body-bg);
-  color: var(--popup-body-text-color); }
+  background-color: var(--color-secondary-200);
+  color: var(--color-text-100); }
+  .transcendence .dialog__body section {
+    margin: 0.75em 0; }
+  .transcendence .dialog__body > span {
+    display: block;
+    margin-bottom: 1em; }
   @media (min-width: 320px) and (max-width: 768px) {
     .transcendence .dialog__body {
       min-height: calc(100% - 140px);
@@ -5296,31 +5246,27 @@ body {
       justify-content: center;
       align-items: center; } }
   .transcendence .dialog__body .caption {
-    color: var(--popup-body-text-color); }
-  .transcendence .dialog__body .button__caption .caption {
-    color: var(--button-text-color); }
+    color: var(--color-text-100); }
 
 .transcendence .dialog__buttons {
-  background: var(--popup-button-bg);
+  background: var(--color-secondary-200);
   display: flex;
-  height: var(--popup-button-height);
   justify-content: flex-end;
   width: 100%;
   align-items: center;
-  padding: 0px 8px;
-  flex: 0 0 auto; }
+  padding: 0px 1em;
+  flex: 0 0 auto;
+  margin-top: auto; }
   .transcendence .dialog__buttons .button {
-    flex: 0 1 var(--popup-button-width);
+    flex: 0 1 8em;
     height: 50px;
     margin-right: 1.25em; }
     .transcendence .dialog__buttons .button > div {
-      border-radius: var(--border-radius);
-      background-color: var(--button-bg);
+      border-radius: 3px;
+      background-color: var(--color-primary-100);
       color: #e4e4e4; }
       .transcendence .dialog__buttons .button > div:hover, .transcendence .dialog__buttons .button > div:active {
-        background-color: var(--button-bg-hover); }
-    .transcendence .dialog__buttons .button .caption {
-      color: var(--button-text-color); }
+        background-color: var(--color-primary-200); }
   .transcendence .dialog__buttons #button-dialog-ok div {
     background-color: var(--green); }
     .transcendence .dialog__buttons #button-dialog-ok div:hover, .transcendence .dialog__buttons #button-dialog-ok div:active {
@@ -5357,10 +5303,8 @@ body {
           width: 100%; } }
 
 .transcendence .dialog__container--configuration {
-  max-height: 650px;
-  color: var(--grid-text-color); }
+  max-height: 650px; }
   .transcendence .dialog__container--configuration .dialog__body {
-    padding: 0;
     min-height: 45vh; }
 
 .transcendence .dialog__settings__body {
@@ -5370,36 +5314,35 @@ body {
 .transcendence .dialog__settings__body [data-simplebar] {
   height: calc(45vh - 70px); }
 
-.transcendence .dialog-configuration__group {
-  margin-bottom: 5px;
-  padding: 10px 20px; }
-  .transcendence .dialog-configuration__group:last-child {
-    margin-bottom: 0; }
-  .transcendence .dialog-configuration__group.is-expanded .dialog-configuration__group__content {
-    max-height: 400px;
-    background: var(--color-secondary);
-    padding: 15px;
-    border-radius: 0 0 3px 3px;
-    box-shadow: var(--button-shadow); }
-  .transcendence .dialog-configuration__group.is-expanded .toggle-icon {
-    top: 10px; }
+.transcendence .dialog-configuration__group:last-child {
+  margin-bottom: 0; }
+
+.transcendence .dialog-configuration__group.is-expanded .dialog-configuration__group__content {
+  max-height: 400px;
+  background: var(--color-secondary-100);
+  padding: 15px;
+  border-radius: 0 0 3px 3px;
+  box-shadow: var(--box-shadow); }
+
+.transcendence .dialog-configuration__group.is-expanded .toggle-icon {
+  top: 10px; }
 
 .transcendence .dialog__caption {
   padding: 20px 20px 10px; }
 
 .transcendence .dialog-configuration__group__caption {
   position: relative;
-  padding: 10px;
-  background: var(--color-primary);
+  padding: 1em;
+  background: var(--color-primary-100);
   cursor: pointer;
-  color: var(--button-text-color);
   transition: all 0.3s ease-out;
   border: none;
-  border-radius: var(--border-radius); }
+  border-radius: 3px;
+  color: var(--color-text-200); }
   .transcendence .dialog-configuration__group__caption:hover {
-    background-color: var(--button-bg-hover); }
+    background-color: var(--color-primary-200); }
   .transcendence .dialog-configuration__group__caption span.toggle-icon {
-    color: var(--button-text-color); }
+    color: var(--color-text-200); }
 
 .transcendence .dialog-configuration__group__content {
   transition: all 0.3s ease-in-out;
@@ -5412,10 +5355,7 @@ body {
   .transcendence .dialog-configuration__group__content .input-with-binding {
     margin: 0 0 15px; }
   .transcendence .dialog-configuration__group__content .switch {
-    border: 1px solid;
     margin: 0 0 15px; }
-    .transcendence .dialog-configuration__group__content .switch:last-child {
-      border: 1px solid; }
   .transcendence .dialog-configuration__group__content > div {
     padding: 10px; }
     .transcendence .dialog-configuration__group__content > div:last-child {
@@ -5430,7 +5370,7 @@ body {
   transition: all 0.3s ease-in-out; }
 
 .transcendence .dialog__container.dialog__container--configuration-table {
-  color: var(--input-text-color);
+  color: var(--color-text-100);
   min-width: 50%; }
   .transcendence .dialog__container.dialog__container--configuration-table .dialog__titlebar {
     min-height: auto; }
@@ -5438,7 +5378,7 @@ body {
     min-height: 45vh;
     padding: 0; }
     .transcendence .dialog__container.dialog__container--configuration-table .dialog__body span {
-      color: var(--input-text-color); }
+      color: var(--color-text-100); }
   .transcendence .dialog__container.dialog__container--configuration-table .dialog__settings__body {
     height: 100%; }
   .transcendence .dialog__container.dialog__container--configuration-table table {
@@ -5449,7 +5389,7 @@ body {
       border: none; }
     .transcendence .dialog__container.dialog__container--configuration-table table table {
       padding: 0;
-      border: 1px solid var(--color-primary);
+      border: 1px solid var(--color-primary-100);
       margin-bottom: 10px; }
       .transcendence .dialog__container.dialog__container--configuration-table table table td,
       .transcendence .dialog__container.dialog__container--configuration-table table table th {
@@ -5457,15 +5397,15 @@ body {
   .transcendence .dialog__container.dialog__container--configuration-table tr {
     position: relative; }
     .transcendence .dialog__container.dialog__container--configuration-table tr.has-second-level table {
-      background: var(--button-bg);
-      border-radius: var(--border-radius);
+      background: var(--color-primary-100);
+      border-radius: 3px;
       border: none;
       margin: 0;
       position: relative; }
       .transcendence .dialog__container.dialog__container--configuration-table tr.has-second-level table:hover {
-        background: var(--button-bg-hover); }
+        background: var(--color-primary-200); }
       .transcendence .dialog__container.dialog__container--configuration-table tr.has-second-level table span {
-        color: var(--text-color); }
+        color: var(--color-text-100); }
     .transcendence .dialog__container.dialog__container--configuration-table tr.has-second-level td {
       padding: 0; }
       .transcendence .dialog__container.dialog__container--configuration-table tr.has-second-level td td {
@@ -5473,11 +5413,11 @@ body {
     .transcendence .dialog__container.dialog__container--configuration-table tr.has-second-level.is-active table {
       margin: 0; }
     .transcendence .dialog__container.dialog__container--configuration-table tr.second-level td {
-      background: var(--color-secondary); }
+      background: var(--color-secondary-100); }
       .transcendence .dialog__container.dialog__container--configuration-table tr.second-level td span {
-        color: var(--text-color); }
+        color: var(--color-text-100); }
     .transcendence .dialog__container.dialog__container--configuration-table tr.second-level table {
-      border: 1px solid var(--color-primary);
+      border: 1px solid var(--color-primary-100);
       margin: 10px;
       width: calc(100% - 20px); }
     .transcendence .dialog__container.dialog__container--configuration-table tr.second-level + tr table {
@@ -5530,7 +5470,7 @@ body {
         overflow-y: auto; }
     .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body span {
       display: block;
-      color: var(--popup-body-text-color); }
+      color: var(--color-text-100); }
     .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-loading {
       display: flex;
       flex: 1 1 auto;
@@ -5546,23 +5486,22 @@ body {
         color: #898989;
         animation: spin 4s linear infinite; }
     .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry {
-      box-shadow: var(--lookup-row-shadow);
       margin: 0.5em;
       padding: 0.5em;
       transition: background-color 300ms ease-out; }
       .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry.lookup-entry--selected {
-        background-color: var(--lookup-row-selected); }
+        background-color: var(--color-primary-300); }
         .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry.lookup-entry--selected:hover {
-          background-color: var(--lookup-row-selected-hover); }
+          background-color: var(--color-primary-200); }
       .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry:hover {
-        background-color: var(--lookup-row-hover); }
+        background-color: var(--color-primary-300); }
       .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line {
         padding: 0.25em;
         display: flex;
         flex-flow: row;
         justify-content: space-between; }
         .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line.lookup-entry-line--main span {
-          color: var(--lookup-row-text-dark); }
+          color: var(--color-text-100); }
         .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-left {
           text-align: left; }
         .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-center {
@@ -5583,9 +5522,9 @@ body {
           font-size: 1.33em; }
         .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell__caption {
           font-size: 0.67em;
-          color: var(--lookup-row-text-light); }
+          color: var(--color-text-300); }
         .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line span {
-          color: var(--lookup-row-text-dark); }
+          color: var(--color-text-100); }
 
 .transcendence .dialog-host .dialog__container.dialog__container--menu {
   width: 75%;
@@ -5594,12 +5533,9 @@ body {
     .transcendence .dialog-host .dialog__container.dialog__container--menu {
       width: 100%;
       height: 100%; } }
-  .transcendence .dialog-host .dialog__container.dialog__container--menu .dialog__body {
-    height: calc(100% - var(--popup-button-height)); }
 
 .transcendence .dialog-host .dialog__container.dialog__container--message .dialog__body span, .transcendence .dialog-host .dialog__container.dialog__container--confirm .dialog__body span, .transcendence .dialog-host .dialog__container.dialog__container--error .dialog__body span {
   display: block;
-  color: var(--popup-body-text-color);
   text-align: center; }
 
 .transcendence .dialog-host .dialog__container.dialog__container--numpad {
@@ -5643,7 +5579,7 @@ body {
   animation-name: right-to-left;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
-  background: linear-gradient(to left, var(--color-primary) 50%, var(--color-secondary) 50%);
+  background: linear-gradient(to left, var(--color-primary-100) 50%, var(--color-secondary-100) 50%);
   background-size: 200% 100%; }
 
 .transcendence .dialog-host .dialog__container.dialog__container--timeout .dialog__buttons .button {
@@ -5659,7 +5595,7 @@ body {
   .transcendence .dialog__container.dialog__container--seating-setup .dialog__body {
     min-height: calc(100vh - 160px); }
     .transcendence .dialog__container.dialog__container--seating-setup .dialog__body span {
-      color: var(--text-color); }
+      color: var(--color-text-100); }
 
 .transcendence .seating {
   position: absolute;
@@ -5695,7 +5631,7 @@ body {
   width: calc(100% - 250px - 1.5em); }
 
 .transcendence .seating-setup-menu__burger {
-  background: var(--body-bg);
+  background: var(--color-secondary-100);
   border-radius: 3px;
   cursor: pointer;
   overflow: hidden;
@@ -5712,7 +5648,7 @@ body {
       display: block;
       width: 20px;
       height: 2px;
-      background-color: var(--text-color);
+      background-color: var(--color-text-100);
       outline: 1px solid transparent;
       border-radius: 10px;
       -webkit-transition-property: background-color, -webkit-transform;
@@ -5765,8 +5701,8 @@ body {
     height: calc(100% - 44px); }
 
 .transcendence .seating-setup-menu__content {
-  background: var(--color-secondary);
-  color: var(--text-color);
+  background: var(--color-secondary-100);
+  color: var(--color-text-100);
   height: 0;
   overflow: hidden;
   padding: 0;
@@ -5774,7 +5710,7 @@ body {
 
 .transcendence .seating-setup-context-menu {
   animation: width-height2 cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
-  background: var(--color-secondary);
+  background: var(--color-secondary-100);
   overflow: hidden;
   position: absolute;
   right: -2px;
@@ -5788,12 +5724,12 @@ body {
   padding: 5px 10px;
   transition: background-color 0.2s ease-out;
   overflow: hidden;
-  border-bottom: 1px solid var(--color-secondary);
+  border-bottom: 1px solid var(--color-secondary-100);
   cursor: pointer; }
   .transcendence .seating-setup-locations__location:hover {
-    background-color: var(--color-secondary); }
+    background-color: var(--color-secondary-100); }
   .transcendence .seating-setup-locations__location.selected {
-    background-color: var(--color-primary); }
+    background-color: var(--color-primary-100); }
   .transcendence .seating-setup-locations__location > span {
     float: left;
     padding: 8px 0; }
@@ -5816,14 +5752,14 @@ body {
     width: 95%;
     margin: 0 auto;
     text-align: center;
-    background-color: var(--color-secondary);
+    background-color: var(--color-secondary-100);
     box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.35);
     transition: background-color 0.2s ease-out; }
     .transcendence .seating-setup-menu__new-location .seating-setup-menu-button:hover {
-      background-color: var(--color-secondary-hover); }
+      background-color: var(--color-secondary-200); }
 
 .transcendence .seating-setup-menu__configuration-title {
-  background: var(--body-bg);
+  background: var(--color-secondary-100);
   padding: 13px;
   font-size: 16px;
   line-height: 16px; }
@@ -5834,7 +5770,7 @@ body {
   border-radius: 3px;
   border-bottom: 1px solid; }
   .transcendence .seating-setup-menu-button:hover {
-    background-color: var(--color-secondary); }
+    background-color: var(--color-secondary-100); }
   .transcendence .seating-setup-menu-button .fa {
     font-size: 16px; }
 
@@ -6002,10 +5938,9 @@ body {
   display: flex;
   flex: 1;
   align-items: center;
-  box-shadow: var(--button-shadow);
   flex-flow: column nowrap;
   justify-content: center;
-  margin-right: var(--button-space);
+  margin-right: 0.5em;
   min-width: 0;
   padding: 0;
   position: relative;
@@ -6015,7 +5950,7 @@ body {
   width: 0;
   height: 100%; }
   .transcendence .button.button--has-plus-minus > div:hover {
-    background-color: var(--button-bg); }
+    background-color: var(--color-primary-100); }
   .transcendence .button.button--has-plus-minus .button__caption {
     width: 60%;
     margin: 0 auto; }
@@ -6024,14 +5959,14 @@ body {
     background-size: auto 100% !important;
     background-position: center 0 !important;
     background-repeat: no-repeat;
-    background-color: var(--button-bg);
-    border-radius: var(--border-radius);
+    background-color: var(--color-primary-100);
+    border-radius: 3px;
     border: none;
-    color: var(--button-text-color);
+    color: var(--color-text-200);
     cursor: pointer;
     height: 100%;
     outline: none;
-    padding: var(--button-padding);
+    padding: 0.5em;
     transition: background-color 300ms ease-out;
     width: 100%;
     position: relative; }
@@ -6058,14 +5993,14 @@ body {
         background: rgba(102, 102, 102, 0.3);
         border-radius: 3px 0 0 3px; }
     .transcendence .button > div:hover, .transcendence .button > div:active {
-      background-color: var(--button-bg-hover); }
+      background-color: var(--color-primary-200); }
     .transcendence .button > div.button--disabled {
-      background-color: var(--button-bg-disabled) !important;
+      background-color: var(--color-primary-300) !important;
       cursor: default !important;
       transform: none !important;
-      color: var(--button-color-disabled) !important; }
+      color: var(--color-text-200) !important; }
       .transcendence .button > div.button--disabled:hover, .transcendence .button > div.button--disabled:focus {
-        background-color: var(--button-bg-disabled) !important; }
+        background-color: var(--color-primary-300) !important; }
   .transcendence .button:last-child {
     margin-right: 0; }
   .transcendence .button:active, .transcendence .button.active {
@@ -6078,7 +6013,7 @@ body {
       -webkit-transform: scale(1, 1);
       transform: scale(1, 1); }
     .transcendence .button.button--disabled .caption {
-      color: var(--button-color-disabled); }
+      color: var(--color-text-200); }
   .transcendence .button.button--has-icon .button__caption {
     height: 50%; }
     @media (min-width: 320px) and (max-width: 768px) {
@@ -6139,22 +6074,22 @@ body {
       top: 0;
       height: auto;
       left: 0;
-      background-color: var(--button-bg);
-      border-radius: var(--border-radius) var(--border-radius) 0 0; }
+      background-color: var(--color-primary-100);
+      border-radius: 3px 3px 0 0; }
   .transcendence .button.button--image-below .button__icon {
     height: 100%;
     padding-top: 3vh; }
   .transcendence .button.button--image-above > div .button__caption {
     bottom: 0;
     top: auto;
-    border-radius: 0 0 var(--border-radius) var(--border-radius); }
+    border-radius: 0 0 3px 3px; }
 
 .transcendence .button.button--simple {
   margin-right: 0.5em; }
   .transcendence .button.button--simple > div {
-    background-color: var(--color-secondary); }
+    background-color: var(--color-secondary-100); }
   .transcendence .button.button--simple:hover > div {
-    background-color: var(--color-secondary-hover); }
+    background-color: var(--color-secondary-200); }
   .transcendence .button.button--simple .button__caption > span {
     overflow: auto;
     white-space: normal;
@@ -6169,7 +6104,7 @@ body {
 
 .transcendence .button--selected > div,
 .transcendence .button--highlight > div {
-  background-color: var(--button-bg-hover); }
+  background-color: var(--color-primary-200); }
 
 .transcendence .buttongrid {
   display: flex;
@@ -6181,7 +6116,7 @@ body {
     height: auto; }
 
 .transcendence .buttongrid__row {
-  padding-bottom: var(--button-space);
+  padding-bottom: 0.5em;
   display: flex;
   flex: 1;
   min-height: 1%; }
@@ -6193,7 +6128,7 @@ body {
     flex-flow: column; }
   .transcendence .buttongrid--popup .button {
     margin-right: 0;
-    margin-bottom: var(--button-space);
+    margin-bottom: 0.5em;
     width: 100%; } }
   @media (min-width: 320px) and (max-width: 768px) and (min-width: 320px) and (max-width: 768px) {
     .transcendence .buttongrid--popup .button.button--disabled {
@@ -6214,13 +6149,13 @@ body {
     ------------------------------------------------- */ }
   .transcendence .datepicker--cell-day.-other-month-,
   .transcendence .datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .datepicker--cell-day.-other-month-:hover,
   .transcendence .datepicker--cell-year.-other-decade-:hover {
     color: #c5c5c5; }
   .transcendence .-disabled-.-focus-.datepicker--cell-day.-other-month-,
   .transcendence .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .-selected-.datepicker--cell-day.-other-month-,
   .transcendence .-selected-.datepicker--cell-year.-other-decade- {
     color: #fff;
@@ -6263,16 +6198,16 @@ body {
     height: 32px;
     z-index: 1; }
   .transcendence .datepicker--cell.-focus- {
-    background: #f0f0f0; }
+    background: var(--color-primary-300); }
   .transcendence .datepicker--cell.-current- {
     color: #4eb5e6; }
   .transcendence .datepicker--cell.-current-.-focus- {
-    color: var(--color-secondary); }
+    color: var(--color-secondary-100); }
   .transcendence .datepicker--cell.-current-.-in-range- {
     color: #4eb5e6; }
   .transcendence .datepicker--cell.-in-range- {
     background: rgba(92, 196, 239, 0.1);
-    color: var(--color-secondary);
+    color: var(--color-secondary-100);
     border-radius: 0; }
   .transcendence .datepicker--cell.-in-range-.-focus- {
     background-color: rgba(92, 196, 239, 0.2); }
@@ -6347,13 +6282,13 @@ body {
     height: 33.33%; }
   .transcendence .datepicker--cell-day.-other-month-,
   .transcendence .datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .datepicker--cell-day.-other-month-:hover,
   .transcendence .datepicker--cell-year.-other-decade-:hover {
     color: #c5c5c5; }
   .transcendence .-disabled-.-focus-.datepicker--cell-day.-other-month-,
   .transcendence .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .-selected-.datepicker--cell-day.-other-month-,
   .transcendence .-selected-.datepicker--cell-year.-other-decade- {
     color: #fff;
@@ -6380,14 +6315,14 @@ body {
     .transcendence .datepickers-container {
       display: none; } }
   .transcendence .datepicker {
-    background: #fff;
-    border: 1px solid #dbdbdb;
+    background: var(--color-secondary-100);
+    border: 1px solid var(--color-primary-300);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: 4px;
     box-sizing: content-box;
     font-family: Tahoma, sans-serif;
     font-size: 14px;
-    color: var(--input-text-color);
+    color: var(--color-text-100);
     width: 250px;
     position: absolute;
     left: -100000px;
@@ -6416,8 +6351,8 @@ body {
     transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s;
     transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease; }
   .transcendence .datepicker-inline .datepicker {
-    border-color: #d7d7d7;
-    box-shadow: none;
+    border-color: var(--color-primary-300);
+    box-shadow: var(--box-shadow);
     position: static;
     left: auto;
     right: auto;
@@ -6433,7 +6368,7 @@ body {
     display: none; }
   .transcendence .datepicker--pointer {
     position: absolute;
-    background: #fff;
+    background: var(--color-secondary-100);
     border-top: 1px solid #dbdbdb;
     border-right: 1px solid #dbdbdb;
     width: 10px;
@@ -6487,13 +6422,13 @@ body {
     display: block; }
   .transcendence .datepicker--cell-day.-other-month-,
   .transcendence .datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .datepicker--cell-day.-other-month-:hover,
   .transcendence .datepicker--cell-year.-other-decade-:hover {
     color: #c5c5c5; }
   .transcendence .-disabled-.-focus-.datepicker--cell-day.-other-month-,
   .transcendence .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .-selected-.datepicker--cell-day.-other-month-,
   .transcendence .-selected-.datepicker--cell-year.-other-decade- {
     color: #fff;
@@ -6519,7 +6454,7 @@ body {
     -webkit-justify-content: space-between;
     -ms-flex-pack: justify;
     justify-content: space-between;
-    border-bottom: 1px solid #efefef;
+    border-bottom: 1px solid var(--color-primary-300);
     min-height: 32px;
     padding: 4px; }
   .transcendence .-only-timepicker- .datepicker--nav {
@@ -6590,17 +6525,17 @@ body {
     align-items: center;
     height: 32px; }
   .transcendence .datepicker--button:hover {
-    color: var(--color-secondary);
+    color: var(--color-secondary-100);
     background: #f0f0f0; }
   .transcendence .datepicker--cell-day.-other-month-,
   .transcendence .datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .datepicker--cell-day.-other-month-:hover,
   .transcendence .datepicker--cell-year.-other-decade-:hover {
     color: #c5c5c5; }
   .transcendence .-disabled-.-focus-.datepicker--cell-day.-other-month-,
   .transcendence .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .-selected-.datepicker--cell-day.-other-month-,
   .transcendence .-selected-.datepicker--cell-year.-other-decade- {
     color: #fff;
@@ -6701,7 +6636,7 @@ body {
     align-items: center;
     font-size: 11px;
     height: 17px;
-    background: linear-gradient(to right, var(--text-color), var(--text-color)) left 50%/100% 1px no-repeat; }
+    background: linear-gradient(to right, var(--color-text-100), var(--color-text-100)) left 50%/100% 1px no-repeat; }
   .transcendence .datepicker--time-row:first-child {
     margin-bottom: 4px; }
   .transcendence .datepicker--time-row input[type="range"] {
@@ -6740,8 +6675,8 @@ body {
     height: 12px;
     width: 12px;
     border-radius: 3px;
-    border: 1px solid var(--text-color);
-    background: #fff;
+    border: 1px solid var(--color-text-100);
+    background: var(--color-secondary-100);
     cursor: pointer;
     transition: background 0.2s; }
   .transcendence .datepicker--time-row input[type="range"]::-moz-range-thumb {
@@ -6749,8 +6684,8 @@ body {
     height: 12px;
     width: 12px;
     border-radius: 3px;
-    border: 1px solid var(--text-color);
-    background: #fff;
+    border: 1px solid var(--color-text-100);
+    background: var(--color-secondary-100);
     cursor: pointer;
     transition: background 0.2s; }
   .transcendence .datepicker--time-row input[type="range"]::-ms-thumb {
@@ -6758,8 +6693,8 @@ body {
     height: 12px;
     width: 12px;
     border-radius: 3px;
-    border: 1px solid var(--text-color);
-    background: #fff;
+    border: 1px solid var(--color-text-100);
+    background: var(--color-secondary-100);
     cursor: pointer;
     transition: background 0.2s; }
   .transcendence .datepicker--time-row input[type="range"]::-webkit-slider-thumb {
@@ -6816,13 +6751,13 @@ body {
     left: calc(50% - 1px); }
   .transcendence .datepicker--cell-day.-other-month-,
   .transcendence .datepicker--cell-year.-other-decade- {
-    color: var(--text-color-secondary); }
+    color: var(--color-text-300); }
   .transcendence .datepicker--cell-day.-other-month-:hover,
   .transcendence .datepicker--cell-year.-other-decade-:hover {
     color: #c5c5c5; }
   .transcendence .-disabled-.-focus-.datepicker--cell-day.-other-month-,
   .transcendence .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: var(--text-color); }
+    color: var(--color-text-100); }
   .transcendence .-selected-.datepicker--cell-day.-other-month-,
   .transcendence .-selected-.datepicker--cell-year.-other-decade- {
     color: #fff;
@@ -6849,7 +6784,7 @@ body {
     display: flex;
     flex-flow: column; }
   .transcendence .datepicker-inline {
-    height: var(--date-picker-height); }
+    height: 300px; }
     @media (min-width: 320px) and (max-width: 768px) {
       .transcendence .datepicker-inline {
         height: 250px; } }
@@ -6862,7 +6797,7 @@ body {
           margin-right: 0;
           width: 100%; } }
       .transcendence .datepicker-inline .datepicker .datepicker--nav-title {
-        color: var(--text-color); }
+        color: var(--color-text-200); }
       .transcendence .datepicker-inline .datepicker .datepicker--cells {
         height: 100%; }
       .transcendence .datepicker-inline .datepicker .datepicker--cell-day {
@@ -6872,40 +6807,41 @@ body {
         flex-flow: column;
         height: 100%; }
       .transcendence .datepicker-inline .datepicker .datepicker--nav {
-        background: var(--color-primary); }
+        background: var(--color-primary-100); }
       .transcendence .datepicker-inline .datepicker .datepicker--nav-action path {
-        stroke: var(--text-color); }
+        stroke: var(--color-text-200); }
       .transcendence .datepicker-inline .datepicker .datepicker--nav-action:hover {
-        background: var(--button-bg-hover); }
+        background: var(--color-primary-200); }
       .transcendence .datepicker-inline .datepicker .datepicker--cell.-selected- {
-        background: var(--button-bg); }
+        background: var(--color-primary-100); }
         .transcendence .datepicker-inline .datepicker .datepicker--cell.-selected-.-focus- {
-          background: var(--button-bg-hover); }
+          background: var(--color-primary-200); }
       .transcendence .datepicker-inline .datepicker .datepicker--day-name {
         font-size: 14px;
         font-weight: bold;
-        color: var(--color-primary); }
+        color: var(--color-text-100); }
       .transcendence .datepicker-inline .datepicker .datepicker--cell.-current- {
-        color: var(--color-primary);
+        color: var(--color-primary-100);
         font-weight: bold; }
         .transcendence .datepicker-inline .datepicker .datepicker--cell.-current-.-selected- {
-          background: var(--button-bg);
-          color: var(--text-color); }
+          background: var(--color-primary-100);
+          color: var(--color-text-200); }
       .transcendence .datepicker-inline .datepicker .datepicker--nav-title i {
-        color: var(--text-color);
+        color: var(--color-text-200);
         font-weight: bold; }
       .transcendence .datepicker-inline .datepicker .datepicker--nav-title:hover {
-        background: var(--button-bg-hover); }
+        background: var(--color-primary-200); }
 
 .transcendence .grid {
   display: flex;
   flex: 1;
-  background-color: var(--caption-box-bg);
-  border-radius: var(--border-radius);
-  box-shadow: var(--button-shadow);
+  border-radius: 3px;
+  box-shadow: var(--box-shadow);
   flex-direction: column;
   overflow: hidden;
-  height: 100%; }
+  height: 100%;
+  background: var(--color-secondary-100);
+  color: var(--color-text-100); }
 
 .transcendence .grid__table {
   width: 100%;
@@ -6924,39 +6860,37 @@ body {
       vertical-align: middle;
       white-space: nowrap; }
     .transcendence .grid__table table thead {
-      background-color: var(--color-primary);
-      color: var(--grid-head-color); }
+      background-color: var(--color-primary-100);
+      color: var(--color-text-200); }
       .transcendence .grid__table table thead th {
         font-weight: 600;
         height: 2em;
         padding: 0.2em;
         text-align: center; }
     .transcendence .grid__table table tbody tr {
-      border-bottom: var(--grid-row-border);
+      border-bottom: 1px solid var(--color-secondary-200);
       cursor: default;
       display: flex; }
       .transcendence .grid__table table tbody tr.negative-row {
-        color: var(--danger); }
+        color: var(--color-danger); }
       .transcendence .grid__table table tbody tr.tr-highlight {
-        background-color: var(--grid-row-highlight-bg);
-        border-bottom: 1px solid var(--grid-row-highlight-bg);
-        box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.3); }
+        background-color: var(--color-primary-300); }
     .transcendence .grid__table table tbody td {
-      border-right: var(--grid-column-border);
-      padding: var(--grid-column-padding);
+      border-right: none;
+      padding: 0.5% 1%;
       justify-content: flex-end;
       display: flex;
-      color: var(--grid-text-color); }
+      align-items: center; }
       .transcendence .grid__table table tbody td:first-child {
         justify-content: flex-start; }
       .transcendence .grid__table table tbody td:last-child {
         border-right: none; }
       .transcendence .grid__table table tbody td.loading {
         align-items: center;
-        color: var(--light-gray); }
+        color: var(--color-primary-300); }
         .transcendence .grid__table table tbody td.loading span {
-          background-color: var(--light-gray);
-          color: var(--light-gray); }
+          background-color: var(--color-primary-300);
+          color: var(--color-primary-300); }
 
 .transcendence .grid__table--head {
   flex: 0 0 auto;
@@ -6970,15 +6904,15 @@ body {
   align-items: flex-start; }
 
 .transcendence .subtotal {
-  color: var(--subtotal-color);
+  color: var(--color-text-200);
   flex: 0 0 auto;
   margin: 0;
   text-align: right;
   text-transform: uppercase;
-  background-color: var(--color-primary);
-  padding: var(--subtotal-padding); }
+  background-color: var(--color-primary-100);
+  padding: 0.5em; }
   .transcendence .subtotal .subtotal__container.negative {
-    color: var(--danger); }
+    color: var(--color-danger); }
   .transcendence .subtotal .subtotal__container span {
     font-weight: 600;
     display: inline-block; }
@@ -7016,585 +6950,569 @@ body {
   width: 1em; }
 
 .transcendence .captionbox {
-  background: var(--caption-box-bg);
+  background: var(--color-secondary-100);
   display: flex;
   flex-flow: column nowrap;
   overflow: hidden;
   width: 100%;
-  color: var(--info-box-color);
-  border-radius: var(--border-radius);
+  color: var(--color-text-100);
+  border-radius: 3px;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: var(--box-shadow);
   height: 100%; }
 
 .transcendence .captionbox__datacaption {
   align-items: center;
   display: flex;
   flex-flow: row nowrap;
-  flex: 1 1 var(--info-box-caption-height);
-  height: var(--info-box-caption-height);
+  flex: 1 1 1.25em;
+  height: 1.25em;
   justify-content: space-between;
-  padding: 0 0.5em; }
+  padding: 0 1em; }
 
 .transcendence .captionbox__caption {
   font-weight: 600; }
-  .transcendence .captionbox__caption span {
-    color: var(--grid-text-color); }
 
 .transcendence .captionbox__datacaption--title {
-  border-bottom: 1px solid var(--info-box-border-color);
-  flex-basis: var(--info-box-title-height);
-  height: var(--info-box-title-height); }
+  border-bottom: 1px solid var(--color-secondary-200);
+  flex-basis: 2.25em;
+  height: 2.25em; }
 
 .transcendence .input {
   display: block;
   margin-bottom: 0.5em;
   width: 100%;
-  position: relative; }
-
-.transcendence .input--with-caption {
-  background-color: var(--input-with-caption-bg);
-  padding: 0.5em 1em 1em 1em;
-  border-radius: var(--border-radius); }
-
-.transcendence .input__label {
-  background-color: var(--label-bg-color);
-  color: var(--label-color);
-  margin: 0 auto 8px;
-  padding: var(--label-padding);
-  width: 100%;
-  text-align: left; }
-
-.transcendence .input__holder {
-  width: 100%;
-  display: flex;
   position: relative;
-  background-color: var(--text-color);
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--button-bg); }
-
-.transcendence.super-ux .input__holder--invalid {
-  animation: shake 0.3s cubic-bezier(0.5, 0.25, 0.5, 1) both;
-  transform: translate3d(0, 0, 0); }
-
-.transcendence .input__erase {
-  background: var(--input-erase-bg);
-  border: 1px solid var(--input-erase-bg);
-  color: var(--button-text-color);
-  cursor: pointer;
-  padding: 5px 10px;
-  position: absolute;
-  right: 0;
-  text-align: center;
-  top: 0;
-  transition: background-color 300ms ease-out;
-  width: 40px; }
-  .transcendence .input__erase:hover {
-    background: var(--button-bg-hover);
-    border: 1px solid var(--button-bg-hover); }
-  .transcendence .input__erase:active, .transcendence .input__erase.active {
-    background-color: #888888;
-    border: 1px solid #888888;
-    transform: none;
-    transition: none; }
-    .transcendence .input__erase:active > i, .transcendence .input__erase.active > i {
-      transform: scale(0.93); }
-
-.transcendence .input__notification {
-  font-size: 0.7em;
-  padding-top: 5px;
-  color: var(--text-color); }
-
-.transcendence .input__textbox {
-  border: var(--input-border);
-  padding: 5px 50px 5px 10px;
-  width: 100%;
-  margin: 0;
-  outline: none;
-  color: var(--input-text-color);
-  background-color: var(--input-bg); }
-  .transcendence .input__textbox.error {
-    border-color: var(--danger);
-    background-color: #ffede8; }
-  .transcendence .input__textbox.filteredinputactive {
-    color: #7ba1c4; }
-  .transcendence .input__textbox::selection {
-    background-color: var(--input-selection-bg);
-    color: var(--input-selection-color); }
-  .transcendence .input__textbox:read-only {
-    background-color: #a7a7a7; }
+  border-radius: 3px; }
+  .transcendence .input--with-caption {
+    background-color: var(--color-primary-100);
+    padding: 0.5em 1em 1em 1em;
+    border-radius: 3px; }
+  .transcendence .input__label {
+    background-color: inherit;
+    color: var(--color-text-200);
+    margin: 0 auto 8px;
+    padding: 0;
+    width: 100%;
+    text-align: left; }
+  .transcendence .input__holder {
+    width: 100%;
+    display: flex;
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-primary-300);
+    border-radius: 3px; }
+  .transcendence .input__erase {
+    cursor: pointer;
+    padding: 5px 10px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    transition: background-color 300ms ease-out;
+    width: 40px;
+    color: var(--color-text-100); }
+    .transcendence .input__erase:hover {
+      background: var(--color-primary-300); }
+    .transcendence .input__erase:active, .transcendence .input__erase.active {
+      background-color: #888888;
+      border: 1px solid #888888;
+      transform: none;
+      transition: none; }
+      .transcendence .input__erase:active > i, .transcendence .input__erase.active > i {
+        transform: scale(0.93); }
+  .transcendence .input__notification {
+    font-size: 0.7em;
+    padding-top: 5px;
+    color: var(--color-text-100); }
+  .transcendence .input__textbox {
+    border: none;
+    padding: 5px 50px 5px 10px;
+    width: 100%;
+    margin: 0;
+    outline: none;
+    color: var(--color-text-100);
+    background-color: var(--color-secondary-100); }
+    .transcendence .input__textbox.error {
+      border-color: var(--color-danger);
+      background-color: #ffede8; }
+    .transcendence .input__textbox.filteredinputactive {
+      color: #7ba1c4; }
+    .transcendence .input__textbox::selection {
+      background-color: var(--color-primary-200);
+      color: var(--color-text-200); }
 
 .transcendence .text-enter {
   position: absolute;
   z-index: 9;
   width: calc(100% - 2em); }
-
-.transcendence .text-enter__entry {
-  animation: fadeIn-slideIn-dark 0.3s ease-in-out forwards;
-  backdrop-filter: blur(2px);
-  background: var(--text-color);
-  border-radius: var(--border-radius);
-  border: none;
-  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.35);
-  margin-top: 8px;
-  padding: 5px 10px;
-  pointer-events: none;
-  position: absolute;
-  transition: margin-top 0.3s ease-in-out;
-  width: 100%; }
-  .transcendence .text-enter__entry.is-closing {
-    animation: slideOut-dark 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards; }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(38px + 30 * 0px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(40px + 32 * 0px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(41px + 33 * 0px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(43px + 35 * 0px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(45px + 37 * 0px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(46px + 38 * 0px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(47px + 39 * 0px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(52px + 44 * 0px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(56px + 48 * 0px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-1 {
-      margin-top: calc(58px + 50 * 0px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(38px + 30 * 1px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(40px + 32 * 1px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(41px + 33 * 1px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(43px + 35 * 1px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(45px + 37 * 1px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(46px + 38 * 1px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(47px + 39 * 1px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(52px + 44 * 1px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(56px + 48 * 1px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-2 {
-      margin-top: calc(58px + 50 * 1px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(38px + 30 * 2px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(40px + 32 * 2px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(41px + 33 * 2px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(43px + 35 * 2px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(45px + 37 * 2px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(46px + 38 * 2px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(47px + 39 * 2px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(52px + 44 * 2px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(56px + 48 * 2px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-3 {
-      margin-top: calc(58px + 50 * 2px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(38px + 30 * 3px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(40px + 32 * 3px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(41px + 33 * 3px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(43px + 35 * 3px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(45px + 37 * 3px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(46px + 38 * 3px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(47px + 39 * 3px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(52px + 44 * 3px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(56px + 48 * 3px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-4 {
-      margin-top: calc(58px + 50 * 3px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(38px + 30 * 4px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(40px + 32 * 4px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(41px + 33 * 4px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(43px + 35 * 4px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(45px + 37 * 4px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(46px + 38 * 4px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(47px + 39 * 4px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(52px + 44 * 4px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(56px + 48 * 4px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-5 {
-      margin-top: calc(58px + 50 * 4px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(38px + 30 * 5px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(40px + 32 * 5px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(41px + 33 * 5px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(43px + 35 * 5px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(45px + 37 * 5px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(46px + 38 * 5px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(47px + 39 * 5px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(52px + 44 * 5px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(56px + 48 * 5px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-6 {
-      margin-top: calc(58px + 50 * 5px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(38px + 30 * 6px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(40px + 32 * 6px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(41px + 33 * 6px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(43px + 35 * 6px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(45px + 37 * 6px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(46px + 38 * 6px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(47px + 39 * 6px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(52px + 44 * 6px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(56px + 48 * 6px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-7 {
-      margin-top: calc(58px + 50 * 6px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(38px + 30 * 7px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(40px + 32 * 7px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(41px + 33 * 7px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(43px + 35 * 7px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(45px + 37 * 7px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(46px + 38 * 7px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(47px + 39 * 7px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(52px + 44 * 7px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(56px + 48 * 7px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-8 {
-      margin-top: calc(58px + 50 * 7px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(38px + 30 * 8px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(40px + 32 * 8px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(41px + 33 * 8px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(43px + 35 * 8px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(45px + 37 * 8px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(46px + 38 * 8px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(47px + 39 * 8px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(52px + 44 * 8px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(56px + 48 * 8px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-9 {
-      margin-top: calc(58px + 50 * 8px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(38px + 30 * 9px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(40px + 32 * 9px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(41px + 33 * 9px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(43px + 35 * 9px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(45px + 37 * 9px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(46px + 38 * 9px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(47px + 39 * 9px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(52px + 44 * 9px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(56px + 48 * 9px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-10 {
-      margin-top: calc(58px + 50 * 9px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(38px + 30 * 10px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(40px + 32 * 10px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(41px + 33 * 10px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(43px + 35 * 10px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(45px + 37 * 10px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(46px + 38 * 10px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(47px + 39 * 10px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(52px + 44 * 10px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(56px + 48 * 10px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-11 {
-      margin-top: calc(58px + 50 * 10px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(38px + 30 * 11px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(40px + 32 * 11px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(41px + 33 * 11px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(43px + 35 * 11px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(45px + 37 * 11px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(46px + 38 * 11px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(47px + 39 * 11px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(52px + 44 * 11px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(56px + 48 * 11px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-12 {
-      margin-top: calc(58px + 50 * 11px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(38px + 30 * 12px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(40px + 32 * 12px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(41px + 33 * 12px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(43px + 35 * 12px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(45px + 37 * 12px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(46px + 38 * 12px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(47px + 39 * 12px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(52px + 44 * 12px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(56px + 48 * 12px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-13 {
-      margin-top: calc(58px + 50 * 12px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(38px + 30 * 13px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(40px + 32 * 13px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(41px + 33 * 13px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(43px + 35 * 13px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(45px + 37 * 13px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(46px + 38 * 13px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(47px + 39 * 13px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(52px + 44 * 13px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(56px + 48 * 13px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-14 {
-      margin-top: calc(58px + 50 * 13px); } }
-  @media only screen and (min-width: 700px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(38px + 30 * 14px); } }
-  @media only screen and (min-width: 800px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(40px + 32 * 14px); } }
-  @media only screen and (min-width: 1000px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(41px + 33 * 14px); } }
-  @media only screen and (min-width: 1200px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(43px + 35 * 14px); } }
-  @media only screen and (min-width: 1400px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(45px + 37 * 14px); } }
-  @media only screen and (min-width: 1600px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(46px + 38 * 14px); } }
-  @media only screen and (min-width: 1900px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(47px + 39 * 14px); } }
-  @media only screen and (min-width: 2200px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(52px + 44 * 14px); } }
-  @media only screen and (min-width: 2600px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(56px + 48 * 14px); } }
-  @media only screen and (min-width: 3000px) {
-    .transcendence .text-enter__entry.ordinal-15 {
-      margin-top: calc(58px + 50 * 14px); } }
+  .transcendence .text-enter__entry {
+    animation: fadeIn-slideIn-dark 0.3s ease-in-out forwards;
+    backdrop-filter: blur(2px);
+    background: var(--color-secondary-100);
+    border-radius: 3px;
+    border: none;
+    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.35);
+    color: var(--color-text-100);
+    margin-top: 8px;
+    padding: 5px 10px;
+    pointer-events: none;
+    position: absolute;
+    transition: margin-top 0.3s ease-in-out;
+    width: 100%; }
+    .transcendence .text-enter__entry.is-closing {
+      animation: slideOut-dark 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards; }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(38px + 30 * 0px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(40px + 32 * 0px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(41px + 33 * 0px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(43px + 35 * 0px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(45px + 37 * 0px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(46px + 38 * 0px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(47px + 39 * 0px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(52px + 44 * 0px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(56px + 48 * 0px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-1 {
+        margin-top: calc(58px + 50 * 0px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(38px + 30 * 1px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(40px + 32 * 1px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(41px + 33 * 1px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(43px + 35 * 1px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(45px + 37 * 1px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(46px + 38 * 1px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(47px + 39 * 1px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(52px + 44 * 1px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(56px + 48 * 1px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-2 {
+        margin-top: calc(58px + 50 * 1px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(38px + 30 * 2px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(40px + 32 * 2px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(41px + 33 * 2px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(43px + 35 * 2px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(45px + 37 * 2px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(46px + 38 * 2px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(47px + 39 * 2px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(52px + 44 * 2px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(56px + 48 * 2px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-3 {
+        margin-top: calc(58px + 50 * 2px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(38px + 30 * 3px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(40px + 32 * 3px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(41px + 33 * 3px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(43px + 35 * 3px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(45px + 37 * 3px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(46px + 38 * 3px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(47px + 39 * 3px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(52px + 44 * 3px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(56px + 48 * 3px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-4 {
+        margin-top: calc(58px + 50 * 3px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(38px + 30 * 4px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(40px + 32 * 4px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(41px + 33 * 4px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(43px + 35 * 4px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(45px + 37 * 4px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(46px + 38 * 4px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(47px + 39 * 4px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(52px + 44 * 4px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(56px + 48 * 4px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-5 {
+        margin-top: calc(58px + 50 * 4px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(38px + 30 * 5px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(40px + 32 * 5px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(41px + 33 * 5px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(43px + 35 * 5px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(45px + 37 * 5px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(46px + 38 * 5px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(47px + 39 * 5px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(52px + 44 * 5px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(56px + 48 * 5px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-6 {
+        margin-top: calc(58px + 50 * 5px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(38px + 30 * 6px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(40px + 32 * 6px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(41px + 33 * 6px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(43px + 35 * 6px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(45px + 37 * 6px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(46px + 38 * 6px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(47px + 39 * 6px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(52px + 44 * 6px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(56px + 48 * 6px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-7 {
+        margin-top: calc(58px + 50 * 6px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(38px + 30 * 7px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(40px + 32 * 7px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(41px + 33 * 7px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(43px + 35 * 7px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(45px + 37 * 7px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(46px + 38 * 7px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(47px + 39 * 7px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(52px + 44 * 7px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(56px + 48 * 7px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-8 {
+        margin-top: calc(58px + 50 * 7px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(38px + 30 * 8px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(40px + 32 * 8px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(41px + 33 * 8px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(43px + 35 * 8px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(45px + 37 * 8px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(46px + 38 * 8px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(47px + 39 * 8px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(52px + 44 * 8px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(56px + 48 * 8px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-9 {
+        margin-top: calc(58px + 50 * 8px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(38px + 30 * 9px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(40px + 32 * 9px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(41px + 33 * 9px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(43px + 35 * 9px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(45px + 37 * 9px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(46px + 38 * 9px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(47px + 39 * 9px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(52px + 44 * 9px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(56px + 48 * 9px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-10 {
+        margin-top: calc(58px + 50 * 9px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(38px + 30 * 10px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(40px + 32 * 10px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(41px + 33 * 10px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(43px + 35 * 10px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(45px + 37 * 10px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(46px + 38 * 10px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(47px + 39 * 10px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(52px + 44 * 10px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(56px + 48 * 10px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-11 {
+        margin-top: calc(58px + 50 * 10px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(38px + 30 * 11px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(40px + 32 * 11px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(41px + 33 * 11px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(43px + 35 * 11px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(45px + 37 * 11px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(46px + 38 * 11px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(47px + 39 * 11px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(52px + 44 * 11px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(56px + 48 * 11px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-12 {
+        margin-top: calc(58px + 50 * 11px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(38px + 30 * 12px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(40px + 32 * 12px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(41px + 33 * 12px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(43px + 35 * 12px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(45px + 37 * 12px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(46px + 38 * 12px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(47px + 39 * 12px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(52px + 44 * 12px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(56px + 48 * 12px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-13 {
+        margin-top: calc(58px + 50 * 12px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(38px + 30 * 13px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(40px + 32 * 13px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(41px + 33 * 13px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(43px + 35 * 13px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(45px + 37 * 13px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(46px + 38 * 13px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(47px + 39 * 13px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(52px + 44 * 13px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(56px + 48 * 13px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-14 {
+        margin-top: calc(58px + 50 * 13px); } }
+    @media only screen and (min-width: 700px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(38px + 30 * 14px); } }
+    @media only screen and (min-width: 800px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(40px + 32 * 14px); } }
+    @media only screen and (min-width: 1000px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(41px + 33 * 14px); } }
+    @media only screen and (min-width: 1200px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(43px + 35 * 14px); } }
+    @media only screen and (min-width: 1400px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(45px + 37 * 14px); } }
+    @media only screen and (min-width: 1600px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(46px + 38 * 14px); } }
+    @media only screen and (min-width: 1900px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(47px + 39 * 14px); } }
+    @media only screen and (min-width: 2200px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(52px + 44 * 14px); } }
+    @media only screen and (min-width: 2600px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(56px + 48 * 14px); } }
+    @media only screen and (min-width: 3000px) {
+      .transcendence .text-enter__entry.ordinal-15 {
+        margin-top: calc(58px + 50 * 14px); } }
 
 .transcendence .input-with-binding .input {
   margin: 0; }
@@ -7623,30 +7541,24 @@ body {
 .transcendence .input-with-binding__input {
   flex: 0 0 60%; }
 
-.caption {
-  color: var(--button-text-color); }
-
 .transcendence .loginpad {
   display: flex;
   flex: 1;
   flex-flow: column nowrap;
-  background-color: var(--login-bg);
-  border-radius: var(--border-radius);
-  padding: var(--login-padding);
-  box-shadow: var(--shadow);
+  border-radius: 3px;
+  padding: 0;
   height: 100%; }
   @media (min-width: 320px) and (max-width: 768px) {
     .transcendence .loginpad {
       max-height: 85vh; }
       .transcendence .loginpad .loginpad {
-        padding: 0;
-        box-shadow: none; } }
+        padding: 0; } }
   .transcendence .loginpad .button > div {
-    background-color: var(--button-bg); }
+    background-color: var(--color-primary-100); }
     .transcendence .loginpad .button > div:hover, .transcendence .loginpad .button > div:active {
-      background-color: var(--button-bg-hover); }
+      background-color: var(--color-primary-200); }
   .transcendence .loginpad .buttongrid {
-    padding: var(--login-button-grid-padding); }
+    padding: 0; }
 
 @media (min-width: 320px) and (max-width: 768px) {
   .transcendence .mobile-core__menus {
@@ -7693,7 +7605,7 @@ body {
   right: 0; }
 
 .transcendence .notifications-panel {
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-200);
   box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.25);
   height: 100vh;
   position: absolute;
@@ -7708,15 +7620,15 @@ body {
 
 .transcendence .notification__entry,
 .transcendence .notification-toast {
-  background: var(--color-secondary);
-  box-shadow: 0px 1px 4px var(--body-bg);
-  color: var(--text-color);
+  background: var(--color-accent-100);
+  color: var(--color-text-200);
   margin: 10px;
   padding: 15px 12px;
-  position: relative; }
+  position: relative;
+  border-radius: 3px; }
   .transcendence .notification__entry .close,
   .transcendence .notification-toast .close {
-    color: #999;
+    color: var(--color-text-200);
     cursor: pointer;
     font-size: 16px;
     position: absolute;
@@ -7724,7 +7636,7 @@ body {
     top: 10px; }
     .transcendence .notification__entry .close:hover,
     .transcendence .notification-toast .close:hover {
-      color: #888; }
+      color: var(--color-text-300); }
 
 .transcendence .notification__title {
   font-weight: bold; }
@@ -7740,7 +7652,7 @@ body {
 
 .transcendence .notification-toast {
   opacity: 0;
-  margin: 0.7em 1.5em; }
+  margin: 0.5em 1em; }
 
 .transcendence .notification-toast--show {
   animation: fadeIn-from-up 0.3s ease-in-out forwards; }
@@ -7767,9 +7679,9 @@ body {
   border-radius: 20px; }
   .transcendence .plus-minus-editor__buttons .subtract,
   .transcendence .plus-minus-editor__buttons .add {
-    background: var(--color-primary);
+    background: var(--color-primary-100);
     border-radius: 20px 0 0 20px;
-    color: var(--button-text-color);
+    color: var(--color-text-200);
     cursor: pointer;
     font-size: 20px;
     padding: 5px 0;
@@ -7777,7 +7689,8 @@ body {
     transition: all 0.3s ease-out;
     width: 40px;
     position: relative;
-    height: 36px; }
+    height: 36px;
+    box-shadow: var(--box-shadow); }
     .transcendence .plus-minus-editor__buttons .subtract span,
     .transcendence .plus-minus-editor__buttons .add span {
       position: absolute;
@@ -7786,11 +7699,11 @@ body {
       left: 1px; }
     .transcendence .plus-minus-editor__buttons .subtract:hover,
     .transcendence .plus-minus-editor__buttons .add:hover {
-      background: var(--button-bg-hover); }
+      background: var(--color-primary-200); }
     .transcendence .plus-minus-editor__buttons .subtract.disabled,
     .transcendence .plus-minus-editor__buttons .add.disabled {
-      background-color: var(--button-bg-disabled);
-      color: var(--button-color-disabled);
+      background-color: var(--color-primary-300);
+      color: var(--color-text-200);
       cursor: default; }
   .transcendence .plus-minus-editor__buttons .add {
     border-radius: 0 20px 20px 0; }
@@ -7802,16 +7715,16 @@ body {
     display: flex;
     align-items: center;
     padding: 0 15px;
-    background-color: var(--input-bg);
+    background-color: var(--color-secondary-100);
     cursor: pointer; }
     .transcendence .plus-minus-editor__buttons .value span {
-      color: var(--input-text-color) !important; }
+      color: var(--color-text-100) !important; }
     .transcendence .plus-minus-editor__buttons .value:hover {
       background-color: #bababa; }
   .transcendence .plus-minus-editor__buttons .remove {
-    color: var(--text-color);
+    color: var(--color-text-100);
     margin-right: 20px;
-    border-right: 1px solid var(--color-primary);
+    border-right: 1px solid var(--color-primary-100);
     padding-right: 20px;
     cursor: pointer;
     display: flex;
@@ -7823,128 +7736,127 @@ body {
 .transcendence .plus-minus-editor__caption {
   display: flex;
   align-items: center;
-  color: var(--text-color); }
+  color: var(--color-text-100); }
 
-.transcendence {
-  /*.switch__label {
-        &:active {
-            .switch__pointer:after {
-                width: 28px;
-                transform: translate3d(2px, 2px, 0);
-            }*/
-  /*input:checked + .switch__pointer:after {
-                transform: translate3d(16px, 2px, 0);
-            }
-        }
-    }*/ }
-  .transcendence .switch__content {
-    width: 100%; }
-  .transcendence .switch__caption {
-    float: left; }
-  .transcendence .switch__checkbox {
-    display: none; }
-    .transcendence .switch__checkbox:checked + .switch__pointer {
-      background-color: #5eb267; }
-      .transcendence .switch__checkbox:checked + .switch__pointer:before {
-        transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0); }
-      .transcendence .switch__checkbox:checked + .switch__pointer:after {
-        transform: translate3d(22px, 2px, 0); }
-  .transcendence .switch__label {
-    -webkit-tap-highlight-color: transparent;
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    overflow: hidden;
-    width: 100%; }
-  .transcendence .switch__pointer {
-    background-color: var(--button-switch-bg);
-    border-radius: 23px;
-    float: right;
-    height: 26px;
-    margin-right: 0.5rem;
-    position: relative;
-    transition: all 0.3s linear;
-    vertical-align: text-bottom;
-    width: 46px; }
-    .transcendence .switch__pointer:before {
-      border-radius: 11px;
-      content: "";
-      height: 22px;
-      left: 0;
-      position: absolute;
-      transform: translate3d(2px, 2px, 0) scale3d(1, 1, 1);
-      transition: all 0.25s linear;
-      width: 42px; }
-    .transcendence .switch__pointer:after {
-      background-color: #fff;
-      border-radius: 11px;
-      content: "";
-      height: 22px;
-      left: 0;
-      position: absolute;
-      transform: translate3d(2px, 2px, 0);
-      transition: all 0.2s ease-in-out;
-      width: 22px; }
-  .transcendence .radio-group {
-    margin: 1.5em; }
-  .transcendence .radio-group__content {
-    display: flex;
-    flex-flow: row wrap;
-    width: 100%; }
-  .transcendence .switch__caption--radio-group {
-    padding-bottom: 0;
-    padding-right: 10px; }
-  .transcendence .switch__label--radio-group {
-    border-radius: 3px;
-    border: 1px solid;
-    flex: 0 1 calc(100% / 3 - 15px);
-    margin-bottom: 15px;
-    margin-right: 15px;
-    padding: 10px; }
-    .transcendence .switch__label--radio-group:only-child {
-      margin-right: 0;
-      flex: 1; }
-    .transcendence .switch__label--radio-group:first-child:nth-last-child(2) {
-      flex: 1; }
-    .transcendence .switch__label--radio-group:first-child:nth-last-child(2) ~ .switch__label--radio-group {
-      flex: 1;
-      margin-right: 0; }
-    .transcendence .switch__label--radio-group:nth-child(3n + 3) {
-      margin-right: 0;
-      flex: 0 1 calc(100% / 3); }
-    .transcendence .switch__label--radio-group.true {
-      background-color: rgba(94, 178, 103, 0.1);
-      transition: all 0.25s ease-in-out; }
-  .transcendence .radio-group__caption {
-    padding-bottom: 10px; }
-  .transcendence .switch__radio:checked + .switch__pointer--radio-group:after {
-    animation: zoomIn 0.3s ease-in-out forwards; }
-  .transcendence .switch__pointer--radio-group {
-    width: 26px;
-    margin: 0;
-    flex: 0 0 26px; }
-    .transcendence .switch__pointer--radio-group:after {
-      height: 16px;
-      left: 5px;
-      top: 5px;
-      transform: scale(0);
-      transform: translate3d(0);
-      width: 16px; }
+.transcendence .switch__content {
+  width: 100%; }
+
+.transcendence .switch__caption {
+  float: left; }
+
+.transcendence .switch__checkbox {
+  display: none; }
+  .transcendence .switch__checkbox:checked + .switch__pointer {
+    background-color: var(--color-accent-200); }
+    .transcendence .switch__checkbox:checked + .switch__pointer:before {
+      transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0); }
+    .transcendence .switch__checkbox:checked + .switch__pointer:after {
+      transform: translate3d(22px, 2px, 0); }
+
+.transcendence .switch__label {
+  -webkit-tap-highlight-color: transparent;
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+  width: 100%; }
+
+.transcendence .switch__pointer {
+  background: var(--color-primary-300);
+  border-radius: 23px;
+  float: right;
+  height: 26px;
+  margin-right: 0.5rem;
+  position: relative;
+  transition: all 0.3s linear;
+  vertical-align: text-bottom;
+  width: 46px; }
+  .transcendence .switch__pointer:before {
+    border-radius: 11px;
+    content: "";
+    height: 22px;
+    left: 0;
+    position: absolute;
+    transform: translate3d(2px, 2px, 0) scale3d(1, 1, 1);
+    transition: all 0.25s linear;
+    width: 42px; }
+  .transcendence .switch__pointer:after {
+    background-color: #fff;
+    border-radius: 11px;
+    content: "";
+    height: 22px;
+    left: 0;
+    position: absolute;
+    transform: translate3d(2px, 2px, 0);
+    transition: all 0.2s ease-in-out;
+    width: 22px; }
+
+.transcendence .radio-group {
+  margin: 1.5em; }
+
+.transcendence .radio-group__content {
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%; }
+
+.transcendence .switch__caption--radio-group {
+  padding-bottom: 0;
+  padding-right: 10px; }
+
+.transcendence .switch__label--radio-group {
+  border-radius: 3px;
+  border: 1px solid var(--color-primary-300);
+  flex: 0 1 calc(100% / 3 - 15px);
+  margin-bottom: 15px;
+  margin-right: 15px;
+  padding: 10px; }
+  .transcendence .switch__label--radio-group:only-child {
+    margin-right: 0;
+    flex: 1; }
+  .transcendence .switch__label--radio-group:first-child:nth-last-child(2) {
+    flex: 1; }
+  .transcendence .switch__label--radio-group:first-child:nth-last-child(2) ~ .switch__label--radio-group {
+    flex: 1;
+    margin-right: 0; }
+  .transcendence .switch__label--radio-group:nth-child(3n + 3) {
+    margin-right: 0;
+    flex: 0 1 calc(100% / 3); }
+  .transcendence .switch__label--radio-group.true {
+    background: var(--color-primary-300);
+    transition: all 0.25s ease-in-out; }
+
+.transcendence .radio-group__caption {
+  padding-bottom: 10px; }
+
+.transcendence .switch__radio:checked + .switch__pointer--radio-group:after {
+  animation: zoomIn 0.3s ease-in-out forwards; }
+
+.transcendence .switch__pointer--radio-group {
+  width: 26px;
+  margin: 0;
+  flex: 0 0 26px; }
+  .transcendence .switch__pointer--radio-group:after {
+    height: 16px;
+    left: 5px;
+    top: 5px;
+    transform: scale(0);
+    transform: translate3d(0);
+    width: 16px; }
 
 .transcendence .view.login > .container > .container:last-child {
-  flex: 1 1 var(--login-right-width); }
+  flex: 1 1 40%; }
 
 .transcendence .view.login > .container .lastsale {
   font-size: 1.8rem; }
   .transcendence .view.login > .container .lastsale .captionbox__datacaption {
-    padding: 1.5rem 1rem; }
+    padding: 1.25em 1em; }
   .transcendence .view.login > .container .lastsale .lastline {
-    padding: 1.5rem 0; }
+    padding: 1.25em 0; }
 
 .transcendence .view.login .captionbox > .captionbox__datacaption:last-child {
-  background: var(--last-sale-bg);
-  color: var(--last-sale-text-color); }
+  background: var(--color-primary-100);
+  color: var(--color-text-200); }
   @media (min-width: 320px) and (max-width: 768px) {
     .transcendence .view.login .captionbox > .captionbox__datacaption:last-child {
       padding: 0 10px; } }
@@ -7979,7 +7891,7 @@ body {
 
 .transcendence .view.sale > .container:first-child > .container:last-child,
 .transcendence .view.payment > .container:first-child > .container:last-child {
-  max-height: calc(55% - var(--container--space)); }
+  max-height: calc(55% - 1.25em); }
   @media (min-width: 320px) and (max-width: 768px) {
     .transcendence .view.sale > .container:first-child > .container:last-child,
     .transcendence .view.payment > .container:first-child > .container:last-child {
@@ -7991,8 +7903,7 @@ body {
 
 .transcendence .view.sale .input--with-caption,
 .transcendence .view.payment .input--with-caption {
-  margin-bottom: 0;
-  box-shadow: var(--shadow); }
+  margin-bottom: 0; }
 
 .transcendence .restaurant__container {
   width: 100%;
@@ -8011,15 +7922,15 @@ body {
 
 .transcendence .restaurant__locations {
   display: flex;
-  background: var(--color-primary);
+  background: var(--color-primary-100);
   justify-content: center;
   padding: 0.8em; }
 
 .transcendence .restaurant__location__selection__button.is-active .button > div {
-  background-color: var(--color-secondary-hover); }
+  background-color: var(--color-secondary-200); }
 
 .transcendence .restaurant__selection {
-  color: var(--text-color);
+  color: var(--color-text-100);
   position: absolute;
   top: 2.3em;
   left: 2.3em;
@@ -8030,7 +7941,7 @@ body {
     transform: rotate(180deg); }
 
 .transcendence .restaurant__selection__current {
-  background: var(--body-bg);
+  background: var(--color-secondary-100);
   cursor: pointer;
   padding: 0.5em 1em;
   min-width: 150px; }
@@ -8044,11 +7955,11 @@ body {
   cursor: pointer;
   padding: 0.5em;
   border-bottom: 1px solid;
-  color: var(--text-color);
+  color: var(--color-text-100);
   font-size: 0.9em;
-  background-color: var(--color-secondary); }
+  background-color: var(--color-secondary-100); }
   .transcendence .restaurant__selection__item:hover {
-    background-color: var(--color-secondary); }
+    background-color: var(--color-secondary-100); }
   .transcendence .restaurant__selection__item.is-active {
     font-weight: bold; }
 
@@ -8058,7 +7969,7 @@ body {
   overflow: hidden; }
 
 .transcendence .waiter-pads__pad {
-  border: 1px solid var(--color-secondary);
+  border: 1px solid var(--color-secondary-100);
   color: #fff;
   margin-left: 10px;
   padding: 10px 25px;
@@ -8538,7 +8449,7 @@ body {
 
 .transcendence .table-waiter-pad {
   align-items: center;
-  border: 1px solid var(--color-secondary);
+  border: 1px solid var(--color-secondary-100);
   color: #fff;
   display: flex;
   font-size: 0.7em;
@@ -8556,7 +8467,7 @@ body {
     border-color: #fff; }
 
 .transcendence .table-waiter-pad-menu {
-  background: var(--color-secondary);
+  background: var(--color-secondary-100);
   border-radius: 3px;
   position: absolute;
   right: -2em;
@@ -8580,7 +8491,7 @@ body {
         transition: font-size 0.2s ease-in-out; }
         .transcendence .table-waiter-pad-menu .button.button--simple.table-waiter-pad-menu-close-button > div .caption:after {
           content: "\d7";
-          color: var(--text-color);
+          color: var(--color-text-100);
           font-size: 1.4em; }
       .transcendence .table-waiter-pad-menu .button.button--simple.table-waiter-pad-menu-close-button:hover > div {
         font-size: 1.3em; }
@@ -8588,15 +8499,15 @@ body {
       box-shadow: none;
       margin: 1em auto; }
       .transcendence .table-waiter-pad-menu .button.button--simple.table-waiter-pad-menu-add-new-button > div {
-        background: var(--button-bg); }
+        background: var(--color-primary-100); }
       .transcendence .table-waiter-pad-menu .button.button--simple.table-waiter-pad-menu-add-new-button:hover > div {
-        background: var(--button-bg-hover); }
+        background: var(--color-primary-200); }
 
 .transcendence .table-waiter-pad-menu__title {
   font-size: 1.1em;
   font-weight: 600;
-  background: var(--color-primary);
-  color: var(--text-color);
+  background: var(--color-primary-100);
+  color: var(--color-text-100);
   padding: 0.7em 0.5em;
   cursor: default; }
 
@@ -8604,10 +8515,10 @@ body {
   cursor: pointer;
   padding: 0.5em;
   border-bottom: 1px solid;
-  color: var(--text-color);
+  color: var(--color-text-100);
   font-size: 0.9em; }
   .transcendence .table-waiter-pad-menu__pad:hover {
-    background-color: var(--color-secondary); }
+    background-color: var(--color-secondary-100); }
 
 .transcendence .table-waiter-pads {
   display: flex;
@@ -8640,8 +8551,7 @@ body {
   cursor: pointer;
   justify-content: center;
   margin-top: 1em;
-  color: var(--text-color);
-  box-shadow: var(--button-shadow);
+  color: var(--color-text-100);
   transition: all 300ms; }
 
 .transcendence .npre-status__icon {
@@ -8651,12 +8561,932 @@ body {
   transform: scale(1.125); }
 
 .transcendence .npre-status--unbound {
-  color: var(--text-color-disabled);
-  box-shadow: var(--button-shadow-disabled); }
+  color: #dedede20; }
+
+.mobile-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: var(--font-mobile); }
+  .mobile-view .body {
+    display: flex;
+    justify-content: center;
+    width: 200%;
+    height: calc(100vh - 45px);
+    overflow-y: scroll;
+    background: var(--color-secondary-200);
+    font-weight: 500; }
+    .mobile-view .body .main {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-items: center;
+      position: relative;
+      left: 0;
+      top: 0;
+      transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      flex: 1 1 auto; }
+      .mobile-view .body .main--hidden {
+        left: -100%; }
+    .mobile-view .body .subpage {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-items: center;
+      position: relative;
+      left: -50%;
+      transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      flex: 1 1 auto;
+      height: 100%; }
+      .mobile-view .body .subpage--hidden {
+        left: 0; }
+    .mobile-view .body .layout {
+      height: 100%;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      overflow-y: scroll; }
+  .mobile-view .mobile {
+    width: 100%;
+    flex-grow: 1; }
+
+.mobile-view .login {
+  margin: auto 0; }
+  .mobile-view .login .password-input {
+    font-size: 1.7em;
+    text-align: center;
+    color: var(--color-text-100); }
+    .mobile-view .login .password-input__caption {
+      margin-bottom: 1em;
+      position: relative;
+      top: 2em; }
+    .mobile-view .login .password-input__password {
+      height: 2.75em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      width: 100%; }
+      .mobile-view .login .password-input__password .dot {
+        font-size: 0.8em;
+        color: var(--color-text-100);
+        position: relative; }
+  .mobile-view .login .numpad {
+    display: grid;
+    grid-gap: 0.5em;
+    justify-content: center;
+    justify-items: center;
+    padding: 0.5em;
+    grid-template-columns: repeat(3, auto); }
+
+.mobile-view {
+  z-index: 0; }
+  .mobile-view .background {
+    position: absolute;
+    height: 100vh;
+    z-index: -1; }
+    .mobile-view .background__image {
+      /* Set rules to fill background */
+      min-height: 100%;
+      min-width: 1024px;
+      /* Set up proportionate scaling */
+      width: 100%;
+      height: auto;
+      /* Set up positioning */
+      position: fixed;
+      top: 0;
+      left: -100%;
+      transition: left 0.85s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.mobile-view .toolbar {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-primary-100);
+  position: relative;
+  top: -5rem;
+  margin-bottom: -5rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--box-shadow);
+  z-index: 20; }
+  .mobile-view .toolbar__icons {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end; }
+  .mobile-view .toolbar--visible {
+    margin-bottom: 0;
+    top: 0; }
+  .mobile-view .toolbar .toolbar__option--hamburger {
+    margin-right: auto !important; }
+  .mobile-view .toolbar__option {
+    font-size: 2rem;
+    color: var(--color-text-200);
+    padding: 1rem 1.5rem;
+    opacity: 0.75;
+    position: relative; }
+    .mobile-view .toolbar__option--active {
+      opacity: 1; }
+    .mobile-view .toolbar__option:last-child {
+      margin-right: 0; }
+
+.data-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  height: 100%; }
+  .data-grid__item {
+    width: 100%;
+    height: fit-content;
+    font-size: 1.5em;
+    display: flex;
+    margin-top: 0.125em;
+    justify-content: flex-start;
+    align-items: flex-start; }
+  .data-grid__slider {
+    color: var(--color-text-100);
+    width: 100%;
+    max-width: 100vw;
+    background: var(--color-secondary-100);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    z-index: 10; }
+    .data-grid__slider .item-data {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%; }
+      .data-grid__slider .item-data__name-container {
+        width: 60%;
+        padding: 1.5em 1em;
+        display: flex; }
+      .data-grid__slider .item-data__name {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-right: 0.25em; }
+      .data-grid__slider .item-data__caption {
+        font-size: 0.6em;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        margin-top: 0.25em;
+        padding-top: 0.25em; }
+      .data-grid__slider .item-data__price-per-unit {
+        height: 100%;
+        width: 15%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-right: 1em;
+        opacity: 0.6; }
+      .data-grid__slider .item-data__price-total {
+        font-size: 1.4em;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 25%; }
+        .data-grid__slider .item-data__price-total .item-data__caption {
+          opacity: 0.6; }
+      .data-grid__slider .item-data__price-total-value {
+        color: var(--color-accent-200); }
+  .data-grid__hidden-menu {
+    width: 100%;
+    margin-left: -100%;
+    z-index: 1;
+    color: var(--color-text-200);
+    display: flex;
+    align-items: center;
+    font-size: 1.5em;
+    height: 100%; }
+    .data-grid__hidden-menu--left {
+      background-color: var(--color-accent-100); }
+    .data-grid__hidden-menu--right {
+      background-color: var(--color-primary-100);
+      justify-content: flex-end; }
+    .data-grid__hidden-menu .hidden-menu-button {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      width: 2.5em;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center; }
+
+@keyframes slideFromTop {
+  from {
+    top: -100%; }
+  to {
+    top: 0; } }
+
+.expanded-item {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  z-index: 25;
+  background: var(--color-secondary-100);
+  box-shadow: var(--box-shadow);
+  padding: 0.5em 1em; }
+  .expanded-item p {
+    line-height: 1;
+    margin: 0.5em 0; }
+
+.expanded-item-container {
+  width: 100%;
+  position: fixed; }
+
+.mobile-view {
+  display: flex; }
+  .mobile-view .mobile-button {
+    outline: none;
+    border: none;
+    color: var(--color-text-100);
+    background-color: var(--color-secondary-100);
+    box-shadow: var(--box-shadow-light);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center; }
+    .mobile-view .mobile-button__icon {
+      font-size: 2.25em;
+      color: var(--color-text-200);
+      min-width: 2em;
+      min-height: 2em;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center; }
+    .mobile-view .mobile-button__caption {
+      font-size: 1.25em;
+      padding: 1em;
+      text-align: left;
+      width: 100%;
+      font-family: var(--font-mobile);
+      font-weight: 500;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+
+.mobile-view .layout .menu .layout-body {
+  display: grid;
+  grid-gap: 0.5em;
+  justify-content: space-evenly;
+  padding: 1em; }
+  .mobile-view .layout .menu .layout-body--list {
+    grid-template-columns: 100%; }
+  .mobile-view .layout .menu .layout-body--columns {
+    grid-template-columns: repeat(2, calc(50% - 0.5em)); }
+    .mobile-view .layout .menu .layout-body--columns .mobile-button {
+      border-width: 0.5em; }
+      .mobile-view .layout .menu .layout-body--columns .mobile-button__icon {
+        font-size: 1.75em; }
+      .mobile-view .layout .menu .layout-body--columns .mobile-button__caption {
+        padding: 0.75em;
+        font-size: 1.1em; }
+  .mobile-view .layout .menu .layout-body--grid {
+    grid-template-columns: repeat(3, calc(33.33% - 0.66em)); }
+    .mobile-view .layout .menu .layout-body--grid .mobile-button {
+      flex-direction: column;
+      padding: 0.5em; }
+      .mobile-view .layout .menu .layout-body--grid .mobile-button__icon {
+        background: var(--color-secondary-100);
+        color: var(--color-text-100);
+        font-size: 1.75em;
+        width: 100%;
+        min-height: 1.5em;
+        height: 1.5em; }
+      .mobile-view .layout .menu .layout-body--grid .mobile-button__caption {
+        padding: 0;
+        font-size: 1.1em; }
+  .mobile-view .layout .menu .layout-body--grid-small {
+    grid-template-columns: repeat(4, calc(25% - 0.75em)); }
+    .mobile-view .layout .menu .layout-body--grid-small .mobile-button {
+      flex-direction: column;
+      padding: 0.4em; }
+      .mobile-view .layout .menu .layout-body--grid-small .mobile-button__icon {
+        background: var(--color-secondary-100);
+        color: var(--color-text-100);
+        font-size: 1.75em;
+        width: 100%;
+        min-height: 1.5em;
+        height: 1.5em; }
+      .mobile-view .layout .menu .layout-body--grid-small .mobile-button__caption {
+        padding: 0;
+        font-size: 1em; }
+
+.numpad-button {
+  position: relative;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-secondary-100);
+  color: var(--color-text-100);
+  overflow: hidden;
+  box-shadow: var(--box-shadow); }
+  .numpad-button--transparent {
+    background: transparent; }
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 0.4s linear;
+  background-color: var(--color-text-100);
+  opacity: 0.1; }
+  .ripple--light {
+    background-color: var(--color-secondary-100); }
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0; } }
+
+.mobile-view .nav {
+  background-color: var(--color-primary-100);
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+  box-shadow: var(--box-shadow-top);
+  z-index: 20; }
+  .mobile-view .nav__button {
+    background-color: transparent;
+    border: none;
+    color: var(--color-text-200);
+    padding: 1rem 0 0.4rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0px; }
+    .mobile-view .nav__button:focus {
+      outline: none; }
+    .mobile-view .nav__button--disabled {
+      color: var(--color-text-400); }
+  .mobile-view .nav__icon {
+    font-size: 1.2em;
+    margin-bottom: 0.5rem;
+    position: relative; }
+  .mobile-view .nav__caption {
+    font-size: 0.9em; }
+  .mobile-view .nav__active-item-indicator {
+    border-top: 2px solid var(--color-primary-300);
+    opacity: 50%;
+    height: 100%;
+    position: absolute;
+    transition: left 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
+    .mobile-view .nav__active-item-indicator:after {
+      content: "";
+      display: block;
+      width: inherit;
+      height: 100%;
+      background-color: var(--color-primary-300);
+      opacity: 50%; }
+  .mobile-view .nav__badge {
+    background: var(--color-accent-100);
+    width: 1.8em;
+    height: 1.8em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 0.8em;
+    position: absolute;
+    top: -0.7em;
+    right: -1.5em;
+    font-family: var(--font-mobile);
+    font-weight: 500;
+    z-index: 1; }
+
+.mobile-view .infobox {
+  background-color: var(--color-secondary-100);
+  box-shadow: var(--box-shadow);
+  color: var(--color-text-100);
+  padding: 1em;
+  border-radius: 0.25em;
+  font-size: 1.5em;
+  height: fit-content;
+  margin: auto 1em; }
+  .mobile-view .infobox__header {
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-secondary-200);
+    padding-bottom: 0.75em;
+    margin-bottom: 0.75em;
+    display: flex;
+    justify-content: space-between;
+    white-space: nowrap; }
+  .mobile-view .infobox__body {
+    border-bottom: 1px solid var(--color-secondary-200);
+    padding-bottom: 0.75em;
+    margin-bottom: 0.75em; }
+  .mobile-view .infobox__row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25em; }
+    .mobile-view .infobox__row div {
+      display: inline; }
+    .mobile-view .infobox__row .aligned-content {
+      display: flex; }
+      .mobile-view .infobox__row .aligned-content div {
+        padding-right: 0.25em; }
+  .mobile-view .infobox__separator {
+    width: 100%;
+    height: 0.25em;
+    margin-bottom: 0.25em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+  .mobile-view .infobox__spacer {
+    width: 100%;
+    height: 0.5em; }
+
+.mobile-view .drawer {
+  height: 100%;
+  width: 75%;
+  position: absolute;
+  z-index: 30;
+  font-size: 1.75rem; }
+  .mobile-view .drawer__background {
+    position: absolute;
+    top: 0;
+    left: -30%;
+    bottom: 0;
+    width: 180%;
+    z-index: -1;
+    background-color: var(--color-primary-100); }
+  .mobile-view .drawer__items {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: 3em;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none; }
+    .mobile-view .drawer__items::-webkit-scrollbar {
+      display: none; }
+  .mobile-view .drawer__item {
+    display: flex;
+    padding: 1em 1em 1em 2em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative; }
+    .mobile-view .drawer__item:last-child {
+      border-bottom: none; }
+  .mobile-view .drawer__icon {
+    width: 1em;
+    margin-right: 0.75em;
+    color: #fff; }
+  .mobile-view .drawer__caption {
+    padding-left: 0.75em;
+    border-left: 2px dotted rgba(255, 255, 255, 0.3);
+    color: #fff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden; }
+  .mobile-view .drawer .logo-container {
+    width: 100%;
+    margin-bottom: 3em;
+    display: flex;
+    justify-content: center; }
+    .mobile-view .drawer .logo-container__image {
+      width: 60%; }
+
+.animated-content {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  position: absolute;
+  bottom: -100px;
+  display: flex;
+  justify-content: center;
+  align-items: center; }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  #popup-host {
+    backdrop-filter: none; }
+    #popup-host .dialog__swipe-handle {
+      display: block;
+      width: 4em;
+      height: 0.15em;
+      background: var(--color-secondary-100);
+      opacity: 0.5;
+      border-radius: 40em;
+      position: relative;
+      top: -0.5em;
+      margin-bottom: 0.25em; }
+      #popup-host .dialog__swipe-handle::after {
+        content: "";
+        display: block;
+        width: 4em;
+        height: 0.15em;
+        background: var(--color-secondary-100);
+        border-radius: 40em;
+        position: absolute;
+        top: 0.5em; }
+    #popup-host div,
+    #popup-host input {
+      background-color: transparent;
+      box-shadow: none;
+      border: none;
+      color: var(--color-text-200);
+      font-weight: 500;
+      font-family: var(--font-mobile); }
+    #popup-host.dialog-host {
+      opacity: 1; }
+      #popup-host.dialog-host--show {
+        opacity: 1; }
+    #popup-host .dialog__container {
+      padding: 2em 0 1em 0;
+      display: flex;
+      justify-content: center;
+      overflow: visible;
+      width: 100%;
+      bottom: 0;
+      border-radius: 0;
+      background-color: rgba(19, 29, 46, 0.331);
+      padding-bottom: 20em;
+      box-shadow: rgba(0, 0, 0, 0.16) 0px -3px 6px, rgba(0, 0, 0, 0.23) 0px -3px 6px; }
+      #popup-host .dialog__container .dialog__titlebar {
+        text-align: center;
+        font-size: 1.8em; }
+      #popup-host .dialog__container .dialog__body {
+        justify-content: center;
+        flex-direction: column;
+        overflow-y: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        color: var(--color-text-200); }
+        #popup-host .dialog__container .dialog__body::-webkit-scrollbar {
+          display: none; }
+        #popup-host .dialog__container .dialog__body > span {
+          font-size: 1.2em; }
+        #popup-host .dialog__container .dialog__body .input .input__holder .input__textbox {
+          font-size: 1.25em;
+          background: var(--color-secondary-100);
+          color: var(--color-text-100);
+          padding: 0.5em 3em 0.5em 0.4em;
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #popup-host .dialog__container .dialog__body .input .input__holder .input__erase {
+          height: 100%;
+          width: 3em;
+          font-size: 1em;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          color: var(--color-text-100); }
+          #popup-host .dialog__container .dialog__body .input .input__holder .input__erase i {
+            width: 100%; }
+        #popup-host .dialog__container .dialog__body .input .input__notification {
+          font-size: 1em; }
+        #popup-host .dialog__container .dialog__body .numpad {
+          flex: 0 auto; }
+          #popup-host .dialog__container .dialog__body .numpad .buttongrid {
+            align-items: center; }
+            #popup-host .dialog__container .dialog__body .numpad .buttongrid__row {
+              width: fit-content;
+              height: fit-content;
+              flex: 0 auto; }
+              #popup-host .dialog__container .dialog__body .numpad .buttongrid__row .button {
+                height: fit-content;
+                width: fit-content; }
+                #popup-host .dialog__container .dialog__body .numpad .buttongrid__row .button > div {
+                  border-radius: 50%;
+                  width: 2.75em;
+                  height: 2.75em;
+                  background: var(--color-secondary-100);
+                  color: var(--color-text-100);
+                  box-shadow: var(--box-shadow); }
+        #popup-host .dialog__container .dialog__body .dialog__settings__body .dialog__caption {
+          font-size: 1.4em;
+          margin: 0;
+          padding: 1em;
+          text-align: center;
+          position: relative;
+          z-index: 1; }
+        #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] {
+          height: calc(100% - 6em);
+          overflow-y: scroll; }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .simplebar-content-wrapper {
+            padding: 0; }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] section {
+            background: var(--color-primary-200);
+            margin: 0.25em 0;
+            font-size: 1.3em; }
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] section > div {
+              margin: 0;
+              padding: 1em 1.5em; }
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] section:first-child {
+              margin-top: 0; }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group {
+            padding: 0; }
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group section {
+              font-size: 1em;
+              margin: 0;
+              border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+              background: transparent;
+              border-radius: 0; }
+              #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group section:first-child {
+                border-top: 1px solid rgba(255, 255, 255, 0.3); }
+              #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group section:last-child {
+                border-bottom: none; }
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group__caption {
+              transition: border 0.4s ease;
+              display: flex;
+              flex-direction: column;
+              padding: 1em 1.5em; }
+              #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group__caption .toggle-icon {
+                position: static;
+                padding-right: 0.5em; }
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group__caption-container {
+              display: flex;
+              justify-content: space-between;
+              align-items: center; }
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group__content {
+              border-top: 1px solid transparent;
+              padding: 0; }
+              #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group__content .radio-group__content {
+                display: grid;
+                grid-gap: 1em;
+                justify-content: space-evenly;
+                padding: 0.5em;
+                grid-template-columns: repeat(2, 50%); }
+                #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .dialog-configuration__group__content .radio-group__content .switch__label {
+                  min-width: fit-content;
+                  background: linear-gradient(to right bottom, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+                  background: transparent;
+                  border: none;
+                  margin: 0;
+                  padding: 0.75em 1em;
+                  border: 1px solid rgba(255, 255, 255, 0.3);
+                  border-radius: 30px; }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .plus-minus-editor__buttons .subtract,
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .plus-minus-editor__buttons .add {
+            background: var(--color-secondary-100);
+            box-shadow: var(--box-shadow);
+            color: var(--color-text-100);
+            height: unset; }
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .plus-minus-editor__buttons .subtract span,
+            #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .plus-minus-editor__buttons .add span {
+              position: static; }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .plus-minus-editor__buttons .value {
+            background: var(--color-secondary-100); }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .plus-minus-editor__buttons .disabled {
+            opacity: 0.6; }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .input-with-binding__caption {
+            margin-bottom: 0.4em; }
+          #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .input-with-binding__content {
+            display: flex;
+            flex-direction: column; }
+      #popup-host .dialog__container .dialog__buttons {
+        height: unset;
+        justify-content: center;
+        padding: 2em 0;
+        position: relative; }
+        #popup-host .dialog__container .dialog__buttons .button {
+          height: unset; }
+          #popup-host .dialog__container .dialog__buttons .button > div {
+            font-size: 1.6rem;
+            border-radius: 8px;
+            background: var(--color-secondary-100);
+            color: var(--color-text-100);
+            font-weight: 600;
+            box-shadow: var(--box-shadow);
+            padding: 0.75em 0; }
+            #popup-host .dialog__container .dialog__buttons .button > div.button--disabled {
+              background: var(--color-primary-300) !important; }
+      #popup-host .dialog__container--configuration {
+        max-height: unset;
+        height: calc(100vh + 20em); }
+      #popup-host .dialog__container--confirm, #popup-host .dialog__container--error, #popup-host .dialog__container--input, #popup-host .dialog__container--numpad {
+        height: fit-content;
+        border-radius: 3px;
+        border-radius: 8px 8px 0 0; }
+      #popup-host .dialog__container--numpad, #popup-host .dialog__container--confirm, #popup-host .dialog__container--input, #popup-host .dialog__container--configuration {
+        background: var(--color-primary-100); }
+      #popup-host .dialog__container--error {
+        background: var(--color-accent-100); }
+      #popup-host .dialog__container--numpad .input, #popup-host .dialog__container--input .input {
+        width: 75%; }
+  .animated-content {
+    bottom: -70%; } }
+
+.mobile-view .alert {
+  background-color: var(--color-secondary-100);
+  margin: 0.5em 0.75em;
+  border-radius: 3px;
+  font-size: 1.4em;
+  box-shadow: var(--box-shadow); }
+  .mobile-view .alert__title {
+    padding: 0.75em 1em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    border-radius: 3px 3px 0 0;
+    color: var(--color-text-200); }
+    .mobile-view .alert__title-text {
+      padding-left: 0.75em; }
+    .mobile-view .alert__title-icon {
+      font-size: 1.6em; }
+    .mobile-view .alert__title--danger {
+      background-color: #ef4f4fac; }
+    .mobile-view .alert__title--warning {
+      background-color: #ffc579ab; }
+    .mobile-view .alert__title--info {
+      background-color: #9af586b0; }
+  .mobile-view .alert__message {
+    padding: 1em 1em 0.5em 1em; }
+    .mobile-view .alert__message section {
+      margin-bottom: 0.75em; }
+
+@media (min-width: 320px) and (max-width: 768px) {
+  .transcendence .notifications-host {
+    width: 100%;
+    bottom: 4em;
+    font-size: 1.4em;
+    font-weight: 500; }
+    .transcendence .notifications-host .notification-toast {
+      background: var(--color-accent-100);
+      box-shadow: var(--box-shadow); }
+      .transcendence .notifications-host .notification-toast .close {
+        color: var(--color-text-200); }
+      .transcendence .notifications-host .notification-toast .notification__title {
+        font-size: 1.1em;
+        font-weight: 600;
+        border-bottom: 1px solid var(--color-secondary-100);
+        padding-bottom: 0.25em;
+        margin-bottom: 0.25em; }
+      .transcendence .notifications-host .notification-toast .notification__text {
+        font-size: 1em;
+        line-height: 1.4; } }
+
+.empty-cart {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  color: var(--color-text-100);
+  font-size: 1.3em;
+  padding: 0 2em; }
+  .empty-cart__image {
+    position: relative; }
+  .empty-cart__caption {
+    opacity: 0.7;
+    position: relative;
+    margin-bottom: 2em; }
+  .empty-cart__call-to-action {
+    background: var(--color-accent-100);
+    position: relative;
+    overflow: hidden;
+    color: var(--color-text-200);
+    width: fit-content;
+    padding: 0.75em 1.25em;
+    border-radius: 3px;
+    box-shadow: var(--box-shadow);
+    margin: 0 auto; }
+  .empty-cart__icon {
+    margin-right: 0.25em; }
+
+.search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding-right: 1em;
+  position: relative; }
+  .search__back {
+    font-size: 2rem;
+    color: var(--color-text-200);
+    padding: 1rem 1.5rem; }
+  .search .input {
+    all: unset;
+    border-radius: 8px;
+    width: 100%; }
+    .search .input__holder {
+      border: none;
+      box-shadow: none; }
+    .search .input__erase {
+      background-color: transparent;
+      border: none;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center; }
+      .search .input__erase:focus, .search .input__erase:hover {
+        background-color: transparent;
+        border: none; }
+    .search .input__notification {
+      display: none; }
+
+.history {
+  background-color: var(--color-primary-100);
+  width: 100%;
+  color: var(--color-text-200);
+  font-size: 1.25em;
+  overflow: hidden;
+  position: absolute;
+  top: 2.9em;
+  box-shadow: var(--box-shadow);
+  border-top: 1px solid rgba(255, 255, 255, 0.3); }
+  .history__item {
+    padding: 0.5em 1em;
+    display: flex;
+    align-items: center;
+    position: relative; }
+  .history__caption {
+    padding-left: 0.5em; }
+
+.search-results {
+  overflow-x: hidden;
+  height: 100%;
+  background: var(--color-secondary-200);
+  padding: 1em;
+  color: var(--color-text-100);
+  font-weight: 500; }
+  .search-results__caption {
+    padding: 0.5em 1em;
+    text-align: center; }
+  .search-results .result {
+    width: 100%;
+    font-size: 1em;
+    display: block;
+    flex-direction: column;
+    margin: 0.5em 0;
+    background: var(--color-secondary-100);
+    padding: 1em;
+    box-shadow: var(--box-shadow);
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden; }
+    .search-results .result__heading {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      font-size: 1.3em;
+      position: relative;
+      margin-bottom: 0.75em; }
+      .search-results .result__heading .icon {
+        width: 30%; }
+      .search-results .result__heading .item-data {
+        display: flex;
+        flex-direction: column;
+        width: 70%;
+        padding-left: 0.5em; }
+        .search-results .result__heading .item-data .number {
+          font-weight: 400;
+          font-size: 0.6em;
+          margin-bottom: 0.5em; }
+        .search-results .result__heading .item-data .name {
+          margin-bottom: 0.25em; }
+        .search-results .result__heading .item-data .price {
+          font-size: 0.9em; }
+    .search-results .result__description {
+      font-weight: 400;
+      margin-bottom: 0.75em; }
+      .search-results .result__description p {
+        margin: 0.5em 0; }
+  .search-results__loadingMore {
+    width: 50%;
+    margin: 0 auto; }
+  .search-results__not-found {
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3em; }
+    .search-results__not-found .animation-container {
+      position: relative; }
+    .search-results__not-found .animation {
+      width: 50%;
+      margin: 0 auto; }
+    .search-results__not-found .text {
+      margin-bottom: 1.5em;
+      opacity: 0.7;
+      font-weight: 400; }
+    .search-results__not-found .search-again {
+      background: var(--color-accent-100);
+      position: relative;
+      overflow: hidden;
+      color: var(--color-text-200);
+      width: fit-content;
+      padding: 0.75em 1.25em;
+      border-radius: 3px;
+      box-shadow: var(--box-shadow);
+      margin: 0 auto; }
+      .search-results__not-found .search-again__icon {
+        margin-right: 0.25em; }
 
 .statusbar {
-  background: var(--color-primary);
-  color: var(--statusbar-color);
+  background: var(--color-primary-100);
+  color: var(--color-text-200);
   display: table;
   font-family: var(--light-font);
   font-size: 0.8em;
@@ -8664,7 +9494,6 @@ body {
   overflow: hidden;
   padding: 3px 0;
   width: 100%;
-  box-shadow: var(--statusbar-shadow);
   z-index: 11;
   height: auto; }
 
