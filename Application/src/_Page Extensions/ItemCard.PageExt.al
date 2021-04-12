@@ -1,5 +1,6 @@
 pageextension 6014430 "NPR Item Card" extends "Item Card"
 {
+    PromotedActionCategories = 'New,Process,Report,Item,History,Special Sales Prices & Discounts,Approve,Request Approval,Magento';
     layout
     {
         addafter(Description)
@@ -936,6 +937,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     ToolTip = 'Executes the POS Info action';
                 }
             }
+        }
+        addafter(SalesPriceListsDiscounts)
+        {
             group("NPR NPR_PriceManagement")
             {
                 Caption = 'Price Management';
@@ -943,6 +947,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 {
                     Caption = 'Multiple Unit Prices';
                     Image = Price;
+                    Promoted = true;
+                    PromotedCategory = Category6;
                     RunObject = Page 6014466;
                     RunPageLink = "Item No." = field("No.");
                     RunPageMode = Edit;
@@ -953,6 +959,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 {
                     Caption = 'Period Discount';
                     Image = Period;
+                    Promoted = true;
+                    PromotedCategory = Category6;
                     ShortCutKey = 'Ctrl+P';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Period Discount action';
@@ -975,6 +983,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 {
                     Caption = 'Mix Discount';
                     Image = Discount;
+                    Promoted = true;
+                    PromotedCategory = Category6;
                     ShortcutKey = 'Ctrl+F';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Mix Discount action';
@@ -996,6 +1006,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 }
             }
         }
+    
 
         addafter(Resources)
         {
@@ -1007,7 +1018,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'Pictures';
                     Promoted = true;
                     PromotedOnly = true;
-                    PromotedCategory = Category6;
+                    PromotedCategory = Category9;
                     Visible = MagentoEnabled;
                     Image = Picture;
                     ApplicationArea = All;
@@ -1030,7 +1041,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'Videos';
                     Promoted = true;
                     PromotedOnly = true;
-                    PromotedCategory = Category6;
+                    PromotedCategory = Category9;
                     Image = Camera;
                     RunObject = page 6151455;
                     RunPageLink = "Item No." = field("No.");
@@ -1043,7 +1054,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'Webshops';
                     Promoted = true;
                     PromotedOnly = true;
-                    PromotedCategory = Category6;
+                    PromotedCategory = Category9;
                     Visible = MagentoEnabled and MagentoEnabledMultistore;
                     Image = Web;
                     ApplicationArea = All;
@@ -1068,7 +1079,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'Display Config';
                     Promoted = true;
                     PromotedOnly = true;
-                    PromotedCategory = Category6;
+                    PromotedCategory = Category9;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
                     Image = ViewPage;
                     ApplicationArea = All;

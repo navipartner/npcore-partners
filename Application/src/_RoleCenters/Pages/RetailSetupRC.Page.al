@@ -451,6 +451,13 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Job Queue action';
                 }
+                action("Job Queue Entries")
+                {
+                    Caption = 'Job Queue Entries';
+                    RunObject = page "Job Queue Entries";
+                    ApplicationArea = All; 
+                    Tooltip = 'View Job Queue Entries'; 
+                }
                 action("CleanCash Setup List")
                 {
                     Caption = 'CleanCash Setup List';
