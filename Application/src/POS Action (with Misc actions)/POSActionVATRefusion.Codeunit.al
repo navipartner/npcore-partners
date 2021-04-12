@@ -1,10 +1,9 @@
-codeunit 6150816 "NPR POSAction: VAT Refusion"
+﻿codeunit 6150816 "NPR POSAction: VAT Refusion"
 {
     var
         ActionDescription: Label 'This is a built in function for handling VAT refussion';
         Setup: Codeunit "NPR POS Setup";
         MaxAmountLimit: Label 'Maximum payment amount for %1 is %2.';
-        MinAmountLimit: Label 'Minimum payment amount for %1 is %2.';
         TEXTConfirmRefussionTitle: Label 'Confirm VAT Refussion';
         TEXTConfrmRefussionLead: Label 'VAT Refussion payment of amount %1 are being added.\\Press Yes to add refussion payment. Press No to abort.';
         TEXTRefussionNotPos_title: Label 'VAT Refussion is not possible';
@@ -24,39 +23,37 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('VATAmt', 'context.VATAmount');
-                RegisterWorkflowStep('confirmRefussion', 'if ( (param.AskForConfirm == true) && (context.VATAmount != 0) ) { confirm(labels.confirmRefussion_title,labels.confirmRefussion_lead.replace("%1",context.VATAmount)).no(abort); }');
-                RegisterWorkflowStep('informRefussionNotPossible', 'if (context.VATAmount == 0) { message(labels.informRefussionNotPossible_title, labels.informRefussionNotPossible_lead); abort; }');
-                RegisterWorkflowStep('doRefussion', 'if (context.VATAmount != 0) { respond(); } ');
-                RegisterWorkflow(true);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('VATAmt', 'context.VATAmount');
+            Sender.RegisterWorkflowStep('confirmRefussion', 'if ( (param.AskForConfirm == true) && (context.VATAmount != 0) ) { confirm(labels.confirmRefussion_title,labels.confirmRefussion_lead.replace("%1",context.VATAmount)).no(abort); }');
+            Sender.RegisterWorkflowStep('informRefussionNotPossible', 'if (context.VATAmount == 0) { message(labels.informRefussionNotPossible_title, labels.informRefussionNotPossible_lead); abort; }');
+            Sender.RegisterWorkflowStep('doRefussion', 'if (context.VATAmount != 0) { respond(); } ');
+            Sender.RegisterWorkflow(true);
 
-                RegisterTextParameter('PaymentTypePOSCode', '');
-                RegisterBooleanParameter('AskForConfirm', false);
+            Sender.RegisterTextParameter('PaymentTypePOSCode', '');
+            Sender.RegisterBooleanParameter('AskForConfirm', false);
 
-            end;
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'confirmRefussion_title', TEXTConfirmRefussionTitle);
-        Captions.AddActionCaption(ActionCode, 'informRefussionNotPossible_title', TEXTRefussionNotPos_title);
-        Captions.AddActionCaption(ActionCode, 'informRefussionNotPossible_lead', TEXTRefussionNotPos_lead);
-        Captions.AddActionCaption(ActionCode, 'confirmRefussion_lead', TEXTConfrmRefussionLead);
+        Captions.AddActionCaption(ActionCode(), 'confirmRefussion_title', TEXTConfirmRefussionTitle);
+        Captions.AddActionCaption(ActionCode(), 'informRefussionNotPossible_title', TEXTRefussionNotPos_title);
+        Captions.AddActionCaption(ActionCode(), 'informRefussionNotPossible_lead', TEXTRefussionNotPos_lead);
+        Captions.AddActionCaption(ActionCode(), 'confirmRefussion_lead', TEXTConfrmRefussionLead);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
 
@@ -79,7 +76,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         SalePOS: Record "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         //Calc VAT amount before
@@ -96,7 +93,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
 
         Context.SetContext('VATAmount', TotalVATOnSale);
 
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
 
         Handled := true;
     end;
@@ -147,7 +144,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaymentLinePOS: Record "NPR POS Sale Line";
     begin
-        SaleLinePOS.Reset;
+        SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);

@@ -42,13 +42,13 @@ page 6184475 "NPR EFT Payment Param. Setup"
         EFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param.";
         EFTTypePaymentBlobParam: Record "NPR EFTType Paym. BLOB Param.";
     begin
-        EFTTypePaymentGenParam.SetRange("Integration Type", "EFT Integration Type");
-        EFTTypePaymentGenParam.SetRange("Payment Type POS", "Payment Type POS");
-        ShowPaymentGenParameter := not EFTTypePaymentGenParam.IsEmpty;
+        EFTTypePaymentGenParam.SetRange("Integration Type", Rec."EFT Integration Type");
+        EFTTypePaymentGenParam.SetRange("Payment Type POS", Rec."Payment Type POS");
+        ShowPaymentGenParameter := not EFTTypePaymentGenParam.IsEmpty();
 
-        EFTTypePaymentBlobParam.SetRange("Integration Type", "EFT Integration Type");
-        EFTTypePaymentBlobParam.SetRange("Payment Type POS", "Payment Type POS");
-        ShowPaymentBLOBParameter := not EFTTypePaymentBlobParam.IsEmpty;
+        EFTTypePaymentBlobParam.SetRange("Integration Type", Rec."EFT Integration Type");
+        EFTTypePaymentBlobParam.SetRange("Payment Type POS", Rec."Payment Type POS");
+        ShowPaymentBLOBParameter := not EFTTypePaymentBlobParam.IsEmpty();
     end;
 
     var

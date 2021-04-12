@@ -19,22 +19,22 @@ page 6151524 "NPR Nc Endpoint E-mail List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field("Recipient E-Mail Address"; "Recipient E-Mail Address")
+                field("Recipient E-Mail Address"; Rec."Recipient E-Mail Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Recipient E-Mail Address field';
@@ -56,7 +56,7 @@ page 6151524 "NPR Nc Endpoint E-mail List"
 
                 trigger OnAction()
                 begin
-                    ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks;
                 end;
             }
         }

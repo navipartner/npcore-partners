@@ -17,47 +17,47 @@ page 6014675 "NPR Endpoint Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active field';
                 }
-                field("Max. Requests per Batch"; "Max. Requests per Batch")
+                field("Max. Requests per Batch"; Rec."Max. Requests per Batch")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. Requests per Batch field';
                 }
-                field("Wait to Send"; "Wait to Send")
+                field("Wait to Send"; Rec."Wait to Send")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Wait to Send field';
                 }
-                field("Delete Obsolete Requests"; "Delete Obsolete Requests")
+                field("Delete Obsolete Requests"; Rec."Delete Obsolete Requests")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete Obsolete Requests field';
                 }
-                field("Delete Sent Requests After"; "Delete Sent Requests After")
+                field("Delete Sent Requests After"; Rec."Delete Sent Requests After")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete Sent Requests After field';
@@ -65,22 +65,22 @@ page 6014675 "NPR Endpoint Card"
             }
             group(Changes)
             {
-                field("Trigger on Modify"; "Trigger on Modify")
+                field("Trigger on Modify"; Rec."Trigger on Modify")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Modify field';
                 }
-                field("Trigger on Insert"; "Trigger on Insert")
+                field("Trigger on Insert"; Rec."Trigger on Insert")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Insert field';
                 }
-                field("Trigger on Delete"; "Trigger on Delete")
+                field("Trigger on Delete"; Rec."Trigger on Delete")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete field';
                 }
-                field("Trigger on Rename"; "Trigger on Rename")
+                field("Trigger on Rename"; Rec."Trigger on Rename")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rename field';
@@ -88,27 +88,27 @@ page 6014675 "NPR Endpoint Card"
             }
             group(Queries)
             {
-                field("Query Name"; "Query Name")
+                field("Query Name"; Rec."Query Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Query Name field';
                 }
-                field("Max. Requests per Query"; "Max. Requests per Query")
+                field("Max. Requests per Query"; Rec."Max. Requests per Query")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. Requests per Query field';
                 }
-                field("Allow Query from Database"; "Allow Query from Database")
+                field("Allow Query from Database"; Rec."Allow Query from Database")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow Query from Database field';
                 }
-                field("Allow Query from Company Name"; "Allow Query from Company Name")
+                field("Allow Query from Company Name"; Rec."Allow Query from Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow Query from Company Name field';
                 }
-                field("Allow Query from User ID"; "Allow Query from User ID")
+                field("Allow Query from User ID"; Rec."Allow Query from User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow Query from User ID field';

@@ -161,7 +161,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 begin
                     CurrPage.SetSelectionFilter(NpRiReimbursementEntry);
                     NpRiReimbursementMgt.ManualApplyEntries(NpRiReimbursementEntry);
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
             action("Cancel Manual Application")
@@ -178,9 +178,9 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                     NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry";
                     NpRiReimbursementMgt: Codeunit "NPR NpRi Reimbursement Mgt.";
                 begin
-                    NpRiReimbursementEntry.Get("Entry No.");
+                    NpRiReimbursementEntry.Get(Rec."Entry No.");
                     NpRiReimbursementMgt.CancelManualApplication(NpRiReimbursementEntry);
-                    CurrPage.Update;
+                    CurrPage.Update();
                 end;
             }
         }
@@ -191,7 +191,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Caption = 'Show Source';
                 Image = Item;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
@@ -210,7 +210,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 Scope = Repeater;
                 ApplicationArea = All;
@@ -221,7 +221,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                     Navigate: Page Navigate;
                 begin
                     Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
-                    Navigate.Run;
+                    Navigate.Run();
                 end;
             }
         }

@@ -18,7 +18,7 @@ page 6151168 "NPR NpGp POSSalesEntry Subpage"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';

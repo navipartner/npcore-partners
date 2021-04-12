@@ -744,7 +744,7 @@ report 6014457 "NPR Sales Stat/Analysis"
 
         ItemCategory1.Reset();
         ItemCategoryHeader.CopyFilter("NPR Date Filter", ItemCategory1."NPR Date Filter");
-        if ItemCategory1.FindSet then
+        if ItemCategory1.FindSet() then
             repeat
                 ItemCategory1.CalcFields("NPR Sales (LCY)", "NPR Consumption (Amount)");
                 TotalRevenue += ItemCategory1."NPR Sales (LCY)";
@@ -759,15 +759,11 @@ report 6014457 "NPR Sales Stat/Analysis"
         CompanyInfo: Record "Company Information";
         ItemCategory1: Record "Item Category";
         ItemCategoryPrinted: Record "Item Category" temporary;
-        DateFiltersApplied: Boolean;
-        FirstDimValue: Boolean;
         OnlySales: Boolean;
         ShowItem: Boolean;
-        Consumption: Decimal;
         Coverage: Decimal;
         CoveragePct: Decimal;
         Profit: Decimal;
-        Sale: Decimal;
         SCoverage: Decimal;
         SCoveragePct: Decimal;
         SInventory: Decimal;
@@ -789,14 +785,10 @@ report 6014457 "NPR Sales Stat/Analysis"
         TSumConsumption: Decimal;
         TSumSale: Decimal;
         TurnoverPct: Decimal;
-        i: Integer;
         LevelsCount: Integer;
         GroupByText: Label 'Group by ';
-        Text001: Label 'Percentage of last years sales';
-        Text10600002: Label 'Salesstatistics/Itemgroupanalysis';
         TotalText: Label 'Total for Item Group %1';
         CaptionClassDim1: Text[30];
-        Date: Text[30];
         TxtDim1: Text[30];
         TxtLabeldim1: Text[100];
 

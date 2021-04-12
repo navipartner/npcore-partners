@@ -1,4 +1,4 @@
-codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
+﻿codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
 {
     var
         Text000: Label 'Extra Coupon Item has not been defined for Coupon %1 (%2)';
@@ -38,9 +38,9 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         ExtraItemQty := CalcExtraItemQty(SaleLinePOSCoupon);
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon, SaleLinePOSCouponApply, SaleLinePOS) then begin
             if ExtraItemQty <= 0 then begin
-                SaleLinePOSCouponApply.Delete;
+                SaleLinePOSCouponApply.Delete();
                 SaleLineOut.OnBeforeDeletePOSSaleLine(SaleLinePOS);
-                SaleLinePOS.Delete;
+                SaleLinePOS.Delete();
                 SaleLineOut.OnAfterDeletePOSSaleLine(SaleLinePOS);
                 exit;
             end;
@@ -51,7 +51,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
 
             if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt then begin
                 SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
-                SaleLinePOSCouponApply.Modify;
+                SaleLinePOSCouponApply.Modify();
             end;
             if SaleLinePOS.Quantity <> ExtraItemQty then begin
                 SaleLineOut.OnBeforeSetQuantity(SaleLinePOS, ExtraItemQty);
@@ -59,7 +59,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
                 SaleLineOut.OnAfterSetQuantity(SaleLinePOS);
 
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
-                SaleLinePOS.Modify;
+                SaleLinePOS.Modify();
             end;
 
             exit;
@@ -70,7 +70,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
 
         LineNo := GetNextLineNo(SaleLinePOSCoupon);
         SaleLinePOS.SetSkipCalcDiscount(true);
-        SaleLinePOS.Init;
+        SaleLinePOS.Init();
         SaleLinePOS."Register No." := SaleLinePOSCoupon."Register No.";
         SaleLinePOS."Sales Ticket No." := SaleLinePOSCoupon."Sales Ticket No.";
         SaleLinePOS.Date := SaleLinePOSCoupon."Sale Date";
@@ -88,7 +88,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         if DiscountAmt > SaleLinePOS."Amount Including VAT" then
             DiscountAmt := SaleLinePOS."Amount Including VAT";
 
-        SaleLinePOSCouponApply.Init;
+        SaleLinePOSCouponApply.Init();
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
         SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
         SaleLinePOSCouponApply."Sale Type" := SaleLinePOS."Sale Type";
@@ -101,7 +101,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         SaleLinePOSCouponApply."Coupon Type" := SaleLinePOSCoupon."Coupon Type";
         SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
         SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
-        SaleLinePOSCouponApply.Insert;
+        SaleLinePOSCouponApply.Insert();
     end;
 
     procedure CalcDiscountAmount(SaleLinePOS: Record "NPR POS Sale Line"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; ExtraItemQty: Decimal) DiscountAmount: Decimal
@@ -151,7 +151,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
 
             repeat
                 SalesQty += CalcPOSSalesQty(SaleLinePOSCoupon, NpDcCouponListItem);
-            until NpDcCouponListItem.Next = 0;
+            until NpDcCouponListItem.Next() = 0;
 
             ExtraItemQty := SalesQty div ExtraItemPerQty;
         end;
@@ -170,7 +170,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
             exit(0);
 
         NpDcCouponListItem.SetFilter("Validation Quantity", '>%1', 0);
-        if not NpDcCouponListItem.FindSet then
+        if not NpDcCouponListItem.FindSet() then
             exit;
 
         MaxLotQty := -1;
@@ -178,7 +178,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
             LotQty := CalcPOSSalesQtyLot(SaleLinePOSCoupon, NpDcCouponListItem);
             if (LotQty < MaxLotQty) or (MaxLotQty = -1) then
                 MaxLotQty := LotQty;
-        until NpDcCouponListItem.Next = 0;
+        until NpDcCouponListItem.Next() = 0;
 
         exit(MaxLotQty);
     end;
@@ -235,7 +235,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");
         NpDcCouponListItem.SetFilter("No.", '<>%1', '');
-        exit(NpDcCouponListItem.FindFirst);
+        exit(NpDcCouponListItem.FindFirst());
     end;
 
     [EventSubscriber(ObjectType::Table, 6151590, 'OnBeforeDeleteEvent', '', true, true)]
@@ -249,7 +249,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         ExtraCouponItem.SetRange("Coupon Type", Rec.Code);
         if ExtraCouponItem.IsEmpty then
             exit;
-        ExtraCouponItem.DeleteAll;
+        ExtraCouponItem.DeleteAll();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
@@ -258,7 +258,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         if CouponModule.Get(CouponModule.Type::"Apply Discount", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Apply Discount";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := Text001;
@@ -288,16 +288,16 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         ExtraCouponItem.SetRange("Coupon Type", CouponType.Code);
         ExtraCouponItem.FilterGroup(0);
         if not FindExtraCouponItem(CouponType, ExtraCouponItem) then begin
-            ExtraCouponItem.Init;
+            ExtraCouponItem.Init();
             ExtraCouponItem."Coupon Type" := CouponType.Code;
             ExtraCouponItem."Line No." := 10000;
             ExtraCouponItem.Insert(true);
         end;
 
-        Commit;
+        Commit();
         PAGE.RunModal(PAGE::"NPR NpDc Extra Item Qty.", ExtraCouponItem);
-        Commit;
-        if not ExtraCouponItem.Find then
+        Commit();
+        if not ExtraCouponItem.Find() then
             exit;
 
         PrevCouponType := Format(CouponType);
@@ -344,7 +344,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         SaleLinePOSCouponApply.SetRange("Applies-to Coupon Line No.", SaleLinePOSCoupon."Line No.");
         SaleLinePOSCouponApply.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");
         SaleLinePOSCouponApply.SetRange("Coupon No.", SaleLinePOSCoupon."Coupon No.");
-        if not SaleLinePOSCouponApply.FindFirst then
+        if not SaleLinePOSCouponApply.FindFirst() then
             exit(false);
 
         exit(SaleLinePOS.Get(
@@ -360,7 +360,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
         SaleLinePOS.SetRange("Sale Type", SaleLinePOSCoupon."Sale Type");
-        if SaleLinePOS.FindLast then;
+        if SaleLinePOS.FindLast() then;
         exit(SaleLinePOS."Line No." + 10000);
     end;
 

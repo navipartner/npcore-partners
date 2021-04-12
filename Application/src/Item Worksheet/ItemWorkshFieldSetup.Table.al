@@ -1,4 +1,4 @@
-table 6060052 "NPR Item Worksh. Field Setup"
+﻿table 6060052 "NPR Item Worksh. Field Setup"
 {
     Caption = 'Item Worksheet Field Setup';
     DataClassification = CustomerContent;
@@ -70,7 +70,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange(FieldName, "Field Name");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);
@@ -91,7 +91,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange("Field Caption", "Field Caption");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);
@@ -134,7 +134,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Create");
                 RecField.SetRange(FieldName, "Target Field Name Create");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);
@@ -155,7 +155,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Create");
                 RecField.SetRange("Field Caption", "Target Field Caption Create");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);
@@ -198,7 +198,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Update");
                 RecField.SetRange(FieldName, "Target Field Name Update");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);
@@ -219,7 +219,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Update");
                 RecField.SetRange("Field Caption", "Target Field Caption Update");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);
@@ -271,22 +271,18 @@ table 6060052 "NPR Item Worksh. Field Setup"
 
     local procedure LookupField(OptType: Option Source,TargetCreate,TargetUpdate)
     var
-        RecTempField: Record "Field" temporary;
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        NPRAttributeIDs: Page "NPR Attribute IDs";
         FieldLookup: Page "NPR Field Lookup";
-        I: Integer;
         FieldNumberFilter: Text;
     begin
         Clear(FieldLookup);
-        RecField.Reset;
+        RecField.Reset();
         case OptType of
             OptType::Source:
                 begin
                     RecField.SetRange(TableNo, "Table No.");
                     FieldNumberFilter := ItemWorksheetManagement.CreateLookupFilter("Table No.");
                     RecField.SetRange("No.", "Field Number");
-                    if RecField.FindFirst then
+                    if RecField.FindFirst() then
                         FieldLookup.SetRecord(RecField);
                     FieldLookup.SetRecord(RecField);
                 end;
@@ -295,7 +291,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                     RecField.SetRange(TableNo, "Target Table No. Create");
                     FieldNumberFilter := ItemWorksheetManagement.CreateLookupFilter("Target Table No. Create");
                     RecField.SetRange("No.", "Target Field Number Create");
-                    if RecField.FindFirst then
+                    if RecField.FindFirst() then
                         FieldLookup.SetRecord(RecField);
                 end;
             OptType::TargetUpdate:
@@ -303,7 +299,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
                     RecField.SetRange(TableNo, "Target Table No. Update");
                     FieldNumberFilter := ItemWorksheetManagement.CreateLookupFilter("Target Table No. Update");
                     RecField.SetRange("No.", "Target Field Number Update");
-                    if RecField.FindFirst then
+                    if RecField.FindFirst() then
                         FieldLookup.SetRecord(RecField);
                 end;
         end;
@@ -313,7 +309,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
         FieldLookup.SetTableView(RecField);
 
         FieldLookup.LookupMode := true;
-        if FieldLookup.RunModal = ACTION::LookupOK then
+        if FieldLookup.RunModal() = ACTION::LookupOK then
             FieldLookup.GetRecord(RecField)
         else
             exit;

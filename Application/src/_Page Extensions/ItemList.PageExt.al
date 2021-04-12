@@ -1,4 +1,4 @@
-pageextension 6014433 "NPR Item List" extends "Item List"
+﻿pageextension 6014433 "NPR Item List" extends "Item List"
 {
     layout
     {
@@ -70,7 +70,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
                 trigger OnDrillDown()
                 begin
-                    ItemFilter.RESET;
+                    ItemFilter.Reset();
                     ItemFilter.SETRANGE("No.", Rec."No.");
 
                     IF Rec."Global Dimension 1 Filter" <> '' THEN
@@ -217,7 +217,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                         MagentoDisplayConfig.SetRange(MagentoDisplayConfig."No.", Rec."No.");
                         MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Item);
                         MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
-                        MagentoDisplayConfigPage.Run;
+                        MagentoDisplayConfigPage.Run();
                     end;
                 }
             }
@@ -247,7 +247,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                     begin
                         Item := Rec;
-                        Item.SetRecFilter;
+                        Item.SetRecFilter();
                         LabelLibrary.ResolveVariantAndPrintItem(Item, ReportSelectionRetail."Report Type"::"Price Label");
                     end;
                 }
@@ -269,7 +269,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                     begin
                         Item := Rec;
-                        Item.SetRecFilter;
+                        Item.SetRecFilter();
                         LabelLibrary.ResolveVariantAndPrintItem(Item, ReportSelectionRetail."Report Type"::"Shelf Label");
                     end;
                 }
@@ -329,7 +329,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Clear(InputDialog);
                     InputDialog.SetInput(1, Validering, Text001);
                     InputDialog.LookupMode(true);
-                    if InputDialog.RunModal <> ACTION::LookupOK then
+                    if InputDialog.RunModal() <> ACTION::LookupOK then
                         exit;
                     InputDialog.InputText(1, Validering);
 
@@ -357,7 +357,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Clear(InputDialog);
                     InputDialog.SetInput(1, Validering, Text001);
                     InputDialog.LookupMode(true);
-                    if InputDialog.RunModal <> ACTION::LookupOK then
+                    if InputDialog.RunModal() <> ACTION::LookupOK then
                         exit;
                     InputDialog.InputText(1, Validering);
 
@@ -384,7 +384,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
         MagentoEnabled := true;
         MagentoEnabledMultistore := MagentoSetup."Multistore Enabled";

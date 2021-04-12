@@ -20,37 +20,37 @@ page 6184490 "NPR Pepper Config. Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field("Recovery Retry Attempts"; "Recovery Retry Attempts")
+                field("Recovery Retry Attempts"; Rec."Recovery Retry Attempts")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Recovery Retry Attempts field';
                 }
-                field(Mode; Mode)
+                field(Mode; Rec.Mode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mode field';
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
-                field("Header and Footer Handling"; "Header and Footer Handling")
+                field("Header and Footer Handling"; Rec."Header and Footer Handling")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Header and Footer Handling field';
@@ -67,37 +67,37 @@ page 6184490 "NPR Pepper Config. Card"
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasAdditionalParameters field';
                 }
-                field("Default POS Timeout (Seconds)"; "Default POS Timeout (Seconds)")
+                field("Default POS Timeout (Seconds)"; Rec."Default POS Timeout (Seconds)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default POS Timeout (Seconds) field';
                 }
-                field("Show Detailed Error Messages"; "Show Detailed Error Messages")
+                field("Show Detailed Error Messages"; Rec."Show Detailed Error Messages")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Detailed Error Messages field';
                 }
-                field("Offline mode"; "Offline mode")
+                field("Offline mode"; Rec."Offline mode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Offline mode field';
                 }
-                field("Min. Length Authorisation No."; "Min. Length Authorisation No.")
+                field("Min. Length Authorisation No."; Rec."Min. Length Authorisation No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Min. Length Authorisation No. field';
                 }
-                field("Max. Length Authorisation No."; "Max. Length Authorisation No.")
+                field("Max. Length Authorisation No."; Rec."Max. Length Authorisation No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. Length Authorisation No. field';
                 }
-                field("Customer ID"; "Customer ID")
+                field("Customer ID"; Rec."Customer ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer ID field';
                 }
-                field("License ID"; "License ID")
+                field("License ID"; Rec."License ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the License ID field';
@@ -105,32 +105,32 @@ page 6184490 "NPR Pepper Config. Card"
             }
             group(Logging)
             {
-                field("Logging Target"; "Logging Target")
+                field("Logging Target"; Rec."Logging Target")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logging Target field';
                 }
-                field("Logging Level"; "Logging Level")
+                field("Logging Level"; Rec."Logging Level")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logging Level field';
                 }
-                field("Logging Max. File Size (MB)"; "Logging Max. File Size (MB)")
+                field("Logging Max. File Size (MB)"; Rec."Logging Max. File Size (MB)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logging Max. File Size (MB) field';
                 }
-                field("Logging Directory"; "Logging Directory")
+                field("Logging Directory"; Rec."Logging Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logging Directory field';
                 }
-                field("Logging Archive Directory"; "Logging Archive Directory")
+                field("Logging Archive Directory"; Rec."Logging Archive Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logging Archive Directory field';
                 }
-                field("Logging Archive Max. Age Days"; "Logging Archive Max. Age Days")
+                field("Logging Archive Max. Age Days"; Rec."Logging Archive Max. Age Days")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logging Archive Max. Age Days field';
@@ -138,12 +138,12 @@ page 6184490 "NPR Pepper Config. Card"
             }
             group(Files)
             {
-                field("Card Type File Full Path"; "Card Type File Full Path")
+                field("Card Type File Full Path"; Rec."Card Type File Full Path")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Type File Full Path field';
                 }
-                field("License File Full Path"; "License File Full Path")
+                field("License File Full Path"; Rec."License File Full Path")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the License File Full Path field';
@@ -151,32 +151,32 @@ page 6184490 "NPR Pepper Config. Card"
             }
             group(Directories)
             {
-                field("Ticket Directory"; "Ticket Directory")
+                field("Ticket Directory"; Rec."Ticket Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Directory field';
                 }
-                field("Journal Directory"; "Journal Directory")
+                field("Journal Directory"; Rec."Journal Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Journal Directory field';
                 }
-                field("Matchbox Directory"; "Matchbox Directory")
+                field("Matchbox Directory"; Rec."Matchbox Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Matchbox Directory field';
                 }
-                field("Messages Directory"; "Messages Directory")
+                field("Messages Directory"; Rec."Messages Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Messages Directory field';
                 }
-                field("Persistance Directory"; "Persistance Directory")
+                field("Persistance Directory"; Rec."Persistance Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Persistance Directory field';
                 }
-                field("Working Directory"; "Working Directory")
+                field("Working Directory"; Rec."Working Directory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Working Directory field';
@@ -184,37 +184,37 @@ page 6184490 "NPR Pepper Config. Card"
             }
             group("Transaction Types")
             {
-                field(Open; "Transaction Type Open Code")
+                field(Open; Rec."Transaction Type Open Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Open Code field';
                 }
-                field(Payment; "Transaction Type Payment Code")
+                field(Payment; Rec."Transaction Type Payment Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Payment Code field';
                 }
-                field(Close; "Transaction Type Close Code")
+                field(Close; Rec."Transaction Type Close Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Close Code field';
                 }
-                field(Refund; "Transaction Type Refund Code")
+                field(Refund; Rec."Transaction Type Refund Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Refund Code field';
                 }
-                field(Recover; "Transaction Type Recover Code")
+                field(Recover; Rec."Transaction Type Recover Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Recover Code field';
                 }
-                field("Transaction Type Auxilary Code"; "Transaction Type Auxilary Code")
+                field("Transaction Type Auxilary Code"; Rec."Transaction Type Auxilary Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Auxilary Code field';
                 }
-                field("Transaction Type Install Code"; "Transaction Type Install Code")
+                field("Transaction Type Install Code"; Rec."Transaction Type Install Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Transaction Type Install Code field';
@@ -222,17 +222,17 @@ page 6184490 "NPR Pepper Config. Card"
             }
             group(Closing)
             {
-                field("End of Day on Close"; "End of Day on Close")
+                field("End of Day on Close"; Rec."End of Day on Close")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End of Day on Close field';
                 }
-                field("Unload Library on Close"; "Unload Library on Close")
+                field("Unload Library on Close"; Rec."Unload Library on Close")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unload Library on Close field';
                 }
-                field("End of Day Receipt Mandatory"; "End of Day Receipt Mandatory")
+                field("End of Day Receipt Mandatory"; Rec."End of Day Receipt Mandatory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End of Day Receipt Mandatory field';
@@ -271,7 +271,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        UploadFile(0);
+                        Rec.UploadFile(0);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -284,7 +284,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        UploadFile(1);
+                        Rec.UploadFile(1);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -302,7 +302,7 @@ page 6184490 "NPR Pepper Config. Card"
                     trigger OnAction()
                     begin
                         UpdateBLOBCheck;
-                        ShowFile(0);
+                        Rec.ShowFile(0);
                     end;
                 }
                 action(ShowConfigXML)
@@ -315,7 +315,7 @@ page 6184490 "NPR Pepper Config. Card"
                     trigger OnAction()
                     begin
                         UpdateBLOBCheck;
-                        ShowFile(1);
+                        Rec.ShowFile(1);
                     end;
                 }
                 action(ShowAdditionalParameters)
@@ -327,7 +327,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        ShowFile(2);
+                        Rec.ShowFile(2);
                     end;
                 }
             }
@@ -343,7 +343,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        ClearFile(0);
+                        Rec.ClearFile(0);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -356,7 +356,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        ClearFile(1);
+                        Rec.ClearFile(1);
                         UpdateBLOBCheck;
                     end;
                 }
@@ -373,7 +373,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        ExportFile(0);
+                        Rec.ExportFile(0);
                     end;
                 }
                 action(ExportConfig)
@@ -385,7 +385,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        ExportFile(1);
+                        Rec.ExportFile(1);
                     end;
                 }
                 action(ExportAddtionalParameters)
@@ -397,7 +397,7 @@ page 6184490 "NPR Pepper Config. Card"
 
                     trigger OnAction()
                     begin
-                        ExportFile(2);
+                        Rec.ExportFile(2);
                     end;
                 }
             }
@@ -415,7 +415,7 @@ page 6184490 "NPR Pepper Config. Card"
 
     local procedure UpdateBLOBCheck()
     begin
-        CalcFields("License File", "Additional Parameters");
+        Rec.CalcFields("License File", "Additional Parameters");
         HasLicense := "License File".HasValue;
         HasAdditionalParameters := "Additional Parameters".HasValue;
     end;

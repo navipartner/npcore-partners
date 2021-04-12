@@ -214,17 +214,17 @@ table 6059768 "NPR NaviDocs Entry"
         NaviDocsEntryComment.DeleteAll(true);
 
         ActivityLog.SetRange("Record ID", RecordId);
-        ActivityLog.DeleteAll;
+        ActivityLog.DeleteAll();
 
         NaviDocsEntryAttachment.SetRange("NaviDocs Entry No.", "Entry No.");
-        NaviDocsEntryAttachment.DeleteAll;
+        NaviDocsEntryAttachment.DeleteAll();
     end;
 
     trigger OnInsert()
     begin
         "Entry No." := 0;
         "Insert User ID" := UserId;
-        "Insert Date" := Today;
+        "Insert Date" := Today();
         "Insert Time" := Time;
     end;
 

@@ -8,8 +8,6 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         POSAction: Record "NPR POS Action";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSSale: Codeunit "NPR POS Sale";
-        ReturnPOSActionMgt: Codeunit "NPR NpRv Ret. POSAction Mgt.";
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SaleAmount: Decimal;
@@ -23,7 +21,7 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         SaleLinePOS.Get(SaleLinePOSVoucher."Register No.", SaleLinePOSVoucher."Sales Ticket No.", SaleLinePOSVoucher."Sale Date", SaleLinePOSVoucher."Sale Type", SaleLinePOSVoucher."Sale Line No.");
         SaleLinePOS."Amount Including VAT" += Subtotal;
         SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
-        SaleLinePOS.Modify;
+        SaleLinePOS.Modify();
 
         if SaleLinePOS."Amount Including VAT" < 0 then
             SaleLinePOS.Delete(true);
@@ -53,7 +51,7 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         if VoucherModule.Get(VoucherModule.Type::"Apply Payment", ModuleCode()) then
             exit;
 
-        VoucherModule.Init;
+        VoucherModule.Init();
         VoucherModule.Type := VoucherModule.Type::"Apply Payment";
         VoucherModule.Code := ModuleCode();
         VoucherModule.Description := Text000;

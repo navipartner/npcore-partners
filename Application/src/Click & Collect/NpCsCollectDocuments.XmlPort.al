@@ -1,4 +1,4 @@
-xmlport 6151196 "NPR NpCs Collect Documents"
+﻿xmlport 6151196 "NPR NpCs Collect Documents"
 {
     Caption = 'Collect Documents';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_document';
@@ -107,7 +107,7 @@ xmlport 6151196 "NPR NpCs Collect Documents"
 
                     trigger OnAfterAssignVariable()
                     begin
-                        currXMLport.Break;
+                        currXMLport.Break();
                     end;
                 }
 
@@ -130,7 +130,7 @@ xmlport 6151196 "NPR NpCs Collect Documents"
                         exit;
                     end;
 
-                    currXMLport.Skip;
+                    currXMLport.Skip();
                 end;
             }
         }
@@ -156,7 +156,7 @@ xmlport 6151196 "NPR NpCs Collect Documents"
                 end;
         end;
         NpCsDocument.SetRange("From Store Code", TempNpCsDocument."From Store Code");
-        exit(NpCsDocument.FindFirst);
+        exit(NpCsDocument.FindFirst());
     end;
 
     local procedure FindNpCsArchDocument(var NpCsArchDocument: Record "NPR NpCs Arch. Document"): Boolean
@@ -175,7 +175,7 @@ xmlport 6151196 "NPR NpCs Collect Documents"
                 end;
         end;
         NpCsArchDocument.SetRange("From Store Code", TempNpCsDocument."From Store Code");
-        exit(NpCsArchDocument.FindLast);
+        exit(NpCsArchDocument.FindLast());
     end;
 
     procedure GetSourceTable(var TempNpCsDocumentTo: Record "NPR NpCs Document" temporary)
@@ -244,16 +244,16 @@ xmlport 6151196 "NPR NpCs Collect Documents"
     procedure RefreshSourceTable()
     begin
         Clear(TempNpCsDocumentLogEntry);
-        TempNpCsDocumentLogEntry.DeleteAll;
+        TempNpCsDocumentLogEntry.DeleteAll();
         LogEntryNo := 0;
 
         Clear(TempNpCsDocument);
-        if not TempNpCsDocument.FindSet then
+        if not TempNpCsDocument.FindSet() then
             exit;
 
         repeat
             RefreshDocument();
-        until TempNpCsDocument.Next = 0;
+        until TempNpCsDocument.Next() = 0;
     end;
 
     local procedure RefreshDocument()
@@ -268,22 +268,22 @@ xmlport 6151196 "NPR NpCs Collect Documents"
             NpCsExpirationMgt.UpdateExpirationStatus(NpCsDocument, true);
 
             TempNpCsDocument.TransferFields(NpCsDocument, false);
-            TempNpCsDocument.Modify;
+            TempNpCsDocument.Modify();
 
             NpCsDocumentLogEntry.SetRange("Document Entry No.", NpCsDocument."Entry No.");
-            if NpCsDocumentLogEntry.FindSet then
+            if NpCsDocumentLogEntry.FindSet() then
                 repeat
-                    if NpCsDocumentLogEntry."Error Message".HasValue then
+                    if NpCsDocumentLogEntry."Error Message".HasValue() then
                         NpCsDocumentLogEntry.CalcFields("Error Message");
 
                     LogEntryNo += 1;
-                    TempNpCsDocumentLogEntry.Init;
+                    TempNpCsDocumentLogEntry.Init();
                     TempNpCsDocumentLogEntry := NpCsDocumentLogEntry;
                     TempNpCsDocumentLogEntry."Store Log Entry No." := NpCsDocumentLogEntry."Entry No.";
                     TempNpCsDocumentLogEntry."Entry No." := LogEntryNo;
                     TempNpCsDocumentLogEntry."Document Entry No." := TempNpCsDocument."Entry No.";
-                    TempNpCsDocumentLogEntry.Insert;
-                until NpCsDocumentLogEntry.Next = 0;
+                    TempNpCsDocumentLogEntry.Insert();
+                until NpCsDocumentLogEntry.Next() = 0;
 
             exit;
         end;
@@ -291,22 +291,22 @@ xmlport 6151196 "NPR NpCs Collect Documents"
         if FindNpCsArchDocument(NpCsArchDocument) then begin
             EntryNo += 1;
             ArchDoc2Doc(NpCsArchDocument, TempNpCsDocument);
-            TempNpCsDocument.Modify;
+            TempNpCsDocument.Modify();
 
             NpCsArchDocumentLogEntry.SetRange("Document Entry No.", NpCsArchDocument."Entry No.");
-            if NpCsArchDocumentLogEntry.FindSet then
+            if NpCsArchDocumentLogEntry.FindSet() then
                 repeat
-                    if NpCsArchDocumentLogEntry."Error Message".HasValue then
+                    if NpCsArchDocumentLogEntry."Error Message".HasValue() then
                         NpCsArchDocumentLogEntry.CalcFields("Error Message");
 
                     LogEntryNo += 1;
-                    TempNpCsDocumentLogEntry.Init;
+                    TempNpCsDocumentLogEntry.Init();
                     ArchDocLog2DocLog(NpCsArchDocumentLogEntry, TempNpCsDocumentLogEntry);
                     TempNpCsDocumentLogEntry."Store Log Entry No." := NpCsArchDocumentLogEntry."Original Entry No.";
                     TempNpCsDocumentLogEntry."Entry No." := LogEntryNo;
                     TempNpCsDocumentLogEntry."Document Entry No." := TempNpCsDocument."Entry No.";
-                    TempNpCsDocumentLogEntry.Insert;
-                until NpCsArchDocumentLogEntry.Next = 0;
+                    TempNpCsDocumentLogEntry.Insert();
+                until NpCsArchDocumentLogEntry.Next() = 0;
 
             exit;
         end;

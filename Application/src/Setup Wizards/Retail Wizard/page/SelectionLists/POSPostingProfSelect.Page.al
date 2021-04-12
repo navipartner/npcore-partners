@@ -13,29 +13,29 @@ page 6014698 "NPR POS Posting Prof. Select"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Default POS Entry No. Series"; "Default POS Entry No. Series")
+                field("Default POS Entry No. Series"; Rec."Default POS Entry No. Series")
                 {
                     Visible = false;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default POS Entry No. Series field';
                 }
-                field("Max. POS Posting Diff. (LCY)"; "Max. POS Posting Diff. (LCY)")
+                field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                 {
                     Visible = false;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. POS Posting Diff. (LCY) field';
                 }
-                field("POS Posting Diff. Account"; "POS Posting Diff. Account")
+                field("POS Posting Diff. Account"; Rec."POS Posting Diff. Account")
                 {
                     Visible = false;
                     ApplicationArea = All;

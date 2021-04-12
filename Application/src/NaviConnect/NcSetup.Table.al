@@ -1,4 +1,4 @@
-table 6151500 "NPR Nc Setup"
+﻿table 6151500 "NPR Nc Setup"
 {
     Caption = 'Nc Setup';
     DataClassification = CustomerContent;
@@ -69,23 +69,16 @@ table 6151500 "NPR Nc Setup"
         //+NC1.21
     end;
 
-    var
-        NaviConnectMgt: Codeunit "NPR Nc Setup Mgt.";
 
     procedure InsertNaviconnectTaskSetup(TableNo: Integer)
-    var
-        NaviConnectTaskSetup: Record "NPR Nc Task Setup";
-        DataLogSetup: Record "NPR Data Log Setup (Table)";
-        DataLogSubscriber: Record "NPR Data Log Subscriber";
-        NpXmlTemplate: Record "NPR NpXml Template";
     begin
         //-NPR5.48 [340446]
         /*
         NaviConnectTaskSetup.SETRANGE("Table No.",TableNo);
         NaviConnectTaskSetup.SETRANGE("Codeunit ID",CODEUNIT::"NaviDocs Management");
         NaviConnectTaskSetup.SETRANGE("Task Processor Code",'NC');
-        IF NOT NaviConnectTaskSetup.FINDFIRST THEN BEGIN
-          NaviConnectTaskSetup.INIT;
+        IF NOT NaviConnectTaskSetup.FindFirst() THEN BEGIN
+          NaviConnectTaskSetup.Init();
           NaviConnectTaskSetup."Entry No." := 0;
           NaviConnectTaskSetup."Table No." := TableNo;
           NaviConnectTaskSetup."Codeunit ID" := CODEUNIT::"NaviDocs Management";
@@ -94,7 +87,7 @@ table 6151500 "NPR Nc Setup"
         END;
         
         IF NOT DataLogSetup.GET(TableNo) THEN BEGIN
-          DataLogSetup.INIT;
+          DataLogSetup.Init();
           DataLogSetup."Table ID" := TableNo;
           DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
           DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
@@ -104,7 +97,7 @@ table 6151500 "NPR Nc Setup"
         END;
         
         IF NOT DataLogSubscriber.GET('NC',TableNo) THEN BEGIN
-          DataLogSubscriber.INIT;
+          DataLogSubscriber.Init();
           DataLogSubscriber.Code := 'NC';
           DataLogSubscriber."Table ID" := TableNo;
           DataLogSubscriber.INSERT(TRUE);

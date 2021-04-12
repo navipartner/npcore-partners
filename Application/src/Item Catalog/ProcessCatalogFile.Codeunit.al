@@ -17,10 +17,8 @@ codeunit 6060062 "NPR Process Catalog File"
     local procedure ProcessCSVFile(var NcImportEntry: Record "NPR Nc Import Entry")
     var
         TempBlob: Codeunit "Temp Blob";
-        TempNameValueBuffer: Record "Name/Value Buffer" temporary;
         FileManagement: Codeunit "File Management";
         ImportVendorCatalogFile: Codeunit "NPR Imp. Vendor Catalog File";
-        ServerTempPath: Text;
     begin
         if Exists(TemporaryPath + NcImportEntry."Document Name") then
             Erase(TemporaryPath + NcImportEntry."Document Name");
@@ -71,10 +69,10 @@ codeunit 6060062 "NPR Process Catalog File"
         FileManagement.GetServerDirectoryFilesList(TempNameValueBuffer, TempFile.Name);
 
         //Process fields
-        if TempNameValueBuffer.FindFirst then
+        if TempNameValueBuffer.FindFirst() then
             repeat
                 ImportVendorCatalogFile.ReadFile('', TempNameValueBuffer.Name, false, true);
-            until TempNameValueBuffer.Next = 0;
+            until TempNameValueBuffer.Next() = 0;
 
         //Delete files
         FileManagement.ServerRemoveDirectory(ServerTempPath, true);

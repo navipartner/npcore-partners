@@ -70,15 +70,15 @@ page 6151332 "NPR Retail Ent Headline"
     var
         Uninitialized: Boolean;
     begin
-        if not Rec.Get then
+        if not Rec.Get() then
             if Rec.WritePermission then begin
-                Rec.Init;
-                Rec.Insert;
+                Rec.Init();
+                Rec.Insert();
             end else
                 Uninitialized := true;
 
         if not Uninitialized and Rec.WritePermission then begin
-            Rec.Modify;
+            Rec.Modify();
             HeadlineManagement.ScheduleTask(Codeunit::"RC Headlines Executor");
         end;
 
@@ -96,14 +96,12 @@ page 6151332 "NPR Retail Ent Headline"
             // table is uninitialized because of permission issues. OnAfterGetRecord won't be called
             ComputeDefaultFieldsVisibility;
 
-        Commit; // not to mess up the other page parts that may do IF CODEUNIT.RUN()
+        Commit(); // not to mess up the other page parts that may do IF CODEUNIT.RUN()
     end;
 
     var
         HeadlineManagement: Codeunit "NPR NP Retail Headline Mgt.";
-        DefaultFieldsVisible: Boolean;
         DocumentationTxt: Label 'Want to learn more about %1?', Comment = '%1 is the NAV short product name.';
-        DocumentationUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=867580', Locked = true;
         GreetingText: Text[250];
         DocumentationText: Text[250];
         UserGreetingVisible: Boolean;
@@ -117,7 +115,6 @@ page 6151332 "NPR Retail Ent Headline"
         ExtensionHeadlinesVisible: Boolean;
     begin
         OnIsAnyExtensionHeadlineVisible(ExtensionHeadlinesVisible);
-        DefaultFieldsVisible := not ExtensionHeadlinesVisible;
         UserGreetingVisible := HeadlineManagement.ShouldUserGreetingBeVisible;
     end;
 

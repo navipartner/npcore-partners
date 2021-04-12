@@ -40,8 +40,6 @@ page 6014697 "NPR Embedded Videos"
     var
         EmbeddedVideoBuffer: Record "NPR Embedded Video Buffer" temporary;
         EmbeddedVideoMgt: Codeunit "NPR Embedded Video Mgt.";
-        Height: Integer;
-        Width: Integer;
         Videohtml: Text;
         i: Integer;
     begin
@@ -65,7 +63,7 @@ page 6014697 "NPR Embedded Videos"
                 Videohtml += '</tr><tr>';
 
             Videohtml += '<td>' + EmbeddedVideoBuffer."Video Html" + '</td>';
-        until EmbeddedVideoBuffer.Next = 0;
+        until EmbeddedVideoBuffer.Next() = 0;
         Videohtml += '</tr></table></div>';
 
         JavaScriptBridgeMgt.EmbedHtml(Videohtml);

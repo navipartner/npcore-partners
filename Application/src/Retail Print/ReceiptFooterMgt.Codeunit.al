@@ -83,10 +83,6 @@ codeunit 6014424 "NPR Receipt Footer Mgt."
     end;
 
     procedure GetSalesTicketReceiptText(var TicketRcptText: Record "NPR POS Ticket Rcpt. Text"; POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
-    var
-        CrLf: Text;
-        PreviewReceiptTextTokensCount: Integer;
-        Iteration: Integer;
     begin
         TicketRcptText.Reset();
         TicketRcptText.SetRange("Rcpt. Txt. Profile Code", POSUnitReceiptTextProfile.Code);

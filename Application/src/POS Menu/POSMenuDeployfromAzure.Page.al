@@ -57,7 +57,7 @@ page 6150709 "NPR POS Menu Deploy from Azure"
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
-                Image = Action; 
+                Image = Action;
 
                 trigger OnAction()
                 var

@@ -12,29 +12,29 @@ page 6059973 "NPR Variety Value"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Table"; Table)
+                field("Table"; Rec.Table)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Table field';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value field';
                 }
-                field("Sort Order"; "Sort Order")
+                field("Sort Order"; Rec."Sort Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sort Order field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

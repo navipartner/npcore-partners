@@ -1,4 +1,4 @@
-﻿table 6014488 "NPR Aux. Item Ledger Entry"
+table 6014488 "NPR Aux. Item Ledger Entry"
 {
     // Fields are populated via transferfield from "Item Ledger Entry", mind the field ids when adding new fields.
 

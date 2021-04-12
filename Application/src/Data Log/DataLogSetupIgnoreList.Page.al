@@ -15,7 +15,7 @@ page 6059895 "NPR Data Log Setup Ignore List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'No.';
@@ -23,7 +23,7 @@ page 6059895 "NPR Data Log Setup Ignore List"
                     Lookup = false;
                     ToolTip = 'Specifies the number of the field.';
                 }
-                field("Field Caption"; "Field Caption")
+                field("Field Caption"; Rec."Field Caption")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Field Caption';
@@ -76,10 +76,10 @@ page 6059895 "NPR Data Log Setup Ignore List"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange(Class, Class::Normal);
-        FilterGroup(0);
-        PageCaption := Format(TableNo) + ' ' + TableName;
+        Rec.FilterGroup(2);
+        Rec.SetRange(Class, Rec.Class::Normal);
+        Rec.FilterGroup(0);
+        PageCaption := Format(Rec.TableNo) + ' ' + Rec.TableName;
     end;
 
     var
@@ -96,15 +96,15 @@ page 6059895 "NPR Data Log Setup Ignore List"
             if DataLogSetupField.Delete then;
         end else
             if not DataLogSetupField.Modify then
-                DataLogSetupField.Insert;
+                DataLogSetupField.Insert();
     end;
 
     local procedure GetRec()
     begin
-        if not DataLogSetupField.Get(TableNo, "No.") then begin
+        if not DataLogSetupField.Get(Rec.TableNo, Rec."No.") then begin
             DataLogSetupField.Init();
-            DataLogSetupField."Table ID" := TableNo;
-            DataLogSetupField."Field No." := "No.";
+            DataLogSetupField."Table ID" := Rec.TableNo;
+            DataLogSetupField."Field No." := Rec."No.";
         end;
     end;
 

@@ -204,7 +204,7 @@ table 6151504 "NPR Nc Import Entry"
     begin
         //-NC1.16
         CalcFields("Document Source");
-        if not "Document Source".HasValue then
+        if not "Document Source".HasValue() then
             exit(false);
 
         "Document Source".CreateInStream(InStr);
@@ -226,7 +226,7 @@ table 6151504 "NPR Nc Import Entry"
         XML: Text;
     begin
         CalcFields("Document Source");
-        if not "Document Source".HasValue then
+        if not "Document Source".HasValue() then
             exit(false);
 
         "Document Source".CreateInStream(InStr, TextEncoding::UTF8);

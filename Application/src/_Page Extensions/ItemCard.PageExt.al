@@ -1,4 +1,4 @@
-pageextension 6014430 "NPR Item Card" extends "Item Card"
+﻿pageextension 6014430 "NPR Item Card" extends "Item Card"
 {
     PromotedActionCategories = 'New,Process,Report,Item,History,Special Sales Prices & Discounts,Approve,Request Approval,Magento';
     layout
@@ -150,10 +150,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         MixedDiscountLine: Record "NPR Mixed Discount Line";
                     begin
                         MixedDiscountLines.Editable(false);
-                        MixedDiscountLine.Reset;
+                        MixedDiscountLine.Reset();
                         MixedDiscountLine.SetRange("No.", Rec."No.");
                         MixedDiscountLines.SetTableView(MixedDiscountLine);
-                        MixedDiscountLines.RunModal;
+                        MixedDiscountLines.RunModal();
                     end;
                 }
 
@@ -167,10 +167,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         QuantityDiscountCard: Page "NPR Quantity Discount Card";
                     begin
                         QuantityDiscountCard.Editable(false);
-                        QuantityDiscountHeader.Reset;
+                        QuantityDiscountHeader.Reset();
                         QuantityDiscountHeader.SetFilter("Item No.", Rec."No.");
                         QuantityDiscountCard.SetTableView(QuantityDiscountHeader);
-                        QuantityDiscountCard.RunModal;
+                        QuantityDiscountCard.RunModal();
                     end;
                 }
 
@@ -184,10 +184,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         PeriodDiscountLine: Record "NPR Period Discount Line";
                     begin
                         CampaignDiscountLines.Editable(false);
-                        PeriodDiscountLine.Reset;
+                        PeriodDiscountLine.Reset();
                         PeriodDiscountLine.SetRange("Item No.", Rec."No.");
                         CampaignDiscountLines.SetTableView(PeriodDiscountLine);
-                        CampaignDiscountLines.RunModal;
+                        CampaignDiscountLines.RunModal();
                     end;
                 }
             }
@@ -303,7 +303,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                             CLEAR(PrintTagsPage);
                             PrintTagsPage.SetTagText(Rec."NPR Print Tags");
-                            IF PrintTagsPage.RUNMODAL = ACTION::OK THEN
+                            IF PrintTagsPage.RunModal() = ACTION::OK THEN
                                 Rec."NPR Print Tags" := PrintTagsPage.ToText;
 
                         end;
@@ -448,12 +448,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                         trigger OnAssistEdit()
                         var
-                            MagentoFunctions: Codeunit "NPR Magento Functions";
                             MagentoItemCustomOptions: Page "NPR Magento Item Cstm Options";
                         begin
                             Clear(MagentoItemCustomOptions);
                             MagentoItemCustomOptions.SetItemNo(Rec."No.");
-                            MagentoItemCustomOptions.Run;
+                            MagentoItemCustomOptions.Run();
                         end;
                     }
                     field("NPR Backorder"; Rec."NPR Backorder")
@@ -789,7 +788,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         IF PAGE.RUNMODAL(PAGE::"NPR Retail Journal List", RetailJournalHeader) <> ACTION::LookupOK THEN
                             EXIT;
 
-                        RetailJournalLine.RESET;
+                        RetailJournalLine.Reset();
                         RetailJournalLine.SETRANGE("No.", RetailJournalHeader."No.");
                         IF RetailJournalLine.FIND('+') THEN
                             TempInt := RetailJournalLine."Line No." + 10000
@@ -799,15 +798,15 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         TempQty := 1;
 
                         InputDialog.SetInput(1, TempQty, t001);
-                        IF InputDialog.RUNMODAL = ACTION::OK THEN
+                        IF InputDialog.RunModal() = ACTION::OK THEN
                             InputDialog.InputInteger(1, TempQty);
 
-                        RetailJournalLine.INIT;
+                        RetailJournalLine.Init();
                         RetailJournalLine."No." := RetailJournalHeader."No.";
                         RetailJournalLine."Line No." := TempInt;
                         RetailJournalLine.VALIDATE("Item No.", Rec."No.");
                         RetailJournalLine.VALIDATE("Quantity to Print", TempQty);
-                        RetailJournalLine.INSERT;
+                        RetailJournalLine.Insert();
 
                     end;
 
@@ -972,11 +971,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         CLEAR(CampaignDiscountLines);
                         CampaignDiscountLines.EDITABLE(FALSE);
-                        PeriodDiscountLine.RESET;
+                        PeriodDiscountLine.Reset();
                         PeriodDiscountLine.SETRANGE(Status, PeriodDiscountLine.Status::Active);
                         PeriodDiscountLine.SETRANGE("Item No.", Rec."No.");
                         CampaignDiscountLines.SETTABLEVIEW(PeriodDiscountLine);
-                        CampaignDiscountLines.RUNMODAL;
+                        CampaignDiscountLines.RunModal();
                     end;
                 }
                 action("NPR NPR_MixDiscount")
@@ -997,10 +996,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     begin
                         CLEAR(MixedDiscountLines);
                         MixedDiscountLines.EDITABLE(FALSE);
-                        MixedDiscountLine.RESET;
+                        MixedDiscountLine.Reset();
                         MixedDiscountLine.SETRANGE("No.", Rec."No.");
                         MixedDiscountLines.SETTABLEVIEW(MixedDiscountLine);
-                        MixedDiscountLines.RUNMODAL;
+                        MixedDiscountLines.RunModal();
                     end;
 
                 }
@@ -1093,7 +1092,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         MagentoDisplayConfig.SETRANGE("No.", Rec."No.");
                         MagentoDisplayConfig.SETRANGE(Type, MagentoDisplayConfig.Type::Item);
                         MagentoDisplayConfigPage.SETTABLEVIEW(MagentoDisplayConfig);
-                        MagentoDisplayConfigPage.RUN;
+                        MagentoDisplayConfigPage.Run();
                     end;
                 }
 
@@ -1116,36 +1115,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
-        NPRAttrVisible11: Boolean;
-        NPRAttrVisible12: Boolean;
-        NPRAttrVisible13: Boolean;
-        NPRAttrVisible14: Boolean;
-        NPRAttrVisible15: Boolean;
-        NPRAttrVisible16: Boolean;
-        NPRAttrVisible17: Boolean;
-        NPRAttrVisible18: Boolean;
-        NPRAttrVisible19: Boolean;
-        NPRAttrVisible20: Boolean;
-        NPRAttrVisible21: Boolean;
-        NPRAttrVisible22: Boolean;
-        NPRAttrVisible23: Boolean;
-        NPRAttrVisible24: Boolean;
-        NPRAttrVisible25: Boolean;
-        NPRAttrVisible26: Boolean;
-        NPRAttrVisible27: Boolean;
-        NPRAttrVisible28: Boolean;
-        NPRAttrVisible29: Boolean;
-        NPRAttrVisible30: Boolean;
-        NPRAttrVisible31: Boolean;
-        NPRAttrVisible32: Boolean;
-        NPRAttrVisible33: Boolean;
-        NPRAttrVisible34: Boolean;
-        NPRAttrVisible35: Boolean;
-        NPRAttrVisible36: Boolean;
-        NPRAttrVisible37: Boolean;
-        NPRAttrVisible38: Boolean;
-        NPRAttrVisible39: Boolean;
-        NPRAttrVisible40: Boolean;
 
         MagentoEnabled: Boolean;
         MagentoEnabledAttributeSet: Boolean;
@@ -1159,13 +1128,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         OriginalRec: Record Item;
         AccessorySparePart: Record "NPR Accessory/Spare Part";
         ItemCostMgt: Codeunit ItemCostManagement;
-        AverageCostLCY: Decimal;
         AverageCostACY: Decimal;
-        SearchNo: code[20];
 
-        Barcode: code[13];
 
-        Text10600012: Label 'Enter item number for new item';
 
         Text6151400: Label 'Update Seo Link?';
 
@@ -1185,36 +1150,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         NPRAttrVisible08 := NPRAttrVisibleArray[8];
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
-        NPRAttrVisible11 := NPRAttrVisibleArray[11];
-        NPRAttrVisible12 := NPRAttrVisibleArray[12];
-        NPRAttrVisible13 := NPRAttrVisibleArray[13];
-        NPRAttrVisible14 := NPRAttrVisibleArray[14];
-        NPRAttrVisible15 := NPRAttrVisibleArray[15];
-        NPRAttrVisible16 := NPRAttrVisibleArray[16];
-        NPRAttrVisible17 := NPRAttrVisibleArray[17];
-        NPRAttrVisible18 := NPRAttrVisibleArray[18];
-        NPRAttrVisible19 := NPRAttrVisibleArray[19];
-        NPRAttrVisible20 := NPRAttrVisibleArray[20];
-        NPRAttrVisible21 := NPRAttrVisibleArray[21];
-        NPRAttrVisible22 := NPRAttrVisibleArray[22];
-        NPRAttrVisible23 := NPRAttrVisibleArray[23];
-        NPRAttrVisible24 := NPRAttrVisibleArray[24];
-        NPRAttrVisible25 := NPRAttrVisibleArray[25];
-        NPRAttrVisible26 := NPRAttrVisibleArray[26];
-        NPRAttrVisible27 := NPRAttrVisibleArray[27];
-        NPRAttrVisible28 := NPRAttrVisibleArray[28];
-        NPRAttrVisible29 := NPRAttrVisibleArray[29];
-        NPRAttrVisible30 := NPRAttrVisibleArray[30];
-        NPRAttrVisible31 := NPRAttrVisibleArray[31];
-        NPRAttrVisible32 := NPRAttrVisibleArray[32];
-        NPRAttrVisible33 := NPRAttrVisibleArray[33];
-        NPRAttrVisible34 := NPRAttrVisibleArray[34];
-        NPRAttrVisible35 := NPRAttrVisibleArray[35];
-        NPRAttrVisible36 := NPRAttrVisibleArray[36];
-        NPRAttrVisible37 := NPRAttrVisibleArray[37];
-        NPRAttrVisible38 := NPRAttrVisibleArray[38];
-        NPRAttrVisible39 := NPRAttrVisibleArray[39];
-        NPRAttrVisible40 := NPRAttrVisibleArray[40];
         NPRAttrEditable := CurrPage.EDITABLE();
 
     end;
@@ -1237,7 +1172,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
 
         MagentoEnabled := true;

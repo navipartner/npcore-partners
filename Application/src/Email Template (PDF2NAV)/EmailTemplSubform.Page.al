@@ -13,7 +13,7 @@ page 6059793 "NPR E-mail Templ. Subform"
         {
             repeater(Group)
             {
-                field("Mail Body Line"; "Mail Body Line")
+                field("Mail Body Line"; Rec."Mail Body Line")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mail Body Line field';

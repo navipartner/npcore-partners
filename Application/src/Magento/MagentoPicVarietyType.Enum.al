@@ -1,7 +1,7 @@
 enum 6014431 "NPR Magento Pic. Variety Type"
 {
     Extensible = true;
-                
+
     value(0; "Fixed")
     {
         Caption = 'Fixed';

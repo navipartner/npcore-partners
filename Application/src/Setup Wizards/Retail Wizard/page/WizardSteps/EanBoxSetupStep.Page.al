@@ -12,25 +12,23 @@ page 6014673 "NPR Ean Box Setup Step"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnValidate()
-                    var
-                        TempPOSViewProfile: Record "NPR POS View Profile" temporary;
                     begin
-                        CheckIfNoAvailableInEanBoxSetup(ExistingEanBoxSetup, Code);
+                        CheckIfNoAvailableInEanBoxSetup(ExistingEanBoxSetup, Rec.Code);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("POS View"; "POS View")
+                field("POS View"; Rec."POS View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View field';

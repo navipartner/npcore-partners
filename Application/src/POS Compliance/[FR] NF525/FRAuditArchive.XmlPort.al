@@ -1,4 +1,4 @@
-xmlport 6184850 "NPR FR Audit Archive"
+﻿xmlport 6184850 "NPR FR Audit Archive"
 {
     Caption = 'FR Audit Archive';
     Direction = Export;
@@ -398,10 +398,10 @@ xmlport 6184850 "NPR FR Audit Archive"
                             begin
                                 POSAuditLog.SetRange("Record ID", "POS Entry Output Log".RecordId);
                                 POSAuditLog.SetFilter("Action Type", '=%1|=%2', POSAuditLog."Action Type"::RECEIPT_COPY, POSAuditLog."Action Type"::RECEIPT_PRINT);
-                                POSAuditLog.FindFirst;
+                                POSAuditLog.FindFirst();
 
                                 if POSAuditLog."Action Type" = POSAuditLog."Action Type"::RECEIPT_PRINT then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
 
                                 OutputExternalID := POSAuditLog."External ID";
                                 OutputReprintNumber := POSAuditLog."Additional Information"; //Contains reprint no.
@@ -496,11 +496,10 @@ xmlport 6184850 "NPR FR Audit Archive"
                     trigger OnAfterGetRecord()
                     var
                         POSAuditLog: Record "NPR POS Audit Log";
-                        InStream: InStream;
                     begin
                         POSAuditLog.SetRange("Record ID", "POS Entry".RecordId);
                         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
-                        POSAuditLog.FindFirst;
+                        POSAuditLog.FindFirst();
                         DocumentType := POSAuditLog."External Type";
                         TSignature := GetAuditSignature(POSAuditLog);
                     end;
@@ -516,7 +515,6 @@ xmlport 6184850 "NPR FR Audit Archive"
                 trigger OnAfterGetRecord()
                 var
                     POSAuditLog: Record "NPR POS Audit Log";
-                    InStream: InStream;
                     LastZReport: Record "NPR POS Workshift Checkpoint";
                 begin
                     if LastZReportEntryNo <> 0 then begin
@@ -527,7 +525,7 @@ xmlport 6184850 "NPR FR Audit Archive"
 
                     POSAuditLog.SetRange("Record ID", ZCheckpoint.RecordId);
                     POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
-                    POSAuditLog.FindFirst;
+                    POSAuditLog.FindFirst();
                     ZExternalID := POSAuditLog."External ID";
                     ZSignature := GetAuditSignature(POSAuditLog);
                     ZGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
@@ -579,7 +577,7 @@ xmlport 6184850 "NPR FR Audit Archive"
                         POSAuditLog: Record "NPR POS Audit Log";
                     begin
                         POSAuditLog := JETEntry;
-                        POSAuditLog.SetRecFilter;
+                        POSAuditLog.SetRecFilter();
                         JSignature := GetAuditSignature(POSAuditLog);
                     end;
 
@@ -594,7 +592,6 @@ xmlport 6184850 "NPR FR Audit Archive"
             var
                 LastWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
                 POSAuditLog: Record "NPR POS Audit Log";
-                InStream: InStream;
                 POSAuditLog2: Record "NPR POS Audit Log";
                 FromJETEntry: Integer;
                 ToJETEntry: Integer;
@@ -604,14 +601,14 @@ xmlport 6184850 "NPR FR Audit Archive"
 
                 PCheckpoint.TestField(Type, PCheckpoint.Type::PREPORT);
                 PCheckpoint.TestField(Open, false);
-                PCheckpoint.SetRecFilter; //Only one workshift being archived
+                PCheckpoint.SetRecFilter(); //Only one workshift being archived
                 ToZReportEntry := PCheckpoint."Entry No.";
                 UnitNo := PCheckpoint."POS Unit No.";
 
                 POSAuditLog2.SetRange("Record ID", PCheckpoint.RecordId);
                 POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::WORKSHIFT_END);
                 POSAuditLog2.SetRange("Acted on POS Unit No.", PCheckpoint."POS Unit No.");
-                POSAuditLog2.FindLast;
+                POSAuditLog2.FindLast();
                 ToJETEntry := POSAuditLog2."Entry No.";
 
                 JETEntry.SetRange("Active POS Unit No.", PCheckpoint."POS Unit No.");
@@ -622,10 +619,10 @@ xmlport 6184850 "NPR FR Audit Archive"
                 LastWorkshiftCheckpoint.SetRange("Period Type", PCheckpoint."Period Type");
                 LastWorkshiftCheckpoint.SetRange(Open, false);
                 LastWorkshiftCheckpoint.SetFilter("Entry No.", '<%1', PCheckpoint."Entry No.");
-                if LastWorkshiftCheckpoint.FindLast then begin
+                if LastWorkshiftCheckpoint.FindLast() then begin
                     POSAuditLog2.SetRange("Record ID", LastWorkshiftCheckpoint.RecordId);
                     POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::WORKSHIFT_END);
-                    if POSAuditLog2.FindLast then begin
+                    if POSAuditLog2.FindLast() then begin
                         FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
                         FromPOSEntry := LastWorkshiftCheckpoint."POS Entry No.";
 
@@ -637,19 +634,19 @@ xmlport 6184850 "NPR FR Audit Archive"
                 if FromJETEntry = 0 then begin
                     //Set filters to oldest entries after JET init
 
-                    POSAuditLog2.Reset;
+                    POSAuditLog2.Reset();
                     FRAuditMgt.GetJETInitRecord(POSAuditLog2, UnitNo, true);
-                    POSAuditLog2.Reset;
+                    POSAuditLog2.Reset();
                     POSAuditLog2.SetFilter("Entry No.", '>%1', POSAuditLog2."Entry No.");
                     POSAuditLog2.SetRange("Acted on POS Unit No.", PCheckpoint."POS Unit No.");
 
                     POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::DIRECT_SALE_END);
-                    POSAuditLog2.FindFirst;
+                    POSAuditLog2.FindFirst();
                     FromPOSEntry := POSAuditLog2."Acted on POS Entry No.";
 
                     POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::DRAWER_COUNT);
-                    POSAuditLog2.FindFirst;
-                    LastWorkshiftCheckpoint.Reset;
+                    POSAuditLog2.FindFirst();
+                    LastWorkshiftCheckpoint.Reset();
                     LastWorkshiftCheckpoint.Get(POSAuditLog2."Record ID");
                     FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
                     JETEntry.SetFilter("Entry No.", '<=%1', ToJETEntry);
@@ -659,7 +656,7 @@ xmlport 6184850 "NPR FR Audit Archive"
 
                 POSAuditLog.SetRange("Record ID", PCheckpoint.RecordId);
                 POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
-                POSAuditLog.FindFirst;
+                POSAuditLog.FindFirst();
                 PExternalID := POSAuditLog."External ID";
                 PSignature := GetAuditSignature(POSAuditLog);
                 PGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
@@ -687,7 +684,7 @@ xmlport 6184850 "NPR FR Audit Archive"
         Signature: Text;
     begin
         POSAuditLog.SetAutoCalcFields("Electronic Signature");
-        POSAuditLog.FindFirst;
+        POSAuditLog.FindFirst();
         POSAuditLog."Electronic Signature".CreateInStream(InStream);
         while (not InStream.EOS) do
             InStream.Read(Signature);

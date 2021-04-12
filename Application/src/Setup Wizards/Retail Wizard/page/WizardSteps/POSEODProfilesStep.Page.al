@@ -12,7 +12,7 @@ page 6014656 "NPR POS EOD Profiles Step"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
@@ -20,20 +20,20 @@ page 6014656 "NPR POS EOD Profiles Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSEndOfDayProfile(ExistingEndOfDayProfiles, Code);
+                        CheckIfNoAvailableInPOSEndOfDayProfile(ExistingEndOfDayProfiles, Rec.Code);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("End of Day Type"; "End of Day Type")
+                field("End of Day Type"; Rec."End of Day Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End of Day Type field';
                 }
-                field("Master POS Unit No."; "Master POS Unit No.")
+                field("Master POS Unit No."; Rec."Master POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Master POS Unit No. field';
@@ -46,37 +46,37 @@ page 6014656 "NPR POS EOD Profiles Step"
                         POSUnitList.Editable := false;
                         POSUnitList.SetRec(TempAllPOSUnit);
 
-                        if "Master POS Unit No." <> '' then
-                            if TempAllPOSUnit.Get("Master POS Unit No.") then
+                        if Rec."Master POS Unit No." <> '' then
+                            if TempAllPOSUnit.Get(Rec."Master POS Unit No.") then
                                 POSUnitList.SetRecord(TempAllPOSUnit);
 
                         if POSUnitList.RunModal() = Action::LookupOK then begin
                             POSUnitList.GetRecord(TempAllPOSUnit);
-                            "Master POS Unit No." := TempAllPOSUnit."No.";
+                            Rec."Master POS Unit No." := TempAllPOSUnit."No.";
                         end;
                     end;
                 }
-                field("Z-Report UI"; "Z-Report UI")
+                field("Z-Report UI"; Rec."Z-Report UI")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Z-Report UI field';
                 }
-                field("X-Report UI"; "X-Report UI")
+                field("X-Report UI"; Rec."X-Report UI")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the X-Report UI field';
                 }
-                field("Close Workshift UI"; "Close Workshift UI")
+                field("Close Workshift UI"; Rec."Close Workshift UI")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Close Workshift UI field';
                 }
-                field("Force Blind Counting"; "Force Blind Counting")
+                field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Force Blind Counting field';
                 }
-                field("SMS Profile"; "SMS Profile")
+                field("SMS Profile"; Rec."SMS Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the SMS Profile field';
@@ -88,17 +88,17 @@ page 6014656 "NPR POS EOD Profiles Step"
                     begin
                         SMSTemplateList.LookupMode := true;
 
-                        if "SMS Profile" <> '' then
-                            if SMSTemplateHeader.Get("SMS Profile") then
+                        if Rec."SMS Profile" <> '' then
+                            if SMSTemplateHeader.Get(Rec."SMS Profile") then
                                 SMSTemplateList.SetRecord(SMSTemplateHeader);
 
                         if SMSTemplateList.RunModal() = Action::LookupOK then begin
                             SMSTemplateList.GetRecord(SMSTemplateHeader);
-                            "SMS Profile" := SMSTemplateHeader.Code;
+                            Rec."SMS Profile" := SMSTemplateHeader.Code;
                         end;
                     end;
                 }
-                field("Z-Report Number Series"; "Z-Report Number Series")
+                field("Z-Report Number Series"; Rec."Z-Report Number Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Z-Report Number Series field';
@@ -110,17 +110,17 @@ page 6014656 "NPR POS EOD Profiles Step"
                     begin
                         ZReportNoSeries.LookupMode := true;
 
-                        IF "Z-Report Number Series" <> '' then
-                            if ZReportNoSerie.Get("Z-Report Number Series") then
+                        IF Rec."Z-Report Number Series" <> '' then
+                            if ZReportNoSerie.Get(Rec."Z-Report Number Series") then
                                 ZReportNoSeries.SetRecord(ZReportNoSerie);
 
                         if ZReportNoSeries.RunModal() = Action::LookupOK then begin
                             ZReportNoSeries.GetRecord(ZReportNoSerie);
-                            "Z-Report Number Series" := ZReportNoSerie.Code;
+                            Rec."Z-Report Number Series" := ZReportNoSerie.Code;
                         end;
                     end;
                 }
-                field("X-Report Number Series"; "X-Report Number Series")
+                field("X-Report Number Series"; Rec."X-Report Number Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the X-Report Number Series field';
@@ -132,17 +132,17 @@ page 6014656 "NPR POS EOD Profiles Step"
                     begin
                         XReportNoSeries.LookupMode := true;
 
-                        IF "X-Report Number Series" <> '' then
-                            if XReportNoSerie.Get("X-Report Number Series") then
+                        IF Rec."X-Report Number Series" <> '' then
+                            if XReportNoSerie.Get(Rec."X-Report Number Series") then
                                 XReportNoSeries.SetRecord(XReportNoSerie);
 
                         if XReportNoSeries.RunModal() = Action::LookupOK then begin
                             XReportNoSeries.GetRecord(XReportNoSerie);
-                            "X-Report Number Series" := XReportNoSerie.Code;
+                            Rec."X-Report Number Series" := XReportNoSerie.Code;
                         end;
                     end;
                 }
-                field("Show Zero Amount Lines"; "Show Zero Amount Lines")
+                field("Show Zero Amount Lines"; Rec."Show Zero Amount Lines")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Zero Amount Lines field';

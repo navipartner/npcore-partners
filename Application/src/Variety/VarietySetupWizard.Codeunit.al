@@ -1,4 +1,4 @@
-codeunit 6059977 "NPR Variety Setup Wizard"
+﻿codeunit 6059977 "NPR Variety Setup Wizard"
 {
     // NPR5.36/JDH /20170922 CASE 288696 Wizard created
 
@@ -15,7 +15,6 @@ codeunit 6059977 "NPR Variety Setup Wizard"
     end;
 
     var
-        Selection: Page "Dimension Selection-Multiple";
         TMPBusinessChoiceSelectionBuffer: Record "Dimension Selection Buffer" temporary;
         TMPProductChoiceSelectionBuffer: Record "Dimension Selection Buffer" temporary;
 
@@ -30,7 +29,7 @@ codeunit 6059977 "NPR Variety Setup Wizard"
     local procedure Step2_ChooseProducts(): Boolean
     begin
         TMPBusinessChoiceSelectionBuffer.SetRange(Selected, true);
-        if TMPBusinessChoiceSelectionBuffer.FindSet then
+        if TMPBusinessChoiceSelectionBuffer.FindSet() then
             repeat
                 if TMPBusinessChoiceSelectionBuffer.Code = 'SHOES' then begin
                     InsertProductChoices('FR_MEN', 'Shoes for men French Sizes');
@@ -51,14 +50,14 @@ codeunit 6059977 "NPR Variety Setup Wizard"
                 if TMPBusinessChoiceSelectionBuffer.Code = 'JEWELERY' then begin
                     InsertProductChoices('RINGS', 'Ring Sizes');
                 end;
-            until TMPBusinessChoiceSelectionBuffer.Next = 0;
+            until TMPBusinessChoiceSelectionBuffer.Next() = 0;
         exit(PAGE.RunModal(PAGE::"Dimension Selection-Multiple", TMPProductChoiceSelectionBuffer) = ACTION::LookupOK);
     end;
 
     local procedure Step3_SelectWhichToCreate()
     begin
         TMPProductChoiceSelectionBuffer.SetRange(Selected, true);
-        if TMPProductChoiceSelectionBuffer.FindSet then
+        if TMPProductChoiceSelectionBuffer.FindSet() then
             repeat
                 case TMPProductChoiceSelectionBuffer.Code of
                     //Shoes
@@ -93,115 +92,101 @@ codeunit 6059977 "NPR Variety Setup Wizard"
                     'RINGS':
                         InsertRings;
                 end;
-            until TMPProductChoiceSelectionBuffer.Next = 0;
+            until TMPProductChoiceSelectionBuffer.Next() = 0;
         //EXIT(PAGE.RUNMODAL(PAGE::"Dimension Selection-Multiple", TMPProductChoiceSelectionBuffer) = ACTION::LookupOK);
     end;
 
     local procedure InsertBusinessChoices(BusinessCode: Code[10]; BusinessDescription: Text)
     begin
-        with TMPBusinessChoiceSelectionBuffer do begin
-            Init;
-            Code := BusinessCode;
-            Description := BusinessDescription;
-            Insert;
-
-        end;
+        TMPBusinessChoiceSelectionBuffer.Init();
+        TMPBusinessChoiceSelectionBuffer.Code := BusinessCode;
+        TMPBusinessChoiceSelectionBuffer.Description := BusinessDescription;
+        TMPBusinessChoiceSelectionBuffer.Insert();
     end;
 
     local procedure InsertProductChoices(ProductCode: Code[10]; ProductDescription: Text)
     begin
-        with TMPProductChoiceSelectionBuffer do begin
-            Init;
-            Code := ProductCode;
-            Description := ProductDescription;
-            Insert;
-
-        end;
+        TMPProductChoiceSelectionBuffer.Init();
+        TMPProductChoiceSelectionBuffer.Code := ProductCode;
+        TMPProductChoiceSelectionBuffer.Description := ProductDescription;
+        TMPProductChoiceSelectionBuffer.Insert();
     end;
 
     local procedure InsertVarietyGroups(GroupCode: Code[20]; GroupDescription: Text; V1Type: Code[10]; V1Table: Code[20]; V1CreateCopy: Boolean; V2Type: Code[10]; V2Table: Code[20]; V2CreateCopy: Boolean; V3Type: Code[10]; V3Table: Code[20]; V3CreateCopy: Boolean)
     var
         VarietyGroup: Record "NPR Variety Group";
     begin
-        with VarietyGroup do begin
-            if Get(GroupCode) then
-                exit;
-            Init;
-            Code := GroupCode;
-            Description := GroupDescription;
-            "Variety 1" := V1Type;
-            "Variety 1 Table" := V1Table;
-            "Create Copy of Variety 1 Table" := V1CreateCopy;
-            if "Create Copy of Variety 1 Table" then
-                "Copy Naming Variety 1" := "Copy Naming Variety 1"::TableCodeAndItemNo;
+        if VarietyGroup.Get(GroupCode) then
+            exit;
+        VarietyGroup.Init();
+        VarietyGroup.Code := GroupCode;
+        VarietyGroup.Description := GroupDescription;
+        VarietyGroup."Variety 1" := V1Type;
+        VarietyGroup."Variety 1 Table" := V1Table;
+        VarietyGroup."Create Copy of Variety 1 Table" := V1CreateCopy;
+        if VarietyGroup."Create Copy of Variety 1 Table" then
+            VarietyGroup."Copy Naming Variety 1" := VarietyGroup."Copy Naming Variety 1"::TableCodeAndItemNo;
 
-            "Variety 2" := V2Type;
-            "Variety 2 Table" := V2Table;
-            "Create Copy of Variety 2 Table" := V2CreateCopy;
-            if "Create Copy of Variety 2 Table" then
-                "Copy Naming Variety 2" := "Copy Naming Variety 2"::TableCodeAndItemNo;
+        VarietyGroup."Variety 2" := V2Type;
+        VarietyGroup."Variety 2 Table" := V2Table;
+        VarietyGroup."Create Copy of Variety 2 Table" := V2CreateCopy;
+        if VarietyGroup."Create Copy of Variety 2 Table" then
+            VarietyGroup."Copy Naming Variety 2" := VarietyGroup."Copy Naming Variety 2"::TableCodeAndItemNo;
 
-            "Variety 3" := V3Type;
-            "Variety 3 Table" := V3Table;
-            "Create Copy of Variety 3 Table" := V3CreateCopy;
-            if "Create Copy of Variety 3 Table" then
-                "Copy Naming Variety 3" := "Copy Naming Variety 3"::TableCodeAndItemNo;
+        VarietyGroup."Variety 3" := V3Type;
+        VarietyGroup."Variety 3 Table" := V3Table;
+        VarietyGroup."Create Copy of Variety 3 Table" := V3CreateCopy;
+        if VarietyGroup."Create Copy of Variety 3 Table" then
+            VarietyGroup."Copy Naming Variety 3" := VarietyGroup."Copy Naming Variety 3"::TableCodeAndItemNo;
 
-            "Cross Variety No." := "Cross Variety No."::Variety1;
-            Insert;
-        end;
+        VarietyGroup."Cross Variety No." := VarietyGroup."Cross Variety No."::Variety1;
+        VarietyGroup.Insert();
     end;
 
     local procedure CreateVarietyType(VrtType: Code[10]; Desc: Text; PreTag: Text)
     var
         Variety: Record "NPR Variety";
     begin
-        with Variety do begin
-            if Get(VrtType) then
-                exit;
+        if Variety.Get(VrtType) then
+            exit;
 
-            Init;
-            Code := VrtType;
-            Description := Desc;
-            "Use in Variant Description" := true;
-            "Pre tag In Variant Description" := PreTag;
-            Insert;
-        end;
+        Variety.Init();
+        Variety.Code := VrtType;
+        Variety.Description := Desc;
+        Variety."Use in Variant Description" := true;
+        Variety."Pre tag In Variant Description" := PreTag;
+        Variety.Insert();
     end;
 
     local procedure CreateVarietyTable(VrtType: Code[10]; VrtTable: Code[20]; Desc: Text; LockTableParm: Boolean)
     var
         VarietyTable: Record "NPR Variety Table";
     begin
-        with VarietyTable do begin
-            if Get(VrtType, VrtTable) then
-                exit;
-            Init;
-            SetRange(Type, VrtType);
-            SetupNewLine;
-            Type := VrtType;
-            Code := VrtTable;
-            Description := Desc;
-            "Lock Table" := LockTableParm;
-            Insert;
-        end;
+        if VarietyTable.Get(VrtType, VrtTable) then
+            exit;
+        VarietyTable.Init();
+        VarietyTable.SetRange(Type, VrtType);
+        VarietyTable.SetupNewLine;
+        VarietyTable.Type := VrtType;
+        VarietyTable.Code := VrtTable;
+        VarietyTable.Description := Desc;
+        VarietyTable."Lock Table" := LockTableParm;
+        VarietyTable.Insert();
     end;
 
     local procedure CreateVarietyValue(VrtType: Code[10]; VrtTable: Code[20]; VrtValue: Code[20]; Desc: Text)
     var
         VarietyValue: Record "NPR Variety Value";
     begin
-        with VarietyValue do begin
-            if Get(VrtType, VrtTable, VrtValue) then
-                exit;
-            Init;
-            Type := VrtType;
-            Table := VrtTable;
-            Value := VrtValue;
-            Description := Desc;
-            AssignSortOrder;
-            Insert(false);
-        end;
+        if VarietyValue.Get(VrtType, VrtTable, VrtValue) then
+            exit;
+        VarietyValue.Init();
+        VarietyValue.Type := VrtType;
+        VarietyValue.Table := VrtTable;
+        VarietyValue.Value := VrtValue;
+        VarietyValue.Description := Desc;
+        VarietyValue.AssignSortOrder;
+        VarietyValue.Insert(false);
     end;
 
     local procedure InsertShoe_FRMen()

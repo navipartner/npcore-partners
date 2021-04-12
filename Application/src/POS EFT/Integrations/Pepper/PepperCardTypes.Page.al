@@ -14,22 +14,22 @@ page 6184485 "NPR Pepper Card Types"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Payment Type POS"; "Payment Type POS")
+                field("Payment Type POS"; Rec."Payment Type POS")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Type POS field';
                 }
-                field("Card Type Group Code"; "Card Type Group Code")
+                field("Card Type Group Code"; Rec."Card Type Group Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Type Group Code field';

@@ -1,4 +1,4 @@
-codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
+﻿codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
 {
     TableNo = "NPR Nc Import Entry";
 
@@ -18,7 +18,7 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
     begin
         NcRapidConnectSetup.SetRange("Import Type", NcImportEntry."Import Type");
         NcRapidConnectSetup.SetFilter("Package Code", '<>%1', '');
-        if not NcRapidConnectSetup.FindSet then
+        if not NcRapidConnectSetup.FindSet() then
             exit;
 
         XmlLoaded := TryLoadXml(NcImportEntry, XmlDoc);
@@ -30,9 +30,9 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
         repeat
             DataLogMgt.DisableDataLog(NcRapidConnectSetup."Disable Data Log on Import");
             ImportXmlPackage(NcRapidConnectSetup, XmlDoc);
-        until NcRapidConnectSetup.Next = 0;
+        until NcRapidConnectSetup.Next() = 0;
 
-        Commit;
+        Commit();
         Clear(RcApplyPackage);
         RcApplyPackage.SetProcessingOptions(TableIdFilter, UseDialog());
         if RcApplyPackage.Run(NcRapidConnectSetup) then;
@@ -55,7 +55,6 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
         ConfigPackageRecord: Record "Config. Package Record";
         ConfigPackageData: Record "Config. Package Data";
         "Field": Record "Field";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDocElement: DotNet NPRNetXmlElement;
         XmlElement: DotNet NPRNetXmlElement;
         XmlElement2: DotNet NPRNetXmlElement;
@@ -74,20 +73,20 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
             ConfigPackageTable.Get(NcRapidConnectSetup."Package Code", TableId);
 
             Clear(ConfigPackageRecord);
-            ConfigPackageRecord.LockTable;
+            ConfigPackageRecord.LockTable();
             ConfigPackageRecord.SetRange("Package Code", ConfigPackageTable."Package Code");
             ConfigPackageRecord.SetRange("Table ID", ConfigPackageTable."Table ID");
-            if ConfigPackageRecord.FindLast then;
+            if ConfigPackageRecord.FindLast() then;
             PackageNo := ConfigPackageRecord."No." + 1;
 
-            ConfigPackageRecord.Init;
+            ConfigPackageRecord.Init();
             ConfigPackageRecord."Package Code" := ConfigPackageTable."Package Code";
             ConfigPackageRecord."Table ID" := ConfigPackageTable."Table ID";
             ConfigPackageRecord."No." := PackageNo;
             ConfigPackageRecord.Insert(true);
 
             foreach XmlElement2 in XmlElement.SelectNodes('field') do begin
-                ConfigPackageData.Init;
+                ConfigPackageData.Init();
                 ConfigPackageData."Package Code" := ConfigPackageRecord."Package Code";
                 ConfigPackageData."Table ID" := ConfigPackageRecord."Table ID";
                 ConfigPackageData."No." := ConfigPackageRecord."No.";
@@ -102,7 +101,6 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
 
     local procedure FormatValue("Field": Record "Field"; Value: Text): Text
     var
-        TextValue: Text[250];
         DecimalValue: Decimal;
         IntegerValue: Integer;
         BooleanValue: Boolean;
@@ -182,9 +180,9 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
         foreach XmlElement in XmlDocElement.SelectNodes('record') do begin
             Evaluate(TableId, XmlElement.GetAttribute('table_id'), 9);
             if not TempInteger.Get(TableId) then begin
-                TempInteger.Init;
+                TempInteger.Init();
                 TempInteger.Number := TableId;
-                TempInteger.Insert;
+                TempInteger.Insert();
 
                 TableIdFilter += '|' + Format(TableId);
             end;

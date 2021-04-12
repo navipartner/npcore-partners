@@ -17,29 +17,29 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field("Entry Type"; "Entry Type")
+                    field("Entry Type"; Rec."Entry Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Opening Type field';
                     }
-                    field("Start Time"; "Start Time")
+                    field("Start Time"; Rec."Start Time")
                     {
                         ApplicationArea = All;
-                        Editable = "Entry Type" = 0;
+                        Editable = Rec."Entry Type" = 0;
                         ToolTip = 'Specifies the value of the Start Time field';
                     }
-                    field("End Time"; "End Time")
+                    field("End Time"; Rec."End Time")
                     {
                         ApplicationArea = All;
-                        Editable = "Entry Type" = 0;
+                        Editable = Rec."Entry Type" = 0;
                         ToolTip = 'Specifies the value of the End Time field';
                     }
-                    field("Period Type"; "Period Type")
+                    field("Period Type"; Rec."Period Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Period Type field';
                     }
-                    field("Period Description"; "Period Description")
+                    field("Period Description"; Rec."Period Description")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -52,38 +52,38 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                     group(Control6014409)
                     {
                         ShowCaption = false;
-                        Visible = ("Period Type" = 1);
-                        field(Monday; Monday)
+                        Visible = (Rec."Period Type" = 1);
+                        field(Monday; Rec.Monday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Monday field';
                         }
-                        field(Tuesday; Tuesday)
+                        field(Tuesday; Rec.Tuesday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Tuesday field';
                         }
-                        field(Wednesday; Wednesday)
+                        field(Wednesday; Rec.Wednesday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Wednesday field';
                         }
-                        field(Thursday; Thursday)
+                        field(Thursday; Rec.Thursday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Thursday field';
                         }
-                        field(Friday; Friday)
+                        field(Friday; Rec.Friday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Friday field';
                         }
-                        field(Saturday; Saturday)
+                        field(Saturday; Rec.Saturday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Saturday field';
                         }
-                        field(Sunday; Sunday)
+                        field(Sunday; Rec.Sunday)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Sunday field';
@@ -92,8 +92,8 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                     group(Control6014420)
                     {
                         ShowCaption = false;
-                        Visible = ("Period Type" = 2) OR ("Period Type" = 3);
-                        field("Entry Date"; "Entry Date")
+                        Visible = (Rec."Period Type" = 2) OR (Rec."Period Type" = 3);
+                        field("Entry Date"; Rec."Entry Date")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Entry Date field';

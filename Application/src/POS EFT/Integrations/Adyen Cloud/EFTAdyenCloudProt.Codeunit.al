@@ -32,15 +32,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
     end;
 
     var
-        ProtocolError: Label 'An unexpected error ocurred in the %1 protocol:\%2';
         ERROR_INVOKE: Label 'Error: Service endpoint responded with HTTP status %1';
-        ERROR_RECEIPT: Label 'Error: Could not create terminal receipt data';
-        ERROR_HEADER_CATEGORY: Label 'Error: Header category %1, expected %2';
-        ERROR_UNKNOWN_EVENT: Label 'Unknown event json';
-        VOID_SUCCESS: Label 'Transaction %1 was successfully voided';
-        VOID_FAILURE: Label 'Transaction %1 could not be voided: %2\%3';
-        DIAGNOSE: Label 'Terminal Status: %1\Terminal Connection: %2\Host Connection: %3';
-        UNKNOWN: Label 'Unknown';
         RequestResponseBuffer: Text;
         ABORT_ACQUIRE_SWIPE_HEADER: Label 'Card Scanned';
         ABORT_ACQUIRE_SWIPE_LINE: Label 'Please Remove Card';
@@ -113,7 +105,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //-NPR5.54 [364340]
         EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
         //+NPR5.54 [364340]
-        Commit;
+        Commit();
 
         StartSession(SessionId, CODEUNIT::"NPR EFT Adyen Bnd. Trx Req.", CompanyName, EFTTransactionAsyncRequest);
         EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
@@ -155,7 +147,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, ParseError);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         HandleProtocolResponse(EftTransactionRequest);
@@ -173,7 +165,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         SessionId: Integer;
-        Response: Text;
         EFTAdyenCloudTrxDialog: Codeunit "NPR EFT Adyen Cloud Trx Dia.";
         EFTSetup: Record "NPR EFT Setup";
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
@@ -189,7 +180,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //-NPR5.54 [364340]
         EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
         //+NPR5.54 [364340]
-        Commit;
+        Commit();
 
         StartSession(SessionId, CODEUNIT::"NPR EFT Adyen Bnd. Trx Req.", CompanyName, EFTTransactionAsyncRequest);
         EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
@@ -230,7 +221,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, ParseError);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         HandleProtocolResponse(EftTransactionRequest);
@@ -261,7 +252,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //-NPR5.53 [377533]
         if not InvokeVoid(EftTransactionRequest, EFTSetup, OriginalEFTTransactionRequest, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -280,7 +271,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, ParseError);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -298,7 +289,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
     local procedure LookupTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         Response: Text;
-        EFTTransactionAsyncResponse: Record "NPR EFT Trx Async Resp.";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
         EFTAdyenResponseParser: Codeunit "NPR EFT Adyen Resp. Parser";
@@ -313,7 +303,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         if not InvokeLookup(EftTransactionRequest, EFTSetup, OriginalEFTTransactionRequest, 1000 * 60, Response) then begin
             //+NPR5.53 [377533]
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -332,7 +322,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, ParseError);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -350,7 +340,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
     local procedure SetupTerminal(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         Response: Text;
-        MessageString: Text;
         EFTSetup: Record "NPR EFT Setup";
         EFTAdyenResponseParser: Codeunit "NPR EFT Adyen Resp. Parser";
         ParseError: Text;
@@ -361,7 +350,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //-NPR5.53 [377533]
         if not InvokeDiagnoseTerminal(EftTransactionRequest, EFTSetup, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -380,7 +369,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, ParseError);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -409,7 +398,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         end else
             EFTTransactionRequest."NST Error" := CopyStr(GetLastErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));
 
-        EFTTransactionRequest.Modify;
+        EFTTransactionRequest.Modify();
 
         HandleProtocolResponse(EFTTransactionRequest);
     end;
@@ -424,7 +413,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //+NPR5.53 [377533]
 
         EFTTransactionRequest."Force Closed" := true;
-        EFTTransactionRequest.Modify;
+        EFTTransactionRequest.Modify();
 
         HandleProtocolResponse(EFTTransactionRequest);
 
@@ -450,7 +439,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //-NPR5.54 [364340]
         EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
         //+NPR5.54 [364340]
-        Commit;
+        Commit();
 
         StartSession(SessionId, CODEUNIT::"NPR EFT Adyen Bnd. Trx Req.", CompanyName, EFTTransactionAsyncRequest);
         EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
@@ -465,7 +454,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
     local procedure EndAcquireCard(EftTransactionRequest: Record "NPR EFT Transaction Request"; Response: Text)
     var
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTAdyenResponseParser: Codeunit "NPR EFT Adyen Resp. Parser";
         ParseError: Text;
         ParseSuccess: Boolean;
@@ -484,7 +472,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, ParseError);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         HandleProtocolResponse(EftTransactionRequest);
@@ -516,7 +504,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //-NPR5.53 [377533]
         if not InvokeAbortAcquireCard(EftTransactionRequest, EFTSetup, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -535,7 +523,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, ParseError);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -556,7 +544,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not InvokeDisableRecurringContract(EftTransactionRequest, EFTSetup, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -569,7 +557,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -585,7 +573,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         InStream: InStream;
         Text: Text;
         Response: Text;
-        RecordFound: Boolean;
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
     begin
@@ -593,7 +580,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         EFTTrxBackgroundSessionMgt.TryGetResponseRecord(TransactionEntryNo, EFTTransactionAsyncResponse);
 
         if EFTTransactionAsyncResponse.Error then begin
-            EFTTransactionRequest.LockTable;
+            EFTTransactionRequest.LockTable();
             EFTTransactionRequest.Get(TransactionEntryNo);
             EFTTransactionRequest."NST Error" := EFTTransactionAsyncResponse."Error Text";
             //-NPR5.54 [387990]
@@ -608,8 +595,8 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
                 Response += Text;
             end;
 
-            EFTTransactionAsyncResponse.Delete;
-            Commit;
+            EFTTransactionAsyncResponse.Delete();
+            Commit();
             EFTTransactionRequest.Get(TransactionEntryNo);
 
             case EFTTransactionRequest."Processing Type" of
@@ -956,11 +943,8 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         ReqStream: DotNet NPRNetStream;
         ReqStreamWriter: DotNet NPRNetStreamWriter;
         HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        ResponseStream: DotNet NPRNetStream;
-        ResponseStreamReader: DotNet NPRNetStreamReader;
         HttpStatusCode: DotNet NPRNetHttpStatusCode;
         Response: Text;
-        Convert: DotNet NPRNetConvert;
         WebRequestHelper: Codeunit "Web Request Helper";
         ResponseNavStream: InStream;
         ResponseHeaders: DotNet NPRNetNameValueCollection;
@@ -991,7 +975,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
         ReqStreamWriter.Write(Body);
         ReqStreamWriter.Flush;
-        ReqStreamWriter.Close;
+        ReqStreamWriter.Close();
 
         //-NPR5.54 [387990]
         // HttpWebResponse := HttpWebRequest.GetResponse;
@@ -1038,15 +1022,11 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
     procedure GetAPIKey(EFTSetup: Record "NPR EFT Setup"): Text
     var
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
     begin
         exit(EFTAdyenCloudIntegration.GetAPIKey(EFTSetup));
     end;
 
     local procedure GetTerminalURL(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
-    var
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
     begin
         case EFTTransactionRequest.Mode of
             EFTTransactionRequest.Mode::Production:
@@ -1128,7 +1108,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
         Condition: Integer;
         ConditionBrand: Text;
-        Json: Text;
     begin
         Condition := EFTAdyenCloudIntegration.GetTransactionCondition(EFTSetup);
         case Condition of
@@ -1202,7 +1181,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         AcquireCardRequestOut.SetRange("Processing Type", AcquireCardRequestOut."Processing Type"::AUXILIARY);
         AcquireCardRequestOut.SetRange("Auxiliary Operation ID", 2);
         AcquireCardRequestOut.SetRange(Successful, true);
-        exit(AcquireCardRequestOut.FindFirst);
+        exit(AcquireCardRequestOut.FindFirst());
     end;
 
     local procedure GetCardAcquisitionJSON(EFTTransactionRequest: Record "NPR EFT Transaction Request"; PrefixComma: Boolean): Text
@@ -1232,13 +1211,11 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
     local procedure GetCardAcquisitionTransactionJSON(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
     begin
         //-NPR5.53 [377533]
-        with EFTTransactionRequest do begin
-            if ("Processing Type" in ["Processing Type"::PAYMENT, "Processing Type"::REFUND])
-              or (("Processing Type" = "Processing Type"::AUXILIARY) and ("Auxiliary Operation ID" = 2)) then begin
-                exit('"TotalAmount":' + GetAmount(EFTTransactionRequest));
-            end else begin
-                exit('');
-            end;
+        if (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND])
+  or ((EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and (EFTTransactionRequest."Auxiliary Operation ID" = 2)) then begin
+            exit('"TotalAmount":' + GetAmount(EFTTransactionRequest));
+        end else begin
+            exit('');
         end;
         //+NPR5.53 [377533]
     end;
@@ -1288,7 +1265,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         //This should only occur if NAV crashed or dialog force closed while waiting for a previous trx response.
         //We specifically look for the last hanging transaction on the CURRENT register no., to prevent automatic cancelling across registers for shared terminals.
 
-        Commit;
+        Commit();
         EFTAdyenAbortLastTrx.SetResponse(Response);
         if EFTAdyenAbortLastTrx.Run(EFTTransactionRequest) then; //Don't allow any errors. We are at the end of another transaction response handler
         //+NPR5.53 [377533]
@@ -1321,9 +1298,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
     var
         LF: Char;
         CR: Char;
-        EFTSetup: Record "NPR EFT Setup";
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
-        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
     begin
         CR := 13;
         LF := 10;

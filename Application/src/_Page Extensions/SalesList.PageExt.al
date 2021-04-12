@@ -30,7 +30,7 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
                 trigger OnDrillDown()
                 begin
                     if Rec."Document Type" = Rec."Document Type"::Order then
-                        PostedPrepmtDocumentBuffer.ShowPostedDocumentList(RecordId);
+                        PostedPrepmtDocumentBuffer.ShowPostedDocumentList(Rec.RecordId);
                 end;
             }
             field("NPR RemainingAmtInclVAT"; RemainingAmtInclVAT)

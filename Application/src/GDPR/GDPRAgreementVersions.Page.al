@@ -15,32 +15,32 @@ page 6151122 "NPR GDPR Agreement Versions"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(URL; URL)
+                field(URL; Rec.URL)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the URL field';
                 }
-                field("Activation Date"; "Activation Date")
+                field("Activation Date"; Rec."Activation Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Activation Date field';
                 }
-                field("Anonymize After"; "Anonymize After")
+                field("Anonymize After"; Rec."Anonymize After")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Anonymize After field';

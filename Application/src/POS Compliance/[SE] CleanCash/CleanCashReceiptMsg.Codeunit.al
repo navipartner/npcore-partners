@@ -60,7 +60,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         TmpVat.Reset();
     end;
 
-    local procedure StoreCleanCashReceipt(PosEntry: Record "NPR POS Entry"; TotalAmount: Decimal; var TmpVat: Record "NPR CleanCash Trans. VAT" temporary) RequestEntryNo: Integer
+    local procedure StoreCleanCashReceipt(PosEntry: Record "NPR POS Entry"; TotalAmount: Decimal; var TmpVat: Record "NPR CleanCash Trans. VAT" temporary): Integer
     var
         CleanCashTransaction: Record "NPR CleanCash Trans. Request";
         CleanCashVat: Record "NPR CleanCash Trans. VAT";
@@ -137,9 +137,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
     var
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
         CleanCashTransactionVat: Record "NPR CleanCash Trans. VAT";
-        DebugText: Text;
         XmlNs: Text;
-        Declaration: XmlDeclaration;
         Data: XmlElement;
         VatList: XmlElement;
         Vat: XmlElement;
@@ -200,7 +198,6 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
     var
         CleanCashResponse: Record "NPR CleanCash Trans. Response";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
-        DebugText: Text;
         EnumAsText: Text;
         DataElement: XmlElement;
         Element: XmlElement;

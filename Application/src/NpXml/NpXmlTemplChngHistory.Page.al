@@ -13,35 +13,35 @@ page 6151563 "NPR NpXml Templ. Chng. History"
         {
             repeater(Group)
             {
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Version Description"; "Version Description")
+                field("Version Description"; Rec."Version Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version Description field';
                 }
-                field("Template Version No."; "Template Version No.")
+                field("Template Version No."; Rec."Template Version No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Template Version No. field';
                 }
-                field("Event Type"; "Event Type")
+                field("Event Type"; Rec."Event Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Event Type field';
                 }
-                field("Changed by"; "Changed by")
+                field("Changed by"; Rec."Changed by")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Changed by field';
                 }
-                field("Change at"; "Change at")
+                field("Change at"; Rec."Change at")
                 {
                     ApplicationArea = All;
                     Editable = false;

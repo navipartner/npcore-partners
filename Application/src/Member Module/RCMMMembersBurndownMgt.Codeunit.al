@@ -11,23 +11,20 @@ codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
 
     procedure OnPageOpen(var vMembershipBurndownSetup: Record "NPR RC Members. Burndown Setup")
     begin
-        with vMembershipBurndownSetup do
-            if not Get(UserId) then begin
-                "User ID" := UserId;
-                "Use Work Date as Base" := true;
-                "Period Length" := "Period Length"::Month;
-                "Value to Calculate" := "Value to Calculate"::MEMBERSHIP_COUNT;
-                "Chart Type" := "Chart Type"::"Stacked Area";
-                "Show Change As" := "Show Change As"::ACK;
-                Evaluate("StartDate Offset", '<+12M>');
-                Insert();
-            end;
+        if not vMembershipBurndownSetup.Get(UserId) then begin
+            vMembershipBurndownSetup."User ID" := UserId;
+            vMembershipBurndownSetup."Use Work Date as Base" := true;
+            vMembershipBurndownSetup."Period Length" := vMembershipBurndownSetup."Period Length"::Month;
+            vMembershipBurndownSetup."Value to Calculate" := vMembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_COUNT;
+            vMembershipBurndownSetup."Chart Type" := vMembershipBurndownSetup."Chart Type"::"Stacked Area";
+            vMembershipBurndownSetup."Show Change As" := vMembershipBurndownSetup."Show Change As"::ACK;
+            Evaluate(vMembershipBurndownSetup."StartDate Offset", '<+12M>');
+            vMembershipBurndownSetup.Insert();
+        end;
     end;
 
     procedure DrillDown(var BusChartBuf: Record "Business Chart Buffer")
     var
-        SalesHeader: Record "Sales Header";
-        ToDate: Date;
         Measure: Integer;
     begin
         Measure := BusChartBuf."Drill-Down Measure Index";
@@ -114,8 +111,6 @@ codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
 
     local procedure GetAmount(Status: Option; FromDate: Date; ToDate: Date): Decimal
     var
-        CurrExchRate: Record "Currency Exchange Rate";
-        Amount: Decimal;
         TotalAmount: Decimal;
     begin
 
@@ -137,20 +132,18 @@ codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
         MembershipEntry.SetFilter(Context, '=%1', Status);
         MembershipEntry.SetRange("Valid From Date", FromDate, ToDate);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
-        EntryCount := MembershipEntry.Count;
+        EntryCount := MembershipEntry.Count();
 
         MembershipEntry.Reset();
         MembershipEntry.SetFilter(Context, '=%1', Status);
         MembershipEntry.SetRange("Valid Until Date", FromDate, ToDate);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
-        EntryCount -= MembershipEntry.Count;
+        EntryCount -= MembershipEntry.Count();
 
         exit(EntryCount);
     end;
 
     procedure CreateMap(var Map: array[7] of Integer)
-    var
-        SalesHeader: Record "Sales Header";
     begin
         Map[1] := MembershipEntry.Context::NEW;
         Map[2] := MembershipEntry.Context::REGRET;

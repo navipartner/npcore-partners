@@ -379,7 +379,7 @@ page 6059988 "NPR Sale Stats Activities"
     trigger OnOpenPage()
     begin
         case true of
-            ID = Context::Retail:
+            Rec.ID = Context::Retail:
                 ;
         end;
 
@@ -391,7 +391,6 @@ page 6059988 "NPR Sale Stats Activities"
 
     var
         Date: Record Date;
-        "-- Settings": Integer;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         ItemCategoryFilter: Code[20];
@@ -400,10 +399,7 @@ page 6059988 "NPR Sale Stats Activities"
         ChartType: Option Point,Bubble,Line,StepLine,Column,StackedColumn,StackedColumn100,"Area",StackedArea,StackedArea100,Pie,Doughnut,Range,Radar,Funnel;
         FigureToDisplay: Option "Sale (LCY)","Sale (Qty.)","Profit (LCY)","Profit (Pct.)";
         Context: Option Retail,Web;
-        "-- Layout": Integer;
         ColumnCount: Integer;
-        "-- Vars": Integer;
-        PeriodFormMan: Codeunit PeriodFormManagement;
         "Sale (QTY)": Decimal;
         "LastYear Sale (QTY)": Decimal;
         "Sale (LCY)": Decimal;
@@ -413,10 +409,8 @@ page 6059988 "NPR Sale Stats Activities"
         "Profit %": Decimal;
         "LastYear Profit %": Decimal;
         LastYear: Boolean;
-        ShowLastYear: Boolean;
         LastYearCalc: Text[30];
         ShowSameWeekday: Boolean;
-        DateFilterLastYear: Text[50];
         Text0001: Label 'Sale (LCY),Sale (Qty.),Profit (LCY),Profit (Pct.)';
         Text0002: Label 'This Year';
         Text0003: Label 'Last Year';
@@ -425,43 +419,43 @@ page 6059988 "NPR Sale Stats Activities"
     var
         Itt: Integer;
     begin
-        Initialize;
+        Rec.Initialize;
 
-        SetXAxis(SelectStr(FigureToDisplay + 1, Text0001), "Data Type"::String);
+        Rec.SetXAxis(SelectStr(FigureToDisplay + 1, Text0001), Rec."Data Type"::String);
 
-        AddMeasure(Text0002, 0, "Data Type"::Decimal, ChartType);
-        AddMeasure(Text0003, 1, "Data Type"::Decimal, ChartType);
+        Rec.AddMeasure(Text0002, 0, Rec."Data Type"::Decimal, ChartType);
+        Rec.AddMeasure(Text0003, 1, Rec."Data Type"::Decimal, ChartType);
 
-        if Date.FindSet then
+        if Date.FindSet() then
             repeat
                 Calc();
-                AddColumn(StrSubstNo('%1', Date."Period Name"));
+                Rec.AddColumn(StrSubstNo('%1', Date."Period Name"));
                 case FigureToDisplay of
                     FigureToDisplay::"Sale (Qty.)":
                         begin
-                            SetValue(Text0002, Itt, -"Sale (QTY)");
-                            SetValue(Text0003, Itt, -"LastYear Sale (QTY)");
+                            Rec.SetValue(Text0002, Itt, -"Sale (QTY)");
+                            Rec.SetValue(Text0003, Itt, -"LastYear Sale (QTY)");
                         end;
                     FigureToDisplay::"Sale (LCY)":
                         begin
-                            SetValue(Text0002, Itt, "Sale (LCY)");
-                            SetValue(Text0003, Itt, "LastYear Sale (LCY)");
+                            Rec.SetValue(Text0002, Itt, "Sale (LCY)");
+                            Rec.SetValue(Text0003, Itt, "LastYear Sale (LCY)");
                         end;
                     FigureToDisplay::"Profit (LCY)":
                         begin
-                            SetValue(Text0002, Itt, "Profit (LCY)");
-                            SetValue(Text0003, Itt, "LastYear Profit (LCY)");
+                            Rec.SetValue(Text0002, Itt, "Profit (LCY)");
+                            Rec.SetValue(Text0003, Itt, "LastYear Profit (LCY)");
                         end;
                     FigureToDisplay::"Profit (Pct.)":
                         begin
-                            SetValue(Text0002, Itt, "Profit %");
-                            SetValue(Text0003, Itt, "LastYear Profit %");
+                            Rec.SetValue(Text0002, Itt, "Profit %");
+                            Rec.SetValue(Text0003, Itt, "LastYear Profit %");
                         end;
                 end;
                 Itt += 1;
-            until (Date.Next = 0) or (Itt = ColumnCount);
+            until (Date.Next() = 0) or (Itt = ColumnCount);
 
-        Update(CurrPage.SalesChart);
+        Rec.Update(CurrPage.SalesChart);
     end;
 
     local procedure Calc()
@@ -513,7 +507,7 @@ page 6059988 "NPR Sale Stats Activities"
 
     local procedure Scroll(Direction: Text[1])
     begin
-        Date.FindSet;
+        Date.FindSet();
         case PeriodType of
             PeriodType::Day:
                 Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2D>', Direction, 1), Date."Period Start"));

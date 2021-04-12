@@ -24,52 +24,52 @@ page 6059938 "NPR Permission Range"
             }
             repeater(Group)
             {
-                field("Object Type"; "Object Type")
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Type field';
                 }
-                field(Index; Index)
+                field(Index; Rec.Index)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Index field';
                 }
-                field(From; From)
+                field(From; Rec.From)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the From field';
                 }
-                field("To"; "To")
+                field("To"; Rec."To")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the To field';
                 }
-                field("Read Permission"; "Read Permission")
+                field("Read Permission"; Rec."Read Permission")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Read Permission field';
                 }
-                field("Insert Permission"; "Insert Permission")
+                field("Insert Permission"; Rec."Insert Permission")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Insert Permission field';
                 }
-                field("Modify Permission"; "Modify Permission")
+                field("Modify Permission"; Rec."Modify Permission")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Modify Permission field';
                 }
-                field("Delete Permission"; "Delete Permission")
+                field("Delete Permission"; Rec."Delete Permission")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete Permission field';
                 }
-                field("Execute Permission"; "Execute Permission")
+                field("Execute Permission"; Rec."Execute Permission")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Execute Permission field';
                 }
-                field("Limited Usage Permission"; "Limited Usage Permission")
+                field("Limited Usage Permission"; Rec."Limited Usage Permission")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Limited Usage Permission field';

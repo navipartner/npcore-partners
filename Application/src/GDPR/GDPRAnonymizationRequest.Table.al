@@ -50,7 +50,7 @@ table 6151072 "NPR GDPR Anonymization Request"
         }
         field(35; "Log Count"; Integer)
         {
-            CalcFormula = Count ("NPR Customer GDPR Log Entries" WHERE("Customer No" = FIELD("Customer No.")));
+            CalcFormula = Count("NPR Customer GDPR Log Entries" WHERE("Customer No" = FIELD("Customer No.")));
             Caption = 'Log Count';
             Editable = false;
             FieldClass = FlowField;

@@ -1,4 +1,4 @@
-codeunit 6151596 "NPR NpDc Module Apply ItemList"
+﻿codeunit 6151596 "NPR NpDc Module Apply ItemList"
 {
     var
         Text000: Label 'Apply Discount - Item List';
@@ -14,7 +14,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         TotalAmt: Decimal;
     begin
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon, SaleLinePOSCouponApply) then
-            SaleLinePOSCouponApply.DeleteAll;
+            SaleLinePOSCouponApply.DeleteAll();
 
         TotalAmt := CalcTotalAmt(SaleLinePOSCoupon);
         if TotalAmt <= 0 then
@@ -31,17 +31,17 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         if NpDcCouponListItem.Get(SaleLinePOSCoupon."Coupon Type", -1) then
             RemainingQty := NpDcCouponListItem."Max. Quantity";
         NpDcCouponListItem.SetCurrentKey(Priority);
-        NpDcCouponListItem.FindSet;
+        NpDcCouponListItem.FindSet();
         Coupon.Get(SaleLinePOSCoupon."Coupon No.");
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then begin
             repeat
                 ApplyDiscountListItemPct(SaleLinePOSCoupon, Coupon."Discount %", TotalAmt, NpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
-            until NpDcCouponListItem.Next = 0;
+            until NpDcCouponListItem.Next() = 0;
             exit;
         end;
         repeat
             ApplyDiscountListItem(SaleLinePOSCoupon, DiscountAmt, TotalAmt, NpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
-        until (NpDcCouponListItem.Next = 0) or (DiscountAmt <= 0);
+        until (NpDcCouponListItem.Next() = 0) or (DiscountAmt <= 0);
     end;
 
     local procedure ApplyDiscountListItem(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; TotalAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; RemainingQty: Decimal)
@@ -57,20 +57,18 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
             exit;
 
         AppliedListItemDiscAmt := 0;
-        SaleLinePOS.FindSet;
+        SaleLinePOS.FindSet();
         repeat
             ApplyDiscountSaleLinePOS(SaleLinePOSCoupon, DiscountAmt, TotalAmt, NpDcCouponListItem, SaleLinePOS, AppliedListItemDiscAmt, RemainingDiscountAmt, AppliedQty, RemainingQty);
-        until (SaleLinePOS.Next = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
+        until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
     local procedure ApplyDiscountListItemPct(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountPct: Decimal; TotalAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; var RemainingQty: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
-        AppliedListItemDiscAmt: Decimal;
         AppliedQty: Decimal;
         DiscountAmt: Decimal;
-        MaxQty: Decimal;
         QtyToApply: Integer;
         LineNo: Integer;
     begin
@@ -80,8 +78,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         if DiscountPct > 100 then
             DiscountPct := 100;
 
-        AppliedListItemDiscAmt := 0;
-        SaleLinePOS.FindSet;
+        SaleLinePOS.FindSet();
         repeat
             if not HasAppliedCouponDiscount(SaleLinePOS) then begin
                 QtyToApply := SaleLinePOS.Quantity;
@@ -97,7 +94,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
 
                 if DiscountAmt > 0 then begin
                     LineNo := GetNextLineNo(SaleLinePOS);
-                    SaleLinePOSCouponApply.Init;
+                    SaleLinePOSCouponApply.Init();
                     SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
                     SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
                     SaleLinePOSCouponApply."Sale Type" := SaleLinePOS."Sale Type";
@@ -113,13 +110,12 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
                     SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
                     SaleLinePOSCouponApply.Insert(true);
 
-                    AppliedListItemDiscAmt += DiscountAmt;
                     RemainingDiscountAmt -= DiscountAmt;
                     AppliedQty += QtyToApply;
                     RemainingQty -= QtyToApply;
                 end;
             end;
-        until (SaleLinePOS.Next = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
+        until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
     local procedure ApplyDiscountSaleLinePOS(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; TotalAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; var AppliedQty: Decimal; var RemainingQty: Decimal)
@@ -127,10 +123,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
         SalePOS: Record "NPR POS Sale";
         LineNo: Integer;
-        PotentialDiscAmt: Decimal;
         LineDiscountAmt: Decimal;
-        LineDiscountPct: Decimal;
-        MaxQty: Decimal;
         QtyToApply: Integer;
     begin
         if HasAppliedCouponDiscount(SaleLinePOS) then
@@ -153,7 +146,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
             exit;
 
         LineNo := GetNextLineNo(SaleLinePOS);
-        SaleLinePOSCouponApply.Init;
+        SaleLinePOSCouponApply.Init();
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
         SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
         SaleLinePOSCouponApply."Sale Type" := SaleLinePOS."Sale Type";
@@ -239,7 +232,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
             exit(0);
 
         TotalAmt := 0;
-        NpDcCouponListItem.FindSet;
+        NpDcCouponListItem.FindSet();
         repeat
             if FindSaleLinePOSItems(SaleLinePOSCoupon, NpDcCouponListItem, SaleLinePOS) then begin
                 SaleLinePOS.CalcSums("Amount Including VAT");
@@ -249,7 +242,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
 
                 TotalAmt += LineAmt;
             end;
-        until NpDcCouponListItem.Next = 0;
+        until NpDcCouponListItem.Next() = 0;
 
         TotalAmt -= CalcAppliedDiscountTotal(SaleLinePOSCoupon);
         exit(TotalAmt);
@@ -262,7 +255,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");
         NpDcCouponListItem.SetFilter("No.", '<>%1', '');
-        exit(NpDcCouponListItem.FindFirst);
+        exit(NpDcCouponListItem.FindFirst());
     end;
 
     local procedure FindSaleLinePOSItems(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
@@ -290,7 +283,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
                 end;
         end;
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
-        exit(SaleLinePOS.FindFirst);
+        exit(SaleLinePOS.FindFirst());
     end;
 
     local procedure FindSaleLinePOSCouponApply(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon"): Boolean
@@ -305,7 +298,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         SaleLinePOSCouponApply.SetRange("Applies-to Coupon Line No.", SaleLinePOSCoupon."Line No.");
         SaleLinePOSCouponApply.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");
         SaleLinePOSCouponApply.SetRange("Coupon No.", SaleLinePOSCoupon."Coupon No.");
-        exit(SaleLinePOSCouponApply.FindFirst);
+        exit(SaleLinePOSCouponApply.FindFirst());
     end;
 
     local procedure GetNextLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
@@ -317,7 +310,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         SaleLinePOSCoupon.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOSCoupon.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSCoupon.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-        if SaleLinePOSCoupon.FindLast then;
+        if SaleLinePOSCoupon.FindLast() then;
 
         exit(SaleLinePOSCoupon."Line No." + 10000);
     end;
@@ -332,7 +325,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSCouponApply.SetRange("Sale Line No.", SaleLinePOS."Line No.");
         SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
-        exit(SaleLinePOSCouponApply.FindFirst);
+        exit(SaleLinePOSCouponApply.FindFirst());
     end;
 
     [EventSubscriber(ObjectType::Table, 6151590, 'OnBeforeDeleteEvent', '', true, true)]
@@ -346,7 +339,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         NpDcCouponListItem.SetRange("Coupon Type", Rec.Code);
         if NpDcCouponListItem.IsEmpty then
             exit;
-        NpDcCouponListItem.DeleteAll;
+        NpDcCouponListItem.DeleteAll();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
@@ -355,7 +348,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
         if CouponModule.Get(CouponModule.Type::"Apply Discount", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Apply Discount";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := Text000;

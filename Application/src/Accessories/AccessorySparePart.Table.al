@@ -186,7 +186,7 @@ table 6014506 "NPR Accessory/Spare Part"
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
     end;
 
 }

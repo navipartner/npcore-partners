@@ -292,8 +292,6 @@ page 6151131 "NPR TM Seating Template"
 
 
                     trigger OnAction()
-                    var
-                        SeatingTemplate: Record "NPR TM Seating Template";
                     begin
 
                         UnIndent(Rec);

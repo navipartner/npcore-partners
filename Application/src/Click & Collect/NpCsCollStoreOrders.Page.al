@@ -18,7 +18,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
         {
             repeater(Group)
             {
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -29,7 +29,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                         RunCard();
                     end;
                 }
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
@@ -39,7 +39,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                         RunCard();
                     end;
                 }
-                field("Sell-to Customer Name"; "Sell-to Customer Name")
+                field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sell-to Customer Name field';
@@ -49,12 +49,12 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                         RunCard();
                     end;
                 }
-                field("Inserted at"; "Inserted at")
+                field("Inserted at"; Rec."Inserted at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Inserted at field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
@@ -64,137 +64,137 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                         RunCard();
                     end;
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("From Document Type"; "From Document Type")
+                field("From Document Type"; Rec."From Document Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the From Document Type field';
                 }
-                field("From Document No."; "From Document No.")
+                field("From Document No."; Rec."From Document No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the From Document No. field';
                 }
-                field("From Store Code"; "From Store Code")
+                field("From Store Code"; Rec."From Store Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the From Store Code field';
                 }
-                field("Processing Status"; "Processing Status")
+                field("Processing Status"; Rec."Processing Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Status field';
                 }
-                field("Processing updated at"; "Processing updated at")
+                field("Processing updated at"; Rec."Processing updated at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing updated at field';
                 }
-                field("Processing updated by"; "Processing updated by")
+                field("Processing updated by"; Rec."Processing updated by")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Processing updated by field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Customer E-mail"; "Customer E-mail")
+                field("Customer E-mail"; Rec."Customer E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer E-mail field';
                 }
-                field("Customer Phone No."; "Customer Phone No.")
+                field("Customer Phone No."; Rec."Customer Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Phone No. field';
                 }
-                field("Send Notification from Store"; "Send Notification from Store")
+                field("Send Notification from Store"; Rec."Send Notification from Store")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Send Notification from Store field';
                 }
-                field("Notify Customer via E-mail"; "Notify Customer via E-mail")
+                field("Notify Customer via E-mail"; Rec."Notify Customer via E-mail")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Notify Customer via E-mail field';
                 }
-                field("Notify Customer via Sms"; "Notify Customer via Sms")
+                field("Notify Customer via Sms"; Rec."Notify Customer via Sms")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Notify Customer via Sms field';
                 }
-                field("Store Stock"; "Store Stock")
+                field("Store Stock"; Rec."Store Stock")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Stock field';
                 }
-                field("Delivery Status"; "Delivery Status")
+                field("Delivery Status"; Rec."Delivery Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delivery Status field';
                 }
-                field("Delivery updated at"; "Delivery updated at")
+                field("Delivery updated at"; Rec."Delivery updated at")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Delivery updated at field';
                 }
-                field("Delivery updated by"; "Delivery updated by")
+                field("Delivery updated by"; Rec."Delivery updated by")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Delivery updated by field';
                 }
-                field("Prepaid Amount"; "Prepaid Amount")
+                field("Prepaid Amount"; Rec."Prepaid Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Prepaid Amount field';
                 }
-                field("Prepayment Account No."; "Prepayment Account No.")
+                field("Prepayment Account No."; Rec."Prepayment Account No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Prepayment Account No. field';
                 }
-                field("Delivery Document Type"; "Delivery Document Type")
+                field("Delivery Document Type"; Rec."Delivery Document Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Delivery Document Type field';
                 }
-                field("Delivery Document No."; "Delivery Document No.")
+                field("Delivery Document No."; Rec."Delivery Document No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Delivery Document No. field';
                 }
-                field("Archive on Delivery"; "Archive on Delivery")
+                field("Archive on Delivery"; Rec."Archive on Delivery")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Archive on Delivery field';
                 }
-                field(LastLogMessage; GetLastLogMessage())
+                field(LastLogMessage; Rec.GetLastLogMessage())
                 {
                     ApplicationArea = All;
                     Caption = 'Last Log Message';
                     ToolTip = 'Specifies the value of the Last Log Message field';
                 }
-                field(LastLogErrorMessage; GetLastLogErrorMessage())
+                field(LastLogErrorMessage; Rec.GetLastLogErrorMessage())
                 {
                     ApplicationArea = All;
                     Caption = 'Last Log Error Message';
@@ -219,10 +219,10 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Print Order';
                     Image = ConfirmAndPrint;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = "Processing Print Template" <> '';
+                    Visible = Rec."Processing Print Template" <> '';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Order action';
 
@@ -239,21 +239,20 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Ellipsis = true;
                     Image = PrintReport;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = "Document Type" = "Document Type"::Order;
+                    Visible = Rec."Document Type" = Rec."Document Type"::Order;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Confirmation action';
 
                     trigger OnAction()
                     var
-                        ReportSelections: Record "Report Selections";
                         SalesHeader: Record "Sales Header";
                         DocPrint: Codeunit "Document-Print";
                         Usage: Option "Order Confirmation","Work Order","Pick Instruction";
                     begin
-                        SalesHeader.Get("Document Type", "Document No.");
+                        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
                         DocPrint.PrintSalesOrder(SalesHeader, Usage::"Order Confirmation");
                     end;
                 }
@@ -262,10 +261,10 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Print Delivery';
                     Image = Print;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Delivery Status" = "Delivery Status"::Delivered) AND ((("Bill via" = "Bill via"::POS) AND ("Delivery Print Template (POS)" <> '')) OR (("Bill via" = "Bill via"::"Sales Document") AND ("Delivery Print Template (S.)" <> '')));
+                    Visible = (Rec."Delivery Status" = Rec."Delivery Status"::Delivered) AND (((Rec."Bill via" = Rec."Bill via"::POS) AND (Rec."Delivery Print Template (POS)" <> '')) OR ((Rec."Bill via" = Rec."Bill via"::"Sales Document") AND (Rec."Delivery Print Template (S.)" <> '')));
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Delivery action';
 
@@ -285,10 +284,10 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Confirm Order';
                     Image = Approve;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0);
+                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0);
                     ApplicationArea = All;
                     ToolTip = 'Executes the Confirm Order action';
 
@@ -296,7 +295,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        if not Confirm(Text000, true, "Document No.") then
+                        if not Confirm(Text000, true, Rec."Document No.") then
                             exit;
 
                         NpCsCollectMgt.ConfirmProcessing(Rec);
@@ -307,10 +306,10 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Reject Order';
                     Image = Reject;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0) AND ("Store Stock");
+                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0) AND (Rec."Store Stock");
                     ApplicationArea = All;
                     ToolTip = 'Executes the Reject Order action';
 
@@ -318,7 +317,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        if not Confirm(Text001, true, "Document No.") then
+                        if not Confirm(Text001, true, Rec."Document No.") then
                             exit;
 
                         NpCsCollectMgt.RejectProcessing(Rec);
@@ -329,10 +328,10 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = "Send Notification from Store";
+                    Visible = Rec."Send Notification from Store";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send Notification to Customer action';
 
@@ -360,16 +359,16 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     var
                         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
                     begin
-                        if ("Processing Status" in ["Processing Status"::" ", "Processing Status"::Pending, "Processing Status"::Confirmed]) and
-                          ("Delivery Status" in ["Delivery Status"::" ", "Delivery Status"::Ready])
+                        if (Rec."Processing Status" in [Rec."Processing Status"::" ", Rec."Processing Status"::Pending, Rec."Processing Status"::Confirmed]) and
+                          (Rec."Delivery Status" in [Rec."Delivery Status"::" ", Rec."Delivery Status"::Ready])
                         then begin
-                            if not Confirm(Text002, false, "Document Type", "Document No.") then
+                            if not Confirm(Text002, false, Rec."Document Type", Rec."Document No.") then
                                 exit;
                         end;
                         if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
-                            Message(Text003, "Document Type", "Reference No.")
+                            Message(Text003, Rec."Document Type", Rec."Reference No.")
                         else
-                            Message(Text004, "Document Type", "Reference No.", GetLastErrorText);
+                            Message(Text004, Rec."Document Type", Rec."Reference No.", GetLastErrorText);
 
                         CurrPage.Update(false);
                     end;

@@ -1,4 +1,4 @@
-codeunit 6151159 "NPR MM NRP Loyalty Wizard"
+﻿codeunit 6151159 "NPR MM NRP Loyalty Wizard"
 {
 
     trigger OnRun()
@@ -183,42 +183,39 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
     begin
 
-        with NPRRemoteEndpointSetup do begin
-            SetFilter(Code, '=%1', EndpointCode);
-            DeleteAll();
+        NPRRemoteEndpointSetup.SetFilter(Code, '=%1', EndpointCode);
+        NPRRemoteEndpointSetup.DeleteAll();
 
-            Code := EndpointCode;
-            Type := ServiceType;
-            Description := StrSubstNo('NPR %1', Type);
-            "Credentials Type" := "Credentials Type"::NAMED;
-            "User Account" := Username;
-            "User Password" := Password;
-            "Community Code" := CommunityCode;
+        NPRRemoteEndpointSetup.Code := EndpointCode;
+        NPRRemoteEndpointSetup.Type := ServiceType;
+        NPRRemoteEndpointSetup.Description := StrSubstNo('NPR %1', NPRRemoteEndpointSetup.Type);
+        NPRRemoteEndpointSetup."Credentials Type" := NPRRemoteEndpointSetup."Credentials Type"::NAMED;
+        NPRRemoteEndpointSetup."User Account" := Username;
+        NPRRemoteEndpointSetup."User Password" := Password;
+        NPRRemoteEndpointSetup."Community Code" := CommunityCode;
 
-            // CASE Type OF
-            //   Type::LoyaltyServices: "Endpoint URI" := BaseUrl+'loyalty_services';
-            //   Type::MemberServices : "Endpoint URI" := BaseUrl+'member_services';
-            // END;
-            if (TenantName = '') then begin
-                case Type of
-                    Type::LoyaltyServices:
-                        "Endpoint URI" := StrSubstNo('%1%2', BaseUrl, 'loyalty_services');
-                    Type::MemberServices:
-                        "Endpoint URI" := StrSubstNo('%1%2', BaseUrl, 'member_services');
-                end;
-            end else begin
-                case Type of
-                    Type::LoyaltyServices:
-                        "Endpoint URI" := StrSubstNo('%1%2?tenant=%3', BaseUrl, 'loyalty_services', TenantName);
-                    Type::MemberServices:
-                        "Endpoint URI" := StrSubstNo('%1%2?tenant=%3', BaseUrl, 'member_services', TenantName)
-                end;
+        // CASE Type OF
+        //   Type::LoyaltyServices: "Endpoint URI" := BaseUrl+'loyalty_services';
+        //   Type::MemberServices : "Endpoint URI" := BaseUrl+'member_services';
+        // END;
+        if (TenantName = '') then begin
+            case NPRRemoteEndpointSetup.Type of
+                NPRRemoteEndpointSetup.Type::LoyaltyServices:
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2', BaseUrl, 'loyalty_services');
+                NPRRemoteEndpointSetup.Type::MemberServices:
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2', BaseUrl, 'member_services');
             end;
-
-            "Connection Timeout (ms)" := 8000;
-            Insert();
-
+        end else begin
+            case NPRRemoteEndpointSetup.Type of
+                NPRRemoteEndpointSetup.Type::LoyaltyServices:
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2?tenant=%3', BaseUrl, 'loyalty_services', TenantName);
+                NPRRemoteEndpointSetup.Type::MemberServices:
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2?tenant=%3', BaseUrl, 'member_services', TenantName)
+            end;
         end;
+
+        NPRRemoteEndpointSetup."Connection Timeout (ms)" := 8000;
+        NPRRemoteEndpointSetup.Insert();
     end;
 
     local procedure CreateEFTSetup(pPaymentTypeCode: Code[10])
@@ -252,7 +249,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
                 if LoyaltyStoreSetup.Get('', POSStore.Code, '') then
                     LoyaltyStoreSetup.Delete();
 
-                LoyaltyStoreSetup.Init;
+                LoyaltyStoreSetup.Init();
                 LoyaltyStoreSetup."Store Code" := POSStore.Code;
                 LoyaltyStoreSetup.Description := CopyStr(POSStore.Name, 1, MaxStrLen(LoyaltyStoreSetup.Description));
                 LoyaltyStoreSetup."Store Endpoint Code" := StrSubstNo('%1-L', CommunityCode);
@@ -266,7 +263,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
                 if (CompanyName <> '') then begin
                     LoyaltyStoreSetup.ChangeCompany(CompanyName);
                     if (not LoyaltyStoreSetup.Get(FromCompany, POSStore.Code, '')) then begin
-                        LoyaltyStoreSetup.Init;
+                        LoyaltyStoreSetup.Init();
                         LoyaltyStoreSetup.Setup := LoyaltyStoreSetup.Setup::SERVER;
                         LoyaltyStoreSetup."Store Code" := POSStore.Code;
                         LoyaltyStoreSetup."Client Company Name" := FromCompany;
@@ -290,7 +287,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
 
         if (POSStore.FindSet()) then begin
             repeat
-                POSPostingSetup.Init;
+                POSPostingSetup.Init();
                 if (not POSPostingSetup.Get(POSStore.Code, POSMethodCode, '')) then begin
                     POSPostingSetup."POS Store Code" := POSStore.Code;
                     POSPostingSetup."POS Payment Method Code" := POSMethodCode;
@@ -312,7 +309,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
     begin
 
         if (not Currency.Get(CurrencyCode)) then begin
-            Currency.Init;
+            Currency.Init();
             Currency.Code := CurrencyCode;
             Currency.Insert(true);
         end;

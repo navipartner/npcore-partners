@@ -1,8 +1,5 @@
 codeunit 6014474 "NPR E-mail Retail Mgt."
 {
-    var
-        RecRef: RecordRef;
-        NothingToPrintErr: Label 'Nothing to print';
 
     [EventSubscriber(ObjectType::Codeunit, 6014450, 'GetEmailAddressEvent', '', false, false)]
     local procedure OnGetEmailAddressEvent(var RecRef: RecordRef; var EmailAddress: Text; var Handled: Boolean)
@@ -69,7 +66,7 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
         end;
 
         RetailReportSelection.SetFilter("Report ID", '<>%1', 0);
-        if RetailReportSelection.FindFirst then;
+        if RetailReportSelection.FindFirst() then;
 
         exit(RetailReportSelection."Report ID");
     end;
@@ -130,8 +127,6 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
     end;
 
     procedure POSEntryTableId(): Integer
-    var
-        POSEntry: Record "NPR POS Entry";
     begin
         exit(6150621);
     end;

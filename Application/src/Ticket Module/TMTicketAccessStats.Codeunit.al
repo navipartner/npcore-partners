@@ -1,4 +1,4 @@
-codeunit 6060114 "NPR TM Ticket Access Stats"
+﻿codeunit 6060114 "NPR TM Ticket Access Stats"
 {
     trigger OnRun()
     begin
@@ -190,7 +190,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
     procedure CopyFactToBuf(TicketFact: Record "NPR TM Ticket Access Fact"; var DimCodeBuf: Record "Dimension Code Buffer")
     begin
 
-        DimCodeBuf.Init;
+        DimCodeBuf.Init();
         DimCodeBuf.Code := TicketFact."Fact Code";
         DimCodeBuf.Name := TicketFact.Description;
     end;
@@ -200,18 +200,16 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         Period2: Record Date;
     begin
 
-        with DimCodeBuf do begin
-            Init;
-            Code := Format(Period."Period Start");
-            "Period Start" := Period."Period Start";
-            "Period End" := Period."Period End";
-            if DateFilter <> '' then begin
-                Period2.SetFilter("Period End", DateFilter);
-                if Period2.GetRangeMax("Period End") < "Period End" then
-                    "Period End" := Period2.GetRangeMax("Period End");
-            end;
-            Name := Period."Period Name";
+        DimCodeBuf.Init();
+        DimCodeBuf.Code := Format(Period."Period Start");
+        DimCodeBuf."Period Start" := Period."Period Start";
+        DimCodeBuf."Period End" := Period."Period End";
+        if DateFilter <> '' then begin
+            Period2.SetFilter("Period End", DateFilter);
+            if Period2.GetRangeMax("Period End") < DimCodeBuf."Period End" then
+                DimCodeBuf."Period End" := Period2.GetRangeMax("Period End");
         end;
+        DimCodeBuf.Name := Period."Period Name";
     end;
 
     procedure CalcCount(LineFactOption: Option Item,"Ticket Type","Admission Date","Admission Hour",Period,"Admission Code","Variant Code"; LineFactCode: Code[20]; ColumnFactOption: Option Item,"Ticket Type","Admission Date","Admission Hour",Period,"Admission Code","Variant Code"; ColumnFactCode: Code[20]; ColumnFilter: Boolean; var TicketStatisticsFilter: Record "NPR TM Ticket Access Stats"; PeriodFilter: Text[30]; AdmissionDefinition: Option) SumAdmissionCount: Decimal
@@ -451,18 +449,11 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
     procedure BuildCompressedStatistics(SuggestedMaxDate: Date)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        TmpTicketStatistics: Record "NPR TM Ticket Access Stats" temporary;
         TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary;
         StartDate: Date;
         MaxDate: Date;
         FirstEntryNo: Integer;
         LastEntryNo: Integer;
-        TmpRecBuf: Record "Record Buffer" temporary;
-        PreviousAdmissionDate: Date;
-        Ticket: Record "NPR TM Ticket";
-        IsReEntry: Boolean;
-        DoneAggregating: Boolean;
     begin
 
         if (not TicketAccessEntry.FindLast()) then
@@ -478,7 +469,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                 exit;
 
             LockResource();
-            DoneAggregating := false;
             if (SelectEntries(FirstEntryNo, LastEntryNo, StartDate, MaxDate) = -1) then
                 SelectEntriesOnDateTime(FirstEntryNo, LastEntryNo, StartDate, MaxDate); // Handles upgradeded data without "Highest Entry No."
 
@@ -531,7 +521,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         ValidEntry: Boolean;
     begin
 
-        DetailAccessEntry.Reset;
+        DetailAccessEntry.Reset();
         DetailAccessEntry.SetRange("Entry No.", FirstEntryNo, LastEntryNo);
         if (not DetailAccessEntry.FindSet()) then
             exit;
@@ -576,7 +566,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                             SaveStatistics(TmpTicketStatistics, AdHoc, TmpTicketStatisticsResult);
                             TmpTicketStatistics.DeleteAll();
                             TmpRecBuf.DeleteAll();
-                            Commit;
+                            Commit();
 
                             if (not AdHoc) then begin
 
@@ -882,13 +872,12 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         StartTime: Time;
         ZeroHourPrefix: Text[30];
         MaxTime: Time;
-        MaxDatetime: DateTime;
         MaxHour: Integer;
     begin
 
         // Find max date / time for compression
         MaxTime := 235959.999T; //TIME;
-        MaxDate := Today;
+        MaxDate := Today();
         MaxDate := CalcDate('<-1D>', Today);
 
         // Find from which time to start

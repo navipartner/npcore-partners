@@ -10,7 +10,7 @@ codeunit 6151405 "NPR Magento Order Status Mgt."
     begin
         if (SalesInvHdrNo = '') or not SalesInvHeader.Get(SalesInvHdrNo) then
             exit;
-        if not (MagentoSetup.Get and MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
         if SalesInvHeader."Order No." = '' then
             exit;
@@ -40,14 +40,14 @@ codeunit 6151405 "NPR Magento Order Status Mgt."
 
         if Rec."NPR External Order No." = '' then
             exit;
-        if not (MagentoSetup.Get and MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
         if Rec."Document Type" <> Rec."Document Type"::Order then
             exit;
         if MagentoOrderStatus.Get(Rec."No.") then
             exit;
 
-        MagentoOrderStatus.Init;
+        MagentoOrderStatus.Init();
         MagentoOrderStatus."Order No." := Rec."No.";
         MagentoOrderStatus.Status := MagentoOrderStatus.Status::Processing;
         MagentoOrderStatus."External Order No." := Rec."NPR External Order No.";
@@ -64,7 +64,7 @@ codeunit 6151405 "NPR Magento Order Status Mgt."
             exit;
         if IsTemporary(Rec) then
             exit;
-        if not (MagentoSetup.Get and MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
         if Rec."Document Type" <> Rec."Document Type"::Order then
             exit;

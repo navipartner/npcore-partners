@@ -16,18 +16,18 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
@@ -62,14 +62,12 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
                 ToolTip = 'Executes the Or set total action';
 
                 trigger OnAction()
-                var
-                    t001: Label 'Total counted amount';
                 begin
                     // TODO: CTRLUPGRADE - Refactor without Marshaller
                     Error('CTRLUPGRADE');
                     recount;
 
-                    if FindFirst then;
+                    if Rec.FindFirst() then;
                     setAmount(dec);
                 end;
             }
@@ -88,7 +86,7 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
 
     trigger OnOpenPage()
     begin
-        if Find('-') then;
+        if Rec.Find('-') then;
     end;
 
     var
@@ -100,25 +98,25 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
     procedure setAmount(dec: Decimal)
     begin
         if dec > 0 then
-            Validate(Amount, dec);
-        Modify(true);
+            Rec.Validate(Amount, dec);
+        Rec.Modify(true);
         CurrPage.Update(false);
     end;
 
     procedure setQuantity(dec: Decimal)
     begin
         if dec >= 0 then
-            Validate(Quantity, dec);
-        Modify(true);
+            Rec.Validate(Quantity, dec);
+        Rec.Modify(true);
         CurrPage.Update(false);
     end;
 
     procedure recount()
     begin
-        if FindFirst then
+        if Rec.FindFirst() then
             repeat
                 setQuantity(0);
-            until Next = 0;
+            until Rec.Next() = 0;
 
         CurrPage.Update(false);
     end;

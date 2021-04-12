@@ -44,7 +44,7 @@ table 6014562 "NPR RP Data Item Links"
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Parent Field Name" := Field.FieldName;
                     "Parent Field ID" := Field."No.";
@@ -57,7 +57,7 @@ table 6014562 "NPR RP Data Item Links"
             begin
                 Field.SetRange(TableNo, "Parent Table ID");
                 Field.SetRange("No.", "Parent Field ID");
-                Field.FindFirst;
+                Field.FindFirst();
                 "Parent Field Name" := Field.FieldName;
             end;
         }
@@ -76,7 +76,7 @@ table 6014562 "NPR RP Data Item Links"
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Parent Field Name" := Field.FieldName;
                     "Parent Field ID" := Field."No.";
@@ -89,9 +89,9 @@ table 6014562 "NPR RP Data Item Links"
             begin
                 Field.SetRange(TableNo, "Parent Table ID");
                 Field.SetRange(FieldName, "Parent Field Name");
-                if not Field.FindFirst then
+                if not Field.FindFirst() then
                     Field.SetFilter(FieldName, '@' + "Parent Field Name" + '*');
-                Field.FindFirst;
+                Field.FindFirst();
 
                 "Parent Field Name" := Field.FieldName;
                 "Parent Field ID" := Field."No."
@@ -117,7 +117,7 @@ table 6014562 "NPR RP Data Item Links"
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
@@ -130,7 +130,7 @@ table 6014562 "NPR RP Data Item Links"
             begin
                 Field.SetRange(TableNo, "Table ID");
                 Field.SetRange("No.", "Field ID");
-                Field.FindFirst;
+                Field.FindFirst();
                 "Field Name" := Field.FieldName;
             end;
         }
@@ -149,7 +149,7 @@ table 6014562 "NPR RP Data Item Links"
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
 
-                if FieldLookup.RunModal = ACTION::LookupOK then begin
+                if FieldLookup.RunModal() = ACTION::LookupOK then begin
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
@@ -162,9 +162,9 @@ table 6014562 "NPR RP Data Item Links"
             begin
                 Field.SetRange(TableNo, "Table ID");
                 Field.SetRange(FieldName, "Field Name");
-                if not Field.FindFirst then
+                if not Field.FindFirst() then
                     Field.SetFilter(FieldName, '@' + "Field Name" + '*');
-                Field.FindFirst;
+                Field.FindFirst();
 
                 "Field Name" := Field.FieldName;
                 "Field ID" := Field."No."
@@ -212,11 +212,11 @@ table 6014562 "NPR RP Data Item Links"
                     'boolean':
                         begin
                             TempRetailList.Choice := 'True';
-                            TempRetailList.Insert;
+                            TempRetailList.Insert();
 
                             TempRetailList.Number += 1;
                             TempRetailList.Choice := 'False';
-                            TempRetailList.Insert;
+                            TempRetailList.Insert();
                             if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then
                                 "Filter Value" := TempRetailList.Choice;
                         end;
@@ -228,22 +228,22 @@ table 6014562 "NPR RP Data Item Links"
                                 if not (String in ['', ' ']) then begin
                                     TempRetailList.Choice := String;
                                     TempRetailList.Value := Format(TempRetailList.Number - 1);
-                                    TempRetailList.Insert;
+                                    TempRetailList.Insert();
                                 end;
                             end;
                             RetailListPage.SetMultipleChoiceMode(true);
                             RetailListPage.LookupMode(true);
                             RetailListPage.SetRec(TempRetailList);
-                            if RetailListPage.RunModal = ACTION::LookupOK then begin
+                            if RetailListPage.RunModal() = ACTION::LookupOK then begin
                                 "Filter Value" := '';
                                 RetailListPage.GetRec(TempRetailList);
                                 TempRetailList.SetRange(Chosen, true);
-                                if TempRetailList.FindSet then
+                                if TempRetailList.FindSet() then
                                     repeat
                                         if StrLen("Filter Value") > 0 then
                                             "Filter Value" += '|';
                                         "Filter Value" += TempRetailList.Value;
-                                    until TempRetailList.Next = 0;
+                                    until TempRetailList.Next() = 0;
                             end;
                         end;
                     else

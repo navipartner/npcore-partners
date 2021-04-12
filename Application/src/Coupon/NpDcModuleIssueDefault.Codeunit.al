@@ -1,4 +1,4 @@
-codeunit 6151592 "NPR NpDc Module Issue: Default"
+﻿codeunit 6151592 "NPR NpDc Module Issue: Default"
 {
     var
         Text000: Label 'Issue Coupon - Default';
@@ -32,7 +32,7 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         if TempCoupon.IsEmpty then
             exit;
         TempCoupon.FindFirst();
-        if TempCoupon.Count = 1 then begin
+        if TempCoupon.Count() = 1 then begin
             if CouponType."Print on Issue" then
                 Message(CouponPrintedText, TempCoupon."No.")
             else
@@ -52,16 +52,16 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         Coupon: Record "NPR NpDc Coupon";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
-        Coupon.Init;
+        Coupon.Init();
         Coupon.Validate("Coupon Type", CouponType.Code);
         Coupon."No." := '';
         Coupon.Insert(true);
 
         CouponMgt.PostIssueCoupon(Coupon);
 
-        TempCoupon.Init;
+        TempCoupon.Init();
         TempCoupon := Coupon;
-        TempCoupon.Insert;
+        TempCoupon.Insert();
     end;
 
     local procedure PrintCoupons(var TempCoupon: Record "NPR NpDc Coupon" temporary)
@@ -69,13 +69,13 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         Coupon: Record "NPR NpDc Coupon";
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
-        if not TempCoupon.FindSet then
+        if not TempCoupon.FindSet() then
             exit;
 
         repeat
             Coupon.Get(TempCoupon."No.");
             NpDcCouponMgt.PrintCoupon(Coupon);
-        until TempCoupon.Next = 0;
+        until TempCoupon.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
@@ -84,7 +84,7 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         if CouponModule.Get(CouponModule.Type::"Issue Coupon", ModuleCode()) then
             exit;
 
-        CouponModule.Init;
+        CouponModule.Init();
         CouponModule.Type := CouponModule.Type::"Issue Coupon";
         CouponModule.Code := ModuleCode();
         CouponModule.Description := Text000;

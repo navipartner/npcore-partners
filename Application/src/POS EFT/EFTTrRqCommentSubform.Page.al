@@ -48,7 +48,7 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
             }
             repeater(Group)
             {
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field';
@@ -63,13 +63,13 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if not EFTTransactionRequest.Get("Entry No.") then
-            EFTTransactionRequest.Init;
-        if EFTTransactionRequest."Receipt 1".HasValue then
+        if not EFTTransactionRequest.Get(Rec."Entry No.") then
+            EFTTransactionRequest.Init();
+        if EFTTransactionRequest."Receipt 1".HasValue() then
             Receipt1Text := StrSubstNo(TxtClickReceipt, '1')
         else
             Receipt1Text := '';
-        if EFTTransactionRequest."Receipt 2".HasValue then
+        if EFTTransactionRequest."Receipt 2".HasValue() then
             Receipt2Text := StrSubstNo(TxtClickReceipt, '2')
         else
             Receipt2Text := '';

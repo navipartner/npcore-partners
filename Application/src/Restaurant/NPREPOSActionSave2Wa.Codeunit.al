@@ -89,7 +89,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -217,7 +217,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
 
-        Commit;
+        Commit();
         POSSession.RequestRefreshData();
 
         if OpenWaiterPad then
@@ -234,7 +234,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         NPRESeatingWaiterPadLink.SetCurrentKey(Closed);
         NPRESeatingWaiterPadLink.SetRange(Closed, false);
         NPRESeatingWaiterPadLink.SetRange("Seating Code", NPRESeating.Code);
-        if NPRESeatingWaiterPadLink.FindFirst then
+        if NPRESeatingWaiterPadLink.FindFirst() then
             exit('');
 
         ConfirmString := StrSubstNo(Text001, NPRESeating.Code);
@@ -246,7 +246,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
     var
         CaptionReturnToDefaultView: Label 'Return to Default View on Finish';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -260,7 +260,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
     var
         DescReturnToDefaultView: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed';
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

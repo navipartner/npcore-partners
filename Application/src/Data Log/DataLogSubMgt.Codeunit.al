@@ -1,4 +1,4 @@
-codeunit 6059898 "NPR Data Log Sub. Mgt."
+﻿codeunit 6059898 "NPR Data Log Sub. Mgt."
 {
     // DL1.07/MH/20150515  CASE 214248 Object created
     // DL1.08/MH/20150824  CASE 221341 Error with skipped records when max records is reached corrected
@@ -14,14 +14,6 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         CleanDataLog();
     end;
 
-    var
-        Text001: Label 'Error creating %1 - %2. It already exists.';
-        DataLogChecked: Boolean;
-        DataLogActivated: Boolean;
-        MonitoredTablesLoaded: Boolean;
-        TempDataLogSetup: Record "NPR Data Log Setup (Table)" temporary;
-        "--- Debug": Integer;
-        StartTime: Time;
 
     local procedure AssignValue(var FieldRef: FieldRef; Value: Text[250])
     var
@@ -96,7 +88,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         DataLogRecord.SetCurrentKey("Log Date", "Table ID");
         Clear(DataLogField);
         DataLogField.SetCurrentKey("Log Date", "Table ID");
-        if DataLogSetup.FindSet then
+        if DataLogSetup.FindSet() then
             repeat
                 TimeStamp := CurrentDateTime - DataLogSetup."Keep Log for";
 
@@ -109,13 +101,13 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
 
                 DataLogField.SetRange("Table ID", DataLogSetup."Table ID");
                 DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
-                DataLogField.DeleteAll;
+                DataLogField.DeleteAll();
 
                 DataLogRecord.SetRange("Table ID", DataLogSetup."Table ID");
                 DataLogRecord.SetFilter("Log Date", '<%1', TimeStamp);
-                DataLogRecord.DeleteAll;
-                Commit;
-            until DataLogSetup.Next = 0;
+                DataLogRecord.DeleteAll();
+                Commit();
+            until DataLogSetup.Next() = 0;
 
         TimeStamp := CreateDateTime(CalcDate('<-3M>', Today), 0T);
 
@@ -128,34 +120,31 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
 
         DataLogField.SetRange("Table ID");
         DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
-        DataLogField.DeleteAll;
+        DataLogField.DeleteAll();
 
         DataLogRecord.SetRange("Table ID");
         DataLogRecord.SetFilter("Log Date", '<%1', TimeStamp);
-        DataLogRecord.DeleteAll;
+        DataLogRecord.DeleteAll();
     end;
 
     procedure GetNewRecords(SubscriberCode: Code[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
     var
-        DataLogRecord: Record "NPR Data Log Record";
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
         RecRef: RecordRef;
-        LastLogEntryNo: BigInteger;
-        TableFilter: Text[1024];
     begin
         RecRef.GetTable(TempDataLogRecord);
         if not RecRef.IsTemporary then
             exit(false);
-        TempDataLogRecord.DeleteAll;
-        TempDataLogSubscriber.DeleteAll;
+        TempDataLogRecord.DeleteAll();
+        TempDataLogSubscriber.DeleteAll();
 
         Clear(DataLogSubscriber);
         DataLogSubscriber.SetRange(Code, SubscriberCode);
         //-DL1.10
         DataLogSubscriber.SetFilter("Company Name", '%1|%2', '', CompanyName);
         //+DL1.10
-        if not DataLogSubscriber.FindSet then
+        if not DataLogSubscriber.FindSet() then
             exit(false);
 
         repeat
@@ -164,33 +153,33 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
             InsertNewTempRecords('', DataLogSubscriber."Table ID", DataLogSubscriber."Last Log Entry No.", MaxRecords, TempDataLogRecord);
             //+DL1.10
             if ModifySubscriber then begin
-                TempDataLogSubscriber.Init;
+                TempDataLogSubscriber.Init();
                 TempDataLogSubscriber := DataLogSubscriber;
                 TempDataLogSubscriber."Last Date Modified" := CurrentDateTime;
-                TempDataLogSubscriber.Insert;
+                TempDataLogSubscriber.Insert();
                 Clear(TempDataLogRecord);
             end;
-        until DataLogSubscriber.Next = 0;
+        until DataLogSubscriber.Next() = 0;
 
         if MaxRecords > 0 then begin
-            if TempDataLogRecord.Count > MaxRecords then begin
+            if TempDataLogRecord.Count() > MaxRecords then begin
                 if MaxRecords = 1 then
                     TempDataLogRecord.FindFirst
                 else begin
-                    TempDataLogRecord.FindSet;
+                    TempDataLogRecord.FindSet();
                     TempDataLogRecord.Next(MaxRecords - 1);
                 end;
                 TempDataLogRecord.SetFilter("Entry No.", '>%1', TempDataLogRecord."Entry No.");
-                TempDataLogRecord.DeleteAll;
+                TempDataLogRecord.DeleteAll();
                 //-DL1.08
-                if TempDataLogSubscriber.FindSet then
+                if TempDataLogSubscriber.FindSet() then
                     repeat
                         Clear(TempDataLogRecord);
                         TempDataLogRecord.SetRange("Table ID", TempDataLogSubscriber."Table ID");
-                        if TempDataLogRecord.FindLast then;
+                        if TempDataLogRecord.FindLast() then;
                         TempDataLogSubscriber."Last Log Entry No." := TempDataLogRecord."Entry No.";
-                        TempDataLogSubscriber.Modify;
-                    until TempDataLogSubscriber.Next = 0;
+                        TempDataLogSubscriber.Modify();
+                    until TempDataLogSubscriber.Next() = 0;
                 //+DL1.08
             end;
             Clear(TempDataLogRecord);
@@ -199,7 +188,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         if not ModifySubscriber then
             exit(TempDataLogRecord.FindSet);
 
-        DataLogSubscriber.FindSet;
+        DataLogSubscriber.FindSet();
         repeat
             //-DL1.10
             //TempDataLogSubscriber.GET(DataLogSubscriber.Code,DataLogSubscriber."Table ID");
@@ -214,8 +203,8 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
                 DataLogSubscriber.Modify(true);
             end;
             //+DL1.08
-            TempDataLogSubscriber.Delete;
-        until DataLogSubscriber.Next = 0;
+            TempDataLogSubscriber.Delete();
+        until DataLogSubscriber.Next() = 0;
 
         Clear(TempDataLogRecord);
         exit(TempDataLogRecord.FindSet);
@@ -223,56 +212,53 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
 
     procedure GetNewRecordsCompany(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
     var
-        DataLogRecord: Record "NPR Data Log Record";
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
         RecRef: RecordRef;
-        LastLogEntryNo: BigInteger;
-        TableFilter: Text[1024];
     begin
         //-DL1.10
         RecRef.GetTable(TempDataLogRecord);
         if not RecRef.IsTemporary then
             exit(false);
-        TempDataLogRecord.DeleteAll;
-        TempDataLogSubscriber.DeleteAll;
+        TempDataLogRecord.DeleteAll();
+        TempDataLogSubscriber.DeleteAll();
 
         Clear(DataLogSubscriber);
         DataLogSubscriber.SetRange(Code, SubscriberCode);
         DataLogSubscriber.SetRange("Company Name", SubscriberCompanyName);
-        if not DataLogSubscriber.FindSet then
+        if not DataLogSubscriber.FindSet() then
             exit(false);
 
         repeat
             InsertNewTempRecords(SubscriberCompanyName, DataLogSubscriber."Table ID",
                                  DataLogSubscriber."Last Log Entry No.", MaxRecords, TempDataLogRecord);
             if ModifySubscriber then begin
-                TempDataLogSubscriber.Init;
+                TempDataLogSubscriber.Init();
                 TempDataLogSubscriber := DataLogSubscriber;
                 TempDataLogSubscriber."Last Date Modified" := CurrentDateTime;
-                TempDataLogSubscriber.Insert;
+                TempDataLogSubscriber.Insert();
                 Clear(TempDataLogRecord);
             end;
-        until DataLogSubscriber.Next = 0;
+        until DataLogSubscriber.Next() = 0;
 
         if MaxRecords > 0 then begin
-            if TempDataLogRecord.Count > MaxRecords then begin
+            if TempDataLogRecord.Count() > MaxRecords then begin
                 if MaxRecords = 1 then
                     TempDataLogRecord.FindFirst
                 else begin
-                    TempDataLogRecord.FindSet;
+                    TempDataLogRecord.FindSet();
                     TempDataLogRecord.Next(MaxRecords - 1);
                 end;
                 TempDataLogRecord.SetFilter("Entry No.", '>%1', TempDataLogRecord."Entry No.");
-                TempDataLogRecord.DeleteAll;
-                if TempDataLogSubscriber.FindSet then
+                TempDataLogRecord.DeleteAll();
+                if TempDataLogSubscriber.FindSet() then
                     repeat
                         Clear(TempDataLogRecord);
                         TempDataLogRecord.SetRange("Table ID", TempDataLogSubscriber."Table ID");
-                        if TempDataLogRecord.FindLast then;
+                        if TempDataLogRecord.FindLast() then;
                         TempDataLogSubscriber."Last Log Entry No." := TempDataLogRecord."Entry No.";
-                        TempDataLogSubscriber.Modify;
-                    until TempDataLogSubscriber.Next = 0;
+                        TempDataLogSubscriber.Modify();
+                    until TempDataLogSubscriber.Next() = 0;
             end;
             Clear(TempDataLogRecord);
         end;
@@ -280,7 +266,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         if not ModifySubscriber then
             exit(TempDataLogRecord.FindSet);
 
-        DataLogSubscriber.FindSet;
+        DataLogSubscriber.FindSet();
         repeat
             TempDataLogSubscriber.Get(DataLogSubscriber.Code, DataLogSubscriber."Table ID", DataLogSubscriber."Company Name");
             if TempDataLogSubscriber."Last Log Entry No." > 0 then begin
@@ -288,8 +274,8 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
                 DataLogSubscriber."Last Date Modified" := TempDataLogSubscriber."Last Date Modified";
                 DataLogSubscriber.Modify(true);
             end;
-            TempDataLogSubscriber.Delete;
-        until DataLogSubscriber.Next = 0;
+            TempDataLogSubscriber.Delete();
+        until DataLogSubscriber.Next() = 0;
 
         Clear(TempDataLogRecord);
         exit(TempDataLogRecord.FindSet);
@@ -299,10 +285,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
     local procedure InsertNewTempRecords(SubscriberCompanyName: Text[30]; TableID: Integer; var LastLogEntryNo: BigInteger; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary)
     var
         DataLogRecord: Record "NPR Data Log Record";
-        DataLogSubscriber: Record "NPR Data Log Subscriber";
-        RecRef: RecordRef;
         Counter: Integer;
-        Continue: Integer;
     begin
         Counter := 0;
         Clear(DataLogRecord);
@@ -314,18 +297,18 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         DataLogRecord.SetCurrentKey("Table ID");
         DataLogRecord.SetRange("Table ID", TableID);
         DataLogRecord.SetFilter("Entry No.", '>%1', LastLogEntryNo);
-        if not DataLogRecord.FindSet then
+        if not DataLogRecord.FindSet() then
             exit;
 
         repeat
             Counter += 1;
-            TempDataLogRecord.Init;
+            TempDataLogRecord.Init();
             TempDataLogRecord := DataLogRecord;
-            TempDataLogRecord.Insert;
+            TempDataLogRecord.Insert();
             //-DL9.14 [286526]
             LastLogEntryNo := DataLogRecord."Entry No.";
         //+DL9.14 [286526]
-        until (DataLogRecord.Next = 0) or ((MaxRecords > 0) and (Counter >= MaxRecords));
+        until (DataLogRecord.Next() = 0) or ((MaxRecords > 0) and (Counter >= MaxRecords));
         //-DL9.14 [286526]
         //LastLogEntryNo := DataLogRecord."Entry No.";
         //+DL9.14 [286526]
@@ -367,7 +350,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
 
         DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
         DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
-        if not DataLogField.FindSet then begin
+        if not DataLogField.FindSet() then begin
             if Previous then
                 exit(false);
             RecordID := DataLogRecord."Record ID";
@@ -377,14 +360,14 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
 
         Clear(RecRef);
         RecRef.Open(DataLogRecord."Table ID");
-        RecRef.Init;
+        RecRef.Init();
         repeat
             FieldRef := RecRef.Field(DataLogField."Field No.");
             if Previous and DataLogField."Field Value Changed" then
                 AssignValue(FieldRef, DataLogField."Previous Field Value")
             else
                 AssignValue(FieldRef, DataLogField."Field Value");
-        until DataLogField.Next = 0;
+        until DataLogField.Next() = 0;
         exit(true);
     end;
 }

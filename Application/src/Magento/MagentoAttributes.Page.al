@@ -1,4 +1,4 @@
-page 6151431 "NPR Magento Attributes"
+﻿page 6151431 "NPR Magento Attributes"
 {
     AutoSplitKey = true;
     Caption = 'Attributes';
@@ -112,7 +112,7 @@ page 6151431 "NPR Magento Attributes"
 
     trigger OnOpenPage()
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         MagentoSetup.TestField("Attributes Enabled", true);
         SetVisible();
     end;
@@ -120,7 +120,6 @@ page 6151431 "NPR Magento Attributes"
     var
         Text001: Label 'The Type is: %1\\Type can not be changed after Creation\\Create Attribute?';
         MagentoSetup: Record "NPR Magento Setup";
-        MagentoVisibleWebVariant: Boolean;
         TypeEditable: Boolean;
 
     procedure UsedByAttributeSetDrillDown()
@@ -129,16 +128,16 @@ page 6151431 "NPR Magento Attributes"
         MagentoAttributeSetValue: Record "NPR Magento Attr. Set Value";
         TempAttributeSet: Record "NPR Magento Attribute Set" temporary;
     begin
-        TempAttributeSet.DeleteAll;
+        TempAttributeSet.DeleteAll();
         MagentoAttributeSetValue.SetRange("Attribute ID", Rec."Attribute ID");
-        if MagentoAttributeSetValue.FindSet then
+        if MagentoAttributeSetValue.FindSet() then
             repeat
                 if AttributeSet.Get(MagentoAttributeSetValue."Attribute Set ID") then begin
-                    TempAttributeSet.Init;
+                    TempAttributeSet.Init();
                     TempAttributeSet := AttributeSet;
-                    TempAttributeSet.Insert;
+                    TempAttributeSet.Insert();
                 end;
-            until MagentoAttributeSetValue.Next = 0;
+            until MagentoAttributeSetValue.Next() = 0;
         PAGE.Run(PAGE::"NPR Magento Attribute Set List", TempAttributeSet);
     end;
 
@@ -148,24 +147,23 @@ page 6151431 "NPR Magento Attributes"
         TempItem: Record Item temporary;
         MagentoItemAttribute: Record "NPR Magento Item Attr.";
     begin
-        TempItem.DeleteAll;
+        TempItem.DeleteAll();
         MagentoItemAttribute.SetRange("Attribute ID", Rec."Attribute ID");
         MagentoItemAttribute.SetFilter("Variant Code", '=%1', '');
-        if MagentoItemAttribute.FindSet then
+        if MagentoItemAttribute.FindSet() then
             repeat
                 if not TempItem.Get(MagentoItemAttribute."Item No.") then begin
                     if Item.Get(MagentoItemAttribute."Item No.") then begin
-                        TempItem.Init;
+                        TempItem.Init();
                         TempItem := Item;
-                        TempItem.Insert;
+                        TempItem.Insert();
                     end;
                 end;
-            until MagentoItemAttribute.Next = 0;
+            until MagentoItemAttribute.Next() = 0;
         PAGE.Run(PAGE::"Item List", TempItem);
     end;
 
     procedure SetVisible()
     begin
-        MagentoVisibleWebVariant := MagentoSetup."Magento Enabled";
     end;
 }

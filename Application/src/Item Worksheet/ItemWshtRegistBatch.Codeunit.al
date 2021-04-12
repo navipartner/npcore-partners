@@ -24,7 +24,7 @@ codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
 
     local procedure "Code"()
     begin
-        ItemWkshLine.LockTable;
+        ItemWkshLine.LockTable();
 
         if not ItemWkshLine.Find('=><') then begin
             ItemWkshLine."Line No." := 0;
@@ -51,7 +51,7 @@ codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
         ItemWkshLine2: Record "NPR Item Worksheet Line";
     begin
         ItemWkshLine2.Copy(ItemWkshLine);
-        if ItemWkshLine2.FindSet then
+        if ItemWkshLine2.FindSet() then
             repeat
                 ItemWkshtVariantLine2.SetRange("Worksheet Name", ItemWkshLine2."Worksheet Name");
                 ItemWkshtVariantLine2.SetRange("Worksheet Line No.", ItemWkshLine2."Line No.");
@@ -72,7 +72,7 @@ codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
     local procedure CreateRegisteredWorksheet()
     begin
         if NextEntryNo = 0 then begin
-            RegisteredItemWorksheet.LockTable;
+            RegisteredItemWorksheet.LockTable();
             if RegisteredItemWorksheet.FindLast() then
                 NextEntryNo := RegisteredItemWorksheet."No.";
             NextEntryNo := NextEntryNo + 1;

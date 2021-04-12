@@ -73,7 +73,7 @@ page 6059944 "NPR SMS Send Message"
                         trigger OnLookup(var Text: Text): Boolean
                         begin
                             if SelectedRecordRef.Number <> 0 then
-                                SelectedRecordRef.Close;
+                                SelectedRecordRef.Close();
                             if SelectRecord(Rec, SelectedRecordRef) then begin
                                 Text := Format(SelectedRecordRef.RecordId);
                                 SMSMessageText := SMSManagement.MakeMessage(Rec, SelectedRecordRef);
@@ -226,7 +226,7 @@ page 6059944 "NPR SMS Send Message"
         PageID := PageManagement.GetDefaultLookupPageID(Template."Table No.");
         if PageID <> 0 then begin
             RecRef.Open(Template."Table No.");
-            if Template."Table Filters".HasValue then begin
+            if Template."Table Filters".HasValue() then begin
                 Template.CalcFields("Table Filters");
                 Clear(TempBlob);
                 TempBlob.FromRecord(Template, Template.FieldNo("Table Filters"));
@@ -251,7 +251,7 @@ page 6059944 "NPR SMS Send Message"
         EmptyRecRef.Open(RecRef.Number);
         if RecRef.RecordId = EmptyRecRef.RecordId then
             exit(true);
-        exit(RecRef.IsEmpty);
+        exit(RecRef.IsEmpty());
     end;
 }
 

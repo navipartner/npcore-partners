@@ -6,7 +6,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
     end;
 
     var
-        ResponseSourceType: Option EXTERNAL,ADMISSTION_LIMIT;
         ContraintText: Text;
         USER_CONFIRM_MESSAGE: Label '%1\\Do you want to allow action anyway?';
 
@@ -57,7 +56,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
     local procedure InternalLogArrival(ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; ResponseMessage: Text; ResponseCode: Integer; ResponseRuleEntry: Integer)
     var
-        MembershipSetup: Record "NPR MM Membership Setup";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         DoReuseLogEntry: Boolean;
     begin
@@ -75,7 +73,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
         MemberArrivalLogEntry."Event Type" := MemberArrivalLogEntry."Event Type"::ARRIVAL;
         MemberArrivalLogEntry."Created At" := CurrentDateTime();
-        MemberArrivalLogEntry."Local Date" := Today;
+        MemberArrivalLogEntry."Local Date" := Today();
         MemberArrivalLogEntry."Local Time" := Time; // TIME from webclient and webservice are different
 
         MemberArrivalLogEntry."External Membership No." := ExternalMemberShipNo;
@@ -109,7 +107,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
     local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
-        MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         ExternalMemberNo: Code[20];
         ExternalMembershipNo: Code[20];
         MembershipCode: Code[20];
@@ -296,104 +293,101 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MyTime: Time;
     begin
 
-        with MembershipLimitationSetup do begin
+        MembershipLimitationSetup.Get(RuleEntryNo);
+        MyTime := DT2Time(CurrentDateTime()); // TIME from webclient and webservice is not same
 
-            Get(RuleEntryNo);
-            MyTime := DT2Time(CurrentDateTime()); // TIME from webclient and webservice is not same
+        MemberArrivalLogEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', false);
+        MemberArrivalLogEntry.SetFilter("Entry No.", '<>%1', IgnoreLogEntryNo);
 
-            MemberArrivalLogEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-            MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', false);
-            MemberArrivalLogEntry.SetFilter("Entry No.", '<>%1', IgnoreLogEntryNo);
-
-            case "Constraint Source" of
-                "Constraint Source"::MEMBER:
-                    MemberArrivalLogEntry.SetFilter("External Member No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Member No.")));
-                "Constraint Source"::MEMBERCARD:
+        case MembershipLimitationSetup."Constraint Source" of
+            MembershipLimitationSetup."Constraint Source"::MEMBER:
+                MemberArrivalLogEntry.SetFilter("External Member No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Member No.")));
+            MembershipLimitationSetup."Constraint Source"::MEMBERCARD:
+                MemberArrivalLogEntry.SetFilter("External Card No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")));
+            MembershipLimitationSetup."Constraint Source"::MEMBERSHIP:
+                MemberArrivalLogEntry.SetFilter("External Membership No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Membership No.")));
+            MembershipLimitationSetup."Constraint Source"::TEMP_MEMBERCARD:
+                begin
                     MemberArrivalLogEntry.SetFilter("External Card No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")));
-                "Constraint Source"::MEMBERSHIP:
-                    MemberArrivalLogEntry.SetFilter("External Membership No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Membership No.")));
-                "Constraint Source"::TEMP_MEMBERCARD:
-                    begin
-                        MemberArrivalLogEntry.SetFilter("External Card No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")));
-                        MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', true);
-                    end;
-
-                "Constraint Source"::GDPR_PENDING:
-                    begin
-                        if (not MemberHasPendingGDPRRequest(CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")))) then
-                            exit(false);
-                        MemberArrivalLogEntry.SetFilter("External Card No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")));
-                    end;
-                "Constraint Source"::GDPR_REJECTED:
-                    exit(MemberHasRejectedGDPRRequest(CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No."))));
-
-            end;
-
-            case "Event Type" of
-                "Event Type"::SUCCESS_COUNT:
-                    MemberArrivalLogEntry.SetFilter("Response Type", '=%1', MemberArrivalLogEntry."Response Type"::SUCCESS);
-                "Event Type"::FAIL_COUNT:
-                    MemberArrivalLogEntry.SetFilter("Response Type", '<>%1', MemberArrivalLogEntry."Response Type"::SUCCESS);
-            end;
-
-            case "Constraint Type" of
-                "Constraint Type"::RELATIVE_TIME:
-                    begin
-                        RuleConditionalValue := StrSubstNo('%1', "Constraint Seconds");
-                        RelativeDateTime := CurrentDateTime() - ("Constraint Seconds" * 1000);
-                        MemberArrivalLogEntry.SetFilter("Created At", '>=%1', RelativeDateTime);
-                    end;
-
-                "Constraint Type"::FIXED_TIME:
-                    begin
-                        RuleConditionalValue := StrSubstNo('%1 - %2', "Constraint From Time", "Constraint Until Time");
-                        MemberArrivalLogEntry.SetFilter("Local Date", '=%1', Today);
-                        MemberArrivalLogEntry.SetFilter("Local Time", '>=%1 & <=%2', "Constraint From Time", "Constraint Until Time");
-                    end;
-
-                "Constraint Type"::DATEFORMULA:
-                    begin
-                        RuleConditionalValue := StrSubstNo('%1', CalcDate("Constraint Dateformula", Today));
-                        MemberArrivalLogEntry.SetFilter("Local Date", '>=%1', CalcDate("Constraint Dateformula", Today));
-                    end;
-            end;
-
-            MatchCount := MemberArrivalLogEntry.Count();
-
-            ContraintText := '';
-            if (MemberArrivalLogEntry.FindFirst()) then begin
-                case "Constraint Type" of
-                    "Constraint Type"::RELATIVE_TIME:
-                        ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
-                    "Constraint Type"::FIXED_TIME:
-                        ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
-                    "Constraint Type"::DATEFORMULA:
-                        ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                    MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', true);
                 end;
-            end else begin
-                case "Constraint Type" of
-                    "Constraint Type"::RELATIVE_TIME:
-                        ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds");
-                    "Constraint Type"::FIXED_TIME:
-                        ContraintText := StrSubstNo('%1 - %2', "Constraint From Time", "Constraint Until Time");
-                    "Constraint Type"::DATEFORMULA:
-                        ContraintText := StrSubstNo('%1', Today);
-                end;
-            end;
 
-            if ("Event Limit" = 0) then begin
-                case "Constraint Type" of
-                    "Constraint Type"::RELATIVE_TIME:
-                        exit(true);
-                    "Constraint Type"::FIXED_TIME:
-                        exit((Time > "Constraint From Time") and (Time < "Constraint Until Time"));
-                    "Constraint Type"::DATEFORMULA:
-                        exit(CalcDate("Constraint Dateformula", Today) = Today);
+            MembershipLimitationSetup."Constraint Source"::GDPR_PENDING:
+                begin
+                    if (not MemberHasPendingGDPRRequest(CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")))) then
+                        exit(false);
+                    MemberArrivalLogEntry.SetFilter("External Card No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")));
                 end;
-            end;
+            MembershipLimitationSetup."Constraint Source"::GDPR_REJECTED:
+                exit(MemberHasRejectedGDPRRequest(CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No."))));
 
-            exit(MatchCount >= "Event Limit");
         end;
+
+        case MembershipLimitationSetup."Event Type" of
+            MembershipLimitationSetup."Event Type"::SUCCESS_COUNT:
+                MemberArrivalLogEntry.SetFilter("Response Type", '=%1', MemberArrivalLogEntry."Response Type"::SUCCESS);
+            MembershipLimitationSetup."Event Type"::FAIL_COUNT:
+                MemberArrivalLogEntry.SetFilter("Response Type", '<>%1', MemberArrivalLogEntry."Response Type"::SUCCESS);
+        end;
+
+        case MembershipLimitationSetup."Constraint Type" of
+            MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
+                begin
+                    RuleConditionalValue := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds");
+                    RelativeDateTime := CurrentDateTime() - (MembershipLimitationSetup."Constraint Seconds" * 1000);
+                    MemberArrivalLogEntry.SetFilter("Created At", '>=%1', RelativeDateTime);
+                end;
+
+            MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
+                begin
+                    RuleConditionalValue := StrSubstNo('%1 - %2', MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
+                    MemberArrivalLogEntry.SetFilter("Local Date", '=%1', Today);
+                    MemberArrivalLogEntry.SetFilter("Local Time", '>=%1 & <=%2', MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
+                end;
+
+            MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
+                begin
+                    RuleConditionalValue := StrSubstNo('%1', CalcDate(MembershipLimitationSetup."Constraint Dateformula", Today));
+                    MemberArrivalLogEntry.SetFilter("Local Date", '>=%1', CalcDate(MembershipLimitationSetup."Constraint Dateformula", Today));
+                end;
+        end;
+
+        MatchCount := MemberArrivalLogEntry.Count();
+
+        ContraintText := '';
+        if (MemberArrivalLogEntry.FindFirst()) then begin
+            case MembershipLimitationSetup."Constraint Type" of
+                MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
+                    ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
+                MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
+                    ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
+                    ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+            end;
+        end else begin
+            case MembershipLimitationSetup."Constraint Type" of
+                MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
+                    ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds");
+                MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
+                    ContraintText := StrSubstNo('%1 - %2', MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
+                MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
+                    ContraintText := StrSubstNo('%1', Today);
+            end;
+        end;
+
+        if (MembershipLimitationSetup."Event Limit" = 0) then begin
+            case MembershipLimitationSetup."Constraint Type" of
+                MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
+                    exit(true);
+                MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
+                    exit((Time > MembershipLimitationSetup."Constraint From Time") and (Time < MembershipLimitationSetup."Constraint Until Time"));
+                MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
+                    exit(CalcDate(MembershipLimitationSetup."Constraint Dateformula", Today) = Today);
+            end;
+        end;
+
+        exit(MatchCount >= MembershipLimitationSetup."Event Limit");
     end;
 
     local procedure GetExternalMembershipNo(ExternalCardNo: Text[100]; var ExternalMembershipNo: Code[20]; var MembershipCode: Code[20]; var ResponseMessage: Text): Boolean

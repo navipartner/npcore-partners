@@ -26,10 +26,10 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
         ICOutboxSalesLine.SetRange("IC Transaction No.", ICOutboxTransaction."Transaction No.");
         ICOutboxSalesLine.SetRange("IC Partner Code", ICOutboxTransaction."IC Partner Code");
         ICOutboxSalesLine.SetRange("Transaction Source", ICOutboxTransaction."Transaction Source");
-        if ICOutboxSalesLine.FindSet then
+        if ICOutboxSalesLine.FindSet() then
             repeat
                 AddICRSale(ICOutboxSalesLine);
-            until ICOutboxSalesLine.Next = 0;
+            until ICOutboxSalesLine.Next() = 0;
     end;
 
     local procedure FindTransactionLinesPurchase(ICOutboxTransaction: Record "IC Outbox Transaction")
@@ -39,10 +39,10 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
         ICOutboxPurchaseLine.SetRange("IC Transaction No.", ICOutboxTransaction."Transaction No.");
         ICOutboxPurchaseLine.SetRange("IC Partner Code", ICOutboxTransaction."IC Partner Code");
         ICOutboxPurchaseLine.SetRange("Transaction Source", ICOutboxTransaction."Transaction Source");
-        if ICOutboxPurchaseLine.FindSet then
+        if ICOutboxPurchaseLine.FindSet() then
             repeat
                 AddICRPurchase(ICOutboxPurchaseLine);
-            until ICOutboxPurchaseLine.Next = 0;
+            until ICOutboxPurchaseLine.Next() = 0;
     end;
 
     local procedure AddICRSale(ICOutboxSalesLine: Record "IC Outbox Sales Line")
@@ -72,7 +72,7 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
 
         ICOutboxSalesLine."IC Item Reference No." := GetICR(SalesLine."No.", SalesLine."Variant Code");
         if ICOutboxSalesLine."IC Item Reference No." <> '' then
-            ICOutboxSalesLine.Modify;
+            ICOutboxSalesLine.Modify();
     end;
 
     local procedure AddICRPurchase(ICOutboxPurchaseLine: Record "IC Outbox Purchase Line")
@@ -102,7 +102,7 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
 
         ICOutboxPurchaseLine."IC Item Reference No." := GetICR(PurchaseLine."No.", PurchaseLine."Variant Code");
         if ICOutboxPurchaseLine."IC Item Reference No." <> '' then
-            ICOutboxPurchaseLine.Modify;
+            ICOutboxPurchaseLine.Modify();
     end;
 
     local procedure GetICR(ItemNo: Code[20]; VariantCode: Code[10]): Code[50]
@@ -112,11 +112,11 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
         ItemReference.SetRange("Item No.", ItemNo);
         ItemReference.SetRange("Variant Code", VariantCode);
         ItemReference.SetRange("Discontinue Bar Code", false);
-        if ItemReference.FindFirst then
+        if ItemReference.FindFirst() then
             exit(ItemReference."Reference No.");
 
         ItemReference.SetRange("Discontinue Bar Code");
-        if ItemReference.FindFirst then
+        if ItemReference.FindFirst() then
             exit(ItemReference."Reference No.");
     end;
 }

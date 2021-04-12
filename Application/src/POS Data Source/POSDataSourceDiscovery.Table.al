@@ -48,21 +48,20 @@ table 6150708 "NPR POS Data Source Discovery"
         MakeSureRecIsTemporary();
 
         Rec.Name := CopyStr(Name, 1, MaxStrLen(Rec.Name));
-        if Rec.Find then
+        if Rec.Find() then
             Error(Text002, Rec.Name);
 
         Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
-        Rec.Insert;
+        Rec.Insert();
     end;
 
     procedure LookupDataSource(var DataSourceName: Code[50]): Boolean
     var
-        TempDataSource: Record "NPR POS Data Source Discovery" temporary;
         DataSources: Page "NPR POS Data Sources";
     begin
         DataSources.SetCurrent(DataSourceName);
         DataSources.LookupMode := true;
-        if DataSources.RunModal = ACTION::LookupOK then begin
+        if DataSources.RunModal() = ACTION::LookupOK then begin
             DataSourceName := DataSources.GetCurrent();
             exit(true);
         end;

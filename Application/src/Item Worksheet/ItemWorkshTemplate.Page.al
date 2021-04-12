@@ -3,8 +3,8 @@ page 6060058 "NPR Item Worksh. Template"
     Caption = 'Item Worksheet Template';
     PageType = Card;
     SourceTable = "NPR Item Worksh. Template";
-    UsageCategory = Administration; 
-    ApplicationArea = All; 
+    UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {
@@ -160,7 +160,7 @@ page 6060058 "NPR Item Worksh. Template"
 
     local procedure SetFieldsEditable()
     begin
-        LeaveSkippedLineonRegisterEditable := "Delete Processed Lines";
+        LeaveSkippedLineonRegisterEditable := Rec."Delete Processed Lines";
     end;
 }
 

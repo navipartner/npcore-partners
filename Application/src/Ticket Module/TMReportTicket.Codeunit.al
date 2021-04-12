@@ -12,26 +12,24 @@ codeunit 6014571 "NPR TM Report - Ticket"
         Printer.SetAutoLineBreak(true);
         Printer.SetThreeColumnDistribution(0.465, 0.35, 0.235);
 
-        if Ticket.FindSet then
+        if Ticket.FindSet() then
             repeat
                 TicketType.Get(Ticket."Ticket Type Code");
                 if (TicketType."Print Ticket") then
                     PrintOne(Ticket);
 
-            until Ticket.Next = 0;
+            until Ticket.Next() = 0;
     end;
 
     var
         Printer: Codeunit "NPR RP Line Print Mgt.";
         Txt000001: Label 'Valid For';
         Txt000002: Label 'Time';
-        Txt000003: Label 'Ticket No.';
 
     local procedure PrintOne(Ticket: Record "NPR TM Ticket")
     var
         Item: Record Item;
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        Admission: Record "NPR TM Admission";
         TMTicketType: Record "NPR TM Ticket Type";
         PosEntry: Record "NPR POS Entry";
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";

@@ -65,8 +65,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
-        with POSPrintBuffer do
-            PrintData(Text, Font, Align, Rotation, Height, Width, X, Y);
+        PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnLookupFont', '', false, false)]
@@ -93,7 +92,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
         tmpRetailList.Number += 1;
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnGetTargetEncoding', '', false, false)]
@@ -389,7 +388,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
     begin
         RetailList.Number += 1;
         RetailList.Choice := Value;
-        RetailList.Insert;
+        RetailList.Insert();
     end;
 
     procedure ConstructHashTable()
@@ -423,13 +422,13 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
     begin
         HashTable.Template := Name;
         HashTable."Code 1" := Value;
-        HashTable.Insert;
+        HashTable.Insert();
     end;
 
     procedure GetLineHashTable(Name: Code[50]) Value: Code[50]
     begin
         HashTable.SetRange(HashTable.Template, Name);
-        if HashTable.FindFirst then
+        if HashTable.FindFirst() then
             exit(HashTable."Code 1")
         else
             Error(err0002);

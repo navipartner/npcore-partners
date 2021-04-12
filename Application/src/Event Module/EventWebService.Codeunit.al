@@ -1,4 +1,4 @@
-codeunit 6060158 "NPR Event Web Service"
+﻿codeunit 6060158 "NPR Event Web Service"
 {
     procedure CopyEventFromTemplate(BundledItemNo: Code[20]; TemplateEventNo: Code[20]; BillToCustomerNo: Code[20]; BundledItemQuantity: Decimal; BundledItemPrice: Decimal; StartDateTime: DateTime; EndDateTime: DateTime; AdditionalItems: XMLport "NPR Event Import Opt. Items"; var ReturnMessage: Text): Boolean
     var
@@ -31,7 +31,7 @@ codeunit 6060158 "NPR Event Web Service"
         EventSalesSetup.SetRange(Type, EventSalesSetup.Type::Item);
         EventSalesSetup.SetRange("No.", BundledItemNo);
         EventSalesSetup.SetRange("Event No.", TemplateEventNo);
-        if not EventSalesSetup.FindFirst then begin
+        if not EventSalesSetup.FindFirst() then begin
             ReturnMessage := StrSubstNo(ProcessingError, StrSubstNo(NoEventSalesSetup, EventSalesSetup.TableCaption,
                                                                     EventSalesSetup.FieldCaption("No."), BundledItemNo,
                                                                     EventSalesSetup.FieldCaption("Event No."), TemplateEventNo));
@@ -47,7 +47,7 @@ codeunit 6060158 "NPR Event Web Service"
             exit(false);
         end;
 
-        JobsSetup.Get;
+        JobsSetup.Get();
         if JobsSetup."Job Nos." = '' then begin
             ReturnMessage := StrSubstNo(ProcessingError, StrSubstNo(NoJobsSetupNos, JobsSetup.FieldCaption("Job Nos."), JobsSetup.TableCaption));
             exit(false);
@@ -68,10 +68,10 @@ codeunit 6060158 "NPR Event Web Service"
             TargetJob.Validate("NPR Starting Time", DT2Time(StartDateTime));
         if DT2Time(EndDateTime) <> 0T then
             TargetJob.Validate("NPR Ending Time", DT2Time(EndDateTime));
-        TargetJob.Modify;
+        TargetJob.Modify();
 
         JobTask.SetRange("Job No.", TargetJob."No.");
-        if not JobTask.FindFirst then begin
+        if not JobTask.FindFirst() then begin
             ReturnMessage := StrSubstNo(ProcessingError, NoJobTask);
             exit(false);
         end;
@@ -83,10 +83,10 @@ codeunit 6060158 "NPR Event Web Service"
 
         LineNo := 10000;
         JobPlanningLine.SetRange("Job No.", TargetJob."No.");
-        if JobPlanningLine.FindLast then
+        if JobPlanningLine.FindLast() then
             LineNo := JobPlanningLine."Line No." + 10000;
 
-        JobPlanningLine.Init;
+        JobPlanningLine.Init();
         JobPlanningLine."Job No." := TargetJob."No.";
         JobPlanningLine."Job Task No." := JobTask."Job Task No.";
         JobPlanningLine."Line No." := LineNo;
@@ -100,9 +100,9 @@ codeunit 6060158 "NPR Event Web Service"
         LineNo += 10000;
 
         AdditionalItems.GetOptionalItems(TempJobPlanningLine);
-        if TempJobPlanningLine.FindSet then
+        if TempJobPlanningLine.FindSet() then
             repeat
-                JobPlanningLine.Init;
+                JobPlanningLine.Init();
                 JobPlanningLine."Job No." := TargetJob."No.";
                 JobPlanningLine."Job Task No." := JobTask."Job Task No.";
                 JobPlanningLine."Line No." := LineNo;
@@ -117,7 +117,7 @@ codeunit 6060158 "NPR Event Web Service"
                 JobPlanningLine.Validate("Line Discount %", TempJobPlanningLine."Line Discount %");
                 JobPlanningLine.Modify(true);
                 LineNo += 10000;
-            until TempJobPlanningLine.Next = 0;
+            until TempJobPlanningLine.Next() = 0;
 
         ReturnMessage := StrSubstNo(SuccessMsg, TargetJob."No.");
         exit(true);

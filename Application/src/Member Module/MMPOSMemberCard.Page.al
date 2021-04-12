@@ -5,7 +5,7 @@ page 6060140 "NPR MM POS Member Card"
 
     UsageCategory = None;
     Caption = 'Member Details';
-    DataCaptionExpression = "External Member No." + ' - ' + "Display Name";
+    DataCaptionExpression = Rec."External Member No." + ' - ' + Rec."Display Name";
     DeleteAllowed = false;
     InsertAllowed = false;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
@@ -18,37 +18,37 @@ page 6060140 "NPR MM POS Member Card"
         {
             group(General)
             {
-                field("External Member No."; "External Member No.")
+                field("External Member No."; Rec."External Member No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Member No. field';
                 }
-                field("Display Name"; "Display Name")
+                field("Display Name"; Rec."Display Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Display Name field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field("Phone No."; "Phone No.")
+                field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
-                field("E-Mail Address"; "E-Mail Address")
+                field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
@@ -63,29 +63,29 @@ page 6060140 "NPR MM POS Member Card"
             }
             group(CRM)
             {
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Picture field';
                 }
-                field(Gender; Gender)
+                field(Gender; Rec.Gender)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Gender field';
                 }
-                field(Birthday; Birthday)
+                field(Birthday; Rec.Birthday)
                 {
                     ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = IsBirthday;
                     ToolTip = 'Specifies the value of the Birthday field';
                 }
-                field("E-Mail News Letter"; "E-Mail News Letter")
+                field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
                 }
-                field("Notification Method"; "Notification Method")
+                field("Notification Method"; Rec."Notification Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notification Method field';
@@ -184,7 +184,7 @@ page 6060140 "NPR MM POS Member Card"
                 Caption = 'Member Card';
                 Image = Customer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Card";
@@ -197,7 +197,7 @@ page 6060140 "NPR MM POS Member Card"
                 Caption = 'Register Arrival';
                 Image = Approve;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -209,7 +209,7 @@ page 6060140 "NPR MM POS Member Card"
                     ResponseMessage: Text;
                 begin
 
-                    if (not MemberWebService.MemberRegisterArrival("External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
+                    if (not MemberWebService.MemberRegisterArrival(Rec."External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
                         Error(ResponseMessage);
 
                     Message(ResponseMessage);
@@ -222,7 +222,7 @@ page 6060140 "NPR MM POS Member Card"
                 Enabled = NeedsActivation;
                 Image = Start;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Activate Membership action';
@@ -240,7 +240,7 @@ page 6060140 "NPR MM POS Member Card"
                 Ellipsis = true;
                 Image = ChangeCustomer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Add Guardian action';
@@ -256,7 +256,7 @@ page 6060140 "NPR MM POS Member Card"
                 Caption = 'Profiles';
                 Image = Answers;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Profiles action';
 
@@ -271,7 +271,7 @@ page 6060140 "NPR MM POS Member Card"
                 Ellipsis = true;
                 Image = PrintVoucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -279,14 +279,13 @@ page 6060140 "NPR MM POS Member Card"
 
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
                     MemberCardEntryNo: Integer;
                 begin
 
-                    if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
+                    if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, Rec."External Member No.", Rec."Display Name"))) then begin
                         //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
                         MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo();
-                        MemberRetailIntegration.PrintMemberCard("Entry No.", MemberCardEntryNo);
+                        MemberRetailIntegration.PrintMemberCard(Rec."Entry No.", MemberCardEntryNo);
                     end;
                 end;
             }
@@ -302,7 +301,7 @@ page 6060140 "NPR MM POS Member Card"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
@@ -332,7 +331,7 @@ page 6060140 "NPR MM POS Member Card"
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Ledger Entries action';
@@ -361,7 +360,7 @@ page 6060140 "NPR MM POS Member Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'F7';
                     ApplicationArea = All;
@@ -393,7 +392,7 @@ page 6060140 "NPR MM POS Member Card"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -406,7 +405,7 @@ page 6060140 "NPR MM POS Member Card"
                     begin
 
                         if (Membership."Customer No." = '') then
-                            Error(NO_ENTRIES, "External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
                         if (RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction)) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
@@ -418,7 +417,7 @@ page 6060140 "NPR MM POS Member Card"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -431,7 +430,7 @@ page 6060140 "NPR MM POS Member Card"
                     begin
 
                         if (Membership."Customer No." = '') then
-                            Error(NO_ENTRIES, "External Member No.");
+                            Error(NO_ENTRIES, Rec."External Member No.");
                         if (RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction)) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
@@ -461,7 +460,7 @@ page 6060140 "NPR MM POS Member Card"
         if (GMembershipEntryNo <> 0) then
             MembershipRole.SetFilter("Membership Entry No.", '=%1', GMembershipEntryNo);
 
-        MembershipRole.SetFilter("Member Entry No.", '=%1', "Entry No.");
+        MembershipRole.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
         MembershipRole.SetFilter(Blocked, '=%1', false);
         if (MembershipRole.FindFirst()) then begin
             Membership.Get(MembershipRole."Membership Entry No.");
@@ -514,10 +513,10 @@ page 6060140 "NPR MM POS Member Card"
 
         end;
 
-        if (Birthday <> 0D) then
-            IsBirthday := ((Date2DMY(Birthday, 1) = Date2DMY(Today, 1)) and (Date2DMY(Birthday, 2) = Date2DMY(Today, 2)));
+        if (Rec.Birthday <> 0D) then
+            IsBirthday := ((Date2DMY(Rec.Birthday, 1) = Date2DMY(Today, 1)) and (Date2DMY(Rec.Birthday, 2) = Date2DMY(Today, 2)));
 
-        IsInvalid := (Blocked);
+        IsInvalid := (Rec.Blocked);
     end;
 
     trigger OnOpenPage()
@@ -525,7 +524,7 @@ page 6060140 "NPR MM POS Member Card"
         RaptorSetup: Record "NPR Raptor Setup";
     begin
 
-        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
 
     end;
 
@@ -560,11 +559,9 @@ page 6060140 "NPR MM POS Member Card"
     local procedure AddMembershipGuardian()
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         PageAction: Action;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        ResponseMessage: Text;
     begin
 
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";

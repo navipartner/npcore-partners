@@ -29,7 +29,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
 
         Template := POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'print_template', '');
 
-        POSPaymentBin.SetRecFilter;
+        POSPaymentBin.SetRecFilter();
         RecordVariant := POSPaymentBin;
         RPTemplateMgt.PrintTemplate(Template, RecordVariant, 0);
 
@@ -42,7 +42,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := InvokeMethodCode;
         tmpRetailList.Value := InvokeMethodCode;
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150641, 'OnShowInvokeParameters', '', false, false)]

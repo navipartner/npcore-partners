@@ -41,7 +41,7 @@ table 6014674 "NPR Endpoint"
         }
         field(35; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
@@ -129,7 +129,7 @@ table 6014674 "NPR Endpoint"
         }
         field(300; "No. of Inboud Queries"; Integer)
         {
-            CalcFormula = Count ("NPR Endpoint Query" WHERE("Endpoint Code" = FIELD(Code),
+            CalcFormula = Count("NPR Endpoint Query" WHERE("Endpoint Code" = FIELD(Code),
                                                         Direction = CONST(Incoming)));
             Caption = 'No. of Inboud Queries';
             Editable = false;
@@ -137,7 +137,7 @@ table 6014674 "NPR Endpoint"
         }
         field(310; "No. of Outbound Queries"; Integer)
         {
-            CalcFormula = Count ("NPR Endpoint Query" WHERE("Endpoint Code" = FIELD(Code),
+            CalcFormula = Count("NPR Endpoint Query" WHERE("Endpoint Code" = FIELD(Code),
                                                         Direction = CONST(Outgoing)));
             Caption = 'No. of Outbound Queries';
             Editable = false;
@@ -145,7 +145,7 @@ table 6014674 "NPR Endpoint"
         }
         field(320; "No. of Requests"; Integer)
         {
-            CalcFormula = Count ("NPR Endpoint Request" WHERE("Endpoint Code" = FIELD(Code)));
+            CalcFormula = Count("NPR Endpoint Request" WHERE("Endpoint Code" = FIELD(Code)));
             Caption = 'No. of Requests';
             Editable = false;
             FieldClass = FlowField;

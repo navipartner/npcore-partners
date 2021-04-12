@@ -15,7 +15,7 @@ codeunit 6059975 "NPR Variety ShowTables"
         VRTMatrix: Page "NPR Variety Matrix";
     begin
         VRTMatrix.SetRecordRef(RecRef, Item, ShowFieldNo);
-        VRTMatrix.RunModal;
+        VRTMatrix.RunModal();
     end;
 
     procedure ShowBooleanMatrix(RecRef: RecordRef; var Item: Record Item; ShowFieldNo: Integer)
@@ -24,7 +24,7 @@ codeunit 6059975 "NPR Variety ShowTables"
     begin
         //-VRT1.11
         VRTMatrixBool.SetRecordRef(RecRef, Item, ShowFieldNo);
-        VRTMatrixBool.RunModal;
+        VRTMatrixBool.RunModal();
         //+VRT1.11
     end;
 
@@ -33,7 +33,7 @@ codeunit 6059975 "NPR Variety ShowTables"
         Location: Record Location;
     begin
         Location.SetRange(Code, LookupValue);
-        if Location.FindFirst then;
+        if Location.FindFirst() then;
         Location.SetRange(Code);
         if PAGE.RunModal(0, Location) = ACTION::LookupOK then
             exit(Location.Code);
@@ -45,7 +45,6 @@ codeunit 6059975 "NPR Variety ShowTables"
     var
         RecRef: RecordRef;
         FRef: FieldRef;
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
     begin
         //-NPR5.32 [274170]
         if TMPVrtBuffer."Variant Code" = '' then

@@ -59,19 +59,15 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
-        tmpEFTIntegrationType.Init;
+        tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT MobilePay Integ.";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
-    var
-        EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
-        EFTTypePOSUnitBLOBParam: Record "NPR EFTType POSUnit BLOBParam.";
-        EFTInterface: Codeunit "NPR EFT Interface";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
@@ -87,9 +83,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
-    var
-        EFTTypePaymentBLOBParam: Record "NPR EFTType Paym. BLOB Param.";
-        EFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param.";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
@@ -222,8 +215,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure InitializeGlobals(PaymentType: Code[10]; RegisterNo: Code[10])
     var
-        EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
-        EFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param.";
         EFTSetupIn: Record "NPR EFT Setup";
     begin
         EFTSetupIn.FindSetup(RegisterNo, PaymentType);
@@ -265,9 +256,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure RegisterPoS(EFTSetupIn: Record "NPR EFT Setup")
     var
-        RegisterPoSId: Text;
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
-        NewPoSID: Text;
     begin
         ClearAll;
         ClearLastError();
@@ -283,8 +272,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     procedure UpdateRegisteredPoSName(EFTSetupIn: Record "NPR EFT Setup")
-    var
-        EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
         ClearAll;
         ClearLastError();
@@ -320,7 +307,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure AssignPoSUnitIdToPoS(EFTSetupIn: Record "NPR EFT Setup")
     var
-        RegisterPoSUnitId: Text[50];
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
         ClearAll;
@@ -345,7 +331,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure UnAssignPoSUnitIdToPoS(EFTSetupIn: Record "NPR EFT Setup")
     var
-        RegisterPoSUnitId: Text[50];
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
         ClearAll;
@@ -411,7 +396,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
                 EFTTypePOSUnitGenParam.SetRange("Integration Type", IntegrationType());
                 EFTTypePOSUnitGenParam.SetRange(Name, 'PoS ID');
                 EFTTypePOSUnitGenParam.SetRange(Value, RegisterPoSId);
-                Found := EFTTypePOSUnitGenParam.FindFirst;
+                Found := EFTTypePOSUnitGenParam.FindFirst();
             end;
             if Found then
                 Message(Text6014524, RegisterPoSUnitId, EFTTypePOSUnitGenParam."POS Unit No.", RegisterPoSId)
@@ -429,7 +414,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         InitializeGlobals(EftTransactionRequest."POS Payment Type Code", EftTransactionRequest."Register No.");
 
         EftTransactionRequest."Reference Number Input" := StrSubstNo('%1-%2-%3', EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Entry No.");
-        EftTransactionRequest.Modify;
+        EftTransactionRequest.Modify();
 
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
@@ -445,7 +430,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure GetPaymentStatus(var EFTTransReq: Record "NPR EFT Transaction Request"): Boolean
     var
-        RegisterPoSId: Text[50];
         PaymentStatus: Integer;
         CustomerID: Text;
         TransactionID: Text;
@@ -474,7 +458,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
                 EFTTransReq."Result Amount" := EFTTransReq."Amount Input";
             end;
 
-            EFTTransReq.Modify; //Persist changes across multiple status checks.
+            EFTTransReq.Modify(); //Persist changes across multiple status checks.
 
             exit(true);
         end;
@@ -663,7 +647,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
-        CustToken: Integer;
     begin
         RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
         RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
@@ -706,9 +689,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
-        TransactionPaymentStatus: Text[30];
-        TransactionCustomerID: Text[30];
-        TransactionPaymentID: Text[30];
     begin
         RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
         RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
@@ -741,7 +721,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
         ReqStreamWriter.Write(JSONRequestBody);
         ReqStreamWriter.Flush;
-        ReqStreamWriter.Close;
+        ReqStreamWriter.Close();
         Clear(ReqStreamWriter);
         Clear(ReqStream);
 
@@ -779,7 +759,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         HMACString: Text[1024];
         MerchantKey: Text[50];
         HashValue: Text[100];
-        CharSet: Text[30];
     begin
         HMACString := StrSubstNo('%1%2#%3#%4#%5#%6#%7', MerchantID,
                                                        LocationID,
@@ -869,7 +848,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         exit(true);
     end;
 
-    local procedure GetUnixTime(ToDateTime: DateTime) UnixTimeStamp: Integer
+    local procedure GetUnixTime(ToDateTime: DateTime): Integer
     var
         Duration: Duration;
         DurationMs: BigInteger;
@@ -909,7 +888,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     local procedure GetSha256Hash(Value: Text; Encoding: DotNet NPRNetEncoding): Text
     var
         Sha256: DotNet NPRNetSHA256Managed;
-        Convert: DotNet NPRNetConvert;
     begin
         Sha256 := Sha256.SHA256Managed();
         exit(Encoding.GetString(Sha256.ComputeHash(Encoding.GetBytes(Value))));

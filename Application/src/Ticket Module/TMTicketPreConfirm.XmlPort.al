@@ -89,7 +89,6 @@ xmlport 6060115 "NPR TM Ticket PreConfirm"
         ReservationID: Text[100];
         ExternalIdCount: Integer;
         QtySum: Integer;
-        n: Integer;
 
     procedure GetToken(): Text[100]
     begin

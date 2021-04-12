@@ -1,8 +1,8 @@
 report 6014434 "NPR Vendor/Debtor by date"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/VendorDebtor by date.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/VendorDebtor by date.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Vendor/Customer by date';
     dataset
@@ -165,7 +165,7 @@ report 6014434 "NPR Vendor/Debtor by date"
 
     trigger OnInitReport()
     begin
-        Tildato := Today;
+        Tildato := Today();
         Kunmedsaldo := false;
         PrintKreditor := true;
         PrintDebitor := true;
@@ -184,9 +184,7 @@ report 6014434 "NPR Vendor/Debtor by date"
         PrintKreditor: Boolean;
         ShowCreditor: Boolean;
         ShowCustomer: Boolean;
-        afddebitor: Code[20];
         afdfilter: Code[20];
         Tildato: Date;
-        Totalsaldo: Decimal;
 }
 

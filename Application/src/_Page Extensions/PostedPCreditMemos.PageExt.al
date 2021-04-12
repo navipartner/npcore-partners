@@ -9,7 +9,7 @@ pageextension 6014419 "NPR Posted P.Credit Memos" extends "Posted Purchase Credi
                 Caption = 'Show Imported File';
                 Image = DocInBrowser;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Imported File action';

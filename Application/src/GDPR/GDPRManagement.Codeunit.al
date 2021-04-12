@@ -20,7 +20,6 @@ codeunit 6151120 "NPR GDPR Management"
 
     procedure CreateAgreementAcceptEntry(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35])
     var
-        GDPRAgreement: Record "NPR GDPR Agreement";
         GDPRConsentLog: Record "NPR GDPR Consent Log";
     begin
 
@@ -32,7 +31,6 @@ codeunit 6151120 "NPR GDPR Management"
 
     procedure CreateAgreementRejectEntry(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35])
     var
-        GDPRAgreement: Record "NPR GDPR Agreement";
         GDPRConsentLog: Record "NPR GDPR Consent Log";
     begin
 
@@ -44,7 +42,6 @@ codeunit 6151120 "NPR GDPR Management"
 
     procedure CreateAgreementDelegateToGuardianEntry(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35])
     var
-        GDPRAgreement: Record "NPR GDPR Agreement";
         GDPRConsentLog: Record "NPR GDPR Consent Log";
     begin
 
@@ -69,7 +66,7 @@ codeunit 6151120 "NPR GDPR Management"
             if (GDPRConsentLog."Entry Approval State" = State) then
                 exit;
 
-        GDPRConsentLog.Init;
+        GDPRConsentLog.Init();
         GDPRConsentLog."Entry No." := 0;
         GDPRConsentLog."Entry Approval State" := State;
         GDPRConsentLog."Agreement No." := AgreementNo;

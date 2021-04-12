@@ -14,19 +14,19 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
         Clear(RecRef);
         RecRef.Open(Rec."Table No.");
         RecRef.SetPosition(Rec."Record Position");
-        if not RecRef.Find then
+        if not RecRef.Find() then
             exit;
 
         CustomValue := GetExclVat(RecRef, NpXmlElement."Field No.");
         if (CustomValue = '0') and (NpXmlElement."Blank Zero") then
             CustomValue := '';
-        RecRef.Close;
+        RecRef.Close();
 
         Clear(RecRef);
 
         Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     local procedure GetExclVat(RecRef: RecordRef; FieldNo: Integer) DecimalExclVat: Text
@@ -36,7 +36,6 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
         SalesPrice: Record "Sales Price";
         VATPostingSetup: Record "VAT Posting Setup";
         FieldRef: FieldRef;
-        Option: Integer;
         DecimalValue: Decimal;
         MagentoItemCustomOption: Record "NPR Magento Item Custom Option";
         MagentoItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
@@ -52,7 +51,7 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
             DATABASE::Item:
                 begin
                     RecRef.SetTable(Item);
-                    if Item.Find and Item."Price Includes VAT" then begin
+                    if Item.Find() and Item."Price Includes VAT" then begin
                         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
                     end;
@@ -60,7 +59,7 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
             DATABASE::"Sales Price":
                 begin
                     RecRef.SetTable(SalesPrice);
-                    if SalesPrice.Find and SalesPrice."Price Includes VAT" then begin
+                    if SalesPrice.Find() and SalesPrice."Price Includes VAT" then begin
                         Item.Get(SalesPrice."Item No.");
                         VATPostingSetup.Get(SalesPrice."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
@@ -70,7 +69,7 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
             DATABASE::"NPR Magento Item Custom Option":
                 begin
                     RecRef.SetTable(MagentoItemCustomOption);
-                    if MagentoItemCustomOption.Find and MagentoItemCustomOption."Price Includes VAT" then begin
+                    if MagentoItemCustomOption.Find() and MagentoItemCustomOption."Price Includes VAT" then begin
                         Item.Get(MagentoItemCustomOption."Item No.");
                         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
@@ -80,7 +79,7 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
             DATABASE::"NPR Magento Itm Cstm Opt.Value":
                 begin
                     RecRef.SetTable(MagentoItemCustomOptValue);
-                    if MagentoItemCustomOptValue.Find and MagentoItemCustomOptValue."Price Includes VAT" then begin
+                    if MagentoItemCustomOptValue.Find() and MagentoItemCustomOptValue."Price Includes VAT" then begin
                         Item.Get(MagentoItemCustomOptValue."Item No.");
                         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
@@ -88,7 +87,7 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
                 end;
         end;
 
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
         DecimalValue := Round(DecimalValue, GeneralLedgerSetup."Unit-Amount Rounding Precision");
         DecimalExclVat := Format(DecimalValue, 0, 9);
         exit(DecimalExclVat);

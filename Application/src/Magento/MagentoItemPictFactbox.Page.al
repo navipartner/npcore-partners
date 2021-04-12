@@ -1,4 +1,4 @@
-page 6151447 "NPR Magento Item Pict. Factbox"
+﻿page 6151447 "NPR Magento Item Pict. Factbox"
 {
     Caption = 'Picture';
     PageType = CardPart;
@@ -41,24 +41,24 @@ page 6151447 "NPR Magento Item Pict. Factbox"
     begin
         HasPicture := false;
         Initialize();
-        if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
+        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
             exit;
         if not (MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"]) then
             exit;
         Clear(TempMagentoPicture.Picture);
         MagentoPictureLink.SetRange("Item No.", Rec."No.");
         MagentoPictureLink.SetRange("Base Image", true);
-        if not MagentoPictureLink.FindFirst then
+        if not MagentoPictureLink.FindFirst() then
             exit;
 
         if not MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
             exit;
 
         if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then begin
-            TempMagentoPicture.Init;
+            TempMagentoPicture.Init();
             TempMagentoPicture := MagentoPicture;
         end else begin
-            TempMagentoPicture.Init;
+            TempMagentoPicture.Init();
             TempMagentoPicture.Type := TempMagentoPicture.Type::Item;
             TempMagentoPicture.Name := MagentoPictureLink."Picture Name";
         end;
@@ -72,7 +72,7 @@ page 6151447 "NPR Magento Item Pict. Factbox"
         if Initialized then
             exit;
 
-        if MagentoSetup.Get then;
+        if MagentoSetup.Get() then;
         Initialized := true;
     end;
 }

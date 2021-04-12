@@ -96,7 +96,7 @@ table 6151199 "NPR NpCs Document Log Entry"
         TextBuffer: Text;
     begin
         FullLogMessage := '';
-        if not "Error Message".HasValue then
+        if not "Error Message".HasValue() then
             exit('');
 
         CalcFields("Error Message");

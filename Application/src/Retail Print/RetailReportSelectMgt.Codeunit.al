@@ -19,40 +19,33 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
 
 
     trigger OnRun()
-    var
-        StringLibrary: Codeunit "NPR String Library";
     begin
     end;
 
     var
-        Err000001: Label 'Invalid Type: %1';
         RegisterNo: Code[10];
         Import: Boolean;
         ReqWindow: Boolean;
         SystemPrinter: Boolean;
-        PrintSingle: Boolean;
-        MatrixPrintQuantity: Integer;
         MatrixPrintIterationFieldNo: Integer;
 
     procedure RunObjects(var RecRef: RecordRef; ReportType: Integer)
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
-        with ReportSelectionRetail do begin
-            SetRange("Report Type", ReportType);
+        ReportSelectionRetail.SetRange("Report Type", ReportType);
 
-            if RegisterNo <> '' then
-                SetRange("Register No.", RegisterNo);
+        if RegisterNo <> '' then
+            ReportSelectionRetail.SetRange("Register No.", RegisterNo);
 
-            if IsEmpty then
-                SetRange("Register No.", '');
+        if ReportSelectionRetail.IsEmpty then
+            ReportSelectionRetail.SetRange("Register No.", '');
 
-            SetRange(Optional, false);
-            RunSelection(ReportSelectionRetail, RecRef);
+        ReportSelectionRetail.SetRange(Optional, false);
+        RunSelection(ReportSelectionRetail, RecRef);
 
-            SetRange(Optional, true);
-            RunOptionalSelection(ReportSelectionRetail, RecRef);
-        end;
+        ReportSelectionRetail.SetRange(Optional, true);
+        RunOptionalSelection(ReportSelectionRetail, RecRef);
     end;
 
     local procedure "-- Settings"()
@@ -96,7 +89,7 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
     begin
         ReportSelection.SetCurrentKey("Report Type", Sequence);
         ReportSelection.SetAutoCalcFields("Report Name", "Codeunit Name", "XML Port Name");
-        if ReportSelection.FindSet then
+        if ReportSelection.FindSet() then
             repeat
                 case true of
                     ReportSelection."Print Template" <> '':
@@ -108,7 +101,7 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
                     ReportSelection."XML Port Name" <> '':
                         OptionString += DelChr(ReportSelection."XML Port Name", '=', ',') + ',';
                 end;
-            until ReportSelection.Next = 0;
+            until ReportSelection.Next() = 0;
 
         if OptionString = '' then
             exit;
@@ -116,22 +109,21 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
         Option := StrMenu(OptionString);
 
         if Option > 0 then begin
-            ReportSelection.FindSet;
+            ReportSelection.FindSet();
             Itt := 1;
             repeat
                 if Itt = Option then begin
-                    ReportSelection.SetRecFilter;
+                    ReportSelection.SetRecFilter();
                     RunSelection(ReportSelection, RecRefIn);
                 end;
                 Itt += 1;
-            until ReportSelection.Next = 0;
+            until ReportSelection.Next() = 0;
         end;
     end;
 
     local procedure RunSelection(var ReportSelection: Record "NPR Report Selection Retail"; var RecRefIn: RecordRef)
     var
         Variant: Variant;
-        MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
@@ -140,42 +132,40 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
         TaskLine: Record "NPR Task Line" temporary;
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        with ReportSelection do begin
-            if FindSet then
-                repeat
-                    if Format("Record Filter") <> '' then begin
-                        TaskLine.Init;
-                        TaskLine."Table 1 No." := "Filter Object ID";
-                        TaskLine."Table 1 Filter" := "Record Filter";
-                        RecordView := TaskLine.GetTableView("Filter Object ID", RecordView);
-                    end else
-                        RecordView := '';
+        if ReportSelection.FindSet() then
+            repeat
+                if Format(ReportSelection."Record Filter") <> '' then begin
+                    TaskLine.Init();
+                    TaskLine."Table 1 No." := ReportSelection."Filter Object ID";
+                    TaskLine."Table 1 Filter" := ReportSelection."Record Filter";
+                    RecordView := TaskLine.GetTableView(ReportSelection."Filter Object ID", RecordView);
+                end else
+                    RecordView := '';
 
-                    RecRef := RecRefIn.Duplicate;
-                    if TestRecRefFilter(RecRef, "Filter Object ID", RecordView) then begin
-                        Variant := RecRef;
-                        case true of
-                            StrLen("Print Template") > 0:
-                                TemplateMgt.PrintTemplate("Print Template", RecRef, MatrixPrintIterationFieldNo);
+                RecRef := RecRefIn.Duplicate();
+                if TestRecRefFilter(RecRef, ReportSelection."Filter Object ID", RecordView) then begin
+                    Variant := RecRef;
+                    case true of
+                        StrLen(ReportSelection."Print Template") > 0:
+                            TemplateMgt.PrintTemplate(ReportSelection."Print Template", RecRef, MatrixPrintIterationFieldNo);
 
-                            "Report ID" > 0:
-                                ReportPrinterInterface.RunReport("Report ID", ReqWindow, SystemPrinter, Variant);
+                        ReportSelection."Report ID" > 0:
+                            ReportPrinterInterface.RunReport(ReportSelection."Report ID", ReqWindow, SystemPrinter, Variant);
 
-                            "Codeunit ID" > 0:
-                                if ObjectOutputMgt.GetCodeunitOutputPath("Codeunit ID") <> '' then
-                                    LinePrintMgt.ProcessCodeunit("Codeunit ID", Variant)
-                                else
-                                    CODEUNIT.Run("Codeunit ID", Variant);
+                        ReportSelection."Codeunit ID" > 0:
+                            if ObjectOutputMgt.GetCodeunitOutputPath(ReportSelection."Codeunit ID") <> '' then
+                                LinePrintMgt.ProcessCodeunit(ReportSelection."Codeunit ID", Variant)
+                            else
+                                CODEUNIT.Run(ReportSelection."Codeunit ID", Variant);
 
-                            "XML Port ID" > 0:
-                                XMLPORT.Run("XML Port ID", ReqWindow, Import, Variant);
-                        end;
-                        //-NPR5.39 [304165]
-                        OnAfterRunReportSelectionRecord(ReportSelection, RecRefIn);
-                        //+NPR5.39 [304165]
+                        ReportSelection."XML Port ID" > 0:
+                            XMLPORT.Run(ReportSelection."XML Port ID", ReqWindow, Import, Variant);
                     end;
-                until Next = 0;
-        end;
+                    //-NPR5.39 [304165]
+                    OnAfterRunReportSelectionRecord(ReportSelection, RecRefIn);
+                    //+NPR5.39 [304165]
+                end;
+            until ReportSelection.Next() = 0;
 
         //-NPR5.40 [304639]
         OnAfterRunReportSelectionType(ReportSelection, RecRefIn);
@@ -202,24 +192,24 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
                                 DATABASE::"NPR Retail Journal Line":
                                     begin
                                         RecRef.SetTable(RetailJournalLine);
-                                        if RetailJournalLine.FindSet then
+                                        if RetailJournalLine.FindSet() then
                                             repeat
                                                 Item.SetRange("No.", RetailJournalLine."Item No.");
                                                 if not Item.IsEmpty then
                                                     RetailJournalLine.Mark(true);
-                                            until RetailJournalLine.Next = 0;
+                                            until RetailJournalLine.Next() = 0;
                                         RetailJournalLine.MarkedOnly(true);
                                         RecRef.GetTable(RetailJournalLine);
                                     end;
                                 DATABASE::"NPR Exchange Label":
                                     begin
                                         RecRef.SetTable(ExchangeLabel);
-                                        if ExchangeLabel.FindSet then
+                                        if ExchangeLabel.FindSet() then
                                             repeat
                                                 Item.SetRange("No.", ExchangeLabel."Item No.");
                                                 if not Item.IsEmpty then
                                                     ExchangeLabel.Mark(true);
-                                            until ExchangeLabel.Next = 0;
+                                            until ExchangeLabel.Next() = 0;
                                         ExchangeLabel.MarkedOnly(true);
                                         RecRef.GetTable(ExchangeLabel);
                                     end;
@@ -227,12 +217,12 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
                                     begin
                                         RecRef.SetTable(SaleLinePOS);
                                         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
-                                        if SaleLinePOS.FindSet then
+                                        if SaleLinePOS.FindSet() then
                                             repeat
                                                 Item.SetRange("No.", SaleLinePOS."No.");
                                                 if not Item.IsEmpty then
                                                     SaleLinePOS.Mark(true);
-                                            until SaleLinePOS.Next = 0;
+                                            until SaleLinePOS.Next() = 0;
                                         SaleLinePOS.MarkedOnly(true);
                                         RecRef.GetTable(SaleLinePOS);
                                     end;
@@ -242,7 +232,7 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
             end;
         end;
 
-        exit(not RecRef.IsEmpty);
+        exit(not RecRef.IsEmpty());
     end;
 
     [IntegrationEvent(false, false)]

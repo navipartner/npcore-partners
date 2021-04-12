@@ -18,106 +18,106 @@ page 6014452 "NPR Mixed Discount List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Caption = 'Mix No.';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Mix No. field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Mix Type"; "Mix Type")
+                field("Mix Type"; Rec."Mix Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Mix Type field';
                 }
-                field("Min. Quantity"; "Min. Quantity")
+                field("Min. Quantity"; Rec."Min. Quantity")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Min. Quantity field';
                 }
-                field("Discount Type"; "Discount Type")
+                field("Discount Type"; Rec."Discount Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Discount Type field';
                 }
-                field("Total Amount"; "Total Amount")
+                field("Total Amount"; Rec."Total Amount")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Total Amount field';
                 }
-                field("Total Discount %"; "Total Discount %")
+                field("Total Discount %"; Rec."Total Discount %")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Total Discount % field';
                 }
-                field("Total Discount Amount"; "Total Discount Amount")
+                field("Total Discount Amount"; Rec."Total Discount Amount")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Total Discount Amount field';
                 }
-                field("Starting date"; "Starting date")
+                field("Starting date"; Rec."Starting date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Start Date field';
                 }
-                field("Starting time"; "Starting time")
+                field("Starting time"; Rec."Starting time")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field("Ending date"; "Ending date")
+                field("Ending date"; Rec."Ending date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the End Date field';
                 }
-                field("Ending time"; "Ending time")
+                field("Ending time"; Rec."Ending time")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the End Time field';
                 }
-                field("Created the"; "Created the")
+                field("Created the"; Rec."Created the")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Created Date field';
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
-                field(Lot; Lot)
+                field(Lot; Rec.Lot)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -143,8 +143,6 @@ page 6014452 "NPR Mixed Discount List"
                 ToolTip = 'Executes the Dimensions action';
 
                 trigger OnAction()
-                var
-                    DimMgt: Codeunit DimensionManagement;
                 begin
                 end;
             }

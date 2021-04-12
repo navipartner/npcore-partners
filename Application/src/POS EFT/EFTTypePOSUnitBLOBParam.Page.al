@@ -33,12 +33,12 @@ page 6184477 "NPR EFTType POSUnit BLOB Param"
                     ApplicationArea = All;
                     AssistEdit = true;
                     Caption = 'Value';
-                    Editable = "User Configurable";
+                    Editable = Rec."User Configurable";
                     ToolTip = 'Specifies the value of the Value field';
 
                     trigger OnAssistEdit()
                     begin
-                        LookupValue();
+                        Rec.LookupValue();
                     end;
                 }
             }
@@ -62,15 +62,15 @@ page 6184477 "NPR EFTType POSUnit BLOB Param"
     local procedure SetParameterName()
     begin
         Clear(ParameterName);
-        OnGetParameterNameCaption(Rec, ParameterName);
+        Rec.OnGetParameterNameCaption(Rec, ParameterName);
         if (ParameterName = '') then
-            ParameterName := Name;
+            ParameterName := Rec.Name;
     end;
 
     local procedure SetParameterDescription()
     begin
         Clear(ParameterDescription);
-        OnGetParameterDescriptionCaption(Rec, ParameterDescription);
+        Rec.OnGetParameterDescriptionCaption(Rec, ParameterDescription);
     end;
 }
 

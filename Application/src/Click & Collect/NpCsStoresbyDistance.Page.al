@@ -55,11 +55,11 @@ page 6151208 "NPR NpCs Stores by Distance"
 
                         trigger OnValidate()
                         begin
-                            FilterGroup(2);
-                            SetRange("In Stock");
+                            Rec.FilterGroup(2);
+                            Rec.SetRange("In Stock");
                             if InStockOnly then
-                                SetRange("In Stock", true);
-                            FilterGroup(0);
+                                Rec.SetRange("In Stock", true);
+                            Rec.FilterGroup(0);
 
                             CurrPage.Update(false);
                         end;
@@ -79,110 +79,110 @@ page 6151208 "NPR NpCs Stores by Distance"
             }
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("In Stock"; "In Stock")
+                field("In Stock"; Rec."In Stock")
                 {
                     ApplicationArea = All;
                     Visible = ShowInventory;
                     ToolTip = 'Specifies the value of the In Stock field';
                 }
-                field("Requested Qty."; "Requested Qty.")
+                field("Requested Qty."; Rec."Requested Qty.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Requested Qty. field';
                 }
-                field("Fullfilled Qty."; "Fullfilled Qty.")
+                field("Fullfilled Qty."; Rec."Fullfilled Qty.")
                 {
                     ApplicationArea = All;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Fullfilled Qty. field';
                 }
-                field("Distance (km)"; "Distance (km)")
+                field("Distance (km)"; Rec."Distance (km)")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = TRUE;
                     ToolTip = 'Specifies the value of the Distance (km) field';
                 }
-                field("Contact Address"; "Contact Address")
+                field("Contact Address"; Rec."Contact Address")
                 {
                     ApplicationArea = All;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Address field';
                 }
-                field("Contact Post Code"; "Contact Post Code")
+                field("Contact Post Code"; Rec."Contact Post Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Post Code field';
                 }
-                field("Contact City"; "Contact City")
+                field("Contact City"; Rec."Contact City")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact City field';
                 }
-                field("Contact Country/Region Code"; "Contact Country/Region Code")
+                field("Contact Country/Region Code"; Rec."Contact Country/Region Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Country/Region Code field';
                 }
-                field("Contact Phone No."; "Contact Phone No.")
+                field("Contact Phone No."; Rec."Contact Phone No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Phone No. field';
                 }
-                field("Contact E-mail"; "Contact E-mail")
+                field("Contact E-mail"; Rec."Contact E-mail")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = "In Stock";
+                    StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact E-mail field';
                 }
-                field("Geolocation Latitude"; "Geolocation Latitude")
+                field("Geolocation Latitude"; Rec."Geolocation Latitude")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = (NOT ShowInventory);
                     ToolTip = 'Specifies the value of the Geolocation Latitude field';
                 }
-                field("Geolocation Longitude"; "Geolocation Longitude")
+                field("Geolocation Longitude"; Rec."Geolocation Longitude")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -246,15 +246,15 @@ page 6151208 "NPR NpCs Stores by Distance"
     var
         NpCsStore: Record "NPR NpCs Store";
     begin
-        if not IsTemporary then
+        if not Rec.IsTemporary then
             exit;
 
-        if TempNpCsStore.FindFirst then begin
-            Copy(TempNpCsStore, true);
+        if TempNpCsStore.FindFirst() then begin
+            Rec.Copy(TempNpCsStore, true);
             exit;
         end;
 
-        DeleteAll;
+        Rec.DeleteAll();
 
         if not NpCsStore.Get(FromStoreCode) then
             exit;

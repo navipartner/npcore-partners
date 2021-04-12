@@ -107,14 +107,14 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     begin
         POSPaymentMethod.SetCurrentKey("Processing Type");
         POSPaymentMethod.SetRange("Open Drawer", true);
-        if not POSPaymentMethod.FindSet then
+        if not POSPaymentMethod.FindSet() then
             exit;
 
         repeat
             if FilterString <> '' then
                 FilterString += '|';
             FilterString += '''' + POSPaymentMethod.Code + '''';
-        until POSPaymentMethod.Next = 0;
+        until POSPaymentMethod.Next() = 0;
 
         if not POSEntryManagement.FindPOSEntryViaDocumentNo(SalePOS."Sales Ticket No.", POSEntry) then
             exit(false);
@@ -122,7 +122,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSPaymentLine.SetFilter("POS Payment Method Code", FilterString);
         POSPaymentLine.SetFilter("Amount (Sales Currency)", '<>%1', 0);
-        exit(not POSPaymentLine.IsEmpty);
+        exit(not POSPaymentLine.IsEmpty());
     end;
 
     local procedure CarryOutPaymentBinEject(SalePOS: Record "NPR POS Sale"; Force: Boolean)

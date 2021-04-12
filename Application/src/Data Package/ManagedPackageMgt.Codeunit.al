@@ -35,7 +35,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
 
         GlobalTableListTmp."Object Type" := GlobalTableListTmp."Object Type"::Table;
         GlobalTableListTmp."Object ID" := ID;
-        GlobalTableListTmp.Insert;
+        GlobalTableListTmp.Insert();
 
         GlobalTableString += '\' + StrSubstNo('%1: %2', AllObjWithCaption."Object ID", AllObjWithCaption."Object Caption");
     end;
@@ -155,7 +155,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         if JToken.IsArray then
             Total := JToken.AsArray.Count
         else
-            Total := JToken.AsObject.Keys.Count;
+            Total := JToken.AsObject.Keys.Count();
 
         if Total < 1 then
             exit;
@@ -179,16 +179,16 @@ codeunit 6014628 "NPR Managed Package Mgt."
             end;
         end;
 
-        if (LoadMethod = LoadMethod::DeleteFirst) and GlobalTableListTmp.FindSet then
+        if (LoadMethod = LoadMethod::DeleteFirst) and GlobalTableListTmp.FindSet() then
             repeat
                 RecRef.Open(GlobalTableListTmp."Object ID");
 
                 if not RecRef.WritePermission then
                     Error(Error_MissingPermission, RecRef.Number);
 
-                RecRef.DeleteAll;
-                RecRef.Close;
-            until GlobalTableListTmp.Next = 0;
+                RecRef.DeleteAll();
+                RecRef.Close();
+            until GlobalTableListTmp.Next() = 0;
 
         if not LoadRecords(JToken, LoadMethod) then
             Error(Error_PackageLoad);
@@ -211,7 +211,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         Itt: Integer;
     begin
         JArray := JToken.AsArray();
-        Total := JArray.Count;
+        Total := JArray.Count();
 
         if Total < 1 then
             exit;
@@ -247,18 +247,18 @@ codeunit 6014628 "NPR Managed Package Mgt."
 
             case LoadMethod of
                 LoadMethod::DeleteFirst:
-                    if not RecRef.Insert then
+                    if not RecRef.Insert() then
                         exit(false);
                 LoadMethod::OnlyInsert:
-                    if not RecRef.Insert then
+                    if not RecRef.Insert() then
                         ;
                 LoadMethod::InsertOrModify:
-                    if not RecRef.Insert then
+                    if not RecRef.Insert() then
                         if not RecRef.Modify then
                             exit(false);
             end;
 
-            RecRef.Close;
+            RecRef.Close();
         end;
 
         CloseDialog;
@@ -318,7 +318,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
     local procedure CloseDialog()
     begin
         if GuiAllowed then
-            ProgressDialog.Close;
+            ProgressDialog.Close();
 
         IsDialogOpen := false;
     end;

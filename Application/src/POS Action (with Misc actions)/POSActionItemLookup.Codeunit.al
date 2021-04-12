@@ -2,7 +2,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
 {
     var
         ActionDescription: Label 'This is a built in function for handling lookup';
-        Setup: Codeunit "NPR POS Setup";
         LookupType: Option Item,Customer,SKU;
         ReadingErr: Label 'reading in %1';
 
@@ -39,7 +38,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         case WorkflowStep of
@@ -54,11 +53,8 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        Context: Codeunit "NPR POS JSON Management";
-        JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         //No UI yet to support lookup
@@ -146,10 +142,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
     local procedure CompleteLookup(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        ItemList: Page "Item List";
-        Item: Record Item;
         ItemNo: Code[20];
-        ItemView: Text;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         ItemNo := JSON.GetStringOrFail('selected_itemno', StrSubstNo(ReadingErr, ActionCode()));
@@ -192,7 +185,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         StockkeepingUnitList.Editable(false);
         StockkeepingUnitList.LookupMode(true);
         StockkeepingUnitList.SetTableView(StockkeepingUnit);
-        if StockkeepingUnitList.RunModal = ACTION::LookupOK then begin
+        if StockkeepingUnitList.RunModal() = ACTION::LookupOK then begin
             StockkeepingUnitList.GetRecord(StockkeepingUnit);
             ItemNo := StockkeepingUnit."Item No.";
         end else begin
@@ -205,7 +198,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
 
     local procedure AddItemToSale(ItemNo: Code[20]; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         Setup: Codeunit "NPR POS Setup";
         NewSaleLinePOS: Record "NPR POS Sale Line";
         POSSetup: Record "NPR POS Setup";

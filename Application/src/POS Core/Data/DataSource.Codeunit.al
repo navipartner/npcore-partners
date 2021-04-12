@@ -148,7 +148,7 @@ codeunit 6150892 "NPR Data Source" implements "NPR IJsonSerializable"
         Token: JsonToken;
         Ordinal: Integer;
     begin
-        if _columns.Count = 0 then
+        if _columns.Count() = 0 then
             exit;
 
         foreach Token in _columns do begin

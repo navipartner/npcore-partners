@@ -26,9 +26,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
     procedure NotifyRecipients(var TicketParticipantWks: Record "NPR TM Ticket Particpt. Wks.")
     var
-        TicketParticipantWks3: Record "NPR TM Ticket Particpt. Wks.";
         TicketParticipantWks2: Record "NPR TM Ticket Particpt. Wks.";
-        Success: Boolean;
         ResponseMessage: Text;
         MaxCount: Integer;
         Current: Integer;
@@ -81,7 +79,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 TicketParticipantWks2."Notification Sent By User" := UserId;
                 TicketParticipantWks2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketParticipantWks2."Failed With Message"));
                 TicketParticipantWks2.Modify();
-                Commit;
+                Commit();
 
                 if (GuiAllowed) then
                     Window.Update(1, Round(Current / MaxCount * 10000, 1));
@@ -113,7 +111,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
     local procedure SendSms(TicketParticipantWks: Record "NPR TM Ticket Particpt. Wks."; var ResponseMessage: Text): Boolean
     var
-        RecordRef: RecordRef;
         SMSManagement: Codeunit "NPR SMS Management";
         SMSTemplateHeader: Record "NPR SMS Template Header";
         SMSMessage: Text;
@@ -153,7 +150,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
     local procedure SendSmsNotificationEntry(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ResponseMessage: Text): Boolean
     var
-        RecordRef: RecordRef;
         SMSManagement: Codeunit "NPR SMS Management";
         SMSTemplateHeader: Record "NPR SMS Template Header";
         SMSMessage: Text;
@@ -340,26 +336,22 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
         case DetTicketAccessEntry.Type of
             DetTicketAccessEntry.Type::ADMITTED:
-                with Schedule do
-                    if ("Notify Stakeholder" in ["Notify Stakeholder"::ADMIT, "Notify Stakeholder"::ADMIT_DEPART, "Notify Stakeholder"::ALL]) then
-                        CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::ADMIT, Schedule."Notify Stakeholder"::ADMIT_DEPART, Schedule."Notify Stakeholder"::ALL]) then
+                    CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
 
             DetTicketAccessEntry.Type::DEPARTED:
-                with Schedule do
-                    if ("Notify Stakeholder" in ["Notify Stakeholder"::ADMIT_DEPART, "Notify Stakeholder"::ALL]) then
-                        CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::ADMIT_DEPART, Schedule."Notify Stakeholder"::ALL]) then
+                    CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
 
             DetTicketAccessEntry.Type::RESERVATION:
                 begin
                     if (DetTicketAccessEntry.Quantity > 0) and (ReservationConfirmed) then
-                        with Schedule do
-                            if ("Notify Stakeholder" in ["Notify Stakeholder"::RESERVE, "Notify Stakeholder"::RESERVE_CANCEL, "Notify Stakeholder"::ALL]) then
-                                CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                        if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::RESERVE, Schedule."Notify Stakeholder"::RESERVE_CANCEL, Schedule."Notify Stakeholder"::ALL]) then
+                            CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
 
                     if (DetTicketAccessEntry.Quantity < 0) then
-                        with Schedule do // Cancelled reservations are negative
-                            if ("Notify Stakeholder" in ["Notify Stakeholder"::RESERVE_CANCEL, "Notify Stakeholder"::ALL]) then
-                                CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                        if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::RESERVE_CANCEL, Schedule."Notify Stakeholder"::ALL]) then
+                            CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
                 end;
 
             DetTicketAccessEntry.Type::CANCELED_ADMISSION:
@@ -401,7 +393,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NotificationEntry."Entry No." := 0;
         NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::STAKEHOLDER;
         NotificationEntry."Notification Address" := Admission."Stakeholder (E-Mail/Phone No.)";
-        NotificationEntry."Date To Notify" := Today;
+        NotificationEntry."Date To Notify" := Today();
 
         NotificationEntry."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
         NotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
@@ -409,20 +401,19 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         Ticket.Get(DetTicketAccessEntry."Ticket No.");
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
-        with DetTicketAccessEntry do
-            case Type of
-                Type::ADMITTED:
-                    NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADMIT;
-                Type::DEPARTED:
-                    NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::DEPART;
-                Type::RESERVATION:
-                    begin
-                        if (Quantity > 0) then
-                            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::RESERVE;
-                        if (Quantity < 0) then
-                            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::CANCEL_RESERVE;
-                    end;
-            end;
+        case DetTicketAccessEntry.Type of
+            DetTicketAccessEntry.Type::ADMITTED:
+                NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADMIT;
+            DetTicketAccessEntry.Type::DEPARTED:
+                NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::DEPART;
+            DetTicketAccessEntry.Type::RESERVATION:
+                begin
+                    if (DetTicketAccessEntry.Quantity > 0) then
+                        NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::RESERVE;
+                    if (DetTicketAccessEntry.Quantity < 0) then
+                        NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::CANCEL_RESERVE;
+                end;
+        end;
 
         NotificationEntry."Ticket Type Code" := Ticket."Ticket Type Code";
         NotificationEntry."Ticket No." := Ticket."No.";
@@ -455,7 +446,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
     var
         Admission: Record "NPR TM Admission";
         Schedule: Record "NPR TM Admis. Schedule";
-        AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         NotificationEntry: Record "NPR TM Ticket Notif. Entry";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -477,7 +467,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::CAPACITY_TO_WL;
 
         NotificationEntry."Notification Address" := Admission."Stakeholder (E-Mail/Phone No.)";
-        NotificationEntry."Date To Notify" := TODAY;
+        NotificationEntry."Date To Notify" := Today();
 
         NotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
 
@@ -513,7 +503,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Admission: Record "NPR TM Admission";
-        Schedule: Record "NPR TM Admis. Schedule";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -558,7 +547,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
         NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::TICKETSERVER;
         NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::SALES;
-        NotificationEntry."Date To Notify" := Today;
+        NotificationEntry."Date To Notify" := Today();
 
         NotificationEntry."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
         NotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
@@ -659,7 +648,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 TicketNotificationEntry2."Notification Sent By User" := UserId;
                 TicketNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry2."Failed With Message"));
                 TicketNotificationEntry2.Modify();
-                Commit;
+                Commit();
 
                 if (GuiAllowed) then
                     Window.Update(1, Round(Current / MaxCount * 10000, 1));

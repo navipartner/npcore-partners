@@ -17,62 +17,62 @@ page 6060130 "NPR MM Member Card List"
             repeater(Group)
             {
                 Editable = false;
-                field("External Membership No."; "External Membership No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Membership No. field';
                 }
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("External Card No."; "External Card No.")
+                field("External Card No."; Rec."External Card No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Card No. field';
                 }
-                field("External Member No."; "External Member No.")
+                field("External Member No."; Rec."External Member No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Member No. field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Display Name"; "Display Name")
+                field("Display Name"; Rec."Display Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Display Name field';
                 }
-                field("E-Mail Address"; "E-Mail Address")
+                field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
-                field("Valid Until"; "Valid Until")
+                field("Valid Until"; Rec."Valid Until")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid Until field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Member Blocked"; "Member Blocked")
+                field("Member Blocked"; Rec."Member Blocked")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Blocked field';
                 }
-                field("Membership Blocked"; "Membership Blocked")
+                field("Membership Blocked"; Rec."Membership Blocked")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Blocked field';
                 }
-                field("Card Is Temporary"; "Card Is Temporary")
+                field("Card Is Temporary"; Rec."Card Is Temporary")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Is Temporary field';
@@ -91,7 +91,7 @@ page 6060130 "NPR MM Member Card List"
                 Ellipsis = true;
                 Image = CustomerList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
@@ -105,7 +105,7 @@ page 6060130 "NPR MM Member Card List"
                 Ellipsis = true;
                 Image = Customer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Card";
@@ -122,7 +122,7 @@ page 6060130 "NPR MM Member Card List"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";

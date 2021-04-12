@@ -254,7 +254,7 @@ table 6014412 "NPR Mixed Discount Line"
         MixedDiscount: Record "NPR Mixed Discount";
     begin
         MixedDiscount.Get(Code);
-        MixedDiscount."Last Date Modified" := Today;
+        MixedDiscount."Last Date Modified" := Today();
     end;
 
     trigger OnInsert()
@@ -262,7 +262,7 @@ table 6014412 "NPR Mixed Discount Line"
         MixedDiscount: Record "NPR Mixed Discount";
     begin
         MixedDiscount.Get(Code);
-        MixedDiscount."Last Date Modified" := Today;
+        MixedDiscount."Last Date Modified" := Today();
 
         UpdateLine();
     end;
@@ -272,8 +272,8 @@ table 6014412 "NPR Mixed Discount Line"
         MixedDiscount: Record "NPR Mixed Discount";
     begin
         MixedDiscount.Get(Code);
-        MixedDiscount."Last Date Modified" := Today;
-        "Last Date Modified" := Today;
+        MixedDiscount."Last Date Modified" := Today();
+        "Last Date Modified" := Today();
 
         UpdateLine();
     end;
@@ -283,7 +283,7 @@ table 6014412 "NPR Mixed Discount Line"
         MixedDiscount: Record "NPR Mixed Discount";
     begin
         MixedDiscount.Get(Code);
-        MixedDiscount."Last Date Modified" := Today;
+        MixedDiscount."Last Date Modified" := Today();
 
         UpdateLine();
     end;

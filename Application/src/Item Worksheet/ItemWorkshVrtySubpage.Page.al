@@ -38,10 +38,10 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
 
                     trigger OnValidate()
                     begin
-                        if "Variety 1 Value" <> xRec."Variety 1 Value" then
-                            Modify(true);
+                        if Rec."Variety 1 Value" <> xRec."Variety 1 Value" then
+                            Rec.Modify(true);
                         ItemWorksheetLine.UpdateVarietyHeadingText;
-                        Commit;
+                        Commit();
                         CurrPage.Update(false);
                     end;
                 }
@@ -58,7 +58,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                         if Rec."Variety 2 Value" <> xRec."Variety 2 Value" then
                             Rec.Modify(true);
                         ItemWorksheetLine.UpdateVarietyHeadingText;
-                        Commit;
+                        Commit();
                         CurrPage.Update(false);
                     end;
                 }
@@ -75,7 +75,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                         if Rec."Variety 3 Value" <> xRec."Variety 3 Value" then
                             Rec.Modify(true);
                         ItemWorksheetLine.UpdateVarietyHeadingText;
-                        Commit;
+                        Commit();
                         CurrPage.Update(false);
                     end;
                 }
@@ -92,7 +92,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                         if Rec."Variety 4 Value" <> xRec."Variety 4 Value" then
                             Rec.Modify(true);
                         ItemWorksheetLine.UpdateVarietyHeadingText;
-                        Commit;
+                        Commit();
                         CurrPage.Update(false);
                     end;
                 }
@@ -323,8 +323,8 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
 
     trigger OnOpenPage()
     begin
-        if not VarietySetup.Get then
-            VarietySetup.Init;
+        if not VarietySetup.Get() then
+            VarietySetup.Init();
         CrossRefEditable := VarietySetup."Create Item Cross Ref. auto.";
     end;
 

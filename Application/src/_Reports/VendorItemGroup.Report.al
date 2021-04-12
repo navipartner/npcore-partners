@@ -345,7 +345,6 @@ report 6014435 "NPR Vendor/Item Group"
                 AmtLYSum := 0;
                 TurnoverLYSum := 0;
                 SaleLCYLYSum := 0;
-                PctChanges := 0;
                 SumCost := 0;
                 CalcFields("NPR Sales (Qty.)", "Purchases (LCY)", "NPR Sales (LCY)");
 
@@ -356,7 +355,7 @@ report 6014435 "NPR Vendor/Item Group"
                 Kreditorsidsteaar.CalcFields("NPR Sales (LCY)", "NPR Sales (Qty.)", "Purchases (LCY)");
 
                 if "NPR Sales (LCY)" = 0 then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
                 Clear(DG);
                 if "NPR Sales (LCY)" <> 0 then
                     DG := (("NPR Sales (LCY)" - "NPR COGS (LCY)") / "NPR Sales (LCY)") * 100;
@@ -382,7 +381,6 @@ report 6014435 "NPR Vendor/Item Group"
                 AmtLYSum := 0;
                 TurnoverLYSum := 0;
                 SaleLCYLYSum := 0;
-                PctChanges := 0;
                 SumCost := 0;
             end;
         }
@@ -533,7 +531,6 @@ report 6014435 "NPR Vendor/Item Group"
         Foerfra := CalcDate('<-1Y>', Vendor.GetRangeMin("Date Filter"));
         Foertil := CalcDate('<-1Y>', Vendor.GetRangeMax("Date Filter"));
         Omsaetningsidsteaar := 0;
-        Totalantal := 0;
 
         TempNPRBuffer.SetCurrentKey("Decimal 1");
         case Sorter of
@@ -561,7 +558,6 @@ report 6014435 "NPR Vendor/Item Group"
         Omsaetningsidsteaar: Decimal;
         PctaendringItemGroup: Decimal;
         PctaendringVen: Decimal;
-        PctChanges: Decimal;
         Pctoms: Decimal;
         Pctoms_Sum: Decimal;
         PurchaseLCYSum: Decimal;
@@ -571,7 +567,6 @@ report 6014435 "NPR Vendor/Item Group"
         SalesQtySum: Decimal;
         SumCost: Decimal;
         SumPctaendringItemGroup: Decimal;
-        Totalantal: Decimal;
         TotalCost: Decimal;
         TotalCr: Decimal;
         TotalCrPct: Decimal;

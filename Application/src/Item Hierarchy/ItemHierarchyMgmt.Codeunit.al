@@ -24,10 +24,10 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
         ItemHierarchyLine.SetRange("Item Hierarchy Code", ItemHierarchy."Hierarchy Code");
         if not ItemHierarchyLine.IsEmpty then
             if Confirm(ConfirmDeleteText, false, true) then
-                ItemHierarchyLine.DeleteAll;
+                ItemHierarchyLine.DeleteAll();
 
         ItemHierarchyLevel.SetRange("Hierarchy Code", ItemHierarchy."Hierarchy Code");
-        if ItemHierarchyLevel.FindSet then begin
+        if ItemHierarchyLevel.FindSet() then begin
             repeat
                 LineNo := LineNo + 10000;
                 if ((ItemHierarchyLevel."Table No." = 0) and (ItemHierarchyLevel.Level < ItemHierarchy."No. Of Levels")) then begin
@@ -36,7 +36,7 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                     ItemHierarchyLine."Item Hierarchy Level" := ItemHierarchyLevel.Level;
                     ItemHierarchyLine."Related Table Desc Field Value" := ItemHierarchyLevel.Description;
                     ItemHierarchyLine."Item Hierachy Description" := ItemHierarchyLevel.Description;
-                    ItemHierarchyLine.Insert;
+                    ItemHierarchyLine.Insert();
                 end else begin
                     ItemHierarchyLevel.TestField("Table No.");
                     ItemHierarchyLevel.TestField("Primary Field No.");
@@ -50,7 +50,7 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                             ParentFldRef := ParentRecRef.Field(PreviousLevelLine."Primary Field No.");
                         if ItemHierarchyLevel."Level Link Filter" <> '' then
                             ParentFldRef.SetFilter(ItemHierarchyLevel."Level Link Filter");
-                        if ParentRecRef.FindSet then begin
+                        if ParentRecRef.FindSet() then begin
                             repeat
                                 Clear(RecRef);
                                 RecRef.Open(ItemHierarchyLevel."Table No.");
@@ -58,7 +58,7 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                                 if ItemHierarchyLevel."Level Link Field No." > 0 then
                                     FldRef.SetFilter(Format(ParentFldRef.Value));
                                 DescFldRef := RecRef.Field(ItemHierarchyLevel."Description Field No.");
-                                if RecRef.FindSet then begin
+                                if RecRef.FindSet() then begin
                                     repeat
                                         LineNo := LineNo + 10000;
                                         ItemHierarchyLine."Item Hierarchy Code" := ItemHierarchy."Hierarchy Code";
@@ -78,22 +78,22 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                                             ItemHierarchyLine."Item Desc." := Item.Description;
                                             ItemHierarchyLine."Item Hierachy Description" := '';
                                             ItemVariant.SetRange("Item No.", Item."No.");
-                                            if ItemVariant.FindSet then begin
+                                            if ItemVariant.FindSet() then begin
                                                 LineNo := LineNo - 10000;
                                                 repeat
                                                     LineNo := LineNo + 10000;
                                                     ItemHierarchyLine."Item Hierarchy Line No." := LineNo;
                                                     ItemHierarchyLine."Variant Code" := ItemVariant.Code;
                                                     ItemHierarchyLine."Item Desc." := ItemVariant.Description;
-                                                    ItemHierarchyLine.Insert;
-                                                until ItemVariant.Next = 0;
+                                                    ItemHierarchyLine.Insert();
+                                                until ItemVariant.Next() = 0;
                                             end else
-                                                ItemHierarchyLine.Insert;
+                                                ItemHierarchyLine.Insert();
                                         end else
-                                            ItemHierarchyLine.Insert;
-                                    until RecRef.Next = 0;
+                                            ItemHierarchyLine.Insert();
+                                    until RecRef.Next() = 0;
                                 end;
-                            until ParentRecRef.Next = 0;
+                            until ParentRecRef.Next() = 0;
                         end;
                     end else begin
                         Clear(RecRef);
@@ -101,7 +101,7 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                         FldRef := RecRef.Field(ItemHierarchyLevel."Primary Field No.");
                         DescFldRef := RecRef.Field(ItemHierarchyLevel."Description Field No.");
                         //FldRef.SETFILTER();
-                        if RecRef.FindSet then begin
+                        if RecRef.FindSet() then begin
                             repeat
                                 LineNo := LineNo + 10000;
                                 ItemHierarchyLine."Item Hierarchy Code" := ItemHierarchy."Hierarchy Code";
@@ -113,13 +113,13 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                                 ItemHierarchyLine."Linked Table Key Value" := FldRef.Value;
                                 ItemHierarchyLine."Linked Table Value Desc." := FldRef.Value;
                                 ItemHierarchyLine."Item Hierachy Description" := DescFldRef.Value;
-                                ItemHierarchyLine.Insert;
-                            until RecRef.Next = 0;
+                                ItemHierarchyLine.Insert();
+                            until RecRef.Next() = 0;
                         end;
                     end;
                 end;
                 PreviousLevelLine := ItemHierarchyLevel;
-            until ItemHierarchyLevel.Next = 0;
+            until ItemHierarchyLevel.Next() = 0;
         end;
     end;
 
@@ -157,7 +157,6 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
         ItemHierarchy: Record "NPR Item Hierarchy";
         ItemHierarchyLine: Record "NPR Item Hierarchy Line";
         RetaiReplDemandLine: Record "NPR Retail Repl. Demand Line";
-        RetailCampaignLine: Record "NPR Retail Campaign Line";
     begin
         //test if demands are present
 
@@ -170,7 +169,7 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
         //delete lines
         ItemHierarchy.Get(RetailCampaignHeader.Code);
         ItemHierarchyLine.SetRange("Item Hierarchy Code", RetailCampaignHeader.Code);
-        ItemHierarchyLine.DeleteAll;
+        ItemHierarchyLine.DeleteAll();
 
         //recreate lines
         CreateItemHierachyLinesFromRetailCampaign(RetailCampaignHeader, ItemHierarchy);
@@ -188,13 +187,13 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
     begin
         RetailCampaignLine.SetRange("Campaign Code", RetailCampaignHeader.Code);
         LineNo := 0;
-        if RetailCampaignLine.FindSet then begin
+        if RetailCampaignLine.FindSet() then begin
             repeat
                 case RetailCampaignLine.Type of
                     RetailCampaignLine.Type::"Period Discount":
                         begin
                             PeriodDiscountLine.SetRange(Code, RetailCampaignLine.Code);
-                            if PeriodDiscountLine.FindSet then begin
+                            if PeriodDiscountLine.FindSet() then begin
                                 repeat
                                     //use level 0 - should be expanded..
                                     LineNo += 10000;
@@ -209,13 +208,13 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                                         ItemHierarchyLine."Item Hierachy Description" := ItemHierarchyLevel.Code;
                                     end;
                                     ItemHierarchyLine.Insert(true);
-                                until PeriodDiscountLine.Next = 0;
+                                until PeriodDiscountLine.Next() = 0;
                             end;
                         end;
                     RetailCampaignLine.Type::"Mixed Discount":
                         begin
                             MixedDiscountLine.SetRange(Code, RetailCampaignLine.Code);
-                            if MixedDiscountLine.FindSet then begin
+                            if MixedDiscountLine.FindSet() then begin
                                 repeat
                                     case MixedDiscountLine."Disc. Grouping Type" of
                                         MixedDiscountLine."Disc. Grouping Type"::Item:
@@ -239,7 +238,7 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                                                 // add all frtom group..
                                                 Item.SetRange("Item Category Code", MixedDiscountLine."No.");
                                                 Item.SetRange(Blocked, false);
-                                                if Item.FindSet then begin
+                                                if Item.FindSet() then begin
                                                     repeat
                                                         LineNo += 10000;
                                                         ItemHierarchyLine.Validate("Item Hierarchy Code", ItemHierarchy."Hierarchy Code");
@@ -251,21 +250,19 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                                                             ItemHierarchyLine."Item Hierachy Description" := ItemHierarchyLevel.Code;
                                                         end;
                                                         ItemHierarchyLine.Insert(true);
-                                                    until Item.Next = 0
+                                                    until Item.Next() = 0
                                                 end;
                                             end;
                                     end;
-                                until MixedDiscountLine.Next = 0;
+                                until MixedDiscountLine.Next() = 0;
                             end;
                         end;
                 end;
-            until RetailCampaignLine.Next = 0;
+            until RetailCampaignLine.Next() = 0;
         end;
     end;
 
     local procedure NewItemHierachyLine()
-    var
-        ItemHierachyLine: Integer;
     begin
     end;
 }

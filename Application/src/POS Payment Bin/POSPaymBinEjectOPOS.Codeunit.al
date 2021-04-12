@@ -50,7 +50,7 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := InvokeMethodCode;
         tmpRetailList.Value := InvokeMethodCode;
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150641, 'OnShowInvokeParameters', '', false, false)]

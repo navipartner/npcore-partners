@@ -28,7 +28,7 @@ codeunit 6014430 "NPR Apply Salesperson to Doc."
             exit;
 
         Rec.Validate("Salesperson Code", SalespersonCode);
-        Rec.Modify;
+        Rec.Modify();
     end;
 }
 

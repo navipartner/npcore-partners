@@ -1,8 +1,8 @@
 report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 {
     Caption = 'Create Invt. Put-away/Pick/Movement';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -94,7 +94,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                 if TempWhseActivHdr.Find('-') then
                     PrintNewDocuments();
 
-                Window.Close;
+                Window.Close();
                 if not SuppressMessagesState then
                     if DocumentCreated then begin
                         if PutAwayCounter > 0 then
@@ -217,7 +217,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 
     trigger OnPostReport()
     begin
-        TempWhseActivHdr.DeleteAll;
+        TempWhseActivHdr.DeleteAll();
     end;
 
     trigger OnPreReport()

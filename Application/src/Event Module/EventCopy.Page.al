@@ -285,7 +285,7 @@ page 6151577 "NPR Event Copy"
             CheckRecurrFormula();
         end;
 
-        JobsSetup.Get;
+        JobsSetup.Get();
         JobsSetup.TestField("Job Nos.");
         if TargetJobNo = '' then begin
             TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, true);
@@ -330,7 +330,7 @@ page 6151577 "NPR Event Copy"
     procedure GetTargetJob(var NewJob: Record Job)
     begin
         NewJob.Get(TargetJobNo);
-        NewJob.SetRecFilter;
+        NewJob.SetRecFilter();
     end;
 
     procedure GetConfirmAnswer(): Boolean

@@ -44,8 +44,8 @@ table 6060105 "NPR Ean Box Setup"
         EanBoxSetupEvent: Record "NPR Ean Box Setup Event";
     begin
         EanBoxSetupEvent.SetRange("Setup Code", Code);
-        if EanBoxSetupEvent.FindFirst then
-            EanBoxSetupEvent.DeleteAll;
+        if EanBoxSetupEvent.FindFirst() then
+            EanBoxSetupEvent.DeleteAll();
     end;
 }
 

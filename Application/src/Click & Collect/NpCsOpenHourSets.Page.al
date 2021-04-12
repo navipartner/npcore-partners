@@ -14,12 +14,12 @@ page 6151215 "NPR NpCs Open. Hour Sets"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -44,7 +44,7 @@ page 6151215 "NPR NpCs Open. Hour Sets"
                 var
                     NpCsStoreOpeningHourMgt: Codeunit "NPR NpCs Store Open.Hours Mgt.";
                 begin
-                    NpCsStoreOpeningHourMgt.ShowOpeningHours(Code);
+                    NpCsStoreOpeningHourMgt.ShowOpeningHours(Rec.Code);
                 end;
             }
         }

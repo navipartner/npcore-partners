@@ -51,10 +51,10 @@ report 6014441 "NPR POS Item Sales with Dim."
                     POSEntryQry.SetFilter(Location_Code, "POS Sales Line".GetFilter("Location Code"));
                 if DimSetFilter <> '' then
                     POSEntryQry.SetFilter(Dimension_Set_ID, DimSetFilter);
-                POSEntryQry.Open;
-                while POSEntryQry.Read do begin
+                POSEntryQry.Open();
+                while POSEntryQry.Read() do begin
                     POSSalesLine2.Get(POSEntryQry.POS_Entry_No, POSEntryQry.Line_No);
-                    TempDimBuf.DeleteAll;
+                    TempDimBuf.DeleteAll();
                     if TempSelectedDim.FindSet() then
                         repeat
                             TempDimBuf.Init();
@@ -110,7 +110,7 @@ report 6014441 "NPR POS Item Sales with Dim."
 
             trigger OnPreDataItem()
             begin
-                SetRange(Number, 1, AppliedFilterBuffer.Count);
+                SetRange(Number, 1, AppliedFilterBuffer.Count());
             end;
         }
         dataitem(POSSalesLineCons; "NPR POS Entry Sales Line")
@@ -291,7 +291,7 @@ report 6014441 "NPR POS Item Sales with Dim."
         if TempSelectedDim.FindSet() then begin
             DimMgt.GetDimSetIDsForFilter(TempSelectedDim."Dimension Code", TempSelectedDim."Dimension Value Filter");
             DimMgt.GetTempDimSetEntry(TempDimSetEntryBuffer);
-            while not TempDimSetEntryBuffer.IsEmpty and (TempSelectedDim.Next <> 0) do begin
+            while not TempDimSetEntryBuffer.IsEmpty and (TempSelectedDim.Next() <> 0) do begin
                 FilterForBlankIncluded := FilterIncludesBlank(TempSelectedDim."Dimension Code", TempSelectedDim."Dimension Value Filter");
                 DimSetEntry.SetRange("Dimension Code", TempSelectedDim."Dimension Code");
                 DimSetEntry.SetFilter("Dimension Value Code", TempSelectedDim."Dimension Value Filter");
@@ -410,9 +410,9 @@ report 6014441 "NPR POS Item Sales with Dim."
                     SelectedDim.Init();
                 DimSelectionMultiple.InsertDimSelBuf(
                   Selected, Dim.Code, Dim.GetMLName(GlobalLanguage), SelectedDim."Dimension Value Filter");
-            until Dim.Next = 0;
+            until Dim.Next() = 0;
 
-        if DimSelectionMultiple.RunModal = ACTION::OK then begin
+        if DimSelectionMultiple.RunModal() = ACTION::OK then begin
             DimSelectionMultiple.GetDimSelBuf(TempDimSelectionBuf);
             DimSelectionBuf.SetDimSelection(ObjectType, ObjectID, '', SelectedDimText, TempDimSelectionBuf);
         end;

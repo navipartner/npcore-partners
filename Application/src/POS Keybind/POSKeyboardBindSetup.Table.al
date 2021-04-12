@@ -29,7 +29,7 @@ table 6150719 "NPR POS Keyboard Bind. Setup"
                 AvailablePOSKeybinds.Editable := false;
                 AvailablePOSKeybind.SetRange(Supported, true);
                 AvailablePOSKeybinds.SetTableView(AvailablePOSKeybind);
-                if AvailablePOSKeybinds.RunModal = ACTION::LookupOK then begin
+                if AvailablePOSKeybinds.RunModal() = ACTION::LookupOK then begin
                     AvailablePOSKeybinds.GetRecord(AvailablePOSKeybind);
                     Validate("Key Bind", AvailablePOSKeybind."Key Name");
                 end;

@@ -13,62 +13,62 @@ page 6151030 "NPR NpRv Arch. Sending Log"
         {
             repeater(Group)
             {
-                field("Log Date"; "Log Date")
+                field("Log Date"; Rec."Log Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Date field';
                 }
-                field("Log Message"; "Log Message")
+                field("Log Message"; Rec."Log Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Message field';
                 }
-                field("Sending Type"; "Sending Type")
+                field("Sending Type"; Rec."Sending Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sending Type field';
                 }
-                field("Sent to"; "Sent to")
+                field("Sent to"; Rec."Sent to")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sent to field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Error during Send"; "Error during Send")
+                field("Error during Send"; Rec."Error during Send")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error during Send field';
                 }
-                field(ErrorMessage; GetErrorMessage())
+                field(ErrorMessage; Rec.GetErrorMessage())
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the GetErrorMessage() field';
 
                     trigger OnDrillDown()
                     begin
-                        Message(GetErrorMessage());
+                        Message(Rec.GetErrorMessage());
                     end;
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Arch. Voucher No."; "Arch. Voucher No.")
+                field("Arch. Voucher No."; Rec."Arch. Voucher No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Arch. Voucher No. field';
                 }
-                field("Original Entry No."; "Original Entry No.")
+                field("Original Entry No."; Rec."Original Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Original Entry No. field';

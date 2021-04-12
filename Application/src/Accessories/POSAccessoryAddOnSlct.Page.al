@@ -268,12 +268,12 @@ page 6014548 "NPR POS Accessory AddOn Slct."
     procedure ApproveItemAddOns(ItemAddOns: Text)
     begin
         Message(ItemAddOns);
-        CurrPage.Close;
+        CurrPage.Close();
     end;
 
     local procedure CancelItemAddOns()
     begin
-        CurrPage.Close;
+        CurrPage.Close();
     end;
 }
 

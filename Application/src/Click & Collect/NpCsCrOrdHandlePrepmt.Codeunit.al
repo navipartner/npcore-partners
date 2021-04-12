@@ -28,7 +28,7 @@ codeunit 6151213 "NPR NpCs Cr.Ord: Handle Prepmt"
         POSSale: Codeunit "NPR POS Sale";
     begin
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
-        if not SalesHeader.Find then
+        if not SalesHeader.Find() then
             exit;
 
         POSSession.GetSale(POSSale);

@@ -54,14 +54,14 @@ table 6059899 "NPR Data Log Field"
         }
         field(110; "User ID"; Code[250])
         {
-            CalcFormula = Lookup ("NPR Data Log Record"."User ID" WHERE("Entry No." = FIELD("Data Log Record Entry No.")));
+            CalcFormula = Lookup("NPR Data Log Record"."User ID" WHERE("Entry No." = FIELD("Data Log Record Entry No.")));
             Caption = 'User ID';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1000; "Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
+            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
                                                               "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;

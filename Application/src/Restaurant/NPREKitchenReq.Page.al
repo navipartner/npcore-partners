@@ -132,7 +132,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Set Served';
                     Image = Approve;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
@@ -153,7 +153,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Start Production';
                     Image = Start;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -170,7 +170,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'End Production';
                     Image = Stop;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -191,7 +191,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Accept Qty. Change';
                     Image = Approve;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -212,7 +212,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Show/Hide Finished';
                     Image = FilterLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -234,7 +234,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Show/Hide Served';
                     Image = FilterLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
@@ -291,12 +291,12 @@ page 6150689 "NPR NPRE Kitchen Req."
         KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
     begin
         CurrPage.SetSelectionFilter(KitchenRequest);
-        if KitchenRequest.Count = 1 then begin  //Copy all auxiliary filters, if only one record is selected
-            KitchenRequest.FindFirst;
+        if KitchenRequest.Count() = 1 then begin  //Copy all auxiliary filters, if only one record is selected
+            KitchenRequest.FindFirst();
             KitchenRequest.CopyFilters(Rec);
             KitchenRequest.SetRange("Request No.", KitchenRequest."Request No.");
         end;
-        if KitchenRequest.FindSet then
+        if KitchenRequest.FindSet() then
             repeat
                 GetRequestStation(KitchenRequest, KitchenRequestStation);
                 case ActionToRun of
@@ -307,8 +307,8 @@ page 6150689 "NPR NPRE Kitchen Req."
                     KitchenStationAction::"End Production":
                         KitchenOrderMgt.EndProduction(KitchenRequestStation);
                 end;
-                Commit;
-            until KitchenRequest.Next = 0;
+                Commit();
+            until KitchenRequest.Next() = 0;
     end;
 
     local procedure GetRequestStation(var KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
@@ -316,9 +316,9 @@ page 6150689 "NPR NPRE Kitchen Req."
         KitchenRequestStation.SetRange("Request No.", KitchenRequest."Request No.");
         KitchenRequest.CopyFilter("Production Restaurant Filter", KitchenRequestStation."Production Restaurant Code");
         KitchenRequest.CopyFilter("Kitchen Station Filter", KitchenRequestStation."Kitchen Station");
-        if KitchenRequestStation.Count <> 1 then
+        if KitchenRequestStation.Count() <> 1 then
             Error(StationNotFound);
-        KitchenRequestStation.FindFirst;
+        KitchenRequestStation.FindFirst();
     end;
 
     procedure SetViewMode(NewViewMode: Option)

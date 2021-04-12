@@ -1,4 +1,4 @@
-table 6060118 "NPR TM Admis. Schedule"
+﻿table 6060118 "NPR TM Admis. Schedule"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM80.1.09/TSA/20160310  CASE 236689 Change field from percentage to absolute
@@ -334,7 +334,7 @@ table 6060118 "NPR TM Admis. Schedule"
         TMAdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
         //-TM1.11
-        TMAdmissionScheduleLines.Reset;
+        TMAdmissionScheduleLines.Reset();
         TMAdmissionScheduleLines.SetRange("Schedule Code", "Schedule Code");
         TMAdmissionScheduleLines.DeleteAll(true);
         //+TM1.11

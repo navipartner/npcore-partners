@@ -16,29 +16,26 @@ codeunit 6150916 "NPR HC Post S.Header"
     var
         SalesSetup: Record "Sales & Receivables Setup";
         SalesPostViaJobQueue: Codeunit "Sales Post via Job Queue";
-        SalesPost: Codeunit "Sales-Post";
     begin
-        with SalesHeader do begin
-            case "Document Type" of
-                "Document Type"::Order:
-                    begin
-                        Ship := true;
-                        Invoice := true;
-                    end;
-                "Document Type"::"Return Order":
-                    begin
-                        Receive := true;
-                        Invoice := true;
-                    end
-            end;
-            "Print Posted Documents" := false;
-
-            SalesSetup.Get;
-            if SalesSetup."Post with Job Queue" then
-                SalesPostViaJobQueue.EnqueueSalesDoc(SalesHeader)
-            else
-                CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                begin
+                    SalesHeader.Ship := true;
+                    SalesHeader.Invoice := true;
+                end;
+            SalesHeader."Document Type"::"Return Order":
+                begin
+                    SalesHeader.Receive := true;
+                    SalesHeader.Invoice := true;
+                end
         end;
+        SalesHeader."Print Posted Documents" := false;
+
+        SalesSetup.Get();
+        if SalesSetup."Post with Job Queue" then
+            SalesPostViaJobQueue.EnqueueSalesDoc(SalesHeader)
+        else
+            CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
     end;
 }
 

@@ -1,9 +1,8 @@
-codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
+﻿codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 {
     var
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         InQuotes: Label '''%1''', Locked = true;
-        EmptyCodeINQuotes: Label '''''', Locked = true;
 
     procedure LinkSeatingToWaiterPad(WaiterPadNo: Code[20]; SeatingCode: Code[20]) LinkAdded: Boolean
     var
@@ -11,21 +10,21 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         Seating: Record "NPR NPRE Seating";
     begin
-        WaiterPad.Reset;
+        WaiterPad.Reset();
         WaiterPad.SetRange("No.", WaiterPadNo);
-        WaiterPad.FindFirst;
+        WaiterPad.FindFirst();
 
-        Seating.Reset;
+        Seating.Reset();
         Seating.SetRange(Code, SeatingCode);
-        Seating.FindFirst;
+        Seating.FindFirst();
 
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
         if not SeatingWaiterPadLink.IsEmpty then begin
             exit(false);
         end else begin
-            SeatingWaiterPadLink.Init;
+            SeatingWaiterPadLink.Init();
             SeatingWaiterPadLink."Seating Code" := Seating.Code;
             SeatingWaiterPadLink."Waiter Pad No." := WaiterPad."No.";
             SeatingWaiterPadLink.Closed := WaiterPad.Closed;
@@ -38,14 +37,14 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
 
         if SeatingWaiterPadLink.IsEmpty then begin
             exit(false);
         end else begin
-            SeatingWaiterPadLink.FindFirst;
+            SeatingWaiterPadLink.FindFirst();
             SeatingWaiterPadLink.Delete(true);
             exit(true);
         end;
@@ -57,14 +56,14 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
     begin
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
 
         if SeatingWaiterPadLink.IsEmpty then begin
             exit(false);
         end else begin
-            SeatingWaiterPadLink.FindFirst;
+            SeatingWaiterPadLink.FindFirst();
             SeatingWaiterPadLink.Rename(SeatingCodeNew, WaiterPadNo);
 
             if not SeatingWaiterPadLink.Closed then
@@ -79,13 +78,13 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
         if SeatingWaiterPadLink.IsEmpty then begin
             exit(false);
         end else begin
-            SeatingWaiterPadLink.FindFirst;
+            SeatingWaiterPadLink.FindFirst();
             SeatingWaiterPadLink.Rename(SeatingCode, WaiterPadNoNew);
             exit(true);
         end;
@@ -97,13 +96,13 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         HospitalitySetup: Record "NPR NPRE Restaurant Setup";
         NewWaiterPadNo: Code[20];
     begin
-        HospitalitySetup.Get;
+        HospitalitySetup.Get();
         HospitalitySetup.TestField("Waiter Pad No. Serie");
 
         NewWaiterPadNo := NoSeriesManagement.GetNextNo(HospitalitySetup."Waiter Pad No. Serie", Today, true);
 
         WaiterPad."No." := NewWaiterPadNo;
-        WaiterPad."Start Date" := WorkDate;
+        WaiterPad."Start Date" := WorkDate();
         WaiterPad."Start Time" := Time;
         if RunInsert then WaiterPad.Insert(true);
     end;
@@ -117,10 +116,10 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         if WaiterPad."No." = '' then
             InsertWaiterPad(WaiterPad, true);
 
-        SeatingWaiterPadLink.Init;
+        SeatingWaiterPadLink.Init();
         SeatingWaiterPadLink."Seating Code" := Seating.Code;
         SeatingWaiterPadLink."Waiter Pad No." := WaiterPad."No.";
-        SeatingWaiterPadLink.Insert;
+        SeatingWaiterPadLink.Insert();
 
         SeatingMgt.SetSeatingIsOccupied(Seating.Code);
 
@@ -143,13 +142,13 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         NewWaiterPad."Close Time" := 0T;
 
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", FromWaiterPad."No.");
-        if SeatingWaiterPadLink.FindSet then
+        if SeatingWaiterPadLink.FindSet() then
             repeat
                 SeatingWaiterPadLink2 := SeatingWaiterPadLink;
                 SeatingWaiterPadLink2."Waiter Pad No." := NewWaiterPad."No.";
                 SeatingWaiterPadLink2.Closed := NewWaiterPad.Closed;
-                SeatingWaiterPadLink2.Insert;
-            until SeatingWaiterPadLink.Next = 0;
+                SeatingWaiterPadLink2.Insert();
+            until SeatingWaiterPadLink.Next() = 0;
 
         NewWaiterPad.Insert(true);
 
@@ -164,19 +163,19 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         MergeToWaiterPad."Number of Guests" := MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests";
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";
         MergeToWaiterPad."Pre-receipt Printed" := false;
-        MergeToWaiterPad.Modify;
+        MergeToWaiterPad.Modify();
 
         WaiterPad."Number of Guests" := 0;
         WaiterPad."Billed Number of Guests" := 0;
         WaiterPad."Pre-receipt Printed" := false;
-        WaiterPad.Modify;
+        WaiterPad.Modify();
 
-        WaiterPadLine.Reset;
+        WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        if WaiterPadLine.FindSet then begin
+        if WaiterPadLine.FindSet() then begin
             repeat
                 NPHWaiterPadPOSManagement.SplitWaiterPadLine(WaiterPad, WaiterPadLine, WaiterPadLine.Quantity, MergeToWaiterPad);
-            until WaiterPadLine.Next = 0;
+            until WaiterPadLine.Next() = 0;
         end;
 
         CloseWaiterPad(WaiterPad, false);
@@ -203,10 +202,10 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         if not OK then
             OK := WaiterPadCanBeClosed(WaiterPad, SetupProxy);
         if OK then begin
-            WaiterPad."Close Date" := WorkDate;
+            WaiterPad."Close Date" := WorkDate();
             WaiterPad."Close Time" := Time;
             WaiterPad.Closed := true;
-            WaiterPad.Modify;
+            WaiterPad.Modify();
 
             CloseWaiterPadSeatings(WaiterPad, SetupProxy);
         end else begin
@@ -222,15 +221,14 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     procedure CloseWaiterPadSeatings(var WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
         SeatingWaiterPadLink.SetRange(Closed, false);
-        if SeatingWaiterPadLink.FindSet then
+        if SeatingWaiterPadLink.FindSet() then
             repeat
                 CloseWaiterPadSeatingLink(SeatingWaiterPadLink, SetupProxy);
-            until SeatingWaiterPadLink.Next = 0;
+            until SeatingWaiterPadLink.Next() = 0;
     end;
 
     local procedure CloseWaiterPadSeatingLink(SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
@@ -240,7 +238,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     begin
         SeatingWaiterPadLink2 := SeatingWaiterPadLink;
         SeatingWaiterPadLink2.Closed := true;
-        SeatingWaiterPadLink2.Modify;
+        SeatingWaiterPadLink2.Modify();
 
         SeatingMgt.TrySetSeatingIsCleared(SeatingWaiterPadLink2."Seating Code", SetupProxy);
     end;
@@ -250,7 +248,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         POSInfoWaiterPadLink: Record "NPR POS Info NPRE Waiter Pad";
     begin
-        WaiterPadLine.Reset;
+        WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
         if not WaiterPadLine.IsEmpty then
@@ -261,7 +259,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             WaiterPadLine.DeleteAll(true);
 
         POSInfoWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
-        POSInfoWaiterPadLink.DeleteAll;
+        POSInfoWaiterPadLink.DeleteAll();
 
         OnAfterWaiterPadCleanup(WaiterPad);
     end;
@@ -316,7 +314,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     begin
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
-        if WaiterPadLine.FindSet then
+        if WaiterPadLine.FindSet() then
             repeat
                 if not OnlyIfFullyPaid then begin
                     if WaiterPadLine."Billed Quantity" <> 0 then
@@ -324,7 +322,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                 end else
                     if WaiterPadLine.Quantity > WaiterPadLine."Billed Quantity" then
                         exit(false);
-            until WaiterPadLine.Next = 0;
+            until WaiterPadLine.Next() = 0;
 
         exit(OnlyIfFullyPaid);
     end;
@@ -355,7 +353,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
           WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
           FlowStatusTmp, PrintCategoryTmp, true, false, WPadLineBuffer);
 
-        if WPadLineBuffer.FindSet then
+        if WPadLineBuffer.FindSet() then
             repeat
                 if WaiterPadLine.Get(WPadLineBuffer."Waiter Pad No.", WPadLineBuffer."Waiter Pad Line No.") then
                     if KitchenOrderMgt.FindApplicableWPLineKitchenStations(
@@ -364,14 +362,14 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                         KitchenOrderMgt.InitKitchenReqSourceFromWaiterPadLine(
                           KitchenReqSourceParam, WaiterPadLine, KitchenStationBuffer."Restaurant Code", WPadLineBuffer."Serving Step", 0DT);
                         KitchenOrderMgt.FindKitchenRequests(KitchenRequest, KitchenReqSourceParam);
-                        if not KitchenRequest.FindSet then
+                        if not KitchenRequest.FindSet() then
                             exit(false);
                         repeat
                             if KitchenRequest."Line Status" <> KitchenRequest."Line Status"::Served then
                                 exit(false);
-                        until KitchenRequest.Next = 0;
+                        until KitchenRequest.Next() = 0;
                     end;
-            until WPadLineBuffer.Next = 0;
+            until WPadLineBuffer.Next() = 0;
 
         exit(true);
     end;
@@ -384,7 +382,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         ToWaiterPad."Billed Number of Guests" := FromWaiterPad."Billed Number of Guests" - FromWaiterPad."Number of Guests" + ToWaiterPad."Number of Guests";
         if ToWaiterPad."Billed Number of Guests" < 0 then
             ToWaiterPad."Billed Number of Guests" := 0;
-        ToWaiterPad.Modify;
+        ToWaiterPad.Modify();
 
         FromWaiterPad."Number of Guests" := FromWaiterPad."Number of Guests" - ToWaiterPad."Number of Guests";
         if FromWaiterPad."Number of Guests" < 0 then
@@ -392,7 +390,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         FromWaiterPad."Billed Number of Guests" := FromWaiterPad."Billed Number of Guests" - ToWaiterPad."Billed Number of Guests";
         if FromWaiterPad."Billed Number of Guests" < 0 then
             FromWaiterPad."Billed Number of Guests" := 0;
-        FromWaiterPad.Modify;
+        FromWaiterPad.Modify();
     end;
 
     procedure AssignedPrintCategoriesAsFilterString(AppliesToRecID: RecordID; OnlyForServingStepFilter: Text): Text
@@ -404,17 +402,17 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     begin
         FilterAssignedPrintCategories(AppliesToRecID, AssignedPrintCategory);
         AssignedPrintCategory.SetFilter("Print/Prod. Category Code", '<>%1', '');
-        if not AssignedPrintCategory.FindSet then
+        if not AssignedPrintCategory.FindSet() then
             exit('');
         AssignedPrintCategories := '';
         repeat
             if OnlyForServingStepFilter <> '' then begin
                 FilterAssignedFlowStatuses(AssignedPrintCategory.RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
                 AssignedFlowStatus.SetFilter("Flow Status Code", OnlyForServingStepFilter);
-                Include := not AssignedFlowStatus.IsEmpty;
+                Include := not AssignedFlowStatus.IsEmpty();
                 if not Include then begin
                     AssignedFlowStatus.SetRange("Flow Status Code");
-                    Include := AssignedFlowStatus.IsEmpty;  //applicable on all steps
+                    Include := AssignedFlowStatus.IsEmpty();  //applicable on all steps
                 end;
             end else
                 Include := true;
@@ -424,13 +422,13 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                     AssignedPrintCategories := AssignedPrintCategories + '|';
                 AssignedPrintCategories := AssignedPrintCategories + StrSubstNo(InQuotes, AssignedPrintCategory."Print/Prod. Category Code");
             end;
-        until AssignedPrintCategory.Next = 0;
+        until AssignedPrintCategory.Next() = 0;
         exit(AssignedPrintCategories);
     end;
 
     procedure FilterAssignedPrintCategories(AppliesToRecID: RecordID; var AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.")
     begin
-        AssignedPrintCategory.Reset;
+        AssignedPrintCategory.Reset();
         AssignedPrintCategory.SetRange("Table No.", AppliesToRecID.TableNo);
         AssignedPrintCategory.SetRange("Record ID", AppliesToRecID);
     end;
@@ -441,20 +439,20 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     begin
         FilterAssignedFlowStatuses(AppliesToRecID, StatusObject, AssignedFlowStatus);
         AssignedFlowStatus.SetFilter("Flow Status Code", '<>%1', '');
-        if not AssignedFlowStatus.FindSet then
+        if not AssignedFlowStatus.FindSet() then
             exit('');
         AssignedFlowStatuses := '';
         repeat
             if AssignedFlowStatuses <> '' then
                 AssignedFlowStatuses := AssignedFlowStatuses + '|';
             AssignedFlowStatuses := AssignedFlowStatuses + StrSubstNo(InQuotes, AssignedFlowStatus."Flow Status Code");
-        until AssignedFlowStatus.Next = 0;
+        until AssignedFlowStatus.Next() = 0;
         exit(AssignedFlowStatuses);
     end;
 
     procedure FilterAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status")
     begin
-        AssignedFlowStatus.Reset;
+        AssignedFlowStatus.Reset();
         AssignedFlowStatus.SetRange("Table No.", AppliesToRecID.TableNo);
         AssignedFlowStatus.SetRange("Record ID", AppliesToRecID);
         AssignedFlowStatus.SetRange("Flow Status Object", StatusObject);
@@ -469,22 +467,22 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         PrintCategoryList: Page "NPR NPRE Slct Prnt Cat.";
         Handled: Boolean;
     begin
-        PrintCategory.Reset;
+        PrintCategory.Reset();
 
         FilterAssignedPrintCategories(AppliesToRecID, AssignedPrintCategory);
-        if AssignedPrintCategory.FindSet then
+        if AssignedPrintCategory.FindSet() then
             repeat
                 if PrintCategory.Get(AssignedPrintCategory."Print/Prod. Category Code") then begin
                     PrintCategory.Mark := true;
 
                     FilterAssignedFlowStatuses(AssignedPrintCategory.RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
-                    if AssignedFlowStatus.FindSet then
+                    if AssignedFlowStatus.FindSet() then
                         repeat
                             AssignedFlowStatusTmp := AssignedFlowStatus;
-                            AssignedFlowStatusTmp.Insert;
-                        until AssignedFlowStatus.Next = 0;
+                            AssignedFlowStatusTmp.Insert();
+                        until AssignedFlowStatus.Next() = 0;
                 end;
-            until AssignedPrintCategory.Next = 0;
+            until AssignedPrintCategory.Next() = 0;
         Handled := true;
 
         OnBeforeSelectPrintCategories(AppliesToRecID, PrintCategory, Handled);
@@ -497,7 +495,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         PrintCategoryList.SetSourceRecID(AppliesToRecID);
         PrintCategoryList.SetMultiSelectionMode(true);
         PrintCategoryList.LookupMode(true);
-        if PrintCategoryList.RunModal <> ACTION::LookupOK then
+        if PrintCategoryList.RunModal() <> ACTION::LookupOK then
             exit;
         PrintCategoryList.GetDataset(PrintCategory);
         PrintCategoryList.GetAssignedFlowStatusRecordset(AssignedFlowStatusTmp);
@@ -509,24 +507,24 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             exit;
 
         AssignedPrintCategory.DeleteAll(true);
-        if PrintCategory.FindSet then
+        if PrintCategory.FindSet() then
             repeat
-                AssignedPrintCategory.Init;
+                AssignedPrintCategory.Init();
                 AssignedPrintCategory."Table No." := AppliesToRecID.TableNo;
                 AssignedPrintCategory."Record ID" := AppliesToRecID;
                 AssignedPrintCategory."Print/Prod. Category Code" := PrintCategory.Code;
-                AssignedPrintCategory.Insert;
+                AssignedPrintCategory.Insert();
 
                 FilterAssignedFlowStatuses(AssignedPrintCategory.RecordId, AssignedFlowStatusTmp."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatusTmp);
-                if AssignedFlowStatusTmp.FindSet then
+                if AssignedFlowStatusTmp.FindSet() then
                     repeat
                         AssignedFlowStatus := AssignedFlowStatusTmp;
-                        AssignedFlowStatus.Insert;
-                    until AssignedFlowStatusTmp.Next = 0;
-            until PrintCategory.Next = 0;
+                        AssignedFlowStatus.Insert();
+                    until AssignedFlowStatusTmp.Next() = 0;
+            until PrintCategory.Next() = 0;
 
-        AssignedFlowStatusTmp.Reset;
-        AssignedFlowStatusTmp.DeleteAll;
+        AssignedFlowStatusTmp.Reset();
+        AssignedFlowStatusTmp.DeleteAll();
     end;
 
     procedure AssignWPadLinePrintCategories(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RemoveExisting: Boolean)
@@ -556,10 +554,10 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                     if not (Item.Get(WaiterPadLine."No.") and (Item."NPR Print Tags" <> '')) then
                         exit;
                     PrintCategory.SetFilter("Print Tag", ConvertStr(Item."NPR Print Tags", ',', '|'));
-                    if PrintCategory.FindSet then
+                    if PrintCategory.FindSet() then
                         repeat
                             AddAssignedPrintCategory(WaiterPadLine.RecordId, PrintCategory, NewAssignedPrintCategory);
-                        until PrintCategory.Next = 0;
+                        until PrintCategory.Next() = 0;
                     AssignWPadLineServingStepsFromPrintCategories(WaiterPadLine, RemoveExisting);
                 end;
 
@@ -576,12 +574,12 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 
     procedure AddAssignedPrintCategory(AppliesToRecID: RecordID; PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var NewAssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.")
     begin
-        NewAssignedPrintCategory.Init;
+        NewAssignedPrintCategory.Init();
         NewAssignedPrintCategory."Table No." := AppliesToRecID.TableNo;
         NewAssignedPrintCategory."Record ID" := AppliesToRecID;
         NewAssignedPrintCategory."Print/Prod. Category Code" := PrintCategory.Code;
-        if not NewAssignedPrintCategory.Find then
-            NewAssignedPrintCategory.Insert;
+        if not NewAssignedPrintCategory.Find() then
+            NewAssignedPrintCategory.Insert();
     end;
 
     procedure ClearAssignedPrintCategories(AppliesToRecID: RecordID)
@@ -603,19 +601,19 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     begin
         ClearAssignedPrintCategories(ToRecID);
         FilterAssignedPrintCategories(FromRecID, AssignedPrintCategory);
-        if AssignedPrintCategory.FindSet then
+        if AssignedPrintCategory.FindSet() then
             repeat
                 if PrintCategory.Get(AssignedPrintCategory."Print/Prod. Category Code") then begin
                     AddAssignedPrintCategory(ToRecID, PrintCategory, NewAssignedPrintCategory);
 
                     FilterAssignedFlowStatuses(AssignedPrintCategory.RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
-                    if AssignedFlowStatus.FindSet then
+                    if AssignedFlowStatus.FindSet() then
                         repeat
                             if FlowStatus.Get(AssignedFlowStatus."Flow Status Code", AssignedFlowStatus."Flow Status Object") then
                                 AddAssignedFlowStatus(NewAssignedPrintCategory.RecordId, FlowStatus);
-                        until AssignedFlowStatus.Next = 0;
+                        until AssignedFlowStatus.Next() = 0;
                 end;
-            until AssignedPrintCategory.Next = 0;
+            until AssignedPrintCategory.Next() = 0;
     end;
 
     procedure MoveAssignedPrintCategories(FromRecId: RecordID; ToRecId: RecordID)
@@ -630,7 +628,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         FlowStatusList: Page "NPR NPRE Select Flow Status";
         Handled: Boolean;
     begin
-        FlowStatus.Reset;
+        FlowStatus.Reset();
         FlowStatus.FilterGroup(2);
         FlowStatus.SetRange("Status Object", StatusObject);
         FlowStatus.FilterGroup(0);
@@ -639,11 +637,11 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             FlowStatus."Status Object"::WaiterPadLineMealFlow:
                 begin
                     FilterAssignedFlowStatuses(AppliesToRecID, StatusObject, AssignedFlowStatus);
-                    if AssignedFlowStatus.FindSet then
+                    if AssignedFlowStatus.FindSet() then
                         repeat
                             if FlowStatus.Get(AssignedFlowStatus."Flow Status Code", AssignedFlowStatus."Flow Status Object") then
                                 FlowStatus.Mark := true;
-                        until AssignedFlowStatus.Next = 0;
+                        until AssignedFlowStatus.Next() = 0;
                     Handled := true;
                 end;
         end;
@@ -656,7 +654,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         FlowStatusList.SetDataset(FlowStatus);
         FlowStatusList.SetMultiSelectionMode(true);
         FlowStatusList.LookupMode(true);
-        if FlowStatusList.RunModal <> ACTION::LookupOK then
+        if FlowStatusList.RunModal() <> ACTION::LookupOK then
             exit;
         FlowStatusList.GetDataset(FlowStatus);
         FlowStatus.MarkedOnly(true);
@@ -667,15 +665,15 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             FlowStatus."Status Object"::WaiterPadLineMealFlow:
                 begin
                     AssignedFlowStatus.DeleteAll(true);
-                    if FlowStatus.FindSet then
+                    if FlowStatus.FindSet() then
                         repeat
-                            AssignedFlowStatus.Init;
+                            AssignedFlowStatus.Init();
                             AssignedFlowStatus."Table No." := AppliesToRecID.TableNo;
                             AssignedFlowStatus."Record ID" := AppliesToRecID;
                             AssignedFlowStatus."Flow Status Object" := FlowStatus."Status Object";
                             AssignedFlowStatus."Flow Status Code" := FlowStatus.Code;
-                            AssignedFlowStatus.Insert;
-                        until FlowStatus.Next = 0;
+                            AssignedFlowStatus.Insert();
+                        until FlowStatus.Next() = 0;
                     Handled := true;
                 end;
         end;
@@ -687,7 +685,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     var
         AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
         FlowStatus: Record "NPR NPRE Flow Status";
-        Handled: Boolean;
     begin
         if RemoveExisting then
             ClearAssignedFlowStatuses(WaiterPadLine.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
@@ -696,30 +693,30 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             exit;
 
         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);
-        if FlowStatus.FindSet then
+        if FlowStatus.FindSet() then
             repeat
                 FilterAssignedPrintCategories(WaiterPadLine.RecordId, AssignedPrintCategory);
                 AssignedPrintCategory.SetFilter("Print/Prod. Category Code", FlowStatus.AssignedPrintCategoriesAsFilterString());
-                if AssignedPrintCategory.FindSet then begin
+                if AssignedPrintCategory.FindSet() then begin
                     AddAssignedFlowStatus(WaiterPadLine.RecordId, FlowStatus);
                     repeat
                         AddAssignedFlowStatus(AssignedPrintCategory.RecordId, FlowStatus);
-                    until AssignedPrintCategory.Next = 0;
+                    until AssignedPrintCategory.Next() = 0;
                 end;
-            until FlowStatus.Next = 0;
+            until FlowStatus.Next() = 0;
     end;
 
     procedure AddAssignedFlowStatus(AppliesToRecID: RecordID; FlowStatus: Record "NPR NPRE Flow Status")
     var
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
-        AssignedFlowStatus.Init;
+        AssignedFlowStatus.Init();
         AssignedFlowStatus."Table No." := AppliesToRecID.TableNo;
         AssignedFlowStatus."Record ID" := AppliesToRecID;
         AssignedFlowStatus."Flow Status Object" := FlowStatus."Status Object";
         AssignedFlowStatus."Flow Status Code" := FlowStatus.Code;
-        if not AssignedFlowStatus.Find then
-            AssignedFlowStatus.Insert;
+        if not AssignedFlowStatus.Find() then
+            AssignedFlowStatus.Insert();
     end;
 
     procedure ClearAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option)
@@ -738,11 +735,11 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
     begin
         ClearAssignedFlowStatuses(ToRecId, StatusObject);
         FilterAssignedFlowStatuses(FromRecId, StatusObject, AssignedFlowStatus);
-        if AssignedFlowStatus.FindSet then
+        if AssignedFlowStatus.FindSet() then
             repeat
                 if FlowStatus.Get(AssignedFlowStatus."Flow Status Code", AssignedFlowStatus."Flow Status Object") then
                     AddAssignedFlowStatus(ToRecId, FlowStatus);
-            until AssignedFlowStatus.Next = 0;
+            until AssignedFlowStatus.Next() = 0;
     end;
 
     procedure MoveAssignedFlowStatuses(FromRecId: RecordID; ToRecId: RecordID; StatusObject: Option)

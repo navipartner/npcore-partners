@@ -95,7 +95,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         //+NPR5.43 [311964]
 
         PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(GetUnitNo(POSSession), FromBinNo, CheckpointEntryNo);
-        Commit;
+        Commit();
 
         // Confirm amounts counted and float/bank/safe transfer
         POSPaymentBinCheckpoint.Reset();
@@ -107,7 +107,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         PaymentBinCheckpointPage.LookupMode(true);
         PaymentBinCheckpointPage.SetTransferMode();
         PageAction := PaymentBinCheckpointPage.RunModal();
-        Commit;
+        Commit();
 
         if (PageAction = ACTION::LookupOK) then begin
             POSPaymentBinCheckpoint.Reset();
@@ -134,7 +134,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
                 POSPostEntries.SetStopOnError(true);
                 POSPostEntries.SetPostCompressed(false);
                 POSPostEntries.Run(POSEntryToPost);
-                Commit;
+                Commit();
 
                 POSSession.ChangeViewLogin();
                 //+NPR5.43 [311964]
@@ -162,7 +162,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
                 FromBinNo := GetDefaultUnitBin(POSSession);
         end;
         JSON.SetContext('FROM_BIN', FromBinNo);
-        FrontEnd.SetActionContext(ActionCode, JSON);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
     local procedure UserSelectBin(POSSession: Codeunit "NPR POS Session"): Code[10]

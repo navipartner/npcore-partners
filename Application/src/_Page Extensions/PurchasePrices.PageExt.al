@@ -12,7 +12,7 @@ pageextension 6014476 "NPR Purchase Prices" extends "Purchase Prices"
                     Caption = 'Variety';
                     Image = ItemVariant;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Alt+V';

@@ -1,4 +1,4 @@
-codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
+﻿codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
 {
     var
         Text000: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars';
@@ -14,12 +14,12 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
     begin
         TempNpGpPOSSalesEntry2.Copy(TempNpGpPOSSalesEntry, true);
         Clear(TempNpGpPOSSalesEntry2);
-        if not TempNpGpPOSSalesEntry2.FindSet then
+        if not TempNpGpPOSSalesEntry2.FindSet() then
             exit;
 
         repeat
             InsertPosSalesEntry(TempNpGpPOSSalesEntry2, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
-        until TempNpGpPOSSalesEntry2.Next = 0;
+        until TempNpGpPOSSalesEntry2.Next() = 0;
     end;
 
     local procedure InsertPosSalesEntry(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary)
@@ -44,10 +44,10 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
         NpGpPOSSalesEntry.SetRange("POS Store Code", TempNpGpPOSSalesEntry."POS Store Code");
         NpGpPOSSalesEntry.SetRange("POS Unit No.", TempNpGpPOSSalesEntry."POS Unit No.");
         NpGpPOSSalesEntry.SetRange("Document No.", TempNpGpPOSSalesEntry."Document No.");
-        if NpGpPOSSalesEntry.FindFirst then
+        if NpGpPOSSalesEntry.FindFirst() then
             exit;
 
-        NpGpPOSSalesEntry.Init;
+        NpGpPOSSalesEntry.Init();
         NpGpPOSSalesEntry := TempNpGpPOSSalesEntry;
         NpGpPOSSalesEntry."Entry No." := 0;
         DataLogMgt.DisableDataLog(true);
@@ -59,18 +59,18 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
         TempNpGpPOSSalesLine2.Copy(TempNpGpPOSSalesLine, true);
         Clear(TempNpGpPOSSalesLine2);
         TempNpGpPOSSalesLine2.SetRange("POS Entry No.", TempNpGpPOSSalesEntry."Entry No.");
-        if TempNpGpPOSSalesLine2.FindSet then
+        if TempNpGpPOSSalesLine2.FindSet() then
             repeat
                 InsertPosSalesLine(NpGpPOSSalesEntry, TempNpGpPOSSalesLine2);
-            until TempNpGpPOSSalesLine2.Next = 0;
+            until TempNpGpPOSSalesLine2.Next() = 0;
 
         TempNpGpPOSInfoPOSEntry2.Copy(TempNpGpPOSInfoPOSEntry, true);
         Clear(TempNpGpPOSInfoPOSEntry2);
         TempNpGpPOSInfoPOSEntry2.SetRange("POS Entry No.", TempNpGpPOSSalesEntry."Entry No.");
-        if TempNpGpPOSInfoPOSEntry2.FindSet then
+        if TempNpGpPOSInfoPOSEntry2.FindSet() then
             repeat
                 InsertPosInfoPosEntry(NpGpPOSSalesEntry, TempNpGpPOSInfoPOSEntry2);
-            until TempNpGpPOSInfoPOSEntry2.Next = 0;
+            until TempNpGpPOSInfoPOSEntry2.Next() = 0;
     end;
 
     local procedure InsertPosSalesLine(NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
@@ -81,7 +81,7 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
         if NpGpPOSSalesLine.Get(NpGpPOSSalesEntry."Entry No.", TempNpGpPOSSalesLine."Line No.") then
             exit;
 
-        NpGpPOSSalesLine.Init;
+        NpGpPOSSalesLine.Init();
         NpGpPOSSalesLine := TempNpGpPOSSalesLine;
         NpGpPOSSalesLine."POS Entry No." := NpGpPOSSalesEntry."Entry No.";
         NpGpPOSSalesLine."POS Store Code" := NpGpPOSSalesEntry."POS Store Code";
@@ -89,7 +89,7 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
         NpGpPOSSalesLine."Document No." := NpGpPOSSalesEntry."Document No.";
         NpGpPOSSalesLine.Insert(true);
 
-        NpGpDetailedPOSSalesEntry.Init;
+        NpGpDetailedPOSSalesEntry.Init();
         NpGpDetailedPOSSalesEntry."Entry No." := 0;
         NpGpDetailedPOSSalesEntry."POS Entry No." := NpGpPOSSalesLine."POS Entry No.";
         NpGpDetailedPOSSalesEntry."POS Sales Line No." := NpGpPOSSalesLine."Line No.";
@@ -112,7 +112,7 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
         if NpGpPOSInfoPOSEntry.Get(NpGpPOSSalesEntry."Entry No.", TempNpGpPOSInfoPOSEntry."POS Info Code", TempNpGpPOSInfoPOSEntry."Entry No.") then
             exit;
 
-        NpGpPOSInfoPOSEntry.Init;
+        NpGpPOSInfoPOSEntry.Init();
         NpGpPOSInfoPOSEntry := TempNpGpPOSInfoPOSEntry;
         NpGpPOSInfoPOSEntry."POS Entry No." := NpGpPOSSalesEntry."Entry No.";
         NpGpPOSInfoPOSEntry.Insert(true);
@@ -148,21 +148,21 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
     begin
         NcTaskSetup.SetRange("Table No.", DATABASE::"NPR POS Entry");
         NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpGp POS Sales Sync Mgt.");
-        if NcTaskSetup.FindFirst then
+        if NcTaskSetup.FindFirst() then
             exit(NcTaskSetup."Task Processor Code");
 
-        if not NcTaskProcessor.FindFirst then begin
+        if not NcTaskProcessor.FindFirst() then begin
             NcSyncMgt.UpdateTaskProcessor(NcTaskProcessor);
-            Commit;
-            NcTaskProcessor.FindFirst;
+            Commit();
+            NcTaskProcessor.FindFirst();
         end;
 
-        NcTaskSetup.Init;
+        NcTaskSetup.Init();
         NcTaskSetup."Entry No." := 0;
         NcTaskSetup."Task Processor Code" := NcTaskProcessor.Code;
         NcTaskSetup."Table No." := DATABASE::"NPR POS Entry";
         NcTaskSetup."Codeunit ID" := CODEUNIT::"NPR NpGp POS Sales Sync Mgt.";
-        NcTaskSetup.Insert;
+        NcTaskSetup.Insert();
         exit(NcTaskSetup."Task Processor Code");
     end;
 
@@ -217,7 +217,6 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
     [EventSubscriber(ObjectType::Table, 6150622, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertPOSSalesLine(var Rec: Record "NPR POS Entry Sales Line"; RunTrigger: Boolean)
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
         RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
     begin
         if Rec.IsTemporary then
@@ -384,7 +383,7 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
         SaleLinePOS2.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         SaleLinePOS2.SetFilter("Line No.", '<%1', SaleLinePOS."Line No.");
-        NaturalLineNo := SaleLinePOS2.Count + 1;
+        NaturalLineNo := SaleLinePOS2.Count() + 1;
         exit(NaturalLineNo);
     end;
 }

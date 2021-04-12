@@ -334,7 +334,6 @@ table 6059975 "NPR Variety Field Setup"
     procedure InitVarietyFields()
     var
         VRTFieldsSetup: Record "NPR Variety Field Setup";
-        VRTFieldsSetupCopy: Record "NPR Variety Field Setup";
     begin
         //Sales Line
 
@@ -433,13 +432,13 @@ table 6059975 "NPR Variety Field Setup"
         InsertVarietyFields(0, 5401, 6059982, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
 
         if VRTFieldsSetup.Get(1, 5401, 1) then
-            VRTFieldsSetup.Delete;
+            VRTFieldsSetup.Delete();
 
         InsertVarietyFields(1, 5401, 2, false, false, true, 0, 0, 0, '', '', '', false, '', false);
         SetDescription(1, 5401, 2, CreateVariantDesc);
 
         if VRTFieldsSetup.Get(1, 5401, 3) then
-            VRTFieldsSetup.Delete;
+            VRTFieldsSetup.Delete();
         InsertVarietyFields(3, 5401, 100000, false, true, false, 0, 0, 0, 'GetItemCrossReference', '', 'LookupItemCrossReference', true, '', false);
 
         InsertVarietyFields(3, 5401, 100001, false, false, false, 3, 0, 0, 'GetExpectedInventory', 'GetPlannedOrderRcpt', 'LookupAvailabilityByEvent', false, 'LookupAvailabilityByLocation', false);
@@ -464,7 +463,7 @@ table 6059975 "NPR Variety Field Setup"
         InsertVarietyFields(0, 83, 15, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 83, 50, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
 
-        Commit;
+        Commit();
     end;
 
     local procedure InsertVarietyFields(Type: Integer; TableNo: Integer; FieldNo: Integer; ValidateField: Boolean; EditField: Boolean; TableDefault: Boolean; Type2: Integer; TableNo2: Integer; FieldNo2: Integer; MatrixSubscriber1: Text; MatrixSubscriber2: Text; MatrixSubscriberOnLookup: Text; UseOnLookupValue: Boolean; MatrixSubscriberOnDrillDown: Text; UseOnDrillDownalue: Boolean)
@@ -484,13 +483,13 @@ table 6059975 "NPR Variety Field Setup"
                 VRTFieldsSetup."Use OnLookup Return Value" := UseOnLookupValue;
                 VRTFieldsSetup."OnDrillDown Subscriber" := MatrixSubscriberOnDrillDown;
                 VRTFieldsSetup."Use OnDrillDown Return Value" := UseOnDrillDownalue;
-                VRTFieldsSetup.Modify;
+                VRTFieldsSetup.Modify();
             end;
 
             exit;
         end;
 
-        VRTFieldsSetup.Init;
+        VRTFieldsSetup.Init();
         VRTFieldsSetup.Type := Type;
         VRTFieldsSetup."Table No." := TableNo;
         VRTFieldsSetup.Validate("Field No.", FieldNo);
@@ -511,7 +510,7 @@ table 6059975 "NPR Variety Field Setup"
         VRTFieldsSetup."Use OnDrillDown Return Value" := UseOnDrillDownalue;
         //+NPR5.47 [327541]
 
-        if VRTFieldsSetup.Insert then;
+        if VRTFieldsSetup.Insert() then;
     end;
 
     procedure UpdateToLatestVersion()
@@ -538,7 +537,7 @@ table 6059975 "NPR Variety Field Setup"
         if not VRTFieldsSetup.Get(Type, TableNo, FieldNo) then
             exit;
         VRTFieldsSetup.Description := NewDescription;
-        VRTFieldsSetup.Modify;
+        VRTFieldsSetup.Modify();
     end;
 }
 

@@ -1,4 +1,4 @@
-codeunit 6151505 "NPR Nc Sync. Mgt."
+﻿codeunit 6151505 "NPR Nc Sync. Mgt."
 {
     var
         Text000: Label 'NaviConnect Default';
@@ -10,8 +10,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     procedure DownloadFtpType(ImportType: Record "NPR Nc Import Type"): Boolean
     var
         ImportEntryTmp: Record "NPR Nc Import Entry" temporary;
-        FileList: DotNet NPRNetIList;
-        LsEntry: DotNet NPRNetChannelSftp_LsEntry;
         Filename: Text;
         ListDirectory: Text;
     begin
@@ -54,7 +52,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     [TryFunction]
     procedure TryImportNewEntry(var ImportEntry: Record "NPR Nc Import Entry"; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
-        FileMgt: Codeunit "File Management";
         Credential: DotNet NPRNetNetworkCredential;
         FtpWebRequest: DotNet NPRNetFtpWebRequest;
         FtpWebResponse: DotNet NPRNetFtpWebResponse;
@@ -86,7 +83,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
         CopyStream(OutStream, MemoryStream);
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
 
         if ImportType."Ftp Backup Path" = '' then begin
@@ -146,7 +143,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             SharpSFtp.RenameFile(RemotePath + Filename, NewRemotePath + Filename);
         end;
 
-        SharpSFtp.Close;
+        SharpSFtp.Close();
     end;
     #endregion "Download Ftp"
 
@@ -162,7 +159,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
     procedure DownloadServerFile(NcImportType: Record "NPR Nc Import Type"; var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary)
     var
-        FileMgt: Codeunit "File Management";
         ArrayHelper: DotNet NPRNetArray;
         ServerDirectoryHelper: DotNet NPRNetDirectory;
         i: Integer;
@@ -187,7 +183,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     begin
         FileMgt.BLOBImportFromServerFile(TempBlob, Filename);
 
-        NcImportEntryTmp.Init;
+        NcImportEntryTmp.Init();
         NcImportEntryTmp."Entry No." := 0;
         NcImportEntryTmp."Import Type" := NcImportType.Code;
         NcImportEntryTmp.Date := CurrentDateTime;
@@ -199,7 +195,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         TempBlob.ToRecordRef(RecRef, NcImportEntryTmp.FieldNo("Document Source"));
         RecRef.SetTable(NcImportEntryTmp);
 
-        NcImportEntryTmp.Insert;
+        NcImportEntryTmp.Insert();
         if Erase(Filename) then;
     end;
 
@@ -223,9 +219,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
     #region "Process Import"
     procedure ProcessImportEntry(var ImportEntry: Record "NPR Nc Import Entry"): Boolean
-    var
-        DataLogMgt: Codeunit "NPR Data Log Management";
-        NaviConnectImportMgt: Codeunit "NPR Nc Import Mgt.";
     begin
         CODEUNIT.Run(CODEUNIT::"NPR Nc Import Processor", ImportEntry);
         if ImportEntry.Get(ImportEntry."Entry No.") then
@@ -241,7 +234,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         TaskReset(Task);
         TaskSetup.SetRange("Task Processor Code", Task."Task Processor Code");
         TaskSetup.SetRange("Table No.", Task."Table No.");
-        if TaskSetup.FindSet then
+        if TaskSetup.FindSet() then
             repeat
                 if Task.Get(Task."Entry No.") then;
                 ClearLastError;
@@ -249,7 +242,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
                     TaskError(Task);
                     exit(false);
                 end;
-            until TaskSetup.Next = 0;
+            until TaskSetup.Next() = 0;
         TaskComplete(Task);
         exit(true);
     end;
@@ -264,19 +257,19 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         Task.SetRange("Task Processor Code", TaskProcessor.Code);
         Task.SetRange(Processed, false);
         Task.SetFilter("Process Count", '<%1', MaxRetry);
-        if Task.FindSet then
+        if Task.FindSet() then
             repeat
                 ProcessTask(Task);
                 if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
                     exit;
-            until Task.Next = 0;
+            until Task.Next() = 0;
     end;
     #endregion "Process Import"
 
     #region "Status Mgt."
     local procedure TaskComplete(var NaviConnectTask: Record "NPR Nc Task")
     begin
-        NaviConnectTask.LockTable;
+        NaviConnectTask.LockTable();
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
             exit;
         NaviConnectTask."Last Processing Completed at" := CurrentDateTime;
@@ -284,7 +277,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         NaviConnectTask.Processed := true;
         NaviConnectTask."Process Error" := false;
         NaviConnectTask.Modify(true);
-        Commit;
+        Commit();
     end;
 
     local procedure TaskError(var NaviConnectTask: Record "NPR Nc Task")
@@ -292,7 +285,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         OutStream: OutStream;
         ErrorText: Text[1024];
     begin
-        NaviConnectTask.LockTable;
+        NaviConnectTask.LockTable();
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
             exit;
 
@@ -308,12 +301,12 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         end;
 
         NaviConnectTask.Modify(true);
-        Commit;
+        Commit();
     end;
 
     local procedure TaskReset(var NaviConnectTask: Record "NPR Nc Task")
     begin
-        NaviConnectTask.LockTable;
+        NaviConnectTask.LockTable();
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
             exit;
         Clear(NaviConnectTask."Data Output");
@@ -325,7 +318,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         NaviConnectTask."Process Error" := true;
         NaviConnectTask."Process Count" += 1;
         NaviConnectTask.Modify(true);
-        Commit;
+        Commit();
     end;
 
     procedure TaskResetCount()
@@ -334,21 +327,21 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
     begin
         NcTaskMgt.CleanTasks();
-        Commit;
+        Commit();
 
         NaviConnectTask.SetCurrentKey("Log Date", Processed);
         NaviConnectTask.SetRange(Processed, false);
         NaviConnectTask.ModifyAll("Process Count", 0);
-        Commit;
+        Commit();
     end;
 
     procedure UpdateTaskProcessor(TaskProcessor: Record "NPR Nc Task Processor")
     begin
-        if TaskProcessor.Find then
+        if TaskProcessor.Find() then
             exit;
 
         if TaskProcessor.Code in ['', 'NC'] then begin
-            TaskProcessor.Init;
+            TaskProcessor.Init();
             TaskProcessor.Code := 'NC';
             TaskProcessor.Description := Text000;
             TaskProcessor.Insert(true);
@@ -466,7 +459,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         StreamReader := StreamReader.StreamReader(MemoryStream);
         ListDirectory := StreamReader.ReadToEnd;
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
     end;
 
@@ -492,7 +485,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         StreamReader := StreamReader.StreamReader(MemoryStream);
         ListDirectoryDetails := StreamReader.ReadToEnd;
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
     end;
 
@@ -501,7 +494,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     var
         SharpSFtp: DotNet NPRNetSftp0;
         FileList: DotNet NPRNetIList;
-        IEnumerator: DotNet NPRNetIEnumerator;
         LsEntry: DotNet NPRNetChannelSftp_LsEntry;
         RemotePath: Text;
         NetConvHelper: Variant;
@@ -520,7 +512,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
                 ListDirectory += NewLine();
             ListDirectory += LsEntry.Filename;
         end;
-        SharpSFtp.Close;
+        SharpSFtp.Close();
     end;
 
     local procedure ParseFilename(Details: Text) Filename: Text
@@ -558,7 +550,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         exit('');
     end;
 
-    local procedure RegExMatch(Details: Text) Filename: Text
+    local procedure RegExMatch(Details: Text): Text
     var
         Match: DotNet NPRNetMatch;
         RegEx: DotNet NPRNetRegex;
@@ -583,7 +575,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         exit(Match.Groups.Item('filename').Value);
     end;
 
-    local procedure RegExMatch2(Details: Text) Filename: Text
+    local procedure RegExMatch2(Details: Text): Text
     var
         Match: DotNet NPRNetMatch;
         RegEx: DotNet NPRNetRegex;
@@ -607,7 +599,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         exit(Match.Groups.Item('filename').Value);
     end;
 
-    local procedure RegExMatch3(Details: Text) Filename: Text
+    local procedure RegExMatch3(Details: Text): Text
     var
         Match: DotNet NPRNetMatch;
         RegEx: DotNet NPRNetRegex;
@@ -630,7 +622,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         exit(Match.Groups.Item('filename').Value);
     end;
 
-    local procedure RegExMatch4(Details: Text) Filename: Text
+    local procedure RegExMatch4(Details: Text): Text
     var
         Match: DotNet NPRNetMatch;
         RegEx: DotNet NPRNetRegex;
@@ -682,7 +674,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
     end;
 
@@ -702,7 +694,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
     end;
 
@@ -757,7 +749,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         MemoryStream.Flush;
-        MemoryStream.Close;
+        MemoryStream.Close();
         Clear(MemoryStream);
     end;
 

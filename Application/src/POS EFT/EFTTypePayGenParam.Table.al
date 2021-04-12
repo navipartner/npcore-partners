@@ -75,8 +75,6 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
         FieldErrorOption: Label 'does not contain a valid option (%1)';
 
     procedure GetTextParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; DefaultValue: Text; UserConfigurable: Boolean): Text
-    var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
     begin
         FindOrCreateRecord(IntegrationType, PaymentTypePOS, NameIn, "Data Type"::Text, DefaultValue, '', UserConfigurable);
         exit(Value);
@@ -84,7 +82,6 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
 
     procedure GetIntegerParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; DefaultValue: Integer; UserConfigurable: Boolean): Integer
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         "Integer": Integer;
     begin
         FindOrCreateRecord(IntegrationType, PaymentTypePOS, NameIn, "Data Type"::Integer, DefaultValue, '', UserConfigurable);
@@ -94,7 +91,6 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
 
     procedure GetBooleanParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; DefaultValue: Boolean; UserConfigurable: Boolean): Boolean
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         Boolean: Boolean;
     begin
         FindOrCreateRecord(IntegrationType, PaymentTypePOS, NameIn, "Data Type"::Boolean, DefaultValue, '', UserConfigurable);
@@ -104,7 +100,6 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
 
     procedure GetOptionParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; DefaultValue: Integer; OptionStringIn: Text; UserConfigurable: Boolean): Integer
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         "Integer": Integer;
     begin
         FindOrCreateRecord(IntegrationType, PaymentTypePOS, NameIn, "Data Type"::Option, DefaultValue, OptionStringIn, UserConfigurable);
@@ -114,7 +109,6 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
 
     procedure GetDecimalParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; DefaultValue: Decimal; UserConfigurable: Boolean): Decimal
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         Decimal: Decimal;
     begin
         FindOrCreateRecord(IntegrationType, PaymentTypePOS, NameIn, "Data Type"::Decimal, DefaultValue, '', UserConfigurable);
@@ -124,7 +118,6 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
 
     procedure GetDateParameterValue(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; DefaultValue: Date; UserConfigurable: Boolean): Date
     var
-        InvokeParameter: Record "NPR POS Paym. Bin Eject Param.";
         Date: Date;
     begin
         FindOrCreateRecord(IntegrationType, PaymentTypePOS, NameIn, "Data Type"::Date, DefaultValue, '', UserConfigurable);
@@ -135,7 +128,7 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
     local procedure FindOrCreateRecord(IntegrationType: Code[20]; PaymentTypePOS: Code[10]; NameIn: Text; DataType: Integer; DefaultValue: Variant; OptionStringIn: Text; UserConfigurable: Boolean)
     begin
         if not Get(IntegrationType, PaymentTypePOS, NameIn) then begin
-            Init;
+            Init();
             "Integration Type" := IntegrationType;
             "Payment Type POS" := PaymentTypePOS;
             Name := NameIn;
@@ -143,7 +136,7 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
             OptionString := OptionStringIn;
             "User Configurable" := UserConfigurable;
             Validate(Value, DefaultValue);
-            Insert;
+            Insert();
         end;
     end;
 
@@ -151,7 +144,7 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
     begin
         Get(SetupID, PaymentTypePOS, NameIn);
         Validate(Value, ValueIn);
-        Modify;
+        Modify();
     end;
 
     procedure LookupValue()
@@ -181,7 +174,7 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
         foreach Part in Parts do begin
             tmpRetailList.Number += 1;
             tmpRetailList.Choice := Part;
-            tmpRetailList.Insert;
+            tmpRetailList.Insert();
         end;
 
         if tmpRetailList.IsEmpty then

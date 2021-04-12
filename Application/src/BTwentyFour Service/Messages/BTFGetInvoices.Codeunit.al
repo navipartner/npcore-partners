@@ -5,8 +5,6 @@ codeunit 6014645 "NPR BTF GetInvoices" implements "NPR BTF IEndPoint"
         AuthMethodIDNotSetLbl: Label 'Authorization Method ID is not set in %1 or it''s not found in related table %2', Comment = '%1=ServiceSetup.TableCaption();%2=ServiceEndPoint.TableCaption()';
         RequestNotSentLbl: Label 'Failed to send request to %1', Comment = '%1=Request URI';
         DefaultFileNameLbl: Label 'GetInvoices_%1', Comment = '%1=Current Date and Time';
-        ResourcesUriNotFoundInContentErr: Label 'Couldn''t find resources uri in downloaded content. Each resource uri contain details which should be imported into the Business Central tables.';
-        TokenNotFoundErr: Label 'Access token not found for %1.', Comment = '%1="Service EndPoint for Authroization"."EndPoint ID"';
 
     procedure SendRequest(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var Response: Codeunit "Temp Blob")
     var

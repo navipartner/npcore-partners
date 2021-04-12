@@ -20,7 +20,6 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
     var
         BinEntry: Record "NPR POS Bin Entry";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        PreviousFloat: Record "NPR POS Payment Bin Checkp.";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
         PreviousBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -50,7 +49,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         BinEntry.Type := BinEntry.Type::CHECKPOINT;
         BinEntry."Payment Bin No." := BinNo;
 
-        BinEntry."Transaction Date" := Today;
+        BinEntry."Transaction Date" := Today();
         BinEntry."Transaction Time" := Time;
         BinEntry.Comment := UNCONFIRMED_CP;
 
@@ -61,14 +60,14 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         BinEntry."Payment Method Code" := PaymentMethodCode;
         BinEntry.Insert();
 
-        PaymentBinCheckpoint.Init;
+        PaymentBinCheckpoint.Init();
         PaymentBinCheckpoint."Payment Type No." := BinEntry."Payment Type Code";
         PaymentBinCheckpoint."Payment Method No." := BinEntry."Payment Method Code";
         PaymentBinCheckpoint."Currency Code" := POSPaymentMethod."Currency Code";
         PaymentBinCheckpoint."Payment Bin No." := BinNo;
         PaymentBinCheckpoint."Include In Counting" := POSPaymentMethod."Include In Counting";
         PaymentBinCheckpoint."Created On" := CurrentDateTime();
-        PaymentBinCheckpoint."Checkpoint Date" := Today;
+        PaymentBinCheckpoint."Checkpoint Date" := Today();
         PaymentBinCheckpoint."Checkpoint Time" := Time;
         PaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
         PaymentBinCheckpoint.Comment := BinEntry.Comment;
@@ -223,7 +222,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
                         POSBinEntry."Entry No." := 0;
                         POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_OUT;
                         POSBinEntry."Created At" := CurrentDateTime();
-                        POSBinEntry."Transaction Date" := Today;
+                        POSBinEntry."Transaction Date" := Today();
                         POSBinEntry."Transaction Time" := Time;
 
                         POSBinEntry."Transaction Amount" := POSPaymentBinCheckpoint."Payment Bin Entry Amount" * -1;

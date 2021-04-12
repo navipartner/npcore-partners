@@ -17,24 +17,24 @@ codeunit 6151411 "NPR Magento Select. Filt. Mgt."
         More: Boolean;
     begin
         RecRef.Open(TempRecRef.Number);
-        TempRecRefCount := TempRecRef.Count;
+        TempRecRefCount := TempRecRef.Count();
         if TempRecRefCount > 0 then begin
             TempRecRef.Find('-');
             while TempRecRefCount > 0 do begin
                 TempRecRefCount := TempRecRefCount - 1;
                 RecRef.SetPosition(TempRecRef.GetPosition);
-                RecRef.Find;
+                RecRef.Find();
                 FieldRef := RecRef.Field(SelectionFieldID);
                 FirstRecRef := Format(FieldRef.Value);
                 LastRecRef := FirstRecRef;
                 More := TempRecRefCount > 0;
                 while More do
-                    if RecRef.Next = 0 then
+                    if RecRef.Next() = 0 then
                         More := false
                     else begin
                         SavePos := TempRecRef.GetPosition;
                         TempRecRef.SetPosition(RecRef.GetPosition);
-                        if not TempRecRef.Find then begin
+                        if not TempRecRef.Find() then begin
                             More := false;
                             TempRecRef.SetPosition(SavePos);
                         end else begin
@@ -52,7 +52,7 @@ codeunit 6151411 "NPR Magento Select. Filt. Mgt."
                 else
                     SelectionFilter := SelectionFilter + AddQuotes(FirstRecRef) + '..' + AddQuotes(LastRecRef);
                 if TempRecRefCount > 0 then
-                    TempRecRef.Next;
+                    TempRecRef.Next();
             end;
             exit(SelectionFilter);
         end;

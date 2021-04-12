@@ -1,4 +1,4 @@
-codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
+﻿codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 {
     // NPR5.50/MMV /20190321 CASE 300557 Refactored.
     // NPR5.50/MMV /20190606 CASE 352473 Correct sign on return sales document amounts.
@@ -10,7 +10,6 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 
     trigger OnRun()
     var
-        SalesHeader: Record "Sales Header";
         OrderTypeText: Text;
     begin
         case true of
@@ -81,7 +80,6 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         ConfirmDeleteDocumentOnImportToPOS: Boolean;
         TextConfDocDelete: Label 'Do you want to delete existing %1 - %2 ?';
         TextMsgDocDelete: Label 'Please note that %1 %2 has been deleted';
-        PREPAYMENT: Label 'Prepayment for %1 %2';
         ERR_DUPLICATE_DOCUMENT: Label 'Only one sales document can be processed per sale.';
         DOCUMENT_IMPORTED_DELETED: Label '%1 %2 was imported in POS. The document has been deleted.';
         DOCUMENT_IMPORTED: Label '%1 %2 was imported in POS.';
@@ -97,21 +95,19 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         SalesHeader: Record "Sales Header";
         SalesList: Page "Sales List";
         LineNo: Integer;
-        txtDeposit: Label 'Deposit';
-        ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
     begin
         //SalesDocumentToPOS
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        if SaleLinePOS.FindLast then
+        if SaleLinePOS.FindLast() then
             LineNo := SaleLinePOS."Line No." + 10000
         else
             LineNo := 10000;
 
         //-NPR5.48 [300557]
         // SaleLinePOS.SETFILTER("Buffer Document No.",'<>%1','');
-        // IF SaleLinePOS.FINDSET THEN
+        // IF SaleLinePOS.FindSet() THEN
         //  ERROR(ErrDoubleOrder);
         if DocumentIsAttachedToPOSSale(SalePOS) then
             Error(ERR_DUPLICATE_DOCUMENT);
@@ -124,7 +120,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 
         SalesList.SetTableView(SalesHeader);
         SalesList.LookupMode(true);
-        if SalesList.RunModal <> ACTION::LookupOK then
+        if SalesList.RunModal() <> ACTION::LookupOK then
             exit
         else
             SalesList.GetRecord(SalesHeader);
@@ -139,13 +135,13 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         SalePOS."Sales Document No." := SalesHeader."No.";
         SalePOS.Validate("Prices Including VAT", SalesHeader."Prices Including VAT");
         SalePOS.Validate("Location Code", SalesHeader."Location Code");
-        SalePOS.Modify;
+        SalePOS.Modify();
 
-        if SalesLine.FindSet then
+        if SalesLine.FindSet() then
             repeat
                 SalesLine.TestField("Qty. Shipped Not Invoiced", 0);
                 SalesLine.TestField("Return Qty. Received", 0);
-                SaleLinePOS.Init;
+                SaleLinePOS.Init();
                 SaleLinePOS.Silent := true;
                 SaleLinePOS.Validate("Register No.", SalePOS."Register No.");
                 SaleLinePOS.Validate("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -209,9 +205,9 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 
                 SaleLinePOS.Validate("Allow Invoice Discount", SalesLine."Allow Invoice Disc.");
                 SaleLinePOS.Validate("Invoice Discount Amount", SalesLine."Inv. Discount Amount");
-                SaleLinePOS.Modify;
+                SaleLinePOS.Modify();
                 LineNo += 10000;
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
 
         //-NPR5.32 [268218]
         if DeleteDocumentOnImportToPOS then begin
@@ -220,7 +216,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
                     SalesHeader.Delete(true);
                     SalePOS."Sales Document Type" := SalePOS."Sales Document Type"::Quote;
                     SalePOS."Sales Document No." := '';
-                    SalePOS.Modify;
+                    SalePOS.Modify();
                 end;
             end else begin
                 //-NPR5.34
@@ -229,7 +225,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
                 SalesHeader.Delete(true);
                 SalePOS."Sales Document Type" := SalePOS."Sales Document Type"::Quote;
                 SalePOS."Sales Document No." := '';
-                SalePOS.Modify;
+                SalePOS.Modify();
             end;
         end;
         //+NPR5.32 [268218]
@@ -244,8 +240,6 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         SalesList: Page "Sales List";
         PaymentAmount: Decimal;
         LineNo: Integer;
-        txtDeposit: Label 'Deposit';
-        ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
         PrepaymentAmount: Decimal;
         ReceivedFromSaleLinePOS: Record "NPR POS Sale Line";
     begin
@@ -253,14 +247,14 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindLast then
+        if SaleLinePOS.FindLast() then
             LineNo := SaleLinePOS."Line No." + 10000
         else
             LineNo := 10000;
 
         //-NPR5.48 [300557]
         // SaleLinePOS.SETFILTER("Buffer Document No.",'<>%1','');
-        // IF SaleLinePOS.FINDSET THEN
+        // IF SaleLinePOS.FindSet() THEN
         //  ERROR(ErrDoubleOrder);
         if DocumentIsAttachedToPOSSale(SalePOS) then
             Error(ERR_DUPLICATE_DOCUMENT);
@@ -271,7 +265,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
             SalesHeader.SetRange("NPR Order Type", OrderType);
         SalesList.SetTableView(SalesHeader);
         SalesList.LookupMode(true);
-        if SalesList.RunModal <> ACTION::LookupOK then
+        if SalesList.RunModal() <> ACTION::LookupOK then
             exit
         else
             SalesList.GetRecord(SalesHeader);
@@ -284,10 +278,10 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         SalePOS."Sales Document No." := SalesHeader."No.";
         SalePOS.Validate("Prices Including VAT", SalesHeader."Prices Including VAT");
         SalePOS.Validate("Location Code", SalesHeader."Location Code");
-        SalePOS.Modify;
+        SalePOS.Modify();
 
-        if SalesLine.FindSet then begin
-            SaleLinePOS.Init;
+        if SalesLine.FindSet() then begin
+            SaleLinePOS.Init();
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
             SaleLinePOS."Line No." := LineNo;
@@ -304,7 +298,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
             repeat
                 SalesLine.TestField("Qty. Shipped Not Invoiced", 0);
                 SalesLine.TestField("Return Qty. Received", 0);
-                SaleLinePOS.Init;
+                SaleLinePOS.Init();
                 SaleLinePOS.Silent := true;
                 SaleLinePOS.Validate("Register No.", SalePOS."Register No.");
                 SaleLinePOS.Validate("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -332,13 +326,13 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
                 SaleLinePOS."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
                 SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
                 SaleLinePOS."Sales Document No." := SalesHeader."No.";
-                SaleLinePOS.Modify;
+                SaleLinePOS.Modify();
                 LineNo += 10000;
                 PaymentAmount := PaymentAmount + (SalesLine."Amount Including VAT" - SalesLine."Prepmt. Amount Inv. Incl. VAT");
                 //-NPR5.40 [305414]
                 PrepaymentAmount += SalesLine."Prepmt. Amount Inv. Incl. VAT";
             //+NPR5.40 [305414]
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
             //-NPR5.40 [305414]
             if PrepaymentAmount <> 0 then begin
                 ReceivedFromSaleLinePOS.Validate("Unit Price", PrepaymentAmount);
@@ -348,7 +342,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         end;
 
         if PaymentAmount <> 0 then begin
-            SaleLinePOS.Init;
+            SaleLinePOS.Init();
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
             SaleLinePOS.Date := SalePOS.Date;
@@ -385,9 +379,6 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
     end;
 
     procedure SalesDocumentToPOS(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header")
-    var
-        txtDeposit: Label 'Deposit';
-        ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
     begin
         //-NPR5.53 [377510]
         SalesDocumentToPOSCustom(POSSession, SalesHeader, true, true);
@@ -398,8 +389,6 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesLine: Record "Sales Line";
-        txtDeposit: Label 'Deposit';
-        ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -421,7 +410,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetFilter(Type, '%1|%2', SalesLine.Type::Item, SalesLine.Type::" ");
-        SalesLine.FindSet;
+        SalesLine.FindSet();
 
         repeat
             POSSaleLine.GetNewSaleLine(SaleLinePOS);
@@ -472,13 +461,13 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
             POSSaleLine.InsertLineRaw(SaleLinePOS, false);
             SaleLinePOS.SetSkipCalcDiscount(false);
-        until SalesLine.Next = 0;
+        until SalesLine.Next() = 0;
 
         if DeleteDocument then begin
             SalesHeader.Delete(true);
         end;
 
-        Commit;
+        Commit();
 
         if ShowSuccessMessage then begin
             if DeleteDocument then
@@ -491,10 +480,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 
     procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
     var
-        txtDeposit: Label 'Deposit';
-        ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
         PaymentAmount: Decimal;
-        SalesLine: Record "Sales Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -707,7 +693,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         Clear(SalePOS."Sales Document Type");
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
-        SalePOS.Modify;
+        SalePOS.Modify();
         POSSale.RefreshCurrent();
 
         SalesDocumentToPOSCustom(POSSession, SalesHeader, false, false);
@@ -721,11 +707,11 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
         //-NPR5.53 [377510]
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindSet then
+        if SalesLine.FindSet() then
             repeat
                 if ((SalesLine."Qty. to Invoice" + SalesLine."Quantity Invoiced") <> SalesLine.Quantity) then
                     exit(false);
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
 
         exit(true);
         //+NPR5.53 [377510]
@@ -744,7 +730,7 @@ codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
                     SalesLine.Validate("Qty. to Invoice", SalesLine.Quantity - SalesLine."Quantity Invoiced");
                     SalesLine.Modify(true);
                 end;
-            until SalesLine.Next = 0;
+            until SalesLine.Next() = 0;
         //+NPR5.53 [377510]
     end;
 }

@@ -47,12 +47,10 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'InvoiceNoPrompt', CAPTION_INVOICENOPROMPT);
-        Captions.AddActionCaption(ActionCode, 'AmountPrompt', CAPTION_AMOUNTPROMPT);
-        Captions.AddActionCaption(ActionCode, 'CrMemoNoPrompt', CAPTION_INVOICENOPROMPT);
+        Captions.AddActionCaption(ActionCode(), 'InvoiceNoPrompt', CAPTION_INVOICENOPROMPT);
+        Captions.AddActionCaption(ActionCode(), 'AmountPrompt', CAPTION_AMOUNTPROMPT);
+        Captions.AddActionCaption(ActionCode(), 'CrMemoNoPrompt', CAPTION_INVOICENOPROMPT);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
@@ -64,7 +62,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -239,7 +237,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -253,7 +251,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -267,7 +265,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -282,7 +280,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         FilterPageBuilder: FilterPageBuilder;
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -304,7 +302,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

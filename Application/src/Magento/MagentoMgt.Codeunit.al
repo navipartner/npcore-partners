@@ -17,7 +17,7 @@ codeunit 6151402 "NPR Magento Mgt."
         if MagentoCustomerMapping.Get('', '') then
             exit(MagentoCustomerMapping."Customer Template Code");
 
-        if MagentoSetup.Get then
+        if MagentoSetup.Get() then
             exit(MagentoSetup."Customer Template Code");
 
         exit('');
@@ -38,7 +38,7 @@ codeunit 6151402 "NPR Magento Mgt."
         if MagentoCustomerMapping.Get('', '') then
             exit(MagentoCustomerMapping."Config. Template Code");
 
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit('');
 
         ConfigTemplateCode := MagentoSetup."Customer Config. Template Code";
@@ -53,7 +53,7 @@ codeunit 6151402 "NPR Magento Mgt."
         MagentoSetup: Record "NPR Magento Setup";
         MagentoTaxClass: Record "NPR Magento Tax Class";
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit('');
 
         ConfigTemplateCode := MagentoSetup."Customer Config. Template Code";
@@ -72,7 +72,7 @@ codeunit 6151402 "NPR Magento Mgt."
             exit('');
 
         MagentoVatBusGroup.SetRange("Magento Tax Class", CopyStr(TaxClass, 1, MaxStrLen(MagentoVatBusGroup."Magento Tax Class")));
-        MagentoVatBusGroup.FindFirst;
+        MagentoVatBusGroup.FindFirst();
         MagentoVatBusGroup.TestField("VAT Business Posting Group");
         VATBusPostingGroup.Get(MagentoVatBusGroup."VAT Business Posting Group");
         exit(VATBusPostingGroup.Code);
@@ -97,7 +97,7 @@ codeunit 6151402 "NPR Magento Mgt."
             exit(MagentoCustomerMapping."Fixed Customer No.");
         end;
 
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         MagentoSetup.TestField("Fixed Customer No.");
         exit(MagentoSetup."Fixed Customer No.");
     end;
@@ -111,7 +111,6 @@ codeunit 6151402 "NPR Magento Mgt."
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
         HeadersReq: HttpHeaders;
-        Node: XmlNode;
         Response: Text;
     begin
         if MagentoApiUrl = '' then
@@ -156,7 +155,6 @@ codeunit 6151402 "NPR Magento Mgt."
         Content: HttpContent;
         Headers: HttpHeaders;
         HeadersReq: HttpHeaders;
-        Node: XmlNode;
         StreamIn: InStream;
         StreamOut: OutStream;
         Response: Text;
@@ -172,7 +170,7 @@ codeunit 6151402 "NPR Magento Mgt."
         if Headers.Contains('Content-Type') then
             Headers.Remove('Content-Type');
 
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if MagentoSetup."Api Authorization" <> '' then begin
             Headers.Add('Content-Type', 'naviconnect/xml');
             HeadersReq.Add('Accept', 'application/xml');
@@ -212,12 +210,12 @@ codeunit 6151402 "NPR Magento Mgt."
         DataLogMgt: Codeunit "NPR Data Log Management";
     begin
         Item.SetRange("NPR Magento Item", true);
-        if not Item.FindSet then
+        if not Item.FindSet() then
             exit;
 
         repeat
             RecRef.GetTable(Item);
             DataLogMgt.OnDatabaseInsert(RecRef);
-        until Item.Next = 0;
+        until Item.Next() = 0;
     end;
 }

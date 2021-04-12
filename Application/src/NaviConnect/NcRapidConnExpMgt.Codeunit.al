@@ -1,4 +1,4 @@
-codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
+﻿codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
 {
     // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
     // NC2.12/MHA /20180502  CASE 313362 File is always server side in CommitFileToOutput() as ExportToExcel() performs Upload
@@ -20,7 +20,6 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
     end;
 
     var
-        Text000: Label 'Export package %1 with %2 tables?';
         HideDialog: Boolean;
 
     local procedure "--- Task Processing"()
@@ -35,9 +34,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         PrevRecRef: RecordRef;
         RecRef: RecordRef;
-        Output: Text;
         OutputName: Text;
-        ServerFilename: Text;
         Response: Text;
         Success: Boolean;
         XmlDoc: DotNet "NPRNetXmlDocument";
@@ -46,7 +43,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         if not NcTaskMgt.GetRecRef(NcTask, RecRef) then
             exit;
         if not NcTaskMgt.RestoreRecord(NcTask."Entry No.", PrevRecRef) then
-            PrevRecRef := RecRef.Duplicate;
+            PrevRecRef := RecRef.Duplicate();
         if not FindExportTriggers(NcTask, PrevRecRef, RecRef, TempExportTrigger) then
             exit;
         //+NC2.14 [320762]
@@ -62,7 +59,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         //OutputName += '.xlsx';
         //+NC2.17 [335927]
         //+NC2.15 [306532]
-        TempExportTrigger.FindSet;
+        TempExportTrigger.FindSet();
         repeat
             NcRapidConnectSetup.Get(TempExportTrigger."Setup Code");
             //-NC2.17 [335927]
@@ -84,7 +81,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
 
             Success := Success and RunEndpoints(NcRapidConnectSetup, NcTask, NcTaskOutput, Response);
             CommitResponse(Response, NcTask, NcTaskOutput);
-        until TempExportTrigger.Next = 0;
+        until TempExportTrigger.Next() = 0;
 
         if not Success then
             Error(GetLastErrorText);
@@ -98,7 +95,6 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
     var
         ConfigPackageTable: Record "Config. Package Table";
         ConfigPackageField: Record "Config. Package Field";
-        "Field": Record "Field";
         NcRapidConnectSetupMgt: Codeunit "NPR Nc RapidConnect Setup Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
@@ -112,7 +108,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         //-NC2.17 [335927]
         NcRapidConnectSetupMgt.SetConfigPackageTableFilter(NcRapidConnectSetup, ConfigPackageTable);
         ConfigPackageTable.SetRange("Table ID", NcTask."Table No.");
-        if not ConfigPackageTable.FindSet then
+        if not ConfigPackageTable.FindSet() then
             exit;
 
         if not NcTaskMgt.GetRecRef(NcTask, RecRef) then
@@ -128,7 +124,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
             ConfigPackageField.SetRange("Package Code", ConfigPackageTable."Package Code");
             ConfigPackageField.SetRange("Table ID", ConfigPackageTable."Table ID");
             ConfigPackageField.SetRange("Include Field", true);
-            if ConfigPackageField.FindSet then
+            if ConfigPackageField.FindSet() then
                 repeat
                     if ConfigPackageField2FieldRef(ConfigPackageField, RecRef, FieldRef) then begin
                         NpXmlDomMgt.AddElement(XmlElement, 'field', XmlElement2);
@@ -138,8 +134,8 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
                         XmlElement2.AppendChild(XmlCDATA);
                         XmlCDATA.AppendData(GetFieldValue(FieldRef));
                     end;
-                until ConfigPackageField.Next = 0;
-        until ConfigPackageTable.Next = 0;
+                until ConfigPackageField.Next() = 0;
+        until ConfigPackageTable.Next() = 0;
         //+NC2.17 [335927]
     end;
 
@@ -174,14 +170,14 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         OutStr: OutStream;
     begin
         //-NC2.17 [335927]
-        NcTaskOutput.Init;
+        NcTaskOutput.Init();
         NcTaskOutput."Entry No." := 0;
         NcTaskOutput."Task Entry No." := NcTask."Entry No.";
         NcTaskOutput.Data.CreateOutStream(OutStr);
         XmlDoc.Save(OutStr);
         NcTaskOutput.Name := OutputName;
         NcTaskOutput.Insert(true);
-        Commit;
+        Commit();
         //+NC2.17 [335927]
     end;
 
@@ -196,14 +192,14 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
             exit;
 
         Success := true;
-        NcRapidConnectEndpoint.FindSet;
+        NcRapidConnectEndpoint.FindSet();
         repeat
             Success := Success and RunEndpoint(NcTaskOutput, NcRapidConnectEndpoint, EndpointResponse);
 
             if Response <> '' then
                 Response += NewLine();
             Response += EndpointResponse;
-        until NcRapidConnectEndpoint.Next = 0;
+        until NcRapidConnectEndpoint.Next() = 0;
 
         exit(Success);
     end;
@@ -231,7 +227,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         //-NC2.15 [326704]
         NcTask.Get(NcTask."Entry No.");
         //+NC2.15 [326704]
-        if NcTask.Response.HasValue then begin
+        if NcTask.Response.HasValue() then begin
             NcTask.CalcFields(Response);
             NcTask.Response.CreateInStream(InStream);
             CopyStream(OutStream, InStream);
@@ -247,14 +243,14 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         TempBlob.CreateOutStream(OutStream);
         OutStream.WriteText(Response);
 
-        NcTaskOutput.Find;
+        NcTaskOutput.Find();
 
         RecRef.GetTable(NcTaskOutput);
         TempBlob.ToRecordRef(RecRef, NcTaskOutput.FieldNo(Response));
         RecRef.SetTable(NcTaskOutput);
 
         NcTaskOutput.Modify(true);
-        Commit;
+        Commit();
     end;
 
     local procedure "--- Find"()
@@ -284,17 +280,17 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         if ExportTrigger.IsEmpty then
             exit(false);
 
-        ExportTrigger.FindSet;
+        ExportTrigger.FindSet();
         repeat
             //-NC2.14 [322308]
             if RecRefWithinPackage(NcTask, PrevRecRef, RecRef, ExportTrigger) then begin
                 //+NC2.14 [322308]
                 NcRapidConnectSetup.Get(ExportTrigger."Setup Code");
-                TempExportTrigger.Init;
+                TempExportTrigger.Init();
                 TempExportTrigger := ExportTrigger;
-                TempExportTrigger.Insert;
+                TempExportTrigger.Insert();
             end;
-        until ExportTrigger.Next = 0;
+        until ExportTrigger.Next() = 0;
 
         exit(TempExportTrigger.FindSet);
     end;
@@ -310,7 +306,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
 
         RecRef.SetPosition(NcTask."Record Position");
         RecRef.FilterGroup(40);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         RecRef.FilterGroup(0);
     end;
 
@@ -345,7 +341,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         //-NC2.14 [320762]
         TriggerField.SetRange("Setup Code", TempExportTrigger."Setup Code");
         TriggerField.SetRange("Table ID", TempExportTrigger."Table ID");
-        if not TriggerField.FindSet then
+        if not TriggerField.FindSet() then
             exit(false);
 
         if Format(PrevRecRef) = Format(RecRef) then
@@ -358,7 +354,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
                 if PrevFieldRef.Value <> FieldRef.Value then
                     exit(true);
             end;
-        until TriggerField.Next = 0;
+        until TriggerField.Next() = 0;
 
         exit(false);
         //+NC2.14 [320762]
@@ -384,15 +380,15 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         if not NcTaskMgt.GetRecRef(TempTask, RecRef) then
             exit;
         if not NcTaskMgt.RestoreRecordFromDataLog(TempTask."Entry No.", TempTask."Company Name", PrevRecRef) then
-            PrevRecRef := RecRef.Duplicate;
+            PrevRecRef := RecRef.Duplicate();
         if not FindExportTriggers(TempTask, PrevRecRef, RecRef, TempExportTrigger) then
             exit;
         //+NC2.14 [320762]
 
-        TempExportTrigger.FindSet;
+        TempExportTrigger.FindSet();
         repeat
             //-NC2.14 [320762]
-            NewUniqueTaskBuffer.Init;
+            NewUniqueTaskBuffer.Init();
             NewUniqueTaskBuffer."Table No." := RecRef.Number;
             NewUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
             NewUniqueTaskBuffer."Record Position" := RecRef.GetPosition(false);
@@ -401,7 +397,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
             if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
                 IsUnique := true;
         //+NC2.14 [320762]
-        until TempExportTrigger.Next = 0;
+        until TempExportTrigger.Next() = 0;
     end;
 
     local procedure IsRapidConnectTask(TaskProcessor: Record "NPR Nc Task Processor"; Task: Record "NPR Nc Task"): Boolean
@@ -409,13 +405,13 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         NcTaskSetup: Record "NPR Nc Task Setup";
         NpXmlSetup: Record "NPR NpXml Setup";
     begin
-        if not (NpXmlSetup.Get and NpXmlSetup."NpXml Enabled") then
+        if not (NpXmlSetup.Get() and NpXmlSetup."NpXml Enabled") then
             exit(false);
 
         NcTaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
         NcTaskSetup.SetRange("Table No.", Task."Table No.");
         NcTaskSetup.SetRange("Codeunit ID", CurrCodeunitId());
-        exit(NcTaskSetup.FindFirst);
+        exit(NcTaskSetup.FindFirst());
     end;
 
     procedure RecRefWithinPackage(var TempTask: Record "NPR Nc Task" temporary; var PrevRecRef: RecordRef; var RecRef: RecordRef; var TempExportTrigger: Record "NPR Nc RapidConnect Trig.Table" temporary): Boolean
@@ -431,21 +427,21 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
 
         //-NC2.14 [322308]
         if (TempTask.Type in [TempTask.Type::Modify, TempTask.Type::Rename]) and (TempExportTrigger."Modify Trigger" = TempExportTrigger."Modify Trigger"::Partial) then begin
-            RecRef2 := RecRef.Duplicate;
-            PrevRecRef2 := PrevRecRef.Duplicate;
+            RecRef2 := RecRef.Duplicate();
+            PrevRecRef2 := PrevRecRef.Duplicate();
             if not IsPartialModifyTrigger(PrevRecRef2, RecRef2, TempExportTrigger) then
                 exit(false);
         end;
         //+NC2.14 [322308]
-        RecRef2 := RecRef.Duplicate;
+        RecRef2 := RecRef.Duplicate();
         //-NC2.24 [374375]
-        RecRef2.SetRecFilter;
+        RecRef2.SetRecFilter();
         RecRef2.FilterGroup(40);
         //+NC2.24 [374375]
         //-NC14.00.2.22 [361941]
         ConfigXMLExchange.ApplyPackageFilter(ConfigPackageTable, RecRef2);
         //+NC14.00.2.22 [361941]
-        exit(RecRef2.FindFirst);
+        exit(RecRef2.FindFirst());
     end;
 
     local procedure "--- Aux"()

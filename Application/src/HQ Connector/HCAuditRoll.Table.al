@@ -601,7 +601,7 @@ table 6150901 "NPR HC Audit Roll"
         {
             ObsoleteState = Removed;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';            
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         key(Key7; "Sale Type", Type, "No.", Posted)
         {

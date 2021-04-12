@@ -27,21 +27,19 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion(),
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('run_addons', 'respond();');
+        if Sender.DiscoverAction(
+  ActionCode(),
+  Text000,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('run_addons', 'respond();');
 
-                RegisterWorkflow(false);
-                Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
-                Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField("ItemAddOn.ItemAddOn").rawValue;');
-                RegisterIntegerParameter('BaseLineNo', 0);
-            end;
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
+            Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField("ItemAddOn.ItemAddOn").rawValue;');
+            Sender.RegisterIntegerParameter('BaseLineNo', 0);
         end;
     end;
 
@@ -50,7 +48,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -73,7 +71,6 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        AddOnNo: Code[20];
         AppliesToLineNo: Integer;
         UpdateCurrentSaleLine: Boolean;
     begin
@@ -165,7 +162,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         NpIaSaleLinePOSAddOn.SetRange("Sale Type", SaleLinePOS."Sale Type");
         NpIaSaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
         NpIaSaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-        if NpIaSaleLinePOSAddOn.FindFirst then
+        if NpIaSaleLinePOSAddOn.FindFirst() then
             exit(NpIaSaleLinePOSAddOn."Applies-to Line No.");
 
         if SaleLinePOS.Accessory then

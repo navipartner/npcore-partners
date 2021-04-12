@@ -73,7 +73,6 @@ codeunit 6150759 "NPR Web Font" implements "NPR Font Definition"
     procedure Initialize(JsonStream: InStream)
     var
         Json: JsonObject;
-        Token: JsonToken;
     begin
         Json.ReadFrom(JsonStream);
         _code := GetValue(Json, 'Code').AsText();

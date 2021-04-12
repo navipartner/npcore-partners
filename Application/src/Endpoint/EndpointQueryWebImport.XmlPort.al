@@ -108,11 +108,8 @@ xmlport 6014674 "NPR Endpoint Query Web Import"
 
     trigger OnPreXmlPort()
     begin
-        TempLineNo := 0;
     end;
 
-    var
-        TempLineNo: Integer;
 
     procedure GetMessageID(): Text[50]
     begin
@@ -126,17 +123,15 @@ xmlport 6014674 "NPR Endpoint Query Web Import"
     end;
 
     procedure SetEndpointQueryResult(ParReturnValue: Text)
-    var
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
         //tmpTicketReservationResponse.DELETEALL ();
         //TicketReservationResponse.SETFILTER ("Session Token ID", '=%1', DocumentID);
-        //TicketReservationResponse.FINDLAST ();
+        //TicketReservationResponse.FindLast() ();
 
         //tmpTicketReservationResponse.TRANSFERFIELDS (TicketReservationResponse, TRUE);
         //tmpTicketReservationResponse.INSERT ();
         //tmpTicketReservationResponse.RESET ();
-        //COMMIT;
+        //Commit();
 
         ReturnValue := ParReturnValue;
     end;

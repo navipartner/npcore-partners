@@ -54,7 +54,7 @@ codeunit 6151507 "NPR Nc Man. Nav Modules Mgt."
         XmlDoc.LoadXml(NpXmlDomMgt.GetWebResponseText(HttpWebResponse));
         XmlElement := XmlDoc.DocumentElement.SelectSingleNode('soapenv:Body/mnm:FindMissingObjects_Result/mnm:nav_objects/mnm:object', XmlNsManager);
         while not IsNull(XmlElement) do begin
-            TempObject.Init;
+            TempObject.Init();
             Evaluate(TempObject.Type, NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'type', true), 9);
             TempObject."Company Name" := '';
             Evaluate(TempObject.ID, NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'id', true), 9);
@@ -62,11 +62,11 @@ codeunit 6151507 "NPR Nc Man. Nav Modules Mgt."
             TempObject."Version List" := NpXmlDomMgt.GetXmlTextNamespace(XmlElement, 'mnm:version_list', XmlNsManager, MaxStrLen(TempObject."Version List"), true);
             Evaluate(TempObject.Date, NpXmlDomMgt.GetXmlTextNamespace(XmlElement, 'mnm:date', XmlNsManager, 0, true), 9);
             Evaluate(TempObject.Time, NpXmlDomMgt.GetXmlTextNamespace(XmlElement, 'mnm:time', XmlNsManager, 0, true), 9);
-            TempObject.Insert;
+            TempObject.Insert();
 
             if Object.Get(TempObject.Type, TempObject."Company Name", TempObject.ID) then begin
                 TempObject := Object;
-                TempObject.Modify;
+                TempObject.Modify();
             end;
 
             XmlElement := XmlElement.NextSibling;
@@ -138,7 +138,7 @@ codeunit 6151507 "NPR Nc Man. Nav Modules Mgt."
     begin
         Object.SetFilter("Company Name", '=%1', '');
         Object.SetFilter("Version List", '*' + VersionListId + '*');
-        if not Object.FindSet then
+        if not Object.FindSet() then
             exit;
 
         repeat
@@ -158,7 +158,7 @@ codeunit 6151507 "NPR Nc Man. Nav Modules Mgt."
 
             NpXmlDomMgt.AddElementNamespace(XmlElementObject, 'mnm:time', ManagedNavModulesNs(), XmlElementObjectField);
             XmlElementObjectField.InnerText := Format(Object.Time, 0, 9);
-        until Object.Next = 0;
+        until Object.Next() = 0;
     end;
 
     local procedure InitMnmWebRequest(Url: Text; Username: Text; Password: Text; SoapAction: Text; var HttpWebRequest: DotNet NPRNetHttpWebRequest)

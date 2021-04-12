@@ -1,4 +1,4 @@
-codeunit 6151494 "NPR Raptor Send Data"
+﻿codeunit 6151494 "NPR Raptor Send Data"
 {
     TableNo = "Job Queue Entry";
 
@@ -21,19 +21,19 @@ codeunit 6151494 "NPR Raptor Send Data"
         RecRef: RecordRef;
         SessionGUID: Guid;
     begin
-        if not (RaptorSetup.Get and RaptorSetup."Send Data to Raptor") then
+        if not (RaptorSetup.Get() and RaptorSetup."Send Data to Raptor") then
             exit;
 
         if not DataLogSubscriberMgt.GetNewRecords(RaptorMgt.RaptorDataLogSubscriber, true, 0, TempDataLog) then
             exit;
 
-        SessionGUID := CreateGuid;
+        SessionGUID := CreateGuid();
 
         OnProcessDataLogEntries(TempDataLog, SessionGUID);
 
         TempDataLog.SetRange("Table ID", DATABASE::"Item Ledger Entry");
         TempDataLog.SetRange("Type of Change", TempDataLog."Type of Change"::Insert);
-        if not TempDataLog.FindSet then
+        if not TempDataLog.FindSet() then
             exit;
 
         repeat
@@ -49,7 +49,7 @@ codeunit 6151494 "NPR Raptor Send Data"
                     if ItemLedgerIsEligibleForSending(ItemLedger) then
                         SendItemLedgerEntry(ItemLedger, SessionGUID);
                 end;
-        until TempDataLog.Next = 0;
+        until TempDataLog.Next() = 0;
     end;
 
     local procedure SendItemLedgerEntry(ItemLedger: Record "Item Ledger Entry"; SessionGUID: Guid)
@@ -95,13 +95,13 @@ codeunit 6151494 "NPR Raptor Send Data"
 
         Eligible := not RaptorSetup."Exclude Webshop Sales" or (RaptorSetup."Webshop Salesperson Filter" = '');
         if not Eligible then begin
-            SalespersonTmp.Reset;
+            SalespersonTmp.Reset();
             if SalespersonTmp.IsEmpty then
                 CreateTmpSalespersonList(SalespersonTmp);
             SalespersonTmp.SetFilter(Code, RaptorSetup."Webshop Salesperson Filter");
             AuxItemLedgerEntry.Get(ItemLedger."Entry No.");
             SalespersonTmp.Code := AuxItemLedgerEntry."Salespers./Purch. Code";
-            Eligible := not SalespersonTmp.Find;
+            Eligible := not SalespersonTmp.Find();
         end;
 
         exit(Eligible);
@@ -118,17 +118,17 @@ codeunit 6151494 "NPR Raptor Send Data"
             Error(IncorrectFunctionCallErr);
 
         Clear(SalespersonTmp);
-        SalespersonTmp.DeleteAll;
-        if Salesperson.FindSet then
+        SalespersonTmp.DeleteAll();
+        if Salesperson.FindSet() then
             repeat
                 SalespersonTmp := Salesperson;
-                SalespersonTmp.Insert;
-            until Salesperson.Next = 0;
-        SalespersonTmp.Init;
+                SalespersonTmp.Insert();
+            until Salesperson.Next() = 0;
+        SalespersonTmp.Init();
         SalespersonTmp.Code := '';
         SalespersonTmp.Name := CopyStr(EmptyNameML, 1, MaxStrLen(SalespersonTmp.Name));
-        if not SalespersonTmp.Find then
-            SalespersonTmp.Insert;
+        if not SalespersonTmp.Find() then
+            SalespersonTmp.Insert();
         //+NPR5.55 [400925]
     end;
 
@@ -137,7 +137,6 @@ codeunit 6151494 "NPR Raptor Send Data"
         POSUnit: Record "NPR POS Unit";
         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
         Item: Record Item;
-        RaptorMgt: Codeunit "NPR Raptor Management";
     begin
         /*
         -=List Of Raptor Parameters=-
@@ -169,8 +168,8 @@ codeunit 6151494 "NPR Raptor Send Data"
             POSUnit.Init();
 
         if not Item.Get(ItemLedger."Item No.") then
-            Item.Init;
-        Parameters.DeleteAll;
+            Item.Init();
+        Parameters.DeleteAll();
         //Tracking
         AddParameter(Parameters, 1001, 'p1', 'buy');
         AddParameter(Parameters, 1002, 'p2', ItemLedger."Item No.");
@@ -188,7 +187,7 @@ codeunit 6151494 "NPR Raptor Send Data"
         Parameters.ID := ID;
         Parameters.Name := Name;
         Parameters.Value := Value;
-        Parameters.Insert;
+        Parameters.Insert();
     end;
 
     [IntegrationEvent(TRUE, false)]

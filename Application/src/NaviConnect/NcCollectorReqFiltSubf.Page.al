@@ -14,12 +14,12 @@ page 6151534 "NPR Nc Collector Req.Filt.Subf"
         {
             repeater(Group)
             {
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Filter Text"; "Filter Text")
+                field("Filter Text"; Rec."Filter Text")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filter Text field';

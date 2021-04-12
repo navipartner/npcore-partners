@@ -74,14 +74,14 @@ page 6151434 "NPR Magento Attribute Sets"
         Item: Record Item;
         TempItem: Record Item temporary;
     begin
-        TempItem.DeleteAll;
+        TempItem.DeleteAll();
         Item.SetRange("NPR Attribute Set ID", Rec."Attribute Set ID");
-        if Item.FindSet then
+        if Item.FindSet() then
             repeat
-                TempItem.Init;
+                TempItem.Init();
                 TempItem := Item;
-                TempItem.Insert;
-            until Item.Next = 0;
+                TempItem.Insert();
+            until Item.Next() = 0;
         PAGE.Run(PAGE::"Item List", TempItem);
     end;
 }

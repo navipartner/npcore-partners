@@ -52,7 +52,7 @@ table 6151508 "NPR Nc Task Output"
         }
         field(1000; "Task Exists"; Boolean)
         {
-            CalcFormula = Exist ("NPR Nc Task" WHERE("Entry No." = FIELD("Task Entry No.")));
+            CalcFormula = Exist("NPR Nc Task" WHERE("Entry No." = FIELD("Task Entry No.")));
             Caption = 'Task Exists';
             Editable = false;
             FieldClass = FlowField;

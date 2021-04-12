@@ -1,8 +1,8 @@
 report 6014460 "NPR Balancing Report A4"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - NEW.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - NEW.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Balancing Report -A4 - POS';
 
@@ -896,9 +896,6 @@ report 6014460 "NPR Balancing Report A4"
         PrintTurnOver: Boolean;
         PrintVAT: Boolean;
         PrintVouchers: Boolean;
-        VarPrintAmt: Boolean;
-        VarPrintPerc: Boolean;
-        VarPrintTotal: Boolean;
         VarAttachedBin: Integer;
         VarBin: Integer;
         VarDenomination: Integer;
@@ -907,20 +904,16 @@ report 6014460 "NPR Balancing Report A4"
         AttachedPaymentBinslbl: Label 'Attached Payment Bins';
         Closinglbl: Label 'Closing';
         ClosingDatelbl: Label 'Closing Date';
-        CountedAmtInclFloatlbl: Label 'Counted Amount Incl Float';
         Countinglbl: Label 'Counting';
-        DirectTurnoverlbl: Label 'Direct Turnover (LCY)';
         Discountlbl: Label 'Discount';
         DiscountAmtlbl: Label 'Discount Amount';
         DiscountPerclbl: Label 'Discount Percentage';
         DiscountTotallbl: Label 'Discount Total';
         EFTlbl: Label 'EFT';
-        NetTurnoverlbl: Label 'Net Turnover';
         OpeningHrsLbl: Label 'Opening Hours';
         CustomerPaymentLbl: Label 'Payment';
         StoreLbl: Label 'POS Store';
         POSUnitLbl: Label 'POS Unit';
-        PrintDiscountlbl: Label 'Print Discount';
         Receiptslbl: Label 'Receipts';
         BalancedByLbl: Label 'Register Balanced By';
         Saleslbl: Label 'Sales';
@@ -933,7 +926,6 @@ report 6014460 "NPR Balancing Report A4"
         WithLbl: Label 'With';
         Workshiftlbl: Label 'Workshift';
         LblXReport: Label 'X-Report';
-        Text000: Label 'You need to select Print Discount first.';
         LblZReport: Label 'Z-Report';
         VarBalancedBy: Text;
         VarReportTitle: Text;

@@ -25,7 +25,6 @@ xmlport 6151151 "NPR M2 Reset Account Password"
 
                 trigger OnBeforeInsertRecord()
                 begin
-                    RequestEntryCount += 1;
                 end;
             }
             textelement(Response)
@@ -54,11 +53,9 @@ xmlport 6151151 "NPR M2 Reset Account Password"
 
     trigger OnInitXmlPort()
     begin
-        RequestEntryCount := 0;
     end;
 
     var
-        RequestEntryCount: Integer;
         StartTime: Time;
 
     procedure GetRequest(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary)

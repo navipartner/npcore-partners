@@ -112,7 +112,6 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
 
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        AdmissionSetup: Record "NPR TM Admission";
 
     procedure ClearResponse()
     begin
@@ -122,14 +121,8 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
 
     procedure AddResponse(MembershipEntryNo: Integer)
     var
-        Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        EntryNo: Integer;
-        IsValidOption: Boolean;
-        StartDate: Date;
-        EndDate: Date;
-        Item: Record Item;
         ResponseMessage: Text;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
@@ -147,7 +140,7 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
         TmpMembership.TransferFields(Membership, true);
         TmpMembership.Insert();
 
-        TmpActiveMembershipEntry.Init;
+        TmpActiveMembershipEntry.Init();
         MembershipManagement.GetMembershipValidDate(MembershipEntryNo, Today, TmpActiveMembershipEntry."Valid From Date", TmpActiveMembershipEntry."Valid Until Date");
         TmpActiveMembershipEntry."Entry No." := 1;
         TmpActiveMembershipEntry.Insert();
@@ -168,8 +161,6 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)
-    var
-        totalTicketCardinality: Integer;
     begin
 
         errordescription := ErrorMessage;

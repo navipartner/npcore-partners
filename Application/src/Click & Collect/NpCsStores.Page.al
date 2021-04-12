@@ -14,23 +14,23 @@ page 6151195 "NPR NpCs Stores"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Local Store"; "Local Store")
+                field("Local Store"; Rec."Local Store")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Local Store field';
@@ -94,8 +94,8 @@ page 6151195 "NPR NpCs Stores"
                     NpCsStoresbyDistance: Page "NPR NpCs Stores by Distance";
                 begin
                     Clear(NpCsStoresbyDistance);
-                    NpCsStoresbyDistance.SetFromStoreCode(Code);
-                    NpCsStoresbyDistance.Run;
+                    NpCsStoresbyDistance.SetFromStoreCode(Rec.Code);
+                    NpCsStoresbyDistance.Run();
                 end;
             }
             action("Store Stock Items")

@@ -16,27 +16,27 @@ page 6059899 "NPR Data Log Records Subform"
         {
             repeater(Group)
             {
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Previous Field Value"; "Previous Field Value")
+                field("Previous Field Value"; Rec."Previous Field Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Previous Field Value field';
                 }
-                field("Field Value Changed"; "Field Value Changed")
+                field("Field Value Changed"; Rec."Field Value Changed")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Value Changed field';
                 }
-                field("Field Value"; "Field Value")
+                field("Field Value"; Rec."Field Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Value field';

@@ -56,7 +56,7 @@ page 6014571 "NPR Tax Free Consolidation"
                         exit;
 
                     Rec.SetRange("Sales Ticket No.", PosEntry."Document No.");
-                    if Rec.FindFirst then
+                    if Rec.FindFirst() then
                         Error(Error_AlreadySelected, PosEntry."Document No.");
                     Rec.SetRange("Sales Ticket No.");
 
@@ -70,10 +70,10 @@ page 6014571 "NPR Tax Free Consolidation"
                             exit;
                     end;
 
-                    Rec."Entry No." := "Entry No." + 1;
+                    Rec."Entry No." := Rec."Entry No." + 1;
                     Rec."Sales Ticket No." := PosEntry."Document No.";
                     Rec."Sale Date" := PosEntry."Entry Date";
-                    Rec.Insert;
+                    Rec.Insert();
 
                 end;
             }
@@ -91,7 +91,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 trigger OnAction()
                 begin
                     if Confirm(Caption_DeleteSelected) then
-                        Rec.Delete;
+                        Rec.Delete();
                 end;
             }
             action("Consolidate Receipts")
@@ -109,9 +109,9 @@ page 6014571 "NPR Tax Free Consolidation"
                 var
                     TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
                 begin
-                    if Rec.FindSet then begin
+                    if Rec.FindSet() then begin
                         TaxFreeMgt.VoucherConsolidate(TaxFreeUnit, Rec);
-                        CurrPage.Close;
+                        CurrPage.Close();
                     end;
                 end;
             }
@@ -143,8 +143,8 @@ page 6014571 "NPR Tax Free Consolidation"
     procedure SetTaxFreeUnit(TaxFreeUnitIn: Record "NPR Tax Free POS Unit")
     begin
         TaxFreeUnit := TaxFreeUnitIn;
-        TaxFreeUnit.SetRecFilter;
-        TaxFreeUnit.FindFirst;
+        TaxFreeUnit.SetRecFilter();
+        TaxFreeUnit.FindFirst();
     end;
 }
 

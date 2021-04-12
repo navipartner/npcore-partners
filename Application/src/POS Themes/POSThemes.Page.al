@@ -14,17 +14,17 @@ page 6150735 "NPR POS Themes"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
@@ -42,7 +42,7 @@ page 6150735 "NPR POS Themes"
                 Caption = 'Theme Dependencies';
                 Image = StyleSheet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Theme Dependencies";

@@ -15,47 +15,47 @@ page 6151593 "NPR NpDc Coupons"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Coupon Type"; "Coupon Type")
+                field("Coupon Type"; Rec."Coupon Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Coupon Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open field';
                 }
-                field("Remaining Quantity"; "Remaining Quantity")
+                field("Remaining Quantity"; Rec."Remaining Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remaining Quantity field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Ending Date"; "Ending Date")
+                field("Ending Date"; Rec."Ending Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Date field';
                 }
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
@@ -77,7 +77,7 @@ page 6151593 "NPR NpDc Coupons"
                     Caption = 'Print';
                     Image = Print;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -89,12 +89,12 @@ page 6151593 "NPR NpDc Coupons"
                         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
                     begin
                         CurrPage.SetSelectionFilter(Coupon);
-                        if not Coupon.FindSet then
+                        if not Coupon.FindSet() then
                             exit;
 
                         repeat
                             NpDcCouponMgt.PrintCoupon(Coupon);
-                        until Coupon.Next = 0;
+                        until Coupon.Next() = 0;
                     end;
                 }
             }
@@ -130,7 +130,7 @@ page 6151593 "NPR NpDc Coupons"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Ending Date", '>%1&<%2', 0DT, CurrentDateTime);
+                        Rec.SetFilter("Ending Date", '>%1&<%2', 0DT, CurrentDateTime);
                     end;
                 }
             }

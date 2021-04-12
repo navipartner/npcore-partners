@@ -15,27 +15,27 @@ page 6184484 "NPR Pepper Terminal Type Card"
         {
             group(General)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the ID field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active field';
                 }
-                field("Force Fixed Currency Check"; "Force Fixed Currency Check")
+                field("Force Fixed Currency Check"; Rec."Force Fixed Currency Check")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Force Fixed Currency Check field';
                 }
-                field(Deprecated; Deprecated)
+                field(Deprecated; Rec.Deprecated)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Deprecated field';
@@ -43,7 +43,7 @@ page 6184484 "NPR Pepper Terminal Type Card"
             }
             group(ATOS)
             {
-                field(Overtender; Overtender)
+                field(Overtender; Rec.Overtender)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Overtender field';

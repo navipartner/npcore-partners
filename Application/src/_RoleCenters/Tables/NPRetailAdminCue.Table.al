@@ -158,7 +158,7 @@ table 6151248 "NPR NP Retail Admin Cue"
         CurrencySymbol: text[10];
 
     begin
-        GeneralLegerSetup.GET;
+        GeneralLegerSetup.Get();
         CurrencySymbol := GeneralLegerSetup.GetCurrencySymbol;
 
         IF UserPersonalization.GET(USERSECURITYID) AND (CurrencySymbol <> '') THEN

@@ -15,47 +15,47 @@ page 6151529 "NPR Nc Collector Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active field';
                 }
-                field("Max. Lines per Collection"; "Max. Lines per Collection")
+                field("Max. Lines per Collection"; Rec."Max. Lines per Collection")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. Lines per Collection field';
                 }
-                field("Wait to Send"; "Wait to Send")
+                field("Wait to Send"; Rec."Wait to Send")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Wait to Send field';
                 }
-                field("Delete Obsolete Lines"; "Delete Obsolete Lines")
+                field("Delete Obsolete Lines"; Rec."Delete Obsolete Lines")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete Obsolete Lines field';
                 }
-                field("Delete Sent Collections After"; "Delete Sent Collections After")
+                field("Delete Sent Collections After"; Rec."Delete Sent Collections After")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete Sent Collections After field';
@@ -63,22 +63,22 @@ page 6151529 "NPR Nc Collector Card"
             }
             group(Changes)
             {
-                field("Record Modify"; "Record Modify")
+                field("Record Modify"; Rec."Record Modify")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Modify field';
                 }
-                field("Record Insert"; "Record Insert")
+                field("Record Insert"; Rec."Record Insert")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Insert field';
                 }
-                field("Record Delete"; "Record Delete")
+                field("Record Delete"; Rec."Record Delete")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete field';
                 }
-                field("Record Rename"; "Record Rename")
+                field("Record Rename"; Rec."Record Rename")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rename field';

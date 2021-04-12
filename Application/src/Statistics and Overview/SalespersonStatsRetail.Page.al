@@ -35,7 +35,7 @@ page 6014586 "NPR Salesperson Stats Retail"
                         SetItemLedgerEntryFilter(AuxItemLedgerEntry);
                         AuxItemLedgerEntries.SetTableView(AuxItemLedgerEntry);
                         AuxItemLedgerEntries.Editable(false);
-                        AuxItemLedgerEntries.RunModal;
+                        AuxItemLedgerEntries.RunModal();
                     end;
                 }
                 field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
@@ -59,7 +59,7 @@ page 6014586 "NPR Salesperson Stats Retail"
                         SetValueEntryFilter(AuxValueEntry);
                         AuxValueEntries.SetTableView(AuxValueEntry);
                         AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal;
+                        AuxValueEntries.RunModal();
                     end;
                 }
                 field("<Control61506191>"; -"LastYear Sale Amount")
@@ -107,9 +107,9 @@ page 6014586 "NPR Salesperson Stats Retail"
     trigger OnOpenPage()
     begin
         if (Periodestart = 0D) then
-            Periodestart := Today;
+            Periodestart := Today();
         if (Periodeslut = 0D) then
-            Periodeslut := Today;
+            Periodeslut := Today();
     end;
 
     var
@@ -121,14 +121,11 @@ page 6014586 "NPR Salesperson Stats Retail"
         "LastYear Profit Amount": Decimal;
         "Profit %": Decimal;
         "LastYear Profit %": Decimal;
-        "Global Dimension 1 Filter": Code[20];
         "Global Dimension 2 Filter": Code[20];
         ItemCategoryFilter: Code[20];
         Periodestart: Date;
         Periodeslut: Date;
         LastYear: Boolean;
-        ShowSameWeekday: Boolean;
-        DateFilterLastYear: Text[50];
         CalcLastYear: Text[50];
         ItemNoFilter: Code[20];
         HideEmpty: Boolean;
@@ -151,7 +148,7 @@ page 6014586 "NPR Salesperson Stats Retail"
         CalcLastYear := LastYearCalc;
         ItemNoFilter := ItemFilter;
 
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     procedure Calc()
@@ -214,7 +211,7 @@ page 6014586 "NPR Salesperson Stats Retail"
             AuxItemLedgerEntry.SetRange("Item No.");
 
         if Rec."NPR Global Dimension 1 Filter" <> '' then
-            AuxItemLedgerEntry.SetRange("Global Dimension 1 Code", "NPR Global Dimension 1 Filter")
+            AuxItemLedgerEntry.SetRange("Global Dimension 1 Code", Rec."NPR Global Dimension 1 Filter")
         else
             AuxItemLedgerEntry.SetRange("Global Dimension 1 Code");
 
@@ -227,7 +224,7 @@ page 6014586 "NPR Salesperson Stats Retail"
     procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
     begin
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-        AuxValueEntry.SetRange("Salespers./Purch. Code", Code);
+        AuxValueEntry.SetRange("Salespers./Purch. Code", Rec.Code);
         if not LastYear then
             AuxValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -243,8 +240,8 @@ page 6014586 "NPR Salesperson Stats Retail"
         else
             AuxValueEntry.SetRange("Item Category Code");
 
-        if "NPR Global Dimension 1 Filter" <> '' then
-            AuxValueEntry.SetRange("Global Dimension 1 Code", "NPR Global Dimension 1 Filter")
+        if Rec."NPR Global Dimension 1 Filter" <> '' then
+            AuxValueEntry.SetRange("Global Dimension 1 Code", Rec."NPR Global Dimension 1 Filter")
         else
             AuxValueEntry.SetRange("Global Dimension 1 Code");
 
@@ -259,8 +256,8 @@ page 6014586 "NPR Salesperson Stats Retail"
         Rec.Reset();
         Rec."NPR Global Dimension 1 Filter" := '';
         "Global Dimension 2 Filter" := '';
-        Periodestart := Today;
-        Periodeslut := Today;
+        Periodestart := Today();
+        Periodeslut := Today();
         ItemCategoryFilter := '';
     end;
 
@@ -292,7 +289,7 @@ page 6014586 "NPR Salesperson Stats Retail"
                     Count += 1;
 
                     Dlg.Update(1, SalesPerson.Name);
-                    Dlg.Update(2, Round(Count / SalesPerson.Count * 10000, 1, '='));
+                    Dlg.Update(2, Round(Count / SalesPerson.Count() * 10000, 1, '='));
                     SetItemLedgerEntryFilter(AuxItemLedgerEntry);
                     AuxItemLedgerEntry.SetRange("Salespers./Purch. Code", SalesPerson.Code);
                     AuxItemLedgerEntry.CalcSums(Quantity);

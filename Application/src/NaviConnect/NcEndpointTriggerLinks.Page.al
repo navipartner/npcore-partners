@@ -14,12 +14,12 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
         {
             repeater(Group)
             {
-                field("Endpoint Code"; "Endpoint Code")
+                field("Endpoint Code"; Rec."Endpoint Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Endpoint Code field';
                 }
-                field("Trigger Code"; "Trigger Code")
+                field("Trigger Code"; Rec."Trigger Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Trigger Code field';
@@ -47,7 +47,7 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
                 var
                     NcEndpoint: Record "NPR Nc Endpoint";
                 begin
-                    NcEndpoint.Get("Endpoint Code");
+                    NcEndpoint.Get(Rec."Endpoint Code");
                     NcEndpoint.SetupEndpoint();
                 end;
             }

@@ -64,7 +64,6 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         EFTSetup: Record "NPR EFT Setup";
-        EFTVerifoneVimIntegration: Codeunit "NPR EFT Verifone Vim Integ.";
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
@@ -90,7 +89,6 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         OriginalEftTrxRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
-        EFTVerifoneVimIntegration: Codeunit "NPR EFT Verifone Vim Integ.";
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
@@ -126,7 +124,6 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         OriginalEftTrxRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
-        EFTVerifoneVimIntegration: Codeunit "NPR EFT Verifone Vim Integ.";
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
@@ -417,7 +414,6 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
 
     local procedure VerifySetup(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
-        TransactionRequest: DotNet NPRNetTransactionRequest2;
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
     begin

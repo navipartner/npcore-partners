@@ -1,4 +1,4 @@
-codeunit 6151464 "NPR M2 Category Mgt."
+﻿codeunit 6151464 "NPR M2 Category Mgt."
 {
     trigger OnRun()
     begin
@@ -19,9 +19,8 @@ codeunit 6151464 "NPR M2 Category Mgt."
         CategoryId: Code[20];
         PrevRec: Text;
         TypeHelper: Codeunit "Type Helper";
-        i: Integer;
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
 
@@ -30,9 +29,9 @@ codeunit 6151464 "NPR M2 Category Mgt."
         XmlDoc.SelectNodes('//category', XNodeList);
         foreach XNode in XNodeList do begin
             CategoryId := NpXmlDomMgt.GetAttributeCode(XNode.AsXmlElement(), '', 'id', MaxStrLen(MagentoCategory.Id), true);
-            MagentoCategory.LockTable;
+            MagentoCategory.LockTable();
             if not MagentoCategory.Get(CategoryId) then begin
-                MagentoCategory.Init;
+                MagentoCategory.Init();
                 MagentoCategory.Id := CategoryId;
                 MagentoCategory.Insert(true);
             end;
@@ -51,21 +50,21 @@ codeunit 6151464 "NPR M2 Category Mgt."
             if PrevRec <> Format(MagentoCategory) then
                 MagentoCategory.Modify(true);
 
-            Commit;
+            Commit();
 
             if not TempMagentoCategory.Get(MagentoCategory.Id) then begin
-                TempMagentoCategory.Init;
+                TempMagentoCategory.Init();
                 TempMagentoCategory := MagentoCategory;
-                TempMagentoCategory.Insert;
+                TempMagentoCategory.Insert();
             end;
         end;
 
         MagentoCategory.Reset();
-        if MagentoCategory.FindSet then
+        if MagentoCategory.FindSet() then
             repeat
                 if not TempMagentoCategory.Get(MagentoCategory.Id) then
                     RemoveCategory(MagentoCategory);
-            until MagentoCategory.Next = 0;
+            until MagentoCategory.Next() = 0;
         DataLogMgt.DisableDataLog(false);
     end;
 
@@ -81,15 +80,15 @@ codeunit 6151464 "NPR M2 Category Mgt."
         MagentoCategoryLink: Record "NPR Magento Category Link";
     begin
         MagentoCategoryLink.SetRange("Category Id", MagentoCategory.Id);
-        if MagentoCategoryLink.FindFirst then begin
-            MagentoCategoryLink.DeleteAll;
-            Commit;
+        if MagentoCategoryLink.FindFirst() then begin
+            MagentoCategoryLink.DeleteAll();
+            Commit();
         end;
 
-        MagentoCategory.LockTable;
+        MagentoCategory.LockTable();
         if MagentoCategory.Get(MagentoCategory.Id) then begin
-            MagentoCategory.Delete;
-            Commit;
+            MagentoCategory.Delete();
+            Commit();
         end;
     end;
 

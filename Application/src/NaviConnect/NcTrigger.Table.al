@@ -35,7 +35,7 @@ table 6151520 "NPR Nc Trigger"
         }
         field(50; "Linked Endpoints"; Integer)
         {
-            CalcFormula = Count ("NPR Nc Endpoint Trigger Link" WHERE("Trigger Code" = FIELD(Code)));
+            CalcFormula = Count("NPR Nc Endpoint Trigger Link" WHERE("Trigger Code" = FIELD(Code)));
             Caption = 'Linked Endpoints';
             Editable = false;
             FieldClass = FlowField;
@@ -55,7 +55,7 @@ table 6151520 "NPR Nc Trigger"
         }
         field(80; "Subscriber Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Subscriber Codeunit ID")));
             Caption = 'Subscriber Codeunit Name';
             Description = 'NC2.01';
@@ -81,7 +81,5 @@ table 6151520 "NPR Nc Trigger"
     {
     }
 
-    var
-        EventSubscription: Record "Event Subscription";
 }
 

@@ -13,37 +13,37 @@ page 6060135 "NPR MM Members. Admis. Setup"
         {
             repeater(Group)
             {
-                field("Membership  Code"; "Membership  Code")
+                field("Membership  Code"; Rec."Membership  Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership  Code field';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Ticket No. Type"; "Ticket No. Type")
+                field("Ticket No. Type"; Rec."Ticket No. Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket No. Type field';
                 }
-                field("Ticket No."; "Ticket No.")
+                field("Ticket No."; Rec."Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket No. field';
                 }
-                field("Cardinality Type"; "Cardinality Type")
+                field("Cardinality Type"; Rec."Cardinality Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cardinality Type field';
                 }
-                field("Max Cardinality"; "Max Cardinality")
+                field("Max Cardinality"; Rec."Max Cardinality")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max Cardinality field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

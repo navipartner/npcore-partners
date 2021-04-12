@@ -65,20 +65,19 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
     begin
         POSEntry.SetRange("POS Unit No.", SalePOS."Register No.");
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        exit(POSEntry.FindFirst);
+        exit(POSEntry.FindFirst());
     end;
 
     procedure InsertNcTask(TaskProcessorCode: Text; RecVariant: Variant; DocNo: Code[20]; var NcTask: Record "NPR Nc Task"): Boolean
     var
         RecRef: RecordRef;
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
         if not RecVariant.IsRecord then
             exit(false);
 
         RecRef.GetTable(RecVariant);
 
-        NcTask.Init;
+        NcTask.Init();
         NcTask."Entry No." := 0;
         NcTask.Type := NcTask.Type::Insert;
         NcTask."Table No." := RecRef.Number;

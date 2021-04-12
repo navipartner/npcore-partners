@@ -18,199 +18,199 @@ page 6014630 "NPR RP Templ. Line Designer"
         {
             repeater(Control6150613)
             {
-                IndentationColumn = Level;
+                IndentationColumn = Rec.Level;
                 IndentationControls = Type;
                 ShowCaption = false;
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Style = Strong;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Type Option"; "Type Option")
+                field("Type Option"; Rec."Type Option")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
+                    Enabled = NOT (Rec."Prefix Next Line" OR (Rec."Type" = 1));
                     Style = Subordinate;
-                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    StyleExpr = Rec."Prefix Next Line" OR (Rec."Type" = 1);
                     ToolTip = 'Specifies the value of the Type Option field';
                 }
-                field("Prefix Next Line"; "Prefix Next Line")
+                field("Prefix Next Line"; Rec."Prefix Next Line")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Prefix Next Line field';
                 }
-                field("Data Item Name"; "Data Item Name")
+                field("Data Item Name"; Rec."Data Item Name")
                 {
                     ApplicationArea = All;
                     Style = Strong;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field(Operator; Operator)
+                field(Operator; Rec.Operator)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Operator field';
                 }
-                field("Field 2 Name"; "Field 2 Name")
+                field("Field 2 Name"; Rec."Field 2 Name")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Field 2 Name field';
                 }
-                field(Attribute; Attribute)
+                field(Attribute; Rec.Attribute)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Attribute field';
                 }
-                field("Template Column No."; "Template Column No.")
+                field("Template Column No."; Rec."Template Column No.")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
+                    Enabled = NOT (Rec."Prefix Next Line" OR (Rec."Type" = 1));
                     Style = Subordinate;
-                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    StyleExpr = Rec."Prefix Next Line" OR (Rec."Type" = 1);
                     ToolTip = 'Specifies the value of the Column No. field';
                 }
-                field(Prefix; Prefix)
+                field(Prefix; Rec.Prefix)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Prefix field';
                 }
-                field(Postfix; Postfix)
+                field(Postfix; Rec.Postfix)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Postfix field';
                 }
-                field("Default Value"; "Default Value")
+                field("Default Value"; Rec."Default Value")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Default Value field';
                 }
-                field("Pad Char"; "Pad Char")
+                field("Pad Char"; Rec."Pad Char")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
+                    Enabled = NOT (Rec."Prefix Next Line" OR (Rec."Type" = 1));
                     Style = Subordinate;
-                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    StyleExpr = Rec."Prefix Next Line" OR (Rec."Type" = 1);
                     ToolTip = 'Specifies the value of the Pad Char field';
                 }
-                field(Align; Align)
+                field(Align; Rec.Align)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
+                    Enabled = NOT (Rec."Prefix Next Line" OR (Rec."Type" = 1));
                     Style = Subordinate;
-                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    StyleExpr = Rec."Prefix Next Line" OR (Rec."Type" = 1);
                     ToolTip = 'Specifies the value of the Align field';
                 }
-                field(Bold; Bold)
+                field(Bold; Rec.Bold)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Bold field';
                 }
-                field(Width; Width)
+                field(Width; Rec.Width)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
+                    Enabled = NOT (Rec."Prefix Next Line" OR (Rec."Type" = 1));
                     Style = Subordinate;
-                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    StyleExpr = Rec."Prefix Next Line" OR (Rec."Type" = 1);
                     ToolTip = 'Specifies the value of the Barcode Size/Width field';
                 }
-                field(Height; Height)
+                field(Height; Rec.Height)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
+                    Enabled = NOT (Rec."Prefix Next Line" OR (Rec."Type" = 1));
                     Style = Subordinate;
-                    StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    StyleExpr = Rec."Prefix Next Line" OR (Rec."Type" = 1);
                     ToolTip = 'Specifies the value of the Height field';
                 }
-                field("Start Char"; "Start Char")
+                field("Start Char"; Rec."Start Char")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Start Char field';
                 }
-                field("Max Length"; "Max Length")
+                field("Max Length"; Rec."Max Length")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Max Length field';
                 }
-                field(Underline; Underline)
+                field(Underline; Rec.Underline)
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Underline field';
                 }
-                field("Blank Zero"; "Blank Zero")
+                field("Blank Zero"; Rec."Blank Zero")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Blank Zero field';
                 }
-                field("Skip If Empty"; "Skip If Empty")
+                field("Skip If Empty"; Rec."Skip If Empty")
                 {
                     ApplicationArea = All;
-                    Enabled = NOT ("Type" = 1);
+                    Enabled = NOT (Rec."Type" = 1);
                     Style = Subordinate;
-                    StyleExpr = "Type" = 1;
+                    StyleExpr = Rec."Type" = 1;
                     ToolTip = 'Specifies the value of the Skip If Empty field';
                 }
-                field(Comments; Comments)
+                field(Comments; Rec.Comments)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comments field';
                 }
-                field("Processing Codeunit"; "Processing Codeunit")
+                field("Processing Codeunit"; Rec."Processing Codeunit")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Codeunit field';
                 }
-                field("Processing Function ID"; "Processing Function ID")
+                field("Processing Function ID"; Rec."Processing Function ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Function ID field';
                 }
-                field("Processing Function Parameter"; "Processing Function Parameter")
+                field("Processing Function Parameter"; Rec."Processing Function Parameter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Function Parameter field';
@@ -232,11 +232,11 @@ page 6014630 "NPR RP Templ. Line Designer"
         // VALIDATE(Level,Level+1);
         // MODIFY(TRUE);
         CurrPage.SetSelectionFilter(TemplateLine);
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 TemplateLine.Validate(Level, TemplateLine.Level + 1);
                 TemplateLine.Modify(true);
-            until TemplateLine.Next = 0;
+            until TemplateLine.Next() = 0;
         //+NPR5.34 [284505]
     end;
 
@@ -251,13 +251,13 @@ page 6014630 "NPR RP Templ. Line Designer"
         // MODIFY(TRUE);
 
         CurrPage.SetSelectionFilter(TemplateLine);
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 if TemplateLine.Level > 0 then begin
                     TemplateLine.Validate(Level, TemplateLine.Level - 1);
                     TemplateLine.Modify(true);
                 end;
-            until TemplateLine.Next = 0;
+            until TemplateLine.Next() = 0;
         //+NPR5.34 [284505]
     end;
 }

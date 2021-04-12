@@ -15,17 +15,17 @@ page 6151003 "NPR POS Saved Sale Card"
                 group(Control6014411)
                 {
                     ShowCaption = false;
-                    field("Sales Ticket No."; "Sales Ticket No.")
+                    field("Sales Ticket No."; Rec."Sales Ticket No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
                     }
-                    field("Register No."; "Register No.")
+                    field("Register No."; Rec."Register No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the POS Unit No. field';
                     }
-                    field("Entry No."; "Entry No.")
+                    field("Entry No."; Rec."Entry No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Entry No. field';
@@ -34,27 +34,27 @@ page 6151003 "NPR POS Saved Sale Card"
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Created at"; "Created at")
+                    field("Created at"; Rec."Created at")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Created at field';
                     }
-                    field("Salesperson Code"; "Salesperson Code")
+                    field("Salesperson Code"; Rec."Salesperson Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Salesperson Code field';
                     }
-                    field(Amount; Amount)
+                    field(Amount; Rec.Amount)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Amount field';
                     }
-                    field("Amount Including VAT"; "Amount Including VAT")
+                    field("Amount Including VAT"; Rec."Amount Including VAT")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Amount Including VAT field';
                     }
-                    field("Contains EFT Approval"; "Contains EFT Approval")
+                    field("Contains EFT Approval"; Rec."Contains EFT Approval")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Contains EFT Approval field';
@@ -63,32 +63,32 @@ page 6151003 "NPR POS Saved Sale Card"
                 group(Control6014409)
                 {
                     ShowCaption = false;
-                    field("Customer Type"; "Customer Type")
+                    field("Customer Type"; Rec."Customer Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer Type field';
                     }
-                    field("Customer No."; "Customer No.")
+                    field("Customer No."; Rec."Customer No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer No. field';
                     }
-                    field("Customer Price Group"; "Customer Price Group")
+                    field("Customer Price Group"; Rec."Customer Price Group")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer Price Group field';
                     }
-                    field("Customer Disc. Group"; "Customer Disc. Group")
+                    field("Customer Disc. Group"; Rec."Customer Disc. Group")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer Disc. Group field';
                     }
-                    field(Attention; Attention)
+                    field(Attention; Rec.Attention)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Attention field';
                     }
-                    field(Reference; Reference)
+                    field(Reference; Rec.Reference)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Reference field';

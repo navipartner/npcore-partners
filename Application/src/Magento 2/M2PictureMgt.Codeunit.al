@@ -14,10 +14,9 @@ codeunit 6151462 "NPR M2 Picture Mgt."
     local procedure SendMagentoPicture(PictureName: Text; PictureType: Text; PictureDataUri: Text)
     var
         MagentoSetup: Record "NPR Magento Setup";
-        MagentoMgt: Codeunit "NPR Magento Mgt.";
         XmlDoc: XmlDocument;
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         MagentoSetup.TestField("Api Url");
         XmlDocument.ReadFrom('<?xml version="1.0" encoding="UTF-8"?>' +
                        '<images>' +
@@ -51,7 +50,7 @@ codeunit 6151462 "NPR M2 Picture Mgt."
         if Sender.Name = '' then
             exit;
 
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         MagentoUrl := MagentoSetup."Magento Url" + 'pub/media/catalog/' + GetMagentoType(Sender) + '/api/' + Sender.Name;
     end;
 
@@ -100,7 +99,6 @@ codeunit 6151462 "NPR M2 Picture Mgt."
     procedure MagentoApiPost(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
     var
         MagentoSetup: Record "NPR Magento Setup";
-        XmlMgt: Codeunit "XML DOM Management";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Content: HttpContent;
@@ -122,7 +120,7 @@ codeunit 6151462 "NPR M2 Picture Mgt."
         HttpWebRequest.GetHeaders(Headers);
         Headers.Add('Accept', 'naviconnect/xml');
 
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         Headers.Add('Authorization', MagentoSetup."Api Authorization");
 
         Client.Timeout := 300000;

@@ -39,7 +39,7 @@ table 6060107 "NPR Ean Box Setup Event"
         }
         field(5; "POS View"; Option)
         {
-            CalcFormula = Lookup ("NPR Ean Box Setup"."POS View" WHERE(Code = FIELD("Setup Code")));
+            CalcFormula = Lookup("NPR Ean Box Setup"."POS View" WHERE(Code = FIELD("Setup Code")));
             Caption = 'POS View';
             Editable = false;
             FieldClass = FlowField;
@@ -64,29 +64,26 @@ table 6060107 "NPR Ean Box Setup Event"
             TableRelation = "NPR POS Action";
 
             trigger OnValidate()
-            var
-                AllObj: Record AllObj;
-                POSAction: Record "NPR POS Action";
             begin
             end;
         }
         field(21; "Action Description"; Text[250])
         {
-            CalcFormula = Lookup ("NPR POS Action".Description WHERE(Code = FIELD("Action Code")));
+            CalcFormula = Lookup("NPR POS Action".Description WHERE(Code = FIELD("Action Code")));
             Caption = 'Action Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(100; "Module Name"; Text[50])
         {
-            CalcFormula = Lookup ("NPR Ean Box Event"."Module Name" WHERE(Code = FIELD("Event Code")));
+            CalcFormula = Lookup("NPR Ean Box Event"."Module Name" WHERE(Code = FIELD("Event Code")));
             Caption = 'Module Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(105; "Event Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR Ean Box Event".Description WHERE(Code = FIELD("Event Code")));
+            CalcFormula = Lookup("NPR Ean Box Event".Description WHERE(Code = FIELD("Event Code")));
             Caption = 'Event Description';
             Editable = false;
             FieldClass = FlowField;

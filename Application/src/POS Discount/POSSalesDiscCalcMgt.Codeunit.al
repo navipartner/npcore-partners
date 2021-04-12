@@ -1,4 +1,4 @@
-codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
+﻿codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
 {
     // This module is invoked by the sale line wrapper codeunit in transcendence inside insert,modify,delete functions.
     // It is specifically not invoked from table field validations or table subscribers to prevent unnecessary cascading.
@@ -44,8 +44,7 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
         FindAllActiveSaleLineDiscounts(TempDiscountPriority);
 
         //LineOperation & Rec is set as if the last line was just inserted.
-        with TempSaleLinePOS do
-            SaleLinePOS.Get("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line No.");
+        SaleLinePOS.Get(TempSaleLinePOS."Register No.", TempSaleLinePOS."Sales Ticket No.", TempSaleLinePOS.Date, TempSaleLinePOS."Sale Type", TempSaleLinePOS."Line No.");
         ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, SaleLinePOS, SaleLinePOS, 0, true);
 
         LogStopwatch('DISCOUNT_RECALCULATE', CurrentDateTime - StartTime);
@@ -189,10 +188,10 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
     begin
 
         tmpDiscountPriority.SetCurrentKey(Priority);
-        if tmpDiscountPriority.FindSet then begin
+        if tmpDiscountPriority.FindSet() then begin
             repeat
                 ApplyDiscount(tmpDiscountPriority, SalePOS, TempSaleLinePOS, Rec, xRec, LineOperation, RecalculateAllLines);
-            until tmpDiscountPriority.Next = 0;
+            until tmpDiscountPriority.Next() = 0;
 
             UpdateDiscOnSalesLine(TempSaleLinePOS, RecalculateAllLines);
         end;
@@ -208,7 +207,7 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
             exit;
 
         SaleLinePOS.SetSkipCalcDiscount(true);
-        TempSaleLinePOS.FindSet;
+        TempSaleLinePOS.FindSet();
         repeat
             if TempSaleLinePOS."Discount Calculated" or RecalculateAllLines then begin
                 TempSaleLinePOS."Discount Calculated" := false;
@@ -220,12 +219,12 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
                         or (SaleLinePOS.Quantity <> TempSaleLinePOS.Quantity)
                     then begin
                         SaleLinePOS.TransferFields(TempSaleLinePOS, false);
-                        SaleLinePOS.Modify;
+                        SaleLinePOS.Modify();
                     end;
                 end else begin
-                    SaleLinePOS.Init;
+                    SaleLinePOS.Init();
                     SaleLinePOS := TempSaleLinePOS;
-                    SaleLinePOS.Insert;
+                    SaleLinePOS.Insert();
                 end;
 
                 SaleLinePOS.CreateDim(
@@ -233,9 +232,9 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
                   NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
                   DATABASE::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
                   0, '');
-                SaleLinePOS.Modify;
+                SaleLinePOS.Modify();
             end;
-        until TempSaleLinePOS.Next = 0;
+        until TempSaleLinePOS.Next() = 0;
     end;
 
     local procedure "--- Checks"()
@@ -278,27 +277,27 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
         if DiscountPriority.IsEmpty then
             InitDiscountPriority(DiscountPriority);
 
-        tmpDiscountPriority.Reset;
-        tmpDiscountPriority.DeleteAll;
+        tmpDiscountPriority.Reset();
+        tmpDiscountPriority.DeleteAll();
 
         OnFindActiveSaleLineDiscounts(tmpDiscountPriority, SalePOS, Rec, xRec, LineOperation);
-        exit(not tmpDiscountPriority.IsEmpty);
+        exit(not tmpDiscountPriority.IsEmpty());
     end;
 
     local procedure FindAllActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary)
     var
         DiscountPriority: Record "NPR Discount Priority";
     begin
-        tmpDiscountPriority.Reset;
-        tmpDiscountPriority.DeleteAll;
+        tmpDiscountPriority.Reset();
+        tmpDiscountPriority.DeleteAll();
 
         DiscountPriority.SetRange(Disabled, false);
-        if DiscountPriority.FindSet then
+        if DiscountPriority.FindSet() then
             repeat
-                tmpDiscountPriority.Init;
+                tmpDiscountPriority.Init();
                 tmpDiscountPriority := DiscountPriority;
-                tmpDiscountPriority.Insert;
-            until DiscountPriority.Next = 0;
+                tmpDiscountPriority.Insert();
+            until DiscountPriority.Next() = 0;
     end;
 
     local procedure HasActiveCrossLineDiscount(var tmpDiscountPriority: Record "NPR Discount Priority" temporary): Boolean
@@ -306,7 +305,7 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
         Result: Boolean;
     begin
         tmpDiscountPriority.SetRange("Cross Line Calculation", true);
-        Result := not tmpDiscountPriority.IsEmpty;
+        Result := not tmpDiscountPriority.IsEmpty();
         tmpDiscountPriority.SetRange("Cross Line Calculation");
         exit(Result);
     end;
@@ -331,7 +330,7 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
 
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 TempSaleLinePOS := SaleLinePOS;
                 TempSaleLinePOS."Discount Calculated" := false;
@@ -342,8 +341,8 @@ codeunit 6014455 "NPR POS Sales Disc. Calc. Mgt."
                 TempSaleLinePOS."MR Anvendt antal" := 0;
                 TempSaleLinePOS."Custom Disc Blocked" := false;
                 TempSaleLinePOS.UpdateLineVatAmounts(TempSaleLinePOS, 0, 0, 0, 0);
-                TempSaleLinePOS.Insert;
-            until SaleLinePOS.Next = 0;
+                TempSaleLinePOS.Insert();
+            until SaleLinePOS.Next() = 0;
     end;
 
     local procedure "--- Aux"()

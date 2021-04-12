@@ -13,17 +13,17 @@ page 6060096 "NPR POS Input Box Setups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("POS View"; "POS View")
+                field("POS View"; Rec."POS View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View field';

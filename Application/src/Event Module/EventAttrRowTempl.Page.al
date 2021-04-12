@@ -12,12 +12,12 @@ page 6060159 "NPR Event Attr. Row Templ."
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -35,7 +35,7 @@ page 6060159 "NPR Event Attr. Row Templ."
                 Caption = 'Values';
                 Image = BulletList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Row Values";

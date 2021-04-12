@@ -172,11 +172,11 @@ table 6151502 "NPR Nc Task"
         NcTaskOutput: Record "NPR Nc Task Output";
     begin
         NaviConnectTaskField.SetRange("Task Entry No.", "Entry No.");
-        NaviConnectTaskField.DeleteAll;
+        NaviConnectTaskField.DeleteAll();
 
         //-NC2.12 [308107]
         NcTaskOutput.SetRange("Task Entry No.", "Entry No.");
-        NcTaskOutput.DeleteAll;
+        NcTaskOutput.DeleteAll();
         //+NC2.12 [308107]
     end;
 }

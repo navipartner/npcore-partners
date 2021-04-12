@@ -68,7 +68,7 @@ table 6059905 "NPR Task Output Log"
             begin
                 //-TQ1.17
                 CalcFields(File);
-                if File.HasValue then begin
+                if File.HasValue() then begin
                     File.CreateInStream(InStream);
                     InStream.ReadText(Text);
                     Message(Text);
@@ -97,7 +97,6 @@ table 6059905 "NPR Task Output Log"
 
     procedure AddFile(TaskLine: Record "NPR Task Line"; FileName: Text[250])
     var
-        TaskQueueAdd2Log: Codeunit "NPR Task Queue: SingleInstance";
         IStream: InStream;
     begin
         if not Exists(FileName) then
@@ -108,7 +107,7 @@ table 6059905 "NPR Task Output Log"
         //LOCKTABLE;
         //IF FINDLAST THEN;
         //+TQ1.28
-        //INIT;
+        //Init();
         //-TQ1.28
         //"Entry No." := "Entry No." + 1;
         //"Entry No." := 0;
@@ -125,16 +124,15 @@ table 6059905 "NPR Task Output Log"
         Rec.File.CreateInStream(IStream);
         IStream.Read(FileName);
         //File.IMPORT(FileName, FALSE);
-        Insert;
+        Insert();
     end;
 
     procedure InitRecord(TaskLine: Record "NPR Task Line")
     var
         TaskQueueAdd2Log: Codeunit "NPR Task Queue: SingleInstance";
-        IStream: InStream;
     begin
         //-TQ1.29
-        Init;
+        Init();
         "Entry No." := 0;
         "Journal Template Name" := TaskLine."Journal Template Name";
         "Journal Batch Name" := TaskLine."Journal Batch Name";
@@ -153,7 +151,7 @@ table 6059905 "NPR Task Output Log"
         if MessageText = '' then
             exit;
 
-        Init;
+        Init();
         "Entry No." := 0;
         "Journal Template Name" := TaskLine."Journal Template Name";
         "Journal Batch Name" := TaskLine."Journal Batch Name";
@@ -166,7 +164,7 @@ table 6059905 "NPR Task Output Log"
         //-TQ1.29
         "Task Log Entry No." := TaskQueueAdd2Log.GetCurrentLogEntryNo;
         //+TQ1.29
-        Insert;
+        Insert();
     end;
 
     local procedure ConvertCarrigeReturn(ErrorString: Text[1024]): Text[1024]

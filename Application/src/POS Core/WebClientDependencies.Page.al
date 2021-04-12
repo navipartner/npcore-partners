@@ -46,7 +46,7 @@ page 6014659 "NPR Web Client Dependencies"
                 Caption = 'Import File...';
                 Image = ImportDatabase;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -62,7 +62,7 @@ page 6014659 "NPR Web Client Dependencies"
                 Caption = 'Export Managed Dependency Manifest';
                 Image = ExportElectronicDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -161,7 +161,7 @@ page 6014659 "NPR Web Client Dependencies"
                     fPath := Rec.Code + '.svg';
             end;
 
-            FileBlob.FromRecord(Rec, FieldNo(BLOB));
+            FileBlob.FromRecord(Rec, Rec.FieldNo(BLOB));
             FileManagement.BLOBExport(FileBlob, fPath, true);
         end;
     end;
@@ -178,7 +178,7 @@ page 6014659 "NPR Web Client Dependencies"
     begin
         DataUri := 'data:image/';
 
-        CalcFields(BLOB);
+        Rec.CalcFields(BLOB);
         MemStrIn := MemStrIn.MemoryStream();
         CopyStream(MemStrIn, InStr);
         Image := Image.FromStream(MemStrIn);
@@ -210,7 +210,7 @@ page 6014659 "NPR Web Client Dependencies"
     begin
         DataUri := 'data:image/svg+xml;base64,';
 
-        CalcFields(BLOB);
+        Rec.CalcFields(BLOB);
         MemStrIn := MemStrIn.MemoryStream();
         CopyStream(MemStrIn, InStr);
         SVGText := CheckNamespaces(Encoding.UTF8.GetString(MemStrIn.ToArray()));

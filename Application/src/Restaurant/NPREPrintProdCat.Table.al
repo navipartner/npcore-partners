@@ -33,6 +33,4 @@ table 6150663 "NPR NPRE Print/Prod. Cat."
         {
         }
     }
-    var
-        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
 }

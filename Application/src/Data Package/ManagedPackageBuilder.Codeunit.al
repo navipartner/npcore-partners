@@ -10,11 +10,8 @@ codeunit 6014629 "NPR Managed Package Builder"
         GlobalTableListTmp: Record AllObjWithCaption temporary;
         Error_Parameter: Label 'Invalid parameter. Pass either Record or RecordRef';
         Error_NoData: Label 'No data has been added to the manifest';
-        Error_TooLarge: Label 'You cannot create a package containing above 5000 records';
         DialogValues: array[2] of Integer;
         GlobalRecCount: Integer;
-        IsDialogOpen: Boolean;
-        ProgressDialog: Dialog;
 
     procedure AddRecord("Record": Variant)
     var
@@ -24,7 +21,6 @@ codeunit 6014629 "NPR Managed Package Builder"
         FieldValue: Variant;
         i: Integer;
         ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        Itt: Integer;
         Total: Integer;
     begin
         if Record.IsRecord then
@@ -38,12 +34,12 @@ codeunit 6014629 "NPR Managed Package Builder"
         if not RecRef.FindSet(false, false) then
             exit;
 
-        Total := RecRef.Count;
+        Total := RecRef.Count();
         GlobalRecCount += Total;
 
         GlobalTableListTmp."Object Type" := GlobalTableListTmp."Object Type"::Table;
         GlobalTableListTmp."Object ID" := RecRef.Number;
-        if GlobalTableListTmp.Insert then;
+        if GlobalTableListTmp.Insert() then;
 
 
         repeat
@@ -56,17 +52,14 @@ codeunit 6014629 "NPR Managed Package Builder"
             end;
             JObject.Add('Fields', JObjectRec);
             GlobalJArray.Add(JObject);
-        until RecRef.Next = 0;
+        until RecRef.Next() = 0;
 
-        RecRef.Close;
+        RecRef.Close();
     end;
 
 
     procedure ExportToFile(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer)
     var
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
-        FileMgt: Codeunit "File Management";
         MemoryStream: DotNet NPRNetMemoryStream;
         Encoding: DotNet NPRNetEncoding;
         FileName: Variant;
@@ -79,7 +72,6 @@ codeunit 6014629 "NPR Managed Package Builder"
 
     procedure ExportToBlob(Name: Text; FileVersion: Text; Description: Text; PrimaryPackageTable: Integer; var TempBlobOut: Codeunit "Temp Blob")
     var
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
         OutStr: OutStream;
     begin
         TempBlobOut.CreateOutStream(OutStr, TEXTENCODING::UTF8);
@@ -99,10 +91,10 @@ codeunit 6014629 "NPR Managed Package Builder"
         ManagedDependencyMgt.AddToJObject(JObject, 'Description', Description);
         ManagedDependencyMgt.AddToJObject(JObject, 'Primary Package Table', PrimaryPackageTable);
 
-        GlobalTableListTmp.FindSet;
+        GlobalTableListTmp.FindSet();
         repeat
             JArray.Add(GlobalTableListTmp."Object ID");
-        until GlobalTableListTmp.Next = 0;
+        until GlobalTableListTmp.Next() = 0;
 
         JObject.Add('Packaged Tables', JArray);
         JObject.Add('Data', GlobalJArray);

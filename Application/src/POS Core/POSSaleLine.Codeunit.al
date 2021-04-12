@@ -1,4 +1,4 @@
-codeunit 6150706 "NPR POS Sale Line"
+﻿codeunit 6150706 "NPR POS Sale Line"
 {
     trigger OnRun()
     begin
@@ -11,7 +11,6 @@ codeunit 6150706 "NPR POS Sale Line"
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         FrontEnd: Codeunit "NPR POS Front End Management";
-        QTY_CHANGE_NOT_ALLOWED: Label 'When type of sales is %1, quantity must be 1 or -1.';
         ITEM_REQUIRES_VARIANT: Label 'Variant is required for item %1.';
         TEXTDEPOSIT: Label 'Deposit';
         InsertLineWithAutoSplitKey: Boolean;
@@ -29,18 +28,15 @@ codeunit 6150706 "NPR POS Sale Line"
     procedure Init(RegisterNo: Code[20]; SalesTicketNo: Code[20]; SaleIn: Codeunit "NPR POS Sale"; SetupIn: Codeunit "NPR POS Setup"; FrontEndIn: Codeunit "NPR POS Front End Management")
     var
         POSViewProfile: Record "NPR POS View Profile";
-        POSUnit: Record "NPR POS Unit";
     begin
         Clear(Rec);
         Clear(Sale);
 
-        with Rec do begin
-            FilterGroup(2);
-            SetRange("Register No.", RegisterNo);
-            SetRange("Sales Ticket No.", SalesTicketNo);
-            SetFilter(Type, '<>%1', Type::Payment);
-            FilterGroup(0);
-        end;
+        Rec.FilterGroup(2);
+        Rec.SetRange("Register No.", RegisterNo);
+        Rec.SetRange("Sales Ticket No.", SalesTicketNo);
+        Rec.SetFilter(Type, '<>%1', Rec.Type::Payment);
+        Rec.FilterGroup(0);
 
         Sale.Get(RegisterNo, SalesTicketNo);
 
@@ -98,13 +94,13 @@ codeunit 6150706 "NPR POS Sale Line"
 
                 Error(AUTOSPLIT_ERROR, NextLineNo);
             end;
-            SaleLinePOS.Reset;
+            SaleLinePOS.Reset();
         end;
 
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
-        if SaleLinePOS.FindLast then;
+        if SaleLinePOS.FindLast() then;
 
         NextLineNo := SaleLinePOS."Line No." + 10000;
         exit(NextLineNo);
@@ -165,82 +161,80 @@ codeunit 6150706 "NPR POS Sale Line"
         ItemVariant: Record "Item Variant";
         PrefilledUnitPrice: Decimal;
     begin
-        with Rec do begin
-            if UsePresetLineNo then
-                "Line No." := Line."Line No.";
+        if UsePresetLineNo then
+            Rec."Line No." := Line."Line No.";
 
-            InitLine();
+        InitLine();
 
-            // TODO: copy information from Line to Rec
-            Type := Line.Type;
-            "Sale Type" := Line."Sale Type";
+        // TODO: copy information from Line to Rec
+        Rec.Type := Line.Type;
+        Rec."Sale Type" := Line."Sale Type";
 
-            Silent := (Line."Variant Code" <> '');
+        Rec.Silent := (Line."Variant Code" <> '');
 
-            if ((Line.Type = Line.Type::Item) and (not Silent) and (ItemVariantIsRequired(Line."No."))) then begin
-                FillVariantThroughLookUp(Line."No.", Line."Variant Code");
-                if Line."Variant Code" = '' then
-                    Error(ITEM_REQUIRES_VARIANT, Line."No.");
-                Silent := (Line."Variant Code" <> '');
-            end;
-
-            "Variant Code" := Line."Variant Code";
-            Validate("No.", Line."No.");
-            if Line."Unit of Measure Code" <> '' then
-                Validate("Unit of Measure Code", Line."Unit of Measure Code");
-
-            Silent := false;
-
-            if Line.Description <> '' then
-                Description := Line.Description;
-
-            Validate(Quantity, Line.Quantity);
-
-            "Customer No. Line" := Line."Customer No. Line";
-            Validate("NPRE Seating Code", Line."NPRE Seating Code");
-
-            if ("Sale Type" = "Sale Type"::"Out payment") then begin
-                "Unit Price" := Line."Unit Price";
-                Amount := Line.Amount;
-                "Amount Including VAT" := Line."Amount Including VAT";
-            end;
-
-            if Line."Serial No." <> '' then begin //Because existing validation code cant handle blank serial number
-                Validate("Serial No.", Line."Serial No.");
-            end else begin
-                "Serial No." := Line."Serial No.";
-            end;
-            Validate("Serial No. not Created", Line."Serial No. not Created");
-
-            if IncludeDiscountFields then begin
-                Validate("Discount Type", Line."Discount Type");
-                Validate("Discount Code", Line."Discount Code");
-
-                Validate("Allow Line Discount", Line."Allow Line Discount");
-                if not "Allow Line Discount" then
-                    Validate("Discount %", 0)
-                else
-                    if Line."Discount %" > 0 then
-                        Validate("Discount %", Line."Discount %");
-
-                Validate("Allow Invoice Discount", Line."Allow Invoice Discount");
-                Validate("Invoice Discount Amount", Line."Invoice Discount Amount");
-            end;
-
-            if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
-                ConvertPriceToVAT(Line."Price Includes VAT", Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group", Rec, Line."Unit Price")
-            else
-                if (Type = Type::Item) and ("No." <> '') and (Line."Unit Price" <> 0) then begin
-                    Item.Get("No.");
-                    if Item."Price Includes VAT" then begin
-                        Item.TestField("VAT Bus. Posting Gr. (Price)");
-                        Item.TestField("VAT Prod. Posting Group");
-                    end;
-                    ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", Rec, Line."Unit Price");
-                end;
-            if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" then
-                Validate("Unit Price", Line."Unit Price");
+        if ((Line.Type = Line.Type::Item) and (not Rec.Silent) and (ItemVariantIsRequired(Line."No."))) then begin
+            FillVariantThroughLookUp(Line."No.", Line."Variant Code");
+            if Line."Variant Code" = '' then
+                Error(ITEM_REQUIRES_VARIANT, Line."No.");
+            Rec.Silent := (Line."Variant Code" <> '');
         end;
+
+        Rec."Variant Code" := Line."Variant Code";
+        Rec.Validate("No.", Line."No.");
+        if Line."Unit of Measure Code" <> '' then
+            Rec.Validate("Unit of Measure Code", Line."Unit of Measure Code");
+
+        Rec.Silent := false;
+
+        if Line.Description <> '' then
+            Rec.Description := Line.Description;
+
+        Rec.Validate(Quantity, Line.Quantity);
+
+        Rec."Customer No. Line" := Line."Customer No. Line";
+        Rec.Validate("NPRE Seating Code", Line."NPRE Seating Code");
+
+        if (Rec."Sale Type" = Rec."Sale Type"::"Out payment") then begin
+            Rec."Unit Price" := Line."Unit Price";
+            Rec.Amount := Line.Amount;
+            Rec."Amount Including VAT" := Line."Amount Including VAT";
+        end;
+
+        if Line."Serial No." <> '' then begin //Because existing validation code cant handle blank serial number
+            Rec.Validate("Serial No.", Line."Serial No.");
+        end else begin
+            Rec."Serial No." := Line."Serial No.";
+        end;
+        Rec.Validate("Serial No. not Created", Line."Serial No. not Created");
+
+        if IncludeDiscountFields then begin
+            Rec.Validate("Discount Type", Line."Discount Type");
+            Rec.Validate("Discount Code", Line."Discount Code");
+
+            Rec.Validate("Allow Line Discount", Line."Allow Line Discount");
+            if not Rec."Allow Line Discount" then
+                Rec.Validate("Discount %", 0)
+            else
+                if Line."Discount %" > 0 then
+                    Rec.Validate("Discount %", Line."Discount %");
+
+            Rec.Validate("Allow Invoice Discount", Line."Allow Invoice Discount");
+            Rec.Validate("Invoice Discount Amount", Line."Invoice Discount Amount");
+        end;
+
+        if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
+            ConvertPriceToVAT(Line."Price Includes VAT", Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group", Rec, Line."Unit Price")
+        else
+            if (Rec.Type = Rec.Type::Item) and (Rec."No." <> '') and (Line."Unit Price" <> 0) then begin
+                Item.Get(Rec."No.");
+                if Item."Price Includes VAT" then begin
+                    Item.TestField("VAT Bus. Posting Gr. (Price)");
+                    Item.TestField("VAT Prod. Posting Group");
+                end;
+                ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", Rec, Line."Unit Price");
+            end;
+        if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" then
+            Rec.Validate("Unit Price", Line."Unit Price");
 
         Return := InsertLineInternal(Rec, true);
         Line := Rec;
@@ -250,22 +244,19 @@ codeunit 6150706 "NPR POS Sale Line"
     var
         xRec: Record "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-        RecalcSaleLinePOS: Record "NPR POS Sale Line";
     begin
         if (not RefreshCurrent()) then
             exit;
 
         OnBeforeDeletePOSSaleLine(Rec);
         xRec := Rec;
-        with Rec do begin
-            Delete(true);
+        Rec.Delete(true);
 
-            POSSalesDiscountCalcMgt.OnAfterDeleteSaleLinePOS(xRec);
+        POSSalesDiscountCalcMgt.OnAfterDeleteSaleLinePOS(xRec);
 
-            if (Find('><')) then begin
-                UpdateAmounts(Rec);
-                Modify();
-            end;
+        if (Rec.Find('><')) then begin
+            Rec.UpdateAmounts(Rec);
+            Rec.Modify();
         end;
         OnAfterDeletePOSSaleLine(xRec);
 
@@ -282,7 +273,7 @@ codeunit 6150706 "NPR POS Sale Line"
                 xRec := Rec;
                 Rec.Delete(true);
                 OnAfterDeletePOSSaleLine(xRec);
-            until Rec.Next = 0;
+            until Rec.Next() = 0;
 
         POSSale.RefreshCurrent();
     end;
@@ -295,7 +286,7 @@ codeunit 6150706 "NPR POS Sale Line"
     procedure IsEmpty(): Boolean
     begin
         CheckInit(true);
-        exit(Rec.IsEmpty);
+        exit(Rec.IsEmpty());
     end;
 
     procedure SetQuantity(Quantity: Decimal)
@@ -349,26 +340,24 @@ codeunit 6150706 "NPR POS Sale Line"
 
         ItemCountWhenCalculatedBalance := 0;
 
-        with Rec do begin
-            if ("Register No." <> '') and ("Sales Ticket No." <> '') then begin
-                SaleLine.SetRange("Register No.", "Register No.");
-                SaleLine.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                SaleLine.SetFilter(Type, '<>%1', Type::Comment);
-                if SaleLine.FindSet then begin
-                    repeat
-                        ItemCountWhenCalculatedBalance += SaleLine.Quantity;
-                        if SaleLine."Sale Type" in [SaleLine."Sale Type"::Sale, SaleLine."Sale Type"::Deposit] then begin
-                            AmountExclVAT += SaleLine.Amount;
-                            TotalAmount += SaleLine."Amount Including VAT";
-                        end else
-                            if SaleLine."Sale Type" = SaleLine."Sale Type"::"Out payment" then
-                                if SaleLine."Discount Type" <> SaleLine."Discount Type"::Rounding then begin
-                                    OutPaymentAmount += SaleLine."Amount Including VAT";
-                                end;
-                    until SaleLine.Next = 0;
-                    VATAmount := TotalAmount - AmountExclVAT;
-                    TotalAmount -= OutPaymentAmount;
-                end;
+        if (Rec."Register No." <> '') and (Rec."Sales Ticket No." <> '') then begin
+            SaleLine.SetRange("Register No.", Rec."Register No.");
+            SaleLine.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+            SaleLine.SetFilter(Type, '<>%1', Rec.Type::Comment);
+            if SaleLine.FindSet() then begin
+                repeat
+                    ItemCountWhenCalculatedBalance += SaleLine.Quantity;
+                    if SaleLine."Sale Type" in [SaleLine."Sale Type"::Sale, SaleLine."Sale Type"::Deposit] then begin
+                        AmountExclVAT += SaleLine.Amount;
+                        TotalAmount += SaleLine."Amount Including VAT";
+                    end else
+                        if SaleLine."Sale Type" = SaleLine."Sale Type"::"Out payment" then
+                            if SaleLine."Discount Type" <> SaleLine."Discount Type"::Rounding then begin
+                                OutPaymentAmount += SaleLine."Amount Including VAT";
+                            end;
+                until SaleLine.Next() = 0;
+                VATAmount := TotalAmount - AmountExclVAT;
+                TotalAmount -= OutPaymentAmount;
             end;
         end;
     end;
@@ -395,34 +384,30 @@ codeunit 6150706 "NPR POS Sale Line"
 
     local procedure SetDepositLineType(var LinePOS: Record "NPR POS Sale Line")
     begin
-        with LinePOS do begin
-            "Register No." := Sale."Register No.";
-            "Sales Ticket No." := Sale."Sales Ticket No.";
-            Date := Sale.Date;
-            "Sale Type" := "Sale Type"::Deposit;
-            Quantity := 1;
-        end;
+        LinePOS."Register No." := Sale."Register No.";
+        LinePOS."Sales Ticket No." := Sale."Sales Ticket No.";
+        LinePOS.Date := Sale.Date;
+        LinePOS."Sale Type" := LinePOS."Sale Type"::Deposit;
+        LinePOS.Quantity := 1;
     end;
 
     procedure InsertDepositLine(var Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
-        with Rec do begin
-            InitLine();
+        InitLine();
 
-            SetDepositLineType(Rec);
+        SetDepositLineType(Rec);
 
-            Rec.Type := Line.Type;
-            Rec."No." := Line."No.";
-            Rec.Description := Line.Description;
-            Rec.Quantity := Line.Quantity;
-            Rec.Amount := Line.Amount;
-            Rec."Unit Price" := Line."Unit Price";
-            Rec."Amount Including VAT" := Line."Amount Including VAT";
-            Rec.UpdateAmounts(Rec);
+        Rec.Type := Line.Type;
+        Rec."No." := Line."No.";
+        Rec.Description := Line.Description;
+        Rec.Quantity := Line.Quantity;
+        Rec.Amount := Line.Amount;
+        Rec."Unit Price" := Line."Unit Price";
+        Rec."Amount Including VAT" := Line."Amount Including VAT";
+        Rec.UpdateAmounts(Rec);
 
-            if Rec.Description = '' then
-                Rec.Description := TEXTDEPOSIT;
-        end;
+        if Rec.Description = '' then
+            Rec.Description := TEXTDEPOSIT;
 
         Return := InsertLineInternal(Rec, true);
         Line := Rec;
@@ -464,7 +449,7 @@ codeunit 6150706 "NPR POS Sale Line"
         ItemVariants.Editable(false);
         ItemVariants.LookupMode(true);
         ItemVariants.SetTableView(ItemVariant);
-        if ItemVariants.RunModal = ACTION::LookupOK then begin
+        if ItemVariants.RunModal() = ACTION::LookupOK then begin
             ItemVariants.GetRecord(ItemVariant);
             VariantCode := ItemVariant.Code;
         end else begin
@@ -483,7 +468,7 @@ codeunit 6150706 "NPR POS Sale Line"
         ItemVariant.SetFilter(ItemVariant."Item No.", Item."No.");
         ItemVariant.SetFilter(ItemVariant."NPR Blocked", '=%1', false);
 
-        IsRequired := not ItemVariant.IsEmpty;
+        IsRequired := not ItemVariant.IsEmpty();
     end;
 
     procedure InsertLineRaw(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean): Boolean
@@ -580,12 +565,12 @@ codeunit 6150706 "NPR POS Sale Line"
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", OnBeforeInsertSaleLineCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
-        if not POSSalesWorkflowStep.FindSet then
+        if not POSSalesWorkflowStep.FindSet() then
             exit;
 
         repeat
             OnBeforeInsertSaleLine(POSSalesWorkflowStep, SaleLinePOS);
-        until POSSalesWorkflowStep.Next = 0;
+        until POSSalesWorkflowStep.Next() = 0;
     end;
 
     procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
@@ -600,12 +585,12 @@ codeunit 6150706 "NPR POS Sale Line"
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", OnAfterInsertSaleLineCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
-        if not POSSalesWorkflowStep.FindSet then
+        if not POSSalesWorkflowStep.FindSet() then
             exit;
 
         repeat
             OnAfterInsertSaleLine(POSSalesWorkflowStep, SaleLinePOS);
-        until POSSalesWorkflowStep.Next = 0;
+        until POSSalesWorkflowStep.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

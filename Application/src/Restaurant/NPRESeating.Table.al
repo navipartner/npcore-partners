@@ -157,6 +157,6 @@ table 6150665 "NPR NPRE Seating"
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR NPRE Seating", Code, FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 }

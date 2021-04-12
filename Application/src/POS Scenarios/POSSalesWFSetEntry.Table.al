@@ -23,14 +23,14 @@ table 6150732 "NPR POS Sales WF Set Entry"
         }
         field(10; "Workflow Description"; Text[100])
         {
-            CalcFormula = Lookup ("NPR POS Sales Workflow".Description WHERE(Code = FIELD("Workflow Code")));
+            CalcFormula = Lookup("NPR POS Sales Workflow".Description WHERE(Code = FIELD("Workflow Code")));
             Caption = 'Workflow Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(100; "Workflow Steps"; Integer)
         {
-            CalcFormula = Count ("NPR POS Sales Workflow Step" WHERE("Set Code" = FIELD("Set Code"),
+            CalcFormula = Count("NPR POS Sales Workflow Step" WHERE("Set Code" = FIELD("Set Code"),
                                                                  "Workflow Code" = FIELD("Workflow Code")));
             Caption = 'Workflow Steps';
             Description = 'NPR5.45';
@@ -56,8 +56,8 @@ table 6150732 "NPR POS Sales WF Set Entry"
     begin
         POSSalesWorkflowStep.SetRange("Set Code", "Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", "Workflow Code");
-        if POSSalesWorkflowStep.FindFirst then
-            POSSalesWorkflowStep.DeleteAll;
+        if POSSalesWorkflowStep.FindFirst() then
+            POSSalesWorkflowStep.DeleteAll();
     end;
 
     trigger OnRename()

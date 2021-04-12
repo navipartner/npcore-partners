@@ -14,7 +14,7 @@ page 6014522 "NPR Stores WP"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
@@ -22,10 +22,10 @@ page 6014522 "NPR Stores WP"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInMagStore(ExistingMagStores, Code);
+                        CheckIfNoAvailableInMagStore(ExistingMagStores, Rec.Code);
                     end;
                 }
-                field("Website Code"; "Website Code")
+                field("Website Code"; Rec."Website Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Website Code field';
@@ -38,22 +38,22 @@ page 6014522 "NPR Stores WP"
 
                         MagentoWebsites.SetRec(TempAllMagentoWebsite);
 
-                        IF "Website Code" <> '' then
-                            if TempAllMagentoWebsite.Get("Website Code") then
+                        IF Rec."Website Code" <> '' then
+                            if TempAllMagentoWebsite.Get(Rec."Website Code") then
                                 MagentoWebsites.SetRecord(TempAllMagentoWebsite);
 
                         if MagentoWebsites.RunModal() = Action::LookupOK then begin
                             MagentoWebsites.GetRecord(TempAllMagentoWebsite);
-                            "Website Code" := TempAllMagentoWebsite.Code;
+                            Rec."Website Code" := TempAllMagentoWebsite.Code;
                         end;
                     end;
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Language Code"; "Language Code")
+                field("Language Code"; Rec."Language Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Language Code field';
@@ -64,13 +64,13 @@ page 6014522 "NPR Stores WP"
                     begin
                         Languages.LookupMode := true;
 
-                        IF "Language Code" <> '' then
-                            if Language.Get("Language Code") then
+                        IF Rec."Language Code" <> '' then
+                            if Language.Get(Rec."Language Code") then
                                 Languages.SetRecord(Language);
 
                         if Languages.RunModal() = Action::LookupOK then begin
                             Languages.GetRecord(Language);
-                            "Language Code" := Language.Code;
+                            Rec."Language Code" := Language.Code;
                         end;
                     end;
                 }

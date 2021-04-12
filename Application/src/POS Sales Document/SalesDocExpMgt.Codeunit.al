@@ -1,4 +1,4 @@
-codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
+﻿codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 {
     Permissions = TableData "NPR POS Entry" = rimd;
 
@@ -171,20 +171,15 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
     procedure ProcessPOSSale(var SalePOS: Record "NPR POS Sale")
     var
-        SalesHeaderQoute: Record "Sales Header";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesPost: Codeunit "Sales-Post";
         SalesPostYesNo: Codeunit "Sales-Post (Yes/No)";
-        SalesPostAndPrint: Codeunit "Sales-Post + Print";
-        SalesPostAndPdf2Nav: Codeunit "NPR Sales-Post and Pdf2Nav";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         Posted: Boolean;
         POSCreateEntry: Codeunit "NPR POS Create Entry";
-        Success: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
-        POSEntry: Record "NPR POS Entry";
         Post: Boolean;
     begin
         CreateSalesHeader(SalePOS, SalesHeader);
@@ -198,7 +193,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.ModifyAll(Silent, true);
 
-        if SaleLinePOS.FindSet then begin
+        if SaleLinePOS.FindSet() then begin
             CopySaleCommentLines(SalePOS, SalesHeader);
             CopySalesLines(SaleLinePOS, SalesHeader);
         end;
@@ -207,11 +202,11 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             ReserveSalesLines(SalesHeader, true);
         end;
 
-        Commit;
+        Commit();
 
         if OpenSalesDocAfterExport then begin
             OpenSalesDocCardAndSyncChangesBackToPOSSale(SalesHeader, SalePOS);
-            Commit;
+            Commit();
         end;
 
         CreatedSalesHeader := SalesHeader;
@@ -231,10 +226,10 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             SendICOrderConfirmation(SalesHeader);
 
         POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
-        SaleLinePOS.DeleteAll;
-        SalePOS.Delete;
+        SaleLinePOS.DeleteAll();
+        SalePOS.Delete();
 
-        Commit;
+        Commit();
 
         if Post and Posted then begin
             if Print then begin
@@ -266,7 +261,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         TicketManagement.PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
 
-        Commit;
+        Commit();
 
         PrintRetailReceipt(SalePOS);
 
@@ -274,7 +269,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
 
-        Commit;
+        Commit();
     end;
 
     procedure CreateSalesHeader(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
@@ -282,10 +277,10 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Customer: Record Customer;
         GLSetup: Record "General Ledger Setup";
     begin
-        SalesHeader.Init;
+        SalesHeader.Init();
         SalesHeader."Document Type" := DocumentType;
-        SalesHeader."Document Date" := WorkDate;
-        SalesHeader."Posting Date" := Today;
+        SalesHeader."Document Date" := WorkDate();
+        SalesHeader."Posting Date" := Today();
         SalesHeader."NPR Document Time" := Time;
         SalesHeader."Salesperson Code" := SalePOS."Salesperson Code";
         SalesHeader."Sell-to Customer No." := SalePOS."Customer No.";
@@ -297,7 +292,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalesHeader.Validate("Sell-to Customer No.");
         SalesHeader.Validate("Currency Code", '');
         if Customer.Get(SalesHeader."Bill-to Customer No.") then begin
-            GLSetup.Get;
+            GLSetup.Get();
             if Customer."Currency Code" = GLSetup."LCY Code" then
                 SalesHeader.Validate("Currency Code", Customer."Currency Code");
         end;
@@ -336,7 +331,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         TransferInfoFromSalePOS(SalePOS, SalesHeader);
 
-        SalesHeader.Modify;
+        SalesHeader.Modify();
     end;
 
     procedure CopySaleCommentLines(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
@@ -347,9 +342,9 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         RetailComment.SetRange("Table ID", DATABASE::"NPR POS Sale");
         RetailComment.SetRange("No.", SalePOS."Register No.");
         RetailComment.SetRange("No. 2", SalePOS."Sales Ticket No.");
-        if RetailComment.FindSet then
+        if RetailComment.FindSet() then
             repeat
-                SalesCommentLine.Init;
+                SalesCommentLine.Init();
                 SalesCommentLine."Document Type" := SalesHeader."Document Type";
                 SalesCommentLine."No." := SalesHeader."No.";
                 SalesCommentLine."Line No." := RetailComment."Line No.";
@@ -357,7 +352,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                 SalesCommentLine.Code := RetailComment.Code;
                 SalesCommentLine.Comment := RetailComment.Comment;
                 SalesCommentLine.Insert(true);
-            until RetailComment.Next = 0;
+            until RetailComment.Next() = 0;
     end;
 
     procedure CopySalesLines(var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header")
@@ -371,9 +366,9 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         ItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
     begin
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
-                SalesLine.Init;
+                SalesLine.Init();
 
                 TestSaleLinePOS(SaleLinePOS);
 
@@ -410,16 +405,16 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                         SalesLine.Validate("Line Discount %", SaleLinePOS."Discount %");
 
                     TransferInfoFromSaleLinePOS(SaleLinePOS, SalesLine);
-                    SalesLine.Modify;
+                    SalesLine.Modify();
                 end;
                 if SaleLinePOS."Serial No." <> '' then begin
                     ReservationEntry.SetCurrentKey("Entry No.", Positive);
                     ReservationEntry.SetRange(Positive, false);
                     if ReservationEntry.Find('+') then;
-                    ReservationEntry.Init;
+                    ReservationEntry.Init();
                     ReservationEntry."Entry No." += 1;
                     ReservationEntry.Positive := false;
-                    ReservationEntry."Creation Date" := Today;
+                    ReservationEntry."Creation Date" := Today();
                     ReservationEntry."Created By" := UserId;
                     ReservationEntry."Item No." := SaleLinePOS."No.";
                     ReservationEntry."Location Code" := SaleLinePOS."Location Code";
@@ -436,7 +431,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                     ReservationEntry.Quantity := -SalesLine.Quantity;
                     ReservationEntry."Qty. to Handle (Base)" := -SalesLine.Quantity;
                     ReservationEntry."Qty. to Invoice (Base)" := -SalesLine.Quantity;
-                    ReservationEntry.Insert;
+                    ReservationEntry.Insert();
                 end;
                 if Item.Get(SaleLinePOS."No.") then begin
                     if Item."Item Tracking Code" <> '' then begin
@@ -457,15 +452,15 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                 end;
                 NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
                 NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
-                if NpRvSalesLine.FindSet then
+                if NpRvSalesLine.FindSet() then
                     repeat
                         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
                         NpRvSalesLine."Document Type" := SalesLine."Document Type";
                         NpRvSalesLine."Document No." := SalesLine."Document No.";
                         NpRvSalesLine."Document Line No." := SalesLine."Line No.";
                         NpRvSalesLine.Modify(true);
-                    until NpRvSalesLine.Next = 0;
-            until SaleLinePOS.Next = 0;
+                    until NpRvSalesLine.Next() = 0;
+            until SaleLinePOS.Next() = 0;
     end;
 
     procedure TestSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line")
@@ -501,40 +496,40 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 if SaleLinePOS."Sales Document No." <> '' then begin
                     SalesDocNo := SaleLinePOS."Sales Document No.";
                     DocumentType := SaleLinePOS."Sales Document Type";
                 end;
-            until (SaleLinePOS.Next = 0) or (SalesDocNo <> '');
+            until (SaleLinePOS.Next() = 0) or (SalesDocNo <> '');
 
         if SalesDocNo <> '' then begin
             SalesHeader.Get(DocumentType, SalesDocNo);
 
             if DocumentType = DocumentType::Order then begin
                 SalesOrder.SetRecord(SalesHeader);
-                SalesOrder.RunModal;
+                SalesOrder.RunModal();
             end;
 
             if DocumentType = DocumentType::"Credit Memo" then begin
                 SalesCreditMemo.SetRecord(SalesHeader);
-                SalesCreditMemo.RunModal;
+                SalesCreditMemo.RunModal();
             end;
 
             if DocumentType = DocumentType::"Blanket Order" then begin
                 BlanketSalesOrder.SetRecord(SalesHeader);
-                BlanketSalesOrder.RunModal;
+                BlanketSalesOrder.RunModal();
             end;
 
             if DocumentType = DocumentType::"Return Order" then begin
                 SalesReturnOrder.SetRecord(SalesHeader);
-                SalesReturnOrder.RunModal;
+                SalesReturnOrder.RunModal();
             end;
 
             if DocumentType = DocumentType::Quote then begin
                 SalesQuote.SetRecord(SalesHeader);
-                SalesQuote.RunModal;
+                SalesQuote.RunModal();
             end;
         end;
     end;
@@ -546,10 +541,10 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 TestSaleLinePOS(SaleLinePOS);
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
     end;
 
     local procedure TransferInfoFromSalePOS(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
@@ -580,7 +575,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
             SaleLinePOS.SetRange(Date, SalePOS.Date);
             SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
-            if SaleLinePOS.FindFirst then
+            if SaleLinePOS.FindFirst() then
                 if POSPaymentMethod.Get(SaleLinePOS."No.") then
                     if POSPaymentMethod."Payment Method Code" <> '' then
                         SalesHeader.Validate("Payment Method Code", POSPaymentMethod."Payment Method Code");
@@ -633,13 +628,13 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         AllLinesReserved: Boolean;
         Item: Record Item;
     begin
-        SalesLine.Reset;
+        SalesLine.Reset();
         SalesLine.SetFilter("Document Type", '=%1', SalesHeader."Document Type");
         SalesLine.SetFilter("Document No.", '=%1', SalesHeader."No.");
         SalesLine.SetFilter(Type, '=%1', SalesLine.Type::Item);
         SalesLine.SetFilter(Reserve, '<>%1', SalesLine.Reserve::Never);
         AllLinesReserved := true;
-        if SalesLine.FindSet then begin
+        if SalesLine.FindSet() then begin
             repeat
                 if not ReserveSaleLine(SalesLine) then begin
                     AllLinesReserved := false;
@@ -717,16 +712,13 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     local procedure PrintRetailReceipt(SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
-        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        RecRef: RecordRef;
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
     begin
         if not RetailPrint then
             exit;
 
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        if not POSEntry.FindFirst then
+        if not POSEntry.FindFirst() then
             exit;
 
         ClearLastError;
@@ -745,10 +737,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     local procedure PostPrepaymentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
-        SalesLine: Record "Sales Line";
-        ReportSelections: Record "Report Selections";
-        RecordVariant: Variant;
-        SalesInvoiceHeader: Record "Sales Invoice Header";
         Print: Boolean;
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
         Send: Boolean;
@@ -778,7 +766,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS.Validate("Buffer Document No.", SalesHeader."Last Prepayment No.");
         SaleLinePOS.Modify(true);
 
-        Commit;
+        Commit();
 
         if Print then begin
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 1);
@@ -797,9 +785,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         DeleteAfter: Boolean;
-        ReportSelections: Record "Report Selections";
-        RecordVariant: Variant;
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         Print: Boolean;
         Send: Boolean;
         Pdf2Nav: Boolean;
@@ -827,7 +812,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         if DeleteAfter then
             SalesHeader.Delete(true);
 
-        Commit;
+        Commit();
 
         if Print then begin
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 2);
@@ -845,12 +830,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     local procedure PostDocumentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalesPost: Codeunit "Sales-Post";
-        ReportSelections: Record "Report Selections";
-        RecordVariant: Variant;
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        ReturnReceiptHeader: Record "Return Receipt Header";
-        SalesShipmentHeader: Record "Sales Shipment Header";
         Print: Boolean;
         Send: Boolean;
         Pdf2Nav: Boolean;
@@ -925,7 +904,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         end;
 
         SaleLinePOS.Modify(true);
-        Commit;
+        Commit();
 
         if Print then begin
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
@@ -1045,7 +1024,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Sales Document Sync. Posting", true);
         SaleLinePOS.SetFilter("Sales Document No.", '<>%1', '');
-        if not SaleLinePOS.FindSet then
+        if not SaleLinePOS.FindSet() then
             exit;
 
         repeat
@@ -1063,7 +1042,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                         PostDocumentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
                 end;
             end;
-        until SaleLinePOS.Next = 0;
+        until SaleLinePOS.Next() = 0;
 
         POSSaleLine.RefreshCurrent();
     end;
@@ -1074,7 +1053,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         ApplySalespersontoDocument: Codeunit "NPR Apply Salesperson to Doc.";
     begin
         SalesHeader2 := SalesHeader;
-        SalesHeader2.SetRecFilter;
+        SalesHeader2.SetRecFilter();
 
         ApplySalespersontoDocument.SetCode(SalePOS."Salesperson Code");
         BindSubscription(ApplySalespersontoDocument);
@@ -1084,7 +1063,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         if not SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then
             Error(ERR_DOC_MISSING, SalesHeader."Document Type", SalesHeader."No."); //If user deleted/posted etc.
 
-        Commit;
+        Commit();
         UpdateActiveSaleWithDocumentChanges(SalesHeader, SalePOS);
     end;
 
@@ -1191,14 +1170,14 @@ then
             POSSalesWorkflowStep.SetRange("Set Code", '');
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishCreditSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
-        if not POSSalesWorkflowStep.FindSet then
+        if not POSSalesWorkflowStep.FindSet() then
             exit;
 
         repeat
             Clear(CreditSalePostProcessing);
             CreditSalePostProcessing.SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStep);
             if CreditSalePostProcessing.Run(SalePOS) then;
-        until POSSalesWorkflowStep.Next = 0;
+        until POSSalesWorkflowStep.Next() = 0;
     end;
 
     [IntegrationEvent(true, false)]

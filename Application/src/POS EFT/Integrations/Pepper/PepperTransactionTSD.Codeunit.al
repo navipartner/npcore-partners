@@ -15,7 +15,6 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
         TransactionResponse: DotNet NPRNetTransactionResponse0;
         LastRestCode: Integer;
         TrxResult: DotNet NPRNetTrxResult0;
-        NEGATIVE_NOT_ALLOWED: Label 'Negative amount %1 is not allowed in a Pepper capture transaction.';
         Labels: DotNet NPRNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "NPR Pepper Term. Captions TSD";
         TrxIsAbandoned: Boolean;
@@ -228,8 +227,6 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
     end;
 
     procedure GetTrx_AuthorizationInfo(var ReferenceNumber: Text[12]; var TransactionDate: Text[8]; var TransactionTime: Text[6]; var AuthorizationNumber: Text[16]; var TerminalID: Text[30]; var ReceiptSignature: Option; var BookkeepingPeriod: Text[4])
-    var
-        tmpstr: Text;
     begin
 
         if (not InitializedResponse) then
@@ -336,11 +333,8 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
-        PaymentRequest: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         TrxParam: DotNet NPRNetTrxParam0;
-        PepperConfiguration: Record "NPR Pepper Config.";
-        PepperTerminal: Record "NPR Pepper Terminal";
     begin
 
         if (ActionName <> 'Pepper_EftTrx') then
@@ -358,21 +352,18 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
                         // TrxParam := TransactionResponse.TrxParam;
 
                         InitializedResponse := true;
-                        with EFTTransactionRequest do begin
 
-                            Get(TransactionResponse.RequestEntryNo);
-                            "Entry No." := 0;
-                            "Initiated from Entry No." := TransactionResponse.RequestEntryNo;
+                        EFTTransactionRequest.Get(TransactionResponse.RequestEntryNo);
+                        EFTTransactionRequest."Entry No." := 0;
+                        EFTTransactionRequest."Initiated from Entry No." := TransactionResponse.RequestEntryNo;
 
-                            "Pepper Trans. Subtype Code" := Format(TrxParam.TrxType);
-                            "Reference Number Input" := TrxParam.TrxRefNbrIn;
-                            "Amount Input" := TrxParam.OriginalDecimalAmount;
+                        EFTTransactionRequest."Pepper Trans. Subtype Code" := Format(TrxParam.TrxType);
+                        EFTTransactionRequest."Reference Number Input" := TrxParam.TrxRefNbrIn;
+                        EFTTransactionRequest."Amount Input" := TrxParam.OriginalDecimalAmount;
 
-                            TrxIsAbandoned := true;
-
-                        end;
+                        TrxIsAbandoned := true;
                         EFTTransactionRequest.Insert();
-                        Commit;
+                        Commit();
                         OnTransactionReponse(EFTTransactionRequest."Entry No.");
                     end;
                     ReturnData := '';

@@ -6,7 +6,6 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
     trigger OnRun()
     var
         XmlDoc: XmlDocument;
-        ImportType: Record "NPR Nc Import Type";
         FunctionName: Text[100];
     begin
 
@@ -52,16 +51,12 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
     begin
     end;
 
-    local procedure DecodeLoyaltyPointsQuery(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure DecodeLoyaltyPointsQuery(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipEntryNo: Integer;
         Membership: Record "NPR MM Membership";
-        MembershipRole: Record "NPR MM Membership Role";
-        Member: Record "NPR MM Member";
         NotFoundReason: Text;
-        IsValid: Boolean;
     begin
 
         MemberInfoCapture.Init();
@@ -120,7 +115,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         MemberInfoCapture.Insert
     end;
 
-    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]) FunctionName: Text[100]
+    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text[100]
     var
         ImportType: Record "NPR Nc Import Type";
     begin

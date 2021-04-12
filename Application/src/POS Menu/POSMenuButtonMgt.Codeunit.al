@@ -7,11 +7,11 @@ codeunit 6150644 "NPR POS Menu Button Mgt."
     begin
         POSMenuButton.SetRange("Action Type", POSMenuButton."Action Type"::Action);
         POSMenuButton.SetRange("Action Code", Action.Code);
-        if POSMenuButton.FindSet then
+        if POSMenuButton.FindSet() then
             repeat
                 if POSMenuButton.RefreshParametersRequired() then
                     POSMenuButton.RefreshParameters();
-            until POSMenuButton.Next = 0;
+            until POSMenuButton.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150701, 'OnAfterRenameEvent', '', false, false)]
@@ -24,13 +24,11 @@ codeunit 6150644 "NPR POS Menu Button Mgt."
         if not RunTrigger then
             exit;
 
-        with POSParameterValue do begin
-            SetRange("Record ID", xRec.RecordId);
-            if FindSet(true, true) then
-                repeat
-                    Rename("Table No.", Code, ID, Rec.RecordId, Name);
-                until POSParameterValue.Next = 0;
-        end;
+        POSParameterValue.SetRange("Record ID", xRec.RecordId);
+        if POSParameterValue.FindSet(true, true) then
+            repeat
+                POSParameterValue.Rename(POSParameterValue."Table No.", POSParameterValue.Code, POSParameterValue.ID, Rec.RecordId, POSParameterValue.Name);
+            until POSParameterValue.Next() = 0;
     end;
 }
 

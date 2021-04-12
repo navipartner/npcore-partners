@@ -31,17 +31,17 @@ table 6151104 "NPR NpRi Party Type"
                 NpRiSetupMgt: Codeunit "NPR NpRi Setup Mgt.";
             begin
                 NpRiSetupMgt.SetupPartyTypeTableNoLookup(TempTableMetadata);
-                if not TempTableMetadata.FindSet then
+                if not TempTableMetadata.FindSet() then
                     exit;
 
                 repeat
-                    TempAllObjWithCaption.Init;
+                    TempAllObjWithCaption.Init();
                     TempAllObjWithCaption."Object Type" := TempAllObjWithCaption."Object Type"::Table;
                     TempAllObjWithCaption."Object ID" := TempTableMetadata.ID;
                     TempAllObjWithCaption."Object Name" := TempTableMetadata.Name;
                     TempAllObjWithCaption."Object Caption" := TempTableMetadata.Caption;
-                    TempAllObjWithCaption.Insert;
-                until TempTableMetadata.Next = 0;
+                    TempAllObjWithCaption.Insert();
+                until TempTableMetadata.Next() = 0;
 
                 if TempAllObjWithCaption.Get(TempAllObjWithCaption."Object Type"::Table, "Table No.") then;
                 if PAGE.RunModal(PAGE::"Table Objects", TempAllObjWithCaption) <> ACTION::LookupOK then
@@ -95,7 +95,7 @@ table 6151104 "NPR NpRi Party Type"
         NpRiParty: Record "NPR NpRi Party";
     begin
         NpRiParty.SetRange("Party Type", Code);
-        if NpRiParty.FindFirst then
+        if NpRiParty.FindFirst() then
             Error(Text001, NpRiParty."No.");
     end;
 

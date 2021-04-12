@@ -1,4 +1,4 @@
-codeunit 6060105 "NPR POS Input Box Setup Mgt."
+﻿codeunit 6060105 "NPR POS Input Box Setup Mgt."
 {
 
 
@@ -23,7 +23,7 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
         EanBoxSetup: Record "NPR Ean Box Setup";
     begin
         if not EanBoxSetup.Get(DefaultSalesSetupCode()) then begin
-            EanBoxSetup.Init;
+            EanBoxSetup.Init();
             EanBoxSetup.Code := DefaultSalesSetupCode;
             EanBoxSetup.Description := Text000;
             EanBoxSetup."POS View" := EanBoxSetup."POS View"::Sale;
@@ -44,7 +44,7 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
         if not EanBoxEvent.Get(EventCode) then
             exit;
 
-        EanBoxSetupEvent.Init;
+        EanBoxSetupEvent.Init();
         EanBoxSetupEvent.Validate("Setup Code", EanBoxSetup.Code);
         EanBoxSetupEvent.Validate("Event Code", EventCode);
         EanBoxSetupEvent.Enabled := true;
@@ -73,35 +73,35 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
         POSActionParameter.SetRange("POS Action Code", EanBoxEvent."Action Code");
         if POSActionParameter.IsEmpty or (EanBoxEvent."Action Code" = '') then begin
             EanBoxParameter.SetRange("Event Code", EanBoxEvent.Code);
-            if EanBoxParameter.FindFirst then
-                EanBoxParameter.DeleteAll;
+            if EanBoxParameter.FindFirst() then
+                EanBoxParameter.DeleteAll();
 
             exit;
         end;
 
-        EanBoxParameter.Reset;
+        EanBoxParameter.Reset();
         EanBoxParameter.SetRange("Event Code", EanBoxEvent.Code);
-        if EanBoxParameter.FindSet then
+        if EanBoxParameter.FindSet() then
             repeat
                 EanBoxParameter.Mark(true);
-            until EanBoxParameter.Next = 0;
+            until EanBoxParameter.Next() = 0;
 
-        POSActionParameter.FindSet;
+        POSActionParameter.FindSet();
         repeat
             EanBoxSetupEvent."Setup Code" := '';
             EanBoxSetupEvent."Event Code" := EanBoxEvent.Code;
             InitEanBoxSetupEventParameter(EanBoxSetupEvent, POSActionParameter, EanBoxParameter);
 
             EanBoxSetupEvent.SetRange("Event Code", EanBoxEvent.Code);
-            if EanBoxSetupEvent.FindSet then
+            if EanBoxSetupEvent.FindSet() then
                 repeat
                     InitEanBoxSetupEventParameter(EanBoxSetupEvent, POSActionParameter, EanBoxParameter);
-                until EanBoxSetupEvent.Next = 0;
-        until POSActionParameter.Next = 0;
+                until EanBoxSetupEvent.Next() = 0;
+        until POSActionParameter.Next() = 0;
 
         EanBoxParameter.MarkedOnly(true);
-        if EanBoxParameter.FindFirst then
-            EanBoxParameter.DeleteAll;
+        if EanBoxParameter.FindFirst() then
+            EanBoxParameter.DeleteAll();
 
         OnInitEanBoxParameters(EanBoxEvent);
     end;
@@ -134,28 +134,28 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
         if POSActionParameter.IsEmpty or (EanBoxSetupEvent."Action Code" = '') or not EanBoxEvent.Get(EanBoxSetupEvent."Event Code") then begin
             EanBoxParameter.SetRange("Setup Code", EanBoxSetupEvent."Setup Code");
             EanBoxParameter.SetRange("Event Code", EanBoxSetupEvent."Event Code");
-            if EanBoxParameter.FindFirst then
-                EanBoxParameter.DeleteAll;
+            if EanBoxParameter.FindFirst() then
+                EanBoxParameter.DeleteAll();
 
             exit;
         end;
 
-        EanBoxParameter.Reset;
+        EanBoxParameter.Reset();
         EanBoxParameter.SetRange("Setup Code", EanBoxSetupEvent."Setup Code");
         EanBoxParameter.SetRange("Event Code", EanBoxSetupEvent."Event Code");
-        if EanBoxParameter.FindSet then
+        if EanBoxParameter.FindSet() then
             repeat
                 EanBoxParameter.Mark(true);
-            until EanBoxParameter.Next = 0;
+            until EanBoxParameter.Next() = 0;
 
-        POSActionParameter.FindSet;
+        POSActionParameter.FindSet();
         repeat
             InitEanBoxSetupEventParameter(EanBoxSetupEvent, POSActionParameter, EanBoxParameter);
-        until POSActionParameter.Next = 0;
+        until POSActionParameter.Next() = 0;
 
         EanBoxParameter.MarkedOnly(true);
-        if EanBoxParameter.FindFirst then
-            EanBoxParameter.DeleteAll;
+        if EanBoxParameter.FindFirst() then
+            EanBoxParameter.DeleteAll();
 
         OnInitEanBoxParameters(EanBoxEvent);
     end;
@@ -178,7 +178,7 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
                 EanBoxParameter.Modify(true);
             end;
         end else begin
-            EanBoxParameter.Init;
+            EanBoxParameter.Init();
             EanBoxParameter."Setup Code" := EanBoxSetupEvent."Setup Code";
             EanBoxParameter."Event Code" := EanBoxSetupEvent."Event Code";
             EanBoxParameter."Action Code" := POSActionParameter."POS Action Code";
@@ -207,7 +207,7 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
 
         EanBoxParameter.SetRange("Event Code", EanBoxEvent.Code);
         EanBoxParameter.SetRange(Name, Name);
-        if not EanBoxParameter.FindSet then
+        if not EanBoxParameter.FindSet() then
             exit;
 
         repeat
@@ -219,7 +219,7 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
 
             if PrevRec <> Format(EanBoxParameter) then
                 EanBoxParameter.Modify(true);
-        until EanBoxParameter.Next = 0;
+        until EanBoxParameter.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnAfterActionUpdated', '', true, true)]
@@ -231,10 +231,10 @@ codeunit 6060105 "NPR POS Input Box Setup Mgt."
         if EanBoxEvent.IsEmpty then
             exit;
 
-        EanBoxEvent.FindSet;
+        EanBoxEvent.FindSet();
         repeat
             InitEanBoxEventParameters(EanBoxEvent);
-        until EanBoxEvent.Next = 0;
+        until EanBoxEvent.Next() = 0;
     end;
 
     local procedure "--- Aux"()

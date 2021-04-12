@@ -10,14 +10,14 @@ codeunit 6014428 "NPR POS After Sale Execution"
             OnRunType::RunAfterEndSale:
                 begin
                     PosSaleCodeunit.InvokeOnFinishSaleWorkflow(Rec);
-                    Commit;
+                    Commit();
                     PosSaleCodeunit.OnAfterEndSale(OnRunXRec);
-                    Commit;
+                    Commit();
                 end;
             OnRunType::OnFinishSale:
                 begin
                     PosSaleCodeunit.OnFinishSale(OnRunPOSSalesWorkflowStep, Rec);
-                    Commit;
+                    Commit();
                 end;
         end;
     end;

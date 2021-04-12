@@ -73,7 +73,7 @@ page 6150696 "NPR NPRE Kitchen Order Card"
                 Caption = 'Show Requests';
                 Image = ExpandDepositLine;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Kitchen Req.";

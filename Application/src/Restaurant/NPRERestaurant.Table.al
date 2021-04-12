@@ -87,6 +87,6 @@ table 6150681 "NPR NPRE Restaurant"
         Clear(KitchenRequests);
         KitchenRequests.SetViewMode(0);
         KitchenRequests.SetTableView(KitchenRequest);
-        KitchenRequests.Run;
+        KitchenRequests.Run();
     end;
 }

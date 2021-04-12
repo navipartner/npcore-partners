@@ -16,7 +16,6 @@ codeunit 6150718 "NPR POS Unit Identity"
     [EventSubscriber(ObjectType::Codeunit, 6150700, 'OnFrontEndId', '', false, false)]
     local procedure OnFrontEndId(HardwareId: Text; SessionName: Text; HostName: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        DeviceEntryNo: Integer;
         POSSetup: Codeunit "NPR POS Setup";
         POSUnitIdentity: Record "NPR POS Unit Identity";
     begin
@@ -168,7 +167,7 @@ codeunit 6150718 "NPR POS Unit Identity"
         POSUnitIdentity.Get(UnitIdentityEntryNo);
 
         if (Confirm(NewDevice, true)) then begin
-            Commit;
+            Commit();
             POSUnitIdentityCard.SetRecord(POSUnitIdentity);
             POSUnitIdentityCard.RunModal();
             POSUnitIdentityCard.GetRecord(POSUnitIdentity);
@@ -201,7 +200,7 @@ codeunit 6150718 "NPR POS Unit Identity"
         if (POSUnitIdentity.FindFirst()) then begin
             POSUnitIdentity."Default POS Unit No." := PosUnitNo;
             POSUnitIdentity.Modify();
-            Commit;
+            Commit();
         end;
 
 

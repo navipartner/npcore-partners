@@ -1,4 +1,4 @@
-﻿codeunit 6014409 "NPR Distribution Map Ev. Su."
+codeunit 6014409 "NPR Distribution Map Ev. Su."
 {
     #region Purchase Line
 

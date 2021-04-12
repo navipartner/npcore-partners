@@ -11,8 +11,6 @@ codeunit 6150843 "NPR POS Action: Item Prompt"
 
     var
         ActionDescription: Label 'This action prompts for a numeric item number';
-        ValueSelection: Option LIST,"FIXED";
-        DimensionSource: Option SHORTCUT1,SHORTCUT2,ANY;
         Title: Label 'We need more information.';
         Caption: Label 'Item Number';
 
@@ -47,8 +45,8 @@ codeunit 6150843 "NPR POS Action: Item Prompt"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'Title', Title);
-        Captions.AddActionCaption(ActionCode, 'Caption', Caption);
+        Captions.AddActionCaption(ActionCode(), 'Title', Title);
+        Captions.AddActionCaption(ActionCode(), 'Caption', Caption);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -65,7 +63,7 @@ codeunit 6150843 "NPR POS Action: Item Prompt"
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         //-NPR5.40 [306347]
-        //POSAction.GET ('ITEM');
+        //POSAction.Get() ('ITEM');
         if not POSSession.RetrieveSessionAction('ITEM', POSAction) then
             POSAction.Get('ITEM');
         //+NPR5.40 [306347]

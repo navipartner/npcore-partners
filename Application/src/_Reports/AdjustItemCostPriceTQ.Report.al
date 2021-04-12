@@ -1,8 +1,8 @@
 report 6059904 "NPR Adjust Item Cost/Price TQ"
 {
     Caption = 'Adjust Item Costs/Prices';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
 
     dataset
@@ -67,7 +67,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                     Selection::"Standard Cost":
                         Validate("Standard Cost", NewFieldValue);
                 end;
-                Modify;
+                Modify();
             end;
 
             trigger OnPreDataItem()
@@ -119,7 +119,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                     Selection::"Standard Cost":
                         Validate("Standard Cost", NewFieldValue);
                 end;
-                Modify;
+                Modify();
             end;
 
             trigger OnPreDataItem()

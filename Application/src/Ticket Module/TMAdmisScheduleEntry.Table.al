@@ -134,7 +134,7 @@ table 6060122 "NPR TM Admis. Schedule Entry"
         }
         field(100; "Open Reservations"; Decimal)
         {
-            CalcFormula = Sum ("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
+            CalcFormula = Sum("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
                                                                             Type = CONST(RESERVATION),
                                                                             Open = CONST(true),
                                                                             "Sales Channel No." = FIELD("Sales Channel Filter")));
@@ -144,7 +144,7 @@ table 6060122 "NPR TM Admis. Schedule Entry"
         }
         field(101; "Open Admitted"; Decimal)
         {
-            CalcFormula = Sum ("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
+            CalcFormula = Sum("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
                                                                             Type = CONST(ADMITTED),
                                                                             Open = CONST(true),
                                                                             "Sales Channel No." = FIELD("Sales Channel Filter")));
@@ -154,7 +154,7 @@ table 6060122 "NPR TM Admis. Schedule Entry"
         }
         field(102; Departed; Decimal)
         {
-            CalcFormula = Sum ("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
+            CalcFormula = Sum("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
                                                                             Type = CONST(DEPARTED),
                                                                             Open = CONST(false),
                                                                             "Sales Channel No." = FIELD("Sales Channel Filter")));
@@ -164,7 +164,7 @@ table 6060122 "NPR TM Admis. Schedule Entry"
         }
         field(103; "Initial Entry"; Decimal)
         {
-            CalcFormula = Sum ("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
+            CalcFormula = Sum("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
                                                                             Type = CONST(INITIAL_ENTRY),
                                                                             Open = CONST(false),
                                                                             "Sales Channel No." = FIELD("Sales Channel Filter")));
@@ -215,7 +215,7 @@ table 6060122 "NPR TM Admis. Schedule Entry"
         }
         field(210; "Waiting List Queue"; Integer)
         {
-            CalcFormula = Count ("NPR TM Ticket Wait. List" WHERE("External Schedule Entry No." = FIELD("External Schedule Entry No."),
+            CalcFormula = Count("NPR TM Ticket Wait. List" WHERE("External Schedule Entry No." = FIELD("External Schedule Entry No."),
                                                                 Status = CONST(ACTIVE)));
             Caption = 'Waiting List Queue';
             Editable = false;

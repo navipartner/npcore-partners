@@ -18,24 +18,24 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("No."; "No.")
+                    field("No."; Rec."No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the No. field';
                     }
-                    field("Coupon Type"; "Coupon Type")
+                    field("Coupon Type"; Rec."Coupon Type")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Coupon Type field';
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
                     }
-                    field("Discount Type"; "Discount Type")
+                    field("Discount Type"; Rec."Discount Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Discount Type field';
@@ -43,8 +43,8 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                     group(Control6014432)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 0);
-                        field("Discount Amount"; "Discount Amount")
+                        Visible = (Rec."Discount Type" = 0);
+                        field("Discount Amount"; Rec."Discount Amount")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
@@ -54,14 +54,14 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                     group(Control6014430)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 1);
-                        field("Discount %"; "Discount %")
+                        Visible = (Rec."Discount Type" = 1);
+                        field("Discount %"; Rec."Discount %")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the Discount % field';
                         }
-                        field("Max. Discount Amount"; "Max. Discount Amount")
+                        field("Max. Discount Amount"; Rec."Max. Discount Amount")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Max. Discount Amount per Sale';
@@ -71,12 +71,12 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014427)
                 {
                     ShowCaption = false;
-                    field(Open; Open)
+                    field(Open; Rec.Open)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Open field';
                     }
-                    field("Remaining Quantity"; "Remaining Quantity")
+                    field("Remaining Quantity"; Rec."Remaining Quantity")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Remaining Quantity field';
@@ -89,7 +89,7 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Issue Coupon Module"; "Issue Coupon Module")
+                    field("Issue Coupon Module"; Rec."Issue Coupon Module")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -99,18 +99,18 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014435)
                 {
                     ShowCaption = false;
-                    field("Reference No."; "Reference No.")
+                    field("Reference No."; Rec."Reference No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Reference No. field';
                     }
-                    field("Customer No."; "Customer No.")
+                    field("Customer No."; Rec."Customer No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer No. field';
                     }
-                    field("Print Template Code"; "Print Template Code")
+                    field("Print Template Code"; Rec."Print Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Template Code field';
@@ -123,7 +123,7 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014416)
                 {
                     ShowCaption = false;
-                    field("Validate Coupon Module"; "Validate Coupon Module")
+                    field("Validate Coupon Module"; Rec."Validate Coupon Module")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -133,12 +133,12 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014418)
                 {
                     ShowCaption = false;
-                    field("Starting Date"; "Starting Date")
+                    field("Starting Date"; Rec."Starting Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Starting Date field';
                     }
-                    field("Ending Date"; "Ending Date")
+                    field("Ending Date"; Rec."Ending Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Ending Date field';
@@ -151,7 +151,7 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014414)
                 {
                     ShowCaption = false;
-                    field("Apply Discount Module"; "Apply Discount Module")
+                    field("Apply Discount Module"; Rec."Apply Discount Module")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -161,7 +161,7 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Max Use per Sale"; "Max Use per Sale")
+                    field("Max Use per Sale"; Rec."Max Use per Sale")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Max Use per Sale field';

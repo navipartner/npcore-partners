@@ -1,4 +1,4 @@
-codeunit 6151465 "NPR M2 Brand Mgt."
+﻿codeunit 6151465 "NPR M2 Brand Mgt."
 {
     trigger OnRun()
     begin
@@ -19,9 +19,8 @@ codeunit 6151465 "NPR M2 Brand Mgt."
         BrandId: Code[20];
         PrevRec: Text;
         TypeHelper: Codeunit "Type Helper";
-        i: Integer;
     begin
-        MagentoSetup.Get;
+        MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
             exit;
 
@@ -31,7 +30,7 @@ codeunit 6151465 "NPR M2 Brand Mgt."
         foreach XNode in XNodeList do begin
             BrandId := NpXmlDomMgt.GetAttributeCode(XNode.AsXmlElement(), '', 'id', MaxStrLen(MagentoBrand.Id), true);
             if not MagentoBrand.Get(BrandId) then begin
-                MagentoBrand.Init;
+                MagentoBrand.Init();
                 MagentoBrand.Id := BrandId;
                 MagentoBrand.Insert(true);
             end;
@@ -46,18 +45,18 @@ codeunit 6151465 "NPR M2 Brand Mgt."
                 MagentoBrand.Modify(true);
 
             if not TempMagentoBrand.Get(MagentoBrand.Id) then begin
-                TempMagentoBrand.Init;
+                TempMagentoBrand.Init();
                 TempMagentoBrand := MagentoBrand;
-                TempMagentoBrand.Insert;
+                TempMagentoBrand.Insert();
             end;
         end;
 
         MagentoBrand.Reset();
-        if MagentoBrand.FindSet then
+        if MagentoBrand.FindSet() then
             repeat
                 if not TempMagentoBrand.Get(MagentoBrand.Id) then
                     RemoveBrand(MagentoBrand);
-            until MagentoBrand.Next = 0;
+            until MagentoBrand.Next() = 0;
         DataLogMgt.DisableDataLog(false);
     end;
 
@@ -71,20 +70,19 @@ codeunit 6151465 "NPR M2 Brand Mgt."
     local procedure RemoveBrand(var MagentoBrand: Record "NPR Magento Brand")
     var
         Item: Record Item;
-        MagentoCategoryLink: Record "NPR Magento Category Link";
     begin
         if MagentoBrand.Id <> '' then begin
             Item.SetRange("NPR Magento Brand", MagentoBrand.Id);
-            if Item.FindFirst then begin
+            if Item.FindFirst() then begin
                 Item.ModifyAll("NPR Magento Brand", '', false);
-                Commit;
+                Commit();
             end;
         end;
 
-        MagentoBrand.LockTable;
+        MagentoBrand.LockTable();
         if MagentoBrand.Get(MagentoBrand.Id) then begin
-            MagentoBrand.Delete;
-            Commit;
+            MagentoBrand.Delete();
+            Commit();
         end;
     end;
 

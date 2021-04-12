@@ -18,27 +18,27 @@ page 6151501 "NPR Nc Task Setup"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Task Processor Code"; "Task Processor Code")
+                field("Task Processor Code"; Rec."Task Processor Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Processor Code field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("Codeunit ID"; "Codeunit ID")
+                field("Codeunit ID"; Rec."Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
-                field("Codeunit Name"; "Codeunit Name")
+                field("Codeunit Name"; Rec."Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit Name field';

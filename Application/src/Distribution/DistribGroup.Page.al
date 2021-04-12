@@ -14,27 +14,27 @@ page 6151056 "NPR Distrib. Group"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Warehouse Location"; "Warehouse Location")
+                field("Warehouse Location"; Rec."Warehouse Location")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Warehouse Location field';
                 }
-                field("Warehouse Overhead Pct."; "Warehouse Overhead Pct.")
+                field("Warehouse Overhead Pct."; Rec."Warehouse Overhead Pct.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Warehouse Overhead Pct. field';
@@ -68,8 +68,6 @@ page 6151056 "NPR Distrib. Group"
     }
 
     trigger OnDeleteRecord(): Boolean
-    var
-        DistributionLines: Record "NPR Distribution Lines";
     begin
     end;
 }

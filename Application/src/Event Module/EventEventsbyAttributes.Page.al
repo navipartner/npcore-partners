@@ -1,4 +1,4 @@
-page 6151582 "NPR Event Events by Attributes"
+﻿page 6151582 "NPR Event Events by Attributes"
 {
     Caption = 'Events by Attributes';
     CardPageID = "NPR Event Card";
@@ -26,32 +26,32 @@ page 6151582 "NPR Event Events by Attributes"
             }
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Bill-to Customer No."; "Bill-to Customer No.")
+                field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                 }
-                field("Event Status"; "NPR Event Status")
+                field("Event Status"; Rec."NPR Event Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Event Status field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Total Amount"; "NPR Total Amount")
+                field("Total Amount"; Rec."NPR Total Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Total Amount field';
@@ -89,15 +89,15 @@ page 6151582 "NPR Event Events by Attributes"
                     Job: Record Job;
                 begin
                     EventAttributeTempFilters.LookupMode := true;
-                    if EventAttributeTempFilters.RunModal = ACTION::LookupOK then begin
-                        Reset;
+                    if EventAttributeTempFilters.RunModal() = ACTION::LookupOK then begin
+                        Rec.Reset();
                         EventAttributeTempFilters.GetRecord(EventAttributeTempFilter);
                         FilterDescription := EventAttributeTempFilter.Description;
                         if not EventAttrMgt.FindEventsInAttributesFilter(EventAttributeTempFilter."Template Name", EventAttributeTempFilter."Filter Name", Job) then
                             SetDefaultFilter()
                         else begin
-                            Copy(Job);
-                            MarkedOnly(true);
+                            Rec.Copy(Job);
+                            Rec.MarkedOnly(true);
                         end;
                         CurrPage.Update(false);
                     end;
@@ -128,7 +128,7 @@ page 6151582 "NPR Event Events by Attributes"
 
     local procedure SetDefaultFilter()
     begin
-        SetRange("No.", '%$');
+        Rec.SetRange("No.", '%$');
     end;
 }
 

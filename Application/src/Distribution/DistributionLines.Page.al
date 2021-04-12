@@ -15,68 +15,68 @@ page 6151059 "NPR Distribution Lines"
         {
             repeater(Group)
             {
-                field("Distribution Line"; "Distribution Line")
+                field("Distribution Line"; Rec."Distribution Line")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Line field';
                 }
-                field("Distribution Item"; "Distribution Item")
+                field("Distribution Item"; Rec."Distribution Item")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Item field';
                 }
-                field("Item Variant"; "Item Variant")
+                field("Item Variant"; Rec."Item Variant")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Variant field';
                 }
-                field(Location; Location)
+                field(Location; Rec.Location)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Distribution Group Member"; "Distribution Group Member")
+                field("Distribution Group Member"; Rec."Distribution Group Member")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Group Member field';
                 }
-                field("Action Required"; "Action Required")
+                field("Action Required"; Rec."Action Required")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Action Required field';
                 }
-                field("Distribution Quantity"; "Distribution Quantity")
+                field("Distribution Quantity"; Rec."Distribution Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Quantity field';
                 }
-                field("Avaliable Quantity"; "Avaliable Quantity")
+                field("Avaliable Quantity"; Rec."Avaliable Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Avaliable Quantity field';
                 }
-                field("Demanded Quantity"; "Demanded Quantity")
+                field("Demanded Quantity"; Rec."Demanded Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Demanded Quantity field';
                 }
-                field("Org. Distribution Quantity"; "Org. Distribution Quantity")
+                field("Org. Distribution Quantity"; Rec."Org. Distribution Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Org. Distribution Quantity field';
                 }
-                field("Distribution Cost Value (LCY)"; "Distribution Cost Value (LCY)")
+                field("Distribution Cost Value (LCY)"; Rec."Distribution Cost Value (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Distribution Cost Value (LCY) field';
                 }
-                field("Date Created"; "Date Created")
+                field("Date Created"; Rec."Date Created")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date Created field';

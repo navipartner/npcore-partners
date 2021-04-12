@@ -1,8 +1,8 @@
 report 6014533 "NPR Inventory - flow"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Inventory Flow';
     UseRequestPage = true;
@@ -112,9 +112,7 @@ report 6014533 "NPR Inventory - flow"
                         if Item.GetFilter("Statistics Group") <> '' then
                             Item2.SetRange("Statistics Group", Item."Statistics Group");
 
-                        StockInventoryEnd2 := 0;
                         StockInventoryStart2 := 0;
-                        GroupSalesFlowQty := 0;
 
                         Done := false;
                         ItemL3.SetRange("Vendor No.", Item."Vendor No.");
@@ -124,7 +122,7 @@ report 6014533 "NPR Inventory - flow"
                         if ItemL3.FindFirst() then
                             repeat
                                 if ItemL3."No." = ItemNo then begin
-                                    if ItemL3.Next = 0 then begin
+                                    if ItemL3.Next() = 0 then begin
                                         NewGroup := true;
                                         Done := true;
                                     end;
@@ -150,14 +148,8 @@ report 6014533 "NPR Inventory - flow"
 
                                     ItemL2.SetRange("Date Filter", 0D, Item.GetRangeMax("Date Filter"));
                                     ItemL2.CalcFields("Net Change");
-                                    StockInventoryEnd2 += ItemL2."Net Change";
-                                    GroupSalesQty += Item2."Sales (Qty.)";
 
-                                    GroupSalesFlowQty := 0;
-                                    if (StockInventoryStart2 + GroupPurchaseQty) <> 0 then
-                                        GroupSalesFlowQty := GroupSalesQty / (StockInventoryStart2 + GroupPurchaseQty) * 100
-                                    else
-                                        GroupSalesFlowQty := 0;
+
                                 until Item2.Next() = 0;
                         end;
 
@@ -214,10 +206,10 @@ report 6014533 "NPR Inventory - flow"
                     if SkipWithoutPortfolio then begin
                         Done := false;
                         ItemL.SetRange("Vendor No.", Item."Vendor No.");
-                        if ItemL.FindFirst then
+                        if ItemL.FindFirst() then
                             repeat
                                 if ItemL."No." = ItemNo then begin
-                                    if ItemL.Next = 0 then begin
+                                    if ItemL.Next() = 0 then begin
                                         ShowTotalGroup2 := true;
                                         Done := true;
                                     end;
@@ -238,7 +230,7 @@ report 6014533 "NPR Inventory - flow"
                         if ItemL.FindFirst() then
                             repeat
                                 if ItemL."No." = ItemNo then begin
-                                    if ItemL.Next = 0 then begin
+                                    if ItemL.Next() = 0 then begin
                                         ShowTotalGroup2 := true;
                                         Done := true;
                                     end;
@@ -264,30 +256,11 @@ report 6014533 "NPR Inventory - flow"
                                 UpdateGroupSales := false;
 
                         if UpdateGroupSales then begin
-                            GroupSalesQty += Item."Sales (Qty.)";
-                            GroupPurchaseQty += Item."Purchases (Qty.)";
-                            PurchaseLCY += Item."Purchases (LCY)";
-                            SalesLCY += Item."Sales (LCY)";
-                            ConsumptionLCY += Item."COGS (LCY)";
-                            GroupProfitPct := 0;
-                            if SalesLCY <> 0 then
-                                GroupProfitPct := (SalesLCY + ConsumptionLCY) / SalesLCY * 100;
 
-                            GroupSalesFlowAmt := 0;
-                            if PurchaseLCY <> 0 then
-                                GroupSalesFlowAmt := ConsumptionLCY / PurchaseLCY * 100
-                            else
-                                GroupSalesFlowAmt := 0;
 
-                            GroupControl += ("Positive Adjmt. (Qty.)" - "Negative Adjmt. (Qty.)");
+
                         end;
                     end else begin
-                        GroupSalesQty := Item."Sales (Qty.)";
-                        GroupPurchaseQty := Item."Purchases (Qty.)";
-                        PurchaseLCY := Item."Purchases (LCY)";
-                        SalesLCY := Item."Sales (LCY)";
-                        ConsumptionLCY := Item."COGS (LCY)";
-                        GroupControl := 0;
                     end;
 
                     ItemGroupPrevious := Item."Item Category Code";
@@ -387,7 +360,7 @@ report 6014533 "NPR Inventory - flow"
 
     trigger OnPreReport()
     begin
-        CompanyInfo.Get;
+        CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
 
         ShowVendorSection := false;
@@ -412,21 +385,11 @@ report 6014533 "NPR Inventory - flow"
         SkipWithoutPortfolio: Boolean;
         ItemGroupPrevious: Code[10];
         ItemNo: Code[20];
-        ConsumptionLCY: Decimal;
         dg: Decimal;
-        GroupControl: Decimal;
-        GroupProfitPct: Decimal;
-        GroupPurchaseQty: Decimal;
-        GroupSalesFlowAmt: Decimal;
-        GroupSalesFlowQty: Decimal;
-        GroupSalesQty: Decimal;
-        PurchaseLCY: Decimal;
         Regulatory: Decimal;
         SalesFlowAmt: Decimal;
         SalesFlowQty: Decimal;
-        SalesLCY: Decimal;
         StockInventoryEnd: Decimal;
-        StockInventoryEnd2: Decimal;
         StockInventoryStart: Decimal;
         StockInventoryStart2: Decimal;
 }

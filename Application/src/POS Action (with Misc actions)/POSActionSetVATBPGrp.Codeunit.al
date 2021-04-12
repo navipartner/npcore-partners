@@ -13,26 +13,22 @@ codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('do_lookup', 'respond();');
-                RegisterWorkflow(false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('do_lookup', 'respond();');
+            Sender.RegisterWorkflow(false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Confirmed: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         case WorkflowStep of
@@ -85,12 +81,12 @@ codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
 
         if Lookup then begin
             VATBusinessPostingGroups.LookupMode(true);
-            if VATBusinessPostingGroups.RunModal = ACTION::LookupOK then begin
+            if VATBusinessPostingGroups.RunModal() = ACTION::LookupOK then begin
                 VATBusinessPostingGroups.GetRecord(VATBusinessPostingGroup);
                 exit(VATBusinessPostingGroup.Code);
             end;
         end else
-            VATBusinessPostingGroups.RunModal;
+            VATBusinessPostingGroups.RunModal();
     end;
 }
 

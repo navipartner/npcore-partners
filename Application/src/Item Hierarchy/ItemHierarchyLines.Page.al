@@ -15,50 +15,50 @@ page 6151053 "NPR Item Hierarchy Lines"
         {
             repeater(Group)
             {
-                IndentationColumn = "Item Hierarchy Level";
+                IndentationColumn = Rec."Item Hierarchy Level";
                 IndentationControls = "Linked Table Key Value";
                 ShowAsTree = true;
-                field(Hierachy; "Related Table Desc Field Value")
+                field(Hierachy; Rec."Related Table Desc Field Value")
                 {
                     ApplicationArea = All;
                     Caption = 'Hierachy';
                     ToolTip = 'Specifies the value of the Hierachy field';
                 }
-                field("Item Hierarchy Level"; "Item Hierarchy Level")
+                field("Item Hierarchy Level"; Rec."Item Hierarchy Level")
                 {
                     ApplicationArea = All;
                     Caption = 'Level';
                     ToolTip = 'Specifies the value of the Level field';
                 }
-                field("Item Hierachy Description"; "Item Hierachy Description")
+                field("Item Hierachy Description"; Rec."Item Hierachy Description")
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field(Description; "Item Desc.")
+                field(Description; Rec."Item Desc.")
                 {
                     ApplicationArea = All;
                     Caption = 'Item Description';
                     ToolTip = 'Specifies the value of the Item Description field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Linked Table Key Value"; "Linked Table Key Value")
+                field("Linked Table Key Value"; Rec."Linked Table Key Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Linked Table Key Value field';
                 }
-                field("Related Table Key Field Value"; "Related Table Key Field Value")
+                field("Related Table Key Field Value"; Rec."Related Table Key Field Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -84,7 +84,7 @@ page 6151053 "NPR Item Hierarchy Lines"
                     ItemHierarchy: Record "NPR Item Hierarchy";
                     ItemHierarchyMgmt: Codeunit "NPR Item Hierarchy Mgmt.";
                 begin
-                    ItemHierarchy.Get(GetFilter("Item Hierarchy Code"));
+                    ItemHierarchy.Get(Rec.GetFilter("Item Hierarchy Code"));
                     ItemHierarchyMgmt.CreateItemHierarchyLines(ItemHierarchy);
                 end;
             }

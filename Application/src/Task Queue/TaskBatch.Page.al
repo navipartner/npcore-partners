@@ -15,52 +15,52 @@ page 6059901 "NPR Task Batch"
         {
             repeater(Group)
             {
-                field("Journal Template Name"; "Journal Template Name")
+                field("Journal Template Name"; Rec."Journal Template Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Journal Template Name field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Task Worker Group"; "Task Worker Group")
+                field("Task Worker Group"; Rec."Task Worker Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Task Worker Group field';
                 }
-                field("Common Companies"; "Common Companies")
+                field("Common Companies"; Rec."Common Companies")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Common Companies field';
                 }
-                field("Master Company"; "Master Company")
+                field("Master Company"; Rec."Master Company")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Master Company field';
                 }
-                field("Mail From Address"; "Mail From Address")
+                field("Mail From Address"; Rec."Mail From Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mail From Address field';
                 }
-                field("Mail From Name"; "Mail From Name")
+                field("Mail From Name"; Rec."Mail From Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mail From Name field';
                 }
-                field("Template Type"; "Template Type")
+                field("Template Type"; Rec."Template Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Type field';
                 }
-                field("Delete Log After"; "Delete Log After")
+                field("Delete Log After"; Rec."Delete Log After")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete Log After field';
@@ -76,7 +76,7 @@ page 6059901 "NPR Task Batch"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         //-TQ1.29
-        SetupNewBatch;
+        Rec.SetupNewBatch;
         //+TQ1.29
     end;
 }

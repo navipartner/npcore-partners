@@ -15,32 +15,32 @@ page 6151531 "NPR Nc Collection List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Collector Code"; "Collector Code")
+                field("Collector Code"; Rec."Collector Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Collector Code field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Creation Date"; "Creation Date")
+                field("Creation Date"; Rec."Creation Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Creation Date field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("No. of Lines"; "No. of Lines")
+                field("No. of Lines"; Rec."No. of Lines")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. of Lines field';
@@ -77,7 +77,7 @@ page 6151531 "NPR Nc Collection List"
                     trigger OnAction()
                     begin
                         NcCollectorManagement.SetCollectionStatus(Rec, 0);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Set to Ready to Send")
@@ -90,7 +90,7 @@ page 6151531 "NPR Nc Collection List"
                     trigger OnAction()
                     begin
                         NcCollectorManagement.SetCollectionStatus(Rec, 1);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Set to Sent")
@@ -103,7 +103,7 @@ page 6151531 "NPR Nc Collection List"
                     trigger OnAction()
                     begin
                         NcCollectorManagement.SetCollectionStatus(Rec, 2);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
             }

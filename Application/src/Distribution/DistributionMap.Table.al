@@ -1,4 +1,4 @@
-﻿table 6014526 "NPR Distribution Map"
+table 6014526 "NPR Distribution Map"
 {
     DataClassification = CustomerContent;
     Caption = 'Distribution Map';

@@ -592,7 +592,7 @@ table 6150622 "NPR POS Entry Sales Line"
         POSEntry: Record "NPR POS Entry";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
         POSEntry.Get("POS Entry No.");
         if POSEntry."Currency Factor" > 0 then
             POSEntry."Currency Factor" := 1;

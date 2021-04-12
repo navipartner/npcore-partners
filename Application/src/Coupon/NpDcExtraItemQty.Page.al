@@ -16,12 +16,12 @@ page 6151606 "NPR NpDc Extra Item Qty."
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Item No."; "Item No.")
+                    field("Item No."; Rec."Item No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Item No. field';
                     }
-                    field("Discount Type"; "Discount Type")
+                    field("Discount Type"; Rec."Discount Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Discount Type field';
@@ -29,8 +29,8 @@ page 6151606 "NPR NpDc Extra Item Qty."
                     group(Control6014411)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 0);
-                        field("Discount Amount"; "Discount Amount")
+                        Visible = (Rec."Discount Type" = 0);
+                        field("Discount Amount"; Rec."Discount Amount")
                         {
                             ApplicationArea = All;
                             Caption = 'Discount Amount per Item';
@@ -41,8 +41,8 @@ page 6151606 "NPR NpDc Extra Item Qty."
                     group(Control6014409)
                     {
                         ShowCaption = false;
-                        Visible = ("Discount Type" = 1);
-                        field("Discount %"; "Discount %")
+                        Visible = (Rec."Discount Type" = 1);
+                        field("Discount %"; Rec."Discount %")
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
@@ -96,17 +96,17 @@ page 6151606 "NPR NpDc Extra Item Qty."
                 group(Control6014406)
                 {
                     ShowCaption = false;
-                    field("Item Description"; "Item Description")
+                    field("Item Description"; Rec."Item Description")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Item Description field';
                     }
-                    field("Unit Price"; "Unit Price")
+                    field("Unit Price"; Rec."Unit Price")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Unit Price field';
                     }
-                    field("Profit %"; "Profit %")
+                    field("Profit %"; Rec."Profit %")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Profit % field';
@@ -139,11 +139,11 @@ page 6151606 "NPR NpDc Extra Item Qty."
         CouponType: Code[20];
         PrevRec: Text;
     begin
-        CouponType := "Coupon Type";
+        CouponType := Rec."Coupon Type";
         if CouponType = '' then begin
-            FilterGroup(2);
-            CouponType := GetRangeMax("Coupon Type");
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            CouponType := Rec.GetRangeMax("Coupon Type");
+            Rec.FilterGroup(0);
         end;
 
         if (MaxQty <= 0) and (ValidQty <= 0) and (not LotValidation) then begin
@@ -155,7 +155,7 @@ page 6151606 "NPR NpDc Extra Item Qty."
         end;
 
         if not NpDcCouponListItem.Get(CouponType, -1) then begin
-            NpDcCouponListItem.Init;
+            NpDcCouponListItem.Init();
             NpDcCouponListItem."Coupon Type" := CouponType;
             NpDcCouponListItem."Line No." := -1;
             NpDcCouponListItem."Max. Discount Amount" := MaxDiscountAmt;
@@ -182,14 +182,14 @@ page 6151606 "NPR NpDc Extra Item Qty."
         NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
         CouponType: Code[20];
     begin
-        CouponType := "Coupon Type";
+        CouponType := Rec."Coupon Type";
         if CouponType = '' then begin
-            if GetFilter("Coupon Type") = '' then
+            if Rec.GetFilter("Coupon Type") = '' then
                 exit;
 
-            FilterGroup(2);
-            CouponType := GetRangeMax("Coupon Type");
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            CouponType := Rec.GetRangeMax("Coupon Type");
+            Rec.FilterGroup(0);
         end;
         MaxDiscountAmt := 0;
         MaxQty := 0;

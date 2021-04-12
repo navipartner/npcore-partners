@@ -14,47 +14,47 @@ page 6151598 "NPR NpDc SaleLinePOS Coupons"
         {
             repeater(Group)
             {
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Sale Date"; "Sale Date")
+                field("Sale Date"; Rec."Sale Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sale Date field';
                 }
-                field("Sale Line No."; "Sale Line No.")
+                field("Sale Line No."; Rec."Sale Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sale Line No. field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Coupon Type"; "Coupon Type")
+                field("Coupon Type"; Rec."Coupon Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Coupon Type field';
                 }
-                field("Coupon No."; "Coupon No.")
+                field("Coupon No."; Rec."Coupon No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Coupon No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Discount Amount"; "Discount Amount")
+                field("Discount Amount"; Rec."Discount Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Amount field';

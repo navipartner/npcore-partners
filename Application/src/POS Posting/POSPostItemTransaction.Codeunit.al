@@ -15,7 +15,7 @@ codeunit 6150620 "NPR POS Post Item Transaction"
 
         POSEntry.Validate("Post Item Entry Status", POSEntry."Post Item Entry Status"::"Error while Posting");
         POSEntry.Modify();
-        Commit;
+        Commit();
 
         if (not POSPostItemEntries.PostAssemblyOrders(POSEntry, false)) then
             exit;
@@ -24,7 +24,7 @@ codeunit 6150620 "NPR POS Post Item Transaction"
         POSEntry.Validate("Post Item Entry Status", POSEntry."Post Item Entry Status"::Posted);
         POSEntry.Modify();
 
-        Commit;
+        Commit();
     end;
 }
 

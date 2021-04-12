@@ -3,7 +3,7 @@ table 6151396 "NPR CS Phys. Inv. Handl."
     Caption = 'CS Phys. Inventory Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields
@@ -52,7 +52,7 @@ table 6151396 "NPR CS Phys. Inv. Handl."
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
 
-           
+
         }
         field(16; "Variant Code"; Code[10])
         {
@@ -71,7 +71,7 @@ table 6151396 "NPR CS Phys. Inv. Handl."
             Caption = 'Bin Code';
             DataClassification = CustomerContent;
 
-            
+
         }
         field(100; "Table No."; Integer)
         {

@@ -14,24 +14,24 @@ page 6060128 "NPR MM Members.Member ListPart"
         {
             repeater(Group)
             {
-                field("Member Role"; "Member Role")
+                field("Member Role"; Rec."Member Role")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Role field';
                 }
-                field("External Member No."; "External Member No.")
+                field("External Member No."; Rec."External Member No.")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR MM Member Card";
                     LookupPageID = "NPR MM Member Card";
                     ToolTip = 'Specifies the value of the External Member No. field';
                 }
-                field("Member Display Name"; "Member Display Name")
+                field("Member Display Name"; Rec."Member Display Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Display Name field';
                 }
-                field("GDPR Approval"; "GDPR Approval")
+                field("GDPR Approval"; Rec."GDPR Approval")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the GDPR Approval field';
@@ -42,48 +42,48 @@ page 6060128 "NPR MM Members.Member ListPart"
                         GDPRConsentLogPage: Page "NPR GDPR Consent Log";
                     begin
                         GDPRConsentLog.FilterGroup(2);
-                        GDPRConsentLog.SetFilter("Agreement No.", '=%1', "GDPR Agreement No.");
-                        GDPRConsentLog.SetFilter("Data Subject Id", '=%1', "GDPR Data Subject Id");
+                        GDPRConsentLog.SetFilter("Agreement No.", '=%1', Rec."GDPR Agreement No.");
+                        GDPRConsentLog.SetFilter("Data Subject Id", '=%1', Rec."GDPR Data Subject Id");
                         GDPRConsentLog.FilterGroup(0);
                         GDPRConsentLogPage.SetTableView(GDPRConsentLog);
                         GDPRConsentLogPage.RunModal();
                     end;
                 }
-                field("User Logon ID"; "User Logon ID")
+                field("User Logon ID"; Rec."User Logon ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the User Logon ID field';
                 }
-                field("Password Hash"; "Password Hash")
+                field("Password Hash"; Rec."Password Hash")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Password field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field("Member Count"; "Member Count")
+                field("Member Count"; Rec."Member Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Count field';
                 }
-                field("GDPR Agreement No."; "GDPR Agreement No.")
+                field("GDPR Agreement No."; Rec."GDPR Agreement No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the GDPR Agreement No. field';
                 }
-                field("GDPR Data Subject Id"; "GDPR Data Subject Id")
+                field("GDPR Data Subject Id"; Rec."GDPR Data Subject Id")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -101,7 +101,7 @@ page 6060128 "NPR MM Members.Member ListPart"
     trigger OnOpenPage()
     begin
 
-        SetFilter("Member Role", '<> %1', "Member Role"::ANONYMOUS);
+        Rec.SetFilter("Member Role", '<> %1', Rec."Member Role"::ANONYMOUS);
     end;
 }
 

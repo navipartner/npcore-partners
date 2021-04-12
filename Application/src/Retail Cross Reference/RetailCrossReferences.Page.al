@@ -14,22 +14,22 @@ page 6151180 "NPR Retail Cross References"
         {
             repeater(Group)
             {
-                field("Retail ID"; "Retail ID")
+                field("Retail ID"; Rec."Retail ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Retail ID field';
                 }
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
                 }
-                field("Table ID"; "Table ID")
+                field("Table ID"; Rec."Table ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table ID field';
                 }
-                field("Record Value"; "Record Value")
+                field("Record Value"; Rec."Record Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Record Value field';

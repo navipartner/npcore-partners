@@ -1,4 +1,4 @@
-page 6151451 "NPR Magento DragDropPic. Addin"
+﻿page 6151451 "NPR Magento DragDropPic. Addin"
 {
     Caption = ' ';
     InsertAllowed = false;
@@ -67,8 +67,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
 
     trigger OnOpenPage()
     begin
-        MagentoSetup.Get;
-        MagentoEnabled := MagentoSetup."Magento Enabled";
+        MagentoSetup.Get();
     end;
 
     var
@@ -80,7 +79,6 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         HidePicture: Boolean;
         Initialized: Boolean;
         IsLogoPicture: Boolean;
-        MagentoEnabled: Boolean;
         Overwrite: Boolean;
         PictureDataUri: Text;
         Text001: Label '%1 pictures already exist:';
@@ -111,13 +109,13 @@ page 6151451 "NPR Magento DragDropPic. Addin"
 
         ConfirmText := '';
         ExistingCount := 0;
-        if TempMagentoPicture.FindSet then
+        if TempMagentoPicture.FindSet() then
             repeat
                 if MagentoPicture.Get(PictureType, TempMagentoPicture.Name) then begin
                     ExistingCount += 1;
                     ConfirmText += StrSubstNo(Text00101, MagentoPicture.Name);
                 end;
-            until TempMagentoPicture.Next = 0;
+            until TempMagentoPicture.Next() = 0;
 
         if ExistingCount = 0 then
             exit(true);
@@ -132,7 +130,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         Skip: Boolean;
     begin
         Clear(TempMagentoPicture);
-        if not TempMagentoPicture.FindSet then
+        if not TempMagentoPicture.FindSet() then
             exit;
         if PictureType < 0 then
             PictureType := SelectPictureType();
@@ -140,36 +138,34 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             exit;
 
         Overwrite := ConfirmOverwrite();
-        TempMagentoPicture.FindSet;
+        TempMagentoPicture.FindSet();
         repeat
             Skip := MagentoPicture.Get(PictureType, TempMagentoPicture.Name) and not Overwrite;
             if not Skip then begin
                 SavePicture(PictureType, TempMagentoPicture);
                 SavePictureLinks(PictureType, TempMagentoPicture);
-                Commit;
+                Commit();
             end;
-        until TempMagentoPicture.Next = 0;
+        until TempMagentoPicture.Next() = 0;
     end;
 
     local procedure SavePicture(PictureType: Integer; var TempMagentoPicture2: Record "NPR Magento Picture" temporary)
     var
         MagentoPicture: Record "NPR Magento Picture";
-        Skip: Boolean;
-        Base64: Codeunit "Base64 Convert";
     begin
         if MagentoPicture.Get(PictureType, TempMagentoPicture2.Name) then begin
             MagentoPicture."Size (kb)" := TempMagentoPicture."Size (kb)";
             Clear(MagentoPicture.Picture);
             MagentoPicture.Modify(true);
         end else begin
-            MagentoPicture.Init;
+            MagentoPicture.Init();
             MagentoPicture := TempMagentoPicture2;
             MagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
             Clear(MagentoPicture.Picture);
             MagentoPicture.Insert(true);
         end;
         MagentoPictureMgt.DragDropPicture(MagentoPicture.Name, MagentoPicture.GetMagentoType(), TempMagentoPicture2.GetBase64());
-        Commit;
+        Commit();
     end;
 
     [IntegrationEvent(false, false)]
@@ -219,7 +215,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
 
         Clear(MagentoPictureLink);
         MagentoPictureLink.SetRange("Item No.", PictureLinkNo);
-        if MagentoPictureLink.FindLast then;
+        if MagentoPictureLink.FindLast() then;
         LineNo := MagentoPictureLink."Line No." + 10000;
 
         Clear(MagentoPictureLink);
@@ -230,9 +226,9 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         MagentoPictureLink.SetRange("Variety Value", VarietyValueCode);
 
         MagentoPictureLink.SetRange("Picture Name", TempMagentoPicture2.Name);
-        if not MagentoPictureLink.FindFirst then begin
+        if not MagentoPictureLink.FindFirst() then begin
             LineNo += 10000;
-            MagentoPictureLink.Init;
+            MagentoPictureLink.Init();
             MagentoPictureLink."Item No." := PictureLinkNo;
             MagentoPictureLink."Variant Value Code" := PictureLinkVariantValueCode;
             MagentoPictureLink."Variety Type" := VarietyTypeCode;
@@ -254,7 +250,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             exit;
         end;
 
-        if Rec.Picture.HasValue then begin
+        if Rec.Picture.HasValue() then begin
             CurrPage.DragDropAddin.DisplayData(GetDataUri());
             exit;
         end;
@@ -268,7 +264,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         ImageHelpers: Codeunit "Image Helpers";
         InStream: InStream;
     begin
-        if not Rec.Picture.HasValue then
+        if not Rec.Picture.HasValue() then
             exit;
 
         Rec.CalcFields(Picture);
@@ -354,16 +350,16 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         PictureName := '';
         PictureDataUri := '';
         if not Initialized then begin
-            TempMagentoPicture.DeleteAll;
+            TempMagentoPicture.DeleteAll();
             exit;
         end;
-        if not TempMagentoPicture.FindSet then begin
+        if not TempMagentoPicture.FindSet() then begin
             Initialized := false;
             exit;
         end;
 
         SavePictures();
-        TempMagentoPicture.DeleteAll;
+        TempMagentoPicture.DeleteAll();
         Initialized := false;
     end;
 
@@ -378,7 +374,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
     begin
         PictureName := '';
         PictureDataUri := '';
-        TempMagentoPicture.DeleteAll;
+        TempMagentoPicture.DeleteAll();
         Initialized := true;
     end;
 
@@ -404,14 +400,14 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             Match.Groups(Groups);
             Groups.Item(1, Group1);
             Groups.Item(2, Group2);
-            TempMagentoPicture.Init;
+            TempMagentoPicture.Init();
             TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
             TempMagentoPicture.Name := PictureName;
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
             TempMagentoPicture."Mime Type" := Group1.Value;
             TempMagentoPicture.Picture.CreateOutStream(OutStr);
             Convert.FromBase64(Group2.Value, OutStr);
-            TempMagentoPicture.Insert;
+            TempMagentoPicture.Insert();
         end;
         PictureName := '';
     end;

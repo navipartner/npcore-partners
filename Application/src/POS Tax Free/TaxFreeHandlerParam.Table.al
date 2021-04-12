@@ -49,12 +49,12 @@ table 6014642 "NPR Tax Free Handler Param."
         JSON: Text;
         JObject: JsonObject;
     begin
-        if not FindSet then
+        if not FindSet() then
             exit;
 
         repeat
             JObject.Add(Parameter, Value);
-        until Next = 0;
+        until Next() = 0;
 
         JObject.WriteTo(JSON);
 
@@ -184,10 +184,10 @@ table 6014642 "NPR Tax Free Handler Param."
 
     procedure AddParameter(ParamName: Text; DataType: Integer)
     begin
-        Init;
+        Init();
         Parameter := ParamName;
         "Data Type" := DataType;
-        Insert;
+        Insert();
     end;
 }
 

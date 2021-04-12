@@ -22,12 +22,12 @@ codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpda
     begin
         if NcImpListProcessing.HasParameter(JobQueueEntry, NcImpListProcessing.ParamDownloadFtp()) then begin
             NcSyncMgt.DownloadFtpType(ImportType);
-            Commit;
+            Commit();
         end;
 
         if NcImpListProcessing.HasParameter(JobQueueEntry, NcImpListProcessing.ParamDownloadServerFile()) then begin
             NcSyncMgt.DownloadServerFile(ImportType);
-            Commit;
+            Commit();
         end;
     end;
 

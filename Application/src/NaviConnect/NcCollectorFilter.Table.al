@@ -42,7 +42,7 @@ table 6151526 "NPR Nc Collector Filter"
         }
         field(35; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;

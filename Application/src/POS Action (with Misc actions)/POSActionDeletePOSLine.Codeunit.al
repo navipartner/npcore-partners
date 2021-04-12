@@ -20,32 +20,28 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
 
-                RegisterWorkflowStep('decl0', 'confirmtext = labels.notallowed;');
-                RegisterWorkflowStep('decl1', 'if (!data.isEmpty())    {confirmtext = labels.Prompt.substitute(data("10"));};');
-                RegisterWorkflowStep('confirm', '(param.ConfirmDialog == param.ConfirmDialog["Yes"]) ? confirm({title: labels.title, caption: confirmtext}).respond() : respond();');
-                RegisterWorkflow(false);
-                RegisterDataBinding();
-                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-                RegisterOptionParameter('ConfirmDialog', 'No,Yes', 'No');
-            end;
+            Sender.RegisterWorkflowStep('decl0', 'confirmtext = labels.notallowed;');
+            Sender.RegisterWorkflowStep('decl1', 'if (!data.isEmpty())    {confirmtext = labels.Prompt.substitute(data("10"));};');
+            Sender.RegisterWorkflowStep('confirm', '(param.ConfirmDialog == param.ConfirmDialog["Yes"]) ? confirm({title: labels.title, caption: confirmtext}).respond() : respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataBinding();
+            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+            Sender.RegisterOptionParameter('ConfirmDialog', 'No,Yes', 'No');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Confirmed: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         DeletePosLine(Context, POSSession, FrontEnd);
@@ -55,9 +51,9 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'notallowed', NotAllowed);
-        Captions.AddActionCaption(ActionCode, 'Prompt', Prompt);
+        Captions.AddActionCaption(ActionCode(), 'title', Title);
+        Captions.AddActionCaption(ActionCode(), 'notallowed', NotAllowed);
+        Captions.AddActionCaption(ActionCode(), 'Prompt', Prompt);
     end;
 
     local procedure DeletePosLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")

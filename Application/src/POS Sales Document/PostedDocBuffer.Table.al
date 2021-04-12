@@ -141,9 +141,9 @@ table 6014433 "NPR Posted Doc. Buffer"
                         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
                         SalesInvoiceHeader.SetRange("Prepayment Invoice", true);
                         SalesInvoiceHeader.SetAutoCalcFields(Amount, "Amount Including VAT");
-                        if SalesInvoiceHeader.FindSet then
+                        if SalesInvoiceHeader.FindSet() then
                             repeat
-                                Init;
+                                Init();
                                 "Source Record ID" := RecRef.RecordId;
                                 "Document Type" := "Document Type"::"Prepayment Invoice";
                                 "Document No." := SalesInvoiceHeader."No.";
@@ -159,16 +159,16 @@ table 6014433 "NPR Posted Doc. Buffer"
                                 "Currency Code" := SalesInvoiceHeader."Currency Code";
                                 Amount := SalesInvoiceHeader.Amount;
                                 "Amount Including VAT" := SalesInvoiceHeader."Amount Including VAT";
-                                Insert;
-                            until SalesInvoiceHeader.Next = 0;
+                                Insert();
+                            until SalesInvoiceHeader.Next() = 0;
 
                         SalesCrMemoHeader.SetCurrentKey("Prepayment Order No.");
                         SalesCrMemoHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
                         SalesCrMemoHeader.SetRange("Prepayment Credit Memo", true);
                         SalesCrMemoHeader.SetAutoCalcFields(Amount, "Amount Including VAT");
-                        if SalesCrMemoHeader.FindSet then
+                        if SalesCrMemoHeader.FindSet() then
                             repeat
-                                Init;
+                                Init();
                                 "Source Record ID" := RecRef.RecordId;
                                 "Document Type" := "Document Type"::"Prepayment Credit Memo";
                                 "Document No." := SalesCrMemoHeader."No.";
@@ -184,8 +184,8 @@ table 6014433 "NPR Posted Doc. Buffer"
                                 "Currency Code" := SalesCrMemoHeader."Currency Code";
                                 Amount := -SalesCrMemoHeader.Amount;
                                 "Amount Including VAT" := -SalesCrMemoHeader."Amount Including VAT";
-                                Insert;
-                            until SalesCrMemoHeader.Next = 0;
+                                Insert();
+                            until SalesCrMemoHeader.Next() = 0;
                     end;
                     if PrepaymentOnly then
                         exit;
@@ -203,7 +203,7 @@ table 6014433 "NPR Posted Doc. Buffer"
         NavigatePage: Page Navigate;
     begin
         NavigatePage.SetDoc("Posting Date", "Document No.");
-        NavigatePage.Run;
+        NavigatePage.Run();
     end;
 
     procedure ShowPostedDocumentList(SourceRecID: RecordID)

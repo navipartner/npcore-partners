@@ -77,7 +77,7 @@ table 6060132 "NPR MM Member Community"
         }
         field(30; "Foreign Membership"; Boolean)
         {
-            CalcFormula = Exist ("NPR MM Foreign Members. Setup" WHERE("Community Code" = FIELD(Code),
+            CalcFormula = Exist("NPR MM Foreign Members. Setup" WHERE("Community Code" = FIELD(Code),
                                                                      Disabled = CONST(false)));
             Caption = 'Foreign Membership';
             FieldClass = FlowField;

@@ -1,4 +1,4 @@
-page 6151248 "NPR Setup Act - POS"
+﻿page 6151248 "NPR Setup Act - POS"
 {
     Caption = 'NP Retail Setup - POS';
     PageType = CardPart;
@@ -58,10 +58,10 @@ page 6151248 "NPR Setup Act - POS"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

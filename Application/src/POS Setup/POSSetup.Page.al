@@ -12,7 +12,7 @@ page 6150707 "NPR POS Setup"
         {
             group(General)
             {
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -20,7 +20,7 @@ page 6150707 "NPR POS Setup"
             }
             group("Actions")
             {
-                field("Login Action Code"; "Login Action Code")
+                field("Login Action Code"; Rec."Login Action Code")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -30,10 +30,10 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Login Action Code", FieldNo("Login Action Code"));
+                        Rec.AssistEdit(Rec."Login Action Code", Rec.FieldNo("Login Action Code"));
                     end;
                 }
-                field("Text Enter Action Code"; "Text Enter Action Code")
+                field("Text Enter Action Code"; Rec."Text Enter Action Code")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -43,10 +43,10 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Text Enter Action Code", FieldNo("Text Enter Action Code"));
+                        Rec.AssistEdit(Rec."Text Enter Action Code", Rec.FieldNo("Text Enter Action Code"));
                     end;
                 }
-                field("Item Insert Action Code"; "Item Insert Action Code")
+                field("Item Insert Action Code"; Rec."Item Insert Action Code")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -56,10 +56,10 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Item Insert Action Code", FieldNo("Item Insert Action Code"));
+                        Rec.AssistEdit(Rec."Item Insert Action Code", Rec.FieldNo("Item Insert Action Code"));
                     end;
                 }
-                field("Payment Action Code"; "Payment Action Code")
+                field("Payment Action Code"; Rec."Payment Action Code")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -69,10 +69,10 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Payment Action Code", FieldNo("Payment Action Code"));
+                        Rec.AssistEdit(Rec."Payment Action Code", Rec.FieldNo("Payment Action Code"));
                     end;
                 }
-                field("Customer Action Code"; "Customer Action Code")
+                field("Customer Action Code"; Rec."Customer Action Code")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -82,10 +82,10 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Customer Action Code", FieldNo("Customer Action Code"));
+                        Rec.AssistEdit(Rec."Customer Action Code", Rec.FieldNo("Customer Action Code"));
                     end;
                 }
-                field("Lock POS Action Code"; "Lock POS Action Code")
+                field("Lock POS Action Code"; Rec."Lock POS Action Code")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
@@ -94,10 +94,10 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Lock POS Action Code", FieldNo("Lock POS Action Code"));
+                        Rec.AssistEdit(Rec."Lock POS Action Code", Rec.FieldNo("Lock POS Action Code"));
                     end;
                 }
-                field("Unlock POS Action Code"; "Unlock POS Action Code")
+                field("Unlock POS Action Code"; Rec."Unlock POS Action Code")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
@@ -106,10 +106,10 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Unlock POS Action Code", FieldNo("Unlock POS Action Code"));
+                        Rec.AssistEdit(Rec."Unlock POS Action Code", Rec.FieldNo("Unlock POS Action Code"));
                     end;
                 }
-                field("OnBeforePaymentView Action"; "OnBeforePaymentView Action")
+                field("OnBeforePaymentView Action"; Rec."OnBeforePaymentView Action")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
@@ -118,27 +118,27 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("OnBeforePaymentView Action", FieldNo("OnBeforePaymentView Action"));
+                        Rec.AssistEdit(Rec."OnBeforePaymentView Action", Rec.FieldNo("OnBeforePaymentView Action"));
                     end;
                 }
-                field("Idle Timeout Action Code"; "Idle Timeout Action Code")
+                field("Idle Timeout Action Code"; Rec."Idle Timeout Action Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Idle Timeout Action Code field';
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Idle Timeout Action Code", FieldNo("Idle Timeout Action Code"));
+                        Rec.AssistEdit(Rec."Idle Timeout Action Code", Rec.FieldNo("Idle Timeout Action Code"));
                     end;
                 }
-                field("Admin Menu Action Code"; "Admin Menu Action Code")
+                field("Admin Menu Action Code"; Rec."Admin Menu Action Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Admin Menu Action Code field';
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit("Admin Menu Action Code", FieldNo("Admin Menu Action Code"));
+                        Rec.AssistEdit(Rec."Admin Menu Action Code", Rec.FieldNo("Admin Menu Action Code"));
                     end;
                 }
             }
@@ -183,8 +183,8 @@ page 6150707 "NPR POS Setup"
     var
         POSAction: Record "NPR POS Action";
     begin
-        if not Find then
-            Insert;
+        if not Rec.Find() then
+            Rec.Insert();
 
         POSAction.DiscoverActions();
     end;
@@ -204,14 +204,14 @@ page 6150707 "NPR POS Setup"
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Login Action Code"), "Login Action Code");
-        TextEnterActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Text Enter Action Code"), "Text Enter Action Code");
-        ItemInsertActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Item Insert Action Code"), "Item Insert Action Code");
-        PaymentActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Payment Action Code"), "Payment Action Code");
-        CustomerActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Customer Action Code"), "Customer Action Code");
-        LockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Lock POS Action Code"), "Lock POS Action Code");
-        UnlockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Unlock POS Action Code"), "Unlock POS Action Code");
-        OnBeforePaymentViewActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("OnBeforePaymentView Action"), "OnBeforePaymentView Action");
+        LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Login Action Code"), Rec."Login Action Code");
+        TextEnterActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Text Enter Action Code"), Rec."Text Enter Action Code");
+        ItemInsertActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Item Insert Action Code"), Rec."Item Insert Action Code");
+        PaymentActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Payment Action Code"), Rec."Payment Action Code");
+        CustomerActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Customer Action Code"), Rec."Customer Action Code");
+        LockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Lock POS Action Code"), Rec."Lock POS Action Code");
+        UnlockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Unlock POS Action Code"), Rec."Unlock POS Action Code");
+        OnBeforePaymentViewActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("OnBeforePaymentView Action"), Rec."OnBeforePaymentView Action");
 
         RefreshEnabled :=
           LoginActionRefreshNeeded or TextEnterActionRefreshNeeded or ItemInsertActionRefreshNeeded or PaymentActionRefreshNeeded or CustomerActionRefreshNeeded or
@@ -223,28 +223,28 @@ page 6150707 "NPR POS Setup"
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
         if LoginActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Login Action Code"), "Login Action Code");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Login Action Code"), Rec."Login Action Code");
 
         if TextEnterActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Text Enter Action Code"), "Text Enter Action Code");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Text Enter Action Code"), Rec."Text Enter Action Code");
 
         if ItemInsertActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Item Insert Action Code"), "Item Insert Action Code");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Item Insert Action Code"), Rec."Item Insert Action Code");
 
         if PaymentActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Payment Action Code"), "Payment Action Code");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Payment Action Code"), Rec."Payment Action Code");
 
         if CustomerActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Customer Action Code"), "Customer Action Code");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Customer Action Code"), Rec."Customer Action Code");
 
         if LockActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Lock POS Action Code"), "Lock POS Action Code");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Lock POS Action Code"), Rec."Lock POS Action Code");
 
         if UnlockActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("Unlock POS Action Code"), "Unlock POS Action Code");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Unlock POS Action Code"), Rec."Unlock POS Action Code");
 
         if OnBeforePaymentViewActionRefreshNeeded then
-            ParamMgt.RefreshParameters(RecordId, '', FieldNo("OnBeforePaymentView Action"), "OnBeforePaymentView Action");
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("OnBeforePaymentView Action"), Rec."OnBeforePaymentView Action");
     end;
 }
 

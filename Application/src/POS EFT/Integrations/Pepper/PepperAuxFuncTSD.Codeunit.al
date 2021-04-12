@@ -14,7 +14,6 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
         AuxResult: DotNet NPRNetAuxResult0;
         AuxParam: DotNet NPRNetAuxParam0;
         PepperOpCodes: DotNet NPRNetPepperOpCodes0;
-        LastRestCode: Integer;
         NOT_INITIALIZED: Label 'Please invoke initialprotocol function before setting paramaters.';
         Labels: DotNet NPRNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "NPR Pepper Term. Captions TSD";
@@ -36,7 +35,6 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
         PepperTerminalCaptions.GetLabels(Labels);
         AuxRequest.ProcessLabels := Labels;
 
-        LastRestCode := -999998;
         InitializedRequest := true;
     end;
 
@@ -254,7 +252,6 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
-        PaymentRequest: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
 
@@ -268,7 +265,6 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
                 begin
                     AuxResponse := AuxResponse.Deserialize(Data);
                     AuxResult := AuxResponse.AuxResult;
-                    LastRestCode := AuxResult.ResultCode;
                     InitializedRequest := true;
 
                     EFTTransactionRequest.Get(AuxResponse.RequestEntryNo);

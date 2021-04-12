@@ -208,7 +208,6 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
     local procedure IsValidContact(ContactNo: Code[20]): Boolean
     var
         MembershipRole: Record "NPR MM Membership Role";
-        Membership: Record "NPR MM Membership";
     begin
 
         if (ContactNo = '') then

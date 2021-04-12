@@ -2,7 +2,7 @@ page 6060133 "NPR MM Member Card Card"
 {
     UsageCategory = None;
     Caption = 'Member Card Card';
-    DataCaptionExpression = "External Card No.";
+    DataCaptionExpression = Rec."External Card No.";
     InsertAllowed = false;
     SourceTable = "NPR MM Member Card";
 
@@ -12,7 +12,7 @@ page 6060133 "NPR MM Member Card Card"
         {
             group(General)
             {
-                field("External Card No."; "External Card No.")
+                field("External Card No."; Rec."External Card No.")
                 {
                     ApplicationArea = All;
                     NotBlank = true;
@@ -29,63 +29,63 @@ page 6060133 "NPR MM Member Card Card"
                             if (not Confirm(EXT_NO_CHANGE, false)) then
                                 Error('');
 
-                        if (MembershipManagement.GetMembershipFromExtCardNo("External Card No.", Today, NotFoundReasonText) <> 0) then
-                            Error(TEXT6060000, FieldCaption("External Card No."), "External Card No.");
+                        if (MembershipManagement.GetMembershipFromExtCardNo(Rec."External Card No.", Today, NotFoundReasonText) <> 0) then
+                            Error(TEXT6060000, Rec.FieldCaption("External Card No."), Rec."External Card No.");
 
-                        "External Card No. Last 4" := '';
-                        if (StrLen("External Card No.") >= 4) then
-                            "External Card No. Last 4" := CopyStr("External Card No.", StrLen("External Card No.") - 3);
+                        Rec."External Card No. Last 4" := '';
+                        if (StrLen(Rec."External Card No.") >= 4) then
+                            Rec."External Card No. Last 4" := CopyStr(Rec."External Card No.", StrLen(Rec."External Card No.") - 3);
 
                     end;
                 }
-                field("External Card No. Last 4"; "External Card No. Last 4")
+                field("External Card No. Last 4"; Rec."External Card No. Last 4")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Card No. Last 4 field';
                 }
-                field("Pin Code"; "Pin Code")
+                field("Pin Code"; Rec."Pin Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pin Code field';
                 }
-                field("Valid Until"; "Valid Until")
+                field("Valid Until"; Rec."Valid Until")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid Until field';
                 }
-                field("Card Is Temporary"; "Card Is Temporary")
+                field("Card Is Temporary"; Rec."Card Is Temporary")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Is Temporary field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field("Block Reason"; "Block Reason")
+                field("Block Reason"; Rec."Block Reason")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Block Reason field';
                 }
-                field("Membership Entry No."; "Membership Entry No.")
+                field("Membership Entry No."; Rec."Membership Entry No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
                 }
-                field("Member Entry No."; "Member Entry No.")
+                field("Member Entry No."; Rec."Member Entry No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Member Entry No. field';
                 }
-                field("Document ID"; "Document ID")
+                field("Document ID"; Rec."Document ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -102,7 +102,7 @@ page 6060133 "NPR MM Member Card Card"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if (CloseAction = ACTION::OK) then
-            TestField("External Card No.");
+            Rec.TestField("External Card No.");
     end;
 
     var

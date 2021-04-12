@@ -42,11 +42,11 @@ xmlport 6060150 "NPR Event Import Opt. Items"
 
     procedure GetOptionalItems(var JobPlanningLine: Record "Job Planning Line")
     begin
-        if "Job Planning Line".FindSet then
+        if "Job Planning Line".FindSet() then
             repeat
                 JobPlanningLine := "Job Planning Line";
-                JobPlanningLine.Insert;
-            until "Job Planning Line".Next = 0;
+                JobPlanningLine.Insert();
+            until "Job Planning Line".Next() = 0;
     end;
 }
 

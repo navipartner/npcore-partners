@@ -22,14 +22,12 @@ codeunit 6059833 "NPR RFID PostPrint Rest. Rec."
         if not RFIDPrePrintGenerateValues.GetOriginalRecord(OriginalRetailJournalLine) then
             exit;
 
-        RecRef.Close;
+        RecRef.Close();
         RecRef.GetTable(OriginalRetailJournalLine);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014547, 'OnAfterPrintMatrix', '', false, false)]
     local procedure OnAfterPrintMatrix(var RecRef: RecordRef; TemplateHeader: Record "NPR RP Template Header")
-    var
-        RetailJournalLine: Record "NPR Retail Journal Line";
     begin
         if TemplateHeader."Post Processing Codeunit" <> CODEUNIT::"NPR RFID PostPrint Rest. Rec." then
             exit;

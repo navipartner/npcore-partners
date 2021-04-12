@@ -17,105 +17,105 @@ page 6150653 "NPR POS Sale Line Subpage"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Line Discount %"; "Line Discount %")
+                field("Line Discount %"; Rec."Line Discount %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Discount % field';
                 }
-                field("Line Discount Amount Excl. VAT"; "Line Discount Amount Excl. VAT")
+                field("Line Discount Amount Excl. VAT"; Rec."Line Discount Amount Excl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Discount Amount Excl. VAT field';
                 }
-                field("Amount Excl. VAT"; "Amount Excl. VAT")
+                field("Amount Excl. VAT"; Rec."Amount Excl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Excl. VAT field';
                 }
-                field("Amount Incl. VAT"; "Amount Incl. VAT")
+                field("Amount Incl. VAT"; Rec."Amount Incl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Incl. VAT field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Discount Authorised by"; "Discount Authorised by")
+                field("Discount Authorised by"; Rec."Discount Authorised by")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount Authorised by field';
                 }
-                field("Reason Code"; "Reason Code")
+                field("Reason Code"; Rec."Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reason Code field';
                 }
-                field("Bin Code"; "Bin Code")
+                field("Bin Code"; Rec."Bin Code")
                 {
                     ApplicationArea = All;
                     Importance = Standard;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Bin Code field';
                 }
-                field("Discount Type"; "Discount Type")
+                field("Discount Type"; Rec."Discount Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount Type field';
                 }
-                field("Discount Code"; "Discount Code")
+                field("Discount Code"; Rec."Discount Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount Code field';
                 }
-                field("Lot No."; "Lot No.")
+                field("Lot No."; Rec."Lot No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Lot No. field';
                 }
-                field("Return Reason Code"; "Return Reason Code")
+                field("Return Reason Code"; Rec."Return Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -138,7 +138,7 @@ page 6150653 "NPR POS Sale Line Subpage"
                         end;
                     end;
                 }
-                field("Exclude from Posting"; "Exclude from Posting")
+                field("Exclude from Posting"; Rec."Exclude from Posting")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Exclude from Posting field';
@@ -161,7 +161,7 @@ page 6150653 "NPR POS Sale Line Subpage"
                 trigger OnAction()
                 begin
                     //-NPR5.38 [294717]
-                    ShowDimensions;
+                    Rec.ShowDimensions;
                     //+NPR5.38 [294717]
                 end;
             }
@@ -176,9 +176,9 @@ page 6150653 "NPR POS Sale Line Subpage"
                 var
                     POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
                 begin
-                    POSEntrySalesDocLink.SetRange("POS Entry No.", "POS Entry No.");
+                    POSEntrySalesDocLink.SetRange("POS Entry No.", Rec."POS Entry No.");
                     POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE);
-                    POSEntrySalesDocLink.SetRange("POS Entry Reference Line No.", "Line No.");
+                    POSEntrySalesDocLink.SetRange("POS Entry Reference Line No.", Rec."Line No.");
                     PAGE.RunModal(PAGE::"NPR POS Entry Rel. Sales Doc.", POSEntrySalesDocLink);
                 end;
             }
@@ -199,13 +199,13 @@ page 6150653 "NPR POS Sale Line Subpage"
 
     local procedure TryGetLastPostedSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
-        POSEntrySalesDocLinkOut.SetRange("POS Entry No.", "POS Entry No.");
+        POSEntrySalesDocLinkOut.SetRange("POS Entry No.", Rec."POS Entry No.");
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Type", POSEntrySalesDocLinkOut."POS Entry Reference Type"::SALESLINE);
-        POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Line No.", "Line No.");
+        POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Line No.", Rec."Line No.");
         POSEntrySalesDocLinkOut.SetFilter("Sales Document Type", '%1|%2',
             POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_INVOICE,
             POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_CREDIT_MEMO);
-        exit(POSEntrySalesDocLinkOut.FindLast);
+        exit(POSEntrySalesDocLinkOut.FindLast());
     end;
 }
 

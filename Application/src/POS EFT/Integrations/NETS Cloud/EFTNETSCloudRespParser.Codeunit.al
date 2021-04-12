@@ -11,8 +11,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
 
     var
         INVALID_JSON: Label 'Invalid JSON, expected "%1"';
-        UNKNOWN: Label 'Unknown';
-        DIAGNOSE: Label 'Terminal Status: %1\Terminal Connection: %2\Host Connection: %3';
         EftTransactionEntryNo: Integer;
         ResponseType: Text;
         Data: Text;
@@ -50,7 +48,7 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
                 Error(ERROR_RESPONSE_TYPE, ResponseType);
         end;
 
-        EFTTransactionRequest.Modify;
+        EFTTransactionRequest.Modify();
     end;
 
     procedure SetResponseData(ResponseTypeIn: Text; DataIn: Text; EntryNo: Integer)
@@ -114,11 +112,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     local procedure ParseTransactionResult(JObject: DotNet NPRNetJObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         JToken: DotNet NPRNetJToken;
-        JValue: DotNet NPRNetJValue;
-        TrxTimestamp: DateTime;
-        CVM: Integer;
-        CultureInfo: DotNet NPRNetCultureInfo;
-        DecimalBuffer: Decimal;
     begin
         if TrySelectToken(JObject, 'latestTransactionResult', JToken, false) then begin
             //Is a GetLastTransaction result rather than a normal result
@@ -137,10 +130,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     local procedure ParseTransactionFailure(JObject: DotNet NPRNetJObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         JToken: DotNet NPRNetJToken;
-        JValue: DotNet NPRNetJValue;
-        TrxTimestamp: DateTime;
-        CVM: Integer;
-        CultureInfo: DotNet NPRNetCultureInfo;
     begin
         if not JObject.HasValues() then begin
             //Error can be directly in a string. Undocumented by NETS but observed during development.
@@ -353,12 +342,7 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     var
         ReceiptNo: Integer;
         EntryNo: Integer;
-        JToken: DotNet NPRNetJToken;
-        StringReader: DotNet NPRNetStringReader;
-        ReceiptLine: DotNet NPRNetString;
         OutStream: OutStream;
-        MerchantReceipt: Text;
-        CustomerReceipt: Text;
     begin
         ReceiptNo := GetLastReceiptNo(EFTTransactionRequest);
         EntryNo := GetLastReceiptLineEntryNo(EFTTransactionRequest);
@@ -494,7 +478,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
         JsonTextReader: DotNet NPRNetJsonTextReader;
         DateParseHandling: DotNet NPRNetDateParseHandling;
         FloatParseHandling: DotNet NPRNetFloatParseHandling;
-        FloatFormatHandling: DotNet NPRNetFloatFormatHandling;
     begin
         MemStream := MemStream.MemoryStream(Encoding.UTF8.GetBytes(JSON));
         StreamReader := StreamReader.StreamReader(MemStream, Encoding.UTF8);
@@ -508,7 +491,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     procedure IsConclusiveLookupResult(Response: Text; var InnerResponse: Text)
     var
         JObject: DotNet NPRNetJObject;
-        JToken: DotNet NPRNetJObject;
     begin
         ParseJSON(Response, JObject);
     end;
@@ -517,7 +499,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     procedure IsInProgressError(Response: Text)
     var
         JObject: DotNet NPRNetJObject;
-        JToken: DotNet NPRNetJObject;
     begin
         ParseJSON(Response, JObject);
     end;
@@ -564,7 +545,7 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
         EFTTransactionRequest.SetRange("Hardware ID", EftTransactionRequestIn."Hardware ID");
         EFTTransactionRequest.SetRange("Reference Number Output", STAN);
 
-        exit(not EFTTransactionRequest.IsEmpty);
+        exit(not EFTTransactionRequest.IsEmpty());
     end;
 
     local procedure GetLastReceiptLineEntryNo(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Integer
@@ -591,8 +572,8 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     var
         CreditCardTransaction: Record "NPR EFT Receipt";
     begin
-        CreditCardTransaction.Init;
-        CreditCardTransaction.Date := Today;
+        CreditCardTransaction.Init();
+        CreditCardTransaction.Date := Today();
         CreditCardTransaction."Transaction Time" := Time;
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
         CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
@@ -600,7 +581,7 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
         CreditCardTransaction."Receipt No." := ReceiptNo;
         CreditCardTransaction.Text := CopyStr(Line, 1, MaxStrLen(CreditCardTransaction.Text));
         CreditCardTransaction."Entry No." := EntryNo;
-        CreditCardTransaction.Insert;
+        CreditCardTransaction.Insert();
     end;
 
     local procedure ParseOptionalData(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; OptionalData: Text)

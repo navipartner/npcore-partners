@@ -1,4 +1,4 @@
-codeunit 6059940 "NPR SMS Management"
+﻿codeunit 6059940 "NPR SMS Management"
 {
     var
         UserNotified: Boolean;
@@ -53,7 +53,7 @@ codeunit 6059940 "NPR SMS Management"
         i: Integer;
         SendTo: Text;
     begin
-        for i := 1 to PhoneNo.Count do begin
+        for i := 1 to PhoneNo.Count() do begin
             PhoneNo.Get(i, SendTo);
             SendSMS(SendTo, SenderNo, Message, DelayUntil);
         end;
@@ -66,15 +66,13 @@ codeunit 6059940 "NPR SMS Management"
         SendTo: Text;
         Sender: Text;
         SMSBodyText: Text;
-        SendingOption: Option Direct,NaviDocs;
         DelayUntil: DateTime;
-        Changed: Boolean;
         SendToList: List of [Text];
         SMSRecipientType: enum "NPR SMS Recipient Type";
         SMSGroupcode: Code[10];
     begin
         DialogPage.SetRecord(Template);
-        if DialogPage.RunModal <> ACTION::OK then
+        if DialogPage.RunModal() <> ACTION::OK then
             exit;
 
         DialogPage.GetData(SMSRecipientType, SMSGroupcode, SendTo, RecRef, SMSBodyText, Sender, DelayUntil);
@@ -113,7 +111,6 @@ codeunit 6059940 "NPR SMS Management"
         MessageText: Text;
         DummyTxt: Text;
         DummyRecRef: RecordRef;
-        i: Integer;
         SMSRecipientType: enum "NPR SMS Recipient Type";
         SMSGroupcode: Code[10];
     begin
@@ -123,7 +120,7 @@ codeunit 6059940 "NPR SMS Management"
         if not SetFiltersOnTable(SMSTemplateHeader, Filters, RecRef) then
             exit;
 
-        Total := RecRef.Count;
+        Total := RecRef.Count();
 
         if Total = 0 then begin
             Message(NoRecordsText);
@@ -138,7 +135,7 @@ codeunit 6059940 "NPR SMS Management"
         SMSSendMessage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", '', DummyRecRef, Sender, 2, StrSubstNo(BatchSendStatusText, SMSTemplateHeader."Table Caption", Total), false);
 
         SMSSendMessage.SetRecord(SMSTemplateHeader);
-        if SMSSendMessage.RunModal <> ACTION::OK then
+        if SMSSendMessage.RunModal() <> ACTION::OK then
             exit;
 
         SMSSendMessage.GetData(SMSRecipientType, SMSGroupcode, DummyTxt, DummyRecRef, MessageText, DummyTxt, DelayUntil);
@@ -150,14 +147,14 @@ codeunit 6059940 "NPR SMS Management"
             Window.Open(SendingProgressDialogText);
 
 
-        if RecRef.FindSet then
+        if RecRef.FindSet() then
             repeat
                 Counter += 1;
                 Window.Update(1, Round((Counter / Total) * 10000, 1));
                 PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0));
                 QueueMessages(SendToList, Sender, MergeDataFields(MessageText, RecRef, 0), DelayUntil);
-            until RecRef.Next = 0;
-        Window.Close;
+            until RecRef.Next() = 0;
+        Window.Close();
         QueuedNotification();
     end;
 
@@ -169,13 +166,11 @@ codeunit 6059940 "NPR SMS Management"
         SendTo: Text;
         Sender: Text;
         SMSBodyText: Text;
-        SendingOption: Option Direct,NaviDocs;
         DelayUntil: DateTime;
         SMSRecipientType: enum "NPR SMS Recipient Type";
         DataTypeManagement: Codeunit "Data Type Management";
         SMSGroupcode: Code[10];
         SMSPhoneList: List of [Text];
-        i: Integer;
     begin
         if not DataTypeManagement.GetRecordRef(RecordToSendVariant, RecRef) then
             exit;
@@ -188,7 +183,7 @@ codeunit 6059940 "NPR SMS Management"
             DialogPage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo, RecRef, Sender, 1, '', true);
 
             DialogPage.SetRecord(SMSTemplateHeader);
-            if DialogPage.RunModal <> ACTION::OK then
+            if DialogPage.RunModal() <> ACTION::OK then
                 exit;
             DialogPage.GetData(SMSRecipientType, SMSGroupcode, SendTo, RecRef, SMSBodyText, Sender, DelayUntil);
 
@@ -216,7 +211,6 @@ codeunit 6059940 "NPR SMS Management"
         FilterPageBuilder: FilterPageBuilder;
         RecRef: RecordRef;
         PrimaryKeyRef: KeyRef;
-        DynamicRequestPageFieldAdded: Boolean;
         Index: Integer;
     begin
         SMSTemplateHeader.CalcFields("Table Caption");
@@ -230,10 +224,9 @@ codeunit 6059940 "NPR SMS Management"
             PrimaryKeyRef := RecRef.KeyIndex(1);
             for Index := 1 to PrimaryKeyRef.FieldCount do begin
                 DynamicRequestPageField."Field ID" := PrimaryKeyRef.FieldIndex(Index).Number;
-                DynamicRequestPageField.Insert;
+                DynamicRequestPageField.Insert();
             end;
-            DynamicRequestPageFieldAdded := true;
-            Commit;
+            Commit();
         end;
         if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, CopyStr(SMSTemplateHeader."Table Caption", 1, 20), SMSTemplateHeader."Table No.") then
             exit(false);
@@ -245,7 +238,7 @@ codeunit 6059940 "NPR SMS Management"
                 exit(false);
 
         FilterPageBuilder.PageCaption := StrSubstNo(CaptionText, SMSTemplateHeader."Table Caption");
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         ReturnFilters :=
@@ -272,7 +265,7 @@ codeunit 6059940 "NPR SMS Management"
         if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
             exit(false);
 
-        if SMSTemplateHeader."Table Filters".HasValue then begin
+        if SMSTemplateHeader."Table Filters".HasValue() then begin
             RecRef.FilterGroup(56);
             SMSTemplateHeader.CalcFields("Table Filters");
             Clear(TempBlob);
@@ -425,7 +418,6 @@ codeunit 6059940 "NPR SMS Management"
     var
         TempBlob: Codeunit "Temp Blob";
         RecRef: RecordRef;
-        Filters: Text;
         IsHandled: Boolean;
         TemplateFound: Boolean;
         MoreRecords: Boolean;
@@ -439,9 +431,9 @@ codeunit 6059940 "NPR SMS Management"
         TemplateFound := false;
         CanEvaluateFilters := DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
         Template.SetRange("Table No.", RecRef.Number);
-        if Template.FindSet then
+        if Template.FindSet() then
             repeat
-                if CanEvaluateFilters and Template."Table Filters".HasValue then begin
+                if CanEvaluateFilters and Template."Table Filters".HasValue() then begin
                     Template.CalcFields("Table Filters");
                     Clear(TempBlob);
                     TempBlob.FromRecord(Template, Template.FieldNo("Table Filters"));
@@ -450,11 +442,11 @@ codeunit 6059940 "NPR SMS Management"
                 end else
                     TemplateFound := true;
                 if not TemplateFound then
-                    MoreRecords := Template.Next <> 0;
+                    MoreRecords := Template.Next() <> 0;
             until TemplateFound or (not MoreRecords);
 
         if not TemplateFound then begin
-            Template.Init;
+            Template.Init();
             Template.Code := '';
         end;
 
@@ -467,7 +459,6 @@ codeunit 6059940 "NPR SMS Management"
         PossibleTemplate: Record "NPR SMS Template Header" temporary;
         TempBlob: Codeunit "Temp Blob";
         RecRef: RecordRef;
-        Filters: Text;
         IsHandled: Boolean;
         TemplateFound: Boolean;
         CanEvaluateFilters: Boolean;
@@ -479,32 +470,32 @@ codeunit 6059940 "NPR SMS Management"
 
         CanEvaluateFilters := DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
         Template.SetRange("Table No.", RecRef.Number);
-        if Template.FindSet then
+        if Template.FindSet() then
             repeat
-                if CanEvaluateFilters and Template."Table Filters".HasValue then begin
+                if CanEvaluateFilters and Template."Table Filters".HasValue() then begin
                     Template.CalcFields("Table Filters");
                     Clear(TempBlob);
                     TempBlob.FromRecord(Template, Template.FieldNo("Table Filters"));
                     if EvaluateConditionOnTable(RecordVariant, RecRef.Number, TempBlob) then begin
                         PossibleTemplate := Template;
-                        PossibleTemplate.Insert;
+                        PossibleTemplate.Insert();
                     end;
                 end else begin
                     PossibleTemplate := Template;
-                    PossibleTemplate.Insert;
+                    PossibleTemplate.Insert();
                 end;
-            until Template.Next = 0;
+            until Template.Next() = 0;
 
-        TemplateFound := PossibleTemplate.FindFirst;
+        TemplateFound := PossibleTemplate.FindFirst();
 
         if TemplateFound then
-            if GuiAllowed and (PossibleTemplate.Count > 1) then
+            if GuiAllowed and (PossibleTemplate.Count() > 1) then
                 TemplateFound := PAGE.RunModal(6059940, PossibleTemplate) = ACTION::LookupOK;
 
         if TemplateFound then
             Template.Get(PossibleTemplate.Code)
         else begin
-            Template.Init;
+            Template.Init();
             Template.Code := '';
             TemplateFound := false;
         end;
@@ -537,7 +528,7 @@ codeunit 6059940 "NPR SMS Management"
         end;
         TableRecRef.FilterGroup(0);
 
-        exit(not TableRecRef.IsEmpty);
+        exit(not TableRecRef.IsEmpty());
     end;
 
     procedure MakeMessage(Template: Record "NPR SMS Template Header"; RecordVariant: Variant) SMSMessage: Text
@@ -546,7 +537,6 @@ codeunit 6059940 "NPR SMS Management"
         TemplateLine: Record "NPR SMS Template Line";
         DataTypeManagement: Codeunit "Data Type Management";
         MergeRecord: Boolean;
-        CRLF: Text[2];
         Char13: Char;
         Char10: Char;
     begin
@@ -557,7 +547,7 @@ codeunit 6059940 "NPR SMS Management"
             MergeRecord := not IsRecRefEmpty(RecRef);
 
         TemplateLine.SetRange("Template Code", Template.Code);
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 if SMSMessage <> '' then
                     SMSMessage += Format(Char13) + Format(Char10);
@@ -566,7 +556,7 @@ codeunit 6059940 "NPR SMS Management"
                 else
                     SMSMessage += TemplateLine."SMS Text";
 
-            until TemplateLine.Next = 0;
+            until TemplateLine.Next() = 0;
         exit(SMSMessage);
     end;
 
@@ -574,7 +564,6 @@ codeunit 6059940 "NPR SMS Management"
     var
         DotNetRegEx: Codeunit DotNet_Regex;
         DotNetMatch: Codeunit DotNet_Match;
-        FieldPos: Integer;
         ResultText: Text;
     begin
         ResultText := '';
@@ -637,7 +626,7 @@ codeunit 6059940 "NPR SMS Management"
         EmptyRecRef.Open(RecRef.Number);
         if RecRef.RecordId = EmptyRecRef.RecordId then
             exit(true);
-        exit(RecRef.IsEmpty);
+        exit(RecRef.IsEmpty());
     end;
 
     local procedure GetDefaultSender(): Text
@@ -697,7 +686,6 @@ codeunit 6059940 "NPR SMS Management"
         Sender: Text;
         SendTo: Text;
         SMSManagement: Codeunit "NPR SMS Management";
-        i: Integer;
         SendToList: list of [Text];
     begin
         if not Successful then
@@ -712,9 +700,9 @@ codeunit 6059940 "NPR SMS Management"
         if (not SMSTemplateHeader.Get(POSEndOfdayProfile."SMS Profile")) then
             exit;
 
-        POSWorkshifCheckpoint.Reset;
+        POSWorkshifCheckpoint.Reset();
         POSWorkshifCheckpoint.SetRange("POS Entry No.", PosEntryNo);
-        if POSWorkshifCheckpoint.FindFirst then
+        if POSWorkshifCheckpoint.FindFirst() then
             RecRef.GetTable(POSWorkshifCheckpoint);
 
         SMSBodyText := SMSManagement.MakeMessage(SMSTemplateHeader, RecRef);

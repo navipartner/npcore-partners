@@ -29,20 +29,11 @@ codeunit 6014531 "NPR Retail Logo Mgt."
 
     var
         Error000001: Label 'Maximum supported image size after conversion is 65523 bytes.\Uploaded image is %1 bytes after conversion. This usually happens if the image has too much height.';
-        Error000002: Label 'No Object Output found for codeunit %1';
-        Error000003: Label 'Invalid Object Output for codeunit %1';
-        Error000004: Label 'No sales ticket set up in retail report selection. \The "Print Logo" action uses the sales ticket object output to select a test printer!';
         Text000001: Label 'Insert Keyword';
         Text_UploadCaption: Label 'Choose logo file';
 
     procedure GetRetailLogo(KeywordIn: Code[20]; RegisterNo: Code[10]; var RetailLogo: Record "NPR Retail Logo"): Boolean
     var
-        InStream: InStream;
-        ByteArray: DotNet NPRNetArray;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
-        FromDate: Date;
-        ToDate: Date;
         POSUnit: Record "NPR POS Unit";
     begin
         //Use RetailLogo.SETAUTOCALCFIELDS() on the blobs you need, before you call this function.
@@ -71,7 +62,6 @@ codeunit 6014531 "NPR Retail Logo Mgt."
     procedure UploadLogoFromFile(FileName: Text): Boolean
     var
         Bitmap: DotNet NPRNetBitmap;
-        ESCPOS: Text;
     begin
         if not ImportImage(Bitmap) then
             exit(false);
@@ -108,12 +98,11 @@ codeunit 6014531 "NPR Retail Logo Mgt."
     local procedure ImportImage(var Bitmap: DotNet NPRNetBitmap): Boolean
     var
         FileMgt: Codeunit "File Management";
-        FilePath: Text;
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
     begin
         FileMgt.BLOBImportWithFilter(TempBlob, Text_UploadCaption, '', 'Image Files (*.BMP;*.GIF;*.JPG;*.PNG;*.TIFF;*.EXIF)|*.BMP;*.GIF;*.JPG;*.PNG;*.TIFF;*.EXIF', 'bmp,gif,jpg,png,tiff,exif');
-        if not TempBlob.HasValue then
+        if not TempBlob.HasValue() then
             exit(false);
 
         TempBlob.CreateInStream(InStream);
@@ -178,7 +167,7 @@ codeunit 6014531 "NPR Retail Logo Mgt."
         Encoding: DotNet NPRNetEncoding;
         BitConverter: DotNet NPRNetBitConverter;
     begin
-        RetailLogo.Init;
+        RetailLogo.Init();
         RetailLogo.NewRecord;
         RetailLogo.Keyword := Text000001;
         RetailLogo.Width := Bitmap.Width;
@@ -196,7 +185,7 @@ codeunit 6014531 "NPR Retail Logo Mgt."
 
         RetailLogo.Logo.CreateOutStream(OutStream);
         Bitmap.Save(OutStream, ImageFormat.Bmp);
-        RetailLogo.Insert;
+        RetailLogo.Insert();
 
         Clear(OutStream);
         RetailLogo.ESCPOSLogo.CreateOutStream(OutStream);
@@ -213,7 +202,7 @@ codeunit 6014531 "NPR Retail Logo Mgt."
         RetailLogo.OneBitLogoByteSize := MemoryStream.ToArray().Length; // Get bytesize
         OneBitBitmap.Save(OutStream, ImageFormat.Bmp); // Store logo
         //+NPR5.55 [404276]
-        RetailLogo.Modify;
+        RetailLogo.Modify();
     end;
 
     local procedure ConvertToNonIndexed32bit(var BitmapOut: DotNet NPRNetBitmap)
@@ -262,7 +251,7 @@ codeunit 6014531 "NPR Retail Logo Mgt."
     begin
         //-NPR5.46 [327525]
         RetailLogo.CalcFields(Logo);
-        if RetailLogo.Logo.HasValue then begin
+        if RetailLogo.Logo.HasValue() then begin
             TempBlob.FromRecord(RetailLogo, RetailLogo.FieldNo(Logo));
             FileManagement.BLOBExport(TempBlob, RetailLogo.Keyword + Format(RetailLogo.Sequence) + '.bmp', true);
         end;
@@ -272,9 +261,7 @@ codeunit 6014531 "NPR Retail Logo Mgt."
     local procedure ConvertTo1bitBitmap(BitmapIn: DotNet NPRNetBitmap; var BitmapOut: DotNet NPRNetBitmap)
     var
         Bitmap: DotNet NPRNetBitmap;
-        Graphics: DotNet NPRNetGraphics;
         PixelFormat: DotNet NPRNetPixelFormat;
-        PixelOffsetMode: DotNet NPRNetPixelOffsetMode;
         Rectangle: DotNet NPRNetRectangle;
     begin
         //-NPR5.55 [404276]

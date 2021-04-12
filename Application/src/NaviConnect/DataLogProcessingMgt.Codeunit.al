@@ -14,7 +14,7 @@ codeunit 6059896 "NPR Data Log Processing Mgt."
     begin
         DataLogProcessingEntry."Processing Started at" := CurrentDateTime;
         DataLogProcessingEntry.Modify(true);
-        Commit;
+        Commit();
 
         DataLogSubscriber.Get(DataLogProcessingEntry."Subscriber Code", DataLogProcessingEntry."Table Number", '');
         DataLogSubscriber.TestField("Data Processing Codeunit ID");
@@ -23,6 +23,6 @@ codeunit 6059896 "NPR Data Log Processing Mgt."
 
         DataLogProcessingEntry."Processing Completed at" := CurrentDateTime;
         DataLogProcessingEntry.Modify(true);
-        Commit;
+        Commit();
     end;
 }

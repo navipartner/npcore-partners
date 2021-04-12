@@ -111,8 +111,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         ThreeColumnDistribution: array[3] of Decimal;
         FourColumnDistribution: array[4] of Decimal;
         Error_MissingDevice: Label 'Missing printer device type for: (template %1, codeunit %2, report %3)';
-        Error_NoOutputFound: Label 'No output found for\Object: %1 %2\Template: %3';
-        Error_UnsupportedOutput: Label 'Output Type %1 is not supported for %2';
         Error_InvalidTableAttribute: Label 'Cannot print attributes from table %1';
         LineBuffer: Text;
         DecimalRounding: Option "2","3","4","5";
@@ -268,13 +266,10 @@ codeunit 6014549 "NPR RP Line Print Mgt."
 
     procedure ClearBuffer()
     begin
-        Buffer.DeleteAll;
+        Buffer.DeleteAll();
     end;
 
     procedure ProcessCodeunit(CodeunitID: Integer; "Table": Variant)
-    var
-        OutputMgt: Codeunit "NPR Object Output Mgt.";
-        ObjectOutputSelection: Record "NPR Object Output Selection";
     begin
         // DEPRECATED FUNCTION - DO NOT USE.
         // This function takes advantage of the fact that this codeunit is single instance, which will be removed eventually.
@@ -328,7 +323,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
 
     local procedure RunPrintEngine(TemplateHeader: Record "NPR RP Template Header"; "Table": Variant)
     var
-        TemplateLine: Record "NPR RP Template Line";
         RecRef: RecordRef;
         DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt.";
     begin
@@ -354,16 +348,8 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer)
     var
         CurrentLine: Integer;
-        Err00001: Label 'Printername: "%1" is not a supported line printer';
-        PrintBytes: Text;
-        TemplateHeader: Record "NPR RP Template Header";
         DeviceType: Text;
-        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        TargetEncoding: Text;
-        HTTPEndpoint: Text;
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         DeviceSettings: Record "NPR RP Device Settings";
-        Supported: Boolean;
     begin
         DeviceType := GetDeviceType(TemplateCode, CodeunitId, ReportId);
         DeviceSettings.SetRange(Template, TemplateCode);
@@ -371,14 +357,14 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         LinePrinter.Construct(DeviceType);
         LinePrinter.OnInitJob(DeviceSettings);
 
-        if Buffer.FindSet then
+        if Buffer.FindSet() then
             repeat
                 if CurrentLine <> Buffer."Line No." then
                     LinePrinter.OnLineFeed();
                 PadBuffer();
                 LinePrinter.OnPrintData(Buffer);
                 CurrentLine := Buffer."Line No.";
-            until Buffer.Next = 0;
+            until Buffer.Next() = 0;
 
         LinePrinter.OnEndJob();
         OnSendPrintJob(TemplateCode, CodeunitId, ReportId, LinePrinter, 1);
@@ -388,7 +374,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     local procedure GetColumnCount(var PrintBufferIn: Record "NPR RP Print Buffer" temporary) Columns: Integer
     begin
         PrintBufferIn.SetRange("Line No.", PrintBufferIn."Line No.");
-        Columns := PrintBufferIn.Count;
+        Columns := PrintBufferIn.Count();
         PrintBufferIn.SetRange("Line No.");
     end;
 
@@ -400,7 +386,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     begin
         DataJoinBuffer.SetBounds(LowerBoundIn, UpperBoundIn);
 
-        if TemplateLine.FindSet then
+        if TemplateLine.FindSet() then
             repeat
                 case TemplateLine.Type of
                     TemplateLine.Type::Loop:
@@ -432,7 +418,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                             AddLine(TemplateLine."Type Option");
                         end;
                 end;
-            until TemplateLine.Next = 0;
+            until TemplateLine.Next() = 0;
     end;
 
     local procedure EvaluateFields(TemplateLine: Record "NPR RP Template Line"; var DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."): Text[30]
@@ -492,7 +478,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         Handled: Boolean;
         Skip: Boolean;
         DecimalBuffer: Decimal;
-        i: Integer;
     begin
         //-NPR5.55 [391841]
         if TemplateLine."Template Column No." < 1 then begin
@@ -522,7 +507,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                         if TemplateLine.Attribute <> '' then begin
                             AttributeID.SetRange(AttributeID."Table ID", TemplateLine."Data Item Table");
                             AttributeID.SetRange(AttributeID."Attribute Code", TemplateLine.Attribute);
-                            if AttributeID.FindFirst then begin
+                            if AttributeID.FindFirst() then begin
                                 RecRef.Open(TemplateLine."Data Item Table");
                                 KeyRef := RecRef.KeyIndex(RecRef.CurrentKeyIndex());
                                 if KeyRef.FieldCount > 1 then
@@ -547,9 +532,9 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                         if TemplateLine.Attribute <> '' then begin
                             AttributeID.SetRange(AttributeID."Table ID", TemplateLine."Data Item Table");
                             AttributeID.SetRange(AttributeID."Attribute Code", TemplateLine.Attribute);
-                            if AttributeID.FindFirst then begin
+                            if AttributeID.FindFirst() then begin
                                 AttributeLookupValue.SetRange("Attribute Code", AttributeID."Attribute Code");
-                                AttributeLookupValue.FindFirst;
+                                AttributeLookupValue.FindFirst();
                                 TemplateLine."Processing Value" := AttributeLookupValue."Attribute Value Name";
                             end;
                         end;
@@ -589,7 +574,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                 Clear(LineBuffer);
                 if (TemplateLine."Template Column No." > LastColumnNo) and (not TemplateLine."Prefix Next Line") then begin
                     Buffer.SetRange("Line No.", CurrentLineNo);
-                    Buffer.DeleteAll;
+                    Buffer.DeleteAll();
                     Buffer.SetRange("Line No.");
                 end;
                 //-NPR5.55 [391841]
@@ -769,8 +754,8 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         Buffer.Underline := CurrentUnderLine;
         Buffer.DoubleStrike := CurrentDoubleStrike;
         Buffer.Align := Align;
-        if not Buffer.Insert then
-            Buffer.Modify;
+        if not Buffer.Insert() then
+            Buffer.Modify();
 
         LastColumnNo := Column;
 
@@ -780,7 +765,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     local procedure ClearState()
     begin
         //Can be deleted when this CU is no longer single instance.
-        Buffer.DeleteAll;
+        Buffer.DeleteAll();
         Clear(Buffer);
         Clear(LinePrinter);
         Clear(CurrentLineNo);

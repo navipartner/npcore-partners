@@ -1,4 +1,4 @@
-codeunit 6151198 "NPR NpCs Upd. Order Status"
+﻿codeunit 6151198 "NPR NpCs Upd. Order Status"
 {
     var
         Text000: Label 'Collect in Store Document is first Processed by Store and then Delivered';
@@ -15,7 +15,7 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         if NpCsWorkflowModule.Get(NpCsWorkflowModule.Type::"Order Status", WorkflowCode()) then
             exit;
 
-        NpCsWorkflowModule.Init;
+        NpCsWorkflowModule.Init();
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
         NpCsWorkflowModule.Code := WorkflowCode();
         NpCsWorkflowModule.Description := CopyStr(Text000, 1, MaxStrLen(NpCsWorkflowModule.Description));
@@ -69,7 +69,7 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
             ExceptionMessage := Response.ReasonPhrase;
             if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                    ExceptionMessage := Node.AsXmlElement.InnerText();
+                    ExceptionMessage := Node.AsXmlElement().InnerText();
             end;
 
             LogMessage := Text001;
@@ -90,7 +90,7 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         if not Document.SelectSingleNode(XPath, Node) then
             Error(Text002);
 
-        NpCsDocument.Find;
+        NpCsDocument.Find();
         PrevRec := Format(NpCsDocument);
 
         Status := NpXmlDomMgt.GetElementInt(Node.AsXmlElement(), 'processing_status', true);
@@ -113,7 +113,7 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         if PrevRec <> Format(NpCsDocument) then
             NpCsDocument.Modify(true);
 
-        Node.AsXmlElement.SelectNodes('//log_entries/log_entry', NodeList);
+        Node.AsXmlElement().SelectNodes('//log_entries/log_entry', NodeList);
         foreach Node2 in NodeList do
             InsertLogEntry(NpCsStore, NpCsDocument, Node2.AsXmlElement());
     end;
@@ -132,10 +132,10 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         NpCsDocumentLogEntry.SetRange("Document Entry No.", NpCsDocument."Entry No.");
         NpCsDocumentLogEntry.SetRange("Store Log Entry No.", EntryNo);
         NpCsDocumentLogEntry.SetRange("Store Code", NpCsStore.Code);
-        if NpCsDocumentLogEntry.FindFirst then
+        if NpCsDocumentLogEntry.FindFirst() then
             exit;
 
-        NpCsDocumentLogEntry.Init;
+        NpCsDocumentLogEntry.Init();
         NpCsDocumentLogEntry."Entry No." := 0;
         NpCsDocumentLogEntry."Document Entry No." := NpCsDocument."Entry No.";
         NpCsDocumentLogEntry."Store Log Entry No." := EntryNo;

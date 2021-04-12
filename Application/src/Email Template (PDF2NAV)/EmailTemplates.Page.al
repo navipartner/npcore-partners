@@ -15,22 +15,22 @@ page 6059795 "NPR E-mail Templates"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report ID field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
@@ -47,7 +47,7 @@ page 6059795 "NPR E-mail Templates"
             {
                 Caption = 'View HTML Template';
                 Image = View;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the View HTML Template action';
 
@@ -62,7 +62,7 @@ page 6059795 "NPR E-mail Templates"
             {
                 Caption = 'Import HTML Template';
                 Image = Import;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import HTML Template action';
 
@@ -78,7 +78,7 @@ page 6059795 "NPR E-mail Templates"
             {
                 Caption = 'Export HTML Template';
                 Image = Export;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Export HTML Template action';
 
@@ -93,7 +93,7 @@ page 6059795 "NPR E-mail Templates"
             {
                 Caption = 'Copy From E-Mail Template';
                 Image = Copy;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Copy From E-Mail Template action';
 
@@ -108,7 +108,7 @@ page 6059795 "NPR E-mail Templates"
             {
                 Caption = 'Delete HTML Template';
                 Image = Delete;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
+                Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
                 ApplicationArea = All;
                 ToolTip = 'Executes the Delete HTML Template action';
 

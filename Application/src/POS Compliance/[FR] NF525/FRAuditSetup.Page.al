@@ -94,7 +94,7 @@ page 6184850 "NPR FR Audit Setup"
                 Caption = 'Upload Certificate';
                 Image = ImportCodes;
                 Promoted = true;
-                PromotedOnly = true; 
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -155,7 +155,7 @@ page 6184850 "NPR FR Audit Setup"
                         Clear(InputDialog);
                         InputDialog.LookupMode := true;
                         InputDialog.SetInput(1, DescriptionOut, CAPTION_PARTNER_MOD);
-                        if InputDialog.RunModal = ACTION::LookupOK then
+                        if InputDialog.RunModal() = ACTION::LookupOK then
                             ID := InputDialog.InputText(1, DescriptionOut);
                     until (DescriptionOut <> '') or (ID = 0);
                     if (ID = 0) then

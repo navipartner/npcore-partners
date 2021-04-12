@@ -33,7 +33,7 @@ report 6060127 "NPR MM Member Card Print QR"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "MM Member".Picture.HasValue then
+                    if "MM Member".Picture.HasValue() then
                         "MM Member".CalcFields(Picture);
 
                     Clear(MemberName);
@@ -49,7 +49,6 @@ report 6060127 "NPR MM Member Card Print QR"
             trigger OnAfterGetRecord()
             var
                 BarcodeLib: Codeunit "NPR Barcode Image Library";
-                Item: Record Item;
                 MMMembershipRole: Record "NPR MM Membership Role";
             begin
                 BarcodeLib.SetSizeX(2);
@@ -68,7 +67,7 @@ report 6060127 "NPR MM Member Card Print QR"
             trigger OnPreDataItem()
             begin
                 if POSUnit.Get(POSUnit.GetCurrentPOSUnit()) then
-                    if POSViewProfile.Get(POSUnit."POS View Profile") and POSViewProfile.Picture.HasValue then
+                    if POSViewProfile.Get(POSUnit."POS View Profile") and POSViewProfile.Picture.HasValue() then
                         POSViewProfile.CalcFields(Picture);
             end;
         }

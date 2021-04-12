@@ -22,30 +22,28 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion(),
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('select_addon',
-                  'if (param.ItemAddOnNo) {' +
-                  '  context.item_addon = param.ItemAddOnNo;' +
-                  '} else {' +
-                  '  respond();' +
-                  '}'
-                );
-                RegisterWorkflowStep('insert_addons',
-                  'if (context.item_addon) {' +
-                  '  respond();' +
-                  '}'
-                );
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  Text000,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('select_addon',
+              'if (param.ItemAddOnNo) {' +
+              '  context.item_addon = param.ItemAddOnNo;' +
+              '} else {' +
+              '  respond();' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('insert_addons',
+              'if (context.item_addon) {' +
+              '  respond();' +
+              '}'
+            );
+            Sender.RegisterWorkflow(false);
 
-                RegisterTextParameter('ItemAddOnNo', '');
-            end;
+            Sender.RegisterTextParameter('ItemAddOnNo', '');
         end;
     end;
 
@@ -73,7 +71,7 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -133,7 +131,7 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(AppliesToSaleLinePOS);
         NpIaItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(AppliesToSaleLinePOS, SaleLinePOSAddOn);
-        if SaleLinePOSAddOn.FindFirst then
+        if SaleLinePOSAddOn.FindFirst() then
             if SaleLinePOSAddOn."Applies-to Line No." <> 0 then
                 AppliesToSaleLinePOS.Get(
                   AppliesToSaleLinePOS."Register No.",

@@ -29,7 +29,6 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
         Node: XmlNode;
         NodeList: XmlNodeList;
         Declaration: XmlDeclaration;
-        Token: Text[50];
         XPathExcludeNamespacePattern: Text;
     begin
         if not Document.GetRoot(Element) then
@@ -69,7 +68,6 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
         Element2: XmlElement;
         Node: XmlNode;
         NodeList: XmlNodeList;
-        i: Integer;
     begin
         ReadEndpointQuery(Element, EndpointQuery, XPathExcludeNamespacePattern);
         if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'endpointqueryfilter'), NodeList) then
@@ -156,7 +154,6 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
 
     procedure Load(var Rec: Record "NPR Nc Import Entry"; var Document: XmlDocument): Boolean
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         InStr: InStream;
     begin
         Rec.CalcFields("Document Source");

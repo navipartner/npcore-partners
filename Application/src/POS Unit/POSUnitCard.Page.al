@@ -74,7 +74,7 @@ page 6150617 "NPR POS Unit Card"
                 }
                 field("Password on unblock discount"; Rec."Password on unblock discount")
                 {
-                    ApplicationArea = All;                  
+                    ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Administrator Password field.';
                     ExtendedDatatype = Masked;
                 }

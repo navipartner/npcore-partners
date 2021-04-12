@@ -95,7 +95,7 @@ page 6151402 "NPR Magento Inv. Companies"
         MagentoInventoryNpXmlValue: Codeunit "NPR Magento Inv. NpXml Value";
     begin
         if Item.ChangeCompany(Rec."Company Name") then;
-        Item.FindFirst;
+        Item.FindFirst();
         MagentoInventoryNpXmlValue.CalcMagentoInventoryCompany(Rec, Item."No.", '');
         Message(Text000);
     end;

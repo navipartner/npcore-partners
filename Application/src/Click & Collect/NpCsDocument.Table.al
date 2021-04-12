@@ -595,7 +595,7 @@ table 6151198 "NPR NpCs Document"
         end;
 
         NpCsDocumentLogEntry.SetRange("Document Entry No.", "Entry No.");
-        NpCsDocumentLogEntry.DeleteAll;
+        NpCsDocumentLogEntry.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -608,7 +608,7 @@ table 6151198 "NPR NpCs Document"
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
     begin
         NpCsDocumentLogEntry.SetRange("Document Entry No.", "Entry No.");
-        if NpCsDocumentLogEntry.FindLast then
+        if NpCsDocumentLogEntry.FindLast() then
             exit(NpCsDocumentLogEntry."Log Message");
     end;
 
@@ -617,7 +617,7 @@ table 6151198 "NPR NpCs Document"
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
     begin
         NpCsDocumentLogEntry.SetRange("Document Entry No.", "Entry No.");
-        if NpCsDocumentLogEntry.FindLast then
+        if NpCsDocumentLogEntry.FindLast() then
             exit(NpCsDocumentLogEntry.GetErrorMessage());
     end;
 

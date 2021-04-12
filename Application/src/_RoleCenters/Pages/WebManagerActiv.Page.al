@@ -1,4 +1,4 @@
-page 6059984 "NPR Web Manager Activ."
+﻿page 6059984 "NPR Web Manager Activ."
 {
     Caption = 'Web Order Activities';
     PageType = CardPart;
@@ -66,7 +66,7 @@ page 6059984 "NPR Web Manager Activ."
                 RunPageMode = Create;
                 ApplicationArea = All;
                 ToolTip = 'Executes the New Credit Memo action';
-                Image = New; 
+                Image = New;
             }
             action("New Purchase Order")
             {
@@ -74,17 +74,17 @@ page 6059984 "NPR Web Manager Activ."
                 RunObject = Page "Purchase Order";
                 ApplicationArea = All;
                 ToolTip = 'Executes the New Purchase Order action';
-                Image = New; 
+                Image = New;
             }
         }
     }
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

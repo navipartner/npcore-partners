@@ -1,4 +1,4 @@
-page 6060059 "NPR POS Inventory Overview"
+﻿page 6060059 "NPR POS Inventory Overview"
 {
     // NPR5.34/BR  /20170726   CASE 282748 Object Created
     // NPR5.52/ALPO/20191002 CASE 370333 New options to show inventory for current location only
@@ -130,29 +130,29 @@ page 6060059 "NPR POS Inventory Overview"
             repeater(Group)
             {
                 Editable = false;
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Variant Description"; "Variant Description")
+                field("Variant Description"; Rec."Variant Description")
                 {
                     ApplicationArea = All;
                     Visible = VariantVisible;
                     ToolTip = 'Specifies the value of the Variant Description field';
                 }
-                field("Location Name"; "Location Name")
+                field("Location Name"; Rec."Location Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Name field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     DecimalPlaces = 0 : 2;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Item Description"; "Item Description")
+                field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = All;
                     Caption = 'Description 2';
@@ -207,15 +207,15 @@ page 6060059 "NPR POS Inventory Overview"
     begin
         if ItemCode = '' then
             exit;
-        DeleteAll;
+        Rec.DeleteAll();
         QtyCurrentLocation := 0;
 
         if (Item."No." <> '') and (ItemCode <> Item."No.") then begin
             //Open a new page with new Visible properties
             //POSInventoryOverview.SetParameters(ItemCode,VariantCode,CurrentLocationCode);  //NPR5.52 [370333]-revoked
             POSInventoryOverview.SetParameters(ItemCode, VariantCode, CurrentLocationCode, OnlyCurentLoc);  //NPR5.52 [370333]
-            POSInventoryOverview.Run;
-            CurrPage.Close;
+            POSInventoryOverview.Run();
+            CurrPage.Close();
         end;
 
         Item.Get(ItemCode);
@@ -224,9 +224,9 @@ page 6060059 "NPR POS Inventory Overview"
         Variety3ValueVisible := Item."NPR Variety 3" <> '';
         Variety4ValueVisible := Item."NPR Variety 4" <> '';
 
-        ItemVariant.Reset;
+        ItemVariant.Reset();
         ItemVariant.SetRange("Item No.", ItemCode);
-        HasVariants := not (ItemVariant.IsEmpty);
+        HasVariants := not (ItemVariant.IsEmpty());
         VariantVisible := HasVariants;
         if VariantCode <> '' then
             ItemVariant.SetFilter(Code, VariantCode);
@@ -243,11 +243,11 @@ page 6060059 "NPR POS Inventory Overview"
         if OnlyCurentLoc then
             Location.SetRange(Code, CurrentLocationCode);
         //+NPR5.52 [370333]
-        if Location.FindSet then
+        if Location.FindSet() then
             repeat
                 Item.SetFilter("Location Filter", Location.Code);
                 if HasVariants then begin
-                    if ItemVariant.FindSet then
+                    if ItemVariant.FindSet() then
                         repeat
                             Item.SetFilter("Variant Filter", ItemVariant.Code);
                             Item.CalcFields(Inventory);
@@ -255,18 +255,18 @@ page 6060059 "NPR POS Inventory Overview"
                             //IF Item.Inventory > 0 THEN BEGIN
                             if Item.Inventory <> 0 then begin
                                 //+NPR5.55 [404868]
-                                "Item No." := Item."No.";
-                                "Item Description" := Item.Description;
-                                "Variant Code" := ItemVariant.Code;
-                                "Variant Description" := ItemVariant.Description;
-                                "Location Code" := Location.Code;
-                                "Location Name" := Location.Name;
-                                Quantity := Item.Inventory;
-                                Insert;
+                                Rec."Item No." := Item."No.";
+                                Rec."Item Description" := Item.Description;
+                                Rec."Variant Code" := ItemVariant.Code;
+                                Rec."Variant Description" := ItemVariant.Description;
+                                Rec."Location Code" := Location.Code;
+                                Rec."Location Name" := Location.Name;
+                                Rec.Quantity := Item.Inventory;
+                                Rec.Insert();
                                 if CurrentLocationCode = Location.Code then
                                     QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
                             end;
-                        until ItemVariant.Next = 0;
+                        until ItemVariant.Next() = 0;
                 end else begin
                     Item.SetFilter("Variant Filter", '');
                     Item.CalcFields(Inventory);
@@ -274,17 +274,17 @@ page 6060059 "NPR POS Inventory Overview"
                     //IF Item.Inventory > 0 THEN BEGIN
                     if Item.Inventory <> 0 then begin
                         //+NPR5.55 [404868]
-                        "Item No." := Item."No.";
-                        "Item Description" := Item.Description;
-                        "Location Code" := Location.Code;
-                        "Location Name" := Location.Name;
-                        Quantity := Item.Inventory;
-                        Insert;
+                        Rec."Item No." := Item."No.";
+                        Rec."Item Description" := Item.Description;
+                        Rec."Location Code" := Location.Code;
+                        Rec."Location Name" := Location.Name;
+                        Rec.Quantity := Item.Inventory;
+                        Rec.Insert();
                         if CurrentLocationCode = Location.Code then
                             QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
                     end;
                 end;
-            until Location.Next = 0;
+            until Location.Next() = 0;
         CurrPage.Update(false);
     end;
 
@@ -306,7 +306,7 @@ page 6060059 "NPR POS Inventory Overview"
                     RetailItemList.LookupMode := true;
                     RetailItemList.SetRecord(LookupItem);
                     RetailItemList.SetTableView(LookupItem);
-                    if RetailItemList.RunModal = ACTION::LookupOK then begin
+                    if RetailItemList.RunModal() = ACTION::LookupOK then begin
                         RetailItemList.GetRecord(LookupItem);
                         ItemCode := LookupItem."No.";
                         RefreshLines;
@@ -321,7 +321,7 @@ page 6060059 "NPR POS Inventory Overview"
                     ItemVariants.LookupMode := true;
                     ItemVariants.SetRecord(ItemVariant);
                     ItemVariants.SetTableView(ItemVariant);
-                    if ItemVariants.RunModal = ACTION::LookupOK then begin
+                    if ItemVariants.RunModal() = ACTION::LookupOK then begin
                         ItemVariants.GetRecord(ItemVariant);
                         VariantCode := ItemVariant.Code;
                         RefreshLines;
@@ -337,7 +337,7 @@ page 6060059 "NPR POS Inventory Overview"
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);
                     VarietyValuePage.SetTableView(VarietyValue);
-                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                    if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety1ValueCode := VarietyValue.Value;
                         RefreshLines;
@@ -353,7 +353,7 @@ page 6060059 "NPR POS Inventory Overview"
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);
                     VarietyValuePage.SetTableView(VarietyValue);
-                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                    if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety2ValueCode := VarietyValue.Value;
                         RefreshLines;
@@ -369,7 +369,7 @@ page 6060059 "NPR POS Inventory Overview"
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);
                     VarietyValuePage.SetTableView(VarietyValue);
-                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                    if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety3ValueCode := VarietyValue.Value;
                         RefreshLines;
@@ -385,7 +385,7 @@ page 6060059 "NPR POS Inventory Overview"
                     VarietyValuePage.LookupMode := true;
                     VarietyValuePage.SetRecord(VarietyValue);
                     VarietyValuePage.SetTableView(VarietyValue);
-                    if VarietyValuePage.RunModal = ACTION::LookupOK then begin
+                    if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety4ValueCode := VarietyValue.Value;
                         RefreshLines;

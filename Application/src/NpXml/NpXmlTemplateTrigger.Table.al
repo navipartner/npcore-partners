@@ -1,4 +1,4 @@
-table 6151555 "NPR NpXml Template Trigger"
+﻿table 6151555 "NPR NpXml Template Trigger"
 {
     Caption = 'NpXml Template Trigger';
     DataClassification = CustomerContent;
@@ -139,7 +139,7 @@ table 6151555 "NPR NpXml Template Trigger"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Generic Parent Codeunit ID");
                 if "Generic Parent Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Parent Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(605; "Generic Parent Codeunit Name"; Text[50])
@@ -186,7 +186,7 @@ table 6151555 "NPR NpXml Template Trigger"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Generic Parent Codeunit ID");
                 if "Generic Parent Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Parent Function");
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
             end;
         }
         field(1010; "Last Modified at"; DateTime)
@@ -228,10 +228,6 @@ table 6151555 "NPR NpXml Template Trigger"
     trigger OnModify()
     var
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
-        XMLTemplate: Record "NPR NpXml Template";
-        NpXmlTemplateHistory: Record "NPR NpXml Template History";
-        RecRef: RecordRef;
-        xRecRef: RecordRef;
     begin
         TestField("Parent Table No.");
         TestField("Table No.");
@@ -261,7 +257,7 @@ table 6151555 "NPR NpXml Template Trigger"
         NpXmlTemplateTrigger.SetRange("Xml Template Code", "Xml Template Code");
         NpXmlTemplateTrigger.SetFilter("Line No.", '<%1', "Line No.");
         NpXmlTemplateTrigger.SetFilter(Level, '<%1', Level);
-        if NpXmlTemplateTrigger.FindLast then
+        if NpXmlTemplateTrigger.FindLast() then
             exit(NpXmlTemplateTrigger."Line No.");
     end;
 
@@ -292,8 +288,8 @@ table 6151555 "NPR NpXml Template Trigger"
             NaviConnectTaskSetup.SetRange("Table No.", "Table No.");
             NaviConnectTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpXml Task Mgt.");
             NaviConnectTaskSetup.SetRange("Task Processor Code", NpXmlTemplate."Task Processor Code");
-            if not NaviConnectTaskSetup.FindFirst then begin
-                NaviConnectTaskSetup.Init;
+            if not NaviConnectTaskSetup.FindFirst() then begin
+                NaviConnectTaskSetup.Init();
                 NaviConnectTaskSetup."Entry No." := 0;
                 NaviConnectTaskSetup."Table No." := "Table No.";
                 NaviConnectTaskSetup."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
@@ -302,7 +298,7 @@ table 6151555 "NPR NpXml Template Trigger"
             end;
 
             if not DataLogSetup.Get("Table No.") then begin
-                DataLogSetup.Init;
+                DataLogSetup.Init();
                 DataLogSetup."Table ID" := "Table No.";
                 if "Insert Trigger" then
                     DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
@@ -331,7 +327,7 @@ table 6151555 "NPR NpXml Template Trigger"
             end;
 
             if not DataLogSubscriber.Get(NpXmlTemplate."Task Processor Code", "Table No.", '') then begin
-                DataLogSubscriber.Init;
+                DataLogSubscriber.Init();
                 DataLogSubscriber.Code := NpXmlTemplate."Task Processor Code";
                 DataLogSubscriber."Table ID" := "Table No.";
                 DataLogSubscriber."Company Name" := '';

@@ -249,7 +249,7 @@ page 6151133 "NPR TM Ticket Wizard"
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
 
-        TmpStartDate := Today;
+        TmpStartDate := Today();
         TicketSetup.Get();
 
         TmpAdmissionTemplate := TicketSetup."Wizard Admission Template";

@@ -30,7 +30,7 @@ codeunit 6150680 "NPR NPRE RVA: Get WPad"
     var
         WaiterPadCode: Code[20];
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;

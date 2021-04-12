@@ -15,7 +15,7 @@ codeunit 6150719 "NPR POS Action Management"
         POSActions.SetSkipDiscovery(ActionsDiscovered);
         POSActions.SetAction(ActionCode);
         ActionsDiscovered := true;
-        if POSActions.RunModal = ACTION::LookupOK then begin
+        if POSActions.RunModal() = ACTION::LookupOK then begin
             POSActions.GetRecord(POSAction);
             ActionCode := POSAction.Code;
             exit(true);
@@ -24,7 +24,6 @@ codeunit 6150719 "NPR POS Action Management"
 
     procedure IsValidActionConfiguration(POSSession: Codeunit "NPR POS Session"; ActionObject: Interface "NPR IAction"; Source: Text; var ErrorText: Text; RaiseEvent: Boolean) Result: Boolean
     var
-        WorkflowActionType: Enum "NPR Action Type";
         Severity: Integer;
         ActionMoniker: Text;
     begin
@@ -50,16 +49,14 @@ codeunit 6150719 "NPR POS Action Management"
             Error('Function call on a non-temporary variable. This is a critical programming error.');
 
         State.DeleteAll();
-        with EventSubscriber do begin
-            SetRange("Publisher Object Type", "Publisher Object Type"::Table);
-            SetRange("Publisher Object ID", 6150703);
-            SetRange("Published Function", 'OnDiscoverActions');
-            if FindSet then
-                repeat
-                    State := EventSubscriber;
-                    State.Insert();
-                until Next = 0;
-        end;
+        EventSubscriber.SetRange("Publisher Object Type", EventSubscriber."Publisher Object Type"::Table);
+        EventSubscriber.SetRange("Publisher Object ID", 6150703);
+        EventSubscriber.SetRange("Published Function", 'OnDiscoverActions');
+        if EventSubscriber.FindSet() then
+            repeat
+                State := EventSubscriber;
+                State.Insert();
+            until EventSubscriber.Next() = 0;
     end;
 
     procedure InitializeActionDiscovery()
@@ -73,14 +70,14 @@ codeunit 6150719 "NPR POS Action Management"
         NewDiscoveryState: Record "Event Subscription" temporary;
     begin
         InitializeDiscoveryState(NewDiscoveryState);
-        if NewDiscoveryState.FindSet then
+        if NewDiscoveryState.FindSet() then
             repeat
                 if DiscoveryState.Get(NewDiscoveryState."Subscriber Codeunit ID", NewDiscoveryState."Subscriber Function")
                   and (DiscoveryState."Number of Calls" <> NewDiscoveryState."Number of Calls") then begin
                     DiscoveryState."Number of Calls" := NewDiscoveryState."Number of Calls";
                     Rec."Codeunit ID" := NewDiscoveryState."Subscriber Codeunit ID";
                 end;
-            until NewDiscoveryState.Next = 0;
+            until NewDiscoveryState.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

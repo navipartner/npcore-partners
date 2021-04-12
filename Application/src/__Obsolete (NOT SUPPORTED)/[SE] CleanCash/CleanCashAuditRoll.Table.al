@@ -147,8 +147,6 @@ table 6184502 "NPR CleanCash Audit Roll"
     }
 
     trigger OnInsert()
-    var
-        CleanCashSetup: Record "NPR CleanCash Setup";
     begin
     end;
 }

@@ -17,17 +17,17 @@ page 6014610 "NPR Retail Campaigns"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Magento Category Id"; "Magento Category Id")
+                field("Magento Category Id"; Rec."Magento Category Id")
                 {
                     ApplicationArea = All;
                     Visible = MagentoEnabled;
@@ -46,7 +46,7 @@ page 6014610 "NPR Retail Campaigns"
         MagentoSetup: Record "NPR Magento Setup";
     begin
         //-MAG2.26 [401235]
-        MagentoEnabled := MagentoSetup.Get and MagentoSetup."Magento Enabled";
+        MagentoEnabled := MagentoSetup.Get() and MagentoSetup."Magento Enabled";
         //+MAG2.26 [401235]
     end;
 

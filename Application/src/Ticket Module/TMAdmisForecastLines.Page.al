@@ -195,11 +195,9 @@ page 6151139 "NPR TM Admis. Forecast Lines"
 
     var
         MatrixRecords: array[12] of Record "NPR TM Admis. Schedule Entry";
-        MATRIX_ColumnTempRec: Record "NPR TM Admis. Schedule Entry";
         MATRIX_MaxNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[12] of Text[80];
         MATRIX_CaptionSet: array[32] of Text[80];
-        MATRIX_Step: Option Initial,Previous,Same,Next;
         LINE_Code: Code[20];
         LINE_Description: Text;
         LINE_StartTime: Text;

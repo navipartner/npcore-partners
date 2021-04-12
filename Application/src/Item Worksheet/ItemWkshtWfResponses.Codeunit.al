@@ -45,7 +45,6 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Workflow Response Handling", 'OnAddWorkflowResponsesToLibrary', '', true, true)]
     local procedure AddResponsesToLibrary()
     var
-        WorkflowStepArgument: Record "Workflow Step Argument";
         WorkflowResponseHandling: Codeunit "Workflow Response Handling";
     begin
         WorkflowResponseHandling.AddResponseToLibrary(SetItemStatusCode, DATABASE::Item, 'TEST2 Set the status of an item.', 'GROUP 7');

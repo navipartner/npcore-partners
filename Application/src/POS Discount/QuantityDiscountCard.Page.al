@@ -1,4 +1,4 @@
-page 6014466 "NPR Quantity Discount Card"
+﻿page 6014466 "NPR Quantity Discount Card"
 {
     UsageCategory = None;
     Caption = 'Multiple Price Header';
@@ -10,32 +10,32 @@ page 6014466 "NPR Quantity Discount Card"
         {
             group(General)
             {
-                field("Main No."; "Main No.")
+                field("Main No."; Rec."Main No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Main no. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Modified Date field';
                 }
-                field("Block Custom Discount"; "Block Custom Discount")
+                field("Block Custom Discount"; Rec."Block Custom Discount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Block Custom Discount field';
                 }
-                field("Item Description"; "Item Description")
+                field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -44,22 +44,22 @@ page 6014466 "NPR Quantity Discount Card"
             }
             group(Conditions)
             {
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting date field';
                 }
-                field("Closing Date"; "Closing Date")
+                field("Closing Date"; Rec."Closing Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closing Date field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Closing Time"; "Closing Time")
+                field("Closing Time"; Rec."Closing Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closing Time field';
@@ -68,12 +68,12 @@ page 6014466 "NPR Quantity Discount Card"
                 {
                     ShowCaption = false;
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
@@ -144,7 +144,7 @@ page 6014466 "NPR Quantity Discount Card"
                 var
                     RetailJournalMgt: Codeunit "NPR Retail Journal Code";
                 begin
-                    RetailJournalMgt.Quantity2RetailJnl("Item No.", "Main No.", '');
+                    RetailJournalMgt.Quantity2RetailJnl(Rec."Item No.", Rec."Main No.", '');
                 end;
             }
             action("Copy Multiple Price Discount")
@@ -161,22 +161,22 @@ page 6014466 "NPR Quantity Discount Card"
                     QuantityDiscountLine: Record "NPR Quantity Discount Line";
                 begin
                     if PAGE.RunModal(PAGE::"NPR Quantity Discount List", QuantityDiscountHeader) <> ACTION::LookupOK then exit;
-                    QuantityDiscountLine1.Reset;
-                    QuantityDiscountLine1.SetRange("Main no.", "Main No.");
-                    QuantityDiscountLine1.SetRange("Item No.", "Item No.");
-                    QuantityDiscountLine1.DeleteAll;
+                    QuantityDiscountLine1.Reset();
+                    QuantityDiscountLine1.SetRange("Main no.", Rec."Main No.");
+                    QuantityDiscountLine1.SetRange("Item No.", Rec."Item No.");
+                    QuantityDiscountLine1.DeleteAll();
 
-                    QuantityDiscountLine1.Reset;
+                    QuantityDiscountLine1.Reset();
                     QuantityDiscountLine1.SetRange("Main no.", QuantityDiscountHeader."Main No.");
                     QuantityDiscountLine1.SetRange("Item No.", QuantityDiscountHeader."Item No.");
-                    if QuantityDiscountLine1.FindSet then
+                    if QuantityDiscountLine1.FindSet() then
                         repeat
-                            QuantityDiscountLine.Init;
+                            QuantityDiscountLine.Init();
                             QuantityDiscountLine.TransferFields(QuantityDiscountLine1);
-                            QuantityDiscountLine."Main no." := "Main No.";
-                            QuantityDiscountLine."Item No." := "Item No.";
+                            QuantityDiscountLine."Main no." := Rec."Main No.";
+                            QuantityDiscountLine."Item No." := Rec."Item No.";
                             QuantityDiscountLine.Insert(true);
-                        until QuantityDiscountLine1.Next = 0;
+                        until QuantityDiscountLine1.Next() = 0;
 
                 end;
             }
@@ -209,15 +209,15 @@ page 6014466 "NPR Quantity Discount Card"
     var
         "Quantity Discount Header 2": Record "NPR Quantity Discount Header";
     begin
-        "Quantity Discount Header 2".SetFilter(Status, '<>%1', Status::Balanced);
-        if "Quantity Discount Header 2".FindFirst then
+        "Quantity Discount Header 2".SetFilter(Status, '<>%1', Rec.Status::Balanced);
+        if "Quantity Discount Header 2".FindFirst() then
             repeat
                 if ("Quantity Discount Header 2"."Closing Date" < Today) or
                    (("Quantity Discount Header 2"."Closing Date" = Today) and ("Quantity Discount Header 2"."Closing Time" < Time)) then begin
-                    "Quantity Discount Header 2".Validate(Status, Status::Balanced);
+                    "Quantity Discount Header 2".Validate(Status, Rec.Status::Balanced);
                     "Quantity Discount Header 2".Modify(true);
                 end;
-            until "Quantity Discount Header 2".Next = 0;
+            until "Quantity Discount Header 2".Next() = 0;
     end;
 }
 

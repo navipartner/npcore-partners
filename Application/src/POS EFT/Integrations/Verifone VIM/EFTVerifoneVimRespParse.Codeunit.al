@@ -134,13 +134,9 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
     var
         TransactionStatusResponse: DotNet NPRNetTransactionStatusResponse;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        OutStream: OutStream;
-        JSONSerializer: DotNet NPRNetSerializer;
         POSStargateManagement: Codeunit "NPR POS Stargate Management";
         POSSession: Codeunit "NPR POS Session";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        TrxDateTime: DateTime;
-        DotNetDateTime: DotNet NPRNetDateTime;
         OriginalEftTrxRequest: Record "NPR EFT Transaction Request";
     begin
         POSSession.GetSession(POSSession, true);
@@ -266,7 +262,7 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
     begin
         if IsNull(Receipt) then
             exit(false);
-        if Receipt.Count = 0 then
+        if Receipt.Count() = 0 then
             exit(false);
 
         CreditCardTransaction.SetRange("Register No.", EFTTransactionRequest."Register No.");
@@ -277,8 +273,8 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
             ReceiptNo := CreditCardTransaction."Receipt No." + 1;
         end;
 
-        CreditCardTransaction.Init;
-        CreditCardTransaction.Date := Today;
+        CreditCardTransaction.Init();
+        CreditCardTransaction.Date := Today();
         CreditCardTransaction."Transaction Time" := Time;
         CreditCardTransaction.Type := 0;
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
@@ -289,7 +285,7 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
         foreach Line in Receipt do begin
             CreditCardTransaction."Entry No." := EntryNo;
             CreditCardTransaction.Text := Line;
-            CreditCardTransaction.Insert;
+            CreditCardTransaction.Insert();
             EntryNo += 1;
 
             BlobStream.Write(Line);
@@ -303,7 +299,6 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
         TrxDateTime: DateTime;
         DotNetDateTime: DotNet NPRNetDateTime;
         OutStream: OutStream;
-        ProcessingType: Integer;
         OriginalEftTrxReq: Record "NPR EFT Transaction Request";
         VoidedEftTrxReq: Record "NPR EFT Transaction Request";
         TextBuffer: Text;
@@ -402,7 +397,7 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
                 ;
         end;
 
-        if not EFTTransactionRequest."Receipt 1".HasValue then begin //We might already have a signature merchant receipt
+        if not EFTTransactionRequest."Receipt 1".HasValue() then begin //We might already have a signature merchant receipt
             EFTTransactionRequest."Receipt 1".CreateOutStream(OutStream);
             ParseReceipt(EFTTransactionRequest, TransactionResponse.Receipt1, OutStream);
         end;

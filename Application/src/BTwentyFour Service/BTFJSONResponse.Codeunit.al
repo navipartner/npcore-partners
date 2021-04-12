@@ -72,7 +72,6 @@ codeunit 6014647 "NPR BTF JSON Response" implements "NPR BTF IFormatResponse"
     procedure FoundToken(Response: Codeunit "Temp Blob"): Boolean
     var
         JObject: JsonObject;
-        JToken: JsonToken;
         InStr: InStream;
         Json: Text;
     begin

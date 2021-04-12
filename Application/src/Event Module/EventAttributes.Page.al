@@ -12,12 +12,12 @@ page 6151583 "NPR Event Attributes"
         {
             repeater(Group)
             {
-                field("Template Name"; "Template Name")
+                field("Template Name"; Rec."Template Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Name field';
                 }
-                field(Promote; Promote)
+                field(Promote; Rec.Promote)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Promote field';
@@ -35,7 +35,7 @@ page 6151583 "NPR Event Attributes"
                 Caption = 'Attributes Matrix';
                 Image = ShowMatrix;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -45,9 +45,9 @@ page 6151583 "NPR Event Attributes"
                 var
                     EventAttributeMatrix: Page "NPR Event Attribute Matrix";
                 begin
-                    EventAttributeMatrix.SetJob("Job No.");
-                    EventAttributeMatrix.SetAttrTemplate("Template Name");
-                    EventAttributeMatrix.Run;
+                    EventAttributeMatrix.SetJob(Rec."Job No.");
+                    EventAttributeMatrix.SetAttrTemplate(Rec."Template Name");
+                    EventAttributeMatrix.Run();
                 end;
             }
         }

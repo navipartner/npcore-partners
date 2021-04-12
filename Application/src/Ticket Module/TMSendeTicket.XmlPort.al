@@ -77,8 +77,6 @@ xmlport 6060124 "NPR TM Send eTicket"
                     }
 
                     trigger OnAfterGetRecord()
-                    var
-                        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
                     begin
                     end;
                 }

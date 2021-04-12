@@ -2,7 +2,7 @@ table 6059985 "NPR Retail Document Cue"
 {
     Caption = 'Retail Document Cue';
     DataClassification = CustomerContent;
-    ObsoleteState = Removed; 
+    ObsoleteState = Removed;
     ObsoleteReason = 'Table not used anymore';
     ObsoleteTag = 'Deprecating 16/2/2021';
 

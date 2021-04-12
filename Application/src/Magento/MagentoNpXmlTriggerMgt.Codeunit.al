@@ -1,4 +1,4 @@
-codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
+﻿codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
 {
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Trigger Mgt.", 'OnSetupGenericParentTable', '', true, true)]
     local procedure MagentoStore(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
@@ -21,14 +21,14 @@ codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
                         exit;
 
                     ChildLinkRecRef.SetTable(NpCsStore);
-                    if not NpCsStore.Find then
+                    if not NpCsStore.Find() then
                         exit;
                     if not IsMagentoStore(NpCsStore) then
                         exit;
 
-                    TempNpCsStore.Init;
+                    TempNpCsStore.Init();
                     TempNpCsStore := NpCsStore;
-                    TempNpCsStore.Insert;
+                    TempNpCsStore.Insert();
                     ParentRecRef.GetTable(TempNpCsStore);
                 end;
         end;
@@ -55,14 +55,14 @@ codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
                         exit;
 
                     ChildLinkRecRef.SetTable(NpCsStore);
-                    if not NpCsStore.Find then
+                    if not NpCsStore.Find() then
                         exit;
                     if IsMagentoStore(NpCsStore) then
                         exit;
 
-                    TempNpCsStore.Init;
+                    TempNpCsStore.Init();
                     TempNpCsStore := NpCsStore;
-                    TempNpCsStore.Insert;
+                    TempNpCsStore.Insert();
                     ParentRecRef.GetTable(TempNpCsStore);
                 end;
         end;
@@ -72,7 +72,7 @@ codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        if not MagentoSetup.Get then
+        if not MagentoSetup.Get() then
             exit;
 
         exit(NpCsStore.Code = MagentoSetup."NpCs From Store Code");

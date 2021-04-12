@@ -1,4 +1,4 @@
-table 6014430 "NPR Line Dimension"
+﻿table 6014430 "NPR Line Dimension"
 {
     Caption = 'NPR Line Dimension';
     DataClassification = CustomerContent;
@@ -87,7 +87,7 @@ table 6014430 "NPR Line Dimension"
 
     trigger OnDelete()
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         UpdateLineDim(Rec, true);
 
         if "Dimension Code" = GLSetup."Global Dimension 1 Code" then
@@ -119,7 +119,7 @@ table 6014430 "NPR Line Dimension"
     begin
         TestField("Dimension Value Code");
 
-        GLSetup.Get;
+        GLSetup.Get();
 
         UpdateLineDim(Rec, false);
 
@@ -150,7 +150,7 @@ table 6014430 "NPR Line Dimension"
 
     trigger OnModify()
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         UpdateLineDim(Rec, false);
 
         if "Dimension Code" = GLSetup."Global Dimension 1 Code" then
@@ -247,7 +247,7 @@ table 6014430 "NPR Line Dimension"
                     repeat
                         InsertNew(
                           NPRLineDim, DATABASE::"NPR POS Sale Line", "Ekspedition linie");
-                    until "Ekspedition linie".Next = 0;
+                    until "Ekspedition linie".Next() = 0;
             end;
         end;
     end;
@@ -274,9 +274,9 @@ table 6014430 "NPR Line Dimension"
     var
         NPRLineDim: Record "NPR Line Dimension";
     begin
-        TempNPRLineDim.DeleteAll;
+        TempNPRLineDim.DeleteAll();
 
-        NPRLineDim.Reset;
+        NPRLineDim.Reset();
         NPRLineDim.SetRange("Table ID", TableNo);
         NPRLineDim.SetRange("Register No.", Kassenr);
         NPRLineDim.SetRange("Sales Ticket No.", Bonnr);
@@ -287,8 +287,8 @@ table 6014430 "NPR Line Dimension"
         if NPRLineDim.FindSet() then
             repeat
                 TempNPRLineDim := NPRLineDim;
-                TempNPRLineDim.Insert;
-            until NPRLineDim.Next = 0;
+                TempNPRLineDim.Insert();
+            until NPRLineDim.Next() = 0;
     end;
     #endregion
     #region UpdateAllLineDim
@@ -329,7 +329,7 @@ table 6014430 "NPR Line Dimension"
                   (OldNPRLineDimHeader."Dimension Value Code" <> NPRLineDimHeader."Dimension Value Code")
                 then begin
                     NPRLineDimLine.SetRange("Dimension Code", NPRLineDimHeader."Dimension Code");
-                    NPRLineDimLine.DeleteAll;
+                    NPRLineDimLine.DeleteAll();
                     case TableNo of
                         DATABASE::"NPR POS Sale":
                             begin
@@ -338,11 +338,11 @@ table 6014430 "NPR Line Dimension"
                                 if Ekspeditionlinie.FindSet() then
                                     repeat
                                         InsertNew(NPRLineDimHeader, LineTableNo, Ekspeditionlinie);
-                                    until Ekspeditionlinie.Next = 0;
+                                    until Ekspeditionlinie.Next() = 0;
                             end;
                     end;
                 end;
-            until NPRLineDimHeader.Next = 0;
+            until NPRLineDimHeader.Next() = 0;
 
         // Genneml¢b alle dimensionerne på "Ekspedition" F¥R dim er blevet opdateret.
         // hvis Dimensionskoden vare der f¢r men ikke mere, så slettes Dimensionslinjerne med denne Dimensionskode
@@ -350,9 +350,9 @@ table 6014430 "NPR Line Dimension"
             repeat
                 if not NPRLineDimHeader.Get(OldNPRLineDimHeader."Table ID", Kassenr, Bonnr, Dato2, EkspArt, OldNPRLineDimHeader."Line No.", '', OldNPRLineDimHeader."Dimension Code") then begin
                     NPRLineDimLine.SetRange("Dimension Code", OldNPRLineDimHeader."Dimension Code");
-                    NPRLineDimLine.DeleteAll;
+                    NPRLineDimLine.DeleteAll();
                 end;
-            until OldNPRLineDimHeader.Next = 0;
+            until OldNPRLineDimHeader.Next() = 0;
     end;
     #endregion
 }

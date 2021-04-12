@@ -1,4 +1,4 @@
-table 6150661 "NPR NPRE Waiter Pad Line"
+﻿table 6150661 "NPR NPRE Waiter Pad Line"
 {
     Caption = 'Waiter Pad Line';
     DataClassification = CustomerContent;
@@ -441,19 +441,19 @@ table 6150661 "NPR NPRE Waiter Pad Line"
         POSInfoWaiterPadLink.SetRange("Waiter Pad No.", "Waiter Pad No.");
         POSInfoWaiterPadLink.SetRange("Waiter Pad Line No.", "Line No.");
         if not POSInfoWaiterPadLink.IsEmpty then
-            POSInfoWaiterPadLink.DeleteAll;
+            POSInfoWaiterPadLink.DeleteAll();
     end;
 
     trigger OnInsert()
     var
         BongLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        BongLine.Reset;
+        BongLine.Reset();
         BongLine.SetRange("Waiter Pad No.", Rec."Waiter Pad No.");
         if BongLine.IsEmpty then begin
             "Line No." := 10000;
         end else begin
-            BongLine.FindLast;
+            BongLine.FindLast();
             "Line No." := BongLine."Line No." + 10000;
         end;
     end;
@@ -489,7 +489,7 @@ table 6150661 "NPR NPRE Waiter Pad Line"
     begin
         WaiterPadMgt.FilterAssignedPrintCategories(RecordId, AssignedPrintCategory);
         CopyFilter("Print Category Filter", AssignedPrintCategory."Print/Prod. Category Code");
-        exit(AssignedPrintCategory.Count);
+        exit(AssignedPrintCategory.Count());
     end;
 
     procedure TotalNoOfPrintCategories(): Integer
@@ -497,7 +497,7 @@ table 6150661 "NPR NPRE Waiter Pad Line"
         AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
     begin
         WaiterPadMgt.FilterAssignedPrintCategories(RecordId, AssignedPrintCategory);
-        exit(AssignedPrintCategory.Count);
+        exit(AssignedPrintCategory.Count());
     end;
 
     procedure AssignedFlowStatusesAsString(StatusObject: Option): Text
@@ -522,7 +522,7 @@ table 6150661 "NPR NPRE Waiter Pad Line"
     begin
         WaiterPadMgt.FilterAssignedFlowStatuses(RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
         CopyFilter("Serving Step Filter", AssignedFlowStatus."Flow Status Code");
-        exit(AssignedFlowStatus.Count);
+        exit(AssignedFlowStatus.Count());
     end;
 
     procedure TotalNoOfServingSteps(): Integer
@@ -530,7 +530,7 @@ table 6150661 "NPR NPRE Waiter Pad Line"
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
         WaiterPadMgt.FilterAssignedFlowStatuses(RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
-        exit(AssignedFlowStatus.Count);
+        exit(AssignedFlowStatus.Count());
     end;
 
     local procedure CalcBaseQty(Qty: Decimal): Decimal

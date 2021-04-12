@@ -13,12 +13,10 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
         InitializedResponse: Boolean;
         FileMgtRequest: DotNet NPRNetFileManagementRequest0;
         FileMgtResponse: DotNet NPRNetFileManagementResponse0;
-        NOT_INITIALIZED: Label 'Please invoke initialprotocol function before setting paramaters.';
         Labels: DotNet NPRNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "NPR Pepper Term. Captions TSD";
         PepperVersion: Record "NPR Pepper Version";
         LastRestultCode: Integer;
-        "--": Integer;
         ChunkInStr: InStream;
         ChunkBinaryReader: DotNet NPRNetBinaryReader;
         ChunkMemoryStream: DotNet NPRNetMemoryStream;
@@ -106,7 +104,6 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
 
     local procedure GetZipFileToInstall(Data: Text; var PepperB64File: Text)
     var
-        JsonConvert: DotNet JsonConvert;
         InStr: InStream;
         BinaryReader: DotNet NPRNetBinaryReader;
         MemoryStream: DotNet NPRNetMemoryStream;
@@ -193,7 +190,6 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
-        PaymentRequest: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
 

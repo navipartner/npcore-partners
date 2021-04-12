@@ -12,32 +12,32 @@ page 6150701 "NPR POS Menus"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Caption; Caption)
+                field(Caption; Rec.Caption)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Caption field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Register Type"; "Register Type")
+                field("Register Type"; Rec."Register Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View Profile field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';

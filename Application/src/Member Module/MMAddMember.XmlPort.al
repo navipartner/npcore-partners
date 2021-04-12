@@ -183,7 +183,6 @@ xmlport 6060128 "NPR MM Add Member"
     }
 
     var
-        OutStr: OutStream;
         EntryNo: Integer;
 
     procedure ClearResponse()

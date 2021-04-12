@@ -14,17 +14,17 @@ page 6014642 "NPR RP Data Item Constr."
         {
             repeater(Group)
             {
-                field("Constraint Type"; "Constraint Type")
+                field("Constraint Type"; Rec."Constraint Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint Type field';
                 }
-                field("Table ID"; "Table ID")
+                field("Table ID"; Rec."Table ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table ID field';
                 }
-                field("Table Name"; "Table Name")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
                     Editable = false;

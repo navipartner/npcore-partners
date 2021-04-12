@@ -15,27 +15,27 @@ page 6014581 "NPR Web Print Buffer"
         {
             repeater(Group)
             {
-                field("Printjob ID"; "Printjob ID")
+                field("Printjob ID"; Rec."Printjob ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printjob ID field';
                 }
-                field("Printer ID"; "Printer ID")
+                field("Printer ID"; Rec."Printer ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printer ID field';
                 }
-                field("Print Data"; "Print Data")
+                field("Print Data"; Rec."Print Data")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Print Data field';
                 }
-                field("Time Created"; "Time Created")
+                field("Time Created"; Rec."Time Created")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Time Created field';
                 }
-                field(Printed; Printed)
+                field(Printed; Rec.Printed)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printed field';

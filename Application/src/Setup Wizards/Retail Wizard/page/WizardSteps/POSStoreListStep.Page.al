@@ -65,18 +65,18 @@ page 6014653 "NPR POS Store List Step"
             }
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Post Code"; "Post Code")
+                field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Code field';
@@ -88,18 +88,18 @@ page 6014653 "NPR POS Store List Step"
                     begin
                         PostCodeList.LookupMode := true;
 
-                        if ("Post Code" <> '') and (City <> '') then
-                            if PostCode.Get("Post Code", City) then
+                        if (Rec."Post Code" <> '') and (Rec.City <> '') then
+                            if PostCode.Get(Rec."Post Code", Rec.City) then
                                 PostCodeList.SetRecord(PostCode);
 
                         if PostCodeList.RunModal() = Action::LookupOK then begin
                             PostCodeList.GetRecord(PostCode);
-                            "Post Code" := PostCode.Code;
-                            City := PostCode.City;
+                            Rec."Post Code" := PostCode.Code;
+                            Rec.City := PostCode.City;
                         end;
                     end;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the City field';
@@ -111,18 +111,18 @@ page 6014653 "NPR POS Store List Step"
                     begin
                         PostCodeList.LookupMode := true;
 
-                        if (City <> '') and ("Post Code" <> '') then
-                            if PostCode.Get("Post Code", City) then
+                        if (Rec.City <> '') and (Rec."Post Code" <> '') then
+                            if PostCode.Get(Rec."Post Code", Rec.City) then
                                 PostCodeList.SetRecord(PostCode);
 
                         if PostCodeList.RunModal() = Action::LookupOK then begin
                             PostCodeList.GetRecord(PostCode);
-                            "Post Code" := PostCode.Code;
-                            City := PostCode.City;
+                            Rec."Post Code" := PostCode.Code;
+                            Rec.City := PostCode.City;
                         end;
                     end;
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
@@ -142,19 +142,19 @@ page 6014653 "NPR POS Store List Step"
                         if DimValue.FindFirst() then;
                         DimValueList.SetTableView(DimValue);
 
-                        if "Global Dimension 1 Code" <> '' then begin
-                            DimValue.SetRange(Code, "Global Dimension 1 Code");
+                        if Rec."Global Dimension 1 Code" <> '' then begin
+                            DimValue.SetRange(Code, Rec."Global Dimension 1 Code");
                             if DimValue.FindFirst() then
                                 DimValueList.SetRecord(DimValue);
                         end;
 
                         if DimValueList.RunModal() = Action::LookupOK then begin
                             DimValueList.GetRecord(DimValue);
-                            "Global Dimension 1 Code" := DimValue.Code;
+                            Rec."Global Dimension 1 Code" := DimValue.Code;
                         end;
                     end;
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
@@ -174,15 +174,15 @@ page 6014653 "NPR POS Store List Step"
                         if DimValue.FindFirst() then;
                         DimValueList.SetTableView(DimValue);
 
-                        if "Global Dimension 2 Code" <> '' then begin
-                            DimValue.SetRange(Code, "Global Dimension 2 Code");
+                        if Rec."Global Dimension 2 Code" <> '' then begin
+                            DimValue.SetRange(Code, Rec."Global Dimension 2 Code");
                             if DimValue.FindFirst() then
                                 DimValueList.SetRecord(DimValue);
                         end;
 
                         if DimValueList.RunModal() = Action::LookupOK then begin
                             DimValueList.GetRecord(DimValue);
-                            "Global Dimension 2 Code" := DimValue.Code;
+                            Rec."Global Dimension 2 Code" := DimValue.Code;
                         end;
                     end;
                 }
@@ -200,7 +200,6 @@ page 6014653 "NPR POS Store List Step"
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
         i: Integer;
         LastNoUsed: Code[10];
-        RecRef: RecordRef;
     begin
         Rec.Reset();
         LastNoUsed := StartingNo;

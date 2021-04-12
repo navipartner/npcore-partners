@@ -14,59 +14,59 @@ page 6151014 "NPR NpRv Voucher Card"
                 group(Control6014426)
                 {
                     ShowCaption = false;
-                    field("No."; "No.")
+                    field("No."; Rec."No.")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the No. field';
                     }
-                    field("Voucher Type"; "Voucher Type")
+                    field("Voucher Type"; Rec."Voucher Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Voucher Type field';
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
                     }
-                    field("Account No."; "Account No.")
+                    field("Account No."; Rec."Account No.")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Account No. field';
                     }
-                    field("Issue Register No."; "Issue Register No.")
+                    field("Issue Register No."; Rec."Issue Register No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issue Register No. field';
                     }
-                    field("Issue Document Type"; "Issue Document Type")
+                    field("Issue Document Type"; Rec."Issue Document Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issue Document Type field';
                     }
-                    field("Issue Document No."; "Issue Document No.")
+                    field("Issue Document No."; Rec."Issue Document No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issue Document No. field';
                     }
-                    field("Issue External Document No."; "Issue External Document No.")
+                    field("Issue External Document No."; Rec."Issue External Document No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issue External Document No. field';
                     }
-                    field("Issue Partner Code"; "Issue Partner Code")
+                    field("Issue Partner Code"; Rec."Issue Partner Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issue Partner Code field';
                     }
-                    field("Partner Clearing"; "Partner Clearing")
+                    field("Partner Clearing"; Rec."Partner Clearing")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Partner Clearing field';
                     }
-                    field("Allow Top-up"; "Allow Top-up")
+                    field("Allow Top-up"; Rec."Allow Top-up")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Allow Top-up field';
@@ -75,28 +75,28 @@ page 6151014 "NPR NpRv Voucher Card"
                 group(Control6014422)
                 {
                     ShowCaption = false;
-                    field("Issue Date"; "Issue Date")
+                    field("Issue Date"; Rec."Issue Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Issue Date field';
                     }
-                    field(Open; Open)
+                    field(Open; Rec.Open)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Open field';
                     }
-                    field("Initial Amount"; "Initial Amount")
+                    field("Initial Amount"; Rec."Initial Amount")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Initial Amount field';
                     }
-                    field(Amount; Amount)
+                    field(Amount; Rec.Amount)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Amount field';
                     }
-                    field("In-use Quantity"; "In-use Quantity")
+                    field("In-use Quantity"; Rec."In-use Quantity")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the In-use Quantity field';
@@ -109,7 +109,7 @@ page 6151014 "NPR NpRv Voucher Card"
                 group(Control6014417)
                 {
                     ShowCaption = false;
-                    field("Send Voucher Module"; "Send Voucher Module")
+                    field("Send Voucher Module"; Rec."Send Voucher Module")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Send Voucher Module field';
@@ -118,42 +118,42 @@ page 6151014 "NPR NpRv Voucher Card"
                 group(Control6014415)
                 {
                     ShowCaption = false;
-                    field("Reference No."; "Reference No.")
+                    field("Reference No."; Rec."Reference No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Reference No. field';
                     }
-                    field("Send via Print"; "Send via Print")
+                    field("Send via Print"; Rec."Send via Print")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Send via Print field';
                     }
-                    field("Print Template Code"; "Print Template Code")
+                    field("Print Template Code"; Rec."Print Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Template Code field';
                     }
-                    field("Send via E-mail"; "Send via E-mail")
+                    field("Send via E-mail"; Rec."Send via E-mail")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Send via E-mail field';
                     }
-                    field("E-mail Template Code"; "E-mail Template Code")
+                    field("E-mail Template Code"; Rec."E-mail Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the E-mail Template Code field';
                     }
-                    field("Send via SMS"; "Send via SMS")
+                    field("Send via SMS"; Rec."Send via SMS")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Send via SMS field';
                     }
-                    field("SMS Template Code"; "SMS Template Code")
+                    field("SMS Template Code"; Rec."SMS Template Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the SMS Template Code field';
                     }
-                    field("No. Send"; "No. Send")
+                    field("No. Send"; Rec."No. Send")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the No. Send field';
@@ -162,73 +162,73 @@ page 6151014 "NPR NpRv Voucher Card"
                 group(Contact)
                 {
                     Caption = 'Contact';
-                    field("Customer No."; "Customer No.")
+                    field("Customer No."; Rec."Customer No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer No. field';
                     }
-                    field("Contact No."; "Contact No.")
+                    field("Contact No."; Rec."Contact No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Contact No. field';
                     }
-                    field(Name; Name)
+                    field(Name; Rec.Name)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Name field';
                     }
-                    field("Name 2"; "Name 2")
+                    field("Name 2"; Rec."Name 2")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Name 2 field';
                     }
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Address field';
                     }
-                    field("Address 2"; "Address 2")
+                    field("Address 2"; Rec."Address 2")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Address 2 field';
                     }
-                    field("Post Code"; "Post Code")
+                    field("Post Code"; Rec."Post Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Post Code field';
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the City field';
                     }
-                    field(County; County)
+                    field(County; Rec.County)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the County field';
                     }
-                    field("Country/Region Code"; "Country/Region Code")
+                    field("Country/Region Code"; Rec."Country/Region Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Country/Region Code field';
                     }
-                    field("E-mail"; "E-mail")
+                    field("E-mail"; Rec."E-mail")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the E-mail field';
                     }
-                    field("Phone No."; "Phone No.")
+                    field("Phone No."; Rec."Phone No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Phone No. field';
                     }
-                    field("Language Code"; "Language Code")
+                    field("Language Code"; Rec."Language Code")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Language Code field';
                     }
-                    field("Voucher Message"; "Voucher Message")
+                    field("Voucher Message"; Rec."Voucher Message")
                     {
                         ApplicationArea = All;
                         MultiLine = true;
@@ -242,7 +242,7 @@ page 6151014 "NPR NpRv Voucher Card"
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Validate Voucher Module"; "Validate Voucher Module")
+                    field("Validate Voucher Module"; Rec."Validate Voucher Module")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Validate Voucher Module field';
@@ -251,12 +251,12 @@ page 6151014 "NPR NpRv Voucher Card"
                 group(Control6014409)
                 {
                     ShowCaption = false;
-                    field("Starting Date"; "Starting Date")
+                    field("Starting Date"; Rec."Starting Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Starting Date field';
                     }
-                    field("Ending Date"; "Ending Date")
+                    field("Ending Date"; Rec."Ending Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Ending Date field';
@@ -266,7 +266,7 @@ page 6151014 "NPR NpRv Voucher Card"
             group("Apply Payment")
             {
                 Caption = 'Apply Payment';
-                field("Apply Payment Module"; "Apply Payment Module")
+                field("Apply Payment Module"; Rec."Apply Payment Module")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Apply Payment Module field';
@@ -288,7 +288,7 @@ page 6151014 "NPR NpRv Voucher Card"
                     Caption = 'Send Voucher';
                     Image = SendTo;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -336,7 +336,7 @@ page 6151014 "NPR NpRv Voucher Card"
                         if not Confirm(Text001, false) then
                             exit;
 
-                        Voucher.Get("No.");
+                        Voucher.Get(Rec."No.");
                         NpRvVoucherMgt.ArchiveVouchers(Voucher);
                     end;
                 }

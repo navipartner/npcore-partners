@@ -1,4 +1,4 @@
-page 6150675 "NPR POS Entry Card"
+﻿page 6150675 "NPR POS Entry Card"
 {
     Caption = 'POS Entry Card';
     DeleteAllowed = false;
@@ -17,85 +17,85 @@ page 6150675 "NPR POS Entry Card"
         {
             group(Group)
             {
-                field("System Entry"; "System Entry")
+                field("System Entry"; Rec."System Entry")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the System Entry field';
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Fiscal No."; "Fiscal No.")
+                field("Fiscal No."; Rec."Fiscal No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Fiscal No. field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("POS Period Register No."; "POS Period Register No.")
+                field("POS Period Register No."; Rec."POS Period Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Period Register No. field';
                 }
-                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
-                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
                 }
-                field("Entry Type"; "Entry Type")
+                field("Entry Type"; Rec."Entry Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
-                field("Entry Date"; "Entry Date")
+                field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Date field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Ending Time"; "Ending Time")
+                field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Time field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
@@ -136,97 +136,97 @@ page 6150675 "NPR POS Entry Card"
                         end;
                     end;
                 }
-                field("No. of Print Output Entries"; "No. of Print Output Entries")
+                field("No. of Print Output Entries"; Rec."No. of Print Output Entries")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the No. of Print Output Entries field';
                 }
-                field("Post Item Entry Status"; "Post Item Entry Status")
+                field("Post Item Entry Status"; Rec."Post Item Entry Status")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Post Item Entry Status field';
                 }
-                field("Post Entry Status"; "Post Entry Status")
+                field("Post Entry Status"; Rec."Post Entry Status")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Post Entry Status field';
                 }
-                field("Amount Excl. Tax"; "Amount Excl. Tax")
+                field("Amount Excl. Tax"; Rec."Amount Excl. Tax")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount Excl. Tax field';
                 }
-                field("Tax Amount"; "Tax Amount")
+                field("Tax Amount"; Rec."Tax Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Tax Amount field';
                 }
-                field("Amount Incl. Tax"; "Amount Incl. Tax")
+                field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount Incl. Tax field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Rounding Amount (LCY)"; "Rounding Amount (LCY)")
+                field("Rounding Amount (LCY)"; Rec."Rounding Amount (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Rounding Amount (LCY) field';
                 }
-                field("Prices Including VAT"; "Prices Including VAT")
+                field("Prices Including VAT"; Rec."Prices Including VAT")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Prices Including VAT field';
                 }
-                field("Reason Code"; "Reason Code")
+                field("Reason Code"; Rec."Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reason Code field';
                 }
-                field("Tax Area Code"; "Tax Area Code")
+                field("Tax Area Code"; Rec."Tax Area Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Tax Area Code field';
                 }
-                field("POS Sale ID"; "POS Sale ID")
+                field("POS Sale ID"; Rec."POS Sale ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the POS Sale ID field';
                 }
-                field("Transaction Type"; "Transaction Type")
+                field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Transaction Type field';
                 }
-                field("Transport Method"; "Transport Method")
+                field("Transport Method"; Rec."Transport Method")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Transport Method field';
                 }
-                field("Exit Point"; "Exit Point")
+                field("Exit Point"; Rec."Exit Point")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Exit Point field';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -337,7 +337,7 @@ page 6150675 "NPR POS Entry Card"
 
                 trigger OnAction()
                 begin
-                    ShowDimensions;
+                    Rec.ShowDimensions;
                 end;
             }
             action("Sales Document")
@@ -353,7 +353,7 @@ page 6150675 "NPR POS Entry Card"
                     POSEntryManagement: Codeunit "NPR POS Entry Management";
                 begin
                     if not POSEntryManagement.ShowSalesDocument(Rec) then
-                        Error(TextSalesDocNotFound, "Sales Document Type", "Sales Document No.");
+                        Error(TextSalesDocNotFound, Rec."Sales Document Type", Rec."Sales Document No.");
                 end;
             }
             action("POS Info POS Entry")
@@ -401,7 +401,7 @@ page 6150675 "NPR POS Entry Card"
                 var
                     POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
                 begin
-                    POSEntrySalesDocLink.SetRange("POS Entry No.", "Entry No.");
+                    POSEntrySalesDocLink.SetRange("POS Entry No.", Rec."Entry No.");
                     PAGE.RunModal(PAGE::"NPR POS Entry Rel. Sales Doc.", POSEntrySalesDocLink);
                 end;
             }
@@ -445,8 +445,8 @@ page 6150675 "NPR POS Entry Card"
                         var
                             TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
                         begin
-                            if "Entry Type" = "Entry Type"::"Direct Sale" then
-                                TaxFree.VoucherIssueFromPOSSale("Document No.");
+                            if Rec."Entry Type" = Rec."Entry Type"::"Direct Sale" then
+                                TaxFree.VoucherIssueFromPOSSale(Rec."Document No.");
                         end;
                     }
                     action(IssuedTaxFreeVouchers)
@@ -480,8 +480,6 @@ page 6150675 "NPR POS Entry Card"
                     ToolTip = 'Executes the Voucher Lines action';
 
                     trigger OnAction()
-                    var
-                        TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
                     begin
                     end;
                 }
@@ -494,8 +492,6 @@ page 6150675 "NPR POS Entry Card"
                     ToolTip = 'Executes the Voucher List action';
 
                     trigger OnAction()
-                    var
-                        TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
                     begin
                     end;
                 }
@@ -540,10 +536,10 @@ page 6150675 "NPR POS Entry Card"
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                     POSEntryToPost: Record "NPR POS Entry";
                 begin
-                    POSEntryToPost.SetRange("Entry No.", "Entry No.");
-                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
+                    POSEntryToPost.SetRange("Entry No.", Rec."Entry No.");
+                    if Rec."Post Item Entry Status" < Rec."Post Item Entry Status"::Posted then
                         POSPostEntries.SetPostItemEntries(true);
-                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
+                    if Rec."Post Entry Status" < Rec."Post Entry Status"::Posted then
                         POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
@@ -577,7 +573,7 @@ page 6150675 "NPR POS Entry Card"
                     POSPostEntries.SetStopOnError(true);
 
                     if (ItemPosting) then begin
-                        POSEntryToPost.Reset;
+                        POSEntryToPost.Reset();
                         POSEntryToPost.CopyFilters(Rec);
                         POSEntryToPost.SetFilter("Post Item Entry Status", '<2');
                         POSPostEntries.SetPostItemEntries(true);
@@ -588,16 +584,16 @@ page 6150675 "NPR POS Entry Card"
                                 POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
 
                             POSPostEntries.Run(POSEntryToPost);
-                            Commit;
+                            Commit();
 
                             ErrorDuringPosting := not POSEntryToPost.IsEmpty();
-                            POSEntryToPost.SetFilter("POS Period Register No.", GetFilter("POS Period Register No."));
+                            POSEntryToPost.SetFilter("POS Period Register No.", Rec.GetFilter("POS Period Register No."));
 
                         until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
                     end;
 
                     if (POSPosting) then begin
-                        POSEntryToPost.Reset;
+                        POSEntryToPost.Reset();
                         POSEntryToPost.CopyFilters(Rec);
                         POSEntryToPost.SetFilter("Post Entry Status", '<2');
                         POSPostEntries.SetPostItemEntries(false);
@@ -608,10 +604,10 @@ page 6150675 "NPR POS Entry Card"
                                 POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
 
                             POSPostEntries.Run(POSEntryToPost);
-                            Commit;
+                            Commit();
 
                             ErrorDuringPosting := not POSEntryToPost.IsEmpty();
-                            POSEntryToPost.SetFilter("POS Period Register No.", GetFilter("POS Period Register No."));
+                            POSEntryToPost.SetFilter("POS Period Register No.", Rec.GetFilter("POS Period Register No."));
 
                         until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
                     end;
@@ -630,10 +626,10 @@ page 6150675 "NPR POS Entry Card"
                     POSEntryToPost: Record "NPR POS Entry";
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
-                    POSEntryToPost.SetRange("Entry No.", "Entry No.");
-                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
+                    POSEntryToPost.SetRange("Entry No.", Rec."Entry No.");
+                    if Rec."Post Item Entry Status" < Rec."Post Item Entry Status"::Posted then
                         POSPostEntries.SetPostItemEntries(true);
-                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
+                    if Rec."Post Entry Status" < Rec."Post Entry Status"::Posted then
                         POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
@@ -675,10 +671,10 @@ page 6150675 "NPR POS Entry Card"
                     POSEntryToPost: Record "NPR POS Entry";
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
-                    POSEntryToPost.SetRange("Entry No.", "Entry No.");
-                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
+                    POSEntryToPost.SetRange("Entry No.", Rec."Entry No.");
+                    if Rec."Post Item Entry Status" < Rec."Post Item Entry Status"::Posted then
                         POSPostEntries.SetPostItemEntries(true);
-                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
+                    if Rec."Post Entry Status" < Rec."Post Entry Status"::Posted then
                         POSPostEntries.SetPostPOSEntries(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
@@ -701,13 +697,13 @@ page 6150675 "NPR POS Entry Card"
                     POSPeriodRegister: Record "NPR POS Period Register";
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
-                    if ("Entry Type" <> "Entry Type"::Balancing) then
-                        if (POSPeriodRegister.Get("POS Period Register No.")) then
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
+                    if (Rec."Entry Type" <> Rec."Entry Type"::Balancing) then
+                        if (POSPeriodRegister.Get(Rec."POS Period Register No.")) then
                             if (POSPeriodRegister."Document No." <> '') then
-                                Navigate.SetDoc("Posting Date", POSPeriodRegister."Document No.");
+                                Navigate.SetDoc(Rec."Posting Date", POSPeriodRegister."Document No.");
 
-                    Navigate.Run;
+                    Navigate.Run();
                 end;
             }
             group(Print)
@@ -765,12 +761,12 @@ page 6150675 "NPR POS Entry Card"
                     var
                         EFTTransactionRequest: Record "NPR EFT Transaction Request";
                     begin
-                        EFTTransactionRequest.SetRange("Sales Ticket No.", "Document No.");
-                        EFTTransactionRequest.SetRange("Register No.", "POS Unit No.");
-                        if EFTTransactionRequest.FindSet then
+                        EFTTransactionRequest.SetRange("Sales Ticket No.", Rec."Document No.");
+                        EFTTransactionRequest.SetRange("Register No.", Rec."POS Unit No.");
+                        if EFTTransactionRequest.FindSet() then
                             repeat
                                 EFTTransactionRequest.PrintReceipts(true);
-                            until EFTTransactionRequest.Next = 0;
+                            until EFTTransactionRequest.Next() = 0;
                     end;
                 }
                 action("Print Log")
@@ -839,15 +835,15 @@ page 6150675 "NPR POS Entry Card"
         LastOpenSalesDocumentNo := '';
         if TryGetLastOpenSalesDoc(POSEntrySalesDocLink) then
             LastOpenSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
-        POSEntrySalesDocLink.Reset;
+        POSEntrySalesDocLink.Reset();
 
         LastPostedSalesDocumentNo := '';
         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then
             LastPostedSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
-        CalcFields("Sale Lines", "Payment Lines", "Tax Lines");
-        HasSaleLines := "Sale Lines" > 0;
-        HasPaymentLines := "Payment Lines" > 0;
-        HasTaxLines := "Tax Lines" > 0;
+        Rec.CalcFields("Sale Lines", "Payment Lines", "Tax Lines");
+        HasSaleLines := Rec."Sale Lines" > 0;
+        HasPaymentLines := Rec."Payment Lines" > 0;
+        HasTaxLines := Rec."Tax Lines" > 0;
     end;
 
     trigger OnOpenPage()
@@ -868,7 +864,7 @@ page 6150675 "NPR POS Entry Card"
 
     local procedure TryGetLastOpenSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
-        POSEntrySalesDocLinkOut.SetRange("POS Entry No.", "Entry No.");
+        POSEntrySalesDocLinkOut.SetRange("POS Entry No.", Rec."Entry No.");
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Type", POSEntrySalesDocLinkOut."POS Entry Reference Type"::HEADER);
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Line No.", 0);
         POSEntrySalesDocLinkOut.SetFilter("Sales Document Type", '%1|%2|%3|%4',
@@ -876,18 +872,18 @@ page 6150675 "NPR POS Entry Card"
                                           POSEntrySalesDocLinkOut."Sales Document Type"::ORDER,
                                           POSEntrySalesDocLinkOut."Sales Document Type"::CREDIT_MEMO,
                                           POSEntrySalesDocLinkOut."Sales Document Type"::RETURN_ORDER);
-        exit(POSEntrySalesDocLinkOut.FindLast);
+        exit(POSEntrySalesDocLinkOut.FindLast());
     end;
 
     local procedure TryGetLastPostedSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
-        POSEntrySalesDocLinkOut.SetRange("POS Entry No.", "Entry No.");
+        POSEntrySalesDocLinkOut.SetRange("POS Entry No.", Rec."Entry No.");
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Type", POSEntrySalesDocLinkOut."POS Entry Reference Type"::HEADER);
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Line No.", 0);
         POSEntrySalesDocLinkOut.SetFilter("Sales Document Type", '%1|%2',
                                           POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_INVOICE,
                                           POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_CREDIT_MEMO);
-        exit(POSEntrySalesDocLinkOut.FindLast);
+        exit(POSEntrySalesDocLinkOut.FindLast());
     end;
 
     local procedure ShowWorkshift(POSEntry: Record "NPR POS Entry")

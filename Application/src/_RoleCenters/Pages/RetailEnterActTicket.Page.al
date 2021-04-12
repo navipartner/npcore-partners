@@ -1,4 +1,4 @@
-page 6151250 "NPR Retail Enter. Act - Ticket"
+﻿page 6151250 "NPR Retail Enter. Act - Ticket"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -94,10 +94,10 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
     }
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

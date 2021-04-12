@@ -13,17 +13,17 @@ page 6014624 "NPR Pmt. Gateways Select"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Api Url"; "Api Url")
+                field("Api Url"; Rec."Api Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Url field';
                 }
-                field("Api Username"; "Api Username")
+                field("Api Username"; Rec."Api Username")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Username field';
@@ -41,32 +41,32 @@ page 6014624 "NPR Pmt. Gateways Select"
                         Commit();
                     end;
                 }
-                field("Merchant ID"; "Merchant ID")
+                field("Merchant ID"; Rec."Merchant ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Merchant Id field';
                 }
-                field("Merchant Name"; "Merchant Name")
+                field("Merchant Name"; Rec."Merchant Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Merchant Name field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Capture Codeunit Id"; "Capture Codeunit Id")
+                field("Capture Codeunit Id"; Rec."Capture Codeunit Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Capture codeunit-id field';
                 }
-                field("Refund Codeunit Id"; "Refund Codeunit Id")
+                field("Refund Codeunit Id"; Rec."Refund Codeunit Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Refund codeunit-id field';
                 }
-                field("Cancel Codeunit Id"; "Cancel Codeunit Id")
+                field("Cancel Codeunit Id"; Rec."Cancel Codeunit Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cancel Codeunit Id field';

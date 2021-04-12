@@ -77,7 +77,7 @@ table 6151249 "NPR Trail. Purch. Orders Setup"
         if "Use Work Date as Base" then
             StartDate := WorkDate
         else
-            StartDate := Today;
+            StartDate := Today();
         if "Show Orders" = "Show Orders"::"All Orders" then begin
             CalcFields("Latest Order Document Date");
             StartDate := "Latest Order Document Date";
@@ -105,25 +105,25 @@ table 6151249 "NPR Trail. Purch. Orders Setup"
     procedure SetPeriodLength(PeriodLength: Option)
     begin
         "Period Length" := PeriodLength;
-        Modify;
+        Modify();
     end;
 
     procedure SetShowOrders(ShowOrders: Integer)
     begin
         "Show Orders" := ShowOrders;
-        Modify;
+        Modify();
     end;
 
     procedure SetValueToCalcuate(ValueToCalc: Integer)
     begin
         "Value to Calculate" := ValueToCalc;
-        Modify;
+        Modify();
     end;
 
     procedure SetChartType(ChartType: Integer)
     begin
         "Chart Type" := ChartType;
-        Modify;
+        Modify();
     end;
 }
 

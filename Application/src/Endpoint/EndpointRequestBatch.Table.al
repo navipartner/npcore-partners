@@ -1,4 +1,4 @@
-table 6014676 "NPR Endpoint Request Batch"
+﻿table 6014676 "NPR Endpoint Request Batch"
 {
     // NPR5.23\BR\20160518  CASE 237658 Object created
 
@@ -48,7 +48,7 @@ table 6014676 "NPR Endpoint Request Batch"
         }
         field(200; "No. of Requests"; Integer)
         {
-            CalcFormula = Count ("NPR Endpoint Request" WHERE("Request Batch No." = FIELD("No.")));
+            CalcFormula = Count("NPR Endpoint Request" WHERE("Request Batch No." = FIELD("No.")));
             Caption = 'No. of Requests';
             Editable = false;
             FieldClass = FlowField;
@@ -76,7 +76,7 @@ table 6014676 "NPR Endpoint Request Batch"
     var
         EndpointRequest: Record "NPR Endpoint Request";
     begin
-        EndpointRequest.Reset;
+        EndpointRequest.Reset();
         EndpointRequest.SetFilter("Endpoint Code", '=%1', "Endpoint Code");
         EndpointRequest.DeleteAll(true);
     end;

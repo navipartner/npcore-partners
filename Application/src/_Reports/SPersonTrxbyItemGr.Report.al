@@ -85,7 +85,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                 trigger OnAfterGetRecord()
                 begin
                     if "NPR Sales (Qty.)" = 0 then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     Clear(Dg);
                     if "NPR Sales (LCY)" <> 0 then
@@ -161,7 +161,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                         if not TempVendorAmount.Find('-') then
                             CurrReport.Break();
                     end else
-                        if TempVendorAmount.Next = 0 then
+                        if TempVendorAmount.Next() = 0 then
                             CurrReport.Break();
 
                     "Salesperson/Purchaser".Get(TempVendorAmount."Vendor No.");
@@ -267,7 +267,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
 
     trigger OnInitReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
         ShowItemsGrpWithoutSale := false;
         SortSalesPerson := false;

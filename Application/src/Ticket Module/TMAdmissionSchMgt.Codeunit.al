@@ -1,4 +1,4 @@
-codeunit 6060118 "NPR TM Admission Sch. Mgt."
+﻿codeunit 6060118 "NPR TM Admission Sch. Mgt."
 {
 
     trigger OnRun()
@@ -8,7 +8,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
 
         if (Admission.FindSet()) then begin
             repeat
-                Commit;
+                Commit();
                 CreateAdmissionSchedule(Admission."Admission Code", false, Today);
             until (Admission.Next() = 0);
         end;
@@ -20,7 +20,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
 
     procedure CreateAdmissionSchedule(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date)
     var
-        Admission: Record "NPR TM Admission";
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         DateRecord: Record Date;
         TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
@@ -34,7 +33,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         AdmissionScheduleLines.SetCurrentKey("Admission Code", "Process Order");
         AdmissionScheduleLines.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (AdmissionScheduleLines.FindSet()) then begin
-            GenerateFromDate := Today;
+            GenerateFromDate := Today();
             GenerateUntilDate := 0D;
 
             // find the low / high dates for all schedules for this admission
@@ -79,9 +78,9 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
                             StoreScheduleEntries(AdmissionScheduleLines."Admission Code", DateRecord."Period Start", TmpAdmissionScheduleEntry);
                     end;
 
-                    TmpAdmissionScheduleEntry.Reset;
+                    TmpAdmissionScheduleEntry.Reset();
                     if (TmpAdmissionScheduleEntry.IsTemporary) then
-                        TmpAdmissionScheduleEntry.DeleteAll;
+                        TmpAdmissionScheduleEntry.DeleteAll();
 
                 until (DateRecord.Next() = 0);
             end;
@@ -93,7 +92,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
         if (ReferenceDate = 0D) then
-            ReferenceDate := Today;
+            ReferenceDate := Today();
 
         AdmissionScheduleLines.SetFilter("Admission Code", '=%1', AdmissionCode);
         AdmissionScheduleLines.SetFilter(Blocked, '=%1', false);
@@ -137,7 +136,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         if (not CalculateScheduleDateRange(AdmissionScheduleLines, GenerateForDate, 0D, true, ScheduleStartDate, ScheduleEndDate)) then begin
             // This schedule has expired in some way
             if (AdmissionScheduleLines."Schedule Generated At" <> Today) then begin
-                AdmissionScheduleLines."Schedule Generated At" := Today;
+                AdmissionScheduleLines."Schedule Generated At" := Today();
                 AdmissionScheduleLines.Modify();
             end;
             exit;
@@ -200,7 +199,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         end;
 
         AdmissionScheduleLines."Schedule Generated Until" := DateRecord."Period Start";
-        AdmissionScheduleLines."Schedule Generated At" := Today;
+        AdmissionScheduleLines."Schedule Generated At" := Today();
         AdmissionScheduleLines.Modify();
     end;
 
@@ -208,14 +207,8 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
     var
         Admission: Record "NPR TM Admission";
         Schedule: Record "NPR TM Admis. Schedule";
-        DateRecord: Record Date;
-        DateRecordPeriod: Record Date;
         StartDate: Date;
         EndDate: Date;
-        HighestEntryDate: Date;
-        PeriodCount: Integer;
-        CreateEntryThisPeriod: Boolean;
-        ScheduleForDate: Date;
     begin
 
         GenerateFromDate := DMY2Date(31, 12, 9999); //31129999D;
@@ -276,25 +269,16 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
 
     local procedure AddTimeEntry(StartFromDate: Date; Admission: Record "NPR TM Admission"; Schedule: Record "NPR TM Admis. Schedule"; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
-        ExistingAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        NewAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
-        DuplicateAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         CalendarManagement: Codeunit "Calendar Management";
         CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
-        ExternalEntryNo: Integer;
-        HaveExisting: Boolean;
         EndDateTime: DateTime;
-        EntryModified: Boolean;
-        EntryCreated: Boolean;
-        IsEqual: Boolean;
         EntryNo: Integer;
         CalendarDesc: Text;
-        NonWorking: Boolean;
     begin
 
         // we are not creating historical entries
-        if (StartFromDate < WorkDate) then
+        if (StartFromDate < WorkDate()) then
             exit;
 
         AdmissionScheduleLines.Get(Admission."Admission Code", Schedule."Schedule Code");
@@ -303,121 +287,117 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         EntryNo := 1;
 
         // the new entry
-        with TmpAdmissionScheduleEntry do begin
+        TmpAdmissionScheduleEntry.Reset();
+        if (TmpAdmissionScheduleEntry.FindLast()) then
+            EntryNo := TmpAdmissionScheduleEntry."Entry No.";
 
-            Reset();
-            if (FindLast()) then
-                EntryNo := "Entry No.";
+        EntryNo += 1;
+        TmpAdmissionScheduleEntry.Init();
+        TmpAdmissionScheduleEntry."Entry No." := EntryNo;
+        TmpAdmissionScheduleEntry.Insert();
 
-            EntryNo += 1;
-            Init();
-            "Entry No." := EntryNo;
-            Insert();
+        TmpAdmissionScheduleEntry."Admission Code" := Admission."Admission Code";
+        TmpAdmissionScheduleEntry."Schedule Code" := Schedule."Schedule Code";
+        TmpAdmissionScheduleEntry."Admission Start Date" := StartFromDate;
+        TmpAdmissionScheduleEntry."Admission Start Time" := Schedule."Start Time";
 
-            "Admission Code" := Admission."Admission Code";
-            "Schedule Code" := Schedule."Schedule Code";
-            "Admission Start Date" := StartFromDate;
-            "Admission Start Time" := Schedule."Start Time";
-
-            "Admission End Date" := StartFromDate;
-            "Admission End Time" := Schedule."Stop Time";
-            if (Schedule."Event Duration" > 0) then begin
-                EndDateTime := CreateDateTime(StartFromDate, Schedule."Start Time") + Schedule."Event Duration";
-                "Admission End Date" := DT2Date(EndDateTime);
-                "Admission End Time" := DT2Time(EndDateTime);
-                "Event Duration" := Schedule."Event Duration";
-            end;
-
-            // will be deprecated
-            "Unbookable Before Start (Secs)" := AdmissionScheduleLines."Unbookable Before Start (Secs)";
-            "Bookable Passed Start (Secs)" := AdmissionScheduleLines."Bookable Passed Start (Secs)";
-            // new fields
-            "Event Arrival From Time" := AdmissionScheduleLines."Event Arrival From Time";
-            "Event Arrival Until Time" := AdmissionScheduleLines."Event Arrival Until Time";
-
-            if (Format(AdmissionScheduleLines."Sales From Date (Rel.)") <> '') then
-                "Sales From Date" := CalcDate(AdmissionScheduleLines."Sales From Date (Rel.)", "Admission Start Date");
-
-            "Sales From Time" := AdmissionScheduleLines."Sales From Time";
-            if (("Sales From Time" <> 0T) and ("Sales From Date" = 0D)) then
-                "Sales From Date" := "Admission Start Date";
-
-            if (Format(AdmissionScheduleLines."Sales Until Date (Rel.)") <> '') then
-                "Sales Until Date" := CalcDate(AdmissionScheduleLines."Sales Until Date (Rel.)", "Admission End Date");
-
-            "Sales Until Time" := AdmissionScheduleLines."Sales Until Time";
-            if (("Sales Until Time" <> 0T) and ("Sales Until Date" = 0D)) then
-                "Sales Until Date" := "Admission End Date";
-
-            if (("Sales Until Time" = 0T) and ("Sales Until Date" = "Admission End Date")) then
-                "Sales Until Time" := "Admission End Time";
-
-            if (("Sales From Date" = "Admission Start Date") and ("Sales From Time" > "Admission End Time")) then
-                "Sales From Time" := "Admission Start Time";
-
-
-            "Max Capacity Per Sch. Entry" := AdmissionScheduleLines."Max Capacity Per Sch. Entry";
-
-            "Admission Is" := Schedule."Admission Is";
-
-            "Visibility On Web" := AdmissionScheduleLines."Visibility On Web";
-
-            if ((Admission."Admission Base Calendar Code" <> '') and ("Admission Is" = "Admission Is"::OPEN)) then begin
-                CustomizedCalendarChangeTemp.Init();
-                CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-                CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
-                CustomizedCalendarChangeTemp."Date" := StartFromDate;
-                CustomizedCalendarChangeTemp.Description := CalendarDesc;
-                CustomizedCalendarChangeTemp."Source Code" := "Admission Code";
-                CustomizedCalendarChangeTemp.Insert();
-
-                CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
-                if (CustomizedCalendarChangeTemp.Nonworking) then
-                    "Admission Is" := Schedule."Admission Is"::CLOSED;
-            end;
-
-            if ((Schedule."Admission Base Calendar Code" <> '') and ("Admission Is" = "Admission Is"::OPEN)) then begin
-                CustomizedCalendarChangeTemp.DeleteAll();
-                CustomizedCalendarChangeTemp.Init();
-                CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-                CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
-                CustomizedCalendarChangeTemp."Date" := StartFromDate;
-                CustomizedCalendarChangeTemp.Description := CalendarDesc;
-                CustomizedCalendarChangeTemp."Additional Source Code" := "Schedule Code";
-                CustomizedCalendarChangeTemp.Insert();
-
-                CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
-                if (CustomizedCalendarChangeTemp.Nonworking) then
-                    "Admission Is" := Schedule."Admission Is"::CLOSED;
-            end;
-
-            if ((AdmissionScheduleLines."Admission Base Calendar Code" <> '') and ("Admission Is" = "Admission Is"::OPEN)) then begin
-                CustomizedCalendarChangeTemp.DeleteAll();
-                CustomizedCalendarChangeTemp.Init();
-                CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-                CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
-                CustomizedCalendarChangeTemp."Date" := StartFromDate;
-                CustomizedCalendarChangeTemp.Description := CalendarDesc;
-                CustomizedCalendarChangeTemp."Source Code" := "Admission Code";
-                CustomizedCalendarChangeTemp."Additional Source Code" := "Schedule Code";
-                CustomizedCalendarChangeTemp.Insert();
-
-                CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
-                if (CustomizedCalendarChangeTemp.Nonworking) then
-                    "Admission Is" := Schedule."Admission Is"::CLOSED;
-            end;
-
-            Cancelled := false;
-            "Reason Code" := 'NTE'; // New Time Entry
-
-            Modify();
+        TmpAdmissionScheduleEntry."Admission End Date" := StartFromDate;
+        TmpAdmissionScheduleEntry."Admission End Time" := Schedule."Stop Time";
+        if (Schedule."Event Duration" > 0) then begin
+            EndDateTime := CreateDateTime(StartFromDate, Schedule."Start Time") + Schedule."Event Duration";
+            TmpAdmissionScheduleEntry."Admission End Date" := DT2Date(EndDateTime);
+            TmpAdmissionScheduleEntry."Admission End Time" := DT2Time(EndDateTime);
+            TmpAdmissionScheduleEntry."Event Duration" := Schedule."Event Duration";
         end;
+
+        // will be deprecated
+        TmpAdmissionScheduleEntry."Unbookable Before Start (Secs)" := AdmissionScheduleLines."Unbookable Before Start (Secs)";
+        TmpAdmissionScheduleEntry."Bookable Passed Start (Secs)" := AdmissionScheduleLines."Bookable Passed Start (Secs)";
+        // new fields
+        TmpAdmissionScheduleEntry."Event Arrival From Time" := AdmissionScheduleLines."Event Arrival From Time";
+        TmpAdmissionScheduleEntry."Event Arrival Until Time" := AdmissionScheduleLines."Event Arrival Until Time";
+
+        if (Format(AdmissionScheduleLines."Sales From Date (Rel.)") <> '') then
+            TmpAdmissionScheduleEntry."Sales From Date" := CalcDate(AdmissionScheduleLines."Sales From Date (Rel.)", TmpAdmissionScheduleEntry."Admission Start Date");
+
+        TmpAdmissionScheduleEntry."Sales From Time" := AdmissionScheduleLines."Sales From Time";
+        if ((TmpAdmissionScheduleEntry."Sales From Time" <> 0T) and (TmpAdmissionScheduleEntry."Sales From Date" = 0D)) then
+            TmpAdmissionScheduleEntry."Sales From Date" := TmpAdmissionScheduleEntry."Admission Start Date";
+
+        if (Format(AdmissionScheduleLines."Sales Until Date (Rel.)") <> '') then
+            TmpAdmissionScheduleEntry."Sales Until Date" := CalcDate(AdmissionScheduleLines."Sales Until Date (Rel.)", TmpAdmissionScheduleEntry."Admission End Date");
+
+        TmpAdmissionScheduleEntry."Sales Until Time" := AdmissionScheduleLines."Sales Until Time";
+        if ((TmpAdmissionScheduleEntry."Sales Until Time" <> 0T) and (TmpAdmissionScheduleEntry."Sales Until Date" = 0D)) then
+            TmpAdmissionScheduleEntry."Sales Until Date" := TmpAdmissionScheduleEntry."Admission End Date";
+
+        if ((TmpAdmissionScheduleEntry."Sales Until Time" = 0T) and (TmpAdmissionScheduleEntry."Sales Until Date" = TmpAdmissionScheduleEntry."Admission End Date")) then
+            TmpAdmissionScheduleEntry."Sales Until Time" := TmpAdmissionScheduleEntry."Admission End Time";
+
+        if ((TmpAdmissionScheduleEntry."Sales From Date" = TmpAdmissionScheduleEntry."Admission Start Date") and (TmpAdmissionScheduleEntry."Sales From Time" > TmpAdmissionScheduleEntry."Admission End Time")) then
+            TmpAdmissionScheduleEntry."Sales From Time" := TmpAdmissionScheduleEntry."Admission Start Time";
+
+
+        TmpAdmissionScheduleEntry."Max Capacity Per Sch. Entry" := AdmissionScheduleLines."Max Capacity Per Sch. Entry";
+
+        TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is";
+
+        TmpAdmissionScheduleEntry."Visibility On Web" := AdmissionScheduleLines."Visibility On Web";
+
+        if ((Admission."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
+            CustomizedCalendarChangeTemp.Init();
+            CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
+            CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
+            CustomizedCalendarChangeTemp."Date" := StartFromDate;
+            CustomizedCalendarChangeTemp.Description := CalendarDesc;
+            CustomizedCalendarChangeTemp."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
+            CustomizedCalendarChangeTemp.Insert();
+
+            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
+            if (CustomizedCalendarChangeTemp.Nonworking) then
+                TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
+        end;
+
+        if ((Schedule."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
+            CustomizedCalendarChangeTemp.DeleteAll();
+            CustomizedCalendarChangeTemp.Init();
+            CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
+            CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
+            CustomizedCalendarChangeTemp."Date" := StartFromDate;
+            CustomizedCalendarChangeTemp.Description := CalendarDesc;
+            CustomizedCalendarChangeTemp."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
+            CustomizedCalendarChangeTemp.Insert();
+
+            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
+            if (CustomizedCalendarChangeTemp.Nonworking) then
+                TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
+        end;
+
+        if ((AdmissionScheduleLines."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
+            CustomizedCalendarChangeTemp.DeleteAll();
+            CustomizedCalendarChangeTemp.Init();
+            CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
+            CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
+            CustomizedCalendarChangeTemp."Date" := StartFromDate;
+            CustomizedCalendarChangeTemp.Description := CalendarDesc;
+            CustomizedCalendarChangeTemp."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
+            CustomizedCalendarChangeTemp."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
+            CustomizedCalendarChangeTemp.Insert();
+
+            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
+            if (CustomizedCalendarChangeTemp.Nonworking) then
+                TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
+        end;
+
+        TmpAdmissionScheduleEntry.Cancelled := false;
+        TmpAdmissionScheduleEntry."Reason Code" := 'NTE'; // New Time Entry
+
+        TmpAdmissionScheduleEntry.Modify();
     end;
 
     local procedure CompareScheduleEntries(AdmissionCode: Code[20]; ReferenceDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary): Boolean
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        PreviousAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         UniqKey: Text;
     begin
 
@@ -443,14 +423,14 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             exit(not AdmissionScheduleEntry.IsEmpty());
         end;
 
-        if (TmpAdmissionScheduleEntry.Count = 1) then begin
+        if (TmpAdmissionScheduleEntry.Count() = 1) then begin
             TmpAdmissionScheduleEntry.FindFirst();
 
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
             AdmissionScheduleEntry.SetFilter("Admission Start Time", '=%1', TmpAdmissionScheduleEntry."Admission Start Time");
             AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-            if (AdmissionScheduleEntry.Count <> 1) then
+            if (AdmissionScheduleEntry.Count() <> 1) then
                 exit(false);
 
             AdmissionScheduleEntry.FindFirst();
@@ -648,7 +628,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
 
         TicketParticipantWks.SetCurrentKey("Applies To Schedule Entry No.");
         TicketParticipantWks.SetFilter("Applies To Schedule Entry No.", '=%1', ScheduleEntryNo);
-        PendingCount := TicketParticipantWks.Count;
+        PendingCount := TicketParticipantWks.Count();
         if (PendingCount > 0) then begin
             if (not (Confirm(APPEND_LIST_CONFIRM, true))) then begin
                 if not (Confirm(RECREATE_LIST_CONFIRM, false)) then begin
@@ -675,7 +655,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             if (not TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
                 Clear(TicketReservationRequest);
 
-            TmpTicketParticipantWks.Init;
+            TmpTicketParticipantWks.Init();
             EntryCount += 1;
             TmpTicketParticipantWks."Entry No." := EntryCount;
             TmpTicketParticipantWks."Applies To Schedule Entry No." := ScheduleEntryNo;

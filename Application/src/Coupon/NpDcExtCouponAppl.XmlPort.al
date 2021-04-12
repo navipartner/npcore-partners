@@ -112,8 +112,6 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                         {
 
                             trigger OnAfterAssignField()
-                            var
-                                NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
                             begin
                             end;
                         }
@@ -129,7 +127,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
 
                 trigger OnAfterGetRecord()
                 begin
-                    currXMLport.Break;
+                    currXMLport.Break();
                 end;
             }
             tableelement(tempsaleposres; "NPR POS Sale")
@@ -206,7 +204,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
 
                 trigger OnAfterInitRecord()
                 begin
-                    currXMLport.Break;
+                    currXMLport.Break();
                 end;
             }
         }

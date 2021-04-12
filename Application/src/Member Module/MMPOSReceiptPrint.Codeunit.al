@@ -5,7 +5,6 @@ codeunit 6060134 "NPR MM POS Receipt Print"
 
     trigger OnRun()
     var
-        Item: Record Item;
         MembershipEntry: Record "NPR MM Membership Entry";
         MemberRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
@@ -16,7 +15,7 @@ codeunit 6060134 "NPR MM POS Receipt Print"
         Printer.SetAutoLineBreak(true);
         Printer.SetThreeColumnDistribution(0.465, 0.35, 0.235);
 
-        if Membership.FindSet then
+        if Membership.FindSet() then
             repeat
 
                 Printer.SetFont('Control');
@@ -62,7 +61,7 @@ codeunit 6060134 "NPR MM POS Receipt Print"
 
                 Printer.SetFont('Control');
                 Printer.AddLine('P');
-            until Membership.Next = 0;
+            until Membership.Next() = 0;
     end;
 
     var

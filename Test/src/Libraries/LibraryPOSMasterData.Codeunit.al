@@ -1,4 +1,4 @@
-codeunit 85002 "NPR Library - POS Master Data"
+﻿codeunit 85002 "NPR Library - POS Master Data"
 {
     procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; POSProfileCode: Code[20])
     var
@@ -38,7 +38,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         Location: Record Location;
         LibraryWarehouse: Codeunit "Library - Warehouse";
     begin
-        POSStore.Init;
+        POSStore.Init();
         POSStore.Validate(
           Code,
           CopyStr(
@@ -58,7 +58,7 @@ codeunit 85002 "NPR Library - POS Master Data"
     var
         LibraryUtility: Codeunit "Library - Utility";
     begin
-        POSPaymentBin.Init;
+        POSPaymentBin.Init();
         POSPaymentBin.Validate(
           "No.",
           CopyStr(
@@ -76,7 +76,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
     begin
-        POSPaymentMethod.Init;
+        POSPaymentMethod.Init();
         POSPaymentMethod.Validate(
           Code,
           CopyStr(
@@ -120,24 +120,24 @@ codeunit 85002 "NPR Library - POS Master Data"
             POSPaymentMethod.SetRange(Code, POSPaymentMethodCode);
         if POSPaymentBinCode <> '' then
             POSPaymentBin.SetRange("No.", POSPaymentBinCode);
-        if POSStore.FindSet then
+        if POSStore.FindSet() then
             repeat
-                POSPostingSetup.Init;
+                POSPostingSetup.Init();
                 POSPostingSetup."POS Store Code" := POSStore.Code;
-                if POSPaymentMethod.FindSet then
+                if POSPaymentMethod.FindSet() then
                     repeat
                         POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
                         if POSPaymentBinCode = '' then begin
                             CreatePOSPostingSetupLine(POSPostingSetup, false);
                         end else begin
-                            if POSPaymentBin.FindSet then
+                            if POSPaymentBin.FindSet() then
                                 repeat
                                     POSPostingSetup."POS Payment Bin Code" := POSPaymentBin."No.";
                                     CreatePOSPostingSetupLine(POSPostingSetup, false);
-                                until POSPaymentBin.Next = 0;
+                                until POSPaymentBin.Next() = 0;
                         end;
-                    until POSPaymentMethod.Next = 0;
-            until POSStore.Next = 0;
+                    until POSPaymentMethod.Next() = 0;
+            until POSStore.Next() = 0;
     end;
 
     procedure CreatePOSPostingSetupLine(var POSPostingSetup: Record "NPR POS Posting Setup"; UseGLAsDifferenceAccounts: Boolean)
@@ -146,7 +146,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryERM: Codeunit "Library - ERM";
         LibrarySales: Codeunit "Library - Sales";
     begin
-        if POSPostingSetup.Find then
+        if POSPostingSetup.Find() then
             exit;
         POSPaymentMethod.Get(POSPostingSetup."POS Payment Method Code");
         case POSPaymentMethod."Processing Type" of
@@ -180,7 +180,7 @@ codeunit 85002 "NPR Library - POS Master Data"
             POSPostingSetup."Difference Acc. No." := LibraryERM.CreateGLAccountNo;
             POSPostingSetup."Difference Acc. No. (Neg)" := LibrarySales.CreateCustomerNo;
         end;
-        POSPostingSetup.Insert;
+        POSPostingSetup.Insert();
     end;
 
     procedure CreatePOSSetup(var POSSetup: Record "NPR POS Setup")
@@ -188,7 +188,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         if POSSetup.FindFirst() then
             exit;
 
-        POSSetup.Init;
+        POSSetup.Init();
         POSSetup.Insert();
     end;
 
@@ -197,7 +197,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryERM: Codeunit "Library - ERM";
         LibraryUtility: Codeunit "Library - Utility";
     begin
-        POSPaymentMethod.Init;
+        POSPaymentMethod.Init();
         if No <> '' then begin
             POSPaymentMethod.Validate(Code, No);
         end else begin
@@ -207,13 +207,13 @@ codeunit 85002 "NPR Library - POS Master Data"
                 LibraryUtility.GenerateRandomCode(POSPaymentMethod.FieldNo(Code), DATABASE::"NPR POS Payment Method"), 1,
                 LibraryUtility.GetFieldLength(DATABASE::"NPR POS Payment Method", POSPaymentMethod.FieldNo(Code))));
         end;
-        if not POSPaymentMethod.Find then
-            POSPaymentMethod.Insert;
+        if not POSPaymentMethod.Find() then
+            POSPaymentMethod.Insert();
 
         POSPaymentMethod."Processing Type" := ProcessingType;
         POSPaymentMethod."Block POS Payment" := false;
         POSPaymentMethod."Auto End Sale" := true;
-        POSPaymentMethod.Modify;
+        POSPaymentMethod.Modify();
     end;
 
     procedure CreatePeriodRegister(var POSUnit: Record "NPR POS Unit")
@@ -234,7 +234,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
-        POSAuditProfile.Init;
+        POSAuditProfile.Init();
         POSAuditProfile.Validate(
           Code,
           CopyStr(
@@ -246,7 +246,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
         NoSeriesLine.Modify();
         POSAuditProfile."Sales Ticket No. Series" := NoSeries.Code;
-        POSAuditProfile.Insert;
+        POSAuditProfile.Insert();
     end;
 
     procedure CreateGeneralPostingSetupForSaleItem(GenBusPostGrp: Code[10]; GenProdPostGrp: Code[10]; LocationCode: Code[20]; InvPostingGroup: Code[10])
@@ -313,7 +313,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         VATPostingSetup.Validate("Sales VAT Account", LibraryERM.CreateGLAccountNo);
         VATPostingSetup.Validate("Purchase VAT Account", LibraryERM.CreateGLAccountNo);
         VATPostingSetup.Validate("Tax Category", 'S');
-        VATPostingSetup.Modify;
+        VATPostingSetup.Modify();
     end;
 
     procedure CreateDefaultPostingSetup(var POSPostingProfile: Record "NPR POS Posting Profile")
@@ -331,10 +331,10 @@ codeunit 85002 "NPR Library - POS Master Data"
         GeneralPostingSetup: Record "General Posting Setup";
         VATPostingSetup: Record "VAT Posting Setup";
     begin
-        POSPostingProfile.Init;
+        POSPostingProfile.Init();
         POSPostingProfile.Code := LibraryUtility.GenerateRandomCode20(POSPostingProfile.FieldNo(Code), Database::"NPR POS Posting Profile");
-        if not POSPostingProfile.Find then
-            POSPostingProfile.Insert;
+        if not POSPostingProfile.Find() then
+            POSPostingProfile.Insert();
 
         POSPostingProfile."POS Posting Diff. Account" := LibraryERM.CreateGLAccountNo();
         POSPostingProfile."Max. POS Posting Diff. (LCY)" := 0.5;
@@ -350,7 +350,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 25);
         POSPostingProfile.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
 
-        POSPostingProfile.Modify;
+        POSPostingProfile.Modify();
     end;
 
     local procedure CreatePOSPostingSetup(var POSPaymentMethod: Record "NPR POS Payment Method")
@@ -363,17 +363,17 @@ codeunit 85002 "NPR Library - POS Master Data"
 
         if not POSPaymentMethod.Get(POSPaymentMethod.Code) then
             exit;
-        POSPostingSetup.Init;
+        POSPostingSetup.Init();
         POSPostingSetup."POS Store Code" := '';
         POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
         POSPostingSetup."POS Payment Bin Code" := '';
         POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
         POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
 
-        if not POSPostingSetup.Find then
+        if not POSPostingSetup.Find() then
             POSPostingSetup.Insert(true);
 
-        if POSUnit.FindSet then
+        if POSUnit.FindSet() then
             repeat
                 if POSStore.Get(POSUnit."POS Store Code") then begin
                     if POSPostingProfile.Get(POSStore."POS Posting Profile") then begin
@@ -381,7 +381,7 @@ codeunit 85002 "NPR Library - POS Master Data"
                         POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
                         POSPostingSetup."Difference Acc. No." := POSPostingProfile."POS Posting Diff. Account";
                         POSPostingSetup."Difference Acc. No. (Neg)" := POSPostingProfile."Posting Diff. Account (Neg.)";
-                        if not POSPostingSetup.Find then
+                        if not POSPostingSetup.Find() then
                             POSPostingSetup.Insert(true);
                     end;
                 end;
@@ -493,7 +493,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         Item."Price Includes VAT" := true;
         Item."Unit Price" := LibraryRandom.RandDec(1000, 2) + 1; //more than 1
         Item."Unit Cost" := LibraryRandom.RandDecInDecimalRange(0.01, Item."Unit Price", 1);
-        Item.Modify;
+        Item.Modify();
 
         CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
     end;

@@ -93,7 +93,7 @@ codeunit 6150637 "NPR POS Posting Control"
     begin
         if GLSetupGot then
             exit;
-        GLSetup.Get;
+        GLSetup.Get();
         GLSetupGot := true;
     end;
 

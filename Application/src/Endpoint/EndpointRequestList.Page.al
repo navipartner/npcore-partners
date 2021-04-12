@@ -16,72 +16,72 @@ page 6014678 "NPR Endpoint Request List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Endpoint Code"; "Endpoint Code")
+                field("Endpoint Code"; Rec."Endpoint Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Endpoint Code field';
                 }
-                field("Request Batch No."; "Request Batch No.")
+                field("Request Batch No."; Rec."Request Batch No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request Batch No. field';
                 }
-                field("Type of Change"; "Type of Change")
+                field("Type of Change"; Rec."Type of Change")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type of Change field';
                 }
-                field("Record ID"; "Record ID")
+                field("Record ID"; Rec."Record ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Record ID field';
                 }
-                field(Obsolete; Obsolete)
+                field(Obsolete; Rec.Obsolete)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Obsolete field';
                 }
-                field("Data log Record No."; "Data log Record No.")
+                field("Data log Record No."; Rec."Data log Record No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data log Record No. field';
                 }
-                field("Query No."; "Query No.")
+                field("Query No."; Rec."Query No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Query No. field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("PK Code 1"; "PK Code 1")
+                field("PK Code 1"; Rec."PK Code 1")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Primary Key Code 1 field';
                 }
-                field("PK Code 2"; "PK Code 2")
+                field("PK Code 2"; Rec."PK Code 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Primary Key Code 2 field';
                 }
-                field("PK Line 1"; "PK Line 1")
+                field("PK Line 1"; Rec."PK Line 1")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Primary Key Line 1 field';
                 }
-                field("PK Option 1"; "PK Option 1")
+                field("PK Option 1"; Rec."PK Option 1")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Primary Key Option 1 field';
                 }
-                field("Date Created"; "Date Created")
+                field("Date Created"; Rec."Date Created")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date Created field';

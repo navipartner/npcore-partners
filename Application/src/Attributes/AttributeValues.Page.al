@@ -14,29 +14,29 @@ page 6014608 "NPR Attribute Values"
         {
             repeater(Group)
             {
-                field("Attribute Code"; "Attribute Code")
+                field("Attribute Code"; Rec."Attribute Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute Code field';
                 }
-                field("Text Value"; "Text Value")
+                field("Text Value"; Rec."Text Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Text Value field';
                 }
-                field("Datetime Value"; "Datetime Value")
+                field("Datetime Value"; Rec."Datetime Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Datetime Value field';
                 }
-                field("Numeric Value"; "Numeric Value")
+                field("Numeric Value"; Rec."Numeric Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Numeric Value field';
                 }
-                field("Boolean Value"; "Boolean Value")
+                field("Boolean Value"; Rec."Boolean Value")
                 {
                     ApplicationArea = All;
                     Visible = false;

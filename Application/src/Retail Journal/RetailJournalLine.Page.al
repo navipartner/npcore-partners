@@ -1,4 +1,4 @@
-page 6014472 "NPR Retail Journal Line"
+﻿page 6014472 "NPR Retail Journal Line"
 {
     // //- NE 08/07-05
     //   Rettet import tilbage til at bruge forms.
@@ -56,18 +56,18 @@ page 6014472 "NPR Retail Journal Line"
                     trigger OnValidate()
                     begin
                         //-NPR5.53 [374290]
-                        Validate("Item No.", ItemNo);
+                        Rec.Validate("Item No.", ItemNo);
                         Clear(Item);
                         if Item.Get(ItemNo) then;
                         //+NPR5.53 [374290]
                     end;
                 }
-                field("Calculation Date"; "Calculation Date")
+                field("Calculation Date"; Rec."Calculation Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Calculation Date field';
                 }
-                field("Quantity to Print"; "Quantity to Print")
+                field("Quantity to Print"; Rec."Quantity to Print")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity to Print field';
@@ -86,22 +86,22 @@ page 6014472 "NPR Retail Journal Line"
                         LabelLibrary.ToggleLine(RecRef);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Vendor Item No."; "Vendor Item No.")
+                field("Vendor Item No."; Rec."Vendor Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vendor Item No. field';
                 }
-                field(Barcode; Barcode)
+                field(Barcode; Rec.Barcode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Barcode field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
@@ -114,7 +114,7 @@ page 6014472 "NPR Retail Journal Line"
                     Visible = true;
                     ToolTip = 'Specifies the value of the Unit price(Item Card) field';
                 }
-                field("Last Direct Cost"; "Last Direct Cost")
+                field("Last Direct Cost"; Rec."Last Direct Cost")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Direct Cost field';
@@ -127,160 +127,160 @@ page 6014472 "NPR Retail Journal Line"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit cost field';
                 }
-                field("Profit % (new)"; "Profit % (new)")
+                field("Profit % (new)"; Rec."Profit % (new)")
                 {
                     ApplicationArea = All;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Profit % (new) field';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Inventory field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Customer Price Group"; "Customer Price Group")
+                field("Customer Price Group"; Rec."Customer Price Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Price Group field';
                 }
-                field("Customer Disc. Group"; "Customer Disc. Group")
+                field("Customer Disc. Group"; Rec."Customer Disc. Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Disc. Group field';
                 }
-                field("New Item No."; "New Item No.")
+                field("New Item No."; Rec."New Item No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Item No. field';
                 }
-                field("Serial No."; "Serial No.")
+                field("Serial No."; Rec."Serial No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Serial No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 2 field';
                 }
-                field("Base Unit of measure"; "Base Unit of measure")
+                field("Base Unit of measure"; Rec."Base Unit of measure")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Base Unit of measure field';
                 }
-                field("Purch. Unit of measure"; "Purch. Unit of measure")
+                field("Purch. Unit of measure"; Rec."Purch. Unit of measure")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Purch. Unit of measure field';
                 }
-                field("Sales Unit of measure"; "Sales Unit of measure")
+                field("Sales Unit of measure"; Rec."Sales Unit of measure")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sales Unit of measure field';
                 }
-                field("Quantity for Discount Calc"; "Quantity for Discount Calc")
+                field("Quantity for Discount Calc"; Rec."Quantity for Discount Calc")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity for Discount Calculation field';
                 }
-                field("Discount Type"; "Discount Type")
+                field("Discount Type"; Rec."Discount Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Type field';
                 }
-                field("Discount Code"; "Discount Code")
+                field("Discount Code"; Rec."Discount Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Code field';
                 }
-                field("Variant Code 2"; "Variant Code")
+                field("Variant Code 2"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Discount Pct."; "Discount Pct.")
+                field("Discount Pct."; Rec."Discount Pct.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount % field';
                 }
-                field("Discount Price Incl. Vat"; "Discount Price Incl. Vat")
+                field("Discount Price Incl. Vat"; Rec."Discount Price Incl. Vat")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Price Incl. Vat field';
                 }
-                field("Discount Price Excl. VAT"; "Discount Price Excl. VAT")
+                field("Discount Price Excl. VAT"; Rec."Discount Price Excl. VAT")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Discount Price Excl. VAT field';
                 }
-                field("Unit List Price"; "Unit List Price")
+                field("Unit List Price"; Rec."Unit List Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit List Price field';
                 }
-                field("VAT %"; "VAT %")
+                field("VAT %"; Rec."VAT %")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the VAT % field';
                 }
-                field("Item group Field"; "Item group")
+                field("Item group Field"; Rec."Item group")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item group field';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Vendor No. field';
                 }
-                field("Vendor Name"; "Vendor Name")
+                field("Vendor Name"; Rec."Vendor Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Vendor Name field';
                 }
-                field("Net Change"; "Net Change")
+                field("Net Change"; Rec."Net Change")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Net Change field';
                 }
-                field("Purchases (Qty.)"; "Purchases (Qty.)")
+                field("Purchases (Qty.)"; Rec."Purchases (Qty.)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Purchases (Qty.) field';
                 }
-                field("Sales (Qty.)"; "Sales (Qty.)")
+                field("Sales (Qty.)"; Rec."Sales (Qty.)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales (Qty.) field';
                 }
-                field("Cannot edit unit price"; "Cannot edit unit price")
+                field("Cannot edit unit price"; Rec."Cannot edit unit price")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Can''t edit unit price field';
                 }
-                field("Exchange Label"; "Exchange Label")
+                field("Exchange Label"; Rec."Exchange Label")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Exchange Label field';
@@ -288,11 +288,11 @@ page 6014472 "NPR Retail Journal Line"
                     trigger OnValidate()
                     begin
                         //-NPR5.50 [350435]
-                        CurrPage.Update;
+                        CurrPage.Update();
                         //+NPR5.50 [350435]
                     end;
                 }
-                field("RFID Tag Value"; "RFID Tag Value")
+                field("RFID Tag Value"; Rec."RFID Tag Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -308,15 +308,14 @@ page 6014472 "NPR Retail Journal Line"
 
     trigger OnAfterGetRecord()
     var
-        Vendor: Record Vendor;
         RecRef: RecordRef;
     begin
         //-NPR5.53 [374290]
-        ItemNo := "Item No.";
+        ItemNo := Rec."Item No.";
         //+NPR5.53 [374290]
-        if not Item.Get("Item No.") then
-            Item.Init;
-        calcProfit;
+        if not Item.Get(Rec."Item No.") then
+            Item.Init();
+        Rec.calcProfit;
 
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);
@@ -343,7 +342,7 @@ page 6014472 "NPR Retail Journal Line"
         //+NPR5.53 [374290]
         Print := false;
         //-NPR5.46 [294354]
-        SetupNewLine(xRec);
+        Rec.SetupNewLine(xRec);
         //+NPR5.46 [294354]
     end;
 
@@ -370,19 +369,19 @@ page 6014472 "NPR Retail Journal Line"
     begin
         CurrPage.SetSelectionFilter(Lines);
 
-        if not Lines.FindFirst then
+        if not Lines.FindFirst() then
             Error(t001);
 
-        if Lines.Count = 1 then
+        if Lines.Count() = 1 then
             if not Confirm(t002, true) then Error('');
     end;
 
     procedure SetItemFilter(ItemNo1: Code[20])
     begin
         if ItemNo1 = '' then
-            SetRange("Item No.")
+            Rec.SetRange("Item No.")
         else
-            SetRange("Item No.", ItemNo1);
+            Rec.SetRange("Item No.", ItemNo1);
 
         CurrPage.Update(false);
     end;
@@ -405,12 +404,12 @@ page 6014472 "NPR Retail Journal Line"
         //-NPR5.53 [374290]
         if IsWebClient then begin
             CurrPage.SetSelectionFilter(RetailJnlLine);
-            if RetailJnlLine.FindSet then
+            if RetailJnlLine.FindSet() then
                 repeat
-                    TempRetailJnlLine.Init;
+                    TempRetailJnlLine.Init();
                     TempRetailJnlLine := RetailJnlLine;
-                    TempRetailJnlLine.Insert;
-                until RetailJnlLine.Next = 0;
+                    TempRetailJnlLine.Insert();
+                until RetailJnlLine.Next() = 0;
             LabelLibrary.SetSelectionBuffer(TempRetailJnlLine);
         end;
         //+NPR5.53 [374290]
@@ -423,14 +422,14 @@ page 6014472 "NPR Retail Journal Line"
         //+NPR5.53 [375557]
         //-NPR5.34 [282048]
         if Confirm(Caption_DeletePrintedLines) then begin
-            RetailJnlLine.SetRange("No.", "No.");
-            if RetailJnlLine.FindSet then
+            RetailJnlLine.SetRange("No.", Rec."No.");
+            if RetailJnlLine.FindSet() then
                 repeat
                     RecRef.GetTable(RetailJnlLine);
                     if LabelLibrary.SelectionContains(RecRef) then
                         RetailJnlLine.Delete(true);
-                    RecRef.Close;
-                until RetailJnlLine.Next = 0;
+                    RecRef.Close();
+                until RetailJnlLine.Next() = 0;
         end;
         //+NPR5.34 [282048]
     end;
@@ -445,56 +444,56 @@ page 6014472 "NPR Retail Journal Line"
     procedure SetLineFilters(VendorFilter: Text; ItemGroupFilter: Text; ShowUnknown: Option All,"Only existing items","Only unknown items"; ShowNew: Option All,"Only existing items","Only new items"; ShowInventory: Option All,"In stock","Not in stock")
     begin
         //-NPR5.53 [374290]
-        FilterGroup(40);
-        SetFilter("Vendor No.", VendorFilter);
-        SetFilter("Item group", ItemGroupFilter);
+        Rec.FilterGroup(40);
+        Rec.SetFilter("Vendor No.", VendorFilter);
+        Rec.SetFilter("Item group", ItemGroupFilter);
 
         case ShowUnknown of
             ShowUnknown::All:
                 begin
-                    SetRange("Item No.");
+                    Rec.SetRange("Item No.");
                 end;
             ShowUnknown::"Only existing items":
                 begin
-                    SetFilter("Item No.", '<>%1', '');
+                    Rec.SetFilter("Item No.", '<>%1', '');
                 end;
             ShowUnknown::"Only unknown items":
                 begin
-                    SetFilter("Item No.", '=%1', '');
+                    Rec.SetFilter("Item No.", '=%1', '');
                 end;
         end;
 
         case ShowNew of
             ShowNew::All:
                 begin
-                    SetRange("New Item");
+                    Rec.SetRange("New Item");
                 end;
             ShowNew::"Only existing items":
                 begin
-                    SetRange("New Item", false);
+                    Rec.SetRange("New Item", false);
                 end;
             ShowNew::"Only new items":
                 begin
-                    SetRange("New Item", true);
+                    Rec.SetRange("New Item", true);
                 end;
         end;
 
         case ShowInventory of
             ShowInventory::All:
                 begin
-                    SetRange(Inventory);
+                    Rec.SetRange(Inventory);
                 end;
             ShowInventory::"In stock":
                 begin
-                    SetFilter(Inventory, '>%1', 0);
+                    Rec.SetFilter(Inventory, '>%1', 0);
                 end;
             ShowInventory::"Not in stock":
                 begin
-                    SetFilter(Inventory, '<=%1', 0);
+                    Rec.SetFilter(Inventory, '<=%1', 0);
                 end;
         end;
 
-        FilterGroup(0);
+        Rec.FilterGroup(0);
         CurrPage.Update(false);
         //+NPR5.53 [374290]
     end;

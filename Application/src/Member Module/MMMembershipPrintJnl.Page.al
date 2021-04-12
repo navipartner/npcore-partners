@@ -1,4 +1,4 @@
-page 6060074 "NPR MM Membership Print Jnl"
+﻿page 6060074 "NPR MM Membership Print Jnl"
 {
 
     Caption = 'Membership Offline Print Journal';
@@ -17,82 +17,82 @@ page 6060074 "NPR MM Membership Print Jnl"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Member Entry No"; "Member Entry No")
+                field("Member Entry No"; Rec."Member Entry No")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Member Entry No field';
                 }
-                field("Membership Entry No."; "Membership Entry No.")
+                field("Membership Entry No."; Rec."Membership Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
                 }
-                field("Card Entry No."; "Card Entry No.")
+                field("Card Entry No."; Rec."Card Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Card Entry No. field';
                 }
-                field("Information Context"; "Information Context")
+                field("Information Context"; Rec."Information Context")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Information Context field';
                 }
-                field("External Membership No."; "External Membership No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Membership No. field';
                 }
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("External Member No"; "External Member No")
+                field("External Member No"; Rec."External Member No")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Member No. field';
                 }
-                field("First Name"; "First Name")
+                field("First Name"; Rec."First Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the First Name field';
                 }
-                field("Last Name"; "Last Name")
+                field("Last Name"; Rec."Last Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Name field';
                 }
-                field("E-Mail Address"; "E-Mail Address")
+                field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
-                field("Phone No."; "Phone No.")
+                field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
-                field("External Card No."; "External Card No.")
+                field("External Card No."; Rec."External Card No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Card No. field';
                 }
-                field("External Card No. Last 4"; "External Card No. Last 4")
+                field("External Card No. Last 4"; Rec."External Card No. Last 4")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Card No. Last 4 field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
@@ -111,7 +111,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Ellipsis = true;
                 Image = PrintCheck;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Member Account Card action';
@@ -135,7 +135,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Ellipsis = true;
                 Image = PrintVoucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -159,7 +159,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Caption = 'Card Owner';
                 Image = PrintAttachment;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -187,7 +187,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Ellipsis = true;
                 Image = CustomerList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
@@ -210,7 +210,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Caption = 'Shipment';
                 Image = Shipment;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -220,12 +220,11 @@ page 6060074 "NPR MM Membership Print Jnl"
                 var
                     SalesShipmentHeader: Record "Sales Shipment Header";
                     PostedSalesShipment: Page "Posted Sales Shipment";
-                    PostedSalesShipments: Page "Posted Sales Shipments";
                 begin
 
                     SalesShipmentHeader.SetFilter("External Document No.", '=%1', Rec."Document No.");
                     if (SalesShipmentHeader.IsEmpty()) then begin
-                        SalesShipmentHeader.Reset;
+                        SalesShipmentHeader.Reset();
                         SalesShipmentHeader.SetFilter("NPR External Order No.", '=%1', Rec."Document No.");
                     end;
 
@@ -270,7 +269,6 @@ page 6060074 "NPR MM Membership Print Jnl"
     local procedure PrintCard(CardEntryNo: Integer)
     var
         MemberCard: Record "NPR MM Member Card";
-        MembershipRole: Record "NPR MM Membership Role";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
@@ -289,7 +287,7 @@ page 6060074 "NPR MM Membership Print Jnl"
         MemberCard: Record "NPR MM Member Card";
     begin
 
-        MemberCard.Get("Card Entry No.");
+        MemberCard.Get(Rec."Card Entry No.");
         MemberCard.SetRecFilter();
         MemberCardOwner.SetTableView(MemberCard);
 

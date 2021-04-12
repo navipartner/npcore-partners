@@ -27,7 +27,7 @@ table 6151501 "NPR Nc Task Setup"
         }
         field(6; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
@@ -41,7 +41,7 @@ table 6151501 "NPR Nc Task Setup"
         }
         field(11; "Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Codeunit ID")));
             Caption = 'Codeunit Name';
             Editable = false;
@@ -138,11 +138,11 @@ table 6151501 "NPR Nc Task Setup"
         end else begin
             Clear(DataLogRecord);
             DataLogRecord.SetRange("Table ID", TableNo);
-            if DataLogRecord.FindLast then;
+            if DataLogRecord.FindLast() then;
             LastLogEntryNo := DataLogRecord."Entry No.";
         end;
 
-        DataLogSubscriber.Init;
+        DataLogSubscriber.Init();
         DataLogSubscriber.Code := SubscriberCode;
         DataLogSubscriber."Table ID" := TableNo;
         //-NC1.22

@@ -2,7 +2,7 @@ table 6151080 "NPR ExRv Voucher Type"
 {
     Caption = 'External Retail Voucher Type';
     DataClassification = CustomerContent;
-    ObsoleteState = Removed; 
+    ObsoleteState = Removed;
     ObsoleteReason = 'Table not used anymore';
     ObsoleteTag = 'Depcrecating 16/02/2021';
     fields
@@ -119,7 +119,7 @@ table 6151080 "NPR ExRv Voucher Type"
             "Dimension Set ID", StrSubstNo('%1 %2', TableCaption, Code),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         if OldDimSetID <> "Dimension Set ID" then
-            Modify;
+            Modify();
     end;
 
     local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -130,10 +130,10 @@ table 6151080 "NPR ExRv Voucher Type"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
         if Code <> '' then
-            Modify;
+            Modify();
 
         if OldDimSetID <> "Dimension Set ID" then
-            Modify;
+            Modify();
     end;
 }
 

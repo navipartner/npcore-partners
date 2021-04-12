@@ -109,7 +109,7 @@ table 6151401 "NPR Magento Setup"
                 MagentoInventoryCompany: Record "NPR Magento Inv. Company";
             begin
                 if "Intercompany Inventory Enabled" and not MagentoInventoryCompany.Get(CompanyName) then begin
-                    MagentoInventoryCompany.Init;
+                    MagentoInventoryCompany.Init();
                     MagentoInventoryCompany."Company Name" := CompanyName;
                     MagentoInventoryCompany."Location Filter" := "Inventory Location Filter";
                     MagentoInventoryCompany.Insert(true);
@@ -560,7 +560,7 @@ table 6151401 "NPR Magento Setup"
                     EventSubscription.SetRange("Subscriber Codeunit ID", "Stock Codeunit Id");
                 if "Stock Function Name" <> '' then
                     EventSubscription.SetFilter("Subscriber Function", '@*' + "Stock Function Name" + '*');
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
 
                 "Stock Codeunit Id" := EventSubscription."Subscriber Codeunit ID";
                 "Stock Function Name" := EventSubscription."Subscriber Function";
@@ -596,7 +596,7 @@ table 6151401 "NPR Magento Setup"
                     exit;
 
                 NpCsStoreWorkflowRelation.SetRange("Store Code");
-                if NpCsStoreWorkflowRelation.FindFirst then
+                if NpCsStoreWorkflowRelation.FindFirst() then
                     Validate("NpCs Workflow Code", NpCsStoreWorkflowRelation."Workflow Code");
             end;
         }

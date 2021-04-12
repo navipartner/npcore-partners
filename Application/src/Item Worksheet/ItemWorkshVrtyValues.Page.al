@@ -4,7 +4,7 @@ page 6060044 "NPR Item Worksh.Vrty. Values"
     PageType = List;
     SourceTable = "NPR Item Worksh. Variety Value";
     UsageCategory = Lists;
-    ApplicationArea = All; 
+    ApplicationArea = All;
 
     layout
     {

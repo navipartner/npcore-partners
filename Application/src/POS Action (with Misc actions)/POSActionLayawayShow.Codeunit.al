@@ -27,19 +27,17 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('ShowLayawayInvoices', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('ShowLayawayInvoices', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterTextParameter('OrderPaymentTermsFilter', '');
-                RegisterBooleanParameter('SelectCustomer', true);
-            end;
+            Sender.RegisterTextParameter('OrderPaymentTermsFilter', '');
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
         end;
     end;
 
@@ -54,7 +52,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -102,7 +100,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -114,7 +112,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -128,7 +126,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -142,7 +140,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -154,7 +152,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
     var
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -171,7 +169,7 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
     var
         PaymentTerms: Record "Payment Terms";
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

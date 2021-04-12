@@ -19,117 +19,117 @@ page 6014496 "NPR Exchange Label"
         {
             repeater(Group)
             {
-                field("Store ID"; "Store ID")
+                field("Store ID"; Rec."Store ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store ID field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Barcode; Barcode)
+                field(Barcode; Rec.Barcode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Barcode field';
                 }
-                field("Batch No."; "Batch No.")
+                field("Batch No."; Rec."Batch No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Batch No. field';
                 }
-                field("No. Series"; "No. Series")
+                field("No. Series"; Rec."No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. Series field';
                 }
-                field("Packaged Batch"; "Packaged Batch")
+                field("Packaged Batch"; Rec."Packaged Batch")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Packaged Batch field';
                 }
-                field("Valid From"; "Valid From")
+                field("Valid From"; Rec."Valid From")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid From field';
                 }
-                field("Valid To"; "Valid To")
+                field("Valid To"; Rec."Valid To")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Valid To field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Sales Line No."; "Sales Line No.")
+                field("Sales Line No."; Rec."Sales Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Line No. field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Sales Price Incl. Vat"; "Sales Price Incl. Vat")
+                field("Sales Price Incl. Vat"; Rec."Sales Price Incl. Vat")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Price Incl. Vat field';
                 }
-                field("Sales Header Type"; "Sales Header Type")
+                field("Sales Header Type"; Rec."Sales Header Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Header Type field';
                 }
-                field("Sales Header No."; "Sales Header No.")
+                field("Sales Header No."; Rec."Sales Header No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Header No. field';
                 }
-                field("Unit of Measure"; "Unit of Measure")
+                field("Unit of Measure"; Rec."Unit of Measure")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Printed Date"; "Printed Date")
+                field("Printed Date"; Rec."Printed Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printed Date field';
                 }
-                field("Retail Cross Reference No."; "Retail Cross Reference No.")
+                field("Retail Cross Reference No."; Rec."Retail Cross Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Retail Cross Reference No. field';

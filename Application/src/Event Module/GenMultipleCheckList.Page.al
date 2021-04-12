@@ -199,7 +199,6 @@ page 6014650 "NPR Gen. Multiple Check List"
     local procedure PrepareArray()
     var
         i: Integer;
-        OptionNo: Integer;
     begin
         for i := 1 to TypeHelper.GetNumberOfOptions(OptionString) + 1 do begin
             BooleanCaptionArr[i] := SelectStr(i, OptionString);

@@ -13,83 +13,83 @@ page 6060087 "NPR MM Membership Lim. Setup"
         {
             repeater(Group)
             {
-                field("Membership  Code"; "Membership  Code")
+                field("Membership  Code"; Rec."Membership  Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership  Code field';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Constraint Type"; "Constraint Type")
+                field("Constraint Type"; Rec."Constraint Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint Type field';
                 }
-                field("Constraint Source"; "Constraint Source")
+                field("Constraint Source"; Rec."Constraint Source")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint Source field';
                 }
-                field("Constraint Seconds"; "Constraint Seconds")
+                field("Constraint Seconds"; Rec."Constraint Seconds")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint Seconds field';
                 }
-                field("Constraint From Time"; "Constraint From Time")
+                field("Constraint From Time"; Rec."Constraint From Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint From Time field';
                 }
-                field("Constraint Until Time"; "Constraint Until Time")
+                field("Constraint Until Time"; Rec."Constraint Until Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint Until Time field';
                 }
-                field("Constraint Dateformula"; "Constraint Dateformula")
+                field("Constraint Dateformula"; Rec."Constraint Dateformula")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Constraint Dateformula field';
                 }
-                field("Event Type"; "Event Type")
+                field("Event Type"; Rec."Event Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Event Type field';
                 }
-                field("Event Limit"; "Event Limit")
+                field("Event Limit"; Rec."Event Limit")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Event Limit field';
                 }
-                field("POS Response Action"; "POS Response Action")
+                field("POS Response Action"; Rec."POS Response Action")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Response Action field';
                 }
-                field("POS Response Message"; "POS Response Message")
+                field("POS Response Message"; Rec."POS Response Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Response Message field';
                 }
-                field("WS Response Action"; "WS Response Action")
+                field("WS Response Action"; Rec."WS Response Action")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the WS Response Action field';
                 }
-                field("WS Deny Message"; "WS Deny Message")
+                field("WS Deny Message"; Rec."WS Deny Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the WS Deny Message field';
                 }
-                field("Response Code"; "Response Code")
+                field("Response Code"; Rec."Response Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Response Code field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';

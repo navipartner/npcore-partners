@@ -1,11 +1,11 @@
 table 6151368 "NPR CS Rfid Header"
 {
-    
+
     Caption = 'CS Rfid Data By Document';
     DataClassification = CustomerContent;
     DataPerCompany = false;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -127,8 +127,8 @@ table 6151368 "NPR CS Rfid Header"
             Caption = 'Document Matched';
             DataClassification = CustomerContent;
         }
-        
-       
+
+
     }
 
     keys
@@ -142,27 +142,27 @@ table 6151368 "NPR CS Rfid Header"
     {
     }
 
-    
 
-   
 
-   
-   
-                  
 
-                   
 
-                   
-                    
 
-   
-   
 
-      
 
-    
 
-   
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 

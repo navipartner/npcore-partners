@@ -143,14 +143,14 @@ page 6151574 "NPR AF Notification Hub Card"
     begin
         Rec.CalcFields("Request Data", "Response Data");
 
-        if not Rec."Request Data".HasValue then
+        if not Rec."Request Data".HasValue() then
             RequestData := ''
         else begin
             Rec."Request Data".CreateInStream(IStream);
             IStream.Read(RequestData, MaxStrLen(RequestData));
         end;
 
-        if not Rec."Response Data".HasValue then
+        if not Rec."Response Data".HasValue() then
             ResponseData := ''
         else begin
             Rec."Response Data".CreateInStream(IStream);

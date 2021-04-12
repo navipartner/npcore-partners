@@ -168,19 +168,16 @@ report 6014432 "NPR Customer Analysis"
                         ShowType::Sales:
                             begin
                                 CustSalesDKK1 += -CustomerAmountTemp2."Amount (LCY)";
-                                CustBalanceDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
                                 CustProfitDKK1 += -TempCustomerBuffer.Amount;
                             end;
                         ShowType::Balance:
                             begin
                                 CustSalesDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
-                                CustBalanceDKK1 += -CustomerAmountTemp2."Amount (LCY)";
                                 CustProfitDKK1 += -TempCustomerBuffer.Amount;
                             end;
                         ShowType::Margin:
                             begin
                                 CustSalesDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
-                                CustBalanceDKK1 += -TempCustomerBuffer.Amount;
                                 CustProfitDKK1 += -CustomerAmountTemp2."Amount (LCY)";
                             end;
                     end;
@@ -524,7 +521,6 @@ report 6014432 "NPR Customer Analysis"
         AvancePct1: Decimal;
         BalancePct: Decimal;
         CustBalanceDKK: Decimal;
-        CustBalanceDKK1: Decimal;
         Customer1BalanceTotal: Decimal;
         Customer1ProfitTotal: Decimal;
         Customer1SalesTotal: Decimal;

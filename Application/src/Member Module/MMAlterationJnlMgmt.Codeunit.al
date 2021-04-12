@@ -4,8 +4,6 @@ codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
     TableNo = "NPR MM Member Info Capture";
 
     trigger OnRun()
-    var
-        AlterationOk: Boolean;
     begin
 
         AlterMembership(Rec);
@@ -65,7 +63,7 @@ codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
 
         MemberInfoCapture.Get(MemberInfoCaptureEntryNo);
 
-        //Membership.GET (MemberInfoCapture."Membership Entry No.");
+        //Membership.Get() (MemberInfoCapture."Membership Entry No.");
         if (not Membership.Get(MemberInfoCapture."Membership Entry No.")) then begin
             ReasonMessage := StrSubstNo(NOT_FOUND, Membership.TableCaption, MemberInfoCapture."External Membership No.");
             exit(false);

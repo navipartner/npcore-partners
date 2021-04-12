@@ -77,70 +77,70 @@ page 6014493 "NPR POS Apply Cust. Entries"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Applies-to ID"; "Applies-to ID")
+                field("Applies-to ID"; Rec."Applies-to ID")
                 {
                     ApplicationArea = All;
                     Visible = "Applies-to IDVisible";
                     ToolTip = 'Specifies the value of the Applies-to ID field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("Document Type"; "Document Type")
+                field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Original Amount"; "Original Amount")
+                field("Original Amount"; Rec."Original Amount")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Original Amount field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Remaining Amount"; "Remaining Amount")
+                field("Remaining Amount"; Rec."Remaining Amount")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
-                field("CalcApplnRemainingAmount(""Remaining Amount"")"; CalcApplnRemainingAmount("Remaining Amount"))
+                field("CalcApplnRemainingAmount(""Remaining Amount"")"; CalcApplnRemainingAmount(Rec."Remaining Amount"))
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = ApplnCurrencyCode;
@@ -148,7 +148,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Appln. Remaining Amount';
                     ToolTip = 'Specifies the value of the Appln. Remaining Amount field';
                 }
-                field("Amount to Apply"; "Amount to Apply")
+                field("Amount to Apply"; Rec."Amount to Apply")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount to Apply field';
@@ -157,15 +157,15 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     begin
                         CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", Rec);
 
-                        if (xRec."Amount to Apply" = 0) or ("Amount to Apply" = 0) and
+                        if (xRec."Amount to Apply" = 0) or (Rec."Amount to Apply" = 0) and
                            (ApplnType = ApplnType::"Applies-to ID")
                         then
                             SetCustApplId;
-                        Get("Entry No.");
+                        Rec.Get(Rec."Entry No.");
                         AmounttoApplyOnAfterValidate;
                     end;
                 }
-                field("CalcApplnAmounttoApply(""Amount to Apply"")"; CalcApplnAmounttoApply("Amount to Apply"))
+                field("CalcApplnAmounttoApply(""Amount to Apply"")"; CalcApplnAmounttoApply(Rec."Amount to Apply"))
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = ApplnCurrencyCode;
@@ -173,13 +173,13 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Appln. Amount to Apply';
                     ToolTip = 'Specifies the value of the Appln. Amount to Apply field';
                 }
-                field("Due Date"; "Due Date")
+                field("Due Date"; Rec."Due Date")
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Due Date field';
                 }
-                field("Pmt. Discount Date"; "Pmt. Discount Date")
+                field("Pmt. Discount Date"; Rec."Pmt. Discount Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pmt. Discount Date field';
@@ -189,18 +189,18 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         RecalcApplnAmount;
                     end;
                 }
-                field("Pmt. Disc. Tolerance Date"; "Pmt. Disc. Tolerance Date")
+                field("Pmt. Disc. Tolerance Date"; Rec."Pmt. Disc. Tolerance Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pmt. Disc. Tolerance Date field';
                 }
-                field("Original Pmt. Disc. Possible"; "Original Pmt. Disc. Possible")
+                field("Original Pmt. Disc. Possible"; Rec."Original Pmt. Disc. Possible")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Original Pmt. Disc. Possible field';
                 }
-                field("Remaining Pmt. Disc. Possible"; "Remaining Pmt. Disc. Possible")
+                field("Remaining Pmt. Disc. Possible"; Rec."Remaining Pmt. Disc. Possible")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remaining Pmt. Disc. Possible field';
@@ -210,7 +210,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         RecalcApplnAmount;
                     end;
                 }
-                field("CalcApplnRemainingAmount(""Remaining Pmt. Disc. Possible"")"; CalcApplnRemainingAmount("Remaining Pmt. Disc. Possible"))
+                field("CalcApplnRemainingAmount(""Remaining Pmt. Disc. Possible"")"; CalcApplnRemainingAmount(Rec."Remaining Pmt. Disc. Possible"))
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = ApplnCurrencyCode;
@@ -218,29 +218,29 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Appln. Pmt. Disc. Possible';
                     ToolTip = 'Specifies the value of the Appln. Pmt. Disc. Possible field';
                 }
-                field("Max. Payment Tolerance"; "Max. Payment Tolerance")
+                field("Max. Payment Tolerance"; Rec."Max. Payment Tolerance")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. Payment Tolerance field';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Open field';
                 }
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Positive field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
@@ -394,7 +394,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions;
+                        Rec.ShowDimensions;
                     end;
                 }
                 action("Detailed &Ledger Entries")
@@ -418,7 +418,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Set Applies-to ID';
                     Image = SelectLineToApply;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F11';
@@ -449,15 +449,15 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         ShowAppliedEntries := not ShowAppliedEntries;
                         if ShowAppliedEntries then begin
                             if CalcType = CalcType::GenJnlLine then
-                                SetRange("Applies-to ID", GenJnlLine."Applies-to ID")
+                                Rec.SetRange("Applies-to ID", GenJnlLine."Applies-to ID")
                             else begin
                                 CustEntryApplID := UserId;
                                 if CustEntryApplID = '' then
                                     CustEntryApplID := '***';
-                                SetRange("Applies-to ID", CustEntryApplID);
+                                Rec.SetRange("Applies-to ID", CustEntryApplID);
                             end;
                         end else
-                            SetRange("Applies-to ID");
+                            Rec.SetRange("Applies-to ID");
                     end;
                 }
             }
@@ -469,15 +469,15 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
-                    Navigate.Run;
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
+                    Navigate.Run();
                 end;
             }
         }
@@ -491,7 +491,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := SetStyle;
+        StyleTxt := Rec.SetStyle;
     end;
 
     trigger OnInit()
@@ -502,7 +502,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
     trigger OnModifyRecord(): Boolean
     begin
         CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", Rec);
-        if "Applies-to ID" <> xRec."Applies-to ID" then
+        if Rec."Applies-to ID" <> xRec."Applies-to ID" then
             CalcApplnAmount;
         exit(false);
     end;
@@ -510,14 +510,14 @@ page 6014493 "NPR POS Apply Cust. Entries"
     trigger OnOpenPage()
     begin
         if CalcType = CalcType::Direct then begin
-            Cust.Get("Customer No.");
+            Cust.Get(Rec."Customer No.");
             ApplnCurrencyCode := Cust."Currency Code";
             FindApplyingEntry;
         end;
 
         "Applies-to IDVisible" := ApplnType <> ApplnType::"Applies-to Doc. No.";
 
-        GLSetup.Get;
+        GLSetup.Get();
 
         if ApplnType = ApplnType::"Applies-to Doc. No." then
             CalcApplnAmount;
@@ -529,23 +529,23 @@ page 6014493 "NPR POS Apply Cust. Entries"
         if CloseAction = ACTION::LookupOK then
             LookupOKOnPush;
         if ApplnType = ApplnType::"Applies-to Doc. No." then begin
-            if OK and (ApplyingCustLedgEntry."Posting Date" < "Posting Date") then begin
+            if OK and (ApplyingCustLedgEntry."Posting Date" < Rec."Posting Date") then begin
                 OK := false;
                 Error(
                   EarlierPostingDateErr, ApplyingCustLedgEntry."Document Type", ApplyingCustLedgEntry."Document No.",
-                  "Document Type", "Document No.");
+                  Rec."Document Type", Rec."Document No.");
             end;
             if OK then begin
-                if "Amount to Apply" = 0 then
-                    "Amount to Apply" := "Remaining Amount";
+                if Rec."Amount to Apply" = 0 then
+                    Rec."Amount to Apply" := Rec."Remaining Amount";
                 CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", Rec);
             end;
         end;
         if (CalcType = CalcType::Direct) and not OK and not PostingDone then begin
             Rec := ApplyingCustLedgEntry;
-            "Applying Entry" := false;
-            "Applies-to ID" := '';
-            "Amount to Apply" := 0;
+            Rec."Applying Entry" := false;
+            Rec."Applies-to ID" := '';
+            Rec."Amount to Apply" := 0;
             CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", Rec);
         end;
     end;
@@ -589,9 +589,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         CustEntryApplID: Code[50];
         ValidExchRate: Boolean;
         DifferentCurrenciesInAppln: Boolean;
-        Text002: Label 'You must select an applying entry before you can post the application.';
         ShowAppliedEntries: Boolean;
-        Text003: Label 'You must post the application from the window where you entered the applying entry.';
         CannotSetAppliesToIDErr: Label 'You cannot set Applies-to ID while selecting Applies-to Doc. No.';
         OK: Boolean;
         EarlierPostingDateErr: Label 'You cannot apply and post an entry to an entry with an earlier posting date.\\Instead, post the document of type %1 with the number %2 and then apply it to the document of type %3 with the number %4.';
@@ -631,7 +629,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         TotalAdjCostLCY: Decimal;
     begin
         SalesHeader := NewSalesHeader;
-        CopyFilters(NewCustLedgEntry);
+        Rec.CopyFilters(NewCustLedgEntry);
 
         SalesPost.SumSalesLines(
           SalesHeader, 0, TotalSalesLine, TotalSalesLineLCY,
@@ -665,7 +663,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         TotalAdjCostLCY: Decimal;
     begin
         ServHeader := NewServHeader;
-        CopyFilters(NewCustLedgEntry);
+        Rec.CopyFilters(NewCustLedgEntry);
 
         ServAmountsMgt.SumServiceLines(
           ServHeader, 0, TotalServLine, TotalServLineLCY,
@@ -744,20 +742,20 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 end;
             CalcType::Direct:
                 begin
-                    if "Applying Entry" then begin
+                    if Rec."Applying Entry" then begin
                         if ApplyingCustLedgEntry."Entry No." <> 0 then
                             CustLedgEntry := ApplyingCustLedgEntry;
                         "CustEntry-Edit".Run(Rec);
-                        if "Applies-to ID" = '' then
+                        if Rec."Applies-to ID" = '' then
                             SetCustApplId;
-                        CalcFields(Amount);
+                        Rec.CalcFields(Amount);
                         ApplyingCustLedgEntry := Rec;
                         if CustLedgEntry."Entry No." <> 0 then begin
                             Rec := CustLedgEntry;
-                            "Applying Entry" := false;
+                            Rec."Applying Entry" := false;
                             SetCustApplId;
                         end;
-                        SetFilter("Entry No.", '<> %1', ApplyingCustLedgEntry."Entry No.");
+                        Rec.SetFilter("Entry No.", '<> %1', ApplyingCustLedgEntry."Entry No.");
                         ApplyingAmount := ApplyingCustLedgEntry."Remaining Amount";
                         ApplnDate := ApplyingCustLedgEntry."Posting Date";
                         ApplnCurrencyCode := ApplyingCustLedgEntry."Currency Code";
@@ -788,14 +786,14 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
     procedure SetCustApplId()
     begin
-        if (CalcType = CalcType::GenJnlLine) and (ApplyingCustLedgEntry."Posting Date" < "Posting Date") then
+        if (CalcType = CalcType::GenJnlLine) and (ApplyingCustLedgEntry."Posting Date" < Rec."Posting Date") then
             Error(
               EarlierPostingDateErr, ApplyingCustLedgEntry."Document Type", ApplyingCustLedgEntry."Document No.",
-              "Document Type", "Document No.");
+              Rec."Document Type", Rec."Document No.");
 
         if ApplyingCustLedgEntry."Entry No." <> 0 then
             GenJnlApply.CheckAgainstApplnCurrency(
-              ApplnCurrencyCode, "Currency Code", GenJnlLine."Account Type"::Customer, true);
+              ApplnCurrencyCode, Rec."Currency Code", GenJnlLine."Account Type"::Customer, true);
 
         CustLedgEntry.Copy(Rec);
         CurrPage.SetSelectionFilter(CustLedgEntry);
@@ -836,7 +834,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     CustLedgEntry := ApplyingCustLedgEntry;
 
                     AppliedCustLedgEntry.SetCurrentKey("Customer No.", Open, Positive);
-                    AppliedCustLedgEntry.SetRange("Customer No.", "Customer No.");
+                    AppliedCustLedgEntry.SetRange("Customer No.", Rec."Customer No.");
                     AppliedCustLedgEntry.SetRange(Open, true);
                     AppliedCustLedgEntry.SetRange("Applies-to ID", CustEntryApplID);
 
@@ -860,36 +858,34 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         ApplnType::"Applies-to Doc. No.":
                             begin
                                 AppliedCustLedgEntry := Rec;
-                                with AppliedCustLedgEntry do begin
-                                    CalcFields("Remaining Amount");
-                                    if "Currency Code" <> ApplnCurrencyCode then begin
-                                        "Remaining Amount" :=
-                                          CurrExchRate.ExchangeAmtFCYToFCY(
-                                            ApplnDate, "Currency Code", ApplnCurrencyCode, "Remaining Amount");
-                                        "Remaining Pmt. Disc. Possible" :=
-                                          CurrExchRate.ExchangeAmtFCYToFCY(
-                                            ApplnDate, "Currency Code", ApplnCurrencyCode, "Remaining Pmt. Disc. Possible");
-                                        "Amount to Apply" :=
-                                          CurrExchRate.ExchangeAmtFCYToFCY(
-                                            ApplnDate, "Currency Code", ApplnCurrencyCode, "Amount to Apply");
-                                    end;
-
-                                    if "Amount to Apply" <> 0 then
-                                        AppliedAmount := Round("Amount to Apply", AmountRoundingPrecision)
-                                    else
-                                        AppliedAmount := Round("Remaining Amount", AmountRoundingPrecision);
-
-                                    if PaymentToleranceMgt.CheckCalcPmtDiscGenJnlCust(
-                                         GenJnlLine, AppliedCustLedgEntry, 0, false) and
-                                       ((Abs(GenJnlLine.Amount) + ApplnRoundingPrecision >=
-                                         Abs(AppliedAmount - "Remaining Pmt. Disc. Possible")) or
-                                        (GenJnlLine.Amount = 0))
-                                    then
-                                        PmtDiscAmount := "Remaining Pmt. Disc. Possible";
-
-                                    if not DifferentCurrenciesInAppln then
-                                        DifferentCurrenciesInAppln := ApplnCurrencyCode <> "Currency Code";
+                                AppliedCustLedgEntry.CalcFields("Remaining Amount");
+                                if AppliedCustLedgEntry."Currency Code" <> ApplnCurrencyCode then begin
+                                    AppliedCustLedgEntry."Remaining Amount" :=
+                                      CurrExchRate.ExchangeAmtFCYToFCY(
+                                        ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntry."Remaining Amount");
+                                    AppliedCustLedgEntry."Remaining Pmt. Disc. Possible" :=
+                                      CurrExchRate.ExchangeAmtFCYToFCY(
+                                        ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntry."Remaining Pmt. Disc. Possible");
+                                    AppliedCustLedgEntry."Amount to Apply" :=
+                                      CurrExchRate.ExchangeAmtFCYToFCY(
+                                        ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntry."Amount to Apply");
                                 end;
+
+                                if AppliedCustLedgEntry."Amount to Apply" <> 0 then
+                                    AppliedAmount := Round(AppliedCustLedgEntry."Amount to Apply", AmountRoundingPrecision)
+                                else
+                                    AppliedAmount := Round(AppliedCustLedgEntry."Remaining Amount", AmountRoundingPrecision);
+
+                                if PaymentToleranceMgt.CheckCalcPmtDiscGenJnlCust(
+                                     GenJnlLine, AppliedCustLedgEntry, 0, false) and
+                                   ((Abs(GenJnlLine.Amount) + ApplnRoundingPrecision >=
+                                     Abs(AppliedAmount - AppliedCustLedgEntry."Remaining Pmt. Disc. Possible")) or
+                                    (GenJnlLine.Amount = 0))
+                                then
+                                    PmtDiscAmount := AppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+
+                                if not DifferentCurrenciesInAppln then
+                                    DifferentCurrenciesInAppln := ApplnCurrencyCode <> AppliedCustLedgEntry."Currency Code";
                                 CheckRounding;
                             end;
                         ApplnType::"Applies-to ID":
@@ -915,19 +911,17 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         ApplnType::"Applies-to Doc. No.":
                             begin
                                 AppliedCustLedgEntry := Rec;
-                                with AppliedCustLedgEntry do begin
-                                    CalcFields("Remaining Amount");
+                                AppliedCustLedgEntry.CalcFields("Remaining Amount");
 
-                                    if "Currency Code" <> ApplnCurrencyCode then
-                                        "Remaining Amount" :=
-                                          CurrExchRate.ExchangeAmtFCYToFCY(
-                                            ApplnDate, "Currency Code", ApplnCurrencyCode, "Remaining Amount");
+                                if AppliedCustLedgEntry."Currency Code" <> ApplnCurrencyCode then
+                                    AppliedCustLedgEntry."Remaining Amount" :=
+                                      CurrExchRate.ExchangeAmtFCYToFCY(
+                                        ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntry."Remaining Amount");
 
-                                    AppliedAmount := Round("Remaining Amount", AmountRoundingPrecision);
+                                AppliedAmount := Round(AppliedCustLedgEntry."Remaining Amount", AmountRoundingPrecision);
 
-                                    if not DifferentCurrenciesInAppln then
-                                        DifferentCurrenciesInAppln := ApplnCurrencyCode <> "Currency Code";
-                                end;
+                                if not DifferentCurrenciesInAppln then
+                                    DifferentCurrenciesInAppln := ApplnCurrencyCode <> AppliedCustLedgEntry."Currency Code";
                                 CheckRounding;
                             end;
                         ApplnType::"Applies-to ID":
@@ -955,14 +949,14 @@ page 6014493 "NPR POS Apply Cust. Entries"
         ApplnRemainingAmount: Decimal;
     begin
         ValidExchRate := true;
-        if ApplnCurrencyCode = "Currency Code" then
+        if ApplnCurrencyCode = Rec."Currency Code" then
             exit(Amount);
 
         if ApplnDate = 0D then
-            ApplnDate := "Posting Date";
+            ApplnDate := Rec."Posting Date";
         ApplnRemainingAmount :=
           CurrExchRate.ApplnExchangeAmtFCYToFCY(
-            ApplnDate, "Currency Code", ApplnCurrencyCode, Amount, ValidExchRate);
+            ApplnDate, Rec."Currency Code", ApplnCurrencyCode, Amount, ValidExchRate);
         exit(ApplnRemainingAmount);
     end;
 
@@ -972,21 +966,21 @@ page 6014493 "NPR POS Apply Cust. Entries"
     begin
         ValidExchRate := true;
 
-        if ApplnCurrencyCode = "Currency Code" then
+        if ApplnCurrencyCode = Rec."Currency Code" then
             exit(AmounttoApply);
 
         if ApplnDate = 0D then
-            ApplnDate := "Posting Date";
+            ApplnDate := Rec."Posting Date";
         ApplnAmounttoApply :=
           CurrExchRate.ApplnExchangeAmtFCYToFCY(
-            ApplnDate, "Currency Code", ApplnCurrencyCode, AmounttoApply, ValidExchRate);
+            ApplnDate, Rec."Currency Code", ApplnCurrencyCode, AmounttoApply, ValidExchRate);
         exit(ApplnAmounttoApply);
     end;
 
     local procedure FindAmountRounding()
     begin
         if ApplnCurrencyCode = '' then begin
-            Currency.Init;
+            Currency.Init();
             Currency.Code := '';
             Currency.InitRoundingPrecision;
         end else
@@ -1013,7 +1007,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         if ApplnCurrencyCode = '' then
             ApplnRoundingPrecision := GLSetup."Appln. Rounding Precision"
         else begin
-            if ApplnCurrencyCode <> "Currency Code" then
+            if ApplnCurrencyCode <> Rec."Currency Code" then
                 Currency.Get(ApplnCurrencyCode);
             ApplnRoundingPrecision := Currency."Appln. Rounding Precision";
         end;
@@ -1035,14 +1029,14 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 CustEntryApplID := '***';
 
             CustLedgEntry.SetCurrentKey("Customer No.", "Applies-to ID", Open);
-            CustLedgEntry.SetRange("Customer No.", "Customer No.");
+            CustLedgEntry.SetRange("Customer No.", Rec."Customer No.");
             CustLedgEntry.SetRange("Applies-to ID", CustEntryApplID);
             CustLedgEntry.SetRange(Open, true);
             CustLedgEntry.SetRange("Applying Entry", true);
-            if CustLedgEntry.FindFirst then begin
+            if CustLedgEntry.FindFirst() then begin
                 CustLedgEntry.CalcFields(Amount, "Remaining Amount");
                 ApplyingCustLedgEntry := CustLedgEntry;
-                SetFilter("Entry No.", '<>%1', CustLedgEntry."Entry No.");
+                Rec.SetFilter("Entry No.", '<>%1', CustLedgEntry."Entry No.");
                 ApplyingAmount := CustLedgEntry."Remaining Amount";
                 ApplnDate := CustLedgEntry."Posting Date";
                 ApplnCurrencyCode := CustLedgEntry."Currency Code";
@@ -1063,8 +1057,8 @@ page 6014493 "NPR POS Apply Cust. Entries"
         if AppliedCustLedgEntry.FindSet(false, false) then begin
             repeat
                 AppliedCustLedgEntryTemp := AppliedCustLedgEntry;
-                AppliedCustLedgEntryTemp.Insert;
-            until AppliedCustLedgEntry.Next = 0;
+                AppliedCustLedgEntryTemp.Insert();
+            until AppliedCustLedgEntry.Next() = 0;
         end else
             exit;
 
@@ -1073,7 +1067,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         repeat
             if not FromZeroGenJnl then
                 AppliedCustLedgEntryTemp.SetRange(Positive, CurrentAmount < 0);
-            if AppliedCustLedgEntryTemp.FindFirst then begin
+            if AppliedCustLedgEntryTemp.FindFirst() then begin
                 ExchangeAmountsOnLedgerEntry(Type, CurrencyCode, AppliedCustLedgEntryTemp, "Posting Date");
 
                 case Type of
@@ -1129,7 +1123,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 end;
             end else begin
                 AppliedCustLedgEntryTemp.SetRange(Positive);
-                AppliedCustLedgEntryTemp.FindFirst;
+                AppliedCustLedgEntryTemp.FindFirst();
                 ExchangeAmountsOnLedgerEntry(Type, CurrencyCode, AppliedCustLedgEntryTemp, "Posting Date");
             end;
 
@@ -1147,10 +1141,10 @@ page 6014493 "NPR POS Apply Cust. Entries"
             if not DifferentCurrenciesInAppln then
                 DifferentCurrenciesInAppln := ApplnCurrencyCode <> AppliedCustLedgEntryTemp."Currency Code";
 
-            AppliedCustLedgEntryTemp.Delete;
+            AppliedCustLedgEntryTemp.Delete();
             AppliedCustLedgEntryTemp.SetRange(Positive);
 
-        until not AppliedCustLedgEntryTemp.FindFirst;
+        until not AppliedCustLedgEntryTemp.FindFirst();
         PmtDiscAmount += PossiblePmtDisc;
         CheckRounding;
     end;
@@ -1176,22 +1170,21 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
     procedure SetSalesLine(NewGenJnlLine: Record "NPR POS Sale Line"; ApplnTypeSelect: Integer)
     begin
-            SaleLinePOS := NewGenJnlLine;
-            BalancePOSLine := true;
+        SaleLinePOS := NewGenJnlLine;
 
-            ApplnDate := SaleLinePOS.Date;
-            ApplnCurrencyCode := SaleLinePOS."Currency Code";
-            CalcType := CalcType::POSLine;
+        ApplnDate := SaleLinePOS.Date;
+        ApplnCurrencyCode := SaleLinePOS."Currency Code";
+        CalcType := CalcType::POSLine;
 
-            case ApplnTypeSelect of
-                SaleLinePOS.FieldNo("Buffer Document No."):
-                    ApplnType := ApplnType::"Applies-to Doc. No.";
-                SaleLinePOS.FieldNo("Buffer ID"):
-                    begin
-                        ApplnType := ApplnType::"Applies-to ID";
-                        CustEntryApplID := NewGenJnlLine."Buffer ID"
-                    end;
-            end;
+        case ApplnTypeSelect of
+            SaleLinePOS.FieldNo("Buffer Document No."):
+                ApplnType := ApplnType::"Applies-to Doc. No.";
+            SaleLinePOS.FieldNo("Buffer ID"):
+                begin
+                    ApplnType := ApplnType::"Applies-to ID";
+                    CustEntryApplID := NewGenJnlLine."Buffer ID"
+                end;
+        end;
     end;
 
     local procedure ExchangeAmountsOnLedgerEntry(Type: Option Direct,GenJnlLine,SalesHeader; CurrencyCode: Code[10]; var CalcCustLedgEntry: Record "Cust. Ledger Entry"; PostingDate: Date)

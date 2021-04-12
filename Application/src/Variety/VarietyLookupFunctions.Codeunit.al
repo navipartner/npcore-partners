@@ -1,4 +1,4 @@
-codeunit 6059973 "NPR Variety Lookup Functions"
+﻿codeunit 6059973 "NPR Variety Lookup Functions"
 {
     // NPR5.28/JDH /20161128 CASE 255961 Lookup of Inventory per Variant added
 
@@ -27,13 +27,13 @@ codeunit 6059973 "NPR Variety Lookup Functions"
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
-                TMPInvBuffer.Init;
+                TMPInvBuffer.Init();
                 TMPInvBuffer."Item No." := VRTFieldSetup."Item No. (TMPParm)";
                 TMPInvBuffer."Variant Code" := VRTFieldSetup."Variant Code (TMPParm)";
                 TMPInvBuffer."Location Code" := Location.Code;
                 TMPInvBuffer.Quantity := Item."Net Change";
-                TMPInvBuffer.Insert;
-            until Location.Next = 0;
+                TMPInvBuffer.Insert();
+            until Location.Next() = 0;
         PAGE.RunModal(6059976, TMPInvBuffer);
     end;
 
@@ -95,22 +95,22 @@ codeunit 6059973 "NPR Variety Lookup Functions"
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
-                TMPInvBuffer.Init;
+                TMPInvBuffer.Init();
                 TMPInvBuffer."Item No." := ItemNo;
                 TMPInvBuffer."Variant Code" := VariantCode;
                 TMPInvBuffer."Location Code" := Location.Code;
                 TMPInvBuffer.Quantity := Item."Net Change";
-                TMPInvBuffer.Insert;
-            until Location.Next = 0;
+                TMPInvBuffer.Insert();
+            until Location.Next() = 0;
         Item.SetFilter("Location Filter", '');
         Item.CalcFields("Net Change");
         if Item."Net Change" <> 0 then begin
-            TMPInvBuffer.Init;
+            TMPInvBuffer.Init();
             TMPInvBuffer."Item No." := ItemNo;
             TMPInvBuffer."Variant Code" := VariantCode;
             TMPInvBuffer."Location Code" := BlankLocation;
             TMPInvBuffer.Quantity := Item."Net Change";
-            TMPInvBuffer.Insert;
+            TMPInvBuffer.Insert();
         end;
         PAGE.RunModal(6059976, TMPInvBuffer);
         //+NPR5.28 [255961]

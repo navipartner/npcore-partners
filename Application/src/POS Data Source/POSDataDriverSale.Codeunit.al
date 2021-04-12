@@ -2,7 +2,6 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
 {
     var
         Caption_CompanyName: Label 'Company Name';
-        Caption_SalespersonName: Label 'Salesperson Name';
         Caption_RegisterName: Label 'Register Name';
         Caption_CustomerName: Label 'Customer Name';
         Caption_ContactName: Label 'Contact Name';
@@ -117,7 +116,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
             if Customer."No." <> '' then begin
                 ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
                 ContactBusinessRelation.SetRange("No.", Customer."No.");
-                if ContactBusinessRelation.FindFirst then
+                if ContactBusinessRelation.FindFirst() then
                     if Contact.Get(ContactBusinessRelation."Contact No.") then;
             end;
 

@@ -18,27 +18,23 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflow(false);
-                RegisterBooleanParameter(AllItemsParTxt, false);
-                RegisterBooleanParameter(OnlyCurrentLocParTxt, false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterBooleanParameter(AllItemsParTxt, false);
+            Sender.RegisterBooleanParameter(OnlyCurrentLocParTxt, false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Confirmed: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         OpenItemInventoryOverviewPage(Context, POSSession, FrontEnd);
@@ -49,8 +45,8 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'notallowed', NotAllowed);
+        Captions.AddActionCaption(ActionCode(), 'title', Title);
+        Captions.AddActionCaption(ActionCode(), 'notallowed', NotAllowed);
     end;
 
     local procedure OpenItemInventoryOverviewPage(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -79,7 +75,7 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
             Clear(ItemsByLocationOverview);
             if OnlyCurrrentLocation then
                 ItemsByLocationOverview.SetFilters(SalePOS."Location Code");
-            ItemsByLocationOverview.Run;
+            ItemsByLocationOverview.Run();
             exit;
         end;
 
@@ -91,7 +87,7 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
                 POSInventoryOverview.SetParameters(LinePOS."No.", LinePOS."Variant Code", LinePOS."Location Code", OnlyCurrrentLocation);
             end;
         end;
-        POSInventoryOverview.Run;
+        POSInventoryOverview.Run();
     end;
 
     local procedure AllItemsParTxt(): Text

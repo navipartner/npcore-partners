@@ -12,14 +12,14 @@ codeunit 6151403 "NPR Magento Webservice"
     begin
         ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Cr.Memo");
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
-        ReportSelections.FindFirst;
+        ReportSelections.FindFirst();
 
         SalesCrMemoHeader.Get(DocumentNo);
         SalesCrMemoHeader.TestField("Bill-to Customer No.", CustomerNo);
-        SalesCrMemoHeader.SetRecFilter;
+        SalesCrMemoHeader.SetRecFilter();
 
         RecRef.GetTable(SalesCrMemoHeader);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         PdfCrMemo := ReportToBase64(ReportSelections."Report ID", RecRef);
 
         exit(PdfCrMemo);
@@ -33,14 +33,14 @@ codeunit 6151403 "NPR Magento Webservice"
     begin
         ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Order");
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
-        ReportSelections.FindFirst;
+        ReportSelections.FindFirst();
 
         SalesHeader.Get(SalesHeader."Document Type"::Order, DocumentNo);
         SalesHeader.TestField("Bill-to Customer No.", CustomerNo);
-        SalesHeader.SetRecFilter;
+        SalesHeader.SetRecFilter();
 
         RecRef.GetTable(SalesHeader);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         PdfSalesOrder := ReportToBase64(ReportSelections."Report ID", RecRef);
 
         exit(PdfSalesOrder);
@@ -54,14 +54,14 @@ codeunit 6151403 "NPR Magento Webservice"
     begin
         ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
-        ReportSelections.FindFirst;
+        ReportSelections.FindFirst();
 
         SalesInvHeader.Get(DocumentNo);
         SalesInvHeader.TestField("Bill-to Customer No.", CustomerNo);
-        SalesInvHeader.SetRecFilter;
+        SalesInvHeader.SetRecFilter();
 
         RecRef.GetTable(SalesInvHeader);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         PdfSalesInvoice := ReportToBase64(ReportSelections."Report ID", RecRef);
 
         exit(PdfSalesInvoice);
@@ -81,7 +81,7 @@ codeunit 6151403 "NPR Magento Webservice"
         Customer.SetRecFilter();
 
         RecRef.GetTable(Customer);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         PdfCustomerStatement := ReportToBase64(ReportSelections."Report ID", RecRef);
 
         exit(PdfCustomerStatement);
@@ -99,10 +99,10 @@ codeunit 6151403 "NPR Magento Webservice"
 
         SalesShipmentHeader.Get(DocumentNo);
         SalesShipmentHeader.TestField("Bill-to Customer No.", CustomerNo);
-        SalesShipmentHeader.SetRecFilter;
+        SalesShipmentHeader.SetRecFilter();
 
         RecRef.GetTable(SalesShipmentHeader);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         PdfShipment := ReportToBase64(ReportSelections."Report ID", RecRef);
 
         exit(PdfShipment);
@@ -120,10 +120,10 @@ codeunit 6151403 "NPR Magento Webservice"
 
         SalesHeader.Get(SalesHeader."Document Type"::Quote, DocumentNo);
         SalesHeader.TestField("Bill-to Customer No.", CustomerNo);
-        SalesHeader.SetRecFilter;
+        SalesHeader.SetRecFilter();
 
         RecRef.GetTable(SalesHeader);
-        RecRef.SetRecFilter;
+        RecRef.SetRecFilter();
         PdfQuote := ReportToBase64(ReportSelections."Report ID", RecRef);
 
         exit(PdfQuote);
@@ -212,12 +212,12 @@ codeunit 6151403 "NPR Magento Webservice"
 
     procedure GetItemInventorySet(var retail_inventory_api: XMLport "NPR Magento Inv. Set Api")
     begin
-        retail_inventory_api.Import;
+        retail_inventory_api.Import();
     end;
 
     procedure GetStoreInventory(var store_inventory: XMLport "NPR Magento Store Inv.")
     begin
-        store_inventory.Import;
+        store_inventory.Import();
     end;
 
     procedure GetCustomerNo(OrderNo: Code[20]) CustomerNo: Text
@@ -226,7 +226,7 @@ codeunit 6151403 "NPR Magento Webservice"
     begin
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         SalesHeader.SetFilter("NPR External Order No.", OrderNo);
-        if SalesHeader.FindFirst then
+        if SalesHeader.FindFirst() then
             CustomerNo := SalesHeader."Sell-to Customer No.";
         exit(CustomerNo);
     end;
@@ -250,7 +250,6 @@ codeunit 6151403 "NPR Magento Webservice"
 
     procedure GetItemImage(ItemNo: Code[20]; VariantCode: Code[10]; ImageType: Option ANY,BASE,SMALL,THUMBNAIL; var ImageName: Text[250]; var ImageDescription: Text[250]; var ImageBase64: Text): Boolean
     var
-        Item: Record Item;
         MagentoPictureLink: Record "NPR Magento Picture Link";
         MagentoPicture: Record "NPR Magento Picture";
         Base64: Codeunit "Base64 Convert";
@@ -294,14 +293,14 @@ codeunit 6151403 "NPR Magento Webservice"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        sales_orders.Import;
+        sales_orders.Import();
         InsertImportEntry('ImportSalesOrders', ImportEntry);
         ImportEntry."Document Name" := 'Magento Order-' + sales_orders.GetWebsiteCode() + '-' + sales_orders.GetOrderNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_orders.SetDestination(OutStr);
-        sales_orders.Export;
+        sales_orders.Export();
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
     end;
@@ -312,14 +311,14 @@ codeunit 6151403 "NPR Magento Webservice"
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        sales_return_orders.Import;
+        sales_return_orders.Import();
         InsertImportEntry('ImportSalesReturnOrders', ImportEntry);
         ImportEntry."Document Name" := 'Magento Return Order-' + sales_return_orders.GetReturnOrderNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_return_orders.SetDestination(OutStr);
-        sales_return_orders.Export;
+        sales_return_orders.Export();
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
         NcSyncMgt.ProcessImportEntry(ImportEntry);
     end;
@@ -328,7 +327,7 @@ codeunit 6151403 "NPR Magento Webservice"
     var
         NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := NaviConnectSetupMgt.GetImportTypeCode(CODEUNIT::"NPR Magento Webservice", WebserviceFunction);
         ImportEntry.Date := CurrentDateTime;
@@ -341,18 +340,15 @@ codeunit 6151403 "NPR Magento Webservice"
     procedure InitSetup(MagentoUrl: Text; Hash: Text): Text
     var
         MagentoSetup: Record "NPR Magento Setup";
-        NpXmlSetup: Record "NPR NpXml Setup";
-        MagentoNpXmlSetupMgt: Codeunit "NPR Magento NpXml Setup Mgt";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
-        MagentoMgt: Codeunit "NPR Magento Mgt.";
         NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         CryptographyManagement: Codeunit "Cryptography Management";
     begin
         if LowerCase(Hash) <> LowerCase(CryptographyManagement.GenerateHash(MagentoUrl + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2', 0)) then
             Error(Error001);
 
-        if not MagentoSetup.Get then
-            MagentoSetup.Insert;
+        if not MagentoSetup.Get() then
+            MagentoSetup.Insert();
         if (MagentoSetup."Magento Url" <> '') and (MagentoSetup."Magento Url" <> MagentoUrl) then
             Error(Error002, MagentoSetup."Magento Url");
 
@@ -369,17 +365,17 @@ codeunit 6151403 "NPR Magento Webservice"
         NaviConnectSetupMgt.InitNaviConnectSetup();
 
         MagentoSetupMgt.SetupClientAddIns();
-        Commit;
+        Commit();
         MagentoSetupMgt.SetupImportTypes();
-        Commit;
+        Commit();
         NaviConnectSetupMgt.SetupTaskQueue();
-        Commit;
+        Commit();
 
         MagentoSetupMgt.TriggerSetupNpXmlTemplates();
-        Commit;
+        Commit();
         MagentoSetupMgt.SetupVATBusinessPostingGroups();
         MagentoSetupMgt.SetupVATProductPostingGroups();
-        Commit;
+        Commit();
         MagentoSetupMgt.TriggerSetupMagentoCredentials();
         MagentoSetupMgt.TriggerSetupMagentoWebsites();
         MagentoSetupMgt.TriggerSetupMagentoTaxClasses();

@@ -1,4 +1,4 @@
-codeunit 6060074 "NPR Incom. Doc. Splitter"
+﻿codeunit 6060074 "NPR Incom. Doc. Splitter"
 {
     trigger OnRun()
     var
@@ -65,7 +65,6 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
     local procedure ImportSplitFiles(VendorCode: Code[20])
     var
         NameValueBuffer: Record "Name/Value Buffer";
-        IncomingDocumentFile: File;
     begin
         StartEntryNo := 0;
         EndEntryNo := 0;
@@ -77,11 +76,11 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
         FileMgt.GetServerDirectoryFilesList(NameValueBuffer, ServerOutputDirectory);
         if NameValueBuffer.IsEmpty then
             Error(TextNoFilesinDirectory, ServerOutputDirectory);
-        if NameValueBuffer.FindSet then
+        if NameValueBuffer.FindSet() then
             repeat
                 CreateIncomingDoc(NameValueBuffer.Name, VendorCode);
                 Erase(NameValueBuffer.Name);
-            until NameValueBuffer.Next = 0;
+            until NameValueBuffer.Next() = 0;
     end;
 
     local procedure CreateDocs()
@@ -89,10 +88,10 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
         IncomingDocument: Record "Incoming Document";
     begin
         IncomingDocument.SetRange("Entry No.", StartEntryNo, EndEntryNo);
-        if IncomingDocument.FindSet then
+        if IncomingDocument.FindSet() then
             repeat
                 IncomingDocument.CreateDocumentWithDataExchange();
-            until IncomingDocument.Next = 0;
+            until IncomingDocument.Next() = 0;
     end;
 
     local procedure CreateIncomingDoc(IncDocFileName: Text; VendorCode: Code[20])
@@ -101,7 +100,7 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
         DataExchDef: Record "Data Exch. Def";
     begin
-        IncomingDocument.Init;
+        IncomingDocument.Init();
         IncomingDocument.Validate("Data Exchange Type", DataExchangeType.Code);
         if VendorCode <> '' then
             IncomingDocument.Validate("Vendor No.", VendorCode);
@@ -124,14 +123,13 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
     var
         DataExch: Record "Data Exch.";
         PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
         Vendor: Record Vendor;
         VendorBankAccount: Record "Vendor Bank Account";
         GLEntry: Record "G/L Entry";
     begin
         if DataExchDef."Reading/Writing Codeunit" = 0 then
             exit;
-        DataExch.Init;
+        DataExch.Init();
         DataExch.Insert(true);
         IncomingDocumentAttachment.CalcFields(Content);
 
@@ -139,7 +137,7 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
             exit;
         DataExch."File Content" := IncomingDocumentAttachment.Content;
         DataExch."Data Exch. Def Code" := DataExchDef.Code;
-        DataExch.Modify;
+        DataExch.Modify();
         CODEUNIT.Run(DataExchDef."Reading/Writing Codeunit", DataExch);
 
         //Mapping borrowed from Incoming Document table, function GetDataExchangePath
@@ -175,15 +173,15 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
         DataExchangeFieldMapping: Record "Data Exch. Field Mapping";
         DataExchField: Record "Data Exch. Field";
     begin
-        DataExchangeFieldMapping.Reset;
+        DataExchangeFieldMapping.Reset();
         DataExchangeFieldMapping.SetRange("Data Exch. Def Code", DataExch."Data Exch. Def Code");
         DataExchangeFieldMapping.SetRange("Target Table ID", TableNumber);
         DataExchangeFieldMapping.SetRange("Target Field ID", FieldNumber);
-        if DataExchangeFieldMapping.FindFirst then begin
+        if DataExchangeFieldMapping.FindFirst() then begin
             DataExchField.SetRange("Data Exch. No.", DataExch."Entry No.");
             DataExchField.SetRange("Column No.", DataExchangeFieldMapping."Column No.");
             DataExchField.SetFilter(Value, '<>%1', '');
-            if DataExchField.FindFirst then
+            if DataExchField.FindFirst() then
                 if MaxFieldLength <> 0 then
                     exit(CopyStr(DataExchField.Value, 1, MaxFieldLength))
                 else

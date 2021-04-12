@@ -15,12 +15,12 @@ page 6150645 "NPR POS Info Look. Field Setup"
             repeater(Group)
             {
                 Caption = 'Group';
-                field("Map To"; "Map To")
+                field("Map To"; Rec."Map To")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Map To field';
                 }
-                field("Field No."; "Field No.")
+                field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -33,7 +33,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
                         AssistEdit;
                     end;
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field Name field';
@@ -61,13 +61,13 @@ page 6150645 "NPR POS Info Look. Field Setup"
         POSInfoLookupSetup: Record "NPR POS Info Lookup Setup";
     begin
         for i := 0 to 5 do begin
-            Rec.Init;
+            Rec.Init();
             Rec."POS Info Code" := POSInfo.Code;
             Rec."Table No" := POSInfo."Table No.";
             Rec."Map To" := i;
-            if POSInfoLookupSetup.Get("POS Info Code", "Table No", "Map To") then
-                "Field No." := POSInfoLookupSetup."Field No.";
-            if Rec.Insert then;
+            if POSInfoLookupSetup.Get(Rec."POS Info Code", Rec."Table No", Rec."Map To") then
+                Rec."Field No." := POSInfoLookupSetup."Field No.";
+            if Rec.Insert() then;
         end;
     end;
 
@@ -78,16 +78,16 @@ page 6150645 "NPR POS Info Look. Field Setup"
         POSInfoLookupSetup: Record "NPR POS Info Lookup Setup";
     begin
         FieldRec.FilterGroup(2);
-        FieldRec.SetRange(TableNo, "Table No");
+        FieldRec.SetRange(TableNo, Rec."Table No");
         FieldRec.FilterGroup(0);
         FieldList.SetTableView(FieldRec);
         FieldList.LookupMode(true);
-        if FieldList.RunModal = ACTION::LookupOK then begin
+        if FieldList.RunModal() = ACTION::LookupOK then begin
             FieldList.GetRecord(FieldRec);
-            "Field No." := FieldRec."No.";
+            Rec."Field No." := FieldRec."No.";
             POSInfoLookupSetup := Rec;
-            if not POSInfoLookupSetup.Insert then
-                POSInfoLookupSetup.Modify;
+            if not POSInfoLookupSetup.Insert() then
+                POSInfoLookupSetup.Modify();
         end;
     end;
 

@@ -76,7 +76,5 @@ table 6014611 "NPR Retail Campaign Line"
     {
     }
 
-    var
-        DimMgt: Codeunit DimensionManagement;
 }
 

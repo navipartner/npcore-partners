@@ -19,7 +19,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         RESERVATION_NOT_FOR_TODAY: Label 'Your reservation seem not to be valid for the current %1 event. Reservation entry is for %2 %3. ';
         CONF_RES_NOT_FOR_TODAY: Label 'Your reservation seem not to be valid for the current %1 event. Reservation entry is for %2 %3.\\Do you want to proceed with the current action anyway? ';
         RESERVATION_EXCEEDED: Label 'The reservation capacity for %1 at %2 has been exceeded. A maximum of %3 with method %4 is permitted. This action would make it %5.';
-        REENTRY_COUNT: Label 'Please specify a valid reentry count for %1 %2.';
         GREATER_THAN: Label '%1 must be greater than %2';
         ADM_NOT_OPEN: Label 'Admission code %1 does not have a schedule that is open for date %2';
         ADM_NOT_OPEN_ENTRY: Label 'Admission code %1 does not have a schedule that is open for entry %2';
@@ -36,26 +35,17 @@ codeunit 6059784 "NPR TM Ticket Management"
         QTY_CHANGE_NOT_ALLOWED: Label 'Ticket %1 has been used and quantity cannot be changed. %2 %3.';
         QTY_TOO_LARGE: Label 'The new ticket quantity cannot be greater than %1.';
         SCHEDULE_ENTRY_EXPIRED: Label 'The schedule entry %1 specifies a time in the past (%2) and cant be used for ticket reservation at this time (%3).';
-        ITEM_CONSUMED: Label '%1 is marked as consumed for ticket %2.';
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
-        EVENT_SOLD_OUT: Label 'This event is sold out. Sign-up on the waiting list to get notified if ticket cancellations.';
         RESCHEDULE_NOT_ALLOWED: Label 'The ticket reschedule policy for %1 and %2, prevents changes at this time.';
-        SUCCESS: Label '0';
-        UNEXPECTED_NO: Label '-1000';
         INVALID_REFERENCE_NO: Label '-1001';
         RESERVATION_NOT_FOUND_NO: Label '-1002';
         NOT_VALID_NO: Label '-1003';
         CAPACITY_EXCEEDED_NO: Label '-1004';
         RESERVATION_MISMATCH_NO: Label '-1005';
-        REENTRY_COUNT_NO: Label '-1006';
-        GREATER_THAN_NO: Label '-1007';
         ADM_NOT_OPEN_NO: Label '-1008';
         ADM_NOT_OPEN_NO2: Label '-1009';
         NOT_CONFIRMED_NO: Label '-1010';
-        EXCLUDE_ADMISSION_NO: Label '-1011';
-        NOT_WITHIN_TIMEFRAME_NO: Label '-1012';
-        DEPENDENT_ADMISSION_NO: Label '-1013';
         RESERVATION_NOT_FOR_TODAY_NO: Label '-1014';
         RESERVATION_EXCEEDED_NO: Label '-1015';
         TICKET_CANCELED_NO: Label '-1016';
@@ -68,13 +58,10 @@ codeunit 6059784 "NPR TM Ticket Management"
         SCHEDULE_ENTRY_EXPIRED_NO: Label '-1023';
         SCHEDULE_ENTRY_EXPIRED_NO2: Label '-1024';
         SCHEDULE_ENTRY_EXPIRED_NO3: Label '-1025';
-        ITEM_CONSUMED_NO: Label '-1026';
         TICKET_CALENDAR_NO: Label '-1027';
         RESERVATION_NOT_FOR_NOW_NO: Label '-1028';
-        EVENT_SOLD_OUT_NO: Label '-1029';
         CONCURRENT_CAPACITY_EXCEEDED_NO: Label '-1030';
         RESCHEDULE_NOT_ALLOWED_NO: Label '-1031';
-        INVOICE_TEXT1: Label 'Admission on %1 {%2}';
         INVOICE_TEXT2: Label 'Admission on %1 {%2,...}';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
         gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
@@ -106,7 +93,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketType: Record "NPR TM Ticket Type";
         Ticket: Record "NPR TM Ticket";
-        TicketNo: Code[20];
         ResponseMessage: Text;
         IsCheckedBySubscriber: Boolean;
         IsValid: Boolean;
@@ -223,13 +209,12 @@ codeunit 6059784 "NPR TM Ticket Management"
         until (Ticket.Next() = 0);
     end;
 
-    local procedure PrintTicketUsingFormatter(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]) Printed: Boolean
+    local procedure PrintTicketUsingFormatter(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]): Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
-        TicketUpd: Record "NPR TM Ticket";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
 
@@ -258,9 +243,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     procedure PrintSingleTicket(var Ticket: Record "NPR TM Ticket") Printed: Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
     begin
 
         if (not TicketType.Get(Ticket."Ticket Type Code")) then
@@ -271,7 +253,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         Printed := PrintTicketUsingFormatter(Ticket, TicketType."Print Object Type", TicketType."Print Object ID", TicketType."RP Template Code");
         if (Printed) then begin
-            Ticket."Printed Date" := Today;
+            Ticket."Printed Date" := Today();
             Ticket.Modify();
         end;
     end;
@@ -315,17 +297,9 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     procedure ValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer)
     var
-        ReservationSchEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        ReservationAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         Ticket: Record "NPR TM Ticket";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        TicketAccessEntry2: Record "NPR TM Ticket Access Entry";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        AllowUntilDate: Date;
         TicketAccessEntryNo: Integer;
-        MessageNumber: Integer;
     begin
 
         if (not GetTicket(TicketIdentifierType, TicketIdentifier, Ticket)) then
@@ -353,8 +327,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     var
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        DepartureAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
         if (GetTicket(TicketIdentifierType, TicketIdentifier, Ticket)) then begin
@@ -383,7 +355,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         Ticket."Valid From Time" := 000000T;
         Ticket."Valid To Time" := 235959T;
         Ticket.Blocked := false;
-        Ticket."Document Date" := Today;
+        Ticket."Document Date" := Today();
 
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
             exit;
@@ -451,7 +423,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     procedure CreateAdmissionAccessEntry(Ticket: Record "NPR TM Ticket"; TicketQty: Integer; AdmissionCode: Code[20]; AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -650,7 +621,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     end;
 
-    local procedure IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date; ReferenceTime: Time; var ResponseMessage: Text; var ResponseCode: Integer) IsExpired: Boolean
+    local procedure IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date; ReferenceTime: Time; var ResponseMessage: Text; var ResponseCode: Integer): Boolean
     begin
 
         if (AdmissionSchEntry."Admission End Date" = ReferenceDate) then begin
@@ -692,12 +663,6 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     procedure CreatePaymentEntry(Ticket: Record "NPR TM Ticket")
     var
-        AdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        Item: Record Item;
-        TicketType: Record "NPR TM Ticket Type";
-        Admission: Record "NPR TM Admission";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         PaymentType: Option PAYMENT,PREPAID,POSTPAID;
     begin
         CreatePaymentEntryType(Ticket, PaymentType::PAYMENT, 'POS', '');
@@ -710,7 +675,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
         AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
@@ -745,10 +709,8 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     procedure ChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer)
     var
-        Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        ResultCode: Integer;
         TicketAccessEntryNo: Integer;
     begin
 
@@ -793,8 +755,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure RegisterAllAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket")
     var
         Admission: Record "NPR TM Admission";
-        AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketBom: Record "NPR TM Ticket Admission BOM";
     begin
 
@@ -813,8 +773,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure RegisterTicketBomAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket")
     var
         Admission: Record "NPR TM Admission";
-        AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketType: Record "NPR TM Ticket Type";
     begin
@@ -850,7 +808,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     var
         Admission: Record "NPR TM Admission";
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
@@ -907,7 +864,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         Ticket.Get(TicketAccessEntry."Ticket No.");
         if (not Ticket.Blocked) then begin
             Ticket.Blocked := true;
-            Ticket."Blocked Date" := Today;
+            Ticket."Blocked Date" := Today();
             Ticket.Modify();
         end;
 
@@ -1040,7 +997,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
         TicketTypeForm.HideTickets;
         TicketTypeForm.LookupMode(true);
-        if (TicketTypeForm.RunModal = Action::LookupOK) then begin
+        if (TicketTypeForm.RunModal() = ACTION::LookupOK) then begin
             TicketTypeForm.GetRecord(TicketType);
             TicketTypeCode := TicketType.Code;
         end;
@@ -1200,7 +1157,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         EXCLUDE_ADMISSION: Label 'Admission not allowed. The ticket does allow access to both %1 and %2.';
         NOT_WITHIN_TIMEFRAME: Label 'Admission not allowed. Admission to %1 expired on %2.';
         DEPENDENT_ADMISSION: Label 'Admission not allowed. Ticket need to be validated for %1 first.';
-        ADM_SCAN_LIMIT: Label 'Admission to %1 is limited to %2 visits.';
         ADM_DAILY_SCAN_LIMIT: Label 'Admission to %1 has a daily limited of %2 visits.';
         ADM_SCAN_FREQUENCY: Label 'Admission to %1 is limited to once per %2 minutes, previous admission was %3 minute(s) ago.';
     begin
@@ -1327,7 +1283,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     end;
 
-    local procedure GetDefaultAdmissionCode(ItemNo: Code[20]; VariantCode: Code[10]) AdmissionCode: Code[20]
+    local procedure GetDefaultAdmissionCode(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
     var
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
     begin
@@ -1515,7 +1471,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketAccessEntry.LockTable();
         TicketAccessEntry.Get(TicketAccessEntryNo);
         if (TicketAccessEntry."Access Date" = 0D) then begin
-            TicketAccessEntry."Access Date" := Today;
+            TicketAccessEntry."Access Date" := Today();
             TicketAccessEntry."Access Time" := Time;
             TicketAccessEntry.Modify();
         end;
@@ -1535,11 +1491,10 @@ codeunit 6059784 "NPR TM Ticket Management"
         CloseReservationEntry(AdmittedTicketAccessEntry);
     end;
 
-    local procedure RegisterReservation_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer) EntryNo: Integer
+    local procedure RegisterReservation_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer): Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         ReservationTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
     begin
@@ -1814,7 +1769,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(Closed);
     end;
 
-    local procedure GetReservationEntry(TicketAccessEntryNo: Integer; var DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry") Closed: Boolean
+    local procedure GetReservationEntry(TicketAccessEntryNo: Integer; var DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean
     begin
 
         Clear(DetailedTicketAccessEntry);
@@ -1852,15 +1807,11 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(0);
     end;
 
-    local procedure GetAdmScheduleEntry(AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean) Found: Boolean
+    local procedure GetAdmScheduleEntry(AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean): Boolean
     var
-        ScheduleCode: Code[20];
-        Schedule: Record "NPR TM Admis. Schedule";
         Admission: Record "NPR TM Admission";
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         AdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
-        BookablePassedStart: Integer;
-        PreviousAdmissionEntryNo: Integer;
         CurrentAdmissionEntryNo: Integer;
         NextAdmissionEntryNo: Integer;
         ReferenceTime: DateTime;
@@ -1915,12 +1866,10 @@ codeunit 6059784 "NPR TM Ticket Management"
                 if ((ReferenceTime > AdmissionStartTime) and
                     (ReferenceTime > AdmissionEndTime) and
                     (CurrentAdmissionEntryNo = 0)) then begin
-                    PreviousAdmissionEntryNo := AdmissionSchEntry."Entry No.";
                 end;
 
                 if ((ReferenceTime >= AdmissionStartTime) and
                     (ReferenceTime <= AdmissionEndTime)) then begin
-                    PreviousAdmissionEntryNo := CurrentAdmissionEntryNo;
                     CurrentAdmissionEntryNo := AdmissionSchEntry."Entry No.";
                 end;
 
@@ -1955,7 +1904,6 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     local procedure GetTicket(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; var Ticket: Record "NPR TM Ticket"): Boolean
     begin
-
         Clear(Ticket);
 
         case TicketIdentifierType of
@@ -1985,7 +1933,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     var
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
     begin
-
         if (not GetAdmissionCapacity(AdmissionCode, ScheduleCode, AdmissionScheduleEntryNo, MaxCapacity, CapacityControl)) then
             exit(false);
 
@@ -2006,7 +1953,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingTemplate: Record "NPR TM Seating Template";
     begin
-
         if (not Admission.Get(AdmissionCode)) then
             exit(false);
 
@@ -2061,82 +2007,76 @@ codeunit 6059784 "NPR TM Ticket Management"
         ConcurrentQuantity: Integer;
         ConcurrentMaxQty: Integer;
     begin
+        if (not Admission.Get(AdmissionScheduleEntry."Admission Code")) then
+            Admission.Init();
 
-        with AdmissionScheduleEntry do begin
+        if (not TicketBOM.Get(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code")) then
+            TicketBOM.Init();
 
-            if (not Admission.Get("Admission Code")) then
-                Admission.Init();
+        GetTicketCapacity(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
+        RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntry."Entry No.");
 
-            if (not TicketBOM.Get(TicketItemNo, TicketVariantCode, "Admission Code")) then
-                TicketBOM.Init();
+        if (CalculateConcurrentCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Admission Start Date", ConcurrentQuantity, ConcurrentMaxQty)) then
+            if (ConcurrentQuantity >= ConcurrentMaxQty) then
+                exit(false);
 
-            GetTicketCapacity(TicketItemNo, TicketVariantCode, "Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
-            RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntry."Entry No.");
-
-            with AdmissionScheduleEntry do
-                if (CalculateConcurrentCapacity("Admission Code", "Schedule Code", "Admission Start Date", ConcurrentQuantity, ConcurrentMaxQty)) then
-                    if (ConcurrentQuantity >= ConcurrentMaxQty) then
-                        exit(false);
-
-            // Should this time slot be listed?
-            IsReservation := ((Admission.Type = Admission.Type::OCCASION) and (Admission."Prebook Is Required"));
-            ActivateOnSales := false;
-            if (Item.Get(TicketItemNo)) then begin
-                if (TicketType.Get(Item."NPR Ticket Type")) then begin
-                    if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
-                        ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);
-                        if (TicketBOM."Activation Method" = TicketBOM."Activation Method"::NA) then
-                            TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE; // delegate to Ticket Type setup
-                    end;
-
-                    if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
-                        ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
-                                            ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
-                    end;
-
+        // Should this time slot be listed?
+        IsReservation := ((Admission.Type = Admission.Type::OCCASION) and (Admission."Prebook Is Required"));
+        ActivateOnSales := false;
+        if (Item.Get(TicketItemNo)) then begin
+            if (TicketType.Get(Item."NPR Ticket Type")) then begin
+                if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
+                    ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);
+                    if (TicketBOM."Activation Method" = TicketBOM."Activation Method"::NA) then
+                        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE; // delegate to Ticket Type setup
                 end;
+
+                if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
+                    ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
+                                        ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
+                end;
+
             end;
+        end;
 
-            if ("Event Arrival From Time" = 0T) then
-                "Event Arrival From Time" := "Admission Start Time";
+        if (AdmissionScheduleEntry."Event Arrival From Time" = 0T) then
+            AdmissionScheduleEntry."Event Arrival From Time" := AdmissionScheduleEntry."Admission Start Time";
 
-            if ("Event Arrival Until Time" = 0T) then
-                "Event Arrival Until Time" := "Admission End Time";
+        if (AdmissionScheduleEntry."Event Arrival Until Time" = 0T) then
+            AdmissionScheduleEntry."Event Arrival Until Time" := AdmissionScheduleEntry."Admission End Time";
 
-            // if ticket will be admitted automatically, we also need to check valid admission time
-            if (ActivateOnSales) then begin
-                if ("Admission Start Date" <> ReferenceDate) then
-                    exit(false); // When ticket is activated on sales, and its a reservation for another date than the reference date, it cant be sold now, don't validate the time slot
+        // if ticket will be admitted automatically, we also need to check valid admission time
+        if (ActivateOnSales) then begin
+            if (AdmissionScheduleEntry."Admission Start Date" <> ReferenceDate) then
+                exit(false); // When ticket is activated on sales, and its a reservation for another date than the reference date, it cant be sold now, don't validate the time slot
 
-                if (ReferenceTime < "Event Arrival From Time") then
+            if (ReferenceTime < AdmissionScheduleEntry."Event Arrival From Time") then
+                exit(false);
+        end;
+
+        if (IsReservation) or (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
+            // when we pass arrival until time, we cant sell this time slot.
+            if ((AdmissionScheduleEntry."Admission Start Date" = ReferenceDate) and (ReferenceTime > AdmissionScheduleEntry."Event Arrival Until Time")) then
+                exit(false);
+        end;
+
+        // Verify the general window of sales
+        if (TicketBOM."Enforce Schedule Sales Limits") then begin
+            if (AdmissionScheduleEntry."Sales From Date" <> 0D) then begin
+                if (AdmissionScheduleEntry."Sales From Date" > ReferenceDate) then
                     exit(false);
+                if (AdmissionScheduleEntry."Sales From Date" = ReferenceDate) then
+                    if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then
+                        exit(false);
             end;
 
-            if (IsReservation) or (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
-                // when we pass arrival until time, we cant sell this time slot.
-                if (("Admission Start Date" = ReferenceDate) and (ReferenceTime > "Event Arrival Until Time")) then
+            if (AdmissionScheduleEntry."Sales Until Date" <> 0D) then begin
+                if (ReferenceDate > AdmissionScheduleEntry."Sales Until Date") then
                     exit(false);
-            end;
-
-            // Verify the general window of sales
-            if (TicketBOM."Enforce Schedule Sales Limits") then begin
-                if ("Sales From Date" <> 0D) then begin
-                    if ("Sales From Date" > ReferenceDate) then
+                if (ReferenceDate = AdmissionScheduleEntry."Sales Until Date") then
+                    if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then
                         exit(false);
-                    if ("Sales From Date" = ReferenceDate) then
-                        if ("Sales From Time" > ReferenceTime) then
-                            exit(false);
-                end;
-
-                if ("Sales Until Date" <> 0D) then begin
-                    if (ReferenceDate > "Sales Until Date") then
-                        exit(false);
-                    if (ReferenceDate = "Sales Until Date") then
-                        if (ReferenceTime > "Sales Until Time") then
-                            exit(false);
-                end;
             end;
-
         end;
 
         exit(true);
@@ -2145,7 +2085,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure ValidateTicketAdmissionCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntryNo: Integer; TicketExecutionContext: Option SALES,ADMISSION)
     var
         Admission: Record "NPR TM Admission";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Schedule: Record "NPR TM Admis. Schedule";
         AdmissionSchedule: Record "NPR TM Admis. Schedule Lines";
@@ -2155,7 +2094,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         AdmittedCount: Integer;
         CapacityExceeded: Boolean;
         CapacityControl: Option;
-        ResultCode: Integer;
     begin
         // This function should be called after the entry transaction have been created
         // That will allow us to catch a zero count as an error
@@ -2214,7 +2152,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
     begin
-
         AdmissionScheduleEntry.Get(AdmissionScheduleEntryNo);
 
         case CapacityControl of
@@ -2269,7 +2206,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         AdmissionSchedule: Record "NPR TM Admis. Schedule Lines";
         AdmissionGroupConcurrency: Record "NPR TM Concurrent Admis. Setup";
     begin
-
         if (not AdmissionSchedule.Get(AdmissionCode, ScheduleCode)) then
             exit(false);
 
@@ -2288,15 +2224,14 @@ codeunit 6059784 "NPR TM Ticket Management"
         AdmissionSchedule.Reset();
         AdmissionSchedule.SetFilter("Concurrency Code", '=%1', AdmissionSchedule."Concurrency Code");
 
-        with AdmissionGroupConcurrency do
-            case "Concurrency Type" of
-                "Concurrency Type"::CONCURRENCY_CODE:
-                    ;
-                "Concurrency Type"::ADMISSION:
-                    AdmissionSchedule.SetFilter("Admission Code", '=%1', AdmissionCode);
-                "Concurrency Type"::SCHEDULE:
-                    AdmissionSchedule.SetFilter("Schedule Code", '=%1', ScheduleCode);
-            end;
+        case AdmissionGroupConcurrency."Concurrency Type" of
+            AdmissionGroupConcurrency."Concurrency Type"::CONCURRENCY_CODE:
+                ;
+            AdmissionGroupConcurrency."Concurrency Type"::ADMISSION:
+                AdmissionSchedule.SetFilter("Admission Code", '=%1', AdmissionCode);
+            AdmissionGroupConcurrency."Concurrency Type"::SCHEDULE:
+                AdmissionSchedule.SetFilter("Schedule Code", '=%1', ScheduleCode);
+        end;
 
         if (AdmissionSchedule.FindSet()) then begin
             repeat
@@ -2325,15 +2260,12 @@ codeunit 6059784 "NPR TM Ticket Management"
         CapacityExceeded: Boolean;
         FirstAccessDate: Date;
         LastAccessDate: Date;
-        MaxCapacity: Integer;
         EntryValidation: Option UNDEFINED,SINGLE,SAME_DAY,MULTIPLE;
         MaxNoOfEntries: Integer;
         FirstLastEntryDurationFormula: DateFormula;
-        ResponseCode: Integer;
         FirstAccessTime: Time;
         LastAccessTime: Time;
     begin
-
         // This function should be called after the entry transaction have been created
         // That will allow us to catch a zero count as an error
         TicketAccessEntry.Get(TicketAccessEntryNo);
@@ -2436,7 +2368,6 @@ codeunit 6059784 "NPR TM Ticket Management"
             RaiseError(StrSubstNo(TICKET_EXPIRED, Ticket."External Ticket No.", Ticket."Valid To Date"), TICKET_EXPIRED_NO);
 
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", LastAccessDate);
-
     end;
 
     local procedure ValidateReservationCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry")
@@ -2451,7 +2382,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         MaxCapacity: Integer;
         CapacityControl: Option;
     begin
-
         Admission.Get(AdmissionScheduleEntry."Admission Code");
         CapacityExceeded := false;
         if (Admission.Type <> Admission.Type::OCCASION) then
@@ -2509,19 +2439,15 @@ codeunit 6059784 "NPR TM Ticket Management"
             RaiseError(StrSubstNo(RESERVATION_EXCEEDED, Admission."Admission Code",
                 StrSubstNo('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time"),
                 MaxCapacity, AdmissionText."Capacity Control", AdmittedCount), RESERVATION_EXCEEDED_NO);
-
         exit;
     end;
 
     local procedure ValidateTicketAdmissionReservationDate(TicketAccessEntryNo: Integer; AdmissionScheduleEntryNo: Integer)
     var
         Ticket: Record "NPR TM Ticket";
-        TicketType: Record "NPR TM Ticket Type";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
-
         TicketAccessEntry.Get(TicketAccessEntryNo);
         ScheduleEntry.Get(AdmissionScheduleEntryNo);
         Ticket.Get(TicketAccessEntry."Ticket No.");
@@ -2538,7 +2464,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         CalendarManagement: Codeunit "Calendar Management";
         CalendarDesc: Text;
     begin
-
         ResponseMessage := '';
         NonWorking := false;
 
@@ -2574,9 +2499,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                     CalendarDesc := StrSubstNo(TICKET_CALENDAR, ItemNo, VariantCode, AdmissionCode, AdmissionDate);
 
             ResponseMessage := StrSubstNo(CalendarDesc, TICKET_CALENDAR_NO);
-
         end;
-
     end;
 
     procedure CheckTicketBaseCalendar(AdmissionCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionDate: Date; var NonWorking: Boolean; var ResponseMessage: Text)
@@ -2596,7 +2519,6 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     local procedure GetEntryValidationConstraints(TicketType: Record "NPR TM Ticket Type"; TicketBom: Record "NPR TM Ticket Admission BOM"; var EntryValidationType: Option UNDEFINED,SINGLE,SAME_DAY,MULTIPLE; var MaxEntryCount: Integer; var TimespanFormula: DateFormula)
     begin
-
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
             case TicketBom."Admission Entry Validation" of
                 TicketBom."Admission Entry Validation"::SINGLE:
@@ -2634,13 +2556,11 @@ codeunit 6059784 "NPR TM Ticket Management"
         TmpAggregatedPerRequest: Record "NPR TM Ticket Access Entry" temporary;
         TmpAdmissionPerDate: Record "NPR TM Det. Ticket AccessEntry" temporary;
         TmpDetailedAccessEntries: Record "NPR TM Det. Ticket AccessEntry" temporary;
-        TmpInvoiceHeader: Record "Sales Header" temporary;
         FirstInvoiceNo: Code[20];
         LastInvoiceNo: Code[20];
         InvoiceDetailsMessage: Text;
         ShowDialog: Boolean;
     begin
-
         if (not Confirm(HANDLE_POSTPAID)) then
             Error('');
 
@@ -2668,7 +2588,6 @@ codeunit 6059784 "NPR TM Ticket Management"
             gWindow.Close();
 
         Message(POSTPAID_RESULT, TmpTicket.Count(), TmpAggregatedPerRequest.Count(), InvoiceDetailsMessage);
-
     end;
 
     local procedure CollectUnhandledPostpaidTickets(ShowDialog: Boolean; var TmpPostpaidTickets: Record "NPR TM Ticket" temporary; var TmpDetailedAccessEntries: Record "NPR TM Det. Ticket AccessEntry" temporary)
@@ -2680,7 +2599,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         MaxCount: Integer;
         Index: Integer;
     begin
-
         DetTicketAccessEntry.SetCurrentKey(Type, Open, "Posting Date");
         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::POSTPAID);
         DetTicketAccessEntry.SetFilter(Open, '=%1', true);
@@ -2723,7 +2641,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         MaxCount: Integer;
         Index: Integer;
     begin
-
         TmpPostpaidTickets.Reset();
         if (TmpPostpaidTickets.IsEmpty()) then
             exit;
@@ -2794,12 +2711,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         LineNo: Integer;
         MaxCount: Integer;
         Index: Integer;
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ItemNumber: Code[20];
-        VariantCode: Code[10];
-        ResolvingTable: Integer;
     begin
-
         TmpAggregatedPerRequest.Reset();
         if (not TmpAggregatedPerRequest.FindSet()) then
             exit;
@@ -2861,7 +2773,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         MaxCount: Integer;
         Index: Integer;
     begin
-
         TmpDetailedAccessEntries.Reset();
         if (TmpDetailedAccessEntries.IsEmpty()) then
             exit;
@@ -2913,7 +2824,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         SalesInvHeader: Record "Sales Invoice Header";
         RowsFound: Integer;
     begin
-
         if (Ticket.ReadPermission()) then begin
             if (not Ticket.SetCurrentKey("Sales Receipt No.")) then;
             Ticket.SetFilter("Sales Receipt No.", '%1', DocNoFilter);
@@ -2932,7 +2842,6 @@ codeunit 6059784 "NPR TM Ticket Management"
                 end;
             end;
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
@@ -2942,7 +2851,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-
         if (TableID = Database::"NPR TM Ticket") then begin
             if (not Ticket.SetCurrentKey("Sales Receipt No.")) then;
             Ticket.SetFilter("Sales Receipt No.", DocNoFilter);
@@ -2964,7 +2872,6 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text[1024]; DocNoOfRecords: Integer): Integer
     begin
-
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);
 
@@ -2978,7 +2885,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (not DocumentEntry.Insert()) then;
 
         exit(DocNoOfRecords);
-
     end;
 }
 

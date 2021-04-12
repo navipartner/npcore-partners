@@ -1,4 +1,4 @@
-codeunit 85024 "NPR Retail Voucher Tests"
+﻿codeunit 85024 "NPR Retail Voucher Tests"
 {
     // [Feature] Retail Voucher Test scenarios
     Subtype = Test;
@@ -695,7 +695,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         Assert.AreEqual(true, TransactionEnded, 'Transaction end not according to test scenario.');
         NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
         Assert.Istrue(NpRvArchVoucher.FindFirst(), 'Archived Voucher exists ');
-        NpRvVoucher.Reset;
+        NpRvVoucher.Reset();
         NpRvVoucher.SetRange("Issue Document No.", SalePOS."Sales Ticket No.");
         Assert.AreEqual(true, NpRvVoucher.FindFirst(), 'Issued Voucher open not according to test scenario.');
         NpRvVoucher.CalcFields(Open, Amount);
@@ -789,7 +789,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         Assert.AreEqual(true, TransactionEnded, 'Transaction end not according to test scenario.');
         NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
         Assert.Istrue(NpRvArchVoucher.FindFirst(), 'Archived Voucher exists ');
-        NpRvVoucher.Reset;
+        NpRvVoucher.Reset();
         NpRvVoucher.SetRange("Issue Document No.", SalePOS."Sales Ticket No.");
         Assert.AreEqual(true, NpRvVoucher.FindFirst(), 'Issued Voucher open not according to test scenario.');
         NpRvVoucher.CalcFields(Open, Amount);

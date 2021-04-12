@@ -156,7 +156,7 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
 
         Rec.TestField(Type, Rec.Type::CONSUMED);
         if (Rec.Type = Rec.Type::CONSUMED) then
-            Rec.Delete;
+            Rec.Delete();
     end;
 
     local procedure OpenTicketRequest(DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")

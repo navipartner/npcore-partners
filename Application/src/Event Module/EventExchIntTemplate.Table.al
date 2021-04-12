@@ -149,7 +149,7 @@ table 6060150 "NPR Event Exch. Int. Template"
         if not EventExchIntTempEntry.IsEmpty then
             if not Confirm(EventExchIntTempEntryExists) then
                 Error('');
-        EventExchIntTempEntry.DeleteAll;
+        EventExchIntTempEntry.DeleteAll();
     end;
 
     var

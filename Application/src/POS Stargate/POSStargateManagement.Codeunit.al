@@ -96,8 +96,6 @@ codeunit 6150716 "NPR POS Stargate Management"
     end;
 
     procedure DeviceError(Method: Text; Response: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        Envelope: DotNet NPRNetResponseEnvelope0;
     begin
         OnDeviceDoesNotSupportStargate(Method, Response, POSSession, FrontEnd);
         FrontEnd.AbortWorkflows();
@@ -123,7 +121,6 @@ codeunit 6150716 "NPR POS Stargate Management"
 
     procedure AppGatewayProtocolClosed(ActionName: Text; StepName: Text; SerializedData: Text; Forced: Boolean; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        ResponseData: Text;
         Handled: Boolean;
     begin
         OnAppGatewayProtocolClosed(FrontEnd, ActionName, StepName, SerializedData, Forced, Handled);

@@ -1,4 +1,4 @@
-﻿table 6014525 "NPR Master Line Map"
+table 6014525 "NPR Master Line Map"
 {
     DataClassification = CustomerContent;
     Caption = 'Master Line Map';

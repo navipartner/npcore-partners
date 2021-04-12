@@ -18,61 +18,61 @@ page 6014448 "NPR Mixed Disc. Time Interv."
         {
             repeater(Group)
             {
-                field("Start Time"; "Start Time")
+                field("Start Time"; Rec."Start Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field("End Time"; "End Time")
+                field("End Time"; Rec."End Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End Time field';
                 }
-                field("Period Type"; "Period Type")
+                field("Period Type"; Rec."Period Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Type field';
                 }
-                field(Monday; Monday)
+                field(Monday; Rec.Monday)
                 {
                     ApplicationArea = All;
-                    Editable = "Period Type" = 1;
+                    Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Monday field';
                 }
-                field(Tuesday; Tuesday)
+                field(Tuesday; Rec.Tuesday)
                 {
                     ApplicationArea = All;
-                    Editable = "Period Type" = 1;
+                    Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Tuesday field';
                 }
-                field(Wednesday; Wednesday)
+                field(Wednesday; Rec.Wednesday)
                 {
                     ApplicationArea = All;
-                    Editable = "Period Type" = 1;
+                    Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Wednesday field';
                 }
-                field(Thursday; Thursday)
+                field(Thursday; Rec.Thursday)
                 {
                     ApplicationArea = All;
-                    Editable = "Period Type" = 1;
+                    Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Thursday field';
                 }
-                field(Friday; Friday)
+                field(Friday; Rec.Friday)
                 {
                     ApplicationArea = All;
-                    Editable = "Period Type" = 1;
+                    Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Friday field';
                 }
-                field(Saturday; Saturday)
+                field(Saturday; Rec.Saturday)
                 {
                     ApplicationArea = All;
-                    Editable = "Period Type" = 1;
+                    Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Saturday field';
                 }
-                field(Sunday; Sunday)
+                field(Sunday; Rec.Sunday)
                 {
                     ApplicationArea = All;
-                    Editable = "Period Type" = 1;
+                    Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Sunday field';
                 }
             }

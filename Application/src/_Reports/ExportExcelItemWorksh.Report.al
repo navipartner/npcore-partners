@@ -1,8 +1,8 @@
-report 6060043 "NPR Export Excel Item Worksh."
+﻿report 6060043 "NPR Export Excel Item Worksh."
 {
     Caption = 'Export Excel Item Worksheet';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseRequestPage = false;
 
@@ -30,7 +30,7 @@ report 6060043 "NPR Export Excel Item Worksh."
                 ItemWorksheetVariantLine.SetRange("Worksheet Name", "Worksheet Name");
                 ItemWorksheetVariantLine.SetRange("Worksheet Line No.", "Line No.");
                 ItemWorksheetVariantLine.SetFilter(Action, '<>%1', ItemWorksheetVariantLine.Action::Undefined);
-                if ItemWorksheetVariantLine.FindSet then begin
+                if ItemWorksheetVariantLine.FindSet() then begin
                     repeat
                         //Add row based on Worksheet Variant Line
                         ItemWshtImpExpMgt.RaiseOnBeforeExportWorksheetVariantLine(ItemWorksheetVariantLine);
@@ -125,7 +125,7 @@ report 6060043 "NPR Export Excel Item Worksh."
                                     i := i + 1;
                                 until not NPRAttrVisibleArray[i];
                         end;
-                    until ItemWorksheetVariantLine.Next = 0;
+                    until ItemWorksheetVariantLine.Next() = 0;
                 end else begin
                     //Add row based on Worksheet Line
                     RowNo := RowNo + 1;
@@ -193,10 +193,7 @@ report 6060043 "NPR Export Excel Item Worksh."
             end;
 
             trigger OnPostDataItem()
-            var
-                LastBudgetRowNo: Integer;
             begin
-                LastBudgetRowNo := RowNo;
 
                 ExcelBuf.CreateBook('', TextItemWorksheetLbl);
                 ExcelBuf.WriteSheet(
@@ -210,15 +207,13 @@ report 6060043 "NPR Export Excel Item Worksh."
             end;
 
             trigger OnPreDataItem()
-            var
-                BusUnit: Record "Business Unit";
             begin
                 if GetRangeMin("Worksheet Template Name") <> GetRangeMax("Worksheet Template Name") then
                     Error(ExportErr);
                 if GetRangeMin("Worksheet Name") <> GetRangeMax("Worksheet Name") then
                     Error(ExportErr);
 
-                ExcelBuf.DeleteAll;
+                ExcelBuf.DeleteAll();
 
                 if GuiAllowed then begin
                     Window.Open(
@@ -275,10 +270,10 @@ report 6060043 "NPR Export Excel Item Worksh."
                     i := 1;
                     if NPRAttrVisibleArray[1] then
                         repeat
-                            NPRAttributeID.Reset;
+                            NPRAttributeID.Reset();
                             NPRAttributeID.SetRange("Table ID", DATABASE::"NPR Item Worksheet Line");
                             NPRAttributeID.SetRange("Shortcut Attribute ID", i);
-                            if NPRAttributeID.FindFirst then
+                            if NPRAttributeID.FindFirst() then
                                 EnterCell(HeaderRowNo, 0, NPRAttributeID."Attribute Code", false, true, '', ExcelBuf."Cell Type"::Text)
                             else
                                 EnterCell(HeaderRowNo, 0, StrSubstNo(AttributeLbl, i), false, true, '', ExcelBuf."Cell Type"::Text);

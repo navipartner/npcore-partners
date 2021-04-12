@@ -22,12 +22,12 @@ page 6151453 "NPR Magento Payment Gateways"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Url field';
                 }
-                field(Token; Token)
+                field(Token; Rec.Token)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Token';
                 }
-                field("Api Username"; "Api Username")
+                field("Api Username"; Rec."Api Username")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Username field';

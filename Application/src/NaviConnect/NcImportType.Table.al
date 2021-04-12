@@ -213,7 +213,7 @@ table 6151505 "NPR Nc Import Type"
             exit;
         end;
 
-        WebService.Init;
+        WebService.Init();
         WebService."Object Type" := WebService."Object Type"::Codeunit;
         WebService."Object ID" := "Webservice Codeunit ID";
         WebService."Service Name" := Description;

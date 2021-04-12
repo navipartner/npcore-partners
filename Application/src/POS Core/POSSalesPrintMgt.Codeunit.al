@@ -44,7 +44,7 @@ codeunit 6150729 "NPR POS Sales Print Mgt."
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        if not POSEntry.FindFirst then
+        if not POSEntry.FindFirst() then
             exit;
 
         if SkipReceiptPrint(POSEntry) then

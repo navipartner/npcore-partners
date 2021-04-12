@@ -10,13 +10,12 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
 
         Capture(PaymentLine);
 
-        PaymentLine."Date Captured" := Today;
+        PaymentLine."Date Captured" := Today();
         PaymentLine.Modify(true);
     end;
 
     procedure Capture(PaymentLine: Record "NPR Magento Payment Line")
     var
-        SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "NPR Magento Payment Gateway";
         HttpWebRequest: HttpRequestMessage;
@@ -60,7 +59,7 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
         exit(Format(Amount * 100));
     end;
 
-    local procedure GetErrorMessage(ErrorMgs: Text) ErrorMessage: Text
+    local procedure GetErrorMessage(ErrorMgs: Text): Text
     begin
         Message(ErrorMgs);
     end;
@@ -82,7 +81,6 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
     var
         Content: HttpContent;
         Headers: HttpHeaders;
-        HeadersReq: HttpHeaders;
     begin
         Content.GetHeaders(Headers);
         Content.WriteFrom(RequestBody);

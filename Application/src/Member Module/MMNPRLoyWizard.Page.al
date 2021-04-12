@@ -161,7 +161,6 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         GLAccount: Code[20];
         Description: Text;
         LoyaltyAuth: Text;
-        LoyaltyCmpInSameDB: Boolean;
         LoyaltyCmpName: Text;
         IsEditable: Boolean;
         MembershipCode: Code[10];
@@ -177,7 +176,6 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         FS_Prefix := 'NPR';
         GLAccount := '2345';
         Description := 'Membership Loyalty Program';
-        LoyaltyCmpInSameDB := true;
 
         if (UserId = 'TSA') then begin
             ServiceBaseURL := AzureKeyVaultMgt.GetSecret('MMLoyaltyServiceBaseUrl');

@@ -14,40 +14,40 @@ page 6060097 "NPR POS Input Box Events"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Module Name"; "Module Name")
+                field("Module Name"; Rec."Module Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Module Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Action Code"; "Action Code")
+                field("Action Code"; Rec."Action Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Action Code field';
                 }
-                field("Action Description"; "Action Description")
+                field("Action Description"; Rec."Action Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action Description field';
                 }
-                field("POS View"; "POS View")
+                field("POS View"; Rec."POS View")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS View field';
                 }
-                field("Event Codeunit"; "Event Codeunit")
+                field("Event Codeunit"; Rec."Event Codeunit")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Event Codeunit field';
@@ -75,7 +75,7 @@ page 6060097 "NPR POS Input Box Events"
                     EanBoxSetupMgt.InitEanBoxEventParameters(Rec);
 
                     EanBoxParameter.SetRange("Setup Code", '');
-                    EanBoxParameter.SetRange("Event Code", Code);
+                    EanBoxParameter.SetRange("Event Code", Rec.Code);
                     PAGE.Run(0, EanBoxParameter);
                 end;
             }

@@ -38,67 +38,67 @@ page 6014402 "NPR Retail Item Journal"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("Document Date"; "Document Date")
+                field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Date field';
                 }
-                field("Entry Type"; "Entry Type")
+                field("Entry Type"; Rec."Entry Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("External Document No."; "External Document No.")
+                field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Document No. field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnValidate()
                     begin
-                        RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        RetailItemJnlMgt.GetItem(Rec."Item No.", ItemDescription);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Cross-Reference No."; "Item Reference No.")
+                field("Cross-Reference No."; Rec."Item Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';
                 }
-                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
-                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -117,7 +117,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
@@ -133,7 +133,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
@@ -149,7 +149,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
@@ -165,7 +165,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
@@ -181,7 +181,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
@@ -197,10 +197,10 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     Visible = true;
@@ -213,96 +213,96 @@ page 6014402 "NPR Retail Item Journal"
                         WMSManagement.CheckItemJnlLineLocation(Rec, xRec);
                     end;
                 }
-                field("Bin Code"; "Bin Code")
+                field("Bin Code"; Rec."Bin Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Bin Code field';
                 }
-                field("Salespers./Purch. Code"; "Salespers./Purch. Code")
+                field("Salespers./Purch. Code"; Rec."Salespers./Purch. Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Salespers./Purch. Code field';
                 }
-                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
+                field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
                 }
-                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Unit Amount"; "Unit Amount")
+                field("Unit Amount"; Rec."Unit Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Amount field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Discount Amount"; "Discount Amount")
+                field("Discount Amount"; Rec."Discount Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Amount field';
                 }
-                field("Indirect Cost %"; "Indirect Cost %")
+                field("Indirect Cost %"; Rec."Indirect Cost %")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Indirect Cost % field';
                 }
-                field("Unit Cost"; "Unit Cost")
+                field("Unit Cost"; Rec."Unit Cost")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Cost field';
                 }
-                field("Applies-to Entry"; "Applies-to Entry")
+                field("Applies-to Entry"; Rec."Applies-to Entry")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Applies-to Entry field';
                 }
-                field("Applies-from Entry"; "Applies-from Entry")
+                field("Applies-from Entry"; Rec."Applies-from Entry")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Applies-from Entry field';
                 }
-                field("Transaction Type"; "Transaction Type")
+                field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Transaction Type field';
                 }
-                field("Transport Method"; "Transport Method")
+                field("Transport Method"; Rec."Transport Method")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Transport Method field';
                 }
-                field("Country/Region Code"; "Country/Region Code")
+                field("Country/Region Code"; Rec."Country/Region Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Country/Region Code field';
                 }
-                field("Reason Code"; "Reason Code")
+                field("Reason Code"; Rec."Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -372,7 +372,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions;
+                        Rec.ShowDimensions;
                         CurrPage.SaveRecord;
                     end;
                 }
@@ -389,7 +389,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines(false);
+                        Rec.OpenItemTrackingLines(false);
                     end;
                 }
                 action("Bin Contents")
@@ -417,7 +417,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnAction()
                     begin
-                        RecalculateUnitAmount;
+                        Rec.RecalculateUnitAmount;
                         CurrPage.SaveRecord;
                     end;
                 }
@@ -544,7 +544,7 @@ page 6014402 "NPR Retail Item Journal"
                     trigger OnAction()
                     begin
                         CalcWhseAdjmt.SetItemJnlLine(Rec);
-                        CalcWhseAdjmt.RunModal;
+                        CalcWhseAdjmt.RunModal();
                         Clear(CalcWhseAdjmt);
                     end;
                 }
@@ -568,7 +568,7 @@ page 6014402 "NPR Retail Item Journal"
                         StdItemJnl: Record "Standard Item Journal";
                     begin
                         StdItemJnl.FilterGroup := 2;
-                        StdItemJnl.SetRange("Journal Template Name", "Journal Template Name");
+                        StdItemJnl.SetRange("Journal Template Name", Rec."Journal Template Name");
                         StdItemJnl.FilterGroup := 0;
                         if PAGE.RunModal(PAGE::"Standard Item Journals", StdItemJnl) = ACTION::LookupOK then begin
                             StdItemJnl.CreateItemJnlFromStdJnl(StdItemJnl, CurrentJnlBatchName);
@@ -591,14 +591,14 @@ page 6014402 "NPR Retail Item Journal"
                         StdItemJnl: Record "Standard Item Journal";
                         SaveAsStdItemJnl: Report "Save as Standard Item Journal";
                     begin
-                        ItemJnlLines.SetFilter("Journal Template Name", "Journal Template Name");
+                        ItemJnlLines.SetFilter("Journal Template Name", Rec."Journal Template Name");
                         ItemJnlLines.SetFilter("Journal Batch Name", CurrentJnlBatchName);
                         CurrPage.SetSelectionFilter(ItemJnlLines);
                         ItemJnlLines.CopyFilters(Rec);
 
-                        ItemJnlBatch.Get("Journal Template Name", CurrentJnlBatchName);
+                        ItemJnlBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName);
                         SaveAsStdItemJnl.Initialise(ItemJnlLines, ItemJnlBatch);
-                        SaveAsStdItemJnl.RunModal;
+                        SaveAsStdItemJnl.RunModal();
                         if not SaveAsStdItemJnl.GetStdItemJournal(StdItemJnl) then
                             exit;
 
@@ -638,7 +638,7 @@ page 6014402 "NPR Retail Item Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -657,7 +657,7 @@ page 6014402 "NPR Retail Item Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post+Print", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -678,8 +678,8 @@ page 6014402 "NPR Retail Item Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+                    ItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+                    ItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
                     REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
                 end;
             }
@@ -699,19 +699,19 @@ page 6014402 "NPR Retail Item Journal"
 
     trigger OnAfterGetCurrRecord()
     begin
-        RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
+        RetailItemJnlMgt.GetItem(Rec."Item No.", ItemDescription);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnDeleteRecord(): Boolean
     var
         ReserveItemJnlLine: Codeunit "Item Jnl. Line-Reserve";
     begin
-        Commit;
+        Commit();
         if not ReserveItemJnlLine.DeleteLineConfirm(Rec) then
             exit(false);
         ReserveItemJnlLine.DeleteLine(Rec);
@@ -725,7 +725,7 @@ page 6014402 "NPR Retail Item Journal"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
         Clear(ShortcutDimCode);
     end;
 
@@ -733,8 +733,8 @@ page 6014402 "NPR Retail Item Journal"
     var
         JnlSelected: Boolean;
     begin
-        if IsOpenedFromBatch then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
         end;

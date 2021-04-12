@@ -1,4 +1,4 @@
-page 6150747 "NPR Unfinished POS Sale Trx"
+﻿page 6150747 "NPR Unfinished POS Sale Trx"
 {
     Caption = 'Unfinished POS Sale Transactions';
     DataCaptionExpression = '';
@@ -186,10 +186,10 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                         SalePOS: Record "NPR POS Sale";
                     begin
                         SalePOS.Copy(Rec);
-                        Rec.Reset;
+                        Rec.Reset();
                         SalePOS.CopyFilter("Register No.", Rec."Register No.");
                         Rec.Ascending(false);
-                        if Rec.FindFirst then;
+                        if Rec.FindFirst() then;
                     end;
                 }
             }

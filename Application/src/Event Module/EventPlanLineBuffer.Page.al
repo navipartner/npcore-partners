@@ -13,12 +13,12 @@ page 6059832 "NPR Event Plan. Line Buffer"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Planning Date"; "Planning Date")
+                field("Planning Date"; Rec."Planning Date")
                 {
                     ApplicationArea = All;
                     StyleExpr = GlobalStyle;
@@ -29,7 +29,7 @@ page 6059832 "NPR Event Plan. Line Buffer"
                         SetHighlight(true);
                     end;
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     StyleExpr = GlobalStyle;
@@ -40,7 +40,7 @@ page 6059832 "NPR Event Plan. Line Buffer"
                         SetHighlight(true);
                     end;
                 }
-                field("Ending Time"; "Ending Time")
+                field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = All;
                     StyleExpr = GlobalStyle;
@@ -51,7 +51,7 @@ page 6059832 "NPR Event Plan. Line Buffer"
                         SetHighlight(true);
                     end;
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     StyleExpr = GlobalStyle;
@@ -62,20 +62,20 @@ page 6059832 "NPR Event Plan. Line Buffer"
                         SetHighlight(true);
                     end;
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Status Checked"; "Status Checked")
+                field("Status Checked"; Rec."Status Checked")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status Checked field';
                 }
-                field("Action Type"; "Action Type")
+                field("Action Type"; Rec."Action Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action Type field';
@@ -85,14 +85,14 @@ page 6059832 "NPR Event Plan. Line Buffer"
                         SetHighlight(true);
                     end;
                 }
-                field("Status Type"; "Status Type")
+                field("Status Type"; Rec."Status Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Status Type field';
                 }
-                field("Status Text"; "Status Text")
+                field("Status Text"; Rec."Status Text")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -112,7 +112,7 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 Caption = 'Check Capacity/Availability';
                 Image = ItemAvailability;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -121,10 +121,10 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 trigger OnAction()
                 begin
                     Rec.SetRange("Status Checked", false);
-                    if Rec.FindSet then
+                    if Rec.FindSet() then
                         repeat
                             EventPlanLineGroupingMgt.CheckCapAndTimeAvailabilityOnDemand(Rec, true);
-                        until Rec.Next = 0;
+                        until Rec.Next() = 0;
                     Rec.SetRange("Status Checked");
                 end;
             }
@@ -162,8 +162,8 @@ page 6059832 "NPR Event Plan. Line Buffer"
     local procedure SetHighlight(FromValidate: Boolean)
     begin
         GlobalStyle := 'Standard';
-        case "Status Type" of
-            "Status Type"::Error, "Status Type"::Warning:
+        case Rec."Status Type" of
+            Rec."Status Type"::Error, Rec."Status Type"::Warning:
                 GlobalStyle := 'Attention';
         end;
         CurrPage.Update(FromValidate);
@@ -173,9 +173,9 @@ page 6059832 "NPR Event Plan. Line Buffer"
     var
         StatusTypeErrorCount: Integer;
     begin
-        SetRange("Status Type", "Status Type"::Error);
-        StatusTypeErrorCount := Count;
-        SetRange("Status Type");
+        Rec.SetRange("Status Type", Rec."Status Type"::Error);
+        StatusTypeErrorCount := Rec.Count();
+        Rec.SetRange("Status Type");
         if StatusTypeErrorCount > 0 then begin
             Message(ResOvercapMsg);
             exit(false);
@@ -187,11 +187,11 @@ page 6059832 "NPR Event Plan. Line Buffer"
     var
         ActionTypeBlankCount: Integer;
     begin
-        SetRange("Action Type", "Action Type"::" ");
-        ActionTypeBlankCount := Count;
-        SetRange("Action Type");
+        Rec.SetRange("Action Type", Rec."Action Type"::" ");
+        ActionTypeBlankCount := Rec.Count();
+        Rec.SetRange("Action Type");
         if ActionTypeBlankCount > 0 then begin
-            Message(ActionTypeBlankMsg, FieldCaption("Action Type"));
+            Message(ActionTypeBlankMsg, Rec.FieldCaption("Action Type"));
             exit(false);
         end;
         exit(true);
@@ -201,9 +201,9 @@ page 6059832 "NPR Event Plan. Line Buffer"
     var
         NotCheckedCount: Integer;
     begin
-        SetRange("Status Checked", false);
-        NotCheckedCount := Count;
-        SetRange("Status Checked");
+        Rec.SetRange("Status Checked", false);
+        NotCheckedCount := Rec.Count();
+        Rec.SetRange("Status Checked");
         if NotCheckedCount > 0 then
             exit(Confirm(StatusCheckConfirm));
         exit(true);
@@ -211,18 +211,16 @@ page 6059832 "NPR Event Plan. Line Buffer"
 
     local procedure FinalCheck(): Boolean
     var
-        ActionTypeSkipCount: Integer;
         ActionTypeCreateCount: Integer;
         MsgToDisplay: Text;
     begin
-        SetRange("Action Type", "Action Type"::Skip);
-        ActionTypeSkipCount := Count;
-        SetRange("Action Type", "Action Type"::Create);
-        ActionTypeCreateCount := Count;
-        SetRange("Action Type");
-        MsgToDisplay := StrSubstNo(FinalCheckMsg, FieldCaption("Action Type"), Format("Action Type"::Create), Format(ActionTypeCreateCount));
+        Rec.SetRange("Action Type", Rec."Action Type"::Skip);
+        Rec.SetRange("Action Type", Rec."Action Type"::Create);
+        ActionTypeCreateCount := Rec.Count();
+        Rec.SetRange("Action Type");
+        MsgToDisplay := StrSubstNo(FinalCheckMsg, Rec.FieldCaption("Action Type"), Format(Rec."Action Type"::Create), Format(ActionTypeCreateCount));
         if ActionTypeCreateCount = 0 then begin
-            MsgToDisplay := MsgToDisplay + ' ' + StrSubstNo(CantContinueMsg, FieldCaption("Action Type"), Format("Action Type"::Create));
+            MsgToDisplay := MsgToDisplay + ' ' + StrSubstNo(CantContinueMsg, Rec.FieldCaption("Action Type"), Format(Rec."Action Type"::Create));
             Message(MsgToDisplay);
             exit(false);
         end else begin

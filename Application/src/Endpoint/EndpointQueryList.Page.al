@@ -15,67 +15,67 @@ page 6014679 "NPR Endpoint Query List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Direction; Direction)
+                field(Direction; Rec.Direction)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Direction field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Endpoint Code"; "Endpoint Code")
+                field("Endpoint Code"; Rec."Endpoint Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Endpoint Code field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Processing Comment"; "Processing Comment")
+                field("Processing Comment"; Rec."Processing Comment")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Comment field';
                 }
-                field("Creation Date"; "Creation Date")
+                field("Creation Date"; Rec."Creation Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Creation Date field';
                 }
-                field("Processed Date"; "Processed Date")
+                field("Processed Date"; Rec."Processed Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processed Date field';
                 }
-                field("Database Name"; "Database Name")
+                field("Database Name"; Rec."Database Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Database Name field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Only New and Modified Records"; "Only New and Modified Records")
+                field("Only New and Modified Records"; Rec."Only New and Modified Records")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Only New and Modified Records field';
                 }
-                field("Table View"; "Table View")
+                field("Table View"; Rec."Table View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table View field';
@@ -115,7 +115,7 @@ page 6014679 "NPR Endpoint Query List"
 
                 trigger OnAction()
                 begin
-                    ProcessQuery;
+                    Rec.ProcessQuery;
                 end;
             }
         }

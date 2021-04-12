@@ -2,7 +2,6 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
 {
     var
         ERROR_NO_LOG_VALIDATION: Label 'No log validation routine found';
-        ERROR_MOD_DESC: Label 'A description of the modification is required';
 
     local procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
@@ -19,7 +18,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         BlankRecordID: RecordID;
     begin
         CreateEntry(BlankRecordID, POSAuditLog."Action Type"::AUDIT_VERIFY, 0, '', '');
-        Commit;
+        Commit();
         OnValidateLogRecords(POSAuditLog, Handled);
         if not Handled then
             Error(ERROR_NO_LOG_VALIDATION);
@@ -32,7 +31,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
     begin
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::ARCHIVE_ATTEMPT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
-        Commit;
+        Commit();
         CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::ARCHIVE_CREATE, POSEntry."Entry No.", POSEntry."Fiscal No.", POSWorkshiftCheckpoint."POS Unit No.");
         OnArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);
     end;
@@ -58,7 +57,6 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
     var
         POSAuditLog: Record "NPR POS Audit Log";
         RecRef: RecordRef;
-        PreviousEventLog: Record "NPR POS Audit Log";
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
@@ -67,7 +65,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
     begin
-        POSAuditLog.Init;
+        POSAuditLog.Init();
 
         if POSSession.IsActiveSession(FrontEnd) then begin
             FrontEnd.GetSession(POSSession);

@@ -1,4 +1,4 @@
-page 6014640 "NPR RP Template Setup"
+﻿page 6014640 "NPR RP Template Setup"
 {
     Caption = 'Template Setup';
     SourceTable = "NPR RP Template Setup";
@@ -12,12 +12,12 @@ page 6014640 "NPR RP Template Setup"
             group(Settings)
             {
                 Caption = 'Settings';
-                field("Version Major Number"; "Version Major Number")
+                field("Version Major Number"; Rec."Version Major Number")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version Major Number field';
                 }
-                field("Version Prefix"; "Version Prefix")
+                field("Version Prefix"; Rec."Version Prefix")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version Prefix field';
@@ -32,10 +32,10 @@ page 6014640 "NPR RP Template Setup"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert(true);
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert(true);
         end;
     end;
 }

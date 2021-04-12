@@ -1,4 +1,4 @@
-codeunit 6151206 "NPR NpCs POSAction Cre. Order"
+﻿codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 {
     var
         Text000: Label 'Create Collect in Store Order';
@@ -80,7 +80,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         if not NpCsStore.Get(POSParameterValue.Value) then begin
             NpCsStore.SetFilter(Code, '%1', POSParameterValue.Value + '*');
             NpCsStore.SetRange("Local Store", true);
-            if NpCsStore.FindFirst then
+            if NpCsStore.FindFirst() then
                 POSParameterValue.Value := NpCsStore.Code;
         end;
 
@@ -125,9 +125,9 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         Location.SetFilter(Code, POSParameterValue.Value);
-        if not Location.FindFirst then begin
+        if not Location.FindFirst() then begin
             Location.SetFilter(Code, '%1', POSParameterValue.Value + '*');
-            if Location.FindFirst then
+            if Location.FindFirst() then
                 POSParameterValue.Value := Location.Code;
         end;
     end;
@@ -208,28 +208,28 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         POSSetup.GetPOSUnit(POSUnit);
         NpCsStorePOSRelation.SetRange(Type, NpCsStorePOSRelation.Type::"POS Unit");
         NpCsStorePOSRelation.SetRange("No.", POSUnit."No.");
-        if not NpCsStorePOSRelation.FindLast then begin
+        if not NpCsStorePOSRelation.FindLast() then begin
             POSSetup.GetPOSStore(POSStore);
 
             NpCsStorePOSRelation.SetRange(Type, NpCsStorePOSRelation.Type::"POS Store");
             NpCsStorePOSRelation.SetRange("No.", POSStore.Code);
         end;
 
-        NpCsStorePOSRelation.FindLast;
+        NpCsStorePOSRelation.FindLast();
         LastRec := Format(NpCsStorePOSRelation);
         StoreCode := NpCsStorePOSRelation."Store Code";
 
-        NpCsStorePOSRelation.FindFirst;
+        NpCsStorePOSRelation.FindFirst();
         if LastRec <> Format(NpCsStorePOSRelation) then begin
             repeat
                 if NpCsStore.Get(NpCsStorePOSRelation."Store Code") and NpCsStore."Local Store" and not TempNpCsStore.Get(NpCsStore.Code) then begin
-                    TempNpCsStore.Init;
+                    TempNpCsStore.Init();
                     TempNpCsStore := NpCsStore;
-                    TempNpCsStore.Insert;
+                    TempNpCsStore.Insert();
                 end;
-            until NpCsStorePOSRelation.Next = 0;
+            until NpCsStorePOSRelation.Next() = 0;
 
-            if TempNpCsStore.FindFirst then;
+            if TempNpCsStore.FindFirst() then;
             if PAGE.RunModal(0, TempNpCsStore) <> ACTION::LookupOK then
                 exit;
 
@@ -261,10 +261,10 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         LocationFilter := UpperCase(JSON.GetStringParameter('Location Filter'));
         NpCsStore.SetRange("Local Store", true);
         NpCsStore.SetFilter("Location Code", LocationFilter);
-        NpCsStore.FindLast;
+        NpCsStore.FindLast();
         LastRec := Format(NpCsStore);
 
-        NpCsStore.FindFirst;
+        NpCsStore.FindFirst();
         if LastRec <> Format(NpCsStore) then begin
             if PAGE.RunModal(0, NpCsStore) <> ACTION::LookupOK then
                 exit;
@@ -287,7 +287,6 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         NpCsStoresbyDistance: Page "NPR NpCs Stores by Distance";
         FromStoreCode: Text;
         PrevRec: Text;
-        FulFilledQty: Decimal;
     begin
         FromStoreCode := UpperCase(JSON.GetString('from_store_code'));
         FromNpCsStore.Get(FromStoreCode);
@@ -297,36 +296,36 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         FindItemPosLines(SalePOS, TempSaleLinePOS);
 
         ToNpCsStore.SetFilter(Code, '<>%1', FromNpCsStore.Code);
-        ToNpCsStore.FindSet;
+        ToNpCsStore.FindSet();
         repeat
-            TempNpCsStore.Init;
+            TempNpCsStore.Init();
             TempNpCsStore := ToNpCsStore;
             TempNpCsStore."Distance (km)" := NpCsStoreMgt.CalcDistance(FromNpCsStore, ToNpCsStore);
-            TempNpCsStore.Insert;
+            TempNpCsStore.Insert();
 
-            TempSaleLinePOS.FindSet;
+            TempSaleLinePOS.FindSet();
             repeat
-                NpCsStoreInventoryBuffer.Init;
+                NpCsStoreInventoryBuffer.Init();
                 NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
                 NpCsStoreInventoryBuffer.Sku := TempSaleLinePOS.Reference;
                 NpCsStoreInventoryBuffer.Description := CopyStr(TempSaleLinePOS.Description, 1, MaxStrLen(NpCsStoreInventoryBuffer.Description));
                 NpCsStoreInventoryBuffer."Description 2" := TempSaleLinePOS."Description 2";
                 NpCsStoreInventoryBuffer.Quantity := TempSaleLinePOS.Quantity;
-                NpCsStoreInventoryBuffer.Insert;
-            until TempSaleLinePOS.Next = 0;
-        until ToNpCsStore.Next = 0;
+                NpCsStoreInventoryBuffer.Insert();
+            until TempSaleLinePOS.Next() = 0;
+        until ToNpCsStore.Next() = 0;
 
         NpCsStoreMgt.SetBufferInventory(NpCsStoreInventoryBuffer);
-        TempNpCsStore.FindSet;
+        TempNpCsStore.FindSet();
         repeat
             PrevRec := Format(TempNpCsStore);
 
             Clear(NpCsStoreInventoryBuffer);
             NpCsStoreInventoryBuffer.SetRange("Store Code", TempNpCsStore.Code);
             NpCsStoreInventoryBuffer.SetRange("In Stock", false);
-            TempNpCsStore."In Stock" := NpCsStoreInventoryBuffer.IsEmpty;
+            TempNpCsStore."In Stock" := NpCsStoreInventoryBuffer.IsEmpty();
             NpCsStoreInventoryBuffer.SetRange("In Stock");
-            if NpCsStoreInventoryBuffer.FindSet then
+            if NpCsStoreInventoryBuffer.FindSet() then
                 repeat
                     if NpCsStoreInventoryBuffer.Quantity > 0 then begin
                         TempNpCsStore."Requested Qty." += NpCsStoreInventoryBuffer.Quantity;
@@ -336,11 +335,11 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
                             NpCsStoreInventoryBuffer.Inventory := NpCsStoreInventoryBuffer.Quantity;
                         TempNpCsStore."Fullfilled Qty." += NpCsStoreInventoryBuffer.Inventory;
                     end;
-                until NpCsStoreInventoryBuffer.Next = 0;
+                until NpCsStoreInventoryBuffer.Next() = 0;
 
             if PrevRec <> Format(TempNpCsStore) then
-                TempNpCsStore.Modify;
-        until TempNpCsStore.Next = 0;
+                TempNpCsStore.Modify();
+        until TempNpCsStore.Next() = 0;
 
         Clear(NpCsStoresbyDistance);
         Clear(TempNpCsStore);
@@ -353,7 +352,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
             exit;
 
         NpCsStoresbyDistance.GetRecord(TempNpCsStore);
-        TempNpCsStore.Find;
+        TempNpCsStore.Find();
         if not TempNpCsStore."In Stock" then begin
             if not Confirm(Text001, true, TempNpCsStore."Company Name") then
                 exit;
@@ -373,23 +372,23 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
-        SaleLinePOS.FindSet;
+        SaleLinePOS.FindSet();
         repeat
             Sku := SaleLinePOS."No.";
             if SaleLinePOS."Variant Code" <> '' then
                 Sku += '_' + SaleLinePOS."Variant Code";
 
             TempSaleLinePOS.SetRange(Reference, Sku);
-            if not TempSaleLinePOS.FindFirst then begin
-                TempSaleLinePOS.Init;
+            if not TempSaleLinePOS.FindFirst() then begin
+                TempSaleLinePOS.Init();
                 TempSaleLinePOS := SaleLinePOS;
                 TempSaleLinePOS.Reference := Sku;
-                TempSaleLinePOS.Insert;
+                TempSaleLinePOS.Insert();
             end else begin
                 TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
-                TempSaleLinePOS.Modify;
+                TempSaleLinePOS.Modify();
             end;
-        until SaleLinePOS.Next = 0;
+        until SaleLinePOS.Next() = 0;
         Clear(TempSaleLinePOS);
     end;
 
@@ -407,22 +406,22 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         NpCsStore.Get(StoreCode);
 
         NpCsStoreWorkflowRelation.SetRange("Store Code", NpCsStore.Code);
-        NpCsStoreWorkflowRelation.FindLast;
+        NpCsStoreWorkflowRelation.FindLast();
         LastRec := Format(NpCsStoreWorkflowRelation);
         WorkflowCode := NpCsStoreWorkflowRelation."Workflow Code";
 
-        NpCsStoreWorkflowRelation.FindFirst;
+        NpCsStoreWorkflowRelation.FindFirst();
         if LastRec <> Format(NpCsStoreWorkflowRelation) then begin
-            NpCsStoreWorkflowRelation.FindSet;
+            NpCsStoreWorkflowRelation.FindSet();
             repeat
                 if NpCsWorkflow.Get(NpCsStoreWorkflowRelation."Workflow Code") and not TempNpCsWorkflow.Get(NpCsWorkflow.Code) then begin
-                    TempNpCsWorkflow.Init;
+                    TempNpCsWorkflow.Init();
                     TempNpCsWorkflow := NpCsWorkflow;
-                    TempNpCsWorkflow.Insert;
+                    TempNpCsWorkflow.Insert();
                 end;
-            until NpCsStoreWorkflowRelation.Next = 0;
+            until NpCsStoreWorkflowRelation.Next() = 0;
 
-            if TempNpCsWorkflow.FindFirst then;
+            if TempNpCsWorkflow.FindFirst() then;
             if PAGE.RunModal(0, TempNpCsWorkflow) <> ACTION::LookupOK then
                 exit;
 
@@ -482,11 +481,11 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         NpCsDocument."From Store Code" := FromNpCsStore.Code;
         NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
         NpCsDocument.Modify(true);
-        Commit;
+        Commit();
 
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
 
-        Commit;
+        Commit();
         if PrepaymentPct > 0 then begin
             //End sale, auto start new sale, and insert prepayment line.
             POSSession.GetSale(POSSale);
@@ -521,7 +520,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 
         if PrevRec <> Format(SalePOS) then
             SalePOS.Modify(true);
-        Commit;
+        Commit();
 
         SetParameters(POSSaleLine, RetailSalesDocMgt, JSON);
         RetailSalesDocMgt.TestSalePOS(SalePOS);
@@ -559,7 +558,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         HandlePrepmtCU: Codeunit "NPR NpCs Cr.Ord: Handle Prepmt";
     begin
         //An error after sale end, before front end sync, is not allowed.
-        Commit;
+        Commit();
         ClearLastError();
         Clear(HandlePrepmtCU);
         HandlePrepmtCU.SetParameters(POSSession, RetailSalesDocMgt, PrepaymentPct, PrintPrepaymentInvoice, PreviousSalePOS);

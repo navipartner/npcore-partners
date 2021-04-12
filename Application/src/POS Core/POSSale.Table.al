@@ -77,7 +77,6 @@ table 6014405 "NPR POS Sale"
                 POSPricingProfile: Record "NPR POS Pricing Profile";
                 POSPostingProfile: Record "NPR POS Posting Profile";
                 POSViewProfile: Record "NPR POS View Profile";
-                DoCreate: Boolean;
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
                 xSaleLinePOS: Record "NPR POS Sale Line";
@@ -168,7 +167,7 @@ table 6014405 "NPR POS Sale"
                 if not Modify then;
 
                 if ("Customer Type" = "Customer Type"::Ord) then begin
-                    SaleLinePOS.Reset;
+                    SaleLinePOS.Reset();
                     SaleLinePOS.SetRange("Register No.", "Register No.");
                     SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                     SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
@@ -201,15 +200,15 @@ table 6014405 "NPR POS Sale"
 
                             SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
                             SaleLinePOS.GetAmount(SaleLinePOS, Item, SaleLinePOS."Unit Price");
-                            SaleLinePOS.Modify;
-                        until SaleLinePOS.Next = 0;
+                            SaleLinePOS.Modify();
+                        until SaleLinePOS.Next() = 0;
                     end;
                 end;
 
                 POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(Rec);
 
                 //Ændring foretaget for at kunne validere på nummer og slette rabatter på linier, ved ændring af kundenummer.
-                Modify;
+                Modify();
 
                 CreateDim(
                   DATABASE::Customer, "Customer No.",
@@ -473,7 +472,7 @@ table 6014405 "NPR POS Sale"
 
                         SaleLinePOS.UpdateAmounts(SaleLinePOS);
                         SaleLinePOS.Modify(true);
-                    until SaleLinePOS.Next = 0;
+                    until SaleLinePOS.Next() = 0;
                 end;
             end;
         }
@@ -563,10 +562,6 @@ table 6014405 "NPR POS Sale"
             TableRelation = Job WHERE("NPR Event" = CONST(true));
 
             trigger OnValidate()
-            var
-                FromDefDim: Record "Default Dimension";
-                ToDefDim: Record "Default Dimension";
-                POSUnit: Record "NPR POS Unit";
             begin
                 CreateDim(
                   DATABASE::Job, "Event No.",
@@ -609,8 +604,6 @@ table 6014405 "NPR POS Sale"
             FieldClass = FlowField;
 
             trigger OnValidate()
-            var
-                Trans0001: Label 'The sign on quantity and amount must be the same';
             begin
             end;
         }
@@ -679,8 +672,8 @@ table 6014405 "NPR POS Sale"
                     repeat
                         SaleLinePOS2 := SaleLinePOS;
                         SaleLinePOS2.Validate("NPRE Seating Code", "NPRE Pre-Set Seating Code");
-                        SaleLinePOS2.Modify;
-                    until SaleLinePOS.Next = 0;
+                        SaleLinePOS2.Modify();
+                    until SaleLinePOS.Next() = 0;
             end;
         }
         field(701; "NPRE Pre-Set Waiter Pad No."; Code[20])
@@ -779,7 +772,7 @@ table 6014405 "NPR POS Sale"
           DimMgt.GetDefaultDimID(TableID, No, GetPOSSourceCode, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
         if (OldDimSetID <> "Dimension Set ID") then begin
-            Modify;
+            Modify();
             if SalesLinesExist then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
@@ -808,10 +801,10 @@ table 6014405 "NPR POS Sale"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
         if "Sales Ticket No." <> '' then
-            Modify;
+            Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            Modify;
+            Modify();
             if SalesLinesExist then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
@@ -827,7 +820,7 @@ table 6014405 "NPR POS Sale"
             "Dimension Set ID", StrSubstNo('%1 %2', "Register No.", "Sales Ticket No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         if OldDimSetID <> "Dimension Set ID" then begin
-            Modify;
+            Modify();
             if SalesLinesExist then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
@@ -844,19 +837,19 @@ table 6014405 "NPR POS Sale"
 
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        SaleLinePOS.LockTable;
-        if SaleLinePOS.FindSet then
+        SaleLinePOS.LockTable();
+        if SaleLinePOS.FindSet() then
             repeat
                 NewDimSetID := DimMgt.GetDeltaDimSetID(SaleLinePOS."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
                 if SaleLinePOS."Dimension Set ID" <> NewDimSetID then begin
                     SaleLinePOS."Dimension Set ID" := NewDimSetID;
                     DimMgt.UpdateGlobalDimFromDimSetID(
                       SaleLinePOS."Dimension Set ID", SaleLinePOS."Shortcut Dimension 1 Code", SaleLinePOS."Shortcut Dimension 2 Code");
-                    SaleLinePOS.Modify;
+                    SaleLinePOS.Modify();
                     // Investigate
                     // ATOLink.UpdateAsmDimFromSalesLine(SalesLine);
                 end;
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
     end;
 
     procedure SalesLinesExist(): Boolean
@@ -865,7 +858,7 @@ table 6014405 "NPR POS Sale"
     begin
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        exit(SaleLinePOS.FindFirst);
+        exit(SaleLinePOS.FindFirst());
     end;
 
     local procedure GetPOSUnit()

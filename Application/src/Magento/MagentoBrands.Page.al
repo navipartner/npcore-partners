@@ -48,7 +48,7 @@ page 6151420 "NPR Magento Brands"
                 Caption = 'Setup Brands';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupBrands;
@@ -90,7 +90,7 @@ page 6151420 "NPR Magento Brands"
                 begin
                     MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Brand);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
-                    MagentoDisplayConfigPage.Run;
+                    MagentoDisplayConfigPage.Run();
                 end;
             }
         }
@@ -122,8 +122,7 @@ page 6151420 "NPR Magento Brands"
     local procedure SetDisplayConfigVisible()
     var
         MagentoSetup: Record "NPR Magento Setup";
-        MagentoWebsite: Record "NPR Magento Website";
     begin
-        DisplayConfigVisible := MagentoSetup.Get and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
+        DisplayConfigVisible := MagentoSetup.Get() and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
     end;
 }

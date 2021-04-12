@@ -27,7 +27,7 @@ codeunit 6059831 "NPR RFID Mgt."
         BigInt: BigInteger;
         HexValue: Text;
     begin
-        RFIDSetup.Get;
+        RFIDSetup.Get();
         RFIDSetup.TestField("RFID Value No. Series");
         RFIDSetup.TestField("RFID Hex Value Length");
         Evaluate(BigInt, NoSeriesManagement.GetNextNo(RFIDSetup."RFID Value No. Series", WorkDate, true));

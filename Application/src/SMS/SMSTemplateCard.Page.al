@@ -32,8 +32,6 @@ page 6059941 "NPR SMS Template Card"
                     ToolTip = 'Specifies the value of the Table No. field';
 
                     trigger OnValidate()
-                    var
-                        SMSManagement: Codeunit "NPR SMS Management";
                     begin
                         TableFiltersEnabled := Rec."Table No." <> 0;
                         CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and (Rec."Table No." <> 0) and (Rec."Report ID" <> 0));

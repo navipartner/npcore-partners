@@ -1,4 +1,4 @@
-codeunit 6151525 "NPR Nc Endpoint Email Mgt."
+﻿codeunit 6151525 "NPR Nc Endpoint Email Mgt."
 {
     // NC2.01/BR /20160818  CASE 248630 NaviConnect
     // NC2.01/BR /20161028  CASE 248630 Fix BCC
@@ -11,7 +11,6 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
 
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     var
-        NcTrigger: Record "NPR Nc Trigger";
         NcEndpoint: Record "NPR Nc Endpoint";
         NcEndpointEmail: Record "NPR Nc Endpoint E-mail";
         NcEndpointTriggerLink: Record "NPR Nc Endpoint Trigger Link";
@@ -19,9 +18,9 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
         case NcTask."Table No." of
             DATABASE::"NPR Nc Trigger":
                 begin
-                    NcEndpointTriggerLink.Reset;
+                    NcEndpointTriggerLink.Reset();
                     NcEndpointTriggerLink.SetRange("Trigger Code", NcTriggerCode);
-                    if NcEndpointTriggerLink.FindSet then
+                    if NcEndpointTriggerLink.FindSet() then
                         repeat
                             if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
                                 if NcEndpoint."Endpoint Type" = NcEndpointEmail.GetEndpointTypeCode then begin
@@ -30,7 +29,7 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
                                     end;
                                 end;
                             end;
-                        until NcEndpointTriggerLink.Next = 0;
+                        until NcEndpointTriggerLink.Next() = 0;
                 end;
             DATABASE::"NPR Nc Endpoint E-mail":
                 begin
@@ -38,9 +37,9 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
                     NcEndpointEmail.SetPosition(NcTask."Record Position");
                     NcEndpointEmail.SetRange(Code, NcEndpointEmail.Code);
                     NcEndpointEmail.SetRange(Enabled, true);
-                    if NcEndpointEmail.FindFirst then begin
+                    if NcEndpointEmail.FindFirst() then begin
                         ProcessEndPointTask(NcEndpointEmail, NcTask, Output, Filename, Subject, Body);
-                        NcTask.Modify;
+                        NcTask.Modify();
                     end;
                 end;
         end;
@@ -56,11 +55,11 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
         if not NcTrigger."Split Trigger and Endpoint" then begin
             //Process Trigger Task Directly
             EmailProcess(NcTask, NcEndpointEmail, Output, Filename, Subject, Body);
-            NcTask.Modify;
+            NcTask.Modify();
         end else begin
             //Insert New Task per Endpoint
             InsertEndpointTask(NcEndpointEmail, NcTask, Filename, Subject, Body);
-            NcTask.Modify;
+            NcTask.Modify();
         end;
     end;
 
@@ -76,7 +75,7 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
         RecRef.Get(NcEndpointEmail.RecordId);
         NcTriggerSyncMgt.InsertTask(RecRef, TaskEntryNo);
         NewTask.Get(TaskEntryNo);
-        TempNcEndPointEmail.Init;
+        TempNcEndPointEmail.Init();
         TempNcEndPointEmail.Copy(NcEndpointEmail);
         TempNcEndPointEmail."Output Nc Task Entry No." := NcTask."Entry No.";
         if Filename <> '' then
@@ -113,8 +112,6 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
 
     local procedure EmailProcess(var NcTask: Record "NPR Nc Task"; NcEndpointEmail: Record "NPR Nc Endpoint E-mail"; OutputText: Text; Filename: Text; Subject: Text; Body: Text)
     var
-        ResponseDescriptionText: Text;
-        ResponseCodeText: Text;
         TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
         TextEmailSuccess: Label 'File emailed to %1.';
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
@@ -158,7 +155,6 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
     local procedure EmailProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointEmail: Record "NPR Nc Endpoint E-mail")
     var
         TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
-        TextEmailSuccess: Label 'File emailed to %1.';
         SMTPMail: Codeunit "SMTP Mail";
         InStream: InStream;
         Recipients: List of [Text];
@@ -210,9 +206,9 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
         NcEndpointType: Record "NPR Nc Endpoint Type";
     begin
         if not NcEndpointType.Get(NcEndpointEmail.GetEndpointTypeCode) then begin
-            NcEndpointType.Init;
+            NcEndpointType.Init();
             NcEndpointType.Code := NcEndpointEmail.GetEndpointTypeCode;
-            NcEndpointType.Insert;
+            NcEndpointType.Insert();
         end;
     end;
 
@@ -226,10 +222,10 @@ codeunit 6151525 "NPR Nc Endpoint Email Mgt."
         if Sender."Endpoint Type" <> NcEndpointEmail.GetEndpointTypeCode then
             exit;
         if not NcEndpointEmail.Get(Sender.Code) then begin
-            NcEndpointEmail.Init;
+            NcEndpointEmail.Init();
             NcEndpointEmail.Validate(Code, Sender.Code);
             NcEndpointEmail.Description := Sender.Description;
-            NcEndpointEmail.Insert;
+            NcEndpointEmail.Insert();
         end else begin
             if NcEndpointEmail.Description <> Sender.Description then begin
                 NcEndpointEmail.Description := Sender.Description;

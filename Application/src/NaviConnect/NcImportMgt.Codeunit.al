@@ -1,4 +1,4 @@
-codeunit 6151504 "NPR Nc Import Mgt."
+﻿codeunit 6151504 "NPR Nc Import Mgt."
 {
     // NC1.17/MHA /20150623  CASE 216851 Object created
     // NC1.21/TTH /20151118  CASE 227358 Replacing Type option field with "Import type".
@@ -19,7 +19,6 @@ codeunit 6151504 "NPR Nc Import Mgt."
 
     var
         Text000: Label 'Test Error E-mail sent to:\  %1';
-        Text001: Label 'Error during Ftp Backup (%1):\\%2';
 
     procedure InsertImportEntries(ImportType: Code[10]; documents: XMLport "NPR Nc Import Entry"; var NewImportEntry: Record "NPR Nc Import Entry" temporary)
     var
@@ -36,28 +35,28 @@ codeunit 6151504 "NPR Nc Import Mgt."
         else
             Clear(NewImportEntry);
 
-        documents.Import;
+        documents.Import();
         documents.CopySourceTable(TempNcImportEntry);
-        if not TempNcImportEntry.FindSet then
+        if not TempNcImportEntry.FindSet() then
             exit;
 
         repeat
-            ImportEntry.Init;
+            ImportEntry.Init();
             ImportEntry := TempNcImportEntry;
             ImportEntry."Entry No." := 0;
             ImportEntry."Import Type" := ImportType;
             ImportEntry.Insert(true);
 
             if NewRecIsTemp then begin
-                NewImportEntry.Init;
+                NewImportEntry.Init();
                 NewImportEntry := ImportEntry;
-                NewImportEntry.Insert;
+                NewImportEntry.Insert();
             end else begin
                 NewImportEntry.Get(ImportEntry."Entry No.");
                 NewImportEntry.Mark(true);
             end;
-        until TempNcImportEntry.Next = 0;
-        Commit;
+        until TempNcImportEntry.Next() = 0;
+        Commit();
 
         if not NewRecIsTemp then
             NewImportEntry.MarkedOnly(true);
@@ -76,7 +75,7 @@ codeunit 6151504 "NPR Nc Import Mgt."
         //IF CleanupImportType(ImportType) THEN
         CleanupImportType(ImportType);
         //+NC2.06 [290771]
-        Commit;
+        Commit();
         //+NC2.01 [255397]
 
         ImportType.TestField("Import Codeunit ID");
@@ -92,7 +91,7 @@ codeunit 6151504 "NPR Nc Import Mgt."
         ImportType: Record "NPR Nc Import Type";
     begin
         //-NC2.01 [255397]
-        if not ImportType.FindSet then
+        if not ImportType.FindSet() then
             exit;
 
         repeat
@@ -100,8 +99,8 @@ codeunit 6151504 "NPR Nc Import Mgt."
             //IF CleanupImportType(ImportType) THEN
             CleanupImportType(ImportType);
             //+NC2.06 [290771]
-            Commit;
-        until ImportType.Next = 0;
+            Commit();
+        until ImportType.Next() = 0;
         //+NC2.01 [255397]
     end;
 
@@ -122,10 +121,10 @@ codeunit 6151504 "NPR Nc Import Mgt."
         ImportEntry.SetRange("Import Type", ImportType.Code);
         ImportEntry.SetFilter(Date, '<%1', CleanupDate);
         ImportEntry.SetRange(Imported, true);
-        if not ImportEntry.FindSet then
+        if not ImportEntry.FindSet() then
             exit;
 
-        ImportEntry.DeleteAll;
+        ImportEntry.DeleteAll();
         //+NC2.01 [255397]
     end;
 
@@ -141,7 +140,7 @@ codeunit 6151504 "NPR Nc Import Mgt."
     begin
         //-NC2.02 [262318]
         ErrorText := '';
-        if not NcImportEntry."Last Error Message".HasValue then
+        if not NcImportEntry."Last Error Message".HasValue() then
             exit('');
 
         NcImportEntry.CalcFields("Last Error Message");
@@ -163,7 +162,6 @@ codeunit 6151504 "NPR Nc Import Mgt."
     local procedure GetErrorMailBody(var NcImportEntry: Record "NPR Nc Import Entry") Body: Text
     var
         ActiveSession: Record "Active Session";
-        User: Record User;
         ErrorMessage: Text;
     begin
         //-NC2.02 [262318]
@@ -195,7 +193,7 @@ codeunit 6151504 "NPR Nc Import Mgt."
         //+NC2.02 [262318]
     end;
 
-    local procedure GetErrorMailSenderAddress(NcImportEntry: Record "NPR Nc Import Entry") SenderAddress: Text
+    local procedure GetErrorMailSenderAddress(NcImportEntry: Record "NPR Nc Import Entry"): Text
     begin
         //-NC2.02 [262318]
         exit('noreply@navipartner.com');
@@ -203,8 +201,6 @@ codeunit 6151504 "NPR Nc Import Mgt."
     end;
 
     local procedure GetErrorMailSubject(NcImportEntry: Record "NPR Nc Import Entry") Subject: Text
-    var
-        ErrorMessage: Text;
     begin
         //-NC2.02 [262318]
         Subject := 'Nc Import Error: ' + NcImportEntry."Document Name";
@@ -242,7 +238,7 @@ codeunit 6151504 "NPR Nc Import Mgt."
         NcImportType.TestField("Send e-mail on Error");
         NcImportType.TestField("E-mail address on Error");
 
-        SMTPMailSetup.Get;
+        SMTPMailSetup.Get();
 
         SenderAddress := GetErrorMailSenderAddress(NcImportEntry);
         Subject := GetErrorMailSubject(NcImportEntry);
@@ -256,7 +252,7 @@ codeunit 6151504 "NPR Nc Import Mgt."
           Body,
           true);
 
-        if NcImportEntry."Document Source".HasValue then begin
+        if NcImportEntry."Document Source".HasValue() then begin
             NcImportEntry.CalcFields("Document Source");
             NcImportEntry."Document Source".CreateInStream(InStream);
             SMTPMail.AddAttachmentStream(InStream, NcImportEntry."Document Name");
@@ -267,18 +263,17 @@ codeunit 6151504 "NPR Nc Import Mgt."
 
     procedure SendTestErrorMail(NcImportType: Record "NPR Nc Import Type")
     var
-        NcImportEntry: Record "NPR Nc Import Entry";
         TempNcImportEntry: Record "NPR Nc Import Entry";
         OutStream: OutStream;
     begin
         //-NC2.02 [262318]
-        TempNcImportEntry.Init;
+        TempNcImportEntry.Init();
         TempNcImportEntry."Import Type" := NcImportType.Code;
         TempNcImportEntry.Date := CurrentDateTime;
         TempNcImportEntry."Document Name" := 'Test ' + NcImportType.Description + '.xml';
         TempNcImportEntry."Last Error Message".CreateOutStream(OutStream);
         OutStream.WriteText('Test Error Line 1' + NewLine() + 'Test Error Line 2');
-        TempNcImportEntry.Insert;
+        TempNcImportEntry.Insert();
 
         SendErrorMail(TempNcImportEntry);
         Message(Text000, NcImportType."E-mail address on Error");

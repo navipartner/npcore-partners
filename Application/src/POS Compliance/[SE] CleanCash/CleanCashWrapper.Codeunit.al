@@ -77,8 +77,6 @@ codeunit 6184500 "NPR CleanCash Wrapper"
     procedure HandleCleanCashXCCSPReceipt(var PosEntry: Record "NPR POS Entry")
     var
         CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
-        RequestEntryNo: Integer;
-        ResponseEntryNo: Integer;
     begin
         CleanCashXCCSP.StoreReceipt(PosEntry);
     end;

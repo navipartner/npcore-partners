@@ -77,7 +77,7 @@ page 6150683 "NPR NPRE Restaurants"
                     Caption = 'Kitchen Requests (Expedite View)';
                     Image = BlanketOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Scope = Repeater;
@@ -86,9 +86,6 @@ page 6150683 "NPR NPRE Restaurants"
                     ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
 
                     trigger OnAction()
-                    var
-                        KitchenRequest: Record "NPR NPRE Kitchen Request";
-                        KitchenRequests: Page "NPR NPRE Kitchen Req.";
                     begin
                         Rec.ShowKitchenRequests();
                     end;

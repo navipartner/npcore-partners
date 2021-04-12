@@ -13,22 +13,22 @@ page 6151187 "NPR MM Member Comm. Setup"
         {
             repeater(Group)
             {
-                field("Membership Code"; "Membership Code")
+                field("Membership Code"; Rec."Membership Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Code field';
                 }
-                field("Message Type"; "Message Type")
+                field("Message Type"; Rec."Message Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Message Type field';
                 }
-                field("Preferred Method"; "Preferred Method")
+                field("Preferred Method"; Rec."Preferred Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Preferred Method field';
                 }
-                field("Notification Engine"; "Notification Engine")
+                field("Notification Engine"; Rec."Notification Engine")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notification Engine field';
@@ -57,7 +57,6 @@ page 6151187 "NPR MM Member Comm. Setup"
                     Path: Text;
                     PassData: Text;
                     TemplateOutStream: outstream;
-                    NotRequiredErr: Label 'A sender template is not required for this notification engine.';
                 begin
                     Rec.CalcFields("Sender Template");
                     if (not REc."Sender Template".HasValue()) then begin
@@ -95,7 +94,6 @@ page 6151187 "NPR MM Member Comm. Setup"
                 var
                     TempBlob: Codeunit "Temp Blob";
                     FileMgt: Codeunit "File Management";
-                    Path: Text;
                     FileName: Text;
                     RecRef: RecordRef;
                     ImportFileLbl: Label 'Import File';

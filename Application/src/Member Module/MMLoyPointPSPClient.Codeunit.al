@@ -23,7 +23,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
 
-        tmpEFTIntegrationType.Init;
+        tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationName();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR MM Loy. Point PSP (Client)";
@@ -44,7 +44,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         if (not LoyaltyPointsMgrClient.AssignLoyaltyInformation(EftTransactionRequest)) then
             Error(NoMember);
 
-        EftTransactionRequest."Transaction Date" := Today;
+        EftTransactionRequest."Transaction Date" := Today();
         EftTransactionRequest."Transaction Time" := Time;
 
         EftTransactionRequest.Recoverable := false;
@@ -73,7 +73,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         if (not LoyaltyPointsMgrClient.AssignLoyaltyInformation(EftTransactionRequest)) then
             Error(NoMember);
 
-        EftTransactionRequest."Transaction Date" := Today;
+        EftTransactionRequest."Transaction Date" := Today();
         EftTransactionRequest."Transaction Time" := Time;
 
         EftTransactionRequest.Recoverable := false;
@@ -189,9 +189,6 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforeResumeFrontEnd', '', false, false)]
     local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
-    var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
     begin
 
         if (not EFTTransactionRequest.IsType(IntegrationName())) then

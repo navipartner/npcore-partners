@@ -23,11 +23,6 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    var
-        FunctionOptionString: Text;
-        JSArr: Text;
-        OptionName: Text;
-        N: Integer;
     begin
         if Sender.DiscoverAction(
           ActionCode(),

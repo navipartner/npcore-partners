@@ -1,20 +1,19 @@
-codeunit 6150662 "NPR NPRE Seating Mgt."
+﻿codeunit 6150662 "NPR NPRE Seating Mgt."
 {
     var
         AdditionalFiltersSet: Boolean;
         SeatingFiltersGlobal: Record "NPR NPRE Seating";
         InQuotes: Label '''%1''', Comment = '{Fixed}';
-        EmptyCodeINQuotes: Label '''''', Comment = '{Fixed}';
 
     procedure GetSeatingDescription(SeatingCode: Code[20]) SeatingDescription: Text
     var
         Seating: Record "NPR NPRE Seating";
     begin
         SeatingDescription := '';
-        Seating.Reset;
+        Seating.Reset();
         Seating.SetRange(Code, SeatingCode);
         if not Seating.IsEmpty then begin
-            Seating.FindFirst;
+            Seating.FindFirst();
             SeatingDescription := Seating.Description;
         end;
     end;
@@ -26,7 +25,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
     begin
         SeatingCode := '';
 
-        Seating.Reset;
+        Seating.Reset();
         if AdditionalFiltersSet then
             Seating.CopyFilters(SeatingFiltersGlobal);
         if SeatingCodeFilter <> '' then
@@ -35,7 +34,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
             Seating.SetFilter("Seating Location", SeatingLocationFilter);
         SeatingList.SetTableView(Seating);
         SeatingList.LookupMode := true;
-        if SeatingList.RunModal = ACTION::LookupOK then begin
+        if SeatingList.RunModal() = ACTION::LookupOK then begin
             SeatingList.GetRecord(Seating);
             SeatingCode := Seating.Code;
         end else
@@ -72,7 +71,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
     var
         RestSetup: Record "NPR NPRE Restaurant Setup";
     begin
-        if not RestSetup.Get or (RestSetup."Seat.Status: Ready" = '') then
+        if not RestSetup.Get() or (RestSetup."Seat.Status: Ready" = '') then
             exit;
 
         SetSeatingStatus(SeatingCode, RestSetup."Seat.Status: Ready");
@@ -82,7 +81,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
     var
         RestSetup: Record "NPR NPRE Restaurant Setup";
     begin
-        if not RestSetup.Get or (RestSetup."Seat.Status: Occupied" = '') then
+        if not RestSetup.Get() or (RestSetup."Seat.Status: Occupied" = '') then
             exit;
 
         SetSeatingStatus(SeatingCode, RestSetup."Seat.Status: Occupied");
@@ -100,7 +99,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
         xSeating := Seating;
         Seating.Status := NewStatusCode;
         OnAfterChangeSeatingStatus(xSeating, Seating);
-        Seating.Modify;
+        Seating.Modify();
     end;
 
     procedure RestaurantSeatingLocationFilter(RestaurantCode: Code[20]): Text
@@ -112,12 +111,12 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
             exit('');
         LocationFilter := '';
         SeatingLocation.SetRange("Restaurant Code", RestaurantCode);
-        if SeatingLocation.FindSet then
+        if SeatingLocation.FindSet() then
             repeat
                 if LocationFilter <> '' then
                     LocationFilter := LocationFilter + '|';
                 LocationFilter := LocationFilter + StrSubstNo(InQuotes, SeatingLocation.Code);
-            until SeatingLocation.Next = 0;
+            until SeatingLocation.Next() = 0;
         exit(LocationFilter);
     end;
 

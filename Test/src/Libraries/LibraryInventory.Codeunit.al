@@ -25,7 +25,7 @@ codeunit 85001 "NPR Library - Inventory"
         LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
         LibraryERM.FindGeneralPostingSetupInvtFull(GeneralPostingSetup);
         LibraryERM.CreateGeneralPostingSetupInvt(GeneralPostingSetup);
-        if not InventoryPostingGroup.FindFirst then
+        if not InventoryPostingGroup.FindFirst() then
             LibraryInventory.CreateInventoryPostingGroup(InventoryPostingGroup);
 
         ItemCategory.Validate("NPR VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
@@ -70,7 +70,7 @@ codeunit 85001 "NPR Library - Inventory"
         LibraryERM.FindGeneralPostingSetupInvtFull(GeneralPostingSetup);
         if VATPostingSetup."VAT Bus. Posting Group" = '' then
             LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
-        if not InventoryPostingGroup.FindFirst then
+        if not InventoryPostingGroup.FindFirst() then
             LibraryInventory.CreateInventoryPostingGroup(InventoryPostingGroup);
 
         Item.Validate(Description, Item."No.");  // Validation Description as No. because value is not important.
@@ -79,7 +79,7 @@ codeunit 85001 "NPR Library - Inventory"
         Item.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         Item.Validate("Inventory Posting Group", InventoryPostingGroup.Code);
 
-        if TaxGroup.FindFirst then
+        if TaxGroup.FindFirst() then
             Item.Validate("Tax Group Code", TaxGroup.Code);
 
         Item.Modify(true);
@@ -103,7 +103,7 @@ codeunit 85001 "NPR Library - Inventory"
     var
         NoSeriesCode: Code[20];
     begin
-        InventorySetup.Get;
+        InventorySetup.Get();
         NoSeriesCode := LibraryUtility.GetGlobalNoSeriesCode;
         if NoSeriesCode <> InventorySetup."Item Nos." then begin
             InventorySetup.Validate("Item Nos.", LibraryUtility.GetGlobalNoSeriesCode);

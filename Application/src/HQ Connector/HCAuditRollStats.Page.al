@@ -17,12 +17,12 @@ page 6150901 "NPR HC Audit Roll Stats"
                 group(Control6150619)
                 {
                     ShowCaption = false;
-                    field("Register No."; "Register No.")
+                    field("Register No."; Rec."Register No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Cash Register No. field';
                     }
-                    field("Sales Ticket No."; "Sales Ticket No.")
+                    field("Sales Ticket No."; Rec."Sales Ticket No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
@@ -76,12 +76,12 @@ page 6150901 "NPR HC Audit Roll Stats"
 
     trigger OnOpenPage()
     begin
-        SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Date", "Sale Type");
-        CalcSums("Amount Including VAT", Cost, "Line Discount Amount", Amount);
-        Salgspris := "Amount Including VAT";
-        CalcKostpris := Round(Cost, 0.01, '=');
-        Rabat := "Line Discount Amount";
-        Netto := Amount;
+        Rec.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Date", "Sale Type");
+        Rec.CalcSums("Amount Including VAT", Cost, "Line Discount Amount", Amount);
+        Salgspris := Rec."Amount Including VAT";
+        CalcKostpris := Round(Rec.Cost, 0.01, '=');
+        Rabat := Rec."Line Discount Amount";
+        Netto := Rec.Amount;
         DB := Netto - CalcKostpris;
         if Netto <> 0 then
             DG := DB * 100 / Netto else

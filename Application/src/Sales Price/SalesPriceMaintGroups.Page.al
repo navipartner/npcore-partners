@@ -12,12 +12,12 @@ page 6059947 "NPR Sales Price Maint. Groups"
         {
             repeater(Group)
             {
-                field("Item Category Code"; "Item Category Code")
+                field("Item Category Code"; Rec."Item Category Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Category Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

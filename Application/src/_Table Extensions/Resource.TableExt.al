@@ -18,7 +18,7 @@ tableextension 6014421 "NPR Resource" extends Resource
         }
         field(6060152; "NPR Qty. Planned (Job)"; Decimal)
         {
-            CalcFormula = Sum ("Job Planning Line"."Quantity (Base)" WHERE(Status = CONST(Planning),
+            CalcFormula = Sum("Job Planning Line"."Quantity (Base)" WHERE(Status = CONST(Planning),
                                                                            "Schedule Line" = CONST(true),
                                                                            Type = CONST(Resource),
                                                                            "No." = FIELD("No."),

@@ -17,17 +17,17 @@ page 6151125 "NPR NpIa Item AddOns"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the number of the involved entry or record.';                    
+                    ToolTip = 'Specifies the number of the involved entry or record.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies a description of the item.';                    
+                    ToolTip = 'Specifies a description of the item.';
                 }
                 field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
-                    ToolTIp = 'Specifies if the current Item AddOn is enabled.';                    
+                    ToolTIp = 'Specifies if the current Item AddOn is enabled.';
                 }
             }
         }

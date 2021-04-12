@@ -4,8 +4,6 @@ codeunit 6014641 "NPR BTF Service API"
         SampleLbl: Label 'Sample.%1', Comment = '%1=File Extension';
         SendReqToLiveEnvQst: Label 'Do you want to send request on live environment?';
         ResponseContentNotFoundMsg: Label 'Response content not found. Instead, check out Response Note to see error details.';
-        WebReqInitiatedFromNotFoundMsg: Label 'Entry which initiated sending web request with Record ID %1 is not available.', Comment = '%1=ErrorLog."Initiatied From Rec. ID"';
-        ResourcesUriNotFoundInContentLbl: Label 'Couldn''t find resources uri in downloaded content. Each resource uri contain details which should be imported into the Business Central tables.';
 
     procedure VerifyServiceURL(var ServiceURL: Text)
     var
@@ -74,7 +72,6 @@ codeunit 6014641 "NPR BTF Service API"
     [NonDebuggable]
     procedure GetBase64Authorization(Setup: Record "NPR BTF Service Setup"): Text
     var
-        AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         Base64Convert: Codeunit "Base64 Convert";
         Base64Auth: Text;
     begin

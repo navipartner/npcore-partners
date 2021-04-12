@@ -15,37 +15,37 @@ page 6151194 "NPR Ticket App. Area Setup"
         {
             repeater(General)
             {
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Profile ID"; "Profile ID")
+                field("Profile ID"; Rec."Profile ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Profile ID field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("NPR Ticket Essential"; "NPR Ticket Essential")
+                field("NPR Ticket Essential"; Rec."NPR Ticket Essential")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Ticket Essential field';
                 }
-                field("NPR Ticket Advanced"; "NPR Ticket Advanced")
+                field("NPR Ticket Advanced"; Rec."NPR Ticket Advanced")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Ticket Advanced field';
                 }
-                field("NPR Ticket Dynamic Price"; "NPR Ticket Dynamic Price")
+                field("NPR Ticket Dynamic Price"; Rec."NPR Ticket Dynamic Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Ticket Dynamic Price field';
                 }
-                field("NPR Ticket Wallet"; "NPR Ticket Wallet")
+                field("NPR Ticket Wallet"; Rec."NPR Ticket Wallet")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Ticket Wallet field';

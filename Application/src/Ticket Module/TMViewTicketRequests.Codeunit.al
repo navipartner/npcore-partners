@@ -14,7 +14,7 @@ codeunit 6060125 "NPR TM View Ticket Requests"
         TMTicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
         TMTicketReservationRequest.SetRange("Session Token ID", NcImportEntry."Document ID");
-        if TMTicketReservationRequest.FindSet then
+        if TMTicketReservationRequest.FindSet() then
             PAGE.RunModal(PAGE::"NPR TM Ticket Request", TMTicketReservationRequest);
     end;
 }

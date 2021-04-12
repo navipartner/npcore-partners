@@ -2,7 +2,7 @@ page 6151018 "NPR NpRv Sales Line Card"
 {
     UsageCategory = None;
     Caption = 'Issue Retail Voucher Card';
-    DataCaptionExpression = Description;
+    DataCaptionExpression = Rec.Description;
     DeleteAllowed = false;
     InsertAllowed = false;
     SourceTable = "NPR NpRv Sales Line";
@@ -14,30 +14,30 @@ page 6151018 "NPR NpRv Sales Line Card"
             group(General)
             {
                 Caption = 'General';
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Voucher Type"; "Voucher Type")
+                field("Voucher Type"; Rec."Voucher Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Voucher Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Voucher No."; "Voucher No.")
+                field("Voucher No."; Rec."Voucher No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Voucher No. field';
                 }
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -46,11 +46,11 @@ page 6151018 "NPR NpRv Sales Line Card"
                 group(Control6014419)
                 {
                     ShowCaption = false;
-                    Visible = (Type = Type::"New Voucher") OR (Type = Type::"Top-Up") OR (Type = Type::"Partner Issue voucher");
-                    field("Starting Date"; "Starting Date")
+                    Visible = (Rec.Type = Rec.Type::"New Voucher") OR (Rec.Type = Rec.Type::"Top-Up") OR (Rec.Type = Rec.Type::"Partner Issue voucher");
+                    field("Starting Date"; Rec."Starting Date")
                     {
                         ApplicationArea = All;
-                        Editable = (Type = Type::"New Voucher") OR (Type = Type::"Top-Up") OR (Type = Type::"Partner Issue voucher");
+                        Editable = (Rec.Type = Rec.Type::"New Voucher") OR (Rec.Type = Rec.Type::"Top-Up") OR (Rec.Type = Rec.Type::"Partner Issue voucher");
                         ToolTip = 'Specifies the value of the Starting Date field';
                     }
                 }
@@ -58,13 +58,13 @@ page 6151018 "NPR NpRv Sales Line Card"
             group(Contact)
             {
                 Caption = 'Contact';
-                Visible = (Type = Type::"New Voucher") OR (Type = Type::"Top-Up") OR (Type = Type::"Partner Issue voucher");
-                field("Customer No."; "Customer No.")
+                Visible = (Rec.Type = Rec.Type::"New Voucher") OR (Rec.Type = Rec.Type::"Top-Up") OR (Rec.Type = Rec.Type::"Partner Issue voucher");
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Contact No."; "Contact No.")
+                field("Contact No."; Rec."Contact No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact No. field';
@@ -76,81 +76,81 @@ page 6151018 "NPR NpRv Sales Line Card"
                         if PAGE.RunModal(0, Contact) <> ACTION::LookupOK then
                             exit;
 
-                        Validate("Contact No.", Contact."No.");
+                        Rec.Validate("Contact No.", Contact."No.");
                     end;
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Name 2"; "Name 2")
+                field("Name 2"; Rec."Name 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name 2 field';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Address field';
                 }
-                field("Address 2"; "Address 2")
+                field("Address 2"; Rec."Address 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Address 2 field';
                 }
-                field("Post Code"; "Post Code")
+                field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Code field';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the City field';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the County field';
                 }
-                field("Country/Region Code"; "Country/Region Code")
+                field("Country/Region Code"; Rec."Country/Region Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Country/Region Code field';
                 }
-                field("Send via Print"; "Send via Print")
+                field("Send via Print"; Rec."Send via Print")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send via Print field';
                 }
-                field("Send via E-mail"; "Send via E-mail")
+                field("Send via E-mail"; Rec."Send via E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send via E-mail field';
                 }
-                field("E-mail"; "E-mail")
+                field("E-mail"; Rec."E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-mail field';
                 }
-                field("Send via SMS"; "Send via SMS")
+                field("Send via SMS"; Rec."Send via SMS")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send via SMS field';
                 }
-                field("Phone No."; "Phone No.")
+                field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
-                field("Language Code"; "Language Code")
+                field("Language Code"; Rec."Language Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Language Code field';
                 }
-                field("Voucher Message"; "Voucher Message")
+                field("Voucher Message"; Rec."Voucher Message")
                 {
                     ApplicationArea = All;
                     MultiLine = true;
@@ -164,33 +164,33 @@ page 6151018 "NPR NpRv Sales Line Card"
                 {
                     Editable = false;
                     ShowCaption = false;
-                    Visible = ("Document Source" = "Document Source"::POS);
-                    field("Register No."; "Register No.")
+                    Visible = (Rec."Document Source" = Rec."Document Source"::POS);
+                    field("Register No."; Rec."Register No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the POS Unit No. field';
                     }
-                    field("Sales Ticket No."; "Sales Ticket No.")
+                    field("Sales Ticket No."; Rec."Sales Ticket No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
                     }
-                    field("Sale Type"; "Sale Type")
+                    field("Sale Type"; Rec."Sale Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sale Type field';
                     }
-                    field("Sale Date"; "Sale Date")
+                    field("Sale Date"; Rec."Sale Date")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sale Date field';
                     }
-                    field("Sale Line No."; "Sale Line No.")
+                    field("Sale Line No."; Rec."Sale Line No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sale Line No. field';
                     }
-                    field("Retail ID"; "Retail ID")
+                    field("Retail ID"; Rec."Retail ID")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Retail ID field';
@@ -200,28 +200,28 @@ page 6151018 "NPR NpRv Sales Line Card"
                 {
                     Editable = false;
                     ShowCaption = false;
-                    Visible = ("Document Source" = "Document Source"::"Sales Document") OR ("Document Source" = "Document Source"::"Payment Line");
-                    field("Document Type"; "Document Type")
+                    Visible = (Rec."Document Source" = Rec."Document Source"::"Sales Document") OR (Rec."Document Source" = Rec."Document Source"::"Payment Line");
+                    field("Document Type"; Rec."Document Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Document Type field';
                     }
-                    field("Document No."; "Document No.")
+                    field("Document No."; Rec."Document No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Document No. field';
                     }
-                    field("Document Line No."; "Document Line No.")
+                    field("Document Line No."; Rec."Document Line No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Document Line No. field';
                     }
-                    field("External Document No."; "External Document No.")
+                    field("External Document No."; Rec."External Document No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the External Document No. field';
                     }
-                    field("Posting No."; "Posting No.")
+                    field("Posting No."; Rec."Posting No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Posting No. field';
@@ -254,16 +254,16 @@ page 6151018 "NPR NpRv Sales Line Card"
                     Qty: Decimal;
                 begin
                     Qty := 1;
-                    case "Document Source" of
-                        "Document Source"::POS:
+                    case Rec."Document Source" of
+                        Rec."Document Source"::POS:
                             begin
-                                SaleLinePOS.SetRange("Retail ID", "Retail ID");
-                                if SaleLinePOS.FindFirst then
+                                SaleLinePOS.SetRange("Retail ID", Rec."Retail ID");
+                                if SaleLinePOS.FindFirst() then
                                     Qty := SaleLinePOS.Quantity;
                             end;
-                        "Document Source"::"Sales Document":
+                        Rec."Document Source"::"Sales Document":
                             begin
-                                if SalesLine.Get("Document Type", "Document No.", "Document Line No.") then
+                                if SalesLine.Get(Rec."Document Type", Rec."Document No.", Rec."Document Line No.") then
                                     Qty := SalesLine.Quantity;
                             end;
                     end;

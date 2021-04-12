@@ -15,12 +15,12 @@ page 6150641 "NPR POS Info Subform"
             repeater(Group)
             {
                 Caption = 'Group';
-                field(Subcode; Subcode)
+                field(Subcode; Rec.Subcode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Subcode field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';

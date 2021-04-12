@@ -35,7 +35,7 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';

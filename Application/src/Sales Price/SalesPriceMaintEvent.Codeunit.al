@@ -61,24 +61,21 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         Item: Record Item;
     begin
         Item.SetRange("No.", '0000050536191');
-        if Item.FindSet then
+        if Item.FindSet() then
             repeat
                 if Item."No." <> '' then
                     if Item.Modify(true) then;
-            until Item.Next = 0;
+            until Item.Next() = 0;
     end;
 
     procedure UpdateSalesPricesForStaff(var Item: Record Item)
     var
         SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup";
         "Sales Price": Record "Sales Price";
-        Found: Boolean;
         Customer: Record Customer;
         VATPostingSetup: Record "VAT Posting Setup";
         CustomerPriceGroup: Record "Customer Price Group";
-        Campaign: Record Campaign;
         VATPct: Decimal;
-        ChangeKey: Boolean;
         VATBusPostingGrp: Code[20];
         Currency: Record Currency;
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -101,10 +98,10 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         if not TmpItem.Get(Item."No.") then
             exit;
 
-        if SalesPriceMaintenanceSetup.FindFirst then begin
+        if SalesPriceMaintenanceSetup.FindFirst() then begin
 
-            ExchRateDate := Today;
-            GeneralLedgerSetup.Get;
+            ExchRateDate := Today();
+            GeneralLedgerSetup.Get();
 
             repeat
                 SalesPriceMaintenanceSetup.CalcFields("Exclude Item Groups");
@@ -114,11 +111,11 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                         if SalesPriceMaintenanceSetup."Exclude Item Groups" > 0 then begin
                             Clear(SalesPriceMaintenanceGroups);
                             SalesPriceMaintenanceGroups.SetRange(Id, SalesPriceMaintenanceSetup.Id);
-                            if SalesPriceMaintenanceGroups.FindSet then begin
+                            if SalesPriceMaintenanceGroups.FindSet() then begin
                                 repeat
                                     if not BreakLoop then
                                         BreakLoop := ExcludeItemGroup(Item."Item Category Code", SalesPriceMaintenanceGroups."Item Category Code");
-                                until SalesPriceMaintenanceGroups.Next = 0;
+                                until SalesPriceMaintenanceGroups.Next() = 0;
                             end;
                         end;
                 end;
@@ -134,9 +131,9 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                     "Sales Price".SetRange("Sales Code", SalesPriceMaintenanceSetup."Sales Code");
                     "Sales Price".SetRange("Currency Code", SalesPriceMaintenanceSetup."Currency Code");
 
-                    if not "Sales Price".FindFirst then begin
+                    if not "Sales Price".FindFirst() then begin
                         Clear("Sales Price");
-                        "Sales Price".Init;
+                        "Sales Price".Init();
                         "Sales Price".Validate("Item No.", Item."No.");
                         "Sales Price".Validate("Sales Type", SalesPriceMaintenanceSetup."Sales Type");
                         "Sales Price".Validate("Sales Code", SalesPriceMaintenanceSetup."Sales Code");
@@ -235,13 +232,12 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
 
                     "Sales Price".Modify(true)
                 end;
-            until SalesPriceMaintenanceSetup.Next = 0;
+            until SalesPriceMaintenanceSetup.Next() = 0;
         end;
     end;
 
     local procedure ExcludeItemGroup(Current_ItemGroup: Code[20]; ItemCategory_To_Exclude: Code[20]): Boolean
     var
-        Item: Record Item;
         ItemCategory: Record "Item Category";
     begin
         ItemCategory.Get(ItemCategory_To_Exclude);

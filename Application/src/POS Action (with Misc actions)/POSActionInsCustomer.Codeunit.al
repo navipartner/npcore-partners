@@ -1,4 +1,4 @@
-codeunit 6150726 "NPR POSAction: Ins. Customer"
+﻿codeunit 6150726 "NPR POSAction: Ins. Customer"
 {
     // NPR5.38/MHA /20180121  CASE 302639 Implemented functionality for direct creation of Customer/Contact
     // NPR5.49/MHA /20190319  CASE 343617 Implemented OnAfterLog POS Workflow Interface
@@ -16,22 +16,21 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if Sender.DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Single)
-            then begin
-                RegisterWorkflowStep('CreateContact', 'if(param.CustomerType == 0) {respond()}');
-                RegisterWorkflowStep('CreateCustomer', 'if(param.CustomerType == 1) {respond()}');
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Single)
+then begin
+            Sender.RegisterWorkflowStep('CreateContact', 'if(param.CustomerType == 0) {respond()}');
+            Sender.RegisterWorkflowStep('CreateCustomer', 'if(param.CustomerType == 1) {respond()}');
 
-                RegisterOptionParameter('CustomerType', 'Contact,Customer', 'Contact');
-                RegisterIntegerParameter('CardPageId', 0);
+            Sender.RegisterOptionParameter('CustomerType', 'Contact,Customer', 'Contact');
+            Sender.RegisterIntegerParameter('CardPageId', 0);
 
-                Sender.RegisterWorkflow(false);
-            end;
+            Sender.RegisterWorkflow(false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -42,7 +41,7 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
         JSON: Codeunit "NPR POS JSON Management";
         CardPageId: Integer;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -70,18 +69,17 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
     local procedure OnActionCreateContact(CardPageId: Integer; var SalePOS: Record "NPR POS Sale")
     var
         Contact: Record Contact;
-        PageMgt: Codeunit "Page Management";
     begin
         if (SalePOS."Customer Type" = SalePOS."Customer Type"::Cash) and (SalePOS."Customer No." <> '') then
             Contact.Get(SalePOS."Customer No.")
         else begin
-            Contact.Init;
+            Contact.Init();
             Contact."No." := '';
             Contact.Insert(true);
-            Commit;
+            Commit();
         end;
 
-        Contact.SetRecFilter;
+        Contact.SetRecFilter();
         if CardPageId > 0 then
             PAGE.RunModal(CardPageId, Contact)
         else
@@ -101,10 +99,10 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
         if (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) and (SalePOS."Customer No." <> '') then
             Customer.Get(SalePOS."Customer No.")
         else begin
-            Customer.Init;
+            Customer.Init();
             Customer."No." := '';
             Customer.Insert(true);
-            Commit;
+            Commit();
         end;
 
         if CardPageId > 0 then

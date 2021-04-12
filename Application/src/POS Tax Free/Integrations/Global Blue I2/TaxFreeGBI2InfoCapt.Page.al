@@ -48,7 +48,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = StreetMode <> StreetMode::Hide;
                     ToolTip = 'Specifies the value of the Street field';
                 }
-                field("Postal Code"; "Postal Code")
+                field("Postal Code"; Rec."Postal Code")
                 {
                     ApplicationArea = All;
                     Editable = PostalCodeEditable;
@@ -125,14 +125,14 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
             {
                 Caption = 'Mobile Phone No.';
                 Visible = MobileNumberMode <> MobileNumberMode::Hide;
-                field("Mobile No. Country"; "Mobile No. Country")
+                field("Mobile No. Country"; Rec."Mobile No. Country")
                 {
                     ApplicationArea = All;
                     Editable = MobileNumberEditable;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
                     ToolTip = 'Specifies the value of the Mobile No. Country field';
                 }
-                field("Mobile No. Prefix Formatted"; "Mobile No. Prefix Formatted")
+                field("Mobile No. Prefix Formatted"; Rec."Mobile No. Prefix Formatted")
                 {
                     ApplicationArea = All;
                     Caption = 'Phone Prefix';
@@ -140,7 +140,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
                     ToolTip = 'Specifies the value of the Phone Prefix field';
                 }
-                field("Mobile No."; "Mobile No.")
+                field("Mobile No."; Rec."Mobile No.")
                 {
                     ApplicationArea = All;
                     Editable = MobileNumberEditable;
@@ -189,7 +189,6 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
         DepartureEditable: Boolean;
         ArrivalEditable: Boolean;
         FinalDestinationCountryCodeEditable: Boolean;
-        Error_NotEditable: Label 'Field %1 is not editable';
         PassportNumberMandatory: Boolean;
         LastNameMandatory: Boolean;
         FirstNameMandatory: Boolean;
@@ -244,59 +243,59 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
     begin
         if PassportNumberMode = PassportNumberMode::Required then
             if Rec."Passport Number" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("Passport Number"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Passport Number"));
 
         if FirstNameMode = FirstNameMode::Required then
             if Rec."First Name" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("First Name"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("First Name"));
 
         if LastNameMode = LastNameMode::Required then
             if Rec."Last Name" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("Last Name"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Last Name"));
 
         if StreetMode = StreetMode::Required then
             if Rec.Street = '' then
-                Error(Error_MissingRequiredParam, FieldCaption(Street));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption(Street));
 
         if PostalCodeMode = PostalCodeMode::Required then
             if Rec."Postal Code" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("Postal Code"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Postal Code"));
 
         if TownMode = TownMode::Required then
             if Rec.Town = '' then
-                Error(Error_MissingRequiredParam, FieldCaption(Town));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption(Town));
 
         if CountryCodeMode = CountryCodeMode::Required then
             if Rec."Country Of Residence" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("Country Of Residence"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Country Of Residence"));
 
         if EmailMode = EmailMode::Required then
             if Rec."E-mail" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("E-mail"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("E-mail"));
 
         if MobileNumberMode = MobileNumberMode::Required then
             if Rec."Mobile No." = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("Mobile No."));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Mobile No."));
 
         if PassportCountryCodeMode = PassportCountryCodeMode::Required then
             if Rec."Passport Country" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("Passport Country"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Passport Country"));
 
         if DateOfBirthMode = DateOfBirthMode::Required then
             if Rec."Date Of Birth" = 0D then
-                Error(Error_MissingRequiredParam, FieldCaption("Date Of Birth"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Date Of Birth"));
 
         if DepartureDateMode = DepartureDateMode::Required then
             if Rec."Departure Date" = 0D then
-                Error(Error_MissingRequiredParam, FieldCaption("Departure Date"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Departure Date"));
 
         if ArrivalDateMode = ArrivalDateMode::Required then
             if Rec."Arrival Date" = 0D then
-                Error(Error_MissingRequiredParam, FieldCaption("Arrival Date"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Arrival Date"));
 
         if FinalDestinationCountryCodeMode = FinalDestinationCountryCodeMode::Required then
             if Rec."Final Destination Country" = '' then
-                Error(Error_MissingRequiredParam, FieldCaption("Final Destination Country"));
+                Error(Error_MissingRequiredParam, Rec.FieldCaption("Final Destination Country"));
     end;
 
     procedure SetRec(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary)

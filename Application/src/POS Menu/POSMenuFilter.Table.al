@@ -125,7 +125,6 @@ table 6150717 "NPR POS Menu Filter"
     }
 
     var
-        ERRNOFILTER: Label 'No filter to activate.';
         ERRONLYONE: Label 'Only one record can be used when Object Type is Report.';
 
     procedure ActivateFilter()
@@ -143,13 +142,13 @@ table 6150717 "NPR POS Menu Filter"
 
         RunObjectWithFilter(Rec, POSSession);
 
-        Modify;
+        Modify();
     end;
 
     procedure DeActivateFilter()
     begin
         Active := false;
-        Modify;
+        Modify();
     end;
 
     procedure TableFilter()
@@ -162,7 +161,7 @@ table 6150717 "NPR POS Menu Filter"
         OUTS: OutStream;
     begin
         Rec.CalcFields("Table Filter");
-        if Rec."Table Filter".HasValue then begin
+        if Rec."Table Filter".HasValue() then begin
             Rec."Table Filter".CreateInStream(INS);
             INS.Read(FilterStringText);
         end;
@@ -172,20 +171,19 @@ table 6150717 "NPR POS Menu Filter"
         FilterViewName := MailRecordRef.Name;
         FilterBuilder.AddRecordRef(FilterViewName, MailRecordRef);
         if FilterStringText <> '' then FilterBuilder.SetView(FilterViewName, FilterStringText);
-        if FilterBuilder.RunModal then begin
+        if FilterBuilder.RunModal() then begin
             FilterStringText := FilterBuilder.GetView(FilterViewName);
         end;
 
         Rec."Table Filter".CreateOutStream(OUTS);
         OUTS.Write(FilterStringText);
-        Rec.Modify;
+        Rec.Modify();
     end;
 
     procedure RunObjectWithFilter(POSMenuFilter: Record "NPR POS Menu Filter"; POSSession: Codeunit "NPR POS Session")
     var
         FilterRecRef: RecordRef;
         FilterStringText: Text;
-        DataTypeManagement: Codeunit "Data Type Management";
         INS: InStream;
         FilterRecVariant: Variant;
         POSSale: Codeunit "NPR POS Sale";
@@ -208,7 +206,7 @@ table 6150717 "NPR POS Menu Filter"
                 FilterRecRef.Open(POSMenuFilter."Table No.");
 
                 POSMenuFilter.CalcFields("Table Filter");
-                if POSMenuFilter."Table Filter".HasValue then begin
+                if POSMenuFilter."Table Filter".HasValue() then begin
                     POSMenuFilter."Table Filter".CreateInStream(INS);
                     INS.Read(FilterStringText);
                 end;
@@ -218,7 +216,7 @@ table 6150717 "NPR POS Menu Filter"
 
                 if FilterStringText <> '' then begin
                     FilterRecRef.SetView(FilterStringText);
-                    if FilterRecRef.FindFirst then;
+                    if FilterRecRef.FindFirst() then;
                 end;
                 FilterRecVariant := FilterRecRef;
 
@@ -277,7 +275,6 @@ table 6150717 "NPR POS Menu Filter"
         FilterRecRef: RecordRef;
         FilterRecVariant: Variant;
         POSEntry: Record "NPR POS Entry";
-        FilterValue: Code[10];
     begin
 
         FilterRecRef.Open(TableNo);

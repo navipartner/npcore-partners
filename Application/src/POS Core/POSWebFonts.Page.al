@@ -12,27 +12,27 @@ page 6014622 "NPR POS Web Fonts"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Font Face"; "Font Face")
+                field("Font Face"; Rec."Font Face")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Font Face field';
                 }
-                field(Prefix; Prefix)
+                field(Prefix; Rec.Prefix)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prefix field';
@@ -67,7 +67,7 @@ page 6014622 "NPR POS Web Fonts"
                     Caption = 'Import Font';
                     Image = Attach;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -84,7 +84,7 @@ page 6014622 "NPR POS Web Fonts"
                     Enabled = WoffHasValue;
                     Image = ExportAttachment;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -101,7 +101,7 @@ page 6014622 "NPR POS Web Fonts"
                     Enabled = WoffHasValue;
                     Image = CancelAttachment;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -121,7 +121,7 @@ page 6014622 "NPR POS Web Fonts"
                     Caption = 'Import Stylesheet';
                     Image = XMLFile;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -138,7 +138,7 @@ page 6014622 "NPR POS Web Fonts"
                     Enabled = CssHasValue;
                     Image = ExportElectronicDocument;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -155,7 +155,7 @@ page 6014622 "NPR POS Web Fonts"
                     Enabled = CssHasValue;
                     Image = DeleteXML;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -178,7 +178,7 @@ page 6014622 "NPR POS Web Fonts"
                     ToolTip = 'Executes the Export Font Configuration action';
                     PromotedCategory = Process;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -193,7 +193,7 @@ page 6014622 "NPR POS Web Fonts"
                     ToolTip = 'Executes the Import Font Configuration action';
                     PromotedCategory = Process;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -205,7 +205,7 @@ page 6014622 "NPR POS Web Fonts"
                     Caption = 'Export Managed Dependency Manifest';
                     Image = ExportElectronicDocument;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -339,7 +339,7 @@ page 6014622 "NPR POS Web Fonts"
             case true of
                 not Rec.Find():
                     begin
-                        Rec.Init;
+                        Rec.Init();
                         Rec.Code := Font.Code;
                         Rec.Insert(true);
                     end;

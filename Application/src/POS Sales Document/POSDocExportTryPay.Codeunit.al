@@ -14,7 +14,6 @@ codeunit 6014417 "NPR POS Doc. Export Try Pay"
 
     trigger OnRun()
     var
-        Success: Boolean;
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
@@ -23,8 +22,8 @@ codeunit 6014417 "NPR POS Doc. Export Try Pay"
         if HandleType = HandleType::Undefined then
             Error(TextDirectInvocationNotAllowed);
 
-        SalesHeader.LockTable;
-        if SalesHeader.Find then begin
+        SalesHeader.LockTable();
+        if SalesHeader.Find() then begin
             if (HandleType = HandleType::Post) and FullPosting then
                 RetailSalesDocImpMgt.SetDocumentToFullPosting(SalesHeader);
 
@@ -43,7 +42,7 @@ codeunit 6014417 "NPR POS Doc. Export Try Pay"
                     RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, Print, Pdf2Nav, Send, true)
             end;
 
-            Commit;
+            Commit();
         end;
     end;
 
@@ -59,7 +58,7 @@ codeunit 6014417 "NPR POS Doc. Export Try Pay"
 
         HandleType := HandleType::Prepayment;
 
-        Commit;
+        Commit();
         Success := Self.Run();
     end;
 
@@ -74,7 +73,7 @@ codeunit 6014417 "NPR POS Doc. Export Try Pay"
 
         HandleType := HandleType::Post;
 
-        Commit;
+        Commit();
         Success := Self.Run();
     end;
 }

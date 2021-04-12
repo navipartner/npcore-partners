@@ -1,8 +1,8 @@
-report 6014545 "NPR Acc. Statement w FIK-Card"
+﻿report 6014545 "NPR Acc. Statement w FIK-Card"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Acc. Statement w FIK-Card';
 
@@ -589,10 +589,8 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
             }
 
             trigger OnAfterGetRecord()
-            var
-                StringLen: Integer;
             begin
-                AgingBandBuf.DeleteAll;
+                AgingBandBuf.DeleteAll();
                 CurrReport.Language := Language.GetLanguageID("Language Code");
                 PrintLine := false;
                 Cust2 := Customer;
@@ -607,7 +605,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         until (Currency2.Next() = 0) or PrintLine;
                 end;
                 if (not PrintLine) and PrintAllHavingEntry then begin
-                    "Cust. Ledger Entry".Reset;
+                    "Cust. Ledger Entry".Reset();
                     "Cust. Ledger Entry".SetCurrentKey("Customer No.", "Posting Date");
                     "Cust. Ledger Entry".SetRange("Customer No.", Customer."No.");
                     "Cust. Ledger Entry".SetRange("Posting Date", StartDate, EndDate);

@@ -15,14 +15,13 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
         if Rec.IsTemporary() then
             exit;
 
         FilterSaleLinePOS2ItemAddOnPOSLine(Rec, SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetRange("Fixed Quantity", true);
-        if SaleLinePOSAddOn.FindFirst then
+        if SaleLinePOSAddOn.FindFirst() then
             if SaleLinePOS.Get(
                 SaleLinePOSAddOn."Register No.",
                 SaleLinePOSAddOn."Sales Ticket No.",
@@ -208,7 +207,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
                             AddOnLine += ', variants: [';
                             NpIaItemAddOnLineOption.SetRange("AddOn No.", NpIaItemAddOnLine."AddOn No.");
                             NpIaItemAddOnLineOption.SetRange("AddOn Line No.", NpIaItemAddOnLine."Line No.");
-                            if NpIaItemAddOnLineOption.FindSet then
+                            if NpIaItemAddOnLineOption.FindSet() then
                                 repeat
                                     AddOnLine += '{ line_no: ' + Format(NpIaItemAddOnLineOption."Line No.");
                                     AddOnLine += ', description: "' + FormatJson(NpIaItemAddOnLineOption.Description) + '"},';
@@ -217,7 +216,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
                                     then
                                         SelectedVariant := Format(i);
                                     i += 1;
-                                until NpIaItemAddOnLineOption.Next = 0;
+                                until NpIaItemAddOnLineOption.Next() = 0;
                             AddOnLine += ']';
                             AddOnLine += ', selected_variant: ' + SelectedVariant;
                         end;
@@ -231,8 +230,6 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     end;
 
     local procedure InitScriptLabels(NpIaItemAddOn: Record "NPR NpIa Item AddOn") Script: Text
-    var
-        NPREWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
         Script := '$scope.labels = ' +
           '{ ' +
@@ -264,7 +261,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         WebClientDependency: Record "NPR Web Client Dependency";
         InStr: InStream;
     begin
-        if WebClientDependency.Get(WebClientDependency.Type::CSS, WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
+        if WebClientDependency.Get(WebClientDependency.Type::CSS, WebDepCode()) and WebClientDependency.BLOB.HasValue() then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
             InStr.Read(Css);
@@ -276,7 +273,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         WebClientDependency: Record "NPR Web Client Dependency";
         InStr: InStream;
     begin
-        if WebClientDependency.Get(WebClientDependency.Type::HTML, WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
+        if WebClientDependency.Get(WebClientDependency.Type::HTML, WebDepCode()) and WebClientDependency.BLOB.HasValue() then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
             InStr.Read(Html);
@@ -312,7 +309,6 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        NetConvHelper: Variant;
         JToken: JsonToken;
         JArray: JsonArray;
     begin
@@ -377,7 +373,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         if NpIaItemAddOnLineTmp.FindSet() then begin
             repeat
                 InsertPOSAddOnLine(NpIaItemAddOnLineTmp, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS);
-            until NpIaItemAddOnLineTmp.Next = 0;
+            until NpIaItemAddOnLineTmp.Next() = 0;
 
             if SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo) then
                 POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
@@ -400,7 +396,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
             FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
             SaleLinePOSAddOn.SetRange("Sale Line No.");
             SaleLinePOSAddOn.SetRange("Applies-to Line No.", AppliesToLineNo);
-            if SaleLinePOSAddOn.FindLast then begin
+            if SaleLinePOSAddOn.FindLast() then begin
                 SaleLinePOS.Get(
                   SaleLinePOSAddOn."Register No.",
                   SaleLinePOSAddOn."Sales Ticket No.",
@@ -433,10 +429,10 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
             POSSaleLine.ForceInsertWithAutoSplitKey(false);
 
             FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
-            if not SaleLinePOSAddOn.FindLast then
+            if not SaleLinePOSAddOn.FindLast() then
                 SaleLinePOSAddOn."Line No." := 0;
             LineNo := SaleLinePOSAddOn."Line No." + 10000;
-            SaleLinePOSAddOn.Init;
+            SaleLinePOSAddOn.Init();
             SaleLinePOSAddOn."Register No." := SaleLinePOS."Register No.";
             SaleLinePOSAddOn."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             SaleLinePOSAddOn."Sale Type" := SaleLinePOS."Sale Type";
@@ -494,7 +490,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
         POSInfoTransaction.SetRange("Register No.", SaleLinePOS."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        if POSInfoTransaction.FindLast then;
+        if POSInfoTransaction.FindLast() then;
         EntryNo := POSInfoTransaction."Entry No.";
 
         Clear(POSInfoTransaction);
@@ -503,8 +499,8 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
         POSInfoTransaction.SetRange("Sale Date", SaleLinePOS.Date);
-        if POSInfoTransaction.FindFirst then
-            POSInfoTransaction.DeleteAll;
+        if POSInfoTransaction.FindFirst() then
+            POSInfoTransaction.DeleteAll();
 
         Comment := GetValueAsString(AddOnLine, 'comment');
         if Comment = '' then
@@ -859,7 +855,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
                    ItemVariantIsRequired(NpIaItemAddOnLine."Item No.")
                 then begin
                     ItemVariantRequestBuffer := NpIaItemAddOnLine;
-                    ItemVariantRequestBuffer.Insert;
+                    ItemVariantRequestBuffer.Insert();
                 end;
             until NpIaItemAddOnLine.Next() = 0;
 

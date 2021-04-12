@@ -31,7 +31,7 @@ table 6014555 "NPR Attribute Value Set"
             begin
                 tmpTextValue := Format("Text Value");
                 AttributeManager.SetAttributeValue("Attribute Set ID", "Attribute Code", tmpTextValue, Rec);
-                // Rec.GET ("Attribute Set ID", "Attribute Code");
+                // Rec.Get() ("Attribute Set ID", "Attribute Code");
             end;
         }
         field(11; "Datetime Value"; DateTime)
@@ -43,7 +43,7 @@ table 6014555 "NPR Attribute Value Set"
             begin
                 tmpTextValue := Format("Datetime Value");
                 AttributeManager.SetAttributeValue("Attribute Set ID", "Attribute Code", tmpTextValue, Rec);
-                // Rec.GET ("Attribute Set ID", "Attribute Code");
+                // Rec.Get() ("Attribute Set ID", "Attribute Code");
             end;
         }
         field(12; "Numeric Value"; Decimal)
@@ -56,7 +56,7 @@ table 6014555 "NPR Attribute Value Set"
             begin
                 tmpTextValue := Format("Numeric Value");
                 AttributeManager.SetAttributeValue("Attribute Set ID", "Attribute Code", tmpTextValue, Rec);
-                // Rec.GET ("Attribute Set ID", "Attribute Code");
+                // Rec.Get() ("Attribute Set ID", "Attribute Code");
             end;
         }
         field(13; "Boolean Value"; Boolean)
@@ -68,12 +68,12 @@ table 6014555 "NPR Attribute Value Set"
             begin
                 tmpTextValue := Format("Boolean Value");
                 AttributeManager.SetAttributeValue("Attribute Set ID", "Attribute Code", tmpTextValue, Rec);
-                // Rec.GET ("Attribute Set ID", "Attribute Code");
+                // Rec.Get() ("Attribute Set ID", "Attribute Code");
             end;
         }
         field(1000; "Table ID"; Integer)
         {
-            CalcFormula = Lookup ("NPR Attribute Key"."Table ID" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
+            CalcFormula = Lookup("NPR Attribute Key"."Table ID" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'Table ID';
             Description = 'NPR5.37';
             Editable = false;
@@ -81,7 +81,7 @@ table 6014555 "NPR Attribute Value Set"
         }
         field(1005; "MDR Code PK"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Attribute Key"."MDR Code PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
+            CalcFormula = Lookup("NPR Attribute Key"."MDR Code PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'MDR Code PK';
             Description = 'NPR5.37';
             Editable = false;
@@ -89,7 +89,7 @@ table 6014555 "NPR Attribute Value Set"
         }
         field(1010; "MDR Line PK"; Integer)
         {
-            CalcFormula = Lookup ("NPR Attribute Key"."MDR Line PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
+            CalcFormula = Lookup("NPR Attribute Key"."MDR Line PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'MDR Line PK';
             Description = 'NPR5.37';
             Editable = false;
@@ -97,7 +97,7 @@ table 6014555 "NPR Attribute Value Set"
         }
         field(1015; "MDR Option PK"; Integer)
         {
-            CalcFormula = Lookup ("NPR Attribute Key"."MDR Option PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
+            CalcFormula = Lookup("NPR Attribute Key"."MDR Option PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'MDR Option PK';
             Description = 'NPR5.37';
             Editable = false;
@@ -105,7 +105,7 @@ table 6014555 "NPR Attribute Value Set"
         }
         field(1020; "MDR Code 2 PK"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Attribute Key"."MDR Code 2 PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
+            CalcFormula = Lookup("NPR Attribute Key"."MDR Code 2 PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'MDR Code 2 PK';
             Description = 'NPR5.37';
             Editable = false;
@@ -113,7 +113,7 @@ table 6014555 "NPR Attribute Value Set"
         }
         field(1025; "MDR Line 2 PK"; Integer)
         {
-            CalcFormula = Lookup ("NPR Attribute Key"."MDR Line 2 PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
+            CalcFormula = Lookup("NPR Attribute Key"."MDR Line 2 PK" WHERE("Attribute Set ID" = FIELD("Attribute Set ID")));
             Caption = 'MDR Line 2 PK';
             Description = 'NPR5.37';
             Editable = false;

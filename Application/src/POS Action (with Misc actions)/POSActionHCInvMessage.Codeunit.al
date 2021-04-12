@@ -16,22 +16,21 @@ codeunit 6150914 "NPR POS Action: HC Inv.Message"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterBooleanParameter('ShowList', false);
-                RegisterBooleanParameter('UseShopLocationAsFilter', false);
-                RegisterTextParameter('ExternalLocationFilter', '');
+            Sender.RegisterBooleanParameter('ShowList', false);
+            Sender.RegisterBooleanParameter('UseShopLocationAsFilter', false);
+            Sender.RegisterTextParameter('ExternalLocationFilter', '');
 
-            end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -48,7 +47,7 @@ codeunit 6150914 "NPR POS Action: HC Inv.Message"
         ResponseText: array[4] of Text;
         ExtLocationFilter: Text;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;

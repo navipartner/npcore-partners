@@ -1,4 +1,4 @@
-codeunit 6014610 "NPR Tax Free Handler Mgt."
+﻿codeunit 6014610 "NPR Tax Free Handler Mgt."
 {
     // All tax free handlers implement the publishers in this codeunit.
     // 
@@ -25,7 +25,6 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         Error_VoucherIsVoided: Label 'This voucher has already been voided';
         Caption_Void: Label 'Void existing voucher';
         Caption_VoidSucces: Label 'Voucher %1 was voided successfully';
-        Caption_EnvironmentWarning: Label 'WARNING:\The current environment is not set to production, but this tax free operation will impact an external service running in production!\Continue?';
 
         #region Replacing assert error
         ConstructorSet: Boolean;
@@ -44,7 +43,6 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     var
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
         Handled: Boolean;
-        JSON: Text;
         TaxFreeHandlerParameters: Page "NPR Tax Free Gen. Handl. Param";
     begin
         Constructor(TaxFreeUnit."Handler ID Enum");
@@ -55,18 +53,18 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         if tmpHandlerParameter.IsEmpty then
             exit;
 
-        if TaxFreeUnit."Handler Parameters".HasValue then
+        if TaxFreeUnit."Handler Parameters".HasValue() then
             tmpHandlerParameter.DeserializeParameterBLOB(TaxFreeUnit);
 
         TaxFreeHandlerParameters.Editable(true);
         TaxFreeHandlerParameters.SetRec(tmpHandlerParameter);
-        if TaxFreeHandlerParameters.RunModal <> ACTION::OK then
+        if TaxFreeHandlerParameters.RunModal() <> ACTION::OK then
             exit;
 
         TaxFreeHandlerParameters.GetRec(tmpHandlerParameter);
 
         tmpHandlerParameter.SerializeParameterBLOB(TaxFreeUnit);
-        TaxFreeUnit.Modify;
+        TaxFreeUnit.Modify();
     end;
 
     #region Tax Free Actions
@@ -152,9 +150,9 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if TaxFreeRequest.Success and (not SkipRecordHandling) then begin
-            tmpTaxFreeVoucherSaleLink.Init;
+            tmpTaxFreeVoucherSaleLink.Init();
             tmpTaxFreeVoucherSaleLink."Sales Ticket No." := ReceiptNo;
-            tmpTaxFreeVoucherSaleLink.Insert;
+            tmpTaxFreeVoucherSaleLink.Insert();
 
             CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
         end;
@@ -199,12 +197,12 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         TaxFreeUnit.Get(TaxFreeVoucher."POS Unit No.");
 
         TaxFreeVoucherSaleLink.SetRange("Voucher Entry No.", TaxFreeVoucher."Entry No.");
-        TaxFreeVoucherSaleLink.FindSet;
+        TaxFreeVoucherSaleLink.FindSet();
         repeat
-            tmpTaxFreeVoucherSaleLink.Init;
+            tmpTaxFreeVoucherSaleLink.Init();
             tmpTaxFreeVoucherSaleLink.TransferFields(TaxFreeVoucherSaleLink);
-            tmpTaxFreeVoucherSaleLink.Insert;
-        until TaxFreeVoucherSaleLink.Next = 0;
+            tmpTaxFreeVoucherSaleLink.Insert();
+        until TaxFreeVoucherSaleLink.Next() = 0;
 
         CreateRequest('VOUCHER_REISSUE', TaxFreeUnit, TaxFreeRequest);
 
@@ -275,9 +273,6 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         TaxFreeRequest: Record "NPR Tax Free Request";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        POSSetup: Codeunit "NPR POS Setup";
         RecRef: RecordRef;
     begin
         //Single instance codeunit contains the last tax free voucher from this user session - for integrations where you should not always be able to re-print any voucher, only the recent last.
@@ -310,16 +305,15 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     procedure VoucherConsolidate(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
     var
         Handled: Boolean;
-        Success: Boolean;
         TaxFreeRequest: Record "NPR Tax Free Request";
         tmpTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
     begin
         CreateRequest('VOUCHER_CONSOLIDATE', TaxFreeUnit, TaxFreeRequest);
 
-        if not tmpTaxFreeConsolidation.FindSet then
+        if not tmpTaxFreeConsolidation.FindSet() then
             exit;
 
-        if tmpTaxFreeConsolidation.Count = 1 then begin //Normal voucher issue flow instead.
+        if tmpTaxFreeConsolidation.Count() = 1 then begin //Normal voucher issue flow instead.
             VoucherIssueFromPOSSale(tmpTaxFreeConsolidation."Sales Ticket No.");
             exit;
         end;
@@ -329,14 +323,14 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if TaxFreeRequest.Success then begin
-            tmpTaxFreeConsolidation.FindSet;
+            tmpTaxFreeConsolidation.FindSet();
             repeat
-                tmpTaxFreeVoucherSaleLink.Init;
+                tmpTaxFreeVoucherSaleLink.Init();
                 tmpTaxFreeVoucherSaleLink."Sales Ticket No." := tmpTaxFreeConsolidation."Sales Ticket No.";
                 tmpTaxFreeVoucherSaleLink."Sales Header No." := tmpTaxFreeConsolidation."Sales Header No.";
                 tmpTaxFreeVoucherSaleLink."Sales Header Type" := tmpTaxFreeConsolidation."Sales Header Type";
-                tmpTaxFreeVoucherSaleLink.Insert;
-            until tmpTaxFreeConsolidation.Next = 0;
+                tmpTaxFreeVoucherSaleLink.Insert();
+            until tmpTaxFreeConsolidation.Next() = 0;
 
             CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
         end;
@@ -401,11 +395,11 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         TaxFreeVoucher.SetRange(Void, false);
         TaxFreeVoucherSaleLink.SetCurrentKey("Sales Ticket No.");
         TaxFreeVoucherSaleLink.SetRange("Sales Ticket No.", ReceiptNo);
-        if TaxFreeVoucherSaleLink.FindSet then
+        if TaxFreeVoucherSaleLink.FindSet() then
             repeat
                 TaxFreeVoucher.SetRange("Entry No.", TaxFreeVoucherSaleLink."Voucher Entry No.");
-                Result := TaxFreeVoucher.FindFirst;
-            until (TaxFreeVoucherSaleLink.Next = 0) or Result;
+                Result := TaxFreeVoucher.FindFirst();
+            until (TaxFreeVoucherSaleLink.Next() = 0) or Result;
         exit(Result);
     end;
 
@@ -415,7 +409,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         i: Integer;
         Value: Text;
     begin
-        for i := 1 to ListOfText.Count do begin
+        for i := 1 to ListOfText.Count() do begin
             ListOfText.Get(i, Value);
             if not ChecklistList.Contains(Value) then
                 ChecklistList.Add(Value);
@@ -439,10 +433,10 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
     begin
         TaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
-        TaxFreeVoucher.Init;
+        TaxFreeVoucher.Init();
         TaxFreeVoucher."External Voucher Barcode" := TaxFreeRequest."External Voucher Barcode";
         TaxFreeVoucher."External Voucher No." := TaxFreeRequest."External Voucher No.";
-        TaxFreeVoucher."Issued Date" := Today;
+        TaxFreeVoucher."Issued Date" := Today();
         TaxFreeVoucher."Issued Time" := Time;
         TaxFreeVoucher."Issued By User" := UserId;
         TaxFreeVoucher."Print Type" := TaxFreeRequest."Print Type";
@@ -457,15 +451,15 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
             TaxFreeVoucher.Print := TaxFreeRequest.Print;
         TaxFreeVoucher.Insert(true);
 
-        tmpTaxFreeVoucherSaleLink.FindSet;
+        tmpTaxFreeVoucherSaleLink.FindSet();
         repeat
-            TaxFreeVoucherSaleLink.Init;
+            TaxFreeVoucherSaleLink.Init();
             TaxFreeVoucherSaleLink.TransferFields(tmpTaxFreeVoucherSaleLink);
             TaxFreeVoucherSaleLink.Validate("Voucher Entry No.", TaxFreeVoucher."Entry No.");
             TaxFreeVoucherSaleLink.Insert(true);
-        until tmpTaxFreeVoucherSaleLink.Next = 0;
+        until tmpTaxFreeVoucherSaleLink.Next() = 0;
 
-        Commit;  //COMMIT data before print is attempted in case of error.
+        Commit();  //COMMIT data before print is attempted in case of error.
 
         TempBlob.FromRecord(TaxFreeRequest, TaxFreeRequest.FieldNo(Print));
         TaxFreeLastVoucher.SetVoucher(TaxFreeVoucher."Entry No.", TempBlob, TaxFreeRequest."Print Type");
@@ -476,10 +470,10 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     begin
         TaxFreeVoucher.Void := true;
         TaxFreeVoucher."Voided By User" := UserId;
-        TaxFreeVoucher."Voided Date" := Today;
+        TaxFreeVoucher."Voided Date" := Today();
         TaxFreeVoucher."Voided Time" := Time;
         TaxFreeVoucher.Modify(true);
-        Commit;
+        Commit();
 
         if not Silent then
             Message(Caption_VoidSucces, TaxFreeVoucher."External Voucher No.");
@@ -491,10 +485,10 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
     begin
-        Request.Init;
+        Request.Init();
         Request."User ID" := UserId;
         Request."Request Type" := RequestType;
-        Request."Date Start" := Today;
+        Request."Date Start" := Today();
         Request."Time Start" := Time;
         Request.Mode := TaxFreeUnit.Mode;
         Request."Timeout (ms)" := TaxFreeUnit."Request Timeout (ms)";
@@ -536,11 +530,11 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         if (TaxFreeUnit."Log Level" = TaxFreeUnit."Log Level"::ERROR) and TaxFreeRequest.Success then
             exit;
 
-        TaxFreeRequest."Date End" := Today;
+        TaxFreeRequest."Date End" := Today();
         TaxFreeRequest."Time End" := Time;
         TaxFreeRequest.Insert(true);
 
-        Commit;
+        Commit();
     end;
 
     local procedure ShowError(ErrorMessage: Text)
@@ -575,7 +569,6 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     var
         POSEntry: Record "NPR POS Entry";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
-        TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -584,7 +577,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
 
         POSEntry.SetRange("POS Unit No.", SalePOS."Register No.");
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        if not POSEntry.FindFirst then
+        if not POSEntry.FindFirst() then
             exit;
 
         if not SalePOS."Issue Tax Free Voucher" then
@@ -593,7 +586,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         if not TaxFreeUnit.Get(SalePOS."Register No.") then
             exit;
 
-        Commit;
+        Commit();
 
         VoucherIssueFromPOSSale(SalePOS."Sales Ticket No.");
     end;

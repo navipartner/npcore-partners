@@ -72,17 +72,15 @@ report 6014414 "NPR Item Sales Statistics"
                     if not TempItem.Get("Item No.") then
                         CurrReport.Skip();
 
-                with TempLoopItem do begin
-                    if Get("Item No.", 1) then begin
-                        "Decimal 1" += Quantity;
-                        Modify();
-                    end else begin
-                        Init;
-                        Template := "Item No.";
-                        "Line No." := 1;
-                        "Decimal 1" := Quantity;
-                        Insert();
-                    end;
+                if TempLoopItem.Get("Item No.", 1) then begin
+                    TempLoopItem."Decimal 1" += Quantity;
+                    TempLoopItem.Modify();
+                end else begin
+                    TempLoopItem.Init();
+                    TempLoopItem.Template := "Item No.";
+                    TempLoopItem."Line No." := 1;
+                    TempLoopItem."Decimal 1" := Quantity;
+                    TempLoopItem.Insert();
                 end;
             end;
         }

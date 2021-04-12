@@ -1,4 +1,4 @@
-codeunit 6014439 "NPR MM Member Create Demo Data"
+﻿codeunit 6014439 "NPR MM Member Create Demo Data"
 {
     procedure CreateDemoData(DeleteCurrentSetup: Boolean)
     var
@@ -9,7 +9,6 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
-        TicketSetup: Record "NPR TM Ticket Setup";
         TicketType: Record "NPR TM Ticket Type";
         MemberCommunity: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -93,26 +92,18 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         CreateNoSerie('TM-PK10', 'TM-PK10000');
         CreateNoSerie('TM-PK20', 'TM-PK2000000000');
 
-        with Admission do begin
-            TicketDemo.CreateAdmissionCode('MM-CASTLE', 'The Castle', Type::LOCATION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::TODAY);
-        end;
+        TicketDemo.CreateAdmissionCode('MM-CASTLE', 'The Castle', Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
 
-        with AdmissionSchedule do begin
-            TicketDemo.CreateSchedule('MM-WEEKDAYS', "Schedule Type"::LOCATION, "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, true, true, true, true, true, false, false);
-            TicketDemo.CreateSchedule('MM-WEEKENDS', "Schedule Type"::LOCATION, "Admission Is"::OPEN, TODAY, "Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, false, false, false, false, false, true, true);
-        end;
+        TicketDemo.CreateSchedule('MM-WEEKDAYS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, true, true, true, true, true, false, false);
+        TicketDemo.CreateSchedule('MM-WEEKENDS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, false, false, false, false, false, true, true);
 
         AllowAdmissionBeforeStart := 15;
         AllowAdmissionAfterStart := 5;
 
-        with ScheduleLine do begin
-            TicketDemo.CreateScheduleLine('MM-CASTLE', 'MM-WEEKDAYS', 1, false, 17, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-            TicketDemo.CreateScheduleLine('MM-CASTLE', 'MM-WEEKENDS', 1, false, 23, "Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
-        end;
+        TicketDemo.CreateScheduleLine('MM-CASTLE', 'MM-WEEKDAYS', 1, false, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
+        TicketDemo.CreateScheduleLine('MM-CASTLE', 'MM-WEEKENDS', 1, false, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-        with TicketType do begin
-            TicketType.Get(TicketDemo.CreateTicketType('MM-AUTO', 'Auto admit ticket', '<+7D>', 0, "Admission Registration"::INDIVIDUAL, "Activation Method"::POS_DEFAULT, "Ticket Entry Validation"::SINGLE, "Ticket Configuration Source"::TICKET_BOM));
-        end;
+        TicketType.Get(TicketDemo.CreateTicketType('MM-AUTO', 'Auto admit ticket', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
 
         // Single ticket same day
         TicketDemo.CreateItem('320100-0', '', 'MM-AUTO', 'Member Ticket', 0);
@@ -120,12 +111,10 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         TicketDemo.CreateItem('320100-2', '', 'MM-AUTO', 'Child Guest Ticket', 0);
         TicketDemo.CreateItem('320100-3', '', 'MM-AUTO', 'Senior Guesy Ticket', 0);
 
-        with TicketBom do begin
-            TicketDemo.CreateTicketBOM('320100-0', '', 'MM-CASTLE', '', 1, true, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            TicketDemo.CreateTicketBOM('320100-1', '', 'MM-CASTLE', '', 1, true, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            TicketDemo.CreateTicketBOM('320100-2', '', 'MM-CASTLE', '', 1, true, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-            TicketDemo.CreateTicketBOM('320100-3', '', 'MM-CASTLE', '', 1, true, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
-        end;
+        TicketDemo.CreateTicketBOM('320100-0', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        TicketDemo.CreateTicketBOM('320100-1', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        TicketDemo.CreateTicketBOM('320100-2', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        TicketDemo.CreateTicketBOM('320100-3', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
         MembershipSetup.Get('GOLD');
         MembershipSetup."Ticket Item Barcode" := 'IXRF-320100-0';
@@ -146,16 +135,14 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         MemberInfo: Record "NPR MM Member Info Capture";
         SalesSetup: Record "NPR MM Members. Sales Setup";
     begin
-        with MemberInfo do begin
-            "Item No." := '320100';
-            "First Name" := 'Bathson';
-            "Last Name" := 'Jenkinsdal';
-            "E-Mail Address" := 'bj@test.navipartner.dk';
-            Address := 'Serene Street';
-            City := 'Deschutes River Woods';
-            Birthday := DMY2Date(Random(27) + 1, Random(11) + 1, 2001 - Random(45));
-            "Document Date" := Today();
-        end;
+        MemberInfo."Item No." := '320100';
+        MemberInfo."First Name" := 'Bathson';
+        MemberInfo."Last Name" := 'Jenkinsdal';
+        MemberInfo."E-Mail Address" := 'bj@test.navipartner.dk';
+        MemberInfo.Address := 'Serene Street';
+        MemberInfo.City := 'Deschutes River Woods';
+        MemberInfo.Birthday := DMY2Date(Random(27) + 1, Random(11) + 1, 2001 - Random(45));
+        MemberInfo."Document Date" := Today();
         MemberInfo.Insert();
 
         if (SalesSetup.get(SalesSetup.type::ITEM, '320100')) then
@@ -175,7 +162,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
         EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
@@ -228,7 +215,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
@@ -281,7 +268,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
             MembershipSalesSetup.Insert();
         end;
 
-        MembershipSalesSetup.INIT;
+        MembershipSalesSetup.Init();
 
         MembershipSalesSetup."Business Flow Type" := MembershipSalesSetup."Business Flow Type"::MEMBERSHIP;
 
@@ -307,7 +294,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
@@ -334,7 +321,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
@@ -356,16 +343,15 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        with AlterationSetup do
-            CreateCancelSetup(CurrentMembershipCode, SalesItemNo,
-              NEwDescription,
-              AlterationSetup."Alteration Activate From"::ASAP,
-              '',          // AlterationSetup."Alteration Date Formula"
-              false,       // AlterationSetup."Activate Grace Period"
-              AlterationSetup."Grace Period Relates To"::START_DATE,
-              '',          // AlterationSetup."Grace Period Before",
-              '',          // AlterationSetup."Grace Period After",
-              AlterationSetup."Price Calculation"::UNIT_PRICE);
+        CreateCancelSetup(CurrentMembershipCode, SalesItemNo,
+  NEwDescription,
+  AlterationSetup."Alteration Activate From"::ASAP,
+  '',          // AlterationSetup."Alteration Date Formula"
+  false,       // AlterationSetup."Activate Grace Period"
+  AlterationSetup."Grace Period Relates To"::START_DATE,
+  '',          // AlterationSetup."Grace Period Before",
+  '',          // AlterationSetup."Grace Period After",
+  AlterationSetup."Price Calculation"::UNIT_PRICE);
     end;
 
     procedure SetupExtend(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text);
@@ -373,19 +359,18 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        with AlterationSetup do
-            CreateExtendSetup(CurrentMembershipCode, SalesItemNo,
-              NewDescription,
-              NewMembershipCode,
-              AlterationSetup."Alteration Activate From"::ASAP,
-              '',          // AlterationSetup."Alteration Date Formula"
-              false,       // AlterationSetup."Activate Grace Period"
-              AlterationSetup."Grace Period Relates To"::START_DATE,
-              '',          // AlterationSetup."Grace Period Before",
-              '',          // AlterationSetup."Grace Period After",
-              NewDuration, // AlterationSetup."Membership Duration"
-              AlterationSetup."Price Calculation"::UNIT_PRICE,
-              false);      // AlterationSetup."Stacking Allowed"
+        CreateExtendSetup(CurrentMembershipCode, SalesItemNo,
+  NewDescription,
+  NewMembershipCode,
+  AlterationSetup."Alteration Activate From"::ASAP,
+  '',          // AlterationSetup."Alteration Date Formula"
+  false,       // AlterationSetup."Activate Grace Period"
+  AlterationSetup."Grace Period Relates To"::START_DATE,
+  '',          // AlterationSetup."Grace Period Before",
+  '',          // AlterationSetup."Grace Period After",
+  NewDuration, // AlterationSetup."Membership Duration"
+  AlterationSetup."Price Calculation"::UNIT_PRICE,
+  false);      // AlterationSetup."Stacking Allowed"
     end;
 
     procedure SetupMembership_Demo(CommunityCode: Code[20]; MembershipCode: Code[20]; LoyaltyCode: Code[20]; NewDescription: Text): Code[20];
@@ -393,20 +378,19 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
 
-        with MembershipSetup do
-            exit(CreateLoyaltyMembershipSetup(MembershipCode,
-              NewDescription,
-              CommunityCode,
-              MembershipSetup."Membership Type"::GROUP,
-              LoyaltyCode,
-              MembershipSetup."Loyalty Card"::YES,
-              MembershipSetup."Member Information"::NAMED,
-              false, // Perpetual
-              MembershipSetup."Member Role Assignment"::FIRST_IS_ADMIN,
-              2,
-              true,
-              true,
-              'MC-DEMO01'));
+        exit(CreateLoyaltyMembershipSetup(MembershipCode,
+  NewDescription,
+  CommunityCode,
+  MembershipSetup."Membership Type"::GROUP,
+  LoyaltyCode,
+  MembershipSetup."Loyalty Card"::YES,
+  MembershipSetup."Member Information"::NAMED,
+  false, // Perpetual
+  MembershipSetup."Member Role Assignment"::FIRST_IS_ADMIN,
+  2,
+  true,
+  true,
+  'MC-DEMO01'));
     end;
 
     procedure SetupRenew_NoGraceNotStackable(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDescription: Text);
@@ -414,19 +398,18 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        with AlterationSetup do
-            CreateRenewSetup(CurrentMembershipCode, SalesItemNo,
-              NewDescription,
-              NewMembershipCode,
-              AlterationSetup."Alteration Activate From"::ASAP,
-              '',          // AlterationSetup."Alteration Date Formula"
-              false,       // AlterationSetup."Activate Grace Period"
-              AlterationSetup."Grace Period Relates To"::START_DATE,
-              '',          // AlterationSetup."Grace Period Before",
-              '',          // AlterationSetup."Grace Period After",
-              '<+1Y-1D>',  // AlterationSetup."Membership Duration"
-              AlterationSetup."Price Calculation"::UNIT_PRICE,
-              false);      // AlterationSetup."Stacking Allowed"
+        CreateRenewSetup(CurrentMembershipCode, SalesItemNo,
+  NewDescription,
+  NewMembershipCode,
+  AlterationSetup."Alteration Activate From"::ASAP,
+  '',          // AlterationSetup."Alteration Date Formula"
+  false,       // AlterationSetup."Activate Grace Period"
+  AlterationSetup."Grace Period Relates To"::START_DATE,
+  '',          // AlterationSetup."Grace Period Before",
+  '',          // AlterationSetup."Grace Period After",
+  '<+1Y-1D>',  // AlterationSetup."Membership Duration"
+  AlterationSetup."Price Calculation"::UNIT_PRICE,
+  false);      // AlterationSetup."Stacking Allowed"
     end;
 
     procedure SetupSimpleMembershipSalesItem(ItemNo: Code[20]; MembershipCode: Code[20]);
@@ -448,19 +431,18 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        with AlterationSetup do
-            CreateUpgradeSetup(CurrentMembershipCode, SalesItemNo,
-              NewDescription,
-              NewMembershipCode,
-              AlterationSetup."Alteration Activate From"::ASAP,
-              '',          // AlterationSetup."Alteration Date Formula"
-              false,       // AlterationSetup."Activate Grace Period"
-              AlterationSetup."Grace Period Relates To"::START_DATE,
-              '',          // AlterationSetup."Grace Period Before",
-              '',          // AlterationSetup."Grace Period After",
-              NewDuration, // AlterationSetup."Membership Duration"
-              AlterationSetup."Price Calculation"::UNIT_PRICE,
-              false);      // AlterationSetup."Stacking Allowed"
+        CreateUpgradeSetup(CurrentMembershipCode, SalesItemNo,
+  NewDescription,
+  NewMembershipCode,
+  AlterationSetup."Alteration Activate From"::ASAP,
+  '',          // AlterationSetup."Alteration Date Formula"
+  false,       // AlterationSetup."Activate Grace Period"
+  AlterationSetup."Grace Period Relates To"::START_DATE,
+  '',          // AlterationSetup."Grace Period Before",
+  '',          // AlterationSetup."Grace Period After",
+  NewDuration, // AlterationSetup."Membership Duration"
+  AlterationSetup."Price Calculation"::UNIT_PRICE,
+  false);      // AlterationSetup."Stacking Allowed"
     end;
 
     procedure SetupWalletNotification(NotificationCode: Code[10]; CommunityCode: Code[20]; MembershipCode: Code[20]; TriggerType: option CREATE,UPDATE);
@@ -626,7 +608,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
             MemberCommunity.Insert();
         end;
 
-        MemberCommunity.INIT;
+        MemberCommunity.Init();
         MemberCommunity.Description := Description;
         MemberCommunity.VALIDATE("External Membership No. Series", MembershipNoSeries);
         MemberCommunity.VALIDATE("External Member No. Series", MemberNoSeries);
@@ -651,7 +633,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
     begin
 
         if (not ConfigTemplateHeader.Get(TemplateCode)) then begin
-            ConfigTemplateHeader.INIT;
+            ConfigTemplateHeader.Init();
             ConfigTemplateHeader.Code := TemplateCode;
             ConfigTemplateHeader.Description := 'Customer created from membership';
             ConfigTemplateHeader.VALIDATE("Table ID", DATABASE::Customer);
@@ -732,7 +714,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
             MembershipSetup.Insert();
         end;
 
-        MembershipSetup.INIT;
+        MembershipSetup.Init();
 
         MembershipSetup.Description := Description;
         MembershipSetup."Customer Config. Template Code" := '';
@@ -844,10 +826,6 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
 
 
     local procedure CreateSimpleCustomerTemplate(): Code[10];
-    var
-        ConfigTemplateHeader: Record "Config. Template Header";
-        ConfigTemplateLine: Record "Config. Template Line";
-        Customer: Record Customer;
     begin
 
         exit(CreateDemoCustomerTemplate(GenerateCode10()));
@@ -912,17 +890,16 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         MemberCommunity: Record "NPR MM Member Community";
     begin
 
-        with MemberCommunity do
-            exit(CreateCommunitySetup(CommunityCode,
-              "External No. Search Order"::CARDNO,
-              "Member Unique Identity"::EMAIL,
-              "Create Member UI Violation"::ERROR,
-              "Member Logon Credentials"::MEMBER_UNIQUE_ID,
-              false,
-              true,
-              NewDescription,
-              'MS-DEMO01',
-              'MM-DEMO01'));
+        exit(CreateCommunitySetup(CommunityCode,
+  MemberCommunity."External No. Search Order"::CARDNO,
+  MemberCommunity."Member Unique Identity"::EMAIL,
+  MemberCommunity."Create Member UI Violation"::ERROR,
+  MemberCommunity."Member Logon Credentials"::MEMBER_UNIQUE_ID,
+  false,
+  true,
+  NewDescription,
+  'MS-DEMO01',
+  'MM-DEMO01'));
     end;
 
 

@@ -115,7 +115,7 @@ table 6014429 "NPR Retail Comment"
         BemLinie.SetRange(Integer, Integer);
         BemLinie.SetRange("Integer 2", "Integer 2");
         if not BemLinie.Find('-') then
-            Date := WorkDate;
+            Date := WorkDate();
     end;
 
     procedure Copylines(var from1: Record "NPR Retail Comment")

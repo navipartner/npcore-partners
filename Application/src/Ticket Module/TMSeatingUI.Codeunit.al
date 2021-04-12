@@ -15,7 +15,6 @@ codeunit 6151131 "NPR TM Seating UI"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Model: DotNet NPRNetModel;
         ActiveModelID: Guid;
-        Iteration: Integer;
         ReservationUpdateEntryNo: Integer;
         ShowExtAdmSchEntryNo: Integer;
         EditReservation: Boolean;
@@ -68,7 +67,6 @@ codeunit 6151131 "NPR TM Seating UI"
 
     procedure ShowSelectSeatUI(POSFrontEnd: Codeunit "NPR POS Front End Management"; Token: Text[100]; EditCurrentReservation: Boolean)
     var
-        TmpSeatingReservationEntry: Record "NPR TM Seating Reserv. Entry" temporary;
         ShowUI: Boolean;
     begin
 
@@ -81,8 +79,6 @@ codeunit 6151131 "NPR TM Seating UI"
     end;
 
     procedure ShowUIAdmissionScheduleEntry(POSFrontEnd: Codeunit "NPR POS Front End Management"; ExtAdmScheduleEntryNo: Integer; EditCurrentReservation: Boolean): Boolean
-    var
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin
 
         EditReservation := EditCurrentReservation;
@@ -175,16 +171,10 @@ codeunit 6151131 "NPR TM Seating UI"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', true, true)]
     local procedure OnUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ResponseMessage: Text;
         ResponseCode: Integer;
-        seatNo: Integer;
         ShowUI: Boolean;
-        ReceiptNo: Code[20];
-        ReceiptLineNo: Integer;
     begin
 
         if ModelID <> ActiveModelID then
@@ -543,14 +533,13 @@ codeunit 6151131 "NPR TM Seating UI"
         exit(SvGText);
     end;
 
-    local procedure Javascript() JsText: Text
+    local procedure Javascript(): Text
     begin
     end;
 
     local procedure LoadSVGForAdmSchEntry(ExtAdmScheduleEntryNo: Integer) SVG: Text
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        SeatingTemplate: Record "NPR TM Seating Template";
         WebClientDependency: Record "NPR Web Client Dependency";
         SeatingSetup: Record "NPR TM Seating Setup";
         SvgCode: Code[10];
@@ -580,7 +569,7 @@ codeunit 6151131 "NPR TM Seating UI"
         SVG := CreateSeatingTemplate(ExtAdmScheduleEntryNo);
 
         if (SvgCode <> '') then begin
-            WebClientDependency.Init;
+            WebClientDependency.Init();
             WebClientDependency.Type := WebClientDependency.Type::SVG;
 
             WebClientDependency.Code := SvgCode;
@@ -596,19 +585,19 @@ codeunit 6151131 "NPR TM Seating UI"
         exit(SVG);
     end;
 
-    local procedure UpdateSeatReservationList(ExtAdmScheduleEntryNo: Integer) JavaScriptFunction: Text
+    local procedure UpdateSeatReservationList(ExtAdmScheduleEntryNo: Integer): Text
     begin
 
         exit(GetSeatReservationList(ExtAdmScheduleEntryNo, ReservationUpdateEntryNo));
     end;
 
-    local procedure CreateInitialSeatReservationList(ExtAdmScheduleEntryNo: Integer) JavaScriptFunction: Text
+    local procedure CreateInitialSeatReservationList(ExtAdmScheduleEntryNo: Integer): Text
     begin
 
         exit(GetSeatReservationList(ExtAdmScheduleEntryNo, 0));
     end;
 
-    local procedure GetSeatReservationList(ExtAdmScheduleEntryNo: Integer; ReservationUpdateEntryNo: Integer) JavaScriptFunction: Text
+    local procedure GetSeatReservationList(ExtAdmScheduleEntryNo: Integer; ReservationUpdateEntryNo: Integer): Text
     var
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         CSV: Text;
@@ -634,7 +623,7 @@ codeunit 6151131 "NPR TM Seating UI"
         exit(StrSubstNo('reserveSeats ("%1");', CSV));
     end;
 
-    local procedure GetSeatReservationEditList(EditMode: Boolean) JavaScriptFunction: Text
+    local procedure GetSeatReservationEditList(EditMode: Boolean): Text
     var
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         CSV: Text;
@@ -658,7 +647,7 @@ codeunit 6151131 "NPR TM Seating UI"
         exit(StrSubstNo('editReservedSeats ("%1");', CSV));
     end;
 
-    local procedure GetSeatDisabledList(ExtAdmScheduleEntryNo: Integer) JavaScriptFunction: Text
+    local procedure GetSeatDisabledList(ExtAdmScheduleEntryNo: Integer): Text
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingTemplate: Record "NPR TM Seating Template";
@@ -692,7 +681,6 @@ codeunit 6151131 "NPR TM Seating UI"
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         JObject: DotNet NPRNetJObject;
-        ElementId: Integer;
         SeatId: Text;
         SeatList: Text;
     begin
@@ -747,7 +735,7 @@ codeunit 6151131 "NPR TM Seating UI"
         exit(JToken.ToString());
     end;
 
-    local procedure NextElement(var VarLineOfText: Text) rField: Text
+    local procedure NextElement(var VarLineOfText: Text): Text
     begin
 
         exit(ForwardTokenizer(VarLineOfText, ',', '"'));
@@ -755,8 +743,6 @@ codeunit 6151131 "NPR TM Seating UI"
 
     local procedure ForwardTokenizer(var VarText: Text; PSeparator: Char; PQuote: Char) RField: Text[1024]
     var
-        Separator: Char;
-        Quote: Char;
         IsQuoted: Boolean;
         InputText: Text[1024];
         NextFieldPos: Integer;
@@ -814,10 +800,6 @@ codeunit 6151131 "NPR TM Seating UI"
 
     local procedure CreateSeatingTest(rows: Integer; cols: Integer) SeatText: Text
     var
-        width: Integer;
-        height: Integer;
-        rx: Integer;
-        ry: Integer;
         a: Integer;
         b: Integer;
         ViewPort: Decimal;
@@ -827,10 +809,6 @@ codeunit 6151131 "NPR TM Seating UI"
         if (rows > cols) then
             ViewPort := rows * 50;
 
-        width := 25;
-        height := 25;
-        rx := 5;
-        ry := 5;
 
         // small angle approximation of cos (x) is 1-x*x/2 (radians) in the range 0..1 (0..57 degrees)
 

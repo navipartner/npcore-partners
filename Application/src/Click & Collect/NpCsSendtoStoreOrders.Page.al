@@ -16,73 +16,73 @@ page 6151204 "NPR NpCs Send to Store Orders"
         {
             repeater(Group)
             {
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Reference No."; "Reference No.")
+                field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
                 }
-                field("Sell-to Customer Name"; "Sell-to Customer Name")
+                field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sell-to Customer Name field';
                 }
-                field("Workflow Code"; "Workflow Code")
+                field("Workflow Code"; Rec."Workflow Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Workflow Code field';
                 }
-                field("Next Workflow Step"; "Next Workflow Step")
+                field("Next Workflow Step"; Rec."Next Workflow Step")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Next Workflow Step field';
                 }
-                field("From Store Code"; "From Store Code")
+                field("From Store Code"; Rec."From Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the From Store Code field';
                 }
-                field("To Document Type"; "To Document Type")
+                field("To Document Type"; Rec."To Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the To Document Type field';
                 }
-                field("To Document No."; "To Document No.")
+                field("To Document No."; Rec."To Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the To Document No. field';
                 }
-                field("To Store Code"; "To Store Code")
+                field("To Store Code"; Rec."To Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the To Store Code field';
                 }
-                field("Store Stock"; "Store Stock")
+                field("Store Stock"; Rec."Store Stock")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Stock field';
                 }
-                field("Prepaid Amount"; "Prepaid Amount")
+                field("Prepaid Amount"; Rec."Prepaid Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prepaid Amount field';
                 }
-                field("Prepayment Account No."; "Prepayment Account No.")
+                field("Prepayment Account No."; Rec."Prepayment Account No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prepayment Account No. field';
                 }
-                field(LastLogMessage; GetLastLogMessage())
+                field(LastLogMessage; Rec.GetLastLogMessage())
                 {
                     ApplicationArea = All;
                     Caption = 'Last Log Message';
                     ToolTip = 'Specifies the value of the Last Log Message field';
                 }
-                field(LastLogErrorMessage; GetLastLogErrorMessage())
+                field(LastLogErrorMessage; Rec.GetLastLogErrorMessage())
                 {
                     ApplicationArea = All;
                     Caption = 'Last Log Error Message';
@@ -90,72 +90,72 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     StyleExpr = TRUE;
                     ToolTip = 'Specifies the value of the Last Log Error Message field';
                 }
-                field("Processing Status"; "Processing Status")
+                field("Processing Status"; Rec."Processing Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Status field';
                 }
-                field("Processing updated at"; "Processing updated at")
+                field("Processing updated at"; Rec."Processing updated at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing updated at field';
                 }
-                field("Processing updated by"; "Processing updated by")
+                field("Processing updated by"; Rec."Processing updated by")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing updated by field';
                 }
-                field("Customer E-mail"; "Customer E-mail")
+                field("Customer E-mail"; Rec."Customer E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer E-mail field';
                 }
-                field("Customer Phone No."; "Customer Phone No.")
+                field("Customer Phone No."; Rec."Customer Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Phone No. field';
                 }
-                field("Send Notification from Store"; "Send Notification from Store")
+                field("Send Notification from Store"; Rec."Send Notification from Store")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send Notification from Store field';
                 }
-                field("Notify Customer via E-mail"; "Notify Customer via E-mail")
+                field("Notify Customer via E-mail"; Rec."Notify Customer via E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notify Customer via E-mail field';
                 }
-                field("Notify Customer via Sms"; "Notify Customer via Sms")
+                field("Notify Customer via Sms"; Rec."Notify Customer via Sms")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notify Customer via Sms field';
                 }
-                field("Delivery Status"; "Delivery Status")
+                field("Delivery Status"; Rec."Delivery Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delivery Status field';
                 }
-                field("Delivery updated at"; "Delivery updated at")
+                field("Delivery updated at"; Rec."Delivery updated at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delivery updated at field';
                 }
-                field("Delivery updated by"; "Delivery updated by")
+                field("Delivery updated by"; Rec."Delivery updated by")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delivery updated by field';
                 }
-                field("Send Order Module"; "Send Order Module")
+                field("Send Order Module"; Rec."Send Order Module")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send Order Module field';
                 }
-                field("Order Status Module"; "Order Status Module")
+                field("Order Status Module"; Rec."Order Status Module")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Order Status Module field';
                 }
-                field("Post Processing Module"; "Post Processing Module")
+                field("Post Processing Module"; Rec."Post Processing Module")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Processing Module field';
@@ -173,7 +173,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 Caption = 'New';
                 Image = NewDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = New;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Insert';
@@ -257,7 +257,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 {
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
-                    Visible = NOT "Send Notification from Store";
+                    Visible = NOT Rec."Send Notification from Store";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send Notification to Customer action';
 
@@ -297,16 +297,16 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     var
                         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
                     begin
-                        if ("Processing Status" in ["Processing Status"::" ", "Processing Status"::Pending, "Processing Status"::Confirmed]) and
-                          ("Delivery Status" in ["Delivery Status"::" ", "Delivery Status"::Ready])
+                        if (Rec."Processing Status" in [Rec."Processing Status"::" ", Rec."Processing Status"::Pending, Rec."Processing Status"::Confirmed]) and
+                          (Rec."Delivery Status" in [Rec."Delivery Status"::" ", Rec."Delivery Status"::Ready])
                         then begin
-                            if not Confirm(Text002, false, "Document Type", "Document No.") then
+                            if not Confirm(Text002, false, Rec."Document Type", Rec."Document No.") then
                                 exit;
                         end;
                         if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
-                            Message(Text003, "Document Type", "Reference No.")
+                            Message(Text003, Rec."Document Type", Rec."Reference No.")
                         else
-                            Message(Text004, "Document Type", "Reference No.", GetLastErrorText);
+                            Message(Text004, Rec."Document Type", Rec."Reference No.", GetLastErrorText);
 
                         CurrPage.Update(false);
                     end;

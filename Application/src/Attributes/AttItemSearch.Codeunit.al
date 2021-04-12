@@ -1,4 +1,4 @@
-codeunit 6014597 "NPR Att. Item Search"
+﻿codeunit 6014597 "NPR Att. Item Search"
 {
     // NPR5.34/ANEN/20170608 CASE 279662 Support for text search in attributes for item
 
@@ -9,22 +9,15 @@ codeunit 6014597 "NPR Att. Item Search"
 
     procedure SearchTextAttribute(SearchString: Text; AttributeCode: Code[20]; var Items: Record Item) Found: Boolean
     var
-        TableId: Integer;
-        TextValue: Text[250];
-        DateTimeValue: DateTime;
-        BoolValue: Boolean;
-        NumberValue: Decimal;
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         NPRAttributeKey: Record "NPR Attribute Key";
-        TempItemNo: Record Item temporary;
         FilterString: Text;
         Counter: Integer;
     begin
-        TableId := 27;
         if SearchString = '' then exit(false);
 
         Items.MarkedOnly(true);
-        if Items.FindFirst then begin
+        if Items.FindFirst() then begin
             repeat
                 Items.Mark(false);
             until (0 = Items.Next);
@@ -32,11 +25,11 @@ codeunit 6014597 "NPR Att. Item Search"
         Items.MarkedOnly(false);
 
 
-        NPRAttributeValueSet.Reset;
+        NPRAttributeValueSet.Reset();
         FilterString := '@*' + SearchString + '*';
         NPRAttributeValueSet.SetFilter("Text Value", FilterString);
         if (AttributeCode <> '') then NPRAttributeValueSet.SetFilter("Attribute Code", '=%1', AttributeCode);
-        if NPRAttributeValueSet.FindSet then begin
+        if NPRAttributeValueSet.FindSet() then begin
             repeat
                 if NPRAttributeKey.Get(NPRAttributeValueSet."Attribute Set ID") then begin
                     Counter := Counter + 1;

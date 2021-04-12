@@ -1,4 +1,4 @@
-codeunit 6150705 "NPR POS Sale"
+﻿codeunit 6150705 "NPR POS Sale"
 {
     var
         Rec: Record "NPR POS Sale";
@@ -62,8 +62,8 @@ codeunit 6150705 "NPR POS Sale"
         Rec."Saved Sale" := false;
         Rec.TouchScreen := true;
 
-        if WorkDate <> Today() then begin
-            WorkDate := Today;
+        if WorkDate() <> Today() then begin
+            WorkDate := Today();
         end;
 
         UpdateSaleDeviceID(Rec);
@@ -123,7 +123,7 @@ codeunit 6150705 "NPR POS Sale"
     begin
         if not Initialized then begin
             TempRec."Register No." := POSUnit."No.";
-            TempRec.Insert;
+            TempRec.Insert();
             DataMgt.RecordToDataSet(TempRec, CurrDataSet, DataSource, POSSession, FrontEnd);
             exit;
         end;
@@ -234,7 +234,6 @@ codeunit 6150705 "NPR POS Sale"
         DimVal: Record "Dimension Value";
         DimSetEntryTmp: Record "Dimension Set Entry" temporary;
         DimMgt: Codeunit DimensionManagement;
-        DimValues: Page "Dimension Values";
         OldDimSetID: Integer;
     begin
         if (not Dim.Get(DimCode)) then
@@ -349,7 +348,6 @@ codeunit 6150705 "NPR POS Sale"
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
-        TempSalesHeader: Record "Sales Header" temporary;
         StartTime: DateTime;
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
@@ -373,7 +371,7 @@ codeunit 6150705 "NPR POS Sale"
         SaleLinePOS.DeleteAll();
         Rec.Delete();
 
-        Commit; // Sale is now committed to POS entry
+        Commit(); // Sale is now committed to POS entry
         Ended := true;
 
         LogStopwatch('FINISH_SALE', CurrentDateTime - StartTime);
@@ -442,18 +440,18 @@ codeunit 6150705 "NPR POS Sale"
     begin
         POSStore.Get(Sale."POS Store Code");
 
-        SaleLinePOS.Reset;
+        SaleLinePOS.Reset();
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 SaleLinePOS.Validate("Shortcut Dimension 1 Code");
                 SaleLinePOS.Validate("Shortcut Dimension 2 Code");
                 if ((SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and (SaleLinePOS.Type = SaleLinePOS.Type::Item)) then begin
                     TotalItemAmountInclVat += SaleLinePOS."Amount Including VAT";
                 end
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
 
         if TotalItemAmountInclVat < 0 then begin
             saleNegCashSum := 0;
@@ -465,7 +463,7 @@ codeunit 6150705 "NPR POS Sale"
                     SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
                     SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
                     SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Payment);
-                    if SaleLinePOS.FindSet then
+                    if SaleLinePOS.FindSet() then
                         repeat
                             if POSPaymentMethod.Get(SaleLinePOS."No.") then
                                 if (POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::Cash) and
@@ -474,11 +472,11 @@ codeunit 6150705 "NPR POS Sale"
                                     if Abs(saleNegCashSum) > Abs(SalespersonPurchaser."NPR Maximum Cash Returnsale") then
                                         Error(ErrReturnCashExceeded);
                                 end;
-                        until SaleLinePOS.Next = 0;
+                        until SaleLinePOS.Next() = 0;
                 end;
         end;
 
-        SaleLinePOS.Reset;
+        SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
         if SaleLinePOS.Find('+') then;
@@ -492,15 +490,15 @@ codeunit 6150705 "NPR POS Sale"
                     SaleLinePOS."Amount Including VAT" := 0;
                     SaleLinePOS."Unit Price" := 0;
                     SaleLinePOS.Quantity := 1;
-                    SaleLinePOS.Modify;
+                    SaleLinePOS.Modify();
                 end;
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
 
         Clear(SaleLinePOS);
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
-        if not SaleLinePOS.FindSet then
+        if not SaleLinePOS.FindSet() then
             Error('No lines');
 
         repeat
@@ -560,7 +558,7 @@ codeunit 6150705 "NPR POS Sale"
 
             if SaleLinePOS."Shortcut Dimension 2 Code" = '' then
                 SaleLinePOS.Validate("Shortcut Dimension 2 Code", POSUnit."Global Dimension 2 Code");
-        until SaleLinePOS.Next = 0;
+        until SaleLinePOS.Next() = 0;
 
         POSInfoManagement.PostPOSInfo(Sale);
     end;
@@ -795,13 +793,13 @@ codeunit 6150705 "NPR POS Sale"
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
-        if not POSSalesWorkflowStep.FindSet then
+        if not POSSalesWorkflowStep.FindSet() then
             exit;
 
         Refresh(SalePOS);
         repeat
             InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep);
-        until POSSalesWorkflowStep.Next = 0;
+        until POSSalesWorkflowStep.Next() = 0;
 
         LogStopwatch('FINISH_SALE_WORKFLOWS', CurrentDateTime - StartTime);
     end;

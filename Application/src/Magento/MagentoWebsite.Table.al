@@ -63,6 +63,6 @@ table 6151402 "NPR Magento Website"
         MagentoStore: Record "NPR Magento Store";
     begin
         MagentoStore.SetRange("Website Code", Code);
-        MagentoStore.DeleteAll;
+        MagentoStore.DeleteAll();
     end;
 }

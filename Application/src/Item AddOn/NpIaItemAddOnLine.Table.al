@@ -230,10 +230,10 @@ table 6151126 "NPR NpIa Item AddOn Line"
                 EventSubscription.SetRange("Published Function", 'BeforeInsertPOSAddOnLine');
                 EventSubscription.SetRange("Subscriber Function", "Before Insert Function");
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Before Insert Codeunit ID");
-                if not EventSubscription.FindFirst then
+                if not EventSubscription.FindFirst() then
                     EventSubscription.SetRange("Subscriber Codeunit ID");
 
-                EventSubscription.FindFirst;
+                EventSubscription.FindFirst();
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
             end;
         }
@@ -256,7 +256,7 @@ table 6151126 "NPR NpIa Item AddOn Line"
     begin
         NpIaItemAddOnLineOption.SetRange("AddOn No.", "AddOn No.");
         NpIaItemAddOnLineOption.SetRange("AddOn Line No.", "Line No.");
-        if NpIaItemAddOnLineOption.FindFirst then
+        if NpIaItemAddOnLineOption.FindFirst() then
             NpIaItemAddOnLineOption.DeleteAll();
     end;
 

@@ -1,4 +1,4 @@
-codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
+﻿codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 {
     var
         ActionDescription: Label 'Set an event from Event Management module as active for current POS register and sale';
@@ -13,7 +13,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         if Sender.DiscoverAction(
           ActionCode,
           ActionDescription,
-          ActionVersion,
+          ActionVersion(),
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
@@ -32,7 +32,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'Title', EventNoLbl);
+        Captions.AddActionCaption(ActionCode(), 'Title', EventNoLbl);
     end;
 
     local procedure ActionVersion(): Text
@@ -56,7 +56,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         ClearEvent: Boolean;
         OnlyCurrentSale: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -139,7 +139,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if not Job.Get(SalePOS."Event No.") then
-            Job.Init;
+            Job.Init();
         DataRow.Add(DataSourceField_EventNo(), SalePOS."Event No.");
         DataRow.Add(DataSourceField_EventDescription(), Job.Description);
     end;
@@ -170,12 +170,12 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         FilterJobs(Job);
         if EventNo <> '' then begin
             Job."No." := EventNo;
-            if Job.Find then;
+            if Job.Find() then;
         end;
         EventList.SetTableView(Job);
         EventList.SetRecord(Job);
         EventList.LookupMode := true;
-        if EventList.RunModal = ACTION::LookupOK then begin
+        if EventList.RunModal() = ACTION::LookupOK then begin
             EventList.GetRecord(Job);
             EventNo := Job."No.";
             exit(EventNo <> '');
@@ -185,19 +185,16 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 
     local procedure UpdateCurrentEvent(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; EventNo: Code[20]; UpdateRegister: Boolean)
     var
-        NewDimSetEntryTmp: Record "Dimension Set Entry" temporary;
-        OldDimSetEntryTmp: Record "Dimension Set Entry" temporary;
         Job: Record Job;
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
         DimMgt: Codeunit DimensionManagement;
         POSSale: Codeunit "NPR POS Sale";
-        OldDimeSetID: Integer;
     begin
         if EventNo <> '' then begin
             FilterJobs(Job);
             Job."No." := EventNo;
-            Job.Find;
+            Job.Find();
         end;
 
         POSSession.GetSale(POSSale);
@@ -233,13 +230,13 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         DefaultDim.SetRange("No.", No);
         DefaultDim.SetFilter("Dimension Code", '<>%1', '');
         DefaultDim.SetFilter("Dimension Value Code", '<>%1', '');
-        if DefaultDim.FindSet then
+        if DefaultDim.FindSet() then
             repeat
-                DimSetEntry.Init;
+                DimSetEntry.Init();
                 DimSetEntry."Dimension Code" := DefaultDim."Dimension Code";
                 DimSetEntry.Validate("Dimension Value Code", DefaultDim."Dimension Value Code");
-                DimSetEntry.Insert;
-            until DefaultDim.Next = 0;
+                DimSetEntry.Insert();
+            until DefaultDim.Next() = 0;
     end;
 }
 

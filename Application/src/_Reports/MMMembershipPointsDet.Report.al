@@ -120,7 +120,7 @@ report 6060131 "NPR MM Membership Points Det."
 
                 MMMembership.SetRange("Entry No.", "Entry No.");
                 MMMembership.SetFilter("Date Filter", '..%1', "MM Membership".GetRangeMin("Date Filter"));
-                if MMMembership.FindFirst then begin
+                if MMMembership.FindFirst() then begin
                     MMMembership.CalcFields("Remaining Points");
                     BalanceBefore := MMMembership."Remaining Points";
                 end;

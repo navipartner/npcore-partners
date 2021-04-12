@@ -1,4 +1,4 @@
-page 6151340 "NPR SO Processor Act"
+﻿page 6151340 "NPR SO Processor Act"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -73,15 +73,15 @@ page 6151340 "NPR SO Processor Act"
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
         Rec.SetRespCenterFilter;
-        Rec.SetRange("Date Filter", 0D, WorkDate - 1);
-        Rec.SetFilter("Date Filter2", '>=%1', WorkDate);
+        Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
+        Rec.SetFilter("Date Filter2", '>=%1', WorkDate());
         Rec.SetFilter("User ID Filter", UserId);
         Rec.SetFilter("NPR Date Filter Lst Year", '%1..%2', CalcDate('<-CM-1Y>', Today), CalcDate('<CM-1Y>', Today));
         Rec.SetFilter("NPR Date Filter", '%1..%2', CalcDate('<-CM>', Today), Today);
@@ -92,8 +92,6 @@ page 6151340 "NPR SO Processor Act"
 
     var
         CueAndKPIs: Codeunit "Cues And KPIs";
-        UserTaskManagement: Codeunit "User Task Management";
-        ShowDocumentsPendingDodExchService: Boolean;
 
     procedure DrillDownSalesThisMonthLastYear()
     var

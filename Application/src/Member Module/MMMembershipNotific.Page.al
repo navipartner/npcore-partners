@@ -14,84 +14,84 @@ page 6060143 "NPR MM Membership Notific."
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Membership Entry No."; "Membership Entry No.")
+                field("Membership Entry No."; Rec."Membership Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
                 }
-                field("External Membership No."; "External Membership No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Membership No. field';
                 }
-                field("Notification Code"; "Notification Code")
+                field("Notification Code"; Rec."Notification Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notification Code field';
                 }
-                field("Date To Notify"; "Date To Notify")
+                field("Date To Notify"; Rec."Date To Notify")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date To Notify field';
                 }
-                field("Notification Status"; "Notification Status")
+                field("Notification Status"; Rec."Notification Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notification Status field';
                 }
-                field("Notification Processed At"; "Notification Processed At")
+                field("Notification Processed At"; Rec."Notification Processed At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notification Processed At field';
                 }
-                field("Notification Processed By User"; "Notification Processed By User")
+                field("Notification Processed By User"; Rec."Notification Processed By User")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notification Processed By User field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocked At"; "Blocked At")
+                field("Blocked At"; Rec."Blocked At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked At field';
                 }
-                field("Blocked By User"; "Blocked By User")
+                field("Blocked By User"; Rec."Blocked By User")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked By User field';
                 }
-                field("Notification Trigger"; "Notification Trigger")
+                field("Notification Trigger"; Rec."Notification Trigger")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Notification Trigger field';
                 }
-                field("Template Filter Value"; "Template Filter Value")
+                field("Template Filter Value"; Rec."Template Filter Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Filter Value field';
                 }
-                field("Target Member Role"; "Target Member Role")
+                field("Target Member Role"; Rec."Target Member Role")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Target Member Role field';
                 }
-                field("Include NP Pass"; "Include NP Pass")
+                field("Include NP Pass"; Rec."Include NP Pass")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Include NP Pass field';
                 }
-                field("Processing Method"; "Processing Method")
+                field("Processing Method"; Rec."Processing Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Method field';

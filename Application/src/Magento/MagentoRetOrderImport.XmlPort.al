@@ -265,7 +265,7 @@ xmlport 6151403 "NPR Magento Ret. Order Import"
                                 Line: Text;
                             begin
                                 comment := '';
-                                if TempItem."NPR Magento Description".HasValue then begin
+                                if TempItem."NPR Magento Description".HasValue() then begin
                                     TempItem.CalcFields("NPR Magento Description");
                                     TempItem."NPR Magento Description".CreateInStream(InStream);
                                     while not InStream.EOS do begin

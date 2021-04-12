@@ -1,4 +1,4 @@
-﻿codeunit 6014475 "NPR Exchange Label Map Ev. Su."
+codeunit 6014475 "NPR Exchange Label Map Ev. Su."
 {
     [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnAfterDeleteEvent', '', false, false)]
     local procedure PurchaseLineOnAfterDelete(var Rec: Record "Purchase Line")

@@ -21,24 +21,23 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Button,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'if ((param.Setting != param.Setting["Package"]) && (param.Setting != param.Setting["Selection"]))' +
-                                             '{ datepad({ title: labels.title, caption: labels.validfrom, value: context.defaultdate, notBlank: true}, "value").respond(); };');
-                RegisterWorkflowStep('2', 'if ((param.Setting == param.Setting["Package"]) || (param.Setting == param.Setting["Selection"]))' +
-                                             '{ calendar({caption: labels.calendar, title: labels.title, checkedByDefault: true, date: context.defaultdate, columns: [10, 12, 15] }).respond(); };');
-                RegisterWorkflow(true);
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Button,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'if ((param.Setting != param.Setting["Package"]) && (param.Setting != param.Setting["Selection"]))' +
+                                         '{ datepad({ title: labels.title, caption: labels.validfrom, value: context.defaultdate, notBlank: true}, "value").respond(); };');
+            Sender.RegisterWorkflowStep('2', 'if ((param.Setting == param.Setting["Package"]) || (param.Setting == param.Setting["Selection"]))' +
+                                         '{ calendar({caption: labels.calendar, title: labels.title, checkedByDefault: true, date: context.defaultdate, columns: [10, 12, 15] }).respond(); };');
+            Sender.RegisterWorkflow(true);
 
-                RegisterOptionParameter('Setting', 'Single,Line Quantity,All Lines,Selection,Package', 'Single');
-                RegisterBooleanParameter('PreventNegativeQty', true);
-                RegisterDataBinding();
-            end;
+            Sender.RegisterOptionParameter('Setting', 'Single,Line Quantity,All Lines,Selection,Package', 'Single');
+            Sender.RegisterBooleanParameter('PreventNegativeQty', true);
+            Sender.RegisterDataBinding();
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
@@ -48,15 +47,15 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
         POSSetup: Codeunit "NPR POS Setup";
         DefaultDate: Date;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         POSSession.GetSetup(POSSetup);
         if not (Evaluate(DefaultDate, POSSetup.ExchangeLabelDefaultDate) and (StrLen(POSSetup.ExchangeLabelDefaultDate) > 0)) then
-            DefaultDate := Today;
+            DefaultDate := Today();
 
         Context.SetContext('defaultdate', Format(DefaultDate, 0, 9));
-        FrontEnd.SetActionContext(ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
 
         Handled := true;
     end;
@@ -64,9 +63,9 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'validfrom', ValidFrom);
-        Captions.AddActionCaption(ActionCode, 'calendar', CalendarCaption);
+        Captions.AddActionCaption(ActionCode(), 'title', Title);
+        Captions.AddActionCaption(ActionCode(), 'validfrom', ValidFrom);
+        Captions.AddActionCaption(ActionCode(), 'calendar', CalendarCaption);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -80,13 +79,9 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
         ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
         PrintLines: Record "NPR POS Sale Line";
         CalendarObject: JsonObject;
-        "Count": Integer;
-        i: Integer;
-        Position: Text;
         PreventNegativeQty: Boolean;
-        DateTime: DateTime;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -111,7 +106,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
                     POSSession.GetSaleLine(POSSaleLine);
                     POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
                     PrintLines := SaleLinePOS;
-                    PrintLines.SetRecFilter;
+                    PrintLines.SetRecFilter();
                 end;
             3, 4:
                 begin

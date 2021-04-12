@@ -52,20 +52,18 @@ table 6014624 "NPR Web Client Dependency"
         Encoding: DotNet NPRNetEncoding;
         InStr: InStream;
     begin
-        with WebDependency do begin
-            if not Get(DependencyType, DependencyCode) then
-                exit;
+        if not WebDependency.Get(DependencyType, DependencyCode) then
+            exit;
 
-            if not BLOB.HasValue then
-                exit;
+        if not WebDependency.BLOB.HasValue() then
+            exit;
 
-            CalcFields(BLOB);
-            BLOB.CreateInStream(InStr);
-            MemStr := MemStr.MemoryStream();
-            CopyStream(MemStr, InStr);
+        WebDependency.CalcFields(BLOB);
+        WebDependency.BLOB.CreateInStream(InStr);
+        MemStr := MemStr.MemoryStream();
+        CopyStream(MemStr, InStr);
 
-            exit(Encoding.UTF8.GetString(MemStr.ToArray()));
-        end;
+        exit(Encoding.UTF8.GetString(MemStr.ToArray()));
     end;
 
     procedure GetJavaScript(DependencyCode: Code[10]): Text

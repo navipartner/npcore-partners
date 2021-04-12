@@ -36,7 +36,7 @@ table 6151052 "NPR Item Hierarchy Line"
         }
         field(11; "Related Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Related Table No.")));
             Caption = 'Related Table Name';
             Editable = false;

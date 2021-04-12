@@ -419,7 +419,6 @@ page 6060136 "NPR MM Member Card"
                 ToolTip = 'Executes the Print Member Card action';
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
                     MemberCardEntryNo: Integer;
                     MemberCard: Record "NPR MM Member Card";
                     Membership: Record "NPR MM Membership";
@@ -709,7 +708,7 @@ page 6060136 "NPR MM Member Card"
 
                         CustomerLedgerEntries.Editable(false);
                         CustomerLedgerEntries.SetTableView(CustLedgerEntry);
-                        CustomerLedgerEntries.RunModal;
+                        CustomerLedgerEntries.RunModal();
 
                     end;
                 }
@@ -765,7 +764,7 @@ page 6060136 "NPR MM Member Card"
                         Customer.Get(Membership."Customer No.");
                         CustomerStatistics.SetRecord(Customer);
                         CustomerStatistics.Editable(false);
-                        CustomerStatistics.RunModal;
+                        CustomerStatistics.RunModal();
 
                     end;
                 }

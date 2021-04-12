@@ -17,19 +17,18 @@ codeunit 6150834 "NPR POS Action: Print Template"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'respond();');
-                RegisterWorkflow(false);
-                RegisterTextParameter('Template', '');
-                RegisterOptionParameter('Record', 'Sale Line,Sale Header', 'Sale Line');
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterTextParameter('Template', '');
+            Sender.RegisterOptionParameter('Record', 'Sale Line,Sale Header', 'Sale Line');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -45,7 +44,7 @@ codeunit 6150834 "NPR POS Action: Print Template"
         SalePOS: Record "NPR POS Sale";
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -59,14 +58,14 @@ codeunit 6150834 "NPR POS Action: Print Template"
                 begin
                     POSSession.GetSaleLine(POSSaleLine);
                     POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-                    SaleLinePOS.SetRecFilter;
+                    SaleLinePOS.SetRecFilter();
                     Record := SaleLinePOS;
                 end;
             RecordSetting::"Sale POS":
                 begin
                     POSSession.GetSale(POSSale);
                     POSSale.GetCurrentSale(SalePOS);
-                    SalePOS.SetRecFilter;
+                    SalePOS.SetRecFilter();
                     Record := SalePOS;
                 end;
             else

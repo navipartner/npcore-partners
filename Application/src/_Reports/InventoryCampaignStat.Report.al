@@ -158,8 +158,6 @@ report 6014499 "NPR Inventory Campaign Stat."
                     end;
 
                     restk := purchase - "Quantity Sold";
-                    if restk < 0 then forbgllager := restk * -1;
-                    if restk >= 0 then forbgllager := 0;
                     if restk < 0 then restk := 0;
                 end;
 
@@ -214,7 +212,6 @@ report 6014499 "NPR Inventory Campaign Stat."
         boughtFor: Decimal;
         db: Decimal;
         dg: Decimal;
-        forbgllager: Decimal;
         momsregulering: Decimal;
         purchase: Decimal;
         restk: Decimal;

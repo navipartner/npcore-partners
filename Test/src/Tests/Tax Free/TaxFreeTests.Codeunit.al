@@ -43,7 +43,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price between service min & max for eligible store
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -115,7 +115,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price below min for not eligible store
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := _TaxFreeservice."Minimum Purchase Amount" - 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -185,7 +185,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price between service min & max for eligible store
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -256,7 +256,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price between service below min for not eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := _TaxFreeservice."Minimum Purchase Amount" - 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -325,7 +325,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price between service below min for not eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -398,7 +398,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price between service min & max for eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -472,7 +472,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price between service min & max for eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -554,7 +554,7 @@ codeunit 85019 "NPR Tax Free Tests"
         // [Given] Item line unit price between service min & max for eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -705,7 +705,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue + 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -781,7 +781,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue - 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -854,7 +854,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue + 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -929,7 +929,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue - 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -1002,7 +1002,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue + 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -1079,7 +1079,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue + 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -1157,7 +1157,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue + 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -1237,7 +1237,7 @@ codeunit 85019 "NPR Tax Free Tests"
         tmpHandlerParameter.FindFirst();
         Evaluate(ItemValue, tmpHandlerParameter.Value);
         Item."Unit Price" := ItemValue + 1;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         // [Given] EFT mock integration set to simulate external approval
@@ -1345,7 +1345,7 @@ codeunit 85019 "NPR Tax Free Tests"
             _Initialized := true;
         end;
 NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
-        Commit;
+        Commit();
     end;
 
     var
@@ -1387,10 +1387,10 @@ NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
         SaleLinePOS.SetRange("Retail ID", LineRetailID);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
         if ShouldExist then begin
-            SaleLinePOS.FindFirst;
+            SaleLinePOS.FindFirst();
             SaleLinePOS.TestField("Amount Including VAT", Amount);
         end else begin
-            asserterror SaleLinePOS.FindFirst;
+            asserterror SaleLinePOS.FindFirst();
         end;
     end;
 

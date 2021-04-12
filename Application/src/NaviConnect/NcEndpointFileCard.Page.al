@@ -18,17 +18,17 @@ page 6151527 "NPR Nc Endpoint File Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
@@ -36,27 +36,27 @@ page 6151527 "NPR Nc Endpoint File Card"
             }
             group("File")
             {
-                field(Path; Path)
+                field(Path; Rec.Path)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Path field';
                 }
-                field("Client Path"; "Client Path")
+                field("Client Path"; Rec."Client Path")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Client Path can only be used with Manual Export';
                 }
-                field(Filename; Filename)
+                field(Filename; Rec.Filename)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Filename field';
                 }
-                field("Handle Exiting File"; "Handle Exiting File")
+                field("Handle Exiting File"; Rec."Handle Exiting File")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handle Exiting File field';
                 }
-                field("File Encoding"; "File Encoding")
+                field("File Encoding"; Rec."File Encoding")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the File Encoding field';
@@ -78,7 +78,7 @@ page 6151527 "NPR Nc Endpoint File Card"
 
                 trigger OnAction()
                 begin
-                    ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks;
                 end;
             }
         }

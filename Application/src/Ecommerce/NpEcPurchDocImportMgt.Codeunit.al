@@ -164,7 +164,7 @@ codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
         Node: XmlNode;
     begin
         LineNo += 10000;
-        PurchLine.Init;
+        PurchLine.Init();
         PurchLine."Document Type" := PurchHeader."Document Type";
         PurchLine."Document No." := PurchHeader."No.";
         PurchLine."Line No." := LineNo;
@@ -435,7 +435,7 @@ codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
         NpEcDocument.SetRange("Store Code", NpEcStore.Code);
         NpEcDocument.SetRange("Reference No.", InvoiceNo);
         NpEcDocument.SetRange("Document Type", NpEcDocument."Document Type"::"Purchase Invoice");
-        if not NpEcDocument.FindLast then
+        if not NpEcDocument.FindLast() then
             exit(false);
 
         exit(PurchHeader.Get(PurchHeader."Document Type"::Invoice, NpEcDocument."Document No."));
@@ -457,7 +457,7 @@ codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
             ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
             ItemRef.SetRange("Reference No.", UpperCase(ReferenceNo));
             ItemRef.SetRange("Discontinue Bar Code", false);
-            if ItemRef.FindFirst then begin
+            if ItemRef.FindFirst() then begin
                 ItemVariant."Item No." := ItemRef."Item No.";
                 ItemVariant.Code := ItemRef."Variant Code";
                 exit(true);

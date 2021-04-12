@@ -1,4 +1,4 @@
-page 6151607 "NPR NpDc ExtraItemQty. Subform"
+﻿page 6151607 "NPR NpDc ExtraItemQty. Subform"
 {
     AutoSplitKey = true;
     Caption = 'Coupon List Items';
@@ -16,35 +16,35 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item Description field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Profit %"; "Profit %")
+                field("Profit %"; Rec."Profit %")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Profit % field';
                 }
-                field("Qty. per Lot"; "Validation Quantity")
+                field("Qty. per Lot"; Rec."Validation Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. per Lot';
@@ -64,7 +64,7 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
                 Caption = 'Add Items';
                 Image = Add;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -82,9 +82,6 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
 
     var
         Text000: Label 'Add Items';
-        MaxDiscountAmt: Decimal;
-        MaxQty: Decimal;
-        ValidQty: Integer;
         LotValidation: Boolean;
 
     local procedure AddItems()
@@ -108,24 +105,24 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
         CouponType: Code[20];
         LineNo: Integer;
     begin
-        FilterGroup(2);
-        CouponType := GetRangeMax("Coupon Type");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        CouponType := Rec.GetRangeMax("Coupon Type");
+        Rec.FilterGroup(0);
         if CouponType = '' then
             exit;
 
         NpDcCouponListItem.SetRange("Coupon Type", CouponType);
-        if NpDcCouponListItem.FindLast then;
+        if NpDcCouponListItem.FindLast() then;
         LineNo := NpDcCouponListItem."Line No.";
 
-        Item.FindSet;
+        Item.FindSet();
         repeat
             NpDcCouponListItem.SetRange("Coupon Type", CouponType);
             NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::Item);
             NpDcCouponListItem.SetRange("No.", Item."No.");
             if NpDcCouponListItem.IsEmpty then begin
                 LineNo += 10000;
-                NpDcCouponListItem.Init;
+                NpDcCouponListItem.Init();
                 NpDcCouponListItem."Coupon Type" := CouponType;
                 NpDcCouponListItem."Line No." := LineNo;
                 NpDcCouponListItem.Type := NpDcCouponListItem.Type::Item;
@@ -133,7 +130,7 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
                 NpDcCouponListItem.Priority := NewPriority;
                 NpDcCouponListItem.Insert(true);
             end;
-        until Item.Next = 0;
+        until Item.Next() = 0;
     end;
 
     local procedure RunDynamicRequestPage(var Item: Record Item): Boolean
@@ -160,12 +157,12 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
         FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Disc. Group"));
         FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Search Description"));
         FilterPageBuilder.PageCaption := Text000;
-        if not FilterPageBuilder.RunModal then
+        if not FilterPageBuilder.RunModal() then
             exit(false);
 
         ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number);
 
-        RecRef.Reset;
+        RecRef.Reset();
         if ReturnFilters <> '' then begin
             Clear(TempBlob);
             TempBlob.CreateOutStream(OutStream);
@@ -175,7 +172,7 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
         end;
 
         RecRef.SetTable(Item);
-        exit(Item.FindFirst);
+        exit(Item.FindFirst());
     end;
 
     procedure SetLotValidation(NewLotValidation: Boolean)

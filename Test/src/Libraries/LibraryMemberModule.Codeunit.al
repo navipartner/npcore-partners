@@ -1,4 +1,4 @@
-codeunit 85014 "NPR Library - Member Module"
+﻿codeunit 85014 "NPR Library - Member Module"
 {
 
     procedure CreateScenario_SmokeTest() SalesItemNo: Code[20]
@@ -97,7 +97,7 @@ codeunit 85014 "NPR Library - Member Module"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
         EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
@@ -150,7 +150,7 @@ codeunit 85014 "NPR Library - Member Module"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
@@ -203,7 +203,7 @@ codeunit 85014 "NPR Library - Member Module"
             MembershipSalesSetup.Insert();
         end;
 
-        MembershipSalesSetup.INIT;
+        MembershipSalesSetup.Init();
 
         MembershipSalesSetup."Business Flow Type" := MembershipSalesSetup."Business Flow Type"::MEMBERSHIP;
 
@@ -229,7 +229,7 @@ codeunit 85014 "NPR Library - Member Module"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
@@ -256,7 +256,7 @@ codeunit 85014 "NPR Library - Member Module"
             AlterationSetup.Insert();
         end;
 
-        AlterationSetup.INIT;
+        AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
@@ -543,7 +543,7 @@ codeunit 85014 "NPR Library - Member Module"
             MemberCommunity.Insert();
         end;
 
-        MemberCommunity.INIT;
+        MemberCommunity.Init();
         MemberCommunity.Description := Description;
         MemberCommunity.VALIDATE("External Membership No. Series", MembershipNoSeries);
         MemberCommunity.VALIDATE("External Member No. Series", MemberNoSeries);
@@ -568,7 +568,7 @@ codeunit 85014 "NPR Library - Member Module"
     begin
 
         if (not ConfigTemplateHeader.Get(TemplateCode)) then begin
-            ConfigTemplateHeader.INIT;
+            ConfigTemplateHeader.Init();
             ConfigTemplateHeader.Code := TemplateCode;
             ConfigTemplateHeader.Description := 'Customer created from membership';
             ConfigTemplateHeader.VALIDATE("Table ID", DATABASE::Customer);
@@ -650,7 +650,7 @@ codeunit 85014 "NPR Library - Member Module"
             MembershipSetup.Insert();
         end;
 
-        MembershipSetup.INIT;
+        MembershipSetup.Init();
 
         MembershipSetup.Description := Description;
         MembershipSetup."Customer Config. Template Code" := '';

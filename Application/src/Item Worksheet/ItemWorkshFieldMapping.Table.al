@@ -59,7 +59,7 @@ table 6060055 "NPR Item Worksh. Field Mapping"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange(FieldName, "Field Name");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);
@@ -75,7 +75,7 @@ table 6060055 "NPR Item Worksh. Field Mapping"
                 RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange("Field Caption", "Field Caption");
-                if RecField.FindFirst then
+                if RecField.FindFirst() then
                     Validate("Field Number", RecField."No.")
                 else
                     Validate("Field Number", 0);

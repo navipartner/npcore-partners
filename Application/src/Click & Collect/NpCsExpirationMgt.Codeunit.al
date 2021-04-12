@@ -7,13 +7,11 @@ codeunit 6151207 "NPR NpCs Expiration Mgt."
         if Rec."Entry No." = 0 then
             UpdateExpirationStatusAll(Rec.Type::"Collect in Store", false)
         else
-            if Rec.Find then
+            if Rec.Find() then
                 UpdateExpirationStatus(Rec, false);
     end;
 
     procedure SetExpiresAt(var NpCsDocument: Record "NPR NpCs Document")
-    var
-        PrevRec: Text;
     begin
         if NpCsDocument."Delivery Status" in [NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired] then
             exit;
@@ -74,19 +72,19 @@ codeunit 6151207 "NPR NpCs Expiration Mgt."
         NpCsDocument.SetFilter("Processing expires at", '<=%1&<>%2', CurrentDateTime, 0DT);
         NpCsDocument.SetFilter("Processing Status", '=%1|=%2', NpCsDocument."Processing Status"::" ", NpCsDocument."Processing Status"::Pending);
         NpCsDocument.SetFilter("Delivery Status", '<>%1&<>%2', NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired);
-        if NpCsDocument.FindSet then
+        if NpCsDocument.FindSet() then
             repeat
                 UpdateExpirationStatus(NpCsDocument, SkipWorkflow);
-            until NpCsDocument.Next = 0;
+            until NpCsDocument.Next() = 0;
 
         NpCsDocument.SetRange("Processing expires at");
         NpCsDocument.SetFilter("Processing Status", '<>%1&<>%2', NpCsDocument."Processing Status"::Rejected, NpCsDocument."Processing Status"::Expired);
         NpCsDocument.SetFilter("Delivery expires at", '<=%1&<>%2', CurrentDateTime, 0DT);
         NpCsDocument.SetFilter("Delivery Status", '=%1|=%2', NpCsDocument."Delivery Status"::" ", NpCsDocument."Delivery Status"::Ready);
-        if NpCsDocument.FindSet then
+        if NpCsDocument.FindSet() then
             repeat
                 UpdateExpirationStatus(NpCsDocument, SkipWorkflow);
-            until NpCsDocument.Next = 0;
+            until NpCsDocument.Next() = 0;
     end;
 
     procedure UpdateExpirationStatus(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)

@@ -86,7 +86,7 @@ xmlport 6060122 "NPR TM Ticket Get Print URL"
                 if (DIYTicketPrint.GenerateTicketPrint(Ticket."Ticket Reservation Entry No.", false, FailReason)) then begin
                     TmpTicketOut.TransferFields(Ticket);
                     if (TmpTicketOut.Insert()) then begin
-                        Ticket."Printed Date" := Today;
+                        Ticket."Printed Date" := Today();
                         Ticket.Modify();
                     end;
                 end else begin

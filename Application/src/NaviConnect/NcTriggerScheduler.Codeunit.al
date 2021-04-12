@@ -1,4 +1,4 @@
-codeunit 6151521 "NPR Nc Trigger Scheduler"
+﻿codeunit 6151521 "NPR Nc Trigger Scheduler"
 {
     // NC2.01/BR /20160809  CASE 247479 NaviConnect: Object created
 
@@ -44,36 +44,33 @@ codeunit 6151521 "NPR Nc Trigger Scheduler"
         NcTriggerSetup: Record "NPR Nc Trigger Setup";
         NcSetup: Record "NPR Nc Setup";
         TaskLine: Record "NPR Task Line";
-        TaskLineParameters: Record "NPR Task Line Parameters";
         LineNo: Integer;
     begin
         GetAndCheckNcTriggerSetup(NcTriggerSetup);
         FilterTaskLines(TaskLine, NcTriggerSetup);
-        with TaskLine do begin
-            SetRange("Journal Template Name", NcTriggerSetup."Task Template Name");
-            SetRange("Journal Batch Name", NcTriggerSetup."Task Batch Name");
+        TaskLine.SetRange("Journal Template Name", NcTriggerSetup."Task Template Name");
+        TaskLine.SetRange("Journal Batch Name", NcTriggerSetup."Task Batch Name");
 
-            if FindLast then
-                LineNo := "Line No." + 10000
-            else
-                LineNo := 10000;
-            Init;
-            Validate("Journal Template Name", NcTriggerSetup."Task Template Name");
-            Validate("Journal Batch Name", NcTriggerSetup."Task Batch Name");
-            Validate("Line No.", LineNo);
-            Validate(Description, CopyStr(NcTrigger.Description, 1, MaxStrLen(Description)));
-            NcSetup.Get;
-            NcSetup.TestField("Task Worker Group");
-            "Task Worker Group" := NcSetup."Task Worker Group";
-            Validate("Call Object With Task Record", true);
-            Validate(Enabled, NcTrigger.Enabled);
-            Validate("Object Type", "Object Type"::Codeunit);
-            Validate("Object No.", CODEUNIT::"NPR Nc Trigger Sync. Mgt.");
-            SetNextRuntime(CurrentDateTime, false);
-            Insert(true);
-            InsertParameter(GetParamName, 0);
-            SetParameterText(GetParamName, NcTrigger.Code);
-        end;
+        if TaskLine.FindLast() then
+            LineNo := TaskLine."Line No." + 10000
+        else
+            LineNo := 10000;
+        TaskLine.Init();
+        TaskLine.Validate("Journal Template Name", NcTriggerSetup."Task Template Name");
+        TaskLine.Validate("Journal Batch Name", NcTriggerSetup."Task Batch Name");
+        TaskLine.Validate("Line No.", LineNo);
+        TaskLine.Validate(Description, CopyStr(NcTrigger.Description, 1, MaxStrLen(TaskLine.Description)));
+        NcSetup.Get();
+        NcSetup.TestField("Task Worker Group");
+        TaskLine."Task Worker Group" := NcSetup."Task Worker Group";
+        TaskLine.Validate("Call Object With Task Record", true);
+        TaskLine.Validate(Enabled, NcTrigger.Enabled);
+        TaskLine.Validate("Object Type", TaskLine."Object Type"::Codeunit);
+        TaskLine.Validate("Object No.", CODEUNIT::"NPR Nc Trigger Sync. Mgt.");
+        TaskLine.SetNextRuntime(CurrentDateTime, false);
+        TaskLine.Insert(true);
+        TaskLine.InsertParameter(GetParamName, 0);
+        TaskLine.SetParameterText(GetParamName, NcTrigger.Code);
     end;
 
     local procedure DeleteTaskLine(NcTrigger: Record "NPR Nc Trigger")
@@ -82,7 +79,7 @@ codeunit 6151521 "NPR Nc Trigger Scheduler"
         TaskLine: Record "NPR Task Line";
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
-        NcTriggerSetup.Get;
+        NcTriggerSetup.Get();
         if not FindTaskLine(NcTrigger, TaskLine, TaskLineParam) then
             exit;
         TaskLine.Delete(true);
@@ -94,7 +91,7 @@ codeunit 6151521 "NPR Nc Trigger Scheduler"
         TaskLine: Record "NPR Task Line";
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
-        NcTriggerSetup.Get;
+        NcTriggerSetup.Get();
         if not FindTaskLine(xRecNcTrigger, TaskLine, TaskLineParam) then
             exit;
         TaskLineParam.Value := NcTrigger.Code;
@@ -107,7 +104,7 @@ codeunit 6151521 "NPR Nc Trigger Scheduler"
         TaskLine: Record "NPR Task Line";
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
-        NcTriggerSetup.Get;
+        NcTriggerSetup.Get();
         if not FindTaskLine(xRecNcTrigger, TaskLine, TaskLineParam) then
             exit;
         TaskLine.Description := NcTrigger.Description;
@@ -124,8 +121,8 @@ codeunit 6151521 "NPR Nc Trigger Scheduler"
         NcSetup: Record "NPR Nc Setup";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
-        if not NcTriggerSetup.Get then begin
-            NcSetup.Get;
+        if not NcTriggerSetup.Get() then begin
+            NcSetup.Get();
             if not NcSetup."Task Queue Enabled" then
                 exit;
             NcSetupMgt.SetupTaskQueue;
@@ -139,7 +136,7 @@ codeunit 6151521 "NPR Nc Trigger Scheduler"
 
     local procedure FilterTaskLines(var TaskLine: Record "NPR Task Line"; NcTriggerSetup: Record "NPR Nc Trigger Setup")
     begin
-        TaskLine.Reset;
+        TaskLine.Reset();
         TaskLine.SetRange("Journal Template Name", NcTriggerSetup."Task Template Name");
         TaskLine.SetRange("Journal Batch Name", NcTriggerSetup."Task Batch Name");
     end;
@@ -148,18 +145,18 @@ codeunit 6151521 "NPR Nc Trigger Scheduler"
     var
         NcTriggerSetup: Record "NPR Nc Trigger Setup";
     begin
-        NcTriggerSetup.Get;
+        NcTriggerSetup.Get();
         FilterTaskLines(TaskLine, NcTriggerSetup);
-        if TaskLine.FindSet then
+        if TaskLine.FindSet() then
             repeat
                 TaskLineParam.SetRange("Journal Template Name", TaskLine."Journal Template Name");
                 TaskLineParam.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
                 TaskLineParam.SetRange("Journal Line No.", TaskLine."Line No.");
                 TaskLineParam.SetRange("Field Code", GetParamName);
                 TaskLineParam.SetRange(Value, NcTrigger.Code);
-                if TaskLineParam.FindFirst then
+                if TaskLineParam.FindFirst() then
                     exit(true);
-            until TaskLine.Next = 0;
+            until TaskLine.Next() = 0;
         exit(false);
     end;
 

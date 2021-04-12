@@ -13,7 +13,7 @@ page 6014538 "NPR Insurance Companies"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';

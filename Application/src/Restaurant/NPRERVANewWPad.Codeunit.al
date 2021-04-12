@@ -34,7 +34,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
     local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -56,7 +56,6 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         POSSale: Codeunit "NPR POS Sale";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         SeatingCode: Code[20];
-        ConfigString: Text;
         Description: Text;
         NumberOfGuests: Integer;
         NotValidSettingErr: Label 'The provided seating code "%1" is invalid. A new waiterpad was not created.';
@@ -75,7 +74,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         WaiterPadMgt.AddNewWaiterPadForSeating(Seating.Code, WaiterPad, SeatingWaiterPadLink);
         WaiterPad."Number of Guests" := NumberOfGuests;
         WaiterPad.Description := CopyStr(Description, 1, MaxStrLen(WaiterPad.Description));
-        WaiterPad.Modify;
+        WaiterPad.Modify();
 
         SeatingLocation.Get(Seating."Seating Location");
         NPREFrontendAssistant.RefreshWaiterPadData(POSSession, FrontEnd, SeatingLocation."Restaurant Code", '');
@@ -84,7 +83,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         if Context.GetBooleanParameter('SwitchToSaleView') then begin
             POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
-            SalePOS.Find;
+            SalePOS.Find();
             SalePOS."NPRE Number of Guests" := NumberOfGuests;
             SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
             SalePOS.Validate("NPRE Pre-Set Seating Code", SeatingCode);

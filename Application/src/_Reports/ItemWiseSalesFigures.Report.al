@@ -52,7 +52,6 @@ report 6060052 "NPR Item Wise Sales Figures"
             var
                 ItemTmp: Record Item;
                 PreviousItemNo: Code[20];
-                SomeProfit: Decimal;
             begin
                 SalesHeader.SetFilter(SalesHeader."Order Date", '%1..%2', FromDate, ToDate);
                 SalesHeader.SetRange(SalesHeader."No.", "Sales Line"."Document No.");
@@ -66,7 +65,6 @@ report 6060052 "NPR Item Wise Sales Figures"
                         ItemTmp.Validate(ItemTmp."Unit Price", "Sales Line"."Unit Price");
                         if ("Sales Line"."No." <> PreviousItemNo) then
                             Profit := 0;
-                        SomeProfit := ItemTmp."Profit %";
                         Profit += (ItemTmp."Profit %" * "Sales Line"."Line Amount") / 100;
                         PreviousItemNo := SalesLine."No.";
                     end;
@@ -117,18 +115,15 @@ report 6060052 "NPR Item Wise Sales Figures"
     trigger OnInitReport()
     begin
         FromDate := CalcDate(MinusOneWeek, Today);
-        ToDate := Today;
+        ToDate := Today();
     end;
 
     var
-        Item: Record Item;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         FromDate: Date;
         ToDate: Date;
-        PercProfit: Decimal;
         Profit: Decimal;
-        ProfitOnLineAmount: Decimal;
         MinusOneWeek: Label '-1W';
 }
 

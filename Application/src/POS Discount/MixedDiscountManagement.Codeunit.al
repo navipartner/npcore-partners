@@ -1,4 +1,4 @@
-codeunit 6014416 "NPR Mixed Discount Management"
+﻿codeunit 6014416 "NPR Mixed Discount Management"
 {
     trigger OnRun()
     begin
@@ -12,9 +12,8 @@ codeunit 6014416 "NPR Mixed Discount Management"
     var
         TempMixedDiscount: Record "NPR Mixed Discount" temporary;
         TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary;
-        DiscAmount: Decimal;
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         GLSetup.TestField("Amount Rounding Precision");
 
         FindPotentiallyImpactedMixesAndLines(TempSaleLinePOS, TriggerRec, TempMixedDiscount, RecalculateAllLines);
@@ -24,7 +23,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit;
         end;
 
-        TempMixedDiscount.Reset;
+        TempMixedDiscount.Reset();
         TempMixedDiscount.SetRange("Mix Type", TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::Combination);
         if TempMixedDiscount.IsEmpty then begin
             Clear(TempSaleLinePOS);
@@ -36,10 +35,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
         TempMixedDiscount.SetCurrentKey("Actual Discount Amount", "Actual Item Qty.");
         TempMixedDiscount.SetRange("Mix Type", TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::Combination);
         TempMixedDiscount.Ascending(false);
-        TempMixedDiscount.FindSet;
+        TempMixedDiscount.FindSet();
         repeat
             ApplyMixDiscount(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS);
-        until (TempMixedDiscount.Next = 0);
+        until (TempMixedDiscount.Next() = 0);
 
         Clear(TempSaleLinePOS);
     end;
@@ -60,7 +59,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         // but will be filtered out later in FindMatchingMixDiscounts()
 
         TempSaleLinePOS.SetRange("Discount Type", TempSaleLinePOS."Discount Type"::" ");
-        if not TempSaleLinePOS.FindSet then
+        if not TempSaleLinePOS.FindSet() then
             exit;
 
         if RecalculateAllLines then begin
@@ -68,28 +67,27 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
                 FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", TempSaleLinePOS."Item Disc. Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
                 FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-            until TempSaleLinePOS.Next = 0;
+            until TempSaleLinePOS.Next() = 0;
         end else begin
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, Rec."No.", Rec."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", Rec."Item Disc. Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
         end;
 
-        TempSaleLinePOS.FindSet;
+        TempSaleLinePOS.FindSet();
         repeat
             if HasImpact(tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, TempSaleLinePOS) then begin
                 TempSaleLinePOS."Discount Calculated" := true;
-                TempSaleLinePOS.Modify;
+                TempSaleLinePOS.Modify();
                 TempSaleLinePOS.Mark(true);
             end;
-        until TempSaleLinePOS.Next = 0;
+        until TempSaleLinePOS.Next() = 0;
         TempSaleLinePOS.MarkedOnly(true);
     end;
 
     local procedure FindMixGroupingImpact(GroupingType: Enum "NPR Disc. Grouping Type"; No: Code[20]; VariantCode: Code[10]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
-        MixedDiscountHeader: Record "NPR Mixed Discount";
     begin
         MixedDiscountLine.SetCurrentKey("Disc. Grouping Type", "No.", "Variant Code", "Starting Date", "Ending Date", "Starting Time", "Ending Time", Status);
         MixedDiscountLine.SetRange("Disc. Grouping Type", GroupingType);
@@ -99,10 +97,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
         MixedDiscountLine.SetFilter("Ending Date", '>=%1|=%2', Today, 0D);
         MixedDiscountLine.SetRange(Status, MixedDiscountLine.Status::Active);
 
-        if MixedDiscountLine.FindSet then
+        if MixedDiscountLine.FindSet() then
             repeat
                 FindMixHeaderImpact(MixedDiscountLine.Code, tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-            until MixedDiscountLine.Next = 0;
+            until MixedDiscountLine.Next() = 0;
     end;
 
     local procedure FindMixHeaderImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
@@ -122,7 +120,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit;
 
         tmpImpactedMixHeaders := MixedDiscount;
-        tmpImpactedMixHeaders.Insert;
+        tmpImpactedMixHeaders.Insert();
 
         FindMixLineImpact(MixDiscountCode, tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
         FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Mix Discount", MixDiscountCode, '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
@@ -131,10 +129,9 @@ codeunit 6014416 "NPR Mixed Discount Management"
     local procedure FindMixLineImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
-        MixedDiscountHeader: Record "NPR Mixed Discount";
     begin
         MixedDiscountLine.SetRange(Code, MixDiscountCode);
-        if not MixedDiscountLine.FindSet then
+        if not MixedDiscountLine.FindSet() then
             exit;
 
         repeat
@@ -143,25 +140,25 @@ codeunit 6014416 "NPR Mixed Discount Management"
                     if not tmpImpactedItems.Get(MixedDiscountLine."No.", MixedDiscountLine."Variant Code") then begin
                         tmpImpactedItems."Item No." := MixedDiscountLine."No.";
                         tmpImpactedItems.Code := MixedDiscountLine."Variant Code";
-                        tmpImpactedItems.Insert;
+                        tmpImpactedItems.Insert();
                         FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
                     end;
                 MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group":
                     if not tmpImpactedItemDiscGroups.Get(MixedDiscountLine."No.") then begin
                         tmpImpactedItemDiscGroups.Code := MixedDiscountLine."No.";
-                        tmpImpactedItemDiscGroups.Insert;
+                        tmpImpactedItemDiscGroups.Insert();
                         FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
                     end;
                 MixedDiscountLine."Disc. Grouping Type"::"Item Group":
                     if not tmpImpactedItemGroups.Get(MixedDiscountLine."No.") then begin
                         tmpImpactedItemGroups.Code := MixedDiscountLine."No.";
-                        tmpImpactedItemGroups.Insert;
+                        tmpImpactedItemGroups.Insert();
                         FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type", MixedDiscountLine."No.", MixedDiscountLine."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
                     end;
                 MixedDiscountLine."Disc. Grouping Type"::"Mix Discount":
                     FindMixHeaderImpact(MixedDiscountLine."No.", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             end;
-        until MixedDiscountLine.Next = 0;
+        until MixedDiscountLine.Next() = 0;
     end;
 
     local procedure HasImpact(var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
@@ -186,8 +183,6 @@ codeunit 6014416 "NPR Mixed Discount Management"
     var
         TotalAmountAfterDisc: Decimal;
         AvgDiscPct: Decimal;
-        DiscQty: Decimal;
-        RemainingQty: Decimal;
         UnitPrice: Decimal;
     begin
         if TotalAmount <= 0 then
@@ -267,14 +262,14 @@ codeunit 6014416 "NPR Mixed Discount Management"
                         exit(0);
 
                     ItemDiscQty := TempMixedDiscount."Item Discount Qty." * BatchQty;
-                    TempPriorityBuffer.FindSet;
+                    TempPriorityBuffer.FindSet();
                     repeat
                         DiscQty := TempPriorityBuffer.Quantity;
                         if DiscQty > ItemDiscQty - TotalDiscQty then
                             DiscQty := ItemDiscQty - TotalDiscQty;
                         TotalDiscQty += DiscQty;
                         TotalDiscAmount += DiscQty * TempPriorityBuffer."Unit Price" * (TempMixedDiscount."Item Discount %" / 100);
-                    until (TempPriorityBuffer.Next = 0) or (TotalDiscQty >= ItemDiscQty);
+                    until (TempPriorityBuffer.Next() = 0) or (TotalDiscQty >= ItemDiscQty);
                 end;
         end;
 
@@ -303,18 +298,18 @@ codeunit 6014416 "NPR Mixed Discount Management"
             if MixedDiscountLine.IsEmpty then
                 exit(0);
 
-            MixedDiscountLine.FindSet;
+            MixedDiscountLine.FindSet();
             repeat
                 if MixedDiscountPart.Get(MixedDiscountLine."No.") then
                     TotalAmount += CalcExpectedAmountPerBatch(MixedDiscountPart, MaxAmount, TempPriorityBuffer);
-            until MixedDiscountLine.Next = 0;
+            until MixedDiscountLine.Next() = 0;
             exit(TotalAmount);
         end;
 
         MixedDiscountLine.SetRange(Code, MixedDiscount.Code);
         MixedDiscountLine.SetFilter("Unit price", '>%1', 0);
         MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::Item, MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group");
-        if not MixedDiscountLine.FindFirst then
+        if not MixedDiscountLine.FindFirst() then
             exit(0);
 
         if MixedDiscount.Lot then begin
@@ -323,7 +318,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 TotalAmount += MixedDiscountLine."Unit price" * MixedDiscountLine.Quantity;
 
                 TransferMixedDiscountLine2PriorityBuffer(MixedDiscountLine, TempPriorityBuffer);
-            until MixedDiscountLine.Next = 0;
+            until MixedDiscountLine.Next() = 0;
 
             exit(TotalAmount);
         end;
@@ -334,7 +329,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 MixedDiscountLine.SetFilter("Unit price", '>%1', MixedDiscountLine."Unit price")
             else
                 MixedDiscountLine.SetFilter("Unit price", '<%1', MixedDiscountLine."Unit price");
-        until not MixedDiscountLine.FindFirst;
+        until not MixedDiscountLine.FindFirst();
 
         MixedDiscountLine.CalcFields("Unit price");
         TotalAmount := MixedDiscountLine."Unit price" * MixedDiscount."Min. Quantity";
@@ -348,53 +343,50 @@ codeunit 6014416 "NPR Mixed Discount Management"
     local procedure TransferSaleLinePOS2PriorityBuffer(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary): Boolean
     var
         Priority: Decimal;
-        Qty: Decimal;
     begin
         if TempSaleLinePOS.IsEmpty then
             exit(false);
 
-        TempPriorityBuffer.DeleteAll;
+        TempPriorityBuffer.DeleteAll();
 
-        TempSaleLinePOS.FindSet;
+        TempSaleLinePOS.FindSet();
         repeat
             Priority := FindPriority(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS);
             if TempPriorityBuffer.Get(Priority, TempSaleLinePOS."Unit Price", TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code") then begin
                 TempPriorityBuffer.Quantity += TempSaleLinePOS.Quantity;
-                TempPriorityBuffer.Modify;
+                TempPriorityBuffer.Modify();
             end else begin
-                TempPriorityBuffer.Init;
+                TempPriorityBuffer.Init();
                 TempPriorityBuffer.Priority := Priority;
                 TempPriorityBuffer."Unit Price" := TempSaleLinePOS."Unit Price";
                 TempPriorityBuffer."Item No." := TempSaleLinePOS."No.";
                 TempPriorityBuffer."Variant Code" := TempSaleLinePOS."Variant Code";
                 TempPriorityBuffer.Quantity := TempSaleLinePOS.Quantity;
-                TempPriorityBuffer.Insert;
+                TempPriorityBuffer.Insert();
             end;
-        until TempSaleLinePOS.Next = 0;
+        until TempSaleLinePOS.Next() = 0;
 
         exit(true);
     end;
 
     local procedure TransferMixedDiscountLine2PriorityBuffer(var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary)
-    var
-        Qty: Decimal;
     begin
         if TempMixedDiscountLine."Disc. Grouping Type" <> TempMixedDiscountLine."Disc. Grouping Type"::Item then
             exit;
 
         if TempPriorityBuffer.Get(TempMixedDiscountLine.Priority, TempMixedDiscountLine."Unit price", TempMixedDiscountLine."No.", TempMixedDiscountLine."Variant Code") then begin
             TempPriorityBuffer.Quantity += TempMixedDiscountLine.Quantity;
-            TempPriorityBuffer.Modify;
+            TempPriorityBuffer.Modify();
             exit;
         end;
 
-        TempPriorityBuffer.Init;
+        TempPriorityBuffer.Init();
         TempPriorityBuffer.Priority := TempMixedDiscountLine.Priority;
         TempPriorityBuffer."Unit Price" := TempMixedDiscountLine."Unit price";
         TempPriorityBuffer."Item No." := TempMixedDiscountLine."No.";
         TempPriorityBuffer."Variant Code" := TempMixedDiscountLine."Variant Code";
         TempPriorityBuffer.Quantity := TempMixedDiscountLine.Quantity;
-        TempPriorityBuffer.Insert;
+        TempPriorityBuffer.Insert();
     end;
 
     local procedure TransferHighestPriorityBuffer(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; BatchQty: Decimal; var TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary; var TempPriorityBufferHigh: Record "NPR Mixed Disc. Prio. Buffer" temporary)
@@ -402,23 +394,23 @@ codeunit 6014416 "NPR Mixed Discount Management"
         DiscQty: Decimal;
         TotalDiscQty: Decimal;
     begin
-        TempPriorityBufferHigh.DeleteAll;
+        TempPriorityBufferHigh.DeleteAll();
         if TempMixedDiscount."Discount Type" <> TempMixedDiscount."Discount Type"::"Priority Discount per Min. Qty" then
             exit;
         if TempPriorityBuffer.IsEmpty then
             exit;
 
         TotalDiscQty := TempMixedDiscount."Item Discount Qty." * BatchQty;
-        TempPriorityBuffer.FindSet;
+        TempPriorityBuffer.FindSet();
         repeat
-            TempPriorityBufferHigh.Init;
+            TempPriorityBufferHigh.Init();
             TempPriorityBufferHigh := TempPriorityBuffer;
             if TempPriorityBufferHigh.Quantity + DiscQty > TotalDiscQty then
                 TempPriorityBufferHigh.Quantity := TotalDiscQty - DiscQty;
-            TempPriorityBufferHigh.Insert;
+            TempPriorityBufferHigh.Insert();
 
             DiscQty += TempPriorityBufferHigh.Quantity;
-        until (TempPriorityBuffer.Next = 0) or (DiscQty >= TotalDiscQty);
+        until (TempPriorityBuffer.Next() = 0) or (DiscQty >= TotalDiscQty);
     end;
 
     local procedure CalcLineMultiLevelDiscAmount(MixedDiscount: Record "NPR Mixed Discount"; MixedDiscountLevel: Record "NPR Mixed Discount Level"; SaleLinePOSApply: Record "NPR POS Sale Line"; QtyToApply: Decimal; var RemainderAmt: Decimal): Decimal
@@ -457,38 +449,36 @@ codeunit 6014416 "NPR Mixed Discount Management"
     begin
         if not MixedDiscountLevelTmp.IsTemporary then
             exit;
-        MixedDiscountLevelTmp.DeleteAll;
+        MixedDiscountLevelTmp.DeleteAll();
 
         MixedDiscountLevel.SetRange("Mixed Discount Code", MixedDiscount.Code);
         MixedDiscountLevel.SetRange("Multiple Of", false);
-        if MixedDiscountLevel.FindSet then
+        if MixedDiscountLevel.FindSet() then
             repeat
                 CopyMixDiscountLevel(MixedDiscountLevel, MixedDiscountLevelTmp, 1);
-            until MixedDiscountLevel.Next = 0;
+            until MixedDiscountLevel.Next() = 0;
 
         MixedDiscountLevel.SetRange("Multiple Of", true);
         MixedDiscountLevel.Ascending(false);
-        if MixedDiscountLevel.FindSet then
+        if MixedDiscountLevel.FindSet() then
             repeat
                 QtyFactor := 1;
                 while MixedDiscountLevel.Quantity * QtyFactor <= MaxQty do begin
                     CopyMixDiscountLevel(MixedDiscountLevel, MixedDiscountLevelTmp, QtyFactor);
                     QtyFactor += 1;
                 end;
-            until MixedDiscountLevel.Next = 0;
+            until MixedDiscountLevel.Next() = 0;
     end;
 
     local procedure CopyMixDiscountLevel(FromMixDiscountLevel: Record "NPR Mixed Discount Level"; var ToMixDiscountLevel: Record "NPR Mixed Discount Level"; QtyFactor: Integer)
     begin
         ToMixDiscountLevel := FromMixDiscountLevel;
-        with ToMixDiscountLevel do begin
-            Quantity := Quantity * QtyFactor;
-            if Find or (Quantity <= 0) then
-                exit;
-            if "Discount Amount" <> 0 then
-                "Discount Amount" := "Discount Amount" * QtyFactor;
-            Insert;
-        end;
+        ToMixDiscountLevel.Quantity := ToMixDiscountLevel.Quantity * QtyFactor;
+        if ToMixDiscountLevel.Find() or (ToMixDiscountLevel.Quantity <= 0) then
+            exit;
+        if ToMixDiscountLevel."Discount Amount" <> 0 then
+            ToMixDiscountLevel."Discount Amount" := ToMixDiscountLevel."Discount Amount" * QtyFactor;
+        ToMixDiscountLevel.Insert();
     end;
 
     local procedure FindApplicableMixDiscountLevel(var MixDiscountLevel: Record "NPR Mixed Discount Level"; QtyToApply: Decimal): Boolean
@@ -497,9 +487,9 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit(false);
 
         MixDiscountLevel.SetFilter(Quantity, '>%1', QtyToApply);
-        MixDiscountLevel.DeleteAll;
+        MixDiscountLevel.DeleteAll();
         MixDiscountLevel.SetRange(Quantity);
-        exit(MixDiscountLevel.FindLast);
+        exit(MixDiscountLevel.FindLast());
     end;
 
     local procedure "--- Apply"()
@@ -512,9 +502,9 @@ codeunit 6014416 "NPR Mixed Discount Management"
         TempSaleLinePOSApplyNew: Record "NPR POS Sale Line" temporary;
         QtyToApply: Decimal;
     begin
-        TempSaleLinePOSApply.Reset;
+        TempSaleLinePOSApply.Reset();
         if BatchQty < 1 then begin
-            TempSaleLinePOSApply.DeleteAll;
+            TempSaleLinePOSApply.DeleteAll();
             exit;
         end;
         if (TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Priority Discount per Min. Qty") then
@@ -529,7 +519,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if not TempMixedDiscount.Lot then
             QtyToApply := Round(TempMixedDiscount.CalcMinQty() * BatchQty, 0.00001);
 
-        TempMixedDiscountLine.FindSet;
+        TempMixedDiscountLine.FindSet();
         repeat
             FilterSaleLinePOS(TempMixedDiscountLine, TempSaleLinePOSApplyCopy);
             TempSaleLinePOSApplyCopy.SetRange("Discount Type");
@@ -537,7 +527,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
             if TempMixedDiscount.Lot then
                 QtyToApply := Round(TempMixedDiscountLine.Quantity * BatchQty, 0.00001);
             AdjustBatchQtyItems(BatchQty, QtyToApply, TempMixedDiscountLine, TempSaleLinePOSApplyCopy, TempSaleLinePOSApplyNew);
-        until TempMixedDiscountLine.Next = 0;
+        until TempMixedDiscountLine.Next() = 0;
         TempSaleLinePOSApply.Copy(TempSaleLinePOSApplyNew, true);
     end;
 
@@ -548,10 +538,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if TempSaleLinePOSApplyCopy.IsEmpty then
             exit;
 
-        TempSaleLinePOSApplyCopy.FindSet;
+        TempSaleLinePOSApplyCopy.FindSet();
         repeat
             if QtyToApply > 0 then begin
-                TempSaleLinePOSApplyNew.Init;
+                TempSaleLinePOSApplyNew.Init();
                 TempSaleLinePOSApplyNew := TempSaleLinePOSApplyCopy;
 
                 if QtyToApply < TempSaleLinePOSApplyNew."MR Anvendt antal" then
@@ -563,12 +553,12 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 end;
                 TempSaleLinePOSApplyNew."Invoice (Qty)" := TempSaleLinePOSApplyNew."MR Anvendt antal";
                 TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal";
-                TempSaleLinePOSApplyNew.Insert;
+                TempSaleLinePOSApplyNew.Insert();
 
                 QtyToApply -= TempSaleLinePOSApplyCopy."MR Anvendt antal";
             end;
-            TempSaleLinePOSApplyCopy.Delete;
-        until TempSaleLinePOSApplyCopy.Next = 0;
+            TempSaleLinePOSApplyCopy.Delete();
+        until TempSaleLinePOSApplyCopy.Next() = 0;
     end;
 
     local procedure AdjustDiscQty(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary)
@@ -589,22 +579,21 @@ codeunit 6014416 "NPR Mixed Discount Management"
         TransferHighestPriorityBuffer(TempMixedDiscount, BatchQty, TempPriorityBuffer, TempPriorityBufferHigh);
         Clear(TempPriorityBufferHigh);
 
-        TempSaleLinePOSApply.FindSet;
+        TempSaleLinePOSApply.FindSet();
         repeat
             AdjustDiscQtyItems(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempPriorityBufferHigh, TempSaleLinePOSApply);
-        until TempSaleLinePOSApply.Next = 0;
+        until TempSaleLinePOSApply.Next() = 0;
     end;
 
     local procedure AdjustDiscQtyItems(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempPriorityBufferHigh: Record "NPR Mixed Disc. Prio. Buffer" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary)
     var
         DiscQty: Decimal;
-        RemainingQty: Decimal;
         Priority: Decimal;
     begin
         Priority := FindPriority(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply);
         if (not TempPriorityBufferHigh.Get(Priority, TempSaleLinePOSApply."Unit Price", TempSaleLinePOSApply."No.", TempSaleLinePOSApply."Variant Code")) or (TempPriorityBufferHigh.Quantity <= 0) then begin
             TempSaleLinePOSApply."Invoice (Qty)" := 0;
-            TempSaleLinePOSApply.Modify;
+            TempSaleLinePOSApply.Modify();
             exit;
         end;
 
@@ -616,10 +605,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if TempPriorityBufferHigh.Quantity > 0 then
             TempPriorityBufferHigh.Modify
         else
-            TempPriorityBufferHigh.Delete;
+            TempPriorityBufferHigh.Delete();
 
         TempSaleLinePOSApply."Invoice (Qty)" := DiscQty;
-        TempSaleLinePOSApply.Modify;
+        TempSaleLinePOSApply.Modify();
     end;
 
     local procedure ApplyMixDiscount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) TotalDiscAmount: Decimal
@@ -629,7 +618,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         BatchQty: Decimal;
         LastLineNo: Integer;
     begin
-        TempSaleLinePOSApply.DeleteAll;
+        TempSaleLinePOSApply.DeleteAll();
         BatchQty := FindLinesToApply(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply);
         if BatchQty < 1 then
             exit(0);
@@ -637,7 +626,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         AdjustBatchQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply);
         AdjustDiscQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply);
         Clear(TempSaleLinePOS);
-        if TempSaleLinePOS.FindLast then
+        if TempSaleLinePOS.FindLast() then
             LastLineNo := TempSaleLinePOS."Line No.";
         if TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Multiple Discount Levels" then
             TotalDiscAmount := ApplylMultiLevelMixDiscountOnLines(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, LastLineNo)
@@ -650,12 +639,9 @@ codeunit 6014416 "NPR Mixed Discount Management"
 
     local procedure ApplyMixDiscountOnLines(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) TotalDiscAmount: Decimal
     var
-        Item: Record Item;
         TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary;
         AppliedDiscAmount: Decimal;
-        DiscPct: Decimal;
         LineDiscAmount: Decimal;
-        RemainingQty: Decimal;
         TotalQty: Decimal;
         TotalAmount: Decimal;
         TotalVATAmount: Decimal;
@@ -668,7 +654,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if TotalAmount = 0 then
             exit(0);
 
-        TempSaleLinePOSApply.FindSet;
+        TempSaleLinePOSApply.FindSet();
         repeat
             TempSaleLinePOSApply."Discount Type" := TempSaleLinePOSApply."Discount Type"::Mix;
             TempSaleLinePOSApply."Discount Code" := TempMixedDiscount.Code;
@@ -678,9 +664,9 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 TempSaleLinePOSApply."Discount Amount" := LineDiscAmount * (1 + TempSaleLinePOSApply."VAT %" / 100)
             else
                 TempSaleLinePOSApply."Discount Amount" := LineDiscAmount;
-            TempSaleLinePOSApply.Modify;
+            TempSaleLinePOSApply.Modify();
             AppliedDiscAmount += LineDiscAmount;
-        until TempSaleLinePOSApply.Next = 0;
+        until TempSaleLinePOSApply.Next() = 0;
 
         TransferSaleLinePOS2PriorityBuffer(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, TempPriorityBuffer);
         TotalDiscAmount := CalcTotalDiscAmount(TempMixedDiscount, BatchQty, TotalVATAmount, TotalAmount, TempPriorityBuffer);
@@ -689,7 +675,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 TempSaleLinePOSApply."Discount Amount" += (TotalDiscAmount - AppliedDiscAmount) * (1 + TempSaleLinePOSApply."VAT %" / 100)
             else
                 TempSaleLinePOSApply."Discount Amount" += TotalDiscAmount - AppliedDiscAmount;
-            TempSaleLinePOSApply.Modify;
+            TempSaleLinePOSApply.Modify();
         end;
 
         exit(TotalDiscAmount);
@@ -734,7 +720,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
             end;
 
             if CurrentQtyToApply > 0 then begin
-                PriorityBufferTmp.FindSet;
+                PriorityBufferTmp.FindSet();
                 repeat
                     SaleLinePOSApply.SetRange(Type, SaleLinePOSApply.Type::Item);
                     SaleLinePOSApply.SetRange("No.", PriorityBufferTmp."Item No.");
@@ -743,7 +729,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
                     SaleLinePOSApply.SetRange("Discount Type", SaleLinePOSApply."Discount Type"::Mix);
                     SaleLinePOSApply.SetRange("Discount Code", MixedDiscount.Code);
                     SaleLinePOSApply.SetFilter(Quantity, '>%1', 0);
-                    if SaleLinePOSApply.FindSet then
+                    if SaleLinePOSApply.FindSet() then
                         repeat
                             if SaleLinePOSApply."Discount Amount" = 0 then begin
                                 if CurrentQtyToApply >= SaleLinePOSApply."MR Anvendt antal" then
@@ -765,7 +751,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
                                 LineDiscountAmt :=
                                   CalcLineMultiLevelDiscAmount(MixedDiscount, MixedDiscountLevelTmp, SaleLinePOSApply, SaleLinePOSApply."MR Anvendt antal", RemainderAmt);
                                 SaleLinePOSApply."Discount Amount" := Round(LineDiscountAmt, 0.01);
-                                SaleLinePOSApply.Modify;
+                                SaleLinePOSApply.Modify();
 
                                 TotalAppliedDiscountAmt += SaleLinePOSApply."Discount Amount";
                                 RemainderAmt := LineDiscountAmt - SaleLinePOSApply."Discount Amount";
@@ -785,23 +771,23 @@ codeunit 6014416 "NPR Mixed Discount Management"
                                     SaleLinePOSApply."Amount Including VAT" := SaleLinePOSApply."MR Anvendt antal" * SaleLinePOSApply."Unit Price";
                                     SaleLinePOSApply."VAT Base Amount" := SaleLinePOSApply."Amount Including VAT" - SaleLinePOSApply."Amount Including VAT" / (1 + SaleLinePOSApply."VAT %" / 100);
                                     SaleLinePOSApply.Amount := SaleLinePOSApply."Amount Including VAT" - SaleLinePOSApply."VAT Base Amount";
-                                    SaleLinePOSApply.Modify;
+                                    SaleLinePOSApply.Modify();
 
                                     InsertReminderLine := false;
                                 end;
                             end;
 
                             if CurrentQtyToApply = 0 then
-                                MixedDiscountLevelTmp.Delete;
-                        until (SaleLinePOSApply.Next = 0) or (CurrentQtyToApply = 0);
-                until (PriorityBufferTmp.Next = 0) or (CurrentQtyToApply = 0);
+                                MixedDiscountLevelTmp.Delete();
+                        until (SaleLinePOSApply.Next() = 0) or (CurrentQtyToApply = 0);
+                until (PriorityBufferTmp.Next() = 0) or (CurrentQtyToApply = 0);
             end;
 
             if not NothingLeftToApply then
                 NothingLeftToApply := TotalQtyToApply = 0;
         end;
 
-        SaleLinePOSApply.Reset;
+        SaleLinePOSApply.Reset();
         exit(TotalAppliedDiscountAmt);
     end;
 
@@ -829,7 +815,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         TempSaleLinePOS.SetRange("Discount Type", TempSaleLinePOS."Discount Type"::" ");
         TempSaleLinePOS.SetFilter("Discount Code", '=%1', '');
         TempSaleLinePOS.SetFilter(Quantity, '>%1', 0);
-        exit(not TempSaleLinePOS.IsEmpty);
+        exit(not TempSaleLinePOS.IsEmpty());
     end;
 
     local procedure FindLinesToApply(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) BatchQty: Decimal
@@ -862,9 +848,6 @@ codeunit 6014416 "NPR Mixed Discount Management"
     var
         TempMixedDiscountLine2: Record "NPR Mixed Discount Line" temporary;
         TempMixedDiscount2: Record "NPR Mixed Discount" temporary;
-        AppliedQty: Decimal;
-        LastBatchQty: Decimal;
-        MaxQtyToApply: Decimal;
         MinQty: Decimal;
     begin
         if TempMixedDiscount."Mix Type" <> TempMixedDiscount."Mix Type"::Combination then
@@ -878,11 +861,11 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit(0);
 
         BatchQty := -1;
-        TempMixedDiscountLine2.FindSet;
+        TempMixedDiscountLine2.FindSet();
         repeat
             TempMixedDiscount2.Get(TempMixedDiscountLine2."No.");
             FindLinesToApply(TempMixedDiscount2, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply);
-        until TempMixedDiscountLine2.Next = 0;
+        until TempMixedDiscountLine2.Next() = 0;
 
         MinQty := TempMixedDiscount.CalcMinQty();
         if MinQty <= 0 then
@@ -896,10 +879,8 @@ codeunit 6014416 "NPR Mixed Discount Management"
 
     local procedure FindLinesToApplyLot(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) BatchQty: Decimal
     var
-        TempMixedDiscount2: Record "NPR Mixed Discount";
         AppliedQty: Decimal;
         LastBatchQty: Decimal;
-        MaxQtyToApply: Decimal;
     begin
         if not (TempMixedDiscount."Mix Type" in [TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::"Combination Part"]) then
             exit(0);
@@ -913,7 +894,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit(0);
 
         BatchQty := -1;
-        TempMixedDiscountLine.FindSet;
+        TempMixedDiscountLine.FindSet();
         repeat
             if TempMixedDiscountLine.Quantity <= 0 then
                 exit(0);
@@ -923,16 +904,14 @@ codeunit 6014416 "NPR Mixed Discount Management"
             LastBatchQty := AppliedQty div TempMixedDiscountLine.Quantity;
             if (LastBatchQty < BatchQty) or (BatchQty = -1) then
                 BatchQty := LastBatchQty;
-        until TempMixedDiscountLine.Next = 0;
+        until TempMixedDiscountLine.Next() = 0;
 
         exit(BatchQty);
     end;
 
     local procedure FindLinesToApplyTotalQty(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) BatchQty: Decimal
     var
-        TempMixedDiscount2: Record "NPR Mixed Discount";
         AppliedQty: Decimal;
-        LastBatchQty: Decimal;
         MaxQtyToApply: Decimal;
     begin
         if not TempSaleLinePOSApply.IsTemporary then
@@ -951,15 +930,15 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit(0);
 
         MaxQtyToApply := TempMixedDiscount."Max. Quantity";
-        TempMixedDiscountLine.FindSet;
+        TempMixedDiscountLine.FindSet();
         repeat
             AppliedQty += TransferLinesToApply(TempMixedDiscount, TempMixedDiscountLine, MaxQtyToApply, TempSaleLinePOS, TempSaleLinePOSApply);
             if TempMixedDiscount."Max. Quantity" > 0 then begin
                 MaxQtyToApply := TempMixedDiscount."Max. Quantity" - AppliedQty;
                 if MaxQtyToApply <= 0 then
-                    TempMixedDiscountLine.FindLast;
+                    TempMixedDiscountLine.FindLast();
             end;
-        until TempMixedDiscountLine.Next = 0;
+        until TempMixedDiscountLine.Next() = 0;
 
         BatchQty := AppliedQty / TempMixedDiscount."Min. Quantity";
         exit(BatchQty);
@@ -989,11 +968,11 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if not FilterSaleLinePOS(TempMixedDiscountLine, TempSaleLinePOS) then
             exit(0);
 
-        TempSaleLinePOS.FindSet;
+        TempSaleLinePOS.FindSet();
         repeat
             if not TempSaleLinePOSApply.Get(TempSaleLinePOS."Register No.", TempSaleLinePOS."Sales Ticket No.", TempSaleLinePOS.Date, TempSaleLinePOS."Sale Type", TempSaleLinePOS."Line No.") then begin
 
-                TempSaleLinePOSApply.Init;
+                TempSaleLinePOSApply.Init();
                 TempSaleLinePOSApply := TempSaleLinePOS;
 
                 TempSaleLinePOSApply."Discount Type" := TempSaleLinePOSApply."Discount Type"::Mix;
@@ -1003,12 +982,12 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 TempSaleLinePOSApply."Retail Document No." := TempMixedDiscountLine."Variant Code";
 
                 TempSaleLinePOSApply."Quantity (Base)" := TempMixedDiscountLine.Quantity;
-                TempSaleLinePOSApply.Insert;
+                TempSaleLinePOSApply.Insert();
 
                 TempSaleLinePOSApply."MR Anvendt antal" := TempSaleLinePOSApply.Quantity;
                 if (MaxQtyToApply > 0) and (AppliedQty + TempSaleLinePOSApply."MR Anvendt antal" >= MaxQtyToApply) then begin
                     TempSaleLinePOSApply."MR Anvendt antal" := MaxQtyToApply - AppliedQty;
-                    TempSaleLinePOS.FindLast;
+                    TempSaleLinePOS.FindLast();
                 end;
                 TempSaleLinePOSApply."Invoice (Qty)" := TempSaleLinePOSApply."MR Anvendt antal";
                 if not TempSaleLinePOSApply."Price Includes VAT" and
@@ -1020,11 +999,11 @@ codeunit 6014416 "NPR Mixed Discount Management"
                 TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price";
                 TempSaleLinePOSApply."VAT Base Amount" := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."Amount Including VAT" / (1 + TempSaleLinePOSApply."VAT %" / 100);
                 TempSaleLinePOSApply.Amount := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."VAT Base Amount";
-                TempSaleLinePOSApply.Modify;
+                TempSaleLinePOSApply.Modify();
 
                 AppliedQty += TempSaleLinePOSApply."MR Anvendt antal";
             end;
-        until TempSaleLinePOS.Next = 0;
+        until TempSaleLinePOS.Next() = 0;
 
         exit(AppliedQty);
     end;
@@ -1039,12 +1018,12 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if TempSaleLinePOSApply.IsEmpty then
             exit;
 
-        TempSaleLinePOSApply.FindSet;
+        TempSaleLinePOSApply.FindSet();
         repeat
             if not TempSaleLinePOS.Get(TempSaleLinePOSApply."Register No.", TempSaleLinePOSApply."Sales Ticket No.", TempSaleLinePOSApply.Date, TempSaleLinePOSApply."Sale Type", TempSaleLinePOSApply."Line No.")
             then begin
                 TempSaleLinePOS := TempSaleLinePOSApply;
-                TempSaleLinePOS.Insert;
+                TempSaleLinePOS.Insert();
             end;
             if not TempSaleLinePOS."Price Includes VAT" then
                 TempSaleLinePOSApply."Discount Amount" := TempSaleLinePOSApply."Discount Amount" / (1 + TempSaleLinePOS."VAT %" / 100);
@@ -1061,11 +1040,11 @@ codeunit 6014416 "NPR Mixed Discount Management"
             TempSaleLinePOS."Discount %" := 0;
             TempSaleLinePOS."Discount Amount" := TempSaleLinePOSApply."Discount Amount";
             TempSaleLinePOS."Custom Disc Blocked" := TempSaleLinePOSApply."Custom Disc Blocked";
-            TempSaleLinePOS.Modify;
+            TempSaleLinePOS.Modify();
 
             InsertNewSaleLine(TempSaleLinePOS, TempSaleLinePOSApply, NonDiscQty, TempSaleLinePOSApply."Discount Type", TempSaleLinePOSApply."Discount Code", LastLineNo);
             InsertNewSaleLine(TempSaleLinePOS, TempSaleLinePOSApply, RemainingQty, TempSaleLinePOS."Discount Type"::" ", '', LastLineNo);
-        until TempSaleLinePOSApply.Next = 0;
+        until TempSaleLinePOSApply.Next() = 0;
     end;
 
     local procedure InsertNewSaleLine(var SaleLinePOS: Record "NPR POS Sale Line"; FromSaleLinePOS: Record "NPR POS Sale Line"; Qty: Decimal; DiscountType: Integer; DiscountCode: Code[20]; var LastLineNo: Integer)
@@ -1077,7 +1056,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
 
         SaleLinePOS2 := SaleLinePOS;
 
-        SaleLinePOS.Init;
+        SaleLinePOS.Init();
         SaleLinePOS := FromSaleLinePOS;
         SaleLinePOS."Sales Document Type" := SaleLinePOS2."Sales Document Type";
         SaleLinePOS."Sales Document No." := SaleLinePOS2."Sales Document No.";
@@ -1089,7 +1068,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         SaleLinePOS."Discount %" := 0;
         SaleLinePOS."Discount Amount" := 0;
         SaleLinePOS."Custom Disc Blocked" := false;
-        SaleLinePOS.Insert;
+        SaleLinePOS.Insert();
 
         LastLineNo := SaleLinePOS."Line No.";
     end;
@@ -1113,27 +1092,27 @@ codeunit 6014416 "NPR Mixed Discount Management"
     begin
         MatchMixedDiscounts(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS);
         MatchMixedDiscountCominations(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS);
-        TempMixedDiscount.Reset;
-        exit(not TempMixedDiscount.IsEmpty);
+        TempMixedDiscount.Reset();
+        exit(not TempMixedDiscount.IsEmpty());
     end;
 
     procedure MatchMixedDiscounts(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     begin
-        TempMixedDiscount.Reset;
+        TempMixedDiscount.Reset();
         TempMixedDiscount.SetFilter("Mix Type", '%1|%2', TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::"Combination Part");
         if TempMixedDiscount.IsEmpty then
             exit;
 
-        TempMixedDiscount.FindSet;
+        TempMixedDiscount.FindSet();
         repeat
             if not MatchMixedDiscount(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS) then begin
-                TempMixedDiscountLine.Reset;
+                TempMixedDiscountLine.Reset();
                 TempMixedDiscountLine.SetRange(Code, TempMixedDiscount.Code);
-                TempMixedDiscountLine.DeleteAll;
+                TempMixedDiscountLine.DeleteAll();
 
-                TempMixedDiscount.Delete;
+                TempMixedDiscount.Delete();
             end;
-        until TempMixedDiscount.Next = 0;
+        until TempMixedDiscount.Next() = 0;
     end;
 
     local procedure MatchMixedDiscount(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
@@ -1154,7 +1133,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit(false);
 
         TotalQuantity := 0;
-        MixedDiscountLine.FindSet;
+        MixedDiscountLine.FindSet();
         repeat
             TempSaleLinePOS2.Copy(TempSaleLinePOS, true);
             TempSaleLinePOS2.SetRange(Type, TempSaleLinePOS2.Type::Item);
@@ -1176,10 +1155,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
             if TempMixedDiscount.Lot and (TotalQuantity < MixedDiscountLine.Quantity) then
                 exit(false);
 
-            TempMixedDiscountLine.Init;
+            TempMixedDiscountLine.Init();
             TempMixedDiscountLine := MixedDiscountLine;
-            TempMixedDiscountLine.Insert;
-        until MixedDiscountLine.Next = 0;
+            TempMixedDiscountLine.Insert();
+        until MixedDiscountLine.Next() = 0;
 
         if TempMixedDiscount.Lot then
             exit(true);
@@ -1189,24 +1168,23 @@ codeunit 6014416 "NPR Mixed Discount Management"
 
     procedure MatchMixedDiscountCominations(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     begin
-        TempMixedDiscount.Reset;
+        TempMixedDiscount.Reset();
         TempMixedDiscount.SetRange("Mix Type", TempMixedDiscount."Mix Type"::Combination);
         if TempMixedDiscount.IsEmpty then
             exit;
 
-        TempMixedDiscount.FindSet;
+        TempMixedDiscount.FindSet();
         repeat
             if not MatchMixedDiscountComination(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS) then begin
                 TempMixedDiscountLine.SetRange(Code, TempMixedDiscount.Code);
-                TempMixedDiscountLine.DeleteAll;
-                TempMixedDiscount.Delete;
+                TempMixedDiscountLine.DeleteAll();
+                TempMixedDiscount.Delete();
             end;
-        until TempMixedDiscount.Next = 0;
+        until TempMixedDiscount.Next() = 0;
     end;
 
     procedure MatchMixedDiscountComination(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     var
-        MixedDiscount: Record "NPR Mixed Discount";
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         TempMixedDiscountPart: Record "NPR Mixed Discount" temporary;
     begin
@@ -1220,15 +1198,15 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if MixedDiscountLine.IsEmpty then
             exit(false);
 
-        MixedDiscountLine.FindSet;
+        MixedDiscountLine.FindSet();
         repeat
             if not TempMixedDiscountPart.Get(MixedDiscountLine."No.") then
                 exit(false);
 
-            TempMixedDiscountLine.Init;
+            TempMixedDiscountLine.Init();
             TempMixedDiscountLine := MixedDiscountLine;
-            TempMixedDiscountLine.Insert;
-        until MixedDiscountLine.Next = 0;
+            TempMixedDiscountLine.Insert();
+        until MixedDiscountLine.Next() = 0;
         exit(true);
     end;
 
@@ -1260,12 +1238,12 @@ codeunit 6014416 "NPR Mixed Discount Management"
                     MixedDiscountLine2.SetRange(Status, MixedDiscountLine2.Status::Active);
                     if MixedDiscountLine2.IsEmpty then
                         exit(false);
-                    MixedDiscountLine2.FindSet;
+                    MixedDiscountLine2.FindSet();
                     repeat
                         if MixedDiscount2.Get(MixedDiscountLine2.Code) and (MixedDiscount2."Mix Type" = MixedDiscount2."Mix Type"::Combination) then
                             if DiscountActive(SalePOS, MixedDiscount2) then
                                 exit(true);
-                    until MixedDiscountLine2.Next = 0;
+                    until MixedDiscountLine2.Next() = 0;
                 end;
         end;
 
@@ -1306,10 +1284,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if TempMixedDiscountCopy.IsEmpty then
             exit(DiscAmount);
 
-        TempMixedDiscountCopy.FindSet;
+        TempMixedDiscountCopy.FindSet();
         repeat
             DiscAmount += ApplyMixDiscount(TempMixedDiscountCopy, TempMixedDiscountLine, TempSaleLinePOS);
-        until TempMixedDiscountCopy.Next = 0;
+        until TempMixedDiscountCopy.Next() = 0;
 
         exit(DiscAmount);
     end;
@@ -1319,17 +1297,17 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if not TempMixedDiscountCopy.IsTemporary then
             exit;
         Clear(TempMixedDiscountCopy);
-        TempMixedDiscountCopy.DeleteAll;
+        TempMixedDiscountCopy.DeleteAll();
 
         if TempMixedDiscount.IsEmpty then
             exit;
 
-        TempMixedDiscount.FindSet;
+        TempMixedDiscount.FindSet();
         repeat
-            TempMixedDiscountCopy.Init;
+            TempMixedDiscountCopy.Init();
             TempMixedDiscountCopy := TempMixedDiscount;
-            TempMixedDiscountCopy.Insert;
-        until TempMixedDiscount.Next = 0;
+            TempMixedDiscountCopy.Insert();
+        until TempMixedDiscount.Next() = 0;
     end;
 
     local procedure CopySaleLinePOS(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSCopy: Record "NPR POS Sale Line" temporary)
@@ -1337,17 +1315,17 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if not TempSaleLinePOSCopy.IsTemporary then
             exit;
         Clear(TempSaleLinePOSCopy);
-        TempSaleLinePOSCopy.DeleteAll;
+        TempSaleLinePOSCopy.DeleteAll();
 
         if TempSaleLinePOS.IsEmpty then
             exit;
 
-        TempSaleLinePOS.FindSet;
+        TempSaleLinePOS.FindSet();
         repeat
-            TempSaleLinePOSCopy.Init;
+            TempSaleLinePOSCopy.Init();
             TempSaleLinePOSCopy := TempSaleLinePOS;
-            TempSaleLinePOSCopy.Insert;
-        until TempSaleLinePOS.Next = 0;
+            TempSaleLinePOSCopy.Insert();
+        until TempSaleLinePOS.Next() = 0;
     end;
 
     local procedure FindBestMixMatch(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
@@ -1358,10 +1336,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
     begin
         Clear(TempMixedDiscount);
         TempMixedDiscount.SetRange("Mix Type", TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::Combination);
-        if TempMixedDiscount.Count <= 1 then
+        if TempMixedDiscount.Count() <= 1 then
             exit;
 
-        TempMixedDiscount.FindSet;
+        TempMixedDiscount.FindSet();
         repeat
             CopySaleLinePOS(TempSaleLinePOS, TempSaleLinePOSCopy);
             DiscAmount := ApplyMixDiscount(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSCopy);
@@ -1370,8 +1348,8 @@ codeunit 6014416 "NPR Mixed Discount Management"
             TempSaleLinePOSCopy.CalcSums(Quantity);
             TempMixedDiscount."Actual Discount Amount" := DiscAmount;
             TempMixedDiscount."Actual Item Qty." := TempSaleLinePOSCopy.Quantity;
-            TempMixedDiscount.Modify;
-        until TempMixedDiscount.Next = 0;
+            TempMixedDiscount.Modify();
+        until TempMixedDiscount.Next() = 0;
 
         Clear(TempMixedDiscount);
         CopyMixedDiscount(TempMixedDiscount, TempMixedDiscountCopy);
@@ -1379,7 +1357,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         TempMixedDiscountCopy.SetCurrentKey("Actual Discount Amount", "Actual Item Qty.");
         TempMixedDiscountCopy.Ascending(false);
         TempMixedDiscountCopy.SetRange("Mix Type", TempMixedDiscountCopy."Mix Type"::Standard, TempMixedDiscountCopy."Mix Type"::Combination);
-        TempMixedDiscountCopy.FindSet;
+        TempMixedDiscountCopy.FindSet();
         repeat
             CopySaleLinePOS(TempSaleLinePOS, TempSaleLinePOSCopy);
             DiscAmount := CalcTotalAppliedMixDisc(TempMixedDiscountCopy, TempMixedDiscountLine, TempSaleLinePOSCopy);
@@ -1390,8 +1368,8 @@ codeunit 6014416 "NPR Mixed Discount Management"
             TempMixedDiscount.Get(TempMixedDiscountCopy.Code);
             TempMixedDiscount."Actual Discount Amount" := DiscAmount;
             TempMixedDiscount."Actual Item Qty." := TempSaleLinePOSCopy.Quantity;
-            TempMixedDiscount.Modify;
-        until TempMixedDiscountCopy.Next = 0;
+            TempMixedDiscount.Modify();
+        until TempMixedDiscountCopy.Next() = 0;
     end;
 
     procedure GetOrInit(var DiscountPriority: Record "NPR Discount Priority")
@@ -1399,7 +1377,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if DiscountPriority.Get(DiscSourceTableId()) then
             exit;
 
-        DiscountPriority.Init;
+        DiscountPriority.Init();
         DiscountPriority."Table ID" := DiscSourceTableId();
         DiscountPriority.Priority := 1;
         DiscountPriority.Disabled := false;
@@ -1461,25 +1439,25 @@ codeunit 6014416 "NPR Mixed Discount Management"
         MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::Item);
         MixedDiscountLine.SetRange("No.", Rec."No.");
         MixedDiscountLine.SetFilter("Variant Code", '%1|%2', '', Rec."Variant Code");
-        IsActive := not MixedDiscountLine.IsEmpty;
+        IsActive := not MixedDiscountLine.IsEmpty();
 
         if not IsActive then begin
             MixedDiscountLine.SetRange("Variant Code");
             MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group");
             MixedDiscountLine.SetRange("No.", Rec."Item Disc. Group");
-            IsActive := not MixedDiscountLine.IsEmpty;
+            IsActive := not MixedDiscountLine.IsEmpty();
         end;
 
         if not IsActive then begin
             MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::"Item Group");
             MixedDiscountLine.SetRange("No.", Rec."Item Category Code");
-            IsActive := not MixedDiscountLine.IsEmpty;
+            IsActive := not MixedDiscountLine.IsEmpty();
         end;
 
         if IsActive then begin
-            tmpDiscountPriority.Init;
+            tmpDiscountPriority.Init();
             tmpDiscountPriority := DiscountPriority;
-            tmpDiscountPriority.Insert;
+            tmpDiscountPriority.Insert();
         end;
     end;
 
@@ -1523,11 +1501,11 @@ codeunit 6014416 "NPR Mixed Discount Management"
             if MixedDiscountLine.IsEmpty then
                 exit(false);
 
-            MixedDiscountLine.FindSet;
+            MixedDiscountLine.FindSet();
             repeat
                 if not IsActiveLineNow(MixedDiscountLine) then
                     exit(true);
-            until MixedDiscountLine.Next = 0;
+            until MixedDiscountLine.Next() = 0;
             exit(false);
         end;
 
@@ -1538,7 +1516,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if MixedDiscount."Ending date" = 0D then
             exit(false);
 
-        CurrDate := Today;
+        CurrDate := Today();
         CurrTime := Time;
         if MixedDiscount."Starting date" > CurrDate then
             exit(false);
@@ -1578,12 +1556,12 @@ codeunit 6014416 "NPR Mixed Discount Management"
             exit(true);
 
         CheckTime := Time;
-        CheckDate := Today;
-        MixedDiscountTimeInterval.FindSet;
+        CheckDate := Today();
+        MixedDiscountTimeInterval.FindSet();
         repeat
             if IsActiveTimeInterval(MixedDiscountTimeInterval, CheckTime, CheckDate) then
                 exit(true);
-        until MixedDiscountTimeInterval.Next = 0;
+        until MixedDiscountTimeInterval.Next() = 0;
 
         exit(false);
     end;

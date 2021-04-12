@@ -26,7 +26,7 @@ table 6014470 "NPR Pacsoft Shipm. Doc. Serv."
         }
         field(20; Description; Text[50])
         {
-            CalcFormula = Lookup ("Shipping Agent Services".Description WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"),
+            CalcFormula = Lookup("Shipping Agent Services".Description WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"),
                                                                               Code = FIELD("Shipping Agent Service Code")));
             Caption = 'Description';
             Editable = false;

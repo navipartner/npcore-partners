@@ -2,23 +2,17 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
 {
     var
         ActionDescription: Label 'Create a prepayment line for a sales order. Prepayment invoice will be posted & applied immediately upon sale end.';
-        ERRDOCTYPE: Label 'Wrong Document Type. Document Type is set to %1. It must be one of %2, %3, %4 or %5';
-        ERRPARSED: Label 'SalesDocumentToPOS and SalesDocumentAmountToPOS can not be used simultaneously. This is an error in parameter setting on menu button for action %1.';
-        ERRPARSEDCOMB: Label 'Import of amount is only supported for Document Type Order. This is an error in parameter setting on menu button for action %1.';
         TextPrepaymentTitle: Label 'Prepayment';
         TextPrepaymentPctLead: Label 'Please specify prepayment % to be paid after export';
         TextPrepaymentAmountLead: Label 'Please specify prepayment amount to be paid after export';
-        CaptionOrderType: Label 'Order Type';
         CaptionPrepaymentDlg: Label 'Prompt Prepayment Value';
         CaptionFixedPrepaymentValue: Label 'Fixed Prepayment Value';
         CaptionPrintDoc: Label 'Print Prepayment Document';
         CaptionPrepaymentIsAmount: Label 'Prepayment Value Is Amount';
-        DescOrderType: Label 'Filter on Order Type';
         DescPrepaymentDlg: Label 'Ask user for prepayment percentage';
         DescFixedPrepaymentValue: Label 'Prepayment value to use either silently or as dialog default value';
         DescPrintDoc: Label 'Print standard prepayment document after posting.';
         DescPrepaymentIsAmount: Label 'The prompt or silent prepayment value is interpreted as an amount instead of percent';
-        OptionOrderType: Label 'Not Set,Order,Lending';
         CaptionSelectCustomer: Label 'Select Customer';
         DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
         CaptionSendDocument: Label 'Send Document';
@@ -39,37 +33,33 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('prepaymentPct', 'param.Dialog && !param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentPctLead, param.FixedValue).cancel(abort);');
-                RegisterWorkflowStep('prepaymentAmount', 'param.Dialog && param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentAmountLead, param.FixedValue).cancel(abort);');
-                RegisterWorkflowStep('PrepayDocument', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode(),
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('prepaymentPct', 'param.Dialog && !param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentPctLead, param.FixedValue).cancel(abort);');
+            Sender.RegisterWorkflowStep('prepaymentAmount', 'param.Dialog && param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentAmountLead, param.FixedValue).cancel(abort);');
+            Sender.RegisterWorkflowStep('PrepayDocument', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterBooleanParameter('InputIsAmount', false);
-                RegisterBooleanParameter('Dialog', true);
-                RegisterDecimalParameter('FixedValue', 0);
-                RegisterBooleanParameter('SendDocument', false);
-                RegisterBooleanParameter('Pdf2NavDocument', false);
-                RegisterBooleanParameter('PrintDocument', false);
-                RegisterBooleanParameter('SelectCustomer', true);
-            end;
+            Sender.RegisterBooleanParameter('InputIsAmount', false);
+            Sender.RegisterBooleanParameter('Dialog', true);
+            Sender.RegisterDecimalParameter('FixedValue', 0);
+            Sender.RegisterBooleanParameter('SendDocument', false);
+            Sender.RegisterBooleanParameter('Pdf2NavDocument', false);
+            Sender.RegisterBooleanParameter('PrintDocument', false);
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        UI: Codeunit "NPR POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'prepaymentDialogTitle', TextPrepaymentTitle);
-        Captions.AddActionCaption(ActionCode, 'prepaymentPctLead', TextPrepaymentPctLead);
-        Captions.AddActionCaption(ActionCode, 'prepaymentAmtLead', TextPrepaymentAmountLead);
+        Captions.AddActionCaption(ActionCode(), 'prepaymentDialogTitle', TextPrepaymentTitle);
+        Captions.AddActionCaption(ActionCode(), 'prepaymentPctLead', TextPrepaymentPctLead);
+        Captions.AddActionCaption(ActionCode(), 'prepaymentAmtLead', TextPrepaymentAmountLead);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -84,7 +74,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         Send: Boolean;
         Pdf2Nav: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
@@ -130,7 +120,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -182,7 +172,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -206,7 +196,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of
@@ -230,7 +220,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        if POSParameterValue."Action Code" <> ActionCode then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
         case POSParameterValue.Name of

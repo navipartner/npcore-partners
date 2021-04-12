@@ -26,20 +26,19 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescriptionCaption,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('', 'respond();');
-                RegisterWorkflow(false);
-                RegisterTextParameter('Template', '');
-                RegisterBooleanParameter('LastSale', false);
-                RegisterBooleanParameter('SingleLine', false);
-            end;
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescriptionCaption,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('', 'respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterTextParameter('Template', '');
+            Sender.RegisterBooleanParameter('LastSale', false);
+            Sender.RegisterBooleanParameter('SingleLine', false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -54,7 +53,7 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
         LastSale: Boolean;
         SingleLine: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -71,12 +70,12 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
         POSEntry.FilterGroup(0);
 
         if LastSale then begin
-            POSEntry.FindLast;
+            POSEntry.FindLast();
             POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         end else
             RunModalPage(POSEntry, POSSalesLine, SingleLine);
 
-        if POSSalesLine.Count = 0 then
+        if POSSalesLine.Count() = 0 then
             Error(NoSaleLinesErr);
 
         RecordVar := POSSalesLine;
@@ -97,7 +96,7 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
         POSEntries.LookupMode(true);
         POSEntries.Caption(ChooseDocumentCaption);
         POSEntries.SetTableView(POSEntry);
-        if not (POSEntries.RunModal = ACTION::LookupOK) then
+        if not (POSEntries.RunModal() = ACTION::LookupOK) then
             Error('');
 
         POSEntries.GetRecord(POSEntry);
@@ -109,11 +108,11 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
         POSSalesLineList.LookupMode(true);
         POSSalesLineList.Caption(ChooseDetailsCaption);
         POSSalesLineList.SetTableView(POSSalesLine);
-        if not (POSSalesLineList.RunModal = ACTION::LookupOK) then
+        if not (POSSalesLineList.RunModal() = ACTION::LookupOK) then
             Error('');
 
         POSSalesLineList.GetRecord(POSSalesLine);
-        POSSalesLine.SetRecFilter;
+        POSSalesLine.SetRecFilter();
     end;
 }
 

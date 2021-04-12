@@ -1,4 +1,4 @@
-codeunit 6151412 "NPR Magento Attr. Set Mgt."
+﻿codeunit 6151412 "NPR Magento Attr. Set Mgt."
 {
     var
         Text00001: Label 'Attribute Set ID %1 and Attribute Group Name %2 already exist.';
@@ -12,7 +12,7 @@ codeunit 6151412 "NPR Magento Attr. Set Mgt."
         Item.Get(ItemNo);
 
         SetupItemAttributes(Item, VariantCode);
-        Commit;
+        Commit();
         Clear(MagentoItemAttribute);
         MagentoItemAttribute.FilterGroup(2);
         MagentoItemAttribute.SetRange("Item No.", Item."No.");
@@ -21,7 +21,7 @@ codeunit 6151412 "NPR Magento Attr. Set Mgt."
         MagentoItemAttribute.FilterGroup(0);
         Clear(MagentoItemAttributes);
         MagentoItemAttributes.SetTableView(MagentoItemAttribute);
-        MagentoItemAttributes.RunModal;
+        MagentoItemAttributes.RunModal();
     end;
 
     procedure SetupItemAttributes(var Item: Record Item; VariantCode: Code[10])
@@ -35,11 +35,11 @@ codeunit 6151412 "NPR Magento Attr. Set Mgt."
         Item.TestField("NPR Attribute Set ID");
 
         MagentoAttributeSetValue.SetRange("Attribute Set ID", Item."NPR Attribute Set ID");
-        if MagentoAttributeSetValue.FindSet then
+        if MagentoAttributeSetValue.FindSet() then
             repeat
                 MagentoAttribute.Get(MagentoAttributeSetValue."Attribute ID");
                 if not MagentoItemAttribute.Get(MagentoAttributeSetValue."Attribute Set ID", MagentoAttributeSetValue."Attribute ID", Item."No.", VariantCode) then begin
-                    MagentoItemAttribute.Init;
+                    MagentoItemAttribute.Init();
                     MagentoItemAttribute."Attribute Set ID" := Item."NPR Attribute Set ID";
                     MagentoItemAttribute."Attribute ID" := MagentoAttributeSetValue."Attribute ID";
                     MagentoItemAttribute."Item No." := Item."No.";
@@ -48,10 +48,10 @@ codeunit 6151412 "NPR Magento Attr. Set Mgt."
                 end;
 
                 MagentoAttributeLabel.SetRange("Attribute ID", MagentoAttributeSetValue."Attribute ID");
-                if MagentoAttributeLabel.FindSet then
+                if MagentoAttributeLabel.FindSet() then
                     repeat
                         if not MagentoItemAttributeValue.Get(MagentoItemAttribute."Attribute ID", Item."No.", VariantCode, MagentoAttributeLabel."Line No.") then begin
-                            MagentoItemAttributeValue.Init;
+                            MagentoItemAttributeValue.Init();
                             MagentoItemAttributeValue."Attribute ID" := MagentoItemAttribute."Attribute ID";
                             MagentoItemAttributeValue."Item No." := Item."No.";
                             MagentoItemAttributeValue."Variant Code" := VariantCode;
@@ -60,14 +60,14 @@ codeunit 6151412 "NPR Magento Attr. Set Mgt."
                             MagentoItemAttributeValue."Attribute Set ID" := MagentoAttributeSetValue."Attribute Set ID";
                             MagentoItemAttributeValue.Picture := MagentoAttributeLabel.Image;
                             MagentoItemAttributeValue.Selected := false;
-                            MagentoItemAttributeValue.Insert;
+                            MagentoItemAttributeValue.Insert();
                         end else
                             if MagentoItemAttributeValue."Attribute Set ID" <> MagentoAttributeSetValue."Attribute Set ID" then begin
                                 MagentoItemAttributeValue."Attribute Set ID" := MagentoAttributeSetValue."Attribute Set ID";
                                 MagentoItemAttributeValue.Modify(true);
                             end;
-                    until MagentoAttributeLabel.Next = 0;
-            until MagentoAttributeSetValue.Next = 0;
+                    until MagentoAttributeLabel.Next() = 0;
+            until MagentoAttributeSetValue.Next() = 0;
     end;
 
     procedure HasProducts(RecRef: RecordRef): Boolean
@@ -79,9 +79,9 @@ codeunit 6151412 "NPR Magento Attr. Set Mgt."
             DATABASE::"NPR Magento Attribute Set":
                 begin
                     RecRef.SetTable(MagentoAttributeSet);
-                    MagentoAttributeSet.Find;
+                    MagentoAttributeSet.Find();
                     Item.SetRange("NPR Attribute Set ID", MagentoAttributeSet."Attribute Set ID");
-                    exit(Item.FindFirst);
+                    exit(Item.FindFirst());
                 end;
         end;
 
@@ -99,7 +99,7 @@ codeunit 6151412 "NPR Magento Attr. Set Mgt."
             exit;
         MagentoAttributeGroup.SetFilter(Description, '%1', Rec.Description);
         MagentoAttributeGroup.SetRange("Attribute Set ID", Rec."Attribute Set ID");
-        if MagentoAttributeGroup.FindFirst then
+        if MagentoAttributeGroup.FindFirst() then
             Error(StrSubstNo(Text00001, Rec."Attribute Set ID", Rec.Description));
     end;
 }

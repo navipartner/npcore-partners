@@ -63,7 +63,7 @@ page 6151042 "NPR Notification Card"
                 trigger OnAction()
                 begin
                     AFAPIWebService.SetNotificationCompletedFlag(UserId, Rec."Temp Current Pos Unit No.", Format(Rec.Id));
-                    CurrPage.Close;
+                    CurrPage.Close();
                 end;
             }
             action(Cancel)
@@ -80,7 +80,7 @@ page 6151042 "NPR Notification Card"
                 trigger OnAction()
                 begin
                     AFAPIWebService.SetNotificationCancelledFlag(UserId, Rec."Temp Current Pos Unit No.", Format(Rec.Id));
-                    CurrPage.Close;
+                    CurrPage.Close();
                 end;
             }
         }

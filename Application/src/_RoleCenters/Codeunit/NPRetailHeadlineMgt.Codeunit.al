@@ -1,4 +1,4 @@
-codeunit 6151240 "NPR NP Retail Headline Mgt."
+﻿codeunit 6151240 "NPR NP Retail Headline Mgt."
 {
 
     trigger OnRun()
@@ -215,31 +215,29 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
 
     procedure GetTopSalesToday(var HigestTodaySales: Text[250])
     var
-        User: Record User;
         POSEntry: Record "NPR POS Entry";
         SalesAmt: Decimal;
     begin
-        POSEntry.Reset;
+        POSEntry.Reset();
         POSEntry.SetFilter("Entry Date", '=%1', Today);
-        if POSEntry.FindSet then begin
+        if POSEntry.FindSet() then begin
             SalesAmt := POSEntry."Item Sales (LCY)";
             repeat
                 if SalesAmt < POSEntry."Item Sales (LCY)" then
                     SalesAmt := POSEntry."Item Sales (LCY)";
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
             HigestTodaySales := Format(SalesAmt);
         end;
     end;
 
     procedure GetTopSalesPersonToday(var TopSalesPerson: Text[50])
     var
-        User: Record User;
         SalesPerson: Record "Salesperson/Purchaser";
         SalesAmt: Decimal;
     begin
         SalesAmt := 0;
-        SalesPerson.Reset;
-        if SalesPerson.FindSet then begin
+        SalesPerson.Reset();
+        if SalesPerson.FindSet() then begin
             SalesPerson.CalcFields("NPR Sales (LCY)");
             SalesAmt := SalesPerson."NPR Sales (LCY)";
             TopSalesPerson := SalesPerson.Name;
@@ -249,7 +247,7 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
                     SalesAmt := SalesPerson."NPR Sales (LCY)";
                     TopSalesPerson := SalesPerson.Name;
                 end;
-            until SalesPerson.Next = 0;
+            until SalesPerson.Next() = 0;
         end;
     end;
 
@@ -257,35 +255,34 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
     var
         WarehouseActivityHdr: Record "Warehouse Activity Header";
     begin
-        WarehouseActivityHdr.Reset;
+        WarehouseActivityHdr.Reset();
         WarehouseActivityHdr.SetRange(Type, WarehouseActivityHdr.Type::Pick);
-        MyPickText := Format(WarehouseActivityHdr.Count);
+        MyPickText := Format(WarehouseActivityHdr.Count());
     end;
 
     procedure GetMyPutAwayToday(var AwayPickText: Text[50])
     var
         WarehouseActivityHdr: Record "Warehouse Activity Header";
     begin
-        WarehouseActivityHdr.Reset;
+        WarehouseActivityHdr.Reset();
         WarehouseActivityHdr.SetRange(Type, WarehouseActivityHdr.Type::"Put-away");
         AwayPickText := Format(WarehouseActivityHdr.Count)
     end;
 
     procedure GetHighestPOSSalesText(var highestPOSSales: Text)
     var
-        User: Record User;
         POSEntry: Record "NPR POS Entry";
         SalesAmt: Decimal;
     begin
-        POSEntry.Reset;
+        POSEntry.Reset();
         POSEntry.SetFilter("Entry Type", '%1', POSEntry."Entry Type"::"Direct Sale");
         POSEntry.SetFilter("Entry Date", '%1', TODAY);
-        if POSEntry.FindSet then begin
+        if POSEntry.FindSet() then begin
             SalesAmt := POSEntry."Amount Excl. Tax";
             repeat
                 if SalesAmt < POSEntry."Amount Excl. Tax" then
                     SalesAmt := POSEntry."Amount Excl. Tax";
-            until POSEntry.Next = 0;
+            until POSEntry.Next() = 0;
             highestPOSSales := Format(SalesAmt);
         end else
             highestPOSSales := '0.00';
@@ -293,20 +290,19 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
 
     procedure GetHighestSalesInvText(var highestSalesInv: Text)
     var
-        User: Record User;
         SalesInvHdr: Record "Sales Invoice Header";
         SalesAmt: Decimal;
     begin
-        SalesInvHdr.Reset;
+        SalesInvHdr.Reset();
         SalesInvHdr.SetFilter(SalesInvHdr."Posting Date", '=%1', TODAY);
-        if SalesInvHdr.FindSet then begin
+        if SalesInvHdr.FindSet() then begin
             SalesInvHdr.CalcFields(Amount);
             SalesAmt := SalesInvHdr.Amount;
             repeat
                 SalesInvHdr.CalcFields(Amount);
                 if SalesAmt < SalesInvHdr."Amount" then
                     SalesAmt := SalesInvHdr."Amount";
-            until SalesInvHdr.Next = 0;
+            until SalesInvHdr.Next() = 0;
             highestSalesInv := Format(SalesAmt);
         end else
             highestSalesInv := '0.00';
@@ -314,38 +310,35 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
 
     procedure GetTopSalesPersonText(var TopSalesPersonText: Text)
     var
-        User: Record User;
         SalesPerson: Record "Salesperson/Purchaser";
         SalesAmt: Decimal;
         HighestSalesAmt: Decimal;
-        SalesPersonName: Text;
         ValueEntry: Record "Value Entry";
     begin
         SalesAmt := 0;
         HighestSalesAmt := 0;
-        SalesPerson.Reset;
-        if SalesPerson.FindSet then begin
+        SalesPerson.Reset();
+        if SalesPerson.FindSet() then begin
             repeat
                 ValueEntry.Reset();
                 ValueEntry.SetRange("Posting Date", Today);
                 ValueEntry.SetRange("Salespers./Purch. Code", SalesPerson.Code);
-                IF ValueEntry.FindSet then begin
+                IF ValueEntry.FindSet() then begin
                     repeat
                         SalesAmt += ValueEntry."Sales Amount (Actual)";
-                    until ValueEntry.Next = 0;
+                    until ValueEntry.Next() = 0;
                     if SalesAmt > HighestSalesAmt then begin
                         HighestSalesAmt := SalesAmt;
                         TopSalesPersonText := SalesPerson.Name;
                     end;
                 end;
-            until SalesPerson.Next = 0;
+            until SalesPerson.Next() = 0;
         end;
     end;
 
     procedure GetAverageBasket(var AvgBasket: decimal)
     var
         PosEntry: Record "NPR POS Entry";
-        Turnover: Decimal;
         TotalSum: Decimal;
         TotalRoundingAmt: Decimal;
         NoOfLines: Integer;
@@ -353,13 +346,13 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
         PosEntry.Reset();
         PosEntry.SetRange("Entry Date", Today);
         PosEntry.SetRange("Post Item Entry Status", PosEntry."Post Item Entry Status"::Posted);
-        NoOfLines := PosEntry.Count;
+        NoOfLines := PosEntry.Count();
 
-        IF PosEntry.FindSet THEN begin
+        IF PosEntry.FindSet() THEN begin
             repeat
                 TotalSum += PosEntry."Amount Excl. Tax";
                 TotalRoundingAmt += PosEntry."Rounding Amount (LCY)";
-            until PosEntry.Next = 0;
+            until PosEntry.Next() = 0;
         END;
 
         IF NoOfLines > 0 THEN
@@ -374,7 +367,7 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
     begin
         TMTicketType.Reset();
         TMTicketType.SetRange("Document Date", Today);
-        AvgIssued := 'Ticket issued for today is ' + FORMAT(TMTicketType.Count);
+        AvgIssued := 'Ticket issued for today is ' + FORMAT(TMTicketType.Count());
 
     end;
 
@@ -384,7 +377,7 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
 
     begin
         TMAdmissionScheduleLines.Reset();
-        AvgAdmission := 'Ticket admission for day is ' + FORMAT(TMAdmissionScheduleLines.Count);
+        AvgAdmission := 'Ticket admission for day is ' + FORMAT(TMAdmissionScheduleLines.Count());
 
     end;
 
@@ -395,7 +388,7 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
 
         MMMember.Reset();
         MMMember.SetRange("Issued Date", Today);
-        AvgMember := 'No of new member for today is ' + FORMAT(MMMember.Count);
+        AvgMember := 'No of new member for today is ' + FORMAT(MMMember.Count());
     end;
 
     procedure DrillDownSalesThisMonthLastYear()

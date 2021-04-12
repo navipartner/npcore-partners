@@ -44,7 +44,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnValidate()
                     begin
-                        if ItemWorksheet.Get("Worksheet Template Name", CurrentWorksheetName) then begin
+                        if ItemWorksheet.Get(Rec."Worksheet Template Name", CurrentWorksheetName) then begin
                             ItemWorksheet."Show Variety Level" := ShowExpanded;
                             ItemWorksheet.Modify();
                             ItemWorksheet.Validate("Show Variety Level");
@@ -417,8 +417,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 1, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[1]);
+                            DATABASE::"NPR Item Worksheet Line", 1, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[1]);
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -432,8 +432,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 2, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[2]);
+                            DATABASE::"NPR Item Worksheet Line", 2, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[2]);
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -447,8 +447,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 3, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[3]);
+                            DATABASE::"NPR Item Worksheet Line", 3, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[3]);
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -462,8 +462,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 4, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[4]);
+                            DATABASE::"NPR Item Worksheet Line", 4, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[4]);
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -477,8 +477,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 5, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[5]);
+                            DATABASE::"NPR Item Worksheet Line", 5, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[5]);
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -492,8 +492,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 6, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[6]);
+                            DATABASE::"NPR Item Worksheet Line", 6, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[6]);
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -507,8 +507,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 7, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[7]);
+                            DATABASE::"NPR Item Worksheet Line", 7, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[7]);
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -522,8 +522,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 8, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[8]);
+                            DATABASE::"NPR Item Worksheet Line", 8, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[8]);
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -537,8 +537,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 9, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[9]);
+                            DATABASE::"NPR Item Worksheet Line", 9, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[9]);
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -552,8 +552,8 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         NPRAttrManagement.SetWorksheetLineAttributeValue(
-                            DATABASE::"NPR Item Worksheet Line", 10, "Worksheet Template Name",
-                            "Worksheet Name", "Line No.", NPRAttrTextArray[10]);
+                            DATABASE::"NPR Item Worksheet Line", 10, Rec."Worksheet Template Name",
+                            Rec."Worksheet Name", Rec."Line No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
@@ -671,8 +671,8 @@ page 6060042 "NPR Item Worksheet Page"
                     begin
                         Clear(SuggestItemWorksheetLines);
                         ItemWorksheet.Reset();
-                        ItemWorksheet.SetRange("Item Template Name", "Worksheet Template Name");
-                        ItemWorksheet.SetRange(Name, "Worksheet Name");
+                        ItemWorksheet.SetRange("Item Template Name", Rec."Worksheet Template Name");
+                        ItemWorksheet.SetRange(Name, Rec."Worksheet Name");
                         SuggestItemWorksheetLines.SetTableView(ItemWorksheet);
                         SuggestItemWorksheetLines.RunModal();
                         CurrPage.Update();
@@ -716,7 +716,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        CreateQueryItemInformation(false);
+                        Rec.CreateQueryItemInformation(false);
                     end;
                 }
                 action("Combine Varieties")
@@ -730,7 +730,7 @@ page 6060042 "NPR Item Worksheet Page"
                     begin
                         ItemWorksheetMgt.CombineLine(Rec, 0);
                         Commit();
-                        RefreshVariants(0, true);
+                        Rec.RefreshVariants(0, true);
                         CurrPage.Update();
                     end;
                 }
@@ -743,7 +743,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(0, true);
+                        Rec.RefreshVariants(0, true);
                         CurrPage.Update();
                     end;
                 }
@@ -765,7 +765,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(1, true);
+                        Rec.RefreshVariants(1, true);
                         CurrPage.Update();
                     end;
                 }
@@ -778,7 +778,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(2, true);
+                        Rec.RefreshVariants(2, true);
                         CurrPage.Update();
                     end;
                 }
@@ -791,7 +791,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        RefreshVariants(3, true);
+                        Rec.RefreshVariants(3, true);
                         CurrPage.Update();
                     end;
                 }
@@ -804,7 +804,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        UpdateSalesPriceWithRRP();
+                        Rec.UpdateSalesPriceWithRRP();
                     end;
                 }
                 action("Shelf Label")
@@ -865,12 +865,12 @@ page 6060042 "NPR Item Worksheet Page"
                         ItemWorksheetMgt.CombineLines(ItemWorksheet);
                         Commit();
                         ItemWorksheetLine.Reset();
-                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", Rec."Worksheet Name");
                         if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(0, true);
-                            until ItemWorksheetLine.Next = 0;
+                            until ItemWorksheetLine.Next() = 0;
                         CurrPage.Update();
                     end;
                 }
@@ -884,12 +884,12 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnAction()
                     begin
                         ItemWorksheetLine.Reset();
-                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", Rec."Worksheet Name");
                         if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(0, true);
-                            until ItemWorksheetLine.Next = 0;
+                            until ItemWorksheetLine.Next() = 0;
                         CurrPage.Update();
                     end;
                 }
@@ -903,12 +903,12 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnAction()
                     begin
                         ItemWorksheetLine.Reset();
-                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", Rec."Worksheet Name");
                         if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(1, true);
-                            until ItemWorksheetLine.Next = 0;
+                            until ItemWorksheetLine.Next() = 0;
                         CurrPage.Update();
                     end;
                 }
@@ -922,12 +922,12 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnAction()
                     begin
                         ItemWorksheetLine.Reset();
-                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", Rec."Worksheet Name");
                         if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(2, true);
-                            until ItemWorksheetLine.Next = 0;
+                            until ItemWorksheetLine.Next() = 0;
                         CurrPage.Update();
                     end;
                 }
@@ -941,12 +941,12 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnAction()
                     begin
                         ItemWorksheetLine.Reset();
-                        ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
+                        ItemWorksheetLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ItemWorksheetLine.SetRange("Worksheet Name", Rec."Worksheet Name");
                         if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(3, true);
-                            until ItemWorksheetLine.Next = 0;
+                            until ItemWorksheetLine.Next() = 0;
                         CurrPage.Update();
                     end;
                 }
@@ -1041,8 +1041,6 @@ page 6060042 "NPR Item Worksheet Page"
                     ToolTip = 'Executes the Export Excel action.';
 
                     trigger OnAction()
-                    var
-                        ItemWorksheetLine: Record "NPR Item Worksheet Line";
                     begin
                         REPORT.Run(REPORT::"NPR Export Excel Item Worksh.", false, true, Rec);
                     end;
@@ -1096,7 +1094,7 @@ page 6060042 "NPR Item Worksheet Page"
 
     trigger OnAfterGetRecord()
     begin
-        NPRAttrManagement.GetWorksheetLineAttributeValue(NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line", "Worksheet Template Name", "Worksheet Name", "Line No.");
+        NPRAttrManagement.GetWorksheetLineAttributeValue(NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line", Rec."Worksheet Template Name", Rec."Worksheet Name", Rec."Line No.");
         NPRAttrEditable := CurrPage.Editable();
     end;
 
@@ -1107,14 +1105,14 @@ page 6060042 "NPR Item Worksheet Page"
 
     trigger OnModifyRecord(): Boolean
     begin
-        CheckManualValidation();
+        Rec.CheckManualValidation();
         SetVisibleFields();
         exit(true);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
         SetFieldEditable();
     end;
 
@@ -1134,13 +1132,13 @@ page 6060042 "NPR Item Worksheet Page"
 
         NPRAttrEditable := CurrPage.Editable();
         if OpenedFromFilteredView then begin
-            CopyFilters(ItemWorksheetLine);
+            Rec.CopyFilters(ItemWorksheetLine);
             exit;
         end;
 
-        OpenedFromWorksheet := ("Worksheet Name" <> '') and ("Worksheet Template Name" = '');
+        OpenedFromWorksheet := (Rec."Worksheet Name" <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromWorksheet then begin
-            CurrentWorksheetName := "Worksheet Name";
+            CurrentWorksheetName := Rec."Worksheet Name";
             ItemWorksheetMgt.OpenJnl(CurrentWorksheetName, Rec);
             exit;
         end;
@@ -1151,7 +1149,6 @@ page 6060042 "NPR Item Worksheet Page"
     end;
 
     var
-        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheet: Record "NPR Item Worksheet";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         NPRAttrManagement: Codeunit "NPR Attribute Management";
@@ -1187,24 +1184,19 @@ page 6060042 "NPR Item Worksheet Page"
         OpenedFromFilteredView: Boolean;
         OpenedFromWorksheet: Boolean;
         RRPDiff: Boolean;
-        [InDataSet]
-        VendorItemNoEditable: Boolean;
         WorksheetSelected: Boolean;
         CurrentWorksheetName: Code[10];
-        InvoiceNo: Code[20];
-        InvoiceDate: Date;
-        Freight: Decimal;
         ShowExpanded: Option "Variety 1","Variety 1+2","Variety 1+2+3","Variety 1+2+3+4";
         NPRAttrTextArray: array[40] of Text;
 
     procedure SetFieldEditable()
     begin
-        FieldsEditable := ("Existing Item No." = '');
+        FieldsEditable := (Rec."Existing Item No." = '');
     end;
 
     procedure GetCurrentWorksheet()
     begin
-        ItemWorksheet.Get(GetRangeMax("Worksheet Template Name"), CurrentWorksheetName);
+        ItemWorksheet.Get(Rec.GetRangeMax("Worksheet Template Name"), CurrentWorksheetName);
         ShowExpanded := ItemWorksheet."Show Variety Level";
     end;
 
@@ -1213,7 +1205,7 @@ page 6060042 "NPR Item Worksheet Page"
         CurrPage.ItemWorksheetVarSubpage.PAGE.SetRecFromIW(Rec);
         CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage;
         UpdateFactBoxes();
-        RRPDiff := ("Recommended Retail Price" <> 0) and ("Sales Price" <> 0) and ("Recommended Retail Price" <> "Sales Price");
+        RRPDiff := (Rec."Recommended Retail Price" <> 0) and (Rec."Sales Price" <> 0) and (Rec."Recommended Retail Price" <> Rec."Sales Price");
     end;
 
     local procedure CurrentJnlBatchNameOnAfterVali()

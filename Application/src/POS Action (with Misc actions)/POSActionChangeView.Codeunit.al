@@ -2,10 +2,6 @@ codeunit 6150724 "NPR POS Action - Change View"
 {
     var
         ActionDescription: Label 'Changes the current view.';
-        ActionOptions: Label 'Login,Sale,Payment,Balance,Locked';
-        POS_LOGOUT: Label 'User logged out from POS %1.';
-        ConfirmPrompt: Label 'Are you sure you want to cancel this sales? All lines will be deleted.';
-        RemovePayment: Label 'All payment lines must be removed before selecting Login View.';
         RemainingLines: Label 'All lines could not be automatically deleted before selecting Login View. You need to cancel sales manually.';
 
     local procedure ActionCode(): Text
@@ -21,30 +17,24 @@ codeunit 6150724 "NPR POS Action - Change View"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Single)
-            then begin
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion(),
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Single)
+then begin
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('ViewType', 'Login,Sale,Payment,Balance,Locked', '');
-                RegisterTextParameter('ViewCode', '');
-            end;
+            Sender.RegisterOptionParameter('ViewType', 'Login,Sale,Payment,Balance,Locked', '');
+            Sender.RegisterTextParameter('ViewCode', '');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        ControlId: Text;
-        Value: Text;
-        DoNotClearTextBox: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         ChangeView(Context, POSSession, FrontEnd);
@@ -54,8 +44,6 @@ codeunit 6150724 "NPR POS Action - Change View"
 
     local procedure ChangeView(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        Item: Record Item;
-        POSAction: Record "NPR POS Action";
         POSDefaultUserView: Record "NPR POS Default User View";
         POSUnit: Record "NPR POS Unit";
         POSSetup: Codeunit "NPR POS Setup";
@@ -63,7 +51,6 @@ codeunit 6150724 "NPR POS Action - Change View"
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         ViewType: Option Login,Sale,Payment,Balance,Locked;
         CurrentView: Codeunit "NPR POS View";
-        POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);

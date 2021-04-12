@@ -8,9 +8,6 @@ codeunit 6184541 "NPR EFT NETS BAXI Protocol"
     var
         ERR_RESPONSE_CRITICAL: Label 'Critical error when parsing %1 response. Could not establish transaction context.\%2';
         DIALOG_ABORT: Label 'Abort';
-        DIALOG_TYPE_PURCHASE: Label 'Purchase';
-        DIALOG_TYPE_REFUND: Label 'Refund';
-        DIALOG_TYPE_REVERSAL: Label 'Reversal';
         DIALOG_CONFIRM: Label 'Confirm';
         DIALOG_REJECT: Label 'Reject';
         DIALOG_FORCE_ABORT: Label 'Force Abort';

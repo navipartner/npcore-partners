@@ -12,20 +12,19 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
         Printer.SetAutoLineBreak(true);
         Printer.SetThreeColumnDistribution(0.465, 0.35, 0.235);
 
-        if Ticket.FindSet then
+        if Ticket.FindSet() then
             repeat
                 TicketType.Get(Ticket."Ticket Type Code");
                 if (TicketType."Print Ticket") then
                     PrintOne(Ticket);
 
-            until Ticket.Next = 0;
+            until Ticket.Next() = 0;
     end;
 
     var
         Printer: Codeunit "NPR RP Line Print Mgt.";
         Txt000001: Label 'Valid For';
         Txt000002: Label 'Time';
-        Txt000003: Label 'Ticket No.';
 
     local procedure PrintOne(Ticket: Record "NPR TM Ticket")
     var
@@ -79,7 +78,7 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
 
-        if TicketAccessEntry.FindSet then
+        if TicketAccessEntry.FindSet() then
             repeat
                 if Admission.Get(TicketAccessEntry."Admission Code") then begin
                     Printer.AddTextField(1, 0, '   ' + Admission.Description);
@@ -88,9 +87,9 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
                     AdmissionCode[i] := Admission."Admission Code";
                     TMDetTickAccEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
                     TMDetTickAccEntry.SetRange(Type, TMDetTickAccEntry.Type::RESERVATION);
-                    if TMDetTickAccEntry.FindFirst then begin
+                    if TMDetTickAccEntry.FindFirst() then begin
                         TMAdmSchEntry.SetRange("External Schedule Entry No.", TMDetTickAccEntry."External Adm. Sch. Entry No.");
-                        if TMAdmSchEntry.FindFirst then begin
+                        if TMAdmSchEntry.FindFirst() then begin
                             AdmStartDate[i] := TMAdmSchEntry."Admission Start Date";
                             AdmEndDate[i] := TMAdmSchEntry."Admission End Date";
                             AdmStartTime[i] := TMAdmSchEntry."Admission Start Time";
@@ -98,7 +97,7 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
                         end;
                     end;
                 end;
-            until TicketAccessEntry.Next = 0;
+            until TicketAccessEntry.Next() = 0;
 
         Printer.SetBold(false);
         Printer.AddLine(' ');

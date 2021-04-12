@@ -15,27 +15,27 @@ page 6014416 "NPR Pakke Foreign Shipm. Map."
         {
             repeater(Group)
             {
-                field("Shipment Method Code"; "Shipment Method Code")
+                field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
                 }
-                field("Shipping Agent Code"; "Shipping Agent Code")
+                field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
                 }
-                field("Country/Region Code"; "Country/Region Code")
+                field("Country/Region Code"; Rec."Country/Region Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ship-to Country/Region Code field';
                 }
-                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
-                field("Base Shipping Agent Code"; "Base Shipping Agent Code")
+                field("Base Shipping Agent Code"; Rec."Base Shipping Agent Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';

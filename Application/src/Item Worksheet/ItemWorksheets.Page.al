@@ -61,7 +61,7 @@ page 6060041 "NPR Item Worksheets"
                 Caption = 'Edit Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Edit Item Worksheet action.';
@@ -98,9 +98,9 @@ page 6060041 "NPR Item Worksheets"
                     ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
                     ItemWorksheetFieldSetupPage: Page "NPR Item Worksh. Field Setup";
                 begin
-                    InsertDefaultFieldSetup();
-                    ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", "Item Template Name");
-                    ItemWorksheetFieldSetup.SetFilter("Worksheet Name", Name);
+                    Rec.InsertDefaultFieldSetup();
+                    ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", Rec."Item Template Name");
+                    ItemWorksheetFieldSetup.SetFilter("Worksheet Name", Rec.Name);
                     ItemWorksheetFieldSetupPage.SetTableView(ItemWorksheetFieldSetup);
                     ItemWorksheetFieldSetupPage.Run();
                 end;

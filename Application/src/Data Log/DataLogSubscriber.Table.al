@@ -120,11 +120,11 @@ table 6059896 "NPR Data Log Subscriber"
         if Get(SubscriberCode, TableNo) then
             exit;
 
-        Init;
+        Init();
         Code := SubscriberCode;
         "Table ID" := TableNo;
         "Last Log Entry No." := 0;
-        Insert;
+        Insert();
     end;
 }
 

@@ -54,8 +54,8 @@ report 6014406 "NPR Sales Person Top 20"
                 if (I = 0) or (I < ShowQty) then
                     I := I + 1
                 else begin
-                    SalesPersonTemp.FindLast;
-                    SalesPersonTemp.Delete;
+                    SalesPersonTemp.FindLast();
+                    SalesPersonTemp.Delete();
                 end;
 
                 SalesTotal += "NPR Sales (LCY)";
@@ -160,10 +160,10 @@ report 6014406 "NPR Sales Person Top 20"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not SalesPersonTemp.FindFirst then
+                    if not SalesPersonTemp.FindFirst() then
                         CurrReport.Break();
                 end else
-                    if SalesPersonTemp.Next = 0 then
+                    if SalesPersonTemp.Next() = 0 then
                         CurrReport.Break();
 
                 if "Salesperson/Purchaser".Get(SalesPersonTemp."Vendor No.") then

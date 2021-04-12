@@ -10,66 +10,62 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
         TextLine: Text[1024];
     begin
         TextWhole := '';
-        with TempFile do begin
-            TextMode(true);
-            WriteMode(false);
-            CreateTempFile;
-            CreateOutStream(StreamOut);
-            case TextType of
-                TextType::License:
-                    begin
-                        PepperConfiguration.CalcFields("License File");
-                        if not PepperConfiguration."License File".HasValue then
-                            exit('');
-                        PepperConfiguration."License File".CreateInStream(StreamIn, TEXTENCODING::UTF8);
-                        CopyStream(StreamOut, StreamIn);
-                    end;
-                TextType::Configuration:
-                    begin
-                        PepperConfiguration.TestField(Version);
-                        PepperVersion.Get(PepperConfiguration.Version);
-                        PepperVersion.TestField(PepperVersion."XMLport Configuration");
-                        XMLPORT.Export(PepperVersion."XMLport Configuration", StreamOut);
-                    end;
-                TextType::AdditionalParameters:
-                    begin
-                        PepperConfiguration.CalcFields("Additional Parameters");
-                        if not PepperConfiguration."Additional Parameters".HasValue then
-                            exit('');
-                        PepperConfiguration."Additional Parameters".CreateInStream(StreamIn, TEXTENCODING::UTF8);
-                        CopyStream(StreamOut, StreamIn);
-                    end;
-            end;
-            Seek(0);
-            repeat
-                Read(TextLine);
-                TextWhole := TextWhole + TextLine;
-            until Pos = Len;
-            Close;
-            exit(TextWhole);
+        TempFile.TextMode(true);
+        TempFile.WriteMode(false);
+        TempFile.CreateTempFile;
+        TempFile.CreateOutStream(StreamOut);
+        case TextType of
+            TextType::License:
+                begin
+                    PepperConfiguration.CalcFields("License File");
+                    if not PepperConfiguration."License File".HasValue() then
+                        exit('');
+                    PepperConfiguration."License File".CreateInStream(StreamIn, TEXTENCODING::UTF8);
+                    CopyStream(StreamOut, StreamIn);
+                end;
+            TextType::Configuration:
+                begin
+                    PepperConfiguration.TestField(Version);
+                    PepperVersion.Get(PepperConfiguration.Version);
+                    PepperVersion.TestField(PepperVersion."XMLport Configuration");
+                    XMLPORT.Export(PepperVersion."XMLport Configuration", StreamOut);
+                end;
+            TextType::AdditionalParameters:
+                begin
+                    PepperConfiguration.CalcFields("Additional Parameters");
+                    if not PepperConfiguration."Additional Parameters".HasValue() then
+                        exit('');
+                    PepperConfiguration."Additional Parameters".CreateInStream(StreamIn, TEXTENCODING::UTF8);
+                    CopyStream(StreamOut, StreamIn);
+                end;
         end;
+        TempFile.Seek(0);
+        repeat
+            TempFile.Read(TextLine);
+            TextWhole := TextWhole + TextLine;
+        until TempFile.Pos = TempFile.Len;
+        TempFile.Close();
+        exit(TextWhole);
     end;
 
     procedure GetTerminalText(PepperTerminal: Record "NPR Pepper Terminal"; TextType: Option License,AdditionalParameters): Text
     var
         PepperConfiguration: Record "NPR Pepper Config.";
         PepperInstance: Record "NPR Pepper Instance";
-        FileManagement: Codeunit "File Management";
         StreamIn: InStream;
         TextWhole: Text;
         TextLine: Text[1024];
-        TextEncodingType: TextEncoding;
     begin
         TextWhole := '';
         case TextType of
             TextType::AdditionalParameters:
                 begin
                     PepperTerminal.CalcFields("Additional Parameters File");
-                    if not PepperTerminal."Additional Parameters File".HasValue then begin
+                    if not PepperTerminal."Additional Parameters File".HasValue() then begin
                         if PepperInstance.Get(PepperTerminal."Instance ID") then begin
                             if PepperConfiguration.Get(PepperInstance."Configuration Code") then begin
                                 PepperConfiguration.CalcFields("Additional Parameters");
-                                if PepperConfiguration."Additional Parameters".HasValue then begin
+                                if PepperConfiguration."Additional Parameters".HasValue() then begin
                                     PepperConfiguration."Additional Parameters".CreateInStream(StreamIn, TEXTENCODING::UTF8);
                                 end else
                                     exit('');
@@ -85,11 +81,11 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
             TextType::License:
                 begin
                     PepperTerminal.CalcFields("License File");
-                    if not PepperTerminal."License File".HasValue then begin
+                    if not PepperTerminal."License File".HasValue() then begin
                         if PepperInstance.Get(PepperTerminal."Instance ID") then begin
                             if PepperConfiguration.Get(PepperInstance."Configuration Code") then begin
                                 PepperConfiguration.CalcFields("License File");
-                                if PepperConfiguration."License File".HasValue then begin
+                                if PepperConfiguration."License File".HasValue() then begin
                                     PepperConfiguration."License File".CreateInStream(StreamIn, TEXTENCODING::UTF8);
                                 end else
                                     exit('');
@@ -119,7 +115,7 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
     begin
         TextWhole := '';
         PepperVersion.CalcFields("Install Zip File");
-        if not PepperVersion."Install Zip File".HasValue then
+        if not PepperVersion."Install Zip File".HasValue() then
             exit('');
         PepperVersion."Install Zip File".CreateInStream(StreamIn, TEXTENCODING::UTF8);
         repeat
@@ -172,15 +168,10 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
     procedure GetReceiptText(PepperTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptNo: Integer; AddBackSlash: Boolean): Text
     var
         PepperTerminal: Record "NPR Pepper Terminal";
-        FileManagement: Codeunit "File Management";
-        StreamOut: OutStream;
         StreamIn: InStream;
-        TempFile: File;
         TextWhole: Text;
         TextLine: Text[1024];
-        TextEncodingType: TextEncoding;
         Separator: Char;
-        Encoding: TextEncoding;
         TextDot: Label '______________________________';
         TextSig: Label 'Customer Signature';
     begin
@@ -194,14 +185,14 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
             1:
                 begin
                     PepperTransactionRequest.CalcFields("Receipt 1");
-                    if not PepperTransactionRequest."Receipt 1".HasValue then
+                    if not PepperTransactionRequest."Receipt 1".HasValue() then
                         exit('');
                     PepperTransactionRequest."Receipt 1".CreateInStream(StreamIn);
                 end;
             2:
                 begin
                     PepperTransactionRequest.CalcFields("Receipt 2");
-                    if not PepperTransactionRequest."Receipt 2".HasValue then
+                    if not PepperTransactionRequest."Receipt 2".HasValue() then
                         exit('');
                     PepperTransactionRequest."Receipt 2".CreateInStream(StreamIn);
                 end;

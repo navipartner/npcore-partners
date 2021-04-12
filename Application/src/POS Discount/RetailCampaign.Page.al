@@ -20,17 +20,17 @@ page 6014611 "NPR Retail Campaign"
                 group(Control6014409)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Code field';
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
                     }
-                    field("Magento Category Id"; "Magento Category Id")
+                    field("Magento Category Id"; Rec."Magento Category Id")
                     {
                         ApplicationArea = All;
                         Visible = MagentoEnabled;
@@ -40,7 +40,7 @@ page 6014611 "NPR Retail Campaign"
                 group(Control6014410)
                 {
                     ShowCaption = false;
-                    field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount(Code, 0))
+                    field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount(Rec.Code, 0))
                     {
                         ApplicationArea = All;
                         Caption = 'Sales Amount';
@@ -48,10 +48,10 @@ page 6014611 "NPR Retail Campaign"
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Rec.Code, 0);
                         end;
                     }
-                    field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount(Code, 0))
+                    field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount(Rec.Code, 0))
                     {
                         ApplicationArea = All;
                         Caption = 'Cost Amount';
@@ -59,10 +59,10 @@ page 6014611 "NPR Retail Campaign"
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Rec.Code, 0);
                         end;
                     }
-                    field(Profit; RetailCampaignCalcMgt.CalcProfit(Code, 0))
+                    field(Profit; RetailCampaignCalcMgt.CalcProfit(Rec.Code, 0))
                     {
                         ApplicationArea = All;
                         Caption = 'Profit';
@@ -70,10 +70,10 @@ page 6014611 "NPR Retail Campaign"
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Rec.Code, 0);
                         end;
                     }
-                    field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct(Code, 0))
+                    field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct(Rec.Code, 0))
                     {
                         ApplicationArea = All;
                         Caption = 'Profit %';
@@ -81,7 +81,7 @@ page 6014611 "NPR Retail Campaign"
 
                         trigger OnDrillDown()
                         begin
-                            RetailCampaignCalcMgt.DrilldownItemEntries(Code, 0);
+                            RetailCampaignCalcMgt.DrilldownItemEntries(Rec.Code, 0);
                         end;
                     }
                 }
@@ -192,7 +192,7 @@ page 6014611 "NPR Retail Campaign"
         MagentoSetup: Record "NPR Magento Setup";
     begin
         //-MAG2.26 [401235]
-        MagentoEnabled := MagentoSetup.Get and MagentoSetup."Magento Enabled";
+        MagentoEnabled := MagentoSetup.Get() and MagentoSetup."Magento Enabled";
         //+MAG2.26 [401235]
     end;
 

@@ -232,7 +232,6 @@ table 6150616 "NPR POS Payment Method"
     trigger OnDelete()
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
-        DimMgt: Codeunit DimensionManagement;
     begin
         POSPostingSetup.SetRange("POS Payment Method Code", Rec.Code);
         POSPostingSetup.DeleteAll(true);

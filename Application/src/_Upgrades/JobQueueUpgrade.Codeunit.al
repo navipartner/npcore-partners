@@ -1,4 +1,4 @@
-﻿codeunit 6014489 "NPR Job Queue Upgrade"
+codeunit 6014489 "NPR Job Queue Upgrade"
 {
     Subtype = Upgrade;
 

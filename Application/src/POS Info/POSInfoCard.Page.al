@@ -18,57 +18,57 @@ page 6150640 "NPR POS Info Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Message"; Message)
+                field("Message"; Rec.Message)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Message field';
                 }
-                field("Once per Transaction"; "Once per Transaction")
+                field("Once per Transaction"; Rec."Once per Transaction")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Once per Transaction field';
                 }
-                field("Copy from Header"; "Copy from Header")
+                field("Copy from Header"; Rec."Copy from Header")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Copy from Header field';
                 }
-                field("Available in Front-End"; "Available in Front-End")
+                field("Available in Front-End"; Rec."Available in Front-End")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Available in Front-End field';
                 }
-                field("Set POS Sale Line Color to Red"; "Set POS Sale Line Color to Red")
+                field("Set POS Sale Line Color to Red"; Rec."Set POS Sale Line Color to Red")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Set POS Sale Line Color to Red field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Input Mandatory"; "Input Mandatory")
+                field("Input Mandatory"; Rec."Input Mandatory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Input Mandatory field';
                 }
-                field("Input Type"; "Input Type")
+                field("Input Type"; Rec."Input Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Input Type field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
@@ -98,11 +98,11 @@ page 6150640 "NPR POS Info Card"
                 var
                     POSInfoLookupFieldSetup: Page "NPR POS Info Look. Field Setup";
                 begin
-                    if ("Input Type" <> "Input Type"::Table) or ("Table No." = 0) then
-                        Error(ErrorText001, Format("Input Type"::Table), FieldCaption("Table No."));
+                    if (Rec."Input Type" <> Rec."Input Type"::Table) or (Rec."Table No." = 0) then
+                        Error(ErrorText001, Format(Rec."Input Type"::Table), Rec.FieldCaption("Table No."));
 
                     POSInfoLookupFieldSetup.SetPOSInfo(Rec);
-                    POSInfoLookupFieldSetup.RunModal;
+                    POSInfoLookupFieldSetup.RunModal();
                 end;
             }
         }

@@ -38,7 +38,7 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         POSSession.GetSale(POSSale);
@@ -94,7 +94,7 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify;
+        Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
         POSSession.GetSale(POSSale);
@@ -144,6 +144,6 @@ codeunit 85007 "NPR POS Saved Sale Tests"
             _Initialized := true;
         end;
 
-        Commit;
+        Commit();
     end;
 }

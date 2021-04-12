@@ -9,18 +9,8 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     end;
 
     var
-        ProtocolError: Label 'An unexpected error ocurred in the %1 protocol:\%2';
         ERROR_INVOKE: Label 'Error: Service endpoint %1 responded with HTTP status %2';
-        ERROR_RECEIPT: Label 'Error: Could not create terminal receipt data';
-        ERROR_HEADER_CATEGORY: Label 'Error: Header category %1, expected %2';
-        ERROR_UNKNOWN_EVENT: Label 'Unknown event json';
-        VOID_SUCCESS: Label 'Transaction %1 was successfully voided';
-        VOID_FAILURE: Label 'Transaction %1 could not be voided: %2\%3';
-        DIAGNOSE: Label 'Terminal Status: %1\Terminal Connection: %2\Host Connection: %3';
-        UNKNOWN: Label 'Unknown';
         RequestResponseBuffer: Text;
-        ABORT_ACQUIRE_SWIPE_HEADER: Label 'Card Scanned';
-        ABORT_ACQUIRE_SWIPE_LINE: Label 'Please Remove Card';
         ResponseStatusCodeBuffer: Integer;
         ResponseErrorBodyBuffer: Text;
 
@@ -70,7 +60,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not InvokeReconciliation(EftTransactionRequest, EFTSetup, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -83,7 +73,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -97,7 +87,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         POSSession: Codeunit "NPR POS Session";
         SessionId: Integer;
         EFTNETSCloudTrxDialog: Codeunit "NPR EFT NETSCloud Trx Dialog";
-        EFTNETSCloudIntegration: Codeunit "NPR EFT NETSCloud Integrat.";
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
         EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
@@ -108,7 +97,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
         EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
-        Commit;
+        Commit();
 
         StartSession(SessionId, CODEUNIT::"NPR EFT NETSCloud Bg. Req.", CompanyName, EFTTransactionAsyncRequest);
         EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
@@ -128,7 +117,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         HandleProtocolResponse(EftTransactionRequest);
@@ -144,7 +133,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         POSSession: Codeunit "NPR POS Session";
         SessionId: Integer;
         EFTNETSCloudTrxDialog: Codeunit "NPR EFT NETSCloud Trx Dialog";
-        EFTNETSCloudIntegration: Codeunit "NPR EFT NETSCloud Integrat.";
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
         EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
@@ -155,7 +143,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
         EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
-        Commit;
+        Commit();
 
         StartSession(SessionId, CODEUNIT::"NPR EFT NETSCloud Bg. Req.", CompanyName, EFTTransactionAsyncRequest);
         EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
@@ -166,7 +154,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     local procedure EndRefundTransaction(var EftTransactionRequest: Record "NPR EFT Transaction Request"; Response: Text)
     var
         EFTNETSCloudResponseParser: Codeunit "NPR EFT NETSCloud Resp. Parser";
-        ParseError: Text;
         ParseSuccess: Boolean;
     begin
         EFTNETSCloudResponseParser.SetResponseData('Payment', Response, EftTransactionRequest."Entry No.");
@@ -176,7 +163,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         HandleProtocolResponse(EftTransactionRequest);
@@ -192,7 +179,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         Response: Text;
         EFTSetup: Record "NPR EFT Setup";
         EFTNETSCloudResponseParser: Codeunit "NPR EFT NETSCloud Resp. Parser";
-        ParseError: Text;
         ParseSuccess: Boolean;
     begin
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
@@ -203,7 +189,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not InvokeVoid(EftTransactionRequest, EFTSetup, OriginalEFTTransactionRequest, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -216,7 +202,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -231,11 +217,9 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     local procedure LookupLastTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         Response: Text;
-        EFTTransactionAsyncResponse: Record "NPR EFT Trx Async Resp.";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
         EFTNETSCloudResponseParser: Codeunit "NPR EFT NETSCloud Resp. Parser";
-        ParseError: Text;
         ParseSuccess: Boolean;
     begin
         OriginalEFTTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
@@ -243,7 +227,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not InvokeLookupLastTransaction(EftTransactionRequest, EFTSetup, OriginalEFTTransactionRequest, 1000 * 60, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
             WriteLogEntry(EFTSetup, true, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -256,7 +240,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
-            EftTransactionRequest.Modify;
+            EftTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EftTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -281,7 +265,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not InvokeCancelAction(EFTTransactionRequest, EFTSetup, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
             WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -294,7 +278,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -317,7 +301,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not InvokeBalanceEnquiry(EFTTransactionRequest, EFTSetup, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
             WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -330,7 +314,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -353,7 +337,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not InvokeDownloadDataset(EFTTransactionRequest, EFTSetup, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
             WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -366,7 +350,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -389,7 +373,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not InvokeDownloadSoftware(EFTTransactionRequest, EFTSetup, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
             WriteLogEntry(EFTSetup, true, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
             exit;
@@ -402,7 +386,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         if not ParseSuccess then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
-            EFTTransactionRequest.Modify;
+            EFTTransactionRequest.Modify();
         end;
 
         WriteLogEntry(EFTSetup, ParseSuccess, EFTTransactionRequest."Entry No.", 'Invoke result', GetRequestResponseBuffer());
@@ -465,12 +449,11 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     procedure ForceCloseTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
     begin
         EFTTrxBackgroundSessionMgt.MarkRequestAsDone(EFTTransactionRequest."Entry No.");
 
         EFTTransactionRequest."Force Closed" := true;
-        EFTTransactionRequest.Modify;
+        EFTTransactionRequest.Modify();
 
         HandleProtocolResponse(EFTTransactionRequest);
     end;
@@ -482,13 +465,12 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         InStream: InStream;
         Text: Text;
         Response: Text;
-        RecordFound: Boolean;
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
     begin
         EFTTrxBackgroundSessionMgt.TryGetResponseRecord(TransactionEntryNo, EFTTransactionAsyncResponse);
 
         if EFTTransactionAsyncResponse.Error then begin
-            EFTTransactionRequest.LockTable;
+            EFTTransactionRequest.LockTable();
             EFTTransactionRequest.Get(TransactionEntryNo);
             EFTTransactionRequest."NST Error" := EFTTransactionAsyncResponse."Error Text";
             HandleProtocolResponse(EFTTransactionRequest);
@@ -499,8 +481,8 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
                 Response += Text;
             end;
 
-            EFTTransactionAsyncResponse.Delete;
-            Commit;
+            EFTTransactionAsyncResponse.Delete();
+            Commit();
             EFTTransactionRequest.Get(TransactionEntryNo);
 
             case EFTTransactionRequest."Processing Type" of
@@ -538,7 +520,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     local procedure InvokeReconciliation(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
         Body: Text;
-        JsonConvert: DotNet NPRNetJsonConvert;
         Endpoint: Text;
     begin
         Body :=
@@ -607,7 +588,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     [TryFunction]
     procedure InvokeLookupLastTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; OriginalEftTransactionRequest: Record "NPR EFT Transaction Request"; TimeoutMs: Integer; var Response: Text)
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
     begin
@@ -623,7 +603,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     [TryFunction]
     local procedure InvokeCancelAction(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
     begin
@@ -641,7 +620,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     [TryFunction]
     local procedure InvokeDownloadDataset(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
     begin
@@ -659,7 +637,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     [TryFunction]
     local procedure InvokeDownloadSoftware(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
     begin
@@ -677,7 +654,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     [TryFunction]
     local procedure InvokeBalanceEnquiry(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
     begin
@@ -695,7 +671,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     [TryFunction]
     local procedure InvokeTerminalSettings(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
     begin
@@ -709,7 +684,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     [TryFunction]
     local procedure InvokeTerminalList(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
     begin
@@ -729,7 +703,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         ResponseNavStream: InStream;
         HttpStatusCode: DotNet NPRNetHttpStatusCode;
         Response: Text;
-        Convert: DotNet NPRNetConvert;
         WebRequestHelper: Codeunit "Web Request Helper";
         ResponseHeaders: DotNet NPRNetNameValueCollection;
         WebException: DotNet NPRNetWebException;
@@ -758,7 +731,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
             ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
             ReqStreamWriter.Write(Body);
             ReqStreamWriter.Flush;
-            ReqStreamWriter.Close;
+            ReqStreamWriter.Close();
         end;
 
         TempBlob.CreateInStream(ResponseNavStream, TEXTENCODING::UTF8);
@@ -800,7 +773,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
         Token: Text;
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         JSON: Text;
         JObject: DotNet NPRNetJObject;
     begin
@@ -831,8 +803,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     end;
 
     local procedure GetServiceURL(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
-    var
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
     begin
         case EFTTransactionRequest.Mode of
             EFTTransactionRequest.Mode::Production:
@@ -889,9 +859,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         LF: Char;
         CR: Char;
-        EFTSetup: Record "NPR EFT Setup";
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
-        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
     begin
         CR := 13;
         LF := 10;

@@ -1,4 +1,4 @@
-﻿codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
+codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
 {
     var
         ParamString: Text;
