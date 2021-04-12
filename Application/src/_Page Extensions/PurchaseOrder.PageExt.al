@@ -17,11 +17,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Pay-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
             field("NPR Sell-to Customer Name"; "NPR Sell-to Customer Name")
             {
                 ApplicationArea = All;
@@ -65,26 +60,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 ToolTip = 'Specifies the value of the NPR Sell-to Phone No. field';
             }
         }
-        addafter(Control3)
-        {
-            part("NPR NPAttributes"; "NPR NP Attributes FactBox")
-            {
-                Provider = PurchLines;
-                SubPageLink = "No." = FIELD("No.");
-                Visible = true;
-                ApplicationArea = All;
-            }
-        }
-        addafter(Control1905767507)
-        {
-            part("NPR Item Availability FactBox"; "NPR Item Availability FactBox")
-            {
-                Caption = 'Item Availability FactBox';
-                Provider = PurchLines;
-                SubPageLink = "No." = FIELD("No.");
-                ApplicationArea = All;
-            }
-        }
     }
     actions
     {
@@ -98,21 +73,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Insert Line with Vendor Item action';
             }
-            action("NPR ImportFromScanner")
-            {
-                Caption = 'Import from scanner';
-                Image = Import;
-                Promoted = true;
-				PromotedOnly = true;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Import from scanner action';
-
-                trigger OnAction()
-                begin
-                    //-NPR5.38 [296801]
-                    //+NPR5.38 [296801]
-                end;
-            }
         }
 
         addafter("&Print")
@@ -123,7 +83,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Ellipsis = true;
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Print action';
@@ -133,7 +93,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Caption = 'Price Label';
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
@@ -160,7 +120,5 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
             }
         }
     }
-
-
 }
 
