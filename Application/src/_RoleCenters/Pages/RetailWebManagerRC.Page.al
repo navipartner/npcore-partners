@@ -8,10 +8,7 @@ page 6151244 "NPR Retail Web Manager RC"
     {
         area(rolecenter)
         {
-            part(Control7; "Headline RC Order Processor")
-            {
-                ApplicationArea = Basic, Suite;
-            }
+
 
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
