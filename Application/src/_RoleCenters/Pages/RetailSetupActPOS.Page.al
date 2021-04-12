@@ -53,6 +53,37 @@
                     ToolTip = 'Specifies the value of the POS Payment Bins field';
                 }
             }
+            cuegroup(Downloads)
+            {
+                Caption = 'Downloads';
+                actions
+                {
+                    action("Download Major Tom")
+                    {
+                        Caption = 'Download Majort Tom';
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies download URL for Major Tom Setup';
+                        Image = TileCloud;
+
+                        trigger OnAction()
+                        begin
+                            System.Hyperlink('https://clickonce.dynamics-retail.com/ClickOnce/Majortom/6.3/install.html');
+                        end;
+                    }
+                    action("Download HW Connector")
+                    {
+                        Caption = 'Download HW Connector';
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies download URL for Hardware Connector Setup';
+                        Image = TileCloud;
+
+                        trigger OnAction()
+                        begin
+                            System.Hyperlink('https://nphardwareconnector.blob.core.windows.net/production/Setup.exe');
+                        end;
+                    }
+                }
+            }
         }
     }
 
