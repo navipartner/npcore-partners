@@ -60,7 +60,7 @@
                 {
                     action("Download Major Tom")
                     {
-                        Caption = 'Download Majort Tom';
+                        Caption = 'Download Major Tom';
                         ApplicationArea = All;
                         ToolTip = 'Specifies download URL for Major Tom Setup';
                         Image = TileCloud;
