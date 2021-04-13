@@ -2,8 +2,7 @@ page 6059799 "NPR E-mail Templ. Choice List"
 {
     Caption = 'Choose E-mail Templates';
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "Field";
     SourceTableTemporary = true;
 
@@ -28,10 +27,6 @@ page 6059799 "NPR E-mail Templ. Choice List"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -37,9 +37,5 @@ table 6014469 "NPR SalesPost Pdf2Nav Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 

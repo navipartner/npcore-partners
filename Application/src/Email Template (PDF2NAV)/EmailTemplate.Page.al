@@ -103,13 +103,13 @@ page 6059791 "NPR E-mail Template"
                             Clear(TextEditorPage);
                             Rec.CalcFields("HTML Template");
                             HtmlText := '';
-                            "HTML Template".CreateInStream(Instream, TEXTENCODING::UTF8);
+                            Rec."HTML Template".CreateInStream(Instream, TEXTENCODING::UTF8);
                             Instream.ReadText(HtmlText);
                             if TextEditorPage.EditText(HtmlText) then begin
                                 Clear(Rec."HTML Template");
-                                "HTML Template".CreateOutStream(Outstream, TEXTENCODING::UTF8);
+                                Rec."HTML Template".CreateOutStream(Outstream, TEXTENCODING::UTF8);
                                 Outstream.WriteText(HtmlText);
-                                Rec.Modify();
+                                Rec.Modify;
                             end;
                         end;
                     }

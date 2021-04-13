@@ -44,10 +44,6 @@ table 6014461 "NPR E-mail Templ. Report"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         TestField(Filename);

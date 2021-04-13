@@ -5,7 +5,7 @@ codeunit 6059905 "NPR Mail Task Status"
     trigger OnRun()
     begin
         TaskLine := Rec;
-        TaskBatch.Get("Journal Template Name", "Journal Batch Name");
+        TaskBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name");
         if TaskBatch."Mail From Address" = '' then
             TaskBatch."Mail From Address" := 'Navipartner@NoReply.com';
         if TaskBatch."Mail From Name" = '' then
@@ -42,7 +42,10 @@ codeunit 6059905 "NPR Mail Task Status"
         Text006: Label 'Company name';
         Text007: Label 'Task "%1" will be executed now';
         Text008: Label 'Task "%1" is running again with status %2';
-        SMTPMail: Codeunit "SMTP Mail";
+
+        EmailItem: Record "Email Item" temporary;
+        MailManagement: Codeunit "Mail Management";
+        Text009: Label 'J-Mail is discontinued';
 
     local procedure SendMailOnStart()
     var
@@ -82,9 +85,8 @@ codeunit 6059905 "NPR Mail Task Status"
             TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
             if TaskOutputLog.FindSet() then
                 repeat
-                    if Exists(TaskOutputLog."File Name") then
-                        AddAttachment(TaskOutputLog."File Name");
-                until TaskOutputLog.Next() = 0;
+                    AddAttachment(TaskOutputLog."File Name");
+                until TaskOutputLog.Next = 0;
         end;
 
         Send();
@@ -115,10 +117,10 @@ codeunit 6059905 "NPR Mail Task Status"
         CreateMessage(0, TaskBatch."Mail From Name", TaskBatch."Mail From Address",
                       '', StrSubstNo(Text001, TaskLine.Description, TaskLog.Status), '');
 
-        if TaskLineParm.FindFirst() then
+        if TaskLineParm.FindFirst then
             repeat
                 AddRecipient(TaskLineParm.Value);
-            until TaskLineParm.Next() = 0;
+            until TaskLineParm.Next = 0;
 
 
         AppendHTML(StrSubstNo(Text002, CurrentErrorNo));
@@ -129,10 +131,10 @@ codeunit 6059905 "NPR Mail Task Status"
             AppendHTML(Text003);
 
         TaskLineParm.SetRange("Field No.", 177);
-        if TaskLineParm.FindFirst() then
+        if TaskLineParm.FindFirst then
             repeat
                 AppendHTML(TaskLineParm.Value);
-            until TaskLineParm.Next() = 0;
+            until TaskLineParm.Next = 0;
 
         AppendHTML('');
         AppendHTML(Text005);
@@ -144,11 +146,10 @@ codeunit 6059905 "NPR Mail Task Status"
 
         if TaskLine.GetLogEntryNo <> 0 then begin
             TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
-            if TaskOutputLog.FindSet() then
+            if TaskOutputLog.FindSet then
                 repeat
-                    if Exists(TaskOutputLog."File Name") then
-                        AddAttachment(TaskOutputLog."File Name");
-                until TaskOutputLog.Next() = 0;
+                    AddAttachment(TaskOutputLog."File Name");
+                until TaskOutputLog.Next = 0;
         end;
 
         Send();
@@ -204,16 +205,8 @@ codeunit 6059905 "NPR Mail Task Status"
             TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
             if TaskOutputLog.FindSet() then
                 repeat
-                    if Exists(TaskOutputLog."File Name") then
-                        AddAttachment(TaskOutputLog."File Name")
-                    else begin
-                        TaskOutputLog.CalcFields(File);
-                        if TaskOutputLog.File.HasValue() then begin
-                            TaskOutputLog.File.CreateInStream(InStr);
-                            AddAttachmentFromStream(InStr, TaskOutputLog."File Name");
-                        end;
-                    end;
-                until TaskOutputLog.Next() = 0;
+                    AddAttachment(TaskOutputLog."File Name")
+                until TaskOutputLog.Next = 0;
         end;
 
         Send();
@@ -236,16 +229,16 @@ codeunit 6059905 "NPR Mail Task Status"
         CreateMessage(0, TaskBatch."Mail From Name", TaskBatch."Mail From Address",
                       '', StrSubstNo(Text008, TaskLine.Description, TaskLog.Status), '');
 
-        if TaskLineParm.FindFirst() then
+        if TaskLineParm.FindFirst then
             repeat
                 AddRecipient(TaskLineParm.Value);
-            until TaskLineParm.Next() = 0;
+            until TaskLineParm.Next = 0;
 
         TaskLineParm.SetRange("Field No.", 182);
-        if TaskLineParm.FindFirst() then
+        if TaskLineParm.FindFirst then
             repeat
                 AppendHTML(TaskLineParm.Value);
-            until TaskLineParm.Next() = 0;
+            until TaskLineParm.Next = 0;
 
         AppendHTML('');
         AppendHTML(Text005);
@@ -257,11 +250,10 @@ codeunit 6059905 "NPR Mail Task Status"
 
         if TaskLine.GetLogEntryNo <> 0 then begin
             TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
-            if TaskOutputLog.FindSet() then
+            if TaskOutputLog.FindSet then
                 repeat
-                    if Exists(TaskOutputLog."File Name") then
-                        AddAttachment(TaskOutputLog."File Name");
-                until TaskOutputLog.Next() = 0;
+                    AddAttachment(TaskOutputLog."File Name");
+                until TaskOutputLog.Next = 0;
         end;
 
         Send();
@@ -269,34 +261,68 @@ codeunit 6059905 "NPR Mail Task Status"
 
     procedure OpenNewMessage(SendAsMailType: Option Auto,JMail,SMTPMail; ToName: Text[80]): Boolean
     var
-        SMTPMailSetup: Record "SMTP Mail Setup";
         Recipients: List of [Text];
     begin
+        Clear(MailManagement);
         if SendAsMailType = SendAsMailType::Auto then begin
-            if SMTPMailSetup.Get() and (SMTPMailSetup."SMTP Server" <> '') then
+            if MailManagement.IsEnabled() then
                 SendAsMailType := SendAsMailType::SMTPMail
             else
                 SendAsMailType := SendAsMailType::JMail;
         end;
-        Clear(SMTPMail);
-        SMTPMail.CreateMessage(ToName, '', Recipients, '', '', true);
+
+        CreateEmailItem(EmailItem, ToName, '', Recipients, '', '');
     end;
 
     procedure CreateMessage(SendAsMailType: Option Auto,JMail,SMTPMail; SenderName: Text[100]; SenderAddress: Text; Recipients: Text[1024]; Subject: Text[200]; Body: Text[1024])
     var
-        SMTPMailSetup: Record "SMTP Mail Setup";
         Separators: List of [Text];
     begin
+        Clear(MailManagement);
         if SendAsMailType = SendAsMailType::Auto then begin
-            if SMTPMailSetup.Get() and (SMTPMailSetup."SMTP Server" <> '') then
+            if MailManagement.IsEnabled() then
                 SendAsMailType := SendAsMailType::SMTPMail
             else
                 SendAsMailType := SendAsMailType::JMail;
         end;
 
-        Clear(SMTPMail);
         InitMailAdrSeparators(Separators);
-        SMTPMail.CreateMessage(SenderName, SenderAddress, Recipients.Split(Separators), Subject, Body, true);
+
+        CreateEmailItem(EmailItem, SenderName, SenderAddress, Recipients.Split(Separators), Subject, Body);
+    end;
+
+    local procedure CreateEmailItem(var EmailItem: Record "Email Item"; FromName: Text; FromAddress: Text; Recipients: List of [Text]; Subject: Text; Body: Text)
+    var
+        i: Integer;
+        RecipientsText: Text;
+        RecipientsCCText: Text;
+        RecValue: Text;
+    begin
+        EmailItem.Initialize();
+        EmailItem.Validate("Plaintext Formatted", false);
+        EmailItem.Validate("Message Type", EmailItem."Message Type"::"From Email Body Template");
+        EmailItem.Validate("From Address", FromAddress);
+        EmailItem.Validate("From Name", FromName);
+
+        for i := 1 to Recipients.Count do begin
+            Recipients.Get(i, RecValue);
+            if StrLen(RecipientsText + ';' + RecValue) < 250 then
+                if RecipientsText = '' then
+                    RecipientsText := RecValue
+                else
+                    RecipientsText += ';' + RecValue
+            else
+                if StrLen(RecipientsCCText + ';' + RecValue) < 250 then
+                    if RecipientsCCText = '' then
+                        RecipientsCCText := RecValue
+                    else
+                        RecipientsCCText += ';' + RecValue;
+        end;
+        EmailItem.Validate("Send to", RecipientsText);
+        EmailItem.Validate("Send CC", RecipientsCCText);
+        EmailItem.Validate(Subject, Subject);
+        EmailItem.SetBodyText(Body);
+        EmailItem.Insert();
     end;
 
     procedure CreateMessage2(SendAsMailType: Option Auto,JMail,SMTPMail; Subject: Text[200]; TaskLine2: Record "NPR Task Line")
@@ -338,50 +364,190 @@ codeunit 6059905 "NPR Mail Task Status"
     var
         Recipients: List of [Text];
         Separators: List of [Text];
+        RecValue: Text;
+        RecipientsText: Text;
+        i: Integer;
     begin
         InitMailAdrSeparators(Separators);
         Recipients := NewRecipient.Split(Separators);
-        SMTPMail.AddRecipients(Recipients);
+
+        RecipientsText := EmailItem."Send to";
+
+        for i := 1 to Recipients.Count do begin
+            Recipients.Get(i, RecValue);
+            if StrLen(RecipientsText + ';' + RecValue) < 250 then
+                if RecipientsText = '' then
+                    RecipientsText := RecValue
+                else
+                    RecipientsText += ';' + RecValue;
+        end;
+
+        EmailItem.Validate("Send to", RecipientsText);
+        EmailItem.Modify();
     end;
 
     procedure AddRecipientCC(NewRecipientCC: Text[80])
     var
         CCRecipients: List of [Text];
         Separators: List of [Text];
+        RecValue: Text;
+        RecipientsText: Text;
+        i: Integer;
     begin
         InitMailAdrSeparators(Separators);
         CCRecipients := NewRecipientCC.Split(Separators);
-        SMTPMail.AddCC(CCRecipients);
+
+        RecipientsText := EmailItem."Send CC";
+
+        for i := 1 to CCRecipients.Count do begin
+            CCRecipients.Get(i, RecValue);
+            if StrLen(RecipientsText + ';' + RecValue) < 250 then
+                if RecipientsText = '' then
+                    RecipientsText := RecValue
+                else
+                    RecipientsText += ';' + RecValue;
+        end;
+
+        EmailItem.Validate("Send CC", RecipientsText);
+        EmailItem.Modify();
     end;
 
     procedure AddRecipientBCC(NewRecipientBCC: Text[80])
     var
         BCCRecipients: List of [Text];
         Separators: List of [Text];
+        RecValue: Text;
+        RecipientsText: Text;
+        i: Integer;
     begin
         InitMailAdrSeparators(Separators);
         BCCRecipients := NewRecipientBCC.Split(Separators);
-        SMTPMail.AddBCC(BCCRecipients);
+
+        RecipientsText := EmailItem."Send BCC";
+
+        for i := 1 to BCCRecipients.Count do begin
+            BCCRecipients.Get(i, RecValue);
+            if StrLen(RecipientsText + ';' + RecValue) < 250 then
+                if RecipientsText = '' then
+                    RecipientsText := RecValue
+                else
+                    RecipientsText += ';' + RecValue;
+        end;
+
+        EmailItem.Validate("Send BCC", RecipientsText);
+        EmailItem.Modify();
     end;
 
     procedure AppendHTML(TextLine: Text[260]): Boolean
+    var
+        InStr: InStream;
+        BodyText: Text;
     begin
-        SMTPMail.AppendBody(TextLine + '<br/>');
+        EmailItem.CalcFields(Body);
+        EmailItem.Body.CreateInStream(InStr);
+        InStr.Read(BodyText);
+        BodyText += TextLine + '<br/>';
+        EmailItem.SetBodyText(BodyText);
+        EmailItem.Modify();
     end;
 
     procedure AddAttachment(NewAttachment: Text[1024])
+    var
+        FileMgt: Codeunit "File Management";
     begin
-        SMTPMail.AddAttachment(NewAttachment, NewAttachment);
+        case true of
+            EmailItem."Attachment File Path" = '':
+                begin
+                    EmailItem."Attachment File Path" := NewAttachment;
+                    EmailItem."Attachment Name" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 2" = '':
+                begin
+                    EmailItem."Attachment File Path 2" := NewAttachment;
+                    EmailItem."Attachment Name 2" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 3" = '':
+                begin
+                    EmailItem."Attachment File Path 3" := NewAttachment;
+                    EmailItem."Attachment Name 3" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 4" = '':
+                begin
+                    EmailItem."Attachment File Path 4" := NewAttachment;
+                    EmailItem."Attachment Name 4" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 5" = '':
+                begin
+                    EmailItem."Attachment File Path 5" := NewAttachment;
+                    EmailItem."Attachment Name 5" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 6" = '':
+                begin
+                    EmailItem."Attachment File Path 6" := NewAttachment;
+                    EmailItem."Attachment Name 6" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 7" = '':
+                begin
+                    EmailItem."Attachment File Path 7" := NewAttachment;
+                    EmailItem."Attachment Name 7" := FileMgt.GetFileName(NewAttachment);
+                end;
+        end;
+        EmailItem.Modify();
     end;
 
-    procedure AddAttachmentFromStream(InStrAttachment: InStream; NewAttachment: Text[1024])
+    procedure AddAttachmentFromStream(TaskOutputLog: Record "NPR Task Output Log"; NewAttachment: Text[1024])
+    var
+        TempBLOB: Codeunit "Temp Blob";
+        Outstr: OutStream;
+        FileMgt: Codeunit "File Management";
+        FilePath: Text;
     begin
-        SMTPMail.AddAttachmentStream(InStrAttachment, NewAttachment);
+        FilePath := FileMgt.CreateFileNameWithExtension(NewAttachment, '.pdf');
+        TaskOutputLog.File.Export(FilePath);
+        case true of
+            EmailItem."Attachment File Path" = '':
+                begin
+                    EmailItem."Attachment File Path" := FilePath;
+                    EmailItem."Attachment Name" := NewAttachment;
+                end;
+            EmailItem."Attachment File Path 2" = '':
+                begin
+                    EmailItem."Attachment File Path 2" := FilePath;
+                    EmailItem."Attachment Name 2" := NewAttachment;
+                end;
+            EmailItem."Attachment File Path 3" = '':
+                begin
+                    EmailItem."Attachment File Path 3" := FilePath;
+                    EmailItem."Attachment Name 3" := NewAttachment;
+                end;
+            EmailItem."Attachment File Path 4" = '':
+                begin
+                    EmailItem."Attachment File Path 4" := FilePath;
+                    EmailItem."Attachment Name 4" := NewAttachment;
+                end;
+            EmailItem."Attachment File Path 5" = '':
+                begin
+                    EmailItem."Attachment File Path 5" := FilePath;
+                    EmailItem."Attachment Name 5" := NewAttachment;
+                end;
+            EmailItem."Attachment File Path 6" = '':
+                begin
+                    EmailItem."Attachment File Path 6" := FilePath;
+                    EmailItem."Attachment Name 6" := NewAttachment;
+                end;
+            EmailItem."Attachment File Path 7" = '':
+                begin
+                    EmailItem."Attachment File Path 7" := FilePath;
+                    EmailItem."Attachment Name 7" := NewAttachment;
+                end;
+        end;
+        EmailItem.Modify();
     end;
 
     procedure Send() MailSent: Boolean
     begin
-        SMTPMail.Send;
+        MailManagement.SetHideMailDialog(true);
+        MailManagement.Send(EmailItem, Enum::"Email Scenario"::Default);
         exit(true);
     end;
 

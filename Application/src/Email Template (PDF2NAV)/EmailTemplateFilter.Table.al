@@ -31,17 +31,11 @@ table 6014464 "NPR E-mail Template Filter"
             var
                 "Field": Record "Field";
             begin
-                //-PN1.08
-                //"Field No." := "FieldRef Library".LookupFieldNum("Table No.");
-                ////-PN1.07
-                //"Field Name" := "FieldRef Library".GetFieldName("Table No.", "Field No.");
-                ////-PN1.07
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, "Table No.");
                 Field.FilterGroup(0);
                 if PAGE.RunModal(PAGE::"NPR Field Lookup", Field) = ACTION::LookupOK then
                     "Field No." := Field."No.";
-                //+PN1.08
             end;
         }
         field(9; Value; Text[250])
@@ -65,10 +59,6 @@ table 6014464 "NPR E-mail Template Filter"
         key(Key1; "E-mail Template Code", "Table No.", "Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
