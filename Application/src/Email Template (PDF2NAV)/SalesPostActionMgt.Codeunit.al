@@ -5,7 +5,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
         Pdf2NavActionDisabledMsg1: Label 'This Action is disabled by setup. Please use ''Post and Print'' or ''Post and Email ''';
         Pdf2NavActionDisabledMsg2: Label 'This Action is disabled by setup. Please use ''Post and Send'', ''Post and Print'' or ''Post and Email ''';
 
-    [EventSubscriber(ObjectType::Page, 42, 'OnBeforeActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order", 'OnBeforeActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
     local procedure Page42OnBeforeActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -15,13 +15,13 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(Pdf2NavActionDisabledMsg1);
     end;
 
-    [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order", 'OnAfterActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
     local procedure Page42OnAfterActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     begin
         Rec.SendToPosting(Pdf2NavPostingCodeunitID);
     end;
 
-    [EventSubscriber(ObjectType::Page, 43, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice", 'OnBeforeActionEvent', 'PostAndSend', true, true)]
     local procedure Page43OnBeforeActionEventPostAndSend(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -31,7 +31,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(StdActionDisabledMsg);
     end;
 
-    [EventSubscriber(ObjectType::Page, 43, 'OnBeforeActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice", 'OnBeforeActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
     local procedure Page43OnBeforeActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -41,13 +41,13 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(Pdf2NavActionDisabledMsg2);
     end;
 
-    [EventSubscriber(ObjectType::Page, 43, 'OnAfterActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice", 'OnAfterActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
     local procedure Page43OnAfterActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     begin
         Rec.SendToPosting(Pdf2NavPostingCodeunitID);
     end;
 
-    [EventSubscriber(ObjectType::Page, 44, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Credit Memo", 'OnBeforeActionEvent', 'PostAndSend', true, true)]
     local procedure Page44OnBeforeActionEventPostAndSend(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -57,7 +57,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(StdActionDisabledMsg);
     end;
 
-    [EventSubscriber(ObjectType::Page, 9301, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice List", 'OnBeforeActionEvent', 'PostAndSend', true, true)]
     local procedure Page9301OnBeforeActionEventPostAndSend(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -67,7 +67,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(StdActionDisabledMsg);
     end;
 
-    [EventSubscriber(ObjectType::Page, 9302, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Credit Memos", 'OnBeforeActionEvent', 'PostAndSend', true, true)]
     local procedure Page9302OnBeforeActionEventPostAndSend(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -77,7 +77,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(StdActionDisabledMsg);
     end;
 
-    [EventSubscriber(ObjectType::Page, 9305, 'OnBeforeActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order List", 'OnBeforeActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
     local procedure Page9305OnBeforeActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -87,13 +87,13 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(Pdf2NavActionDisabledMsg1);
     end;
 
-    [EventSubscriber(ObjectType::Page, 9305, 'OnAfterActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order List", 'OnAfterActionEvent', 'NPR PostAndSendPdf2Nav', true, true)]
     local procedure Page9305OnAfterActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     begin
         Rec.SendToPosting(Pdf2NavPostingCodeunitID);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014518, 'OnBeforeActionEvent', 'PostAndPrint', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick", 'OnBeforeActionEvent', 'PostAndPrint', true, true)]
     local procedure Page6014518OnBeforeActionEventPostAndPrint(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -103,7 +103,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(StdActionDisabledMsg);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014518, 'OnBeforeActionEvent', 'PostAndEmail', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick", 'OnBeforeActionEvent', 'PostAndEmail', true, true)]
     local procedure Page6014518OnBeforeActionEventPostAndEmail(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -113,7 +113,7 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(StdActionDisabledMsg);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014518, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick", 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
     local procedure Page6014518OnBeforeActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
@@ -123,14 +123,10 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
                 Error(Pdf2NavActionDisabledMsg1);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014518, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick", 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
     local procedure Page6014518OnAfterActionEventPostAndSendPdf2Nav(var Rec: Record "Sales Header")
     begin
         Rec.SendToPosting(Pdf2NavPostingCodeunitID);
-    end;
-
-    local procedure "---"()
-    begin
     end;
 
     local procedure Pdf2NavPostingCodeunitID(): Integer

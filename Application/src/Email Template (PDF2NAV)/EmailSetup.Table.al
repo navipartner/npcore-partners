@@ -68,9 +68,5 @@ table 6014468 "NPR E-mail Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 

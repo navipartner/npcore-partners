@@ -63,10 +63,6 @@ table 6014458 "NPR E-mail Attachment"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         FileMgt: Codeunit "File Management";
         Text001: Label 'Replace the existing file?';

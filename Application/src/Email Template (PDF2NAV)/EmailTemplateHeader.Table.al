@@ -141,10 +141,6 @@ table 6014462 "NPR E-mail Template Header"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         EmailAttachment: Record "NPR E-mail Attachment";

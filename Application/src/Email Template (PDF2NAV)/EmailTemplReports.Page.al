@@ -31,9 +31,5 @@ page 6059798 "NPR E-mail Templ. Reports"
             }
         }
     }
-
-    actions
-    {
-    }
 }
 

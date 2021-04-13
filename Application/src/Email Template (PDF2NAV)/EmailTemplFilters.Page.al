@@ -31,9 +31,5 @@ page 6059794 "NPR E-mail Templ. Filters"
             }
         }
     }
-
-    actions
-    {
-    }
 }
 

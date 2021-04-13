@@ -36,9 +36,5 @@ page 6059797 "NPR E-mail Attachments"
             }
         }
     }
-
-    actions
-    {
-    }
 }
 

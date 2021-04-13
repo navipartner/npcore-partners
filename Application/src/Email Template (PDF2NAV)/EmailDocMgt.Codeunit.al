@@ -416,19 +416,6 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
             TempField.Insert();
         end;
 
-        if not EmailRetailMgt.POSEntryExists() then begin
-            TempField.Get(0, "TemplateType.POSEntry");
-            TempField.Delete();
-        end;
-        if not EmailRetailMgt.CreditVoucherExists() then begin
-            TempField.Get(0, "TemplateType.CreditVoucher");
-            TempField.Delete();
-        end;
-        if not EmailRetailMgt.GiftVoucherExists() then begin
-            TempField.Get(0, "TemplateType.GiftVoucher");
-            TempField.Delete();
-        end;
-
         if PAGE.RunModal(PAGE::"NPR E-mail Templ. Choice List", TempField) <> ACTION::LookupOK then
             exit(0);
 
@@ -628,8 +615,6 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.POSEntry":
                 begin
-                    if not EmailRetailMgt.POSEntryExists() then
-                        exit('');
                     NewTemplateCode := UpperCase(POSEntryLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;

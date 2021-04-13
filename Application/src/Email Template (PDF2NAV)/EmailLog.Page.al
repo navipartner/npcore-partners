@@ -52,9 +52,5 @@ page 6059796 "NPR E-mail Log"
             }
         }
     }
-
-    actions
-    {
-    }
 }
 

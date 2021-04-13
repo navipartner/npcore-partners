@@ -65,9 +65,5 @@ table 6014460 "NPR E-mail Log"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 
