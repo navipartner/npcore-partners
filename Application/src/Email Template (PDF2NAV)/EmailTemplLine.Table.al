@@ -29,9 +29,5 @@ table 6014463 "NPR E-mail Templ. Line"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 

@@ -35,10 +35,6 @@
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
         Rec.Reset();

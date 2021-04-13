@@ -1,19 +1,12 @@
 ﻿codeunit 6014452 "NPR E-mail Templ. Mgt."
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Export failed';
         Text001: Label 'All values on %1 will be replaced with values from %2';
         Text002: Label 'Do you want to delete the HTML Template?';
         Text003: Label 'No End-Tag (%1) found for Start-Tag (%2) in %3';
 
-    local procedure "--- Email Content"()
-    begin
-    end;
+    #region Email Content
 
     procedure MergeMailContent(var RecRef: RecordRef; Line: Text; StartTag: Text[10]; EndTag: Text[10]) NewLine: Text
     var
@@ -60,11 +53,8 @@
 
         FieldValue := Format(FRef.Value);
     end;
-
-    local procedure "--- Page Actions"()
-    begin
-    end;
-
+    #endregion
+    #region Page Actions
     procedure CopyFromTemplate(var EmailTemplateHeaderTo: Record "NPR E-mail Template Header")
     var
         EmailTemplateHeaderFrom: Record "NPR E-mail Template Header";
@@ -134,7 +124,7 @@
         if UseDialog then
             ToFile := 'template.html'
         else
-            ToFile := FileManagement.ClientTempFileName('html');
+            ToFile := FileManagement.CreateFileNameWithExtension(CreateGuid(), 'html');
 
         if DownloadFromStream(InStr, 'Export', '', '', ToFile) then
             exit(ToFile);
@@ -162,10 +152,11 @@
 
     procedure ViewHtmlTemplate(var EmailTemplateHeader: Record "NPR E-mail Template Header")
     var
-        Path: Text[1024];
+        Path: Text;
     begin
         Path := ExportHtmlTemplate(EmailTemplateHeader, false);
         HyperLink(Path);
     end;
+    #endregion
 }
 

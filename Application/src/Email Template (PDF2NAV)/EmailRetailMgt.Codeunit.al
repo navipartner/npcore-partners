@@ -1,7 +1,7 @@
 codeunit 6014474 "NPR E-mail Retail Mgt."
 {
 
-    [EventSubscriber(ObjectType::Codeunit, 6014450, 'GetEmailAddressEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR E-mail Management", 'GetEmailAddressEvent', '', false, false)]
     local procedure OnGetEmailAddressEvent(var RecRef: RecordRef; var EmailAddress: Text; var Handled: Boolean)
     var
         emailAddr: Text;
@@ -44,7 +44,7 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014450, 'OnAfterGetReportIDEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR E-mail Management", 'OnAfterGetReportIDEvent', '', false, false)]
     local procedure GetReportID(RecRef: RecordRef; var ReportID: Integer)
     begin
         if ReportID > 0 then
@@ -105,26 +105,6 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
         EmailMgt.SendReport(ReportID, RecRef, EmailAddr, Silent);
     end;
 
-    procedure POSEntryExists(): Boolean
-    var
-        TableInformation: Record "Table Information";
-    begin
-        exit(TableInformation.Get(CompanyName, POSEntryTableId()));
-    end;
-
-    procedure CreditVoucherExists(): Boolean
-    var
-        TableInformation: Record "Table Information";
-    begin
-        exit(TableInformation.Get(CompanyName, CreditVoucherTableId()));
-    end;
-
-    procedure GiftVoucherExists(): Boolean
-    var
-        TableInformation: Record "Table Information";
-    begin
-        exit(TableInformation.Get(CompanyName, GiftVoucherTableId()));
-    end;
 
     procedure POSEntryTableId(): Integer
     begin

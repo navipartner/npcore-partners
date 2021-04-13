@@ -31,9 +31,5 @@ table 6014521 "NPR Mail Text Line"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 

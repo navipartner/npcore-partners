@@ -363,7 +363,6 @@ page 6059789 "NPR E-mail Setup"
                 {
                     Caption = 'Sales Ticket';
                     Image = NewOrder;
-                    Visible = POSEntryExists;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sales Ticket action';
 
@@ -386,23 +385,12 @@ page 6059789 "NPR E-mail Setup"
         if not Rec.Get() then
             Rec.Insert();
 
-        SetVisible();
+
     end;
 
     var
         NoOfEmailTemplatesCreatedMsg: Label '%1 E-mail Templates Created', Comment = '%1=EmailDocumentMgt.CreateEmailTemplates()';
         EMailTemplateCreatedMsg: Label 'E-mail Template %1 Created', Comment = '%1=EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType....")';
-        POSEntryExists: Boolean;
-        CreditVoucherExists: Boolean;
-        GiftVoucherExists: Boolean;
 
-    local procedure SetVisible()
-    var
-        EmailRetailMgt: Codeunit "NPR E-mail Retail Mgt.";
-    begin
-        POSEntryExists := EmailRetailMgt.POSEntryExists();
-        CreditVoucherExists := EmailRetailMgt.CreditVoucherExists();
-        GiftVoucherExists := EmailRetailMgt.GiftVoucherExists();
-    end;
 }
 
