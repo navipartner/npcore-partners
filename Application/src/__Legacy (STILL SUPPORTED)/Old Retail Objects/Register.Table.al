@@ -43,7 +43,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Balanced';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -51,7 +51,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Balanced on Sales Ticket';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -70,7 +70,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Register Type';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register Types to NPR POS View Profile';
         }
@@ -170,7 +170,7 @@ table 6014401 "NPR Register"
             Caption = 'Gen. Business Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -179,7 +179,7 @@ table 6014401 "NPR Register"
             Caption = 'VAT Gen. Business Posting Group (Price)';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -192,7 +192,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Name 2';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -207,7 +207,7 @@ table 6014401 "NPR Register"
             Caption = 'City gift voucher account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -216,7 +216,7 @@ table 6014401 "NPR Register"
             Caption = 'City Gift Voucher Discount';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -224,7 +224,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Change Register';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -232,7 +232,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Opened By Salesperson';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -245,7 +245,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Use Sales Statistics';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -260,7 +260,7 @@ table 6014401 "NPR Register"
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -270,7 +270,7 @@ table 6014401 "NPR Register"
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -292,7 +292,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Credit Card';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -302,7 +302,7 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = ' ,01,02,03,04,05,06 - POINT,07,08,Steria,10 - SAGEM Flexiterm .NET,SAGEM Flexiterm JavaScript,Pepper';
             OptionMembers = " ","MSP DOS","MSP Navision",OCC,"SAGEM Flexiterminal","SAGEM Flexiterm via console",POINT,TPOS3,"SAGEM Flexitermina from server",Steria,"SAGEM Flexiterm .NET","SAGEM Flexiterm JavaScript",Pepper;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -322,7 +322,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Display 1';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -330,7 +330,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Display 2';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -338,7 +338,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Touch Screen';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -346,7 +346,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Connected to Server';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -354,7 +354,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
@@ -362,7 +362,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
@@ -370,7 +370,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'City';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
@@ -380,7 +380,7 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             TableRelation = "Post Code";
             ValidateTableRelation = false;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
@@ -388,7 +388,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Phone No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
@@ -396,7 +396,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Fax No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -404,7 +404,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Giro No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -412,7 +412,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Bank Name';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -420,7 +420,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Bank Registration No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -428,7 +428,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Bank Account No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -436,7 +436,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Automatic Payment No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -444,7 +444,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'VAT No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -452,7 +452,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'E-mail';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -479,7 +479,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Website';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
@@ -487,7 +487,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Close Terminal at Register Balance';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -497,7 +497,7 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'NP Config,Register,Comment Line';
             OptionMembers = "NP Config",Register,Comment;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -505,7 +505,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text1';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -513,7 +513,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text2';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -521,7 +521,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text3';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -529,7 +529,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text 4';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -537,7 +537,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text 5';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -545,7 +545,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text6';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -553,7 +553,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text7';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -561,7 +561,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text8';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -569,13 +569,13 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Line Text9';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
         field(316; "Global Dimension 1 Code"; Code[20])
         {
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
             CaptionClass = '1,2,1';
@@ -585,7 +585,7 @@ table 6014401 "NPR Register"
         }
         field(317; "Global Dimension 2 Code"; Code[20])
         {
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
             CaptionClass = '1,2,2';
@@ -624,7 +624,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Send Receipt Logo from NAV';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -683,7 +683,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Ticket Filter';
             FieldClass = FlowFilter;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -691,7 +691,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Sales Person Filter';
             FieldClass = FlowFilter;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -735,7 +735,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Exchange Amount';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -751,7 +751,7 @@ table 6014401 "NPR Register"
             Caption = 'Money drawer attached';
             DataClassification = CustomerContent;
             InitValue = true;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -759,7 +759,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Lock Register To Salesperson';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -767,7 +767,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Use fee';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -775,7 +775,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Confirm Fee';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -785,7 +785,7 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Customer,Register';
             OptionMembers = Register,Customer;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -793,7 +793,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Terminal Auto Print';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -801,7 +801,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Money drawer at debit/credit card';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -809,7 +809,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Exchange Label Exchange Period';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -817,7 +817,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Enable Contactless';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -825,7 +825,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Tax Free Enabled';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -833,7 +833,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Tax Free Merchant ID';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -841,7 +841,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Tax Free VAT Number';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -849,7 +849,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Tax Free Country Code';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -857,7 +857,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Tax Free Amount Threshold';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -865,7 +865,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Tax Free Check Terminal Prefix';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -873,7 +873,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Register Layout';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -882,7 +882,7 @@ table 6014401 "NPR Register"
             Caption = 'Encrypt Protocol Data';
             DataClassification = CustomerContent;
             Description = 'CASE 226832';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -891,7 +891,7 @@ table 6014401 "NPR Register"
             Caption = 'Secure Protocol Data';
             DataClassification = CustomerContent;
             Description = 'CASE 226832';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -900,7 +900,7 @@ table 6014401 "NPR Register"
             Caption = 'Install Client-side Assemblies';
             DataClassification = CustomerContent;
             Description = 'CASE 226832';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -909,7 +909,7 @@ table 6014401 "NPR Register"
             Caption = 'Skip Infobox Update in Sale';
             DataClassification = CustomerContent;
             Description = 'NPR5.28';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -927,7 +927,7 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Automatic,Quick Buttons,Normal Numeric,Never';
             OptionMembers = Automatic,Quick,"Normal Numeric",Never;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -937,7 +937,7 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Functions,Invoice Customer,Contact';
             OptionMembers = Functions,"Invoice Customer",Contact;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -945,7 +945,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Touch screen connection';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -962,7 +962,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Touch Screen Auto Unwrap If Single';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -970,7 +970,7 @@ table 6014401 "NPR Register"
         {
             Caption = 'Login - Auto popup';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -1010,7 +1010,7 @@ table 6014401 "NPR Register"
             Caption = 'MobilePay Location ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -1019,7 +1019,7 @@ table 6014401 "NPR Register"
             Caption = 'MobilePay PoS ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -1028,7 +1028,7 @@ table 6014401 "NPR Register"
             Caption = 'MobilePay PoS Unit ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -1037,7 +1037,7 @@ table 6014401 "NPR Register"
             Caption = 'MobilePay PoS Registered';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
@@ -1046,7 +1046,7 @@ table 6014401 "NPR Register"
             Caption = 'MobilePay PoS Unit Assigned';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }

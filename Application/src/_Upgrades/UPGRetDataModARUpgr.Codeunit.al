@@ -1,7 +1,5 @@
 codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
 {
-    Subtype = Upgrade;
-
     var
         TmpAuditRollBuffer: Record "NPR Audit Roll" temporary;
         //EstNoOfEntries: Integer;
@@ -14,6 +12,24 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         ALL_REGISTERS_MUST_BE_BALANCED: Label 'Not all %1 have %2 %3! Only %1 with %2 %3 will have their balance transfered. Do you want to continue anyway?';
         NOT_ALL_CR_HAVE_POS_UNIT: Label 'All %1 must have a %2 when activating POS Entry posting. %1 %3 is missing its %2.';
 
+    trigger OnRun()
+    var
+        UpgTagDef: Codeunit "NPR UPG Ret.Dat.Mod.Tag Def";
+        UpgradeTagMgt: Codeunit "Upgrade Tag";
+    begin
+        // Check whether the tag has been used before, and if so, don't run upgrade code
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
+            exit;
+
+        // Run upgrade code
+        UpgradeAuditRollStep1;
+        OnActivatePosEntryPosting();
+
+        // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+    end;
+
+    /* *** REMOVED ***
     trigger OnUpgradePerCompany()
     var
         UpgTagDef: Codeunit "NPR UPG Ret.Dat.Mod.Tag Def";
@@ -32,6 +48,7 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
     end;
+    */
 
     local procedure UpgradeAuditRollStep1()
     var
@@ -44,31 +61,35 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSUnit: Record "NPR POS Unit";
         POSLedgerRegister: Record "NPR POS Period Register";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         HasOpenPOSLedgerRegister: Boolean;
-        i: Integer;
+        i, c : Integer;
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
         POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        p: Dialog;
     begin
-        /*
+        //Use "Audit Roll to POS Entry Link" to determine how far the Migration has come, and if new Datamodel have been disabled and therefore
+        //needs to be rolled up to date again.
+        if not AuditRolltoPOSEntryLink.IsEmpty and GuiAllowed then
+            if Confirm('Do you want to rebuild the POS Entries from the Audit Roll?') then
+                AuditRolltoPOSEntryLink.DeleteAll;  //Remove this after test!
+
         AuditRoll.SetCurrentKey("Clustered Key");
         AuditRolltoPOSEntryLink.LockTable;
         if AuditRolltoPOSEntryLink.FindLast then
             AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Link Entry No.")
         else
             InitDatamodel;
-        */
-
-        //full cleanup is required due to balancing audit roll posting bug
-        AuditRolltoPOSEntryLink.LockTable;
-        AuditRolltoPOSEntryLink.DeleteAll();
-        InitDatamodel;
 
         StartDateTime := CurrentDateTime;
 
         //AuditRoll.SetCurrentKey("Sale Date", "Sales Ticket No.", "Line No.");
         //AuditRoll.SetRange("Sale Date", DMY2Date(1, 1, 2020), WorkDate());
 
+        if GuiAllowed then
+            p.Open('Processing record #1########');
+
+        c := AuditRoll.Count;
         if AuditRoll.FindSet then begin
             repeat
                 if AuditRoll."Sales Ticket No." = '' then
@@ -145,31 +166,19 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
                 end;
                 UpdatePOSEntry(POSEntry, AuditRoll);
                 xAuditRoll := AuditRoll;
+                i := i + 1;
+                if ((i mod 1000) = 0) or ((c - i) < 1000) then
+                    if GuiAllowed then p.Update(1, StrSubstNo('%1/%2...', i, c));
             until AuditRoll.Next = 0;
 
-            Commit();
-            POSEntry.LockTable();
-            POSSalesLine.LockTable();
-            POSPaymentLine.LockTable();
-            POSBalancingLine.LockTable();
-            POSLedgerRegister.LockTable();
-            POSEntryCommentLine.LockTable();
-            POSTaxAmountLine.LockTable();
-
             if NoOfPOSEntriesCreated > 0 then begin
+                if GuiAllowed then p.Update(1, 'Finalizing...');
                 FinalizePOSEntry(POSEntry, AuditRoll);
                 CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
-                Commit();
-                POSEntry.LockTable();
-                POSSalesLine.LockTable();
-                POSPaymentLine.LockTable();
-                POSBalancingLine.LockTable();
-                POSLedgerRegister.LockTable();
-                POSEntryCommentLine.LockTable();
-                POSTaxAmountLine.LockTable();
                 PersistVATAmountLines(POSEntry, VATAmountLine);
             end;
         end;
+        if GuiAllowed then p.Close();
     end;
 
     local procedure UpgradeAuditRoll(Step: Integer)
@@ -527,22 +536,35 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
            (not POSLedgerRegister.IsEmpty) or
            (not POSEntryCommentLine.IsEmpty)
         then begin
-            POSEntry.DeleteAll;
-            POSSalesLine.DeleteAll;
-            POSPaymentLine.DeleteAll;
-            POSBalancingLine.DeleteAll;
-            POSLedgerRegister.DeleteAll;
-            POSEntryCommentLine.DeleteAll;
-            POSTaxAmountLine.DeleteAll;
-            Commit;
-            POSEntry.LockTable();
-            POSSalesLine.LockTable();
-            POSPaymentLine.LockTable();
-            POSBalancingLine.LockTable();
-            POSLedgerRegister.LockTable();
-            POSEntryCommentLine.LockTable();
-            POSTaxAmountLine.LockTable();
+            POSEntry.DeleteAll(false);
+            POSSalesLine.DeleteAll(false);
+            POSPaymentLine.DeleteAll(false);
+            POSBalancingLine.DeleteAll(false);
+            POSLedgerRegister.DeleteAll(false);
+            POSEntryCommentLine.DeleteAll(false);
+            POSTaxAmountLine.DeleteAll(false);
         end;
+        Commit;
+        LockTables();
+    end;
+
+    local procedure LockTables()
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSSalesLine: Record "NPR POS Sales Line";
+        POSPaymentLine: Record "NPR POS Payment Line";
+        POSBalancingLine: Record "NPR POS Balancing Line";
+        POSLedgerRegister: Record "NPR POS Period Register";
+        POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
+        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+    begin
+        POSEntry.LockTable();
+        POSSalesLine.LockTable();
+        POSPaymentLine.LockTable();
+        POSBalancingLine.LockTable();
+        POSLedgerRegister.LockTable();
+        POSEntryCommentLine.LockTable();
+        POSTaxAmountLine.LockTable();
     end;
 
     procedure BufferAuditRollLink(var AuditRoll: Record "NPR Audit Roll")
@@ -605,339 +627,6 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
             POSEntry.Modify(true);
     end;
 
-    procedure DuplicateAuditRollTicketToPosEntry(SalesTicketNo: Code[20])
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        xAuditRoll: Record "NPR Audit Roll";
-        AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
-        POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
-        POSBalancingLine: Record "NPR POS Balancing Line";
-        POSUnit: Record "NPR POS Unit";
-        POSLedgerRegister: Record "NPR POS Period Register";
-        HasOpenPOSLedgerRegister: Boolean;
-    begin
-        if (SalesTicketNo = '') then
-            exit;
-
-        AuditRoll.SetFilter("Sales Ticket No.", '=%1', SalesTicketNo);
-        if (AuditRoll.IsEmpty()) then
-            exit;
-
-        repeat
-            if (AuditRoll."Register No." <> xAuditRoll."Register No.") or
-                (AuditRoll."Sales Ticket No." <> xAuditRoll."Sales Ticket No.") or
-                ((AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment) and (AuditRoll.Type = AuditRoll.Type::"Open/Close")) then begin
-                if NoOfPOSEntriesCreated > 0 then
-                    FinalizePOSEntry(POSEntry, AuditRoll);
-
-                if POSUnit."No." <> AuditRoll."Register No." then
-                    if POSUnit.Get(AuditRoll."Register No.") then;
-
-                POSEntry.Init;
-                POSEntry."Entry No." := 0; //Auto Incr.
-                POSEntry."POS Store Code" := POSUnit."POS Store Code";
-                POSEntry."POS Unit No." := AuditRoll."Register No.";
-                POSEntry."Document No." := AuditRoll."Sales Ticket No.";
-                POSEntry."Entry Type" := POSEntry."Entry Type"::Comment; //Default, until possible lines changes this.
-                POSEntry."Entry Date" := AuditRoll."Sale Date";
-                POSEntry."Posting Date" := POSEntry."Entry Date";
-                POSEntry."Document Date" := POSEntry."Entry Date";
-                POSEntry."POS Sale ID" := AuditRoll."POS Sale ID";
-                POSEntry.Insert;
-
-                if (POSEntry."POS Unit No." <> POSLedgerRegister."POS Unit No.") or
-                    (POSLedgerRegister.Status <> POSLedgerRegister.Status::OPEN) then begin
-                    POSLedgerRegister.SetCurrentKey("POS Unit No.");
-                    POSLedgerRegister.SetRange("POS Unit No.", POSEntry."POS Unit No.");
-                    if POSLedgerRegister.FindLast then
-                        HasOpenPOSLedgerRegister := (POSLedgerRegister.Status = POSLedgerRegister.Status::OPEN)
-                    else
-                        HasOpenPOSLedgerRegister := false;
-                    if not HasOpenPOSLedgerRegister then begin
-                        POSLedgerRegister.Init;
-                        POSLedgerRegister."No." := 0; //Auto Increment;
-                        POSLedgerRegister."POS Store Code" := POSEntry."POS Store Code";
-                        POSLedgerRegister."POS Unit No." := POSEntry."POS Unit No.";
-                        POSLedgerRegister."Opening Entry No." := POSEntry."Entry No.";
-                        POSLedgerRegister.Status := POSLedgerRegister.Status::OPEN;
-                        POSLedgerRegister.Insert;
-                    end;
-                end;
-                POSEntry."POS Period Register No." := POSLedgerRegister."No.";
-
-                AuditRolltoPOSEntryLink.Init;
-                AuditRolltoPOSEntryLink."Link Entry No." := 0; //Auto Increment
-                AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
-                AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
-                AuditRolltoPOSEntryLink."Upgrade Step" := 1;
-                AuditRolltoPOSEntryLink.Insert;
-                NoOfPOSEntriesCreated += 1;
-                case AuditRoll."Sale Type" of
-                    AuditRoll."Sale Type"::Sale,
-                  AuditRoll."Sale Type"::"Out payment",
-                  AuditRoll."Sale Type"::"Debit Sale",
-                  AuditRoll."Sale Type"::Deposit:
-                        InsertPOSSaleLine(AuditRoll, POSEntry, POSSalesLine);
-                    AuditRoll."Sale Type"::Comment:
-                        if (AuditRoll.Type = AuditRoll.Type::"Open/Close") and AuditRoll.Balancing then
-                            InsertPOSBalancingLine(AuditRoll, POSEntry, POSLedgerRegister, POSBalancingLine)
-                        else
-                            POSEntry.Description := CopyStr(AuditRoll.Description, 1, MaxStrLen(POSEntry.Description));//InsertPOSSaleLine(AuditRoll,POSEntry,POSSalesLine);
-                    AuditRoll."Sale Type"::Payment:
-                        InsertPOSPaymentLine(AuditRoll, POSEntry, POSPaymentLine);
-                    else
-                        Error('Sales Line Sale Type %1 not implemented in migration (%2 %3 %4)', AuditRoll."Sale Type", AuditRoll.TableName, AuditRoll.FieldName("Clustered Key"), AuditRoll."Clustered Key");
-                end;
-                UpdatePOSEntry(POSEntry, AuditRoll);
-                xAuditRoll := AuditRoll;
-            end;
-        until AuditRoll.Next = 0;
-
-        if NoOfPOSEntriesCreated > 0 then
-            FinalizePOSEntry(POSEntry, AuditRoll);
-    end;
-
-    procedure UpgradeSetupsBalancingV3()
-    var
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        POSPaymentMethodCheck: Record "NPR POS Payment Method";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        POSUnit: Record "NPR POS Unit";
-        POSUnitCheck: Record "NPR POS Unit";
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        POSPaymentBinCheck: Record "NPR POS Payment Bin";
-        POSPostingSetup: Record "NPR POS Posting Setup";
-        POSPostingSetupCheck: Record "NPR POS Posting Setup";
-        Register: Record "NPR Register";
-        POSStore: Record "NPR POS Store";
-        POSUnitBinRelation: Record "NPR POS Unit to Bin Relation";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        BlankPosStoreCode: Integer;
-    begin
-        Register.Reset;
-        POSUnit.Reset;
-        if Register.FindSet then begin
-            repeat
-                if POSUnitCheck.Get(Register."Register No.") then begin
-                    POSUnit := POSUnitCheck;
-                    POSUnit.Name := Register.Description;
-                    POSUnit.Modify;
-                end;
-            until Register.Next = 0;
-        end;
-        //1. Populate POS Payment Method
-        POSPaymentMethod.Reset;  // Target
-        POSPaymentMethodCheck.Reset;
-        PaymentTypePOS.Reset;   //  Source
-        Register.Reset;
-
-        PaymentTypePOS.SetRange(Status, PaymentTypePOS.Status::Active); //Check for Active Status
-        if PaymentTypePOS.FindSet then
-            repeat
-                POSPaymentMethodCheck.Reset;
-                POSPaymentMethod.Reset;
-                if not POSPaymentMethodCheck.Get(PaymentTypePOS."No.") then begin
-                    POSPaymentMethod.Init;
-                    POSPaymentMethod.Code := PaymentTypePOS."No.";
-                    case PaymentTypePOS."Processing Type" of
-
-                        PaymentTypePOS."Processing Type"::Cash:
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CASH;
-
-                        PaymentTypePOS."Processing Type"::EFT:
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-
-                        PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::VOUCHER;
-
-                        PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::VOUCHER;
-
-                        PaymentTypePOS."Processing Type"::"Finance Agreement":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CUSTOMER;
-
-                        PaymentTypePOS."Processing Type"::Payout:
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::PAYOUT;
-
-                        PaymentTypePOS."Processing Type"::"Foreign Currency":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CASH;
-
-                        PaymentTypePOS."Processing Type"::"Gift Voucher":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::VOUCHER;
-
-                        PaymentTypePOS."Processing Type"::"Credit Voucher":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::VOUCHER;
-
-                        PaymentTypePOS."Processing Type"::"Terminal Card":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-
-                        PaymentTypePOS."Processing Type"::"Manual Card":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-
-                        PaymentTypePOS."Processing Type"::"Other Credit Cards":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-
-                        PaymentTypePOS."Processing Type"::"Debit sale":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CUSTOMER;
-
-                        PaymentTypePOS."Processing Type"::Invoice:
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CUSTOMER;
-
-                        PaymentTypePOS."Processing Type"::DIBS:
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-
-                        PaymentTypePOS."Processing Type"::"Point Card":
-                            POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-
-                    end;
-                    if PaymentTypePOS."To be Balanced" then
-                        POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::YES
-                    else
-                        POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::NO;
-
-                    POSPaymentMethod."Post Condensed" := (PaymentTypePOS.Posting = PaymentTypePOS.Posting::Condensed);
-                    if (POSPaymentMethod."Post Condensed") and (POSPaymentMethod."Condensed Posting Description" = '') then
-                        POSPaymentMethod."Condensed Posting Description" := 'Dagens bevægelser %6 %3 kasse %1';
-                    POSPaymentMethod."Rounding Type" := POSPaymentMethod."Rounding Type"::Nearest;
-                    POSPaymentMethod."Rounding Precision" := PaymentTypePOS."Rounding Precision";
-                    if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH then
-                        POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::YES;
-
-                    if POSPostingProfile.FindFirst then begin
-                        POSPaymentMethod."Rounding Gains Account" := POSPostingProfile."POS Sales Rounding Account";
-                        POSPaymentMethod."Rounding Losses Account" := POSPostingProfile."POS Sales Rounding Account";
-                    end;
-                    POSPaymentMethod.Insert(true);
-                end;
-            until PaymentTypePOS.Next = 0;
-
-        //2. POS Payment Bin
-        POSPaymentBin.Reset;
-        POSPaymentBinCheck.Reset;
-        POSUnit.Reset;
-        if POSUnit.FindSet then
-            repeat
-                POSPaymentBinCheck.Reset;
-                POSPaymentBin.Reset;
-                if not POSPaymentBinCheck.Get(POSUnit."No.") then begin
-                    POSPaymentBin.Init;
-                    POSPaymentBin."No." := POSUnit."No.";
-                    POSPaymentBin."POS Store Code" := POSUnit."POS Store Code";
-                    POSPaymentBin."Attached to POS Unit No." := POSUnit."No.";
-                    POSPaymentBin."Eject Method" := 'Printer';
-                    POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::CASH_DRAWER;
-                    POSPaymentBin.Description := 'Payment Bin' + ' ' + POSPaymentBin."No.";
-                    POSPaymentBin.Insert(true);
-                end;
-                //Default POS Payment Bin
-                CreateDefaultBins(POSUnit."No.");
-            until POSUnit.Next = 0;
-
-        POSPostingSetupCheck.Reset;
-        if POSPostingSetupCheck.Count < 1 then begin
-            //Global Setup
-            POSPostingSetup.Reset;
-            PaymentTypePOS.Reset;
-            Register.Reset;
-            POSPostingSetupCheck.Reset;  //POS Store Code,POS Payment Method Code,POS Payment Bin Code
-            BlankPosStoreCode := 1;
-            PaymentTypePOS.Reset;
-            PaymentTypePOS.SetRange(Status, PaymentTypePOS.Status::Active); //Check for Active Status
-            if PaymentTypePOS.FindSet then
-                repeat
-                    if CheckPaymentTypePOSAccount(PaymentTypePOS) then begin
-                        POSPostingSetup.Reset;
-                        POSPostingSetup.Init;
-                        POSPostingSetup."POS Store Code" := '';
-                        POSPostingSetup."POS Payment Method Code" := PaymentTypePOS."No.";
-                        POSPostingSetup."POS Payment Bin Code" := '';
-                        case PaymentTypePOS."Account Type" of
-                            PaymentTypePOS."Account Type"::Bank:
-                                begin
-                                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"Bank Account";
-                                    POSPostingSetup."Account No." := PaymentTypePOS."Bank Acc. No.";
-                                end;
-                            PaymentTypePOS."Account Type"::Customer:
-                                begin
-                                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::Customer;
-                                    POSPostingSetup."Account No." := PaymentTypePOS."Customer No.";
-                                end;
-                            PaymentTypePOS."Account Type"::"G/L Account":
-                                begin
-                                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
-                                    POSPostingSetup."Account No." := PaymentTypePOS."G/L Account No.";
-                                end;
-                        end;
-                        POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
-                        if Register.FindFirst then begin
-                            POSPostingSetup."Difference Acc. No." := Register."Difference Account";
-                            POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
-                        end;
-                        POSPostingSetup.Insert(true);
-                    end;
-                until PaymentTypePOS.Next = 0;
-
-            //Line Per POS Store
-            POSPostingSetup.Reset;
-            PaymentTypePOS.Reset;
-            POSStore.Reset;
-            Register.Reset;
-            POSPaymentMethod.Reset;
-            POSPostingSetupCheck.Reset;  //POS Store Code,POS Payment Method Code,POS Payment Bin Code
-            if POSStore.FindSet then
-                repeat
-                    POSPaymentMethod.Reset;
-                    POSPaymentMethod.SetRange(POSPaymentMethod."Processing Type", POSPaymentMethod."Processing Type"::CASH);
-                    if POSPaymentMethod.FindSet then
-                        repeat
-                            POSPostingSetup.Reset;
-                            POSPostingSetup.Init;
-                            POSPostingSetup."POS Store Code" := POSStore.Code;
-                            POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
-                            POSPostingSetup."POS Payment Bin Code" := 'BANK';
-                            if Register.FindFirst then begin
-                                case Register."Balanced Type" of
-                                    Register."Balanced Type"::Bank:
-                                        POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"Bank Account";
-
-                                    Register."Balanced Type"::Finans:
-                                        POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
-                                end;
-                            end;
-                            POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
-                            POSPostingSetup."Difference Acc. No." := Register."Difference Account";
-                            POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
-                            POSPostingSetup.Insert(true);
-                            BlankPosStoreCode += 1;
-                        until POSPaymentMethod.Next = 0;
-                until POSStore.Next = 0;
-        end;
-
-        //Create/Update POS Unit to Bin Relation
-
-        POSUnit.Reset;
-        if POSUnit.FindSet then begin
-            repeat
-                POSUnitBinRelation.Reset;
-                POSUnitBinRelation.SetRange("POS Unit No.", POSUnit."No.");
-                if POSUnitBinRelation.FindFirst then begin
-                    if POSUnitBinRelation."POS Payment Bin No." = '' then
-                        POSUnitBinRelation.Rename(POSUnitBinRelation."POS Unit No.", POSUnit."Default POS Payment Bin");
-                end else begin
-                    POSUnitBinRelation.Init;
-                    POSUnitBinRelation."POS Unit No." := POSUnit."No.";
-                    POSUnitBinRelation."POS Payment Bin No." := POSUnit."Default POS Payment Bin";
-                    POSUnitBinRelation."POS Unit Status" := POSUnitBinRelation."POS Unit Status"::OPEN;
-                    POSUnitBinRelation."POS Payment Bin Status" := POSUnitBinRelation."POS Payment Bin Status"::OPEN;
-                    POSUnitBinRelation."POS Unit Name" := POSUnit.Name;
-                    POSUnitBinRelation.Insert(true);
-                end;
-            until POSUnit.Next = 0;
-        end;
-    end;
-
     procedure ExcludeFromPosting(AuditRoll: Record "NPR Audit Roll"): Boolean
     begin
         if AuditRoll.Type in [AuditRoll.Type::Comment] then
@@ -945,78 +634,7 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment, AuditRoll."Sale Type"::"Open/Close"]);//Remove "Sale Type"::"Debit Sale"
     end;
 
-    local procedure CreateDefaultBins(POSUnitNo: Code[10])
-    var
-        BinNoArray: array[3] of Code[10];
-        BinDescArray: array[3] of Text[20];
-        i: Integer;
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        POSPaymentBinCheck: Record "NPR POS Payment Bin";
-    begin
-        BinNoArray[1] := 'AUTO-BIN';
-        BinNoArray[2] := 'BANK';
-        BinNoArray[3] := 'SAFE';
-
-        BinDescArray[1] := 'Auto Count Bin';
-        BinDescArray[2] := 'Bank';
-        BinDescArray[3] := 'Safe';
-
-        for i := 1 to 3 do begin
-            if not POSPaymentBinCheck.Get(BinNoArray[i]) then begin
-                POSPaymentBin.Init;
-                POSPaymentBin."No." := BinNoArray[i];
-                POSPaymentBin."POS Store Code" := '';
-                POSPaymentBin."Attached to POS Unit No." := '';
-                POSPaymentBin."Eject Method" := '';
-                POSPaymentBin.Description := BinDescArray[i];
-                case i of
-                    1:
-                        POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::VIRTUAL; //'AUTO-BIN'
-                    2:
-                        POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::BANK; //'BANK'
-                    3:
-                        POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::SAFE; //'SAFE'
-                end;
-                POSPaymentBin.Insert(true);
-            end;
-        end;
-    end;
-
-    local procedure CheckPaymentTypePOSAccount(PaymentTypePOS: Record "NPR Payment Type POS"): Boolean
-    begin
-        case PaymentTypePOS."Account Type" of
-            PaymentTypePOS."Account Type"::Bank:
-                exit(PaymentTypePOS."Bank Acc. No." <> '');
-            PaymentTypePOS."Account Type"::Customer:
-                exit(PaymentTypePOS."Customer No." <> '');
-            PaymentTypePOS."Account Type"::"G/L Account":
-                exit(PaymentTypePOS."G/L Account No." <> '');
-            else
-                exit(false);
-        end;
-    end;
-
-    local procedure DeleteDuplicatePOSStore()
-    var
-        POSStore: Record "NPR POS Store";
-        POSStoreDuplicate: Record "NPR POS Store";
-        POSStoreTemp: Record "NPR POS Store";
-    begin
-        Clear(POSStore);
-        Clear(POSStoreTemp);
-        Clear(POSStoreDuplicate);
-        POSStore.SetCurrentKey(POSStore."Location Code", POSStore."Gen. Bus. Posting Group");
-        if POSStore.FindSet then begin
-            repeat
-                POSStoreTemp := POSStore;
-                if (POSStore."Location Code" = POSStoreDuplicate."Location Code") and (POSStore."Gen. Bus. Posting Group" = POSStoreDuplicate."Gen. Bus. Posting Group") then
-                    POSStore.Delete;
-                POSStoreDuplicate := POSStoreTemp;
-            until POSStore.Next = 0;
-        end;
-    end;
-
-    local procedure PersistVATAmountLines(var POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line")
+    local procedure PersistVATAmountLines(var POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line" temporary)
     var
         PersistentPOSTaxAmountLine: Record "NPR POS Tax Amount Line";
     begin
@@ -1044,13 +662,13 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
             until VATAmountLine.Next = 0;
     end;
 
-    procedure CalcVATAmountLines(POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line"; POSSalesLine: Record "NPR POS Sales Line")
+    procedure CalcVATAmountLines(POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line" temporary;
+        POSSalesLine: Record "NPR POS Sales Line")
     var
         PrevVatAmountLine: Record "VAT Amount Line";
         Currency: Record Currency;
         POSEntry: Record "NPR POS Entry";
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
-        TotalVATAmount: Decimal;
         QtyToHandle: Decimal;
         RoundingLineInserted: Boolean;
     begin
@@ -1087,7 +705,6 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
                         VATAmountLine."Amount Including VAT" := VATAmountLine."Amount Including VAT" + "Amount Incl. VAT";
                         VATAmountLine."VAT Amount" := VATAmountLine."VAT Amount" + ("Amount Incl. VAT" - "Amount Excl. VAT");
                         VATAmountLine.Modify;
-                        TotalVATAmount := TotalVATAmount + "Amount Incl. VAT" - "Amount Excl. VAT";
                     end;
                 until Next = 0;
         end;
