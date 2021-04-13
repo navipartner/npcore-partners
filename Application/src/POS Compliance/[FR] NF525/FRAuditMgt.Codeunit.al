@@ -36,6 +36,7 @@
                 exit(false);
             FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
             FRCertificationSetup.Get();
+            SetRetentionPolicies();
             Initialized := true;
             Enabled := true;
         end;
@@ -951,6 +952,24 @@
             VATPostingSetup.SetView(FilterPageBuilder.GetView(VATPostingSetup.TableCaption, false));
             exit(VATPostingSetup.GetFilter("VAT Identifier"));
         end;
+    end;
+
+    local procedure SetRetentionPolicies()
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+        RetPeriod: Record "Retention Period";
+        RtnPeriodEnum: Enum "Retention Period Enum";
+    begin
+        if not RetentionPolicySetup.Get(Database::"NPR Data Log Record") then
+            exit;
+        RetPeriod.Reset();
+        RetPeriod.SetRange(RetPeriod."Retention Period", RetPeriod."Retention Period"::"5 Years");
+        if not RetPeriod.FindFirst() then
+            exit;
+        if RetentionPolicySetup."Retention Period" <> RetPeriod.Code then begin
+            RetentionPolicySetup."Retention Period" := RetPeriod.Code;
+            RetentionPolicySetup.Modify();
+        end
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150619, 'OnLookupAuditHandler', '', true, true)]
