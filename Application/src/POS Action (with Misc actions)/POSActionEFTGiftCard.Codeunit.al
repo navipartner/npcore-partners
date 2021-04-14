@@ -176,7 +176,9 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSPaymentMethod.Get(PaymentType);
+
         EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
+        EFTPaymentMgt.GetPOSPostingSetupAccountNo(POSSession, POSPaymentMethod.Code);
 
         EftEntryNo := EFTPaymentMgt.StartGiftCardLoad(EFTSetup, Amount, '', SalePOS);
         POSSession.StoreActionState('eft_gift_card_entry_no', EftEntryNo);
@@ -188,6 +190,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         POSPaymentMethod: Record "NPR POS Payment Method";
         LineAmount: Decimal;
         EftEntryNo: Integer;
@@ -216,7 +219,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
+
 
         if SaleLinePOS."Currency Code" = '' then begin
             Currency.InitRoundingPrecision();
@@ -228,7 +231,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
         SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
-        SaleLinePOS.Validate("No.", POSPaymentMethod."Account No.");
+        SaleLinePOS.Validate("No.", EFTTransactionMgt.GetPOSPostingSetupAccountNo(POSSession, EFTTransactionRequest."Original POS Payment Type Code"));
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + ' - ' + DISCOUNT, 1, MaxStrLen(SaleLinePOS.Description));
         SaleLinePOS.Validate("Unit Price", LineAmount);
@@ -258,6 +261,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSession.StoreActionState('eft_gift_card_current_number', CurrentNumber + 1);
         FrontEnd.ContinueAtStep('LoadGiftCardAndInsertLine');
     end;
+
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
