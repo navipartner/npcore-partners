@@ -86,7 +86,6 @@
         POSPaymentMethod.Validate("Currency Code", CurrencyCode);
         POSPaymentMethod.Validate("Post Condensed", PostCondensed);
         POSPaymentMethod.Validate("Rounding Type", LibraryRandom.RandIntInRange(0, 2));
-        POSPaymentMethod.Validate("Account No.", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Gains Account", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Losses Account", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Precision", GetRandomPrecision());
@@ -359,6 +358,7 @@
         POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
+        LibraryERM: Codeunit "Library - ERM";
     begin
 
         if not POSPaymentMethod.Get(POSPaymentMethod.Code) then
@@ -368,7 +368,7 @@
         POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
         POSPostingSetup."POS Payment Bin Code" := '';
         POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
-        POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
+        POSPostingSetup."Account No." := LibraryERM.CreateGLAccountNo;
 
         if not POSPostingSetup.Find() then
             POSPostingSetup.Insert(true);

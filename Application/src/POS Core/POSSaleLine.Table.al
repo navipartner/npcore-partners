@@ -2302,9 +2302,6 @@ table 6014406 "NPR POS Sale Line"
     begin
         POSUnit.Get("Register No.");
 
-        if POSPaymentMethod."Account No." = '' then
-            Error(Text001, "No.");
-
         POSPaymentMethod.TestField("Block POS Payment", false);
 
         if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::CUSTOMER then

@@ -488,7 +488,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
         SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
         SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
-        SaleLinePOS.Validate("No.", POSPaymentMethod."Account No.");
+        SaleLinePOS.Validate("No.", GetPOSPostingSetupAccountNo(POSSession, EFTTransactionRequest."Original POS Payment Type Code"));
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS."EFT Approved" := EFTTransactionRequest.Successful;
         SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + ' - ' + EFTTransactionRequest."Card Number", 1, MaxStrLen(SaleLinePOS.Description));
@@ -789,6 +789,30 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
           EFTTransactionRequest."Result Amount",
           EFTTransactionRequest."Currency Code",
           EFTTransactionRequest."Reference Number Output");
+    end;
+
+    procedure GetPOSPostingSetupAccountNo(var POSSession: Codeunit "NPR POS Session"; PaymentMethodCode: Code[20]): Code[20]
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSPostingSetup: Record "NPR POS Posting Setup";
+        POSSale: Codeunit "NPR POS Sale";
+        NoPOSPostingSetupFound: Label '%1 for %2 %3 and %4 %5 with %6 %7 not found.', Comment = '%1 = POSPostingSetup.TableCaption(), %2 = POSPostingSetup.FieldCaption("POS Store Code"), %3 = SalePOS."POS Store Code", %4 = POSPostingSetup.FieldCaption("POS Payment Method Code"),%5 = PaymentMethodCode, %6 = POSPostingSetup.FieldCaption("Account Type") %7=  POSPostingSetup."Account Type"::"G/L Account"';
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSPostingSetup.Reset();
+        POSPostingSetup.SetRange("POS Store Code", SalePOS."POS Store Code");
+        POSPostingSetup.SetRange("POS Payment Method Code", PaymentMethodCode);
+        POSPostingSetup.SetRange("Account Type", POSPostingSetup."Account Type"::"G/L Account");
+        if POSPostingSetup.FindFirst() then
+            exit(POSPostingSetup."Account No.")
+        else begin
+            POSPostingSetup.SetRange("POS Store Code");
+            if POSPostingSetup.FindFirst() then
+                exit(POSPostingSetup."Account No.")
+            else
+                Error(NoPOSPostingSetupFound, POSPostingSetup.TableCaption(), POSPostingSetup.FieldCaption("POS Store Code"), SalePOS."POS Store Code", POSPostingSetup.FieldCaption("POS Payment Method Code"), PaymentMethodCode, POSPostingSetup.FieldCaption("Account Type"), POSPostingSetup."Account Type"::"G/L Account");
+        end;
     end;
 
     #endregion

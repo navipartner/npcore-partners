@@ -26,12 +26,6 @@ page 6150619 "NPR POS Payment Method Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Type field. Possible values are Cash,Voucher,Check,EFT,Customer,PayOut.';
                 }
-                field("Account No."; Rec."Account No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Account field related to the General Ledger.';
-                    ShowMandatory = true;
-                }
 
                 field("Return Payment Method Code"; Rec."Return Payment Method Code")
                 {
@@ -69,7 +63,7 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies which Payment Method is connected to selected POS Payment Mehod.';
+                    ToolTip = 'Specifies which Payment Method is connected to selected POS Payment Mehod. Payment Method Code is used when converting POS Sale to Sales Order.';
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
