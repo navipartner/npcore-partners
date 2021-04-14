@@ -29,27 +29,6 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
     end;
 
-    /* *** REMOVED ***
-    trigger OnUpgradePerCompany()
-    var
-        UpgTagDef: Codeunit "NPR UPG Ret.Dat.Mod.Tag Def";
-        UpgradeTagMgt: Codeunit "Upgrade Tag";
-    begin
-
-        // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
-            exit;
-
-        // Run upgrade code
-        UpgradeAuditRollStep1;
-        OnActivatePosEntryPosting();
-
-
-        // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
-    end;
-    */
-
     local procedure UpgradeAuditRollStep1()
     var
         AuditRoll: Record "NPR Audit Roll";
@@ -544,7 +523,6 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
             POSEntryCommentLine.DeleteAll(false);
             POSTaxAmountLine.DeleteAll(false);
         end;
-        Commit;
         LockTables();
     end;
 

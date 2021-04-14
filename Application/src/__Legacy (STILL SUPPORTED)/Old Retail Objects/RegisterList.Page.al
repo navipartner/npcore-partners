@@ -45,6 +45,11 @@ page 6014405 "NPR Register List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Display field';
                 }
+                field(Status; Rec.Status)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
+                }
             }
         }
     }
