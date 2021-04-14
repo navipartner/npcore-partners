@@ -34,14 +34,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 ToolTip = 'Specifies the value of the Bill-to Name 2 field';
             }
         }
-        addafter("Bill-to")
-        {
-            field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
-            }
-        }
     }
     actions
     {

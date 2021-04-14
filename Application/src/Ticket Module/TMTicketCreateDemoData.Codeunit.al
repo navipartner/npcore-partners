@@ -362,7 +362,6 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         TicketItem.VALIDATE("NPR Ticket Type", TicketTypeCode);
 
         TicketItem.Blocked := FALSE;
-        TicketItem."NPR Blocked on Pos" := FALSE;
         TicketItem."NPR Group sale" := FALSE;
 
         TicketItem.MODIFY();

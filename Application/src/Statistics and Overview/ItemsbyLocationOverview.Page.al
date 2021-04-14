@@ -65,7 +65,6 @@
                         ItemList: Page "Item List";
                     begin
                         Item.SetRange(Blocked, false);
-                        Item.SetRange("NPR Blocked on Pos", false);
                         if ItemFilter <> '' then begin
                             Item.SetFilter("No.", ItemFilter);
                             if Item.FindFirst() then;

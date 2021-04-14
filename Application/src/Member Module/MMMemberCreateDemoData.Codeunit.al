@@ -683,7 +683,6 @@
         TicketItem.Description := Description;
         TicketItem."Unit Price" := UnitPrice;
         TicketItem.Blocked := false;
-        TicketItem."NPR Blocked on Pos" := false;
         TicketItem."NPR Group sale" := false;
 
         TicketItem.Modify();

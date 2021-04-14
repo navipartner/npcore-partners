@@ -764,6 +764,5 @@
         Item.SetCurrentKey("Search Description");
         Item.SetFilter("Search Description", SearchFilter);
         Item.SetRange(Blocked, false);
-        Item.SetRange("NPR Blocked on Pos", false);
     end;
 }
