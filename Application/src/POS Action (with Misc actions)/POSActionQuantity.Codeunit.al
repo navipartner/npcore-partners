@@ -2,6 +2,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
 {
     var
         ActionDescription: Label 'This is a build in function to change quantity.';
+        CannotExceedMaxQtyErr: Label 'Quantity cannot exceed the limit value.';
         MUST_BE_POSITIVE: Label 'Quantity must be positive.';
         MUST_BE_NEGATIVE: Label 'Quantity must be negative.';
         SALE_MUST_BE_POSITIVE: Label 'Quantity must be positive on the sales line.';
@@ -19,19 +20,19 @@ codeunit 6150808 "NPR POS Action: Quantity"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.7');
+        exit('1.8');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep('ValidatePositiveConstraint', 'if ((param.Constraint == param.Constraint["Positive Quantity Only"]) && (parseFloat (data("12")) < 0)) { message (labels.MustBePositive);abort();};');
             Sender.RegisterWorkflowStep('ValidateNegativeConstraint', 'if ((param.Constraint == param.Constraint["Negative Quantity Only"]) && (parseFloat (data("12")) > 0)) { message (labels.MustBeNegative);abort();};');
             Sender.RegisterWorkflowStep('PromptQuantity',
@@ -52,6 +53,12 @@ then begin
               '  default:' +
               '    goto("EndOfWorkflow");' +
               '}');
+            Sender.RegisterWorkflowStep('CheckQuantity',
+              'if ((param.MaxQuantityAllowed) && (context.$PromptQuantity.numpad)) {' +
+              '  if (param.MaxQuantityAllowed != 0) {' +
+              '    if (Math.abs(context.$PromptQuantity.numpad) > param.MaxQuantityAllowed) { message(labels.CannotExceedMaxQty + " " + param.MaxQuantityAllowed); abort();}' +
+              '  }' +
+              '};');
             Sender.RegisterWorkflowStep('PromptUnitPrice',
               'if ((param.PromptUnitPriceOnNegativeInput) && (param.NegativeInput ? context.$PromptQuantity.numpad * -1 < 0 : context.$PromptQuantity.numpad < 0)) {' +
               '  numpad({caption: labels.PriceCaption, value: data("15")})' +
@@ -69,6 +76,7 @@ then begin
             Sender.RegisterTextParameter('ChangeToQuantity', '0');
             Sender.RegisterBooleanParameter('NegativeInput', false);
             Sender.RegisterBooleanParameter('PromptUnitPriceOnNegativeInput', true);
+            Sender.RegisterDecimalParameter('MaxQuantityAllowed', 0);
         end;
     end;
 
@@ -79,6 +87,7 @@ then begin
         Captions.AddActionCaption(ActionCode(), 'PriceCaption', PriceCaption);
         Captions.AddActionCaption(ActionCode(), 'MustBePositive', MUST_BE_POSITIVE);
         Captions.AddActionCaption(ActionCode(), 'MustBeNegative', MUST_BE_NEGATIVE);
+        Captions.AddActionCaption(ActionCode(), 'CannotExceedMaxQty', CannotExceedMaxQtyErr);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, false)]
@@ -185,6 +194,26 @@ then begin
         END;
 
         POSSession.RequestRefreshData();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]
+    local procedure OnParameterValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        ValueAsDecimal: Decimal;
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'MaxQuantityAllowed':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+                    Evaluate(ValueAsDecimal, POSParameterValue.Value);
+                    if ValueAsDecimal < 0 then
+                        Error(MUST_BE_POSITIVE);
+                end;
+        end;
     end;
 
     local procedure GetDecimal(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
