@@ -2,24 +2,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
 {
     fields
     {
-        modify("Prices Including VAT")
-        {
-            trigger OnAfterValidate()
-            var
-                SalesLine: Record "Sales Line";
-            begin
-                if Rec."Prices Including VAT" <> xRec."Prices Including VAT" then begin
-                    SalesLine.SetRange("Document Type", Rec."Document Type");
-                    SalesLine.SetRange("Document No.", Rec."No.");
-                    SalesLine.SetRange(Type, SalesLine.Type::Item);
-                    if SalesLine.FindSet(true) then
-                        repeat
-                            if SalesLine.NPRCalcItemGroupUnitCost() then
-                                SalesLine.Modify();
-                        until SalesLine.Next() = 0;
-                end;
-            end;
-        }
         field(6014400; "NPR Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
@@ -37,6 +19,8 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Caption = 'Document Time';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014407; "NPR Bill-to Company"; Text[30])
         {

@@ -2,20 +2,6 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
 {
     fields
     {
-        modify("Unit Price")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPRCalcItemGroupUnitCost();
-            end;
-        }
-        modify("VAT Prod. Posting Group")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPRCalcItemGroupUnitCost();
-            end;
-        }
         field(6014404; "NPR Discount Type"; Option)
         {
             Caption = 'Discount Type';
@@ -39,6 +25,8 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
         {
             Caption = 'Internal';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014408; "NPR Salesperson Code"; Code[20])
         {
@@ -51,6 +39,8 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
         {
             Caption = 'Special Price';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014410; "NPR Color"; Code[20])
         {
@@ -70,6 +60,8 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
         {
             Caption = 'Serial No. Not Created';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014413; "NPR Hide Line"; Boolean)
         {
@@ -144,28 +136,4 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
     }
-
-
-    procedure NPRCalcItemGroupUnitCost(): Boolean
-    var
-        SalesHeader: Record "Sales Header";
-        Item: Record Item;
-        VATPercent: Decimal;
-    begin
-        if (Rec.Type <> Rec.Type::Item) or (Rec."Profit %" = 0) then
-            exit(false);
-
-        Item.Get(Rec."No.");
-        if not (Item."NPR Group sale" or (Item."Unit Cost" = 0)) then
-            exit(false);
-
-        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
-
-        if SalesHeader."Prices Including VAT" then
-            VATPercent := Rec."VAT %";
-
-        Rec.Validate("Unit Cost (LCY)", ((1 - Rec."Profit %" / 100) * Rec."Unit Price" / (1 + VATPercent / 100)) * Rec."Qty. per Unit of Measure");
-
-        exit(true);
-    end;
 }

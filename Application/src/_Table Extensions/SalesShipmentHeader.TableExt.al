@@ -36,6 +36,8 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             OptionCaption = ',Order,Lending';
             OptionMembers = ,"Order",Lending;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014450; "NPR Kolli"; Integer)
         {

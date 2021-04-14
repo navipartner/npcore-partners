@@ -7,12 +7,16 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Caption = 'Sales Ticket No.';
             Description = 'NPR7.100.000';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014414; "NPR Bill-to E-mail"; Text[80])
         {
             Caption = 'Bill-to E-mail';
             Description = 'PN1.00';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {
@@ -29,6 +33,8 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Caption = 'Delivery Location';
             Description = 'PS1.00';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014425; "NPR Order Type"; Option)
         {
@@ -43,6 +49,8 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Description = 'NPR7.100.000';
             InitValue = 1;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014451; "NPR Ship. Agent Serv. Code"; Code[10])
         {
@@ -56,6 +64,8 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Caption = 'Pacsoft Shipment Not Created';
             Description = 'PS1.01';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059931; "NPR Doc. Exch. Fr.work Status"; Option)
         {
@@ -64,30 +74,40 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             OptionCaption = ' ,Exported to Folder,Setup Changed,Delivered to Recepient,File Validation Error';
             OptionMembers = " ","Exported to Folder","Setup Changed","Delivered to Recepient","File Validation Error";
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059932; "NPR Doc. Exch. Exported"; Boolean)
         {
             Caption = 'Doc. Exch. Exported';
             Description = 'NPR5.26';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059933; "NPR Doc. Exch. Setup Path Used"; RecordID)
         {
             Caption = 'Doc. Exch. Setup Path Used';
             Description = 'NPR5.26';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059934; "NPR Doc. Exch. Export. to"; Text[250])
         {
             Caption = 'Doc. Exch. Exported to';
             Description = 'NPR5.26';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059935; "NPR Doc. Exch. File Exists"; Boolean)
         {
             Caption = 'Doc. Exch. File Exists';
             Description = 'NPR5.26';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6151300; "NPR NpEc Store Code"; Code[20])
         {
@@ -95,6 +115,8 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Description = 'NPR5.53,NPR5.54';
             Enabled = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6151305; "NPR NpEc Document No."; Code[50])
         {
@@ -102,6 +124,8 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Description = 'NPR5.53,NPR5.54';
             Enabled = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6151400; "NPR Magento Payment Amount"; Decimal)
         {
@@ -123,6 +147,8 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Caption = 'Payment No.';
             Description = 'MAG2.00';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
 
         field(6151420; "NPR Magento Coupon"; Text[20])

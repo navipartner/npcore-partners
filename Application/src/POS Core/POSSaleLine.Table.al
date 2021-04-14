@@ -1800,13 +1800,10 @@ table 6014406 "NPR POS Sale Line"
         SalesLine."Currency Code" := "Currency Code";
         SalesLine."Outstanding Amount (LCY)" := "Claim (LCY)";
         SalesLine."VAT Base Amount" := "VAT Base Amount";
-        SalesLine."NPR Special Price" := "Special price";
         SalesLine."Unit Cost" := "Unit Cost";
         SalesLine."NPR Discount Type" := "Discount Type";
         SalesLine."NPR Discount Code" := "Discount Code";
         SalesLine."VAT Calculation Type" := "VAT Calculation Type";
-        SalesLine."NPR Internal" := Internal;
-        SalesLine."NPR Serial No. not Created" := "Serial No. not Created";
         SalesLine."Unit Cost (LCY)" := "Unit Cost (LCY)";
         SalesLine.Validate("Variant Code", "Variant Code");
         SalesLine.Description := Description;
@@ -2283,7 +2280,6 @@ table 6014406 "NPR POS Sale Line"
 
         Item.Get("No.");
         Item.TestField(Blocked, false);
-        Item.TestField("NPR Blocked on Pos", false);
         Item.TestField("Gen. Prod. Posting Group");
         if Item.Type <> Item.Type::Service then
             Item.TestField("Inventory Posting Group");

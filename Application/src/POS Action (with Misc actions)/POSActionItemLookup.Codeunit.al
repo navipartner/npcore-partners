@@ -125,7 +125,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         end;
 
         Item.SetFilter(Blocked, '=%1', false);
-        Item.SetFilter("NPR Blocked on Pos", '=%1', false);
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);

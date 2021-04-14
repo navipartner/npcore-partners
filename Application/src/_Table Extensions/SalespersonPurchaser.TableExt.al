@@ -144,6 +144,8 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             DataClassification = CustomerContent;
             Description = 'NPR5.26';
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Standard field used instead.';
         }
         field(6014422; "NPR Supervisor POS"; Boolean)
         {
