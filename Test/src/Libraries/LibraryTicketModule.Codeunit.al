@@ -56,7 +56,6 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketItem.VALIDATE("NPR Ticket Type", TicketTypeCode);
 
         TicketItem.Blocked := FALSE;
-        TicketItem."NPR Blocked on Pos" := FALSE;
         TicketItem."NPR Group sale" := FALSE;
 
         TicketItem.MODIFY();

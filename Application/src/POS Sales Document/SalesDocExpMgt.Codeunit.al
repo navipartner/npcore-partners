@@ -281,7 +281,6 @@
         SalesHeader."Document Type" := DocumentType;
         SalesHeader."Document Date" := WorkDate();
         SalesHeader."Posting Date" := Today();
-        SalesHeader."NPR Document Time" := Time;
         SalesHeader."Salesperson Code" := SalePOS."Salesperson Code";
         SalesHeader."Sell-to Customer No." := SalePOS."Customer No.";
         SalesHeader.Insert(true);

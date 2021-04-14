@@ -175,6 +175,8 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Blocked on Pos';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014635; "NPR Sale Blocked"; Boolean)
         {

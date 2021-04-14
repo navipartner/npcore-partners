@@ -56,11 +56,6 @@ page 6014428 "NPR Salesperson Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Maximum Cash Returnsale field';
                 }
-                field(Picture; Rec."NPR Picture")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the NPR Picture field';
-                }
             }
             group(Security)
             {
@@ -110,6 +105,14 @@ page 6014428 "NPR Salesperson Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR COGS (LCY) field';
                 }
+            }
+        }
+        area(factboxes)
+        {
+            part(SalespersonPicture; "Salesperson/Purchaser Picture")
+            {
+                ApplicationArea = All;
+                SubPageLink = Code = FIELD(Code);
             }
         }
     }

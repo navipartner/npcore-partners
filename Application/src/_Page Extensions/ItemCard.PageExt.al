@@ -61,12 +61,6 @@
 
         addafter("Sales Blocked")
         {
-            field("NPR Blocked on Pos"; Rec."NPR Blocked on Pos")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Blocked on Pos field';
-            }
-
             field("NPR Custom Discount Blocked"; Rec."NPR Custom Discount Blocked")
             {
                 ApplicationArea = All;

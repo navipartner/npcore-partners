@@ -2,15 +2,8 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
 {
     layout
     {
-
         addafter("Shipment Date")
         {
-            field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
-            {
-                ApplicationArea = All;
-                Visible = false;
-                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
-            }
             field("NPR Magento Coupon"; Rec."NPR Magento Coupon")
             {
                 ApplicationArea = All;
@@ -18,7 +11,6 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                 Visible = false;
                 ToolTip = 'Specifies the value of the NPR Magento Coupon field';
             }
-
         }
     }
     actions

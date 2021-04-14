@@ -620,7 +620,6 @@
         MemberItem.Description := Description;
         MemberItem."Unit Price" := UnitPrice;
         MemberItem.Blocked := false;
-        MemberItem."NPR Blocked on Pos" := false;
         MemberItem."NPR Group sale" := false;
 
         MemberItem.Modify();

@@ -355,7 +355,6 @@
             SalesInvHdr."Bill-to Post Code" := '';
             SalesInvHdr."Bill-to County" := '';
             SalesInvHdr."Bill-to Country/Region Code" := '';
-            SalesInvHdr."NPR Bill-to E-mail" := '------@----';
             SalesInvHdr."Sell-to Post Code" := '';
             SalesInvHdr."Sell-to County" := '';
             SalesInvHdr."Sell-to Country/Region Code" := '';
@@ -403,7 +402,6 @@
             SalesCrMemoHdr."Bill-to Post Code" := '';
             SalesCrMemoHdr."Bill-to County" := '';
             SalesCrMemoHdr."Bill-to Country/Region Code" := '';
-            SalesCrMemoHdr."NPR Bill-to E-mail" := '------@----';
             SalesCrMemoHdr."Sell-to Post Code" := '';
             SalesCrMemoHdr."Sell-to County" := '';
             SalesCrMemoHdr."Sell-to Country/Region Code" := '';

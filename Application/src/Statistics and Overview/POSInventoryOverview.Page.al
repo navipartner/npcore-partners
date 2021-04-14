@@ -301,7 +301,6 @@
             FieldType::ItemNo:
                 begin
                     if LookupItem.Get(ItemCode) then;
-                    LookupItem.SetRange("NPR Blocked on Pos", false);
                     LookupItem.SetRange(Blocked, false);
                     RetailItemList.LookupMode := true;
                     RetailItemList.SetRecord(LookupItem);

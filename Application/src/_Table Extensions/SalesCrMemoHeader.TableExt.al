@@ -7,12 +7,16 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             Caption = 'Sales Ticket No.';
             Description = 'NPR7.100.000';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014414; "NPR Bill-to E-mail"; Text[80])
         {
             Caption = 'Bill-to E-mail';
             Description = 'PN1.00';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {
@@ -30,6 +34,8 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             OptionCaption = ',Order,Lending';
             OptionMembers = ,"Order",Lending;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059931; "NPR Doc.Exch. F.work Status"; Option)
         {
@@ -38,39 +44,40 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             OptionCaption = ' ,Exported to Folder,Setup Changed,Delivered to Recepient,File Validation Error';
             OptionMembers = " ","Exported to Folder","Setup Changed","Delivered to Recepient","File Validation Error";
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059932; "NPR Doc. Exch. Exported"; Boolean)
         {
             Caption = 'Doc. Exch. Exported';
             Description = 'NPR5.33';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059933; "NPR Doc.Exch.Setup Path Used"; RecordID)
         {
             Caption = 'Doc. Exch. Setup Path Used';
             Description = 'NPR5.33';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059934; "NPR Doc. Exch. Exported to"; Text[250])
         {
             Caption = 'Doc. Exch. Exported to';
             Description = 'NPR5.33';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6059935; "NPR Doc. Exch. File Exists"; Boolean)
         {
             Caption = 'Doc. Exch. File Exists';
             Description = 'NPR5.33';
             DataClassification = CustomerContent;
-        }
-        field(6151400; "NPR Magento Payment Amount"; Decimal)
-        {
-            CalcFormula = Sum("NPR Magento Payment Line".Amount WHERE("Document Table No." = CONST(114),
-                                                                   "Document No." = FIELD("No.")));
-            Caption = 'Payment Amount';
-            Description = 'MAG2.12';
-            Editable = false;
-            FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6151405; "NPR External Order No."; Code[20])
         {
