@@ -172,7 +172,6 @@
         POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
         POSPaymentMethod."Fixed Rate" := FixedRate * 100;
         POSPaymentMethod."Rounding Precision" := 1.0;
-        POSPaymentMethod."Account No." := GLAccountNo;
         POSPaymentMethod."Currency Code" := CreateCurrencyCode('NPLP', FixedRate);
         POSPaymentMethod.Modify(true);
         exit(PaymentTypeCode);

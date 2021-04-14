@@ -55,6 +55,7 @@ table 6150616 "NPR POS Payment Method"
             Caption = 'Account No.';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account" where("Direct Posting" = const(true), "Account Type" = const(Posting), Blocked = const(false));
+            ObsoleteState = Removed;
         }
         field(30; "Include In Counting"; Option)
         {
