@@ -54,7 +54,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSUnit: Record "NPR POS Unit";
         POSLedgerRegister: Record "NPR POS Period Register";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         HasOpenPOSLedgerRegister: Boolean;
     begin
         //Use "Audit Roll to POS Entry Link" to determine how far the Migration has come, and if new Datamodel have been disabled and therefore
@@ -1295,7 +1295,8 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             until VATAmountLine.Next = 0;
     end;
 
-    procedure CalcVATAmountLines(POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line"; POSSalesLine: Record "NPR POS Sales Line")
+    procedure CalcVATAmountLines(POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line" temporary;
+        POSSalesLine: Record "NPR POS Sales Line")
     var
         PrevVatAmountLine: Record "VAT Amount Line";
         Currency: Record Currency;

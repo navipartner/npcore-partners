@@ -58,6 +58,12 @@ page 6014406 "NPR Register Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Return Payment Type field';
                 }
+
+                field(Status; Rec.Status)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
+                }
             }
             group(Accessories)
             {
