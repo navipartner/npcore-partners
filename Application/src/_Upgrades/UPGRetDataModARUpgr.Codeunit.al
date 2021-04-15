@@ -1,5 +1,7 @@
 codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
 {
+    Subtype = Upgrade;
+
     var
         TmpAuditRollBuffer: Record "NPR Audit Roll" temporary;
         //EstNoOfEntries: Integer;
@@ -12,29 +14,23 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         ALL_REGISTERS_MUST_BE_BALANCED: Label 'Not all %1 have %2 %3! Only %1 with %2 %3 will have their balance transfered. Do you want to continue anyway?';
         NOT_ALL_CR_HAVE_POS_UNIT: Label 'All %1 must have a %2 when activating POS Entry posting. %1 %3 is missing its %2.';
 
-    trigger OnRun()
-    var
-        UpgTagDef: Codeunit "NPR UPG Ret.Dat.Mod.Tag Def";
-        UpgradeTagMgt: Codeunit "Upgrade Tag";
-    begin
-        // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
-            exit;
-
-        // Run upgrade code
-        UpgradeAuditRollStep1;
-        OnActivatePosEntryPosting();
-
-        // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
-    end;
-
-    /* *** REMOVED ***
     trigger OnUpgradePerCompany()
     var
         UpgTagDef: Codeunit "NPR UPG Ret.Dat.Mod.Tag Def";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
+        POSEntry: Record "NPR POS Entry";
+        CurrVer: Version;
+        ModInfo: ModuleInfo;
     begin
+        //run upgrade code only for NpCode 17.6 and above
+        NavApp.GetCurrentModuleInfo(ModInfo);
+        CurrVer := ModInfo.AppVersion;
+        if CurrVer.Major < 6 then
+            exit;
+
+        POSEntry.SetFilter("Entry Type", '<>%1', POSEntry."Entry Type"::Balancing);
+        if not POSEntry.IsEmpty then
+            exit; // exit if there are POS Entry records (except Balanacing due to Audit Roll posting bug)
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
         if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
@@ -48,7 +44,6 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
     end;
-    */
 
     local procedure UpgradeAuditRollStep1()
     var
@@ -63,17 +58,9 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         POSLedgerRegister: Record "NPR POS Period Register";
         VATAmountLine: Record "VAT Amount Line" temporary;
         HasOpenPOSLedgerRegister: Boolean;
-        i, c : Integer;
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
-        p: Dialog;
     begin
-        //Use "Audit Roll to POS Entry Link" to determine how far the Migration has come, and if new Datamodel have been disabled and therefore
-        //needs to be rolled up to date again.
-        if not AuditRolltoPOSEntryLink.IsEmpty and GuiAllowed then
-            if Confirm('Do you want to rebuild the POS Entries from the Audit Roll?') then
-                AuditRolltoPOSEntryLink.DeleteAll;  //Remove this after test!
-
         AuditRoll.SetCurrentKey("Clustered Key");
         AuditRolltoPOSEntryLink.LockTable;
         if AuditRolltoPOSEntryLink.FindLast then
@@ -83,13 +70,6 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
 
         StartDateTime := CurrentDateTime;
 
-        //AuditRoll.SetCurrentKey("Sale Date", "Sales Ticket No.", "Line No.");
-        //AuditRoll.SetRange("Sale Date", DMY2Date(1, 1, 2020), WorkDate());
-
-        if GuiAllowed then
-            p.Open('Processing record #1########');
-
-        c := AuditRoll.Count;
         if AuditRoll.FindSet then begin
             repeat
                 if AuditRoll."Sales Ticket No." = '' then
@@ -166,19 +146,14 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                 end;
                 UpdatePOSEntry(POSEntry, AuditRoll);
                 xAuditRoll := AuditRoll;
-                i := i + 1;
-                if ((i mod 1000) = 0) or ((c - i) < 1000) then
-                    if GuiAllowed then p.Update(1, StrSubstNo('%1/%2...', i, c));
             until AuditRoll.Next = 0;
 
             if NoOfPOSEntriesCreated > 0 then begin
-                if GuiAllowed then p.Update(1, 'Finalizing...');
                 FinalizePOSEntry(POSEntry, AuditRoll);
                 CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
                 PersistVATAmountLines(POSEntry, VATAmountLine);
             end;
         end;
-        if GuiAllowed then p.Close();
     end;
 
     local procedure UpgradeAuditRoll(Step: Integer)
@@ -544,7 +519,6 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             POSEntryCommentLine.DeleteAll(false);
             POSTaxAmountLine.DeleteAll(false);
         end;
-        Commit;
         LockTables();
     end;
 

@@ -2,7 +2,7 @@ table 6150698 "NPR Audit Roll 2 POSEntry Link"
 {
     Caption = 'Audit Roll to POS Entry Link';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteReason = 'Replaced with POS entry';
 
     fields
