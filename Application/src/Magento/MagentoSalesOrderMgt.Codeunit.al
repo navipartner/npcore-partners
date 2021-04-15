@@ -178,7 +178,7 @@
         XNode: XmlNode;
         XNodeList: XmlNodeList;
     begin
-        XmlElement.SelectNodes('comment_line', XNodeList);
+        XmlElement.SelectNodes('comments/comment_line', XNodeList);
         foreach XNode in XNodeList do begin
             InsertCommentLine(XNode.AsXmlElement(), SalesHeader);
         end;
