@@ -259,15 +259,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure ConfigureManualCardWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
-    begin
-        Context.SetContext('capture_amount', true);
-        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
-        Context.SetContext('amount_description', POSPaymentMethod.Description);
-        exit(true);
-    end;
-
-
     local procedure ConfigureVoucherWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', false);
@@ -287,7 +278,7 @@ codeunit 6150725 "NPR POS Action: Payment"
     local procedure ConfigureCashTerminalWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', (POSPaymentMethod."Forced Amount" = false));
-        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);  //NPR5.55 [410991]
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, true, false);
         Context.SetContext('amount_description', POSPaymentMethod.Description);
         exit(true);
     end;
