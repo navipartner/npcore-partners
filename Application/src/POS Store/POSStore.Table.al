@@ -180,7 +180,7 @@ table 6150614 "NPR POS Store"
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Moved to dedicated POS Unit Profile';
             ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
         }

@@ -3,7 +3,7 @@ table 6014402 "NPR Payment Type POS"
 
     Caption = 'Payment Type';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteReason = 'Is replaced by POS Payment Method';
 
     fields
