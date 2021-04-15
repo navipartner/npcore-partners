@@ -2,7 +2,7 @@ table 6014423 "NPR Period"
 {
     Caption = 'Period';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteReason = 'Table is obsolete';
 
     fields

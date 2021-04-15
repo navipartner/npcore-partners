@@ -3,7 +3,7 @@ table 6014407 "NPR Audit Roll"
     Caption = 'Audit Roll';
     DataClassification = CustomerContent;
     PasteIsValid = false;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteReason = 'Replaced by POS entry';
 
     fields

@@ -3,7 +3,7 @@ table 6014401 "NPR Register"
     Caption = 'Cash Register';
     DataClassification = CustomerContent;
     Permissions =;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteReason = 'Replaced with POS Unit, POS store, POS unit profiles';
 
     fields

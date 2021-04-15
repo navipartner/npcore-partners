@@ -64,7 +64,7 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         AddAllowedTable(Database::"NPR EFT Transaction Request", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR Tax Free Voucher", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Entry", RtnPeriodEnum::"5 Years");
-        AddAllowedTable(Database::"NPR Audit Roll", RtnPeriodEnum::"5 Years");
+
         AddAllowedTable(Database::"NPR POS Entry Tax Line", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Period Register", RtnPeriodEnum::"5 Years");
         AddAllowedTable(Database::"NPR POS Entry Sales Line", RtnPeriodEnum::"5 Years");
