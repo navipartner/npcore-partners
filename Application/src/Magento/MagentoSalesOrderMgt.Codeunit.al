@@ -177,7 +177,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         XNodeList: XmlNodeList;
         i: Integer;
     begin
-        XmlElement.SelectNodes('comment_line', XNodeList);
+        XmlElement.SelectNodes('comments/comment_line', XNodeList);
         for i := 1 to XNodeList.Count do begin
             XNodeList.Get(i, XNode);
             InsertCommentLine(XNode.AsXmlElement(), SalesHeader);
