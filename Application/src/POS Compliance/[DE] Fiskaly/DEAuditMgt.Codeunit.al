@@ -53,6 +53,8 @@ codeunit 6014444 "NPR DE Audit Mgt."
             POSAuditLog."Active POS Unit No." := POSAuditLog."Acted on POS Unit No.";
         if not POSUnitAux.Get(POSAuditLog."Active POS Unit No.") then
             exit;
+        if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then
+            exit;
         if not IsEnabled(POSUnit."POS Audit Profile") then
             exit;
 
@@ -100,18 +102,23 @@ codeunit 6014444 "NPR DE Audit Mgt."
         PosEntry.SetFilter("POS Unit No.", '%1', SalePOS."Register No.");
         if (not PosEntry.FindFirst()) then
             exit;
+        IF NOT POSUnitAux.GET(PosEntry."POS Unit No.") THEN
+            EXIT;
+        IF NOT DeAuditAux.GET(PosEntry."Entry No.") THEN
+            EXIT;
+        IF NOT DEAuditSetup.GET() THEN
+            EXIT;
 
         if PosEntry."Entry Type" <> PosEntry."Entry Type"::"Direct Sale" then
             exit;
 
         CreateDocumentJson(PosEntry."Entry No.", POSUnitAux, DocumentJson);
 
-        if not DEFiskalyCommunication.SendDocument(DeAuditAux, DocumentJson, ResponseJson, DEAuditSetup) then begin
-            DeAuditAux."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
-            StrOut.Write(GetLastErrorText);
-        end
+        if not DEFiskalyCommunication.SendDocument(DeAuditAux, DocumentJson, ResponseJson, DEAuditSetup) then
+            SetErrorMsg(DeAuditAux)
         else
-            DeAuxInfoInsertResponse(DeAuditAux, ResponseJson);
+            if not DeAuxInfoInsertResponse(DeAuditAux, ResponseJson) then
+                SetErrorMsg(DeAuditAux);
 
         OnHandleDEAuditAuxLogBeforeModify(DeAuditAux, ResponseJson);
         DeAuditAux.Modify();
@@ -137,14 +144,16 @@ codeunit 6014444 "NPR DE Audit Mgt."
     local procedure GetVatRates(EntryNo: Integer) TaxArray: JsonArray
     var
         TaxAmountLine: Record "NPR POS Entry Tax Line";
-        TaxMapper: Record "NPR VAT Prod Post Group Mapper";
+        TaxMapper: Record "NPR VAT Posting Group Mapper";
         TaxJsonObject: JsonObject;
     begin
         TaxAmountLine.Reset();
         TaxAmountLine.SetRange("POS Entry No.", EntryNo);
         if TaxAmountLine.FindSet() then
             repeat
-                TaxMapper.Get(TaxAmountLine."VAT Identifier");
+                TaxMapper.RESET;
+                TaxMapper.SETRANGE("VAT Identifier", TaxAmountLine."VAT Identifier");
+                TaxMapper.FINDFIRST();
                 TaxJsonObject.Add('vat_rate', TaxMapper."Fiscal Name");
                 TaxJsonObject.Add('amount', Format(TaxAmountLine."Amount Including Tax", 0, '<Precision,2:26><Standard Format,2>'));
                 TaxArray.Add(TaxJsonObject);
@@ -164,7 +173,8 @@ codeunit 6014444 "NPR DE Audit Mgt."
                 PaymentMapper.Get(PaymentLine."POS Payment Method Code");
                 PaymentJsonObject.Add('payment_type', PaymentMapper."Fiscal Name");
                 PaymentJsonObject.Add('amount', Format(PaymentLine.Amount, 0, '<Precision,2:26><Standard Format,2>'));
-                PaymentJsonObject.Add('currency_code', PaymentLine."Currency Code");
+                if PaymentLine."Currency Code" <> '' then
+                    PaymentJsonObject.Add('currency_code', PaymentLine."Currency Code");
                 PaymentArray.Add(PaymentJsonObject);
             until PaymentLine.Next() = 0;
     end;
@@ -181,9 +191,10 @@ codeunit 6014444 "NPR DE Audit Mgt."
         DeAuditAux."Serial Number" := POSUnitAuxPar."Serial Number";
         DeAuditAux."Fiscalization Status" := DeAuditAux."Fiscalization Status"::"Not Fiscalized";
         DeAuditAux."Transaction ID" := CreateGuid();
-        DeAuditAux.Error := true;
+        DeAuditAux."Has Error" := true;
     end;
 
+    [TryFunction]
     procedure DeAuxInfoInsertResponse(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; ResponseJson: JsonObject)
     var
         TypeHelper: Codeunit "Type Helper";
@@ -212,7 +223,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
         OutStr.Write(ResponseTokenList.Get(9).AsValue().AsText());
 
         DeAuditAux."Fiscalization Status" := DeAuditAux."Fiscalization Status"::Fiscalized;
-        DeAuditAux.Error := false;
+        DeAuditAux."Has Error" := false;
         Clear(DeAuditAux."Error Message");
     end;
 
@@ -281,11 +292,28 @@ codeunit 6014444 "NPR DE Audit Mgt."
     local procedure CheckJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
     begin
         JobQueueEntry.Reset();
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly Job");
-        JobQueueEntry.FindFirst();
+        if JobQueueEntry.FindFirst() then
+            exit;
+
+        JobQueueEntry.InitRecurringJob(10);
+        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+        JobQueueEntry."Object ID to Run" := Codeunit::"NPR DE Fiskaly Job";
+        JobQueueEntry."User ID" := CopyStr(UserId, 1, 65);
+        JobQueueEntry.Description := JobDescLbl;
+        JobQueueEntry.Insert(true);
+    end;
+
+    procedure SetErrorMsg(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
+    var
+        StrOut: OutStream;
+    begin
+        DeAuditAux."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
+        StrOut.Write(GetLastErrorText);
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,9 +1,7 @@
-table 6014534 "NPR VAT Prod Post Group Mapper"
+table 6014545 "NPR VAT Posting Group Mapper"
 {
     Caption = 'VAT Product Posting Group Mapper';
     DataClassification = CustomerContent;
-    ObsoleteState = Removed;
-    ObsoleteReason = 'Primary Key change';
 
     fields
     {

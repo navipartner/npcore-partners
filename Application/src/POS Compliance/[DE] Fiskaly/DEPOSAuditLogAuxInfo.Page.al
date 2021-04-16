@@ -56,7 +56,7 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                     ApplicationArea = All;
                     ToolTip = 'Specifies if receipt is loged on TSS system';
                 }
-                field("Error"; Rec.Error)
+                field("Error"; Rec."Has Error")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Message if receipt is not loged on TSS system';
@@ -95,24 +95,54 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                         exit;
                     POSEntry.Get(Rec."POS Entry No.");
                     POSUnitAux.Get(POSEntry."POS Unit No.");
+                    DEAuditSetup.Get();
                     DEAuditMgt.CreateDocumentJson(Rec."POS Entry No.", POSUnitAux, DocumentJson);
 
-                    if not DEFiskalyComm.SendDocument(Rec, DocumentJson, ResponseJson, DEAuditSetup) then begin
-                        Rec."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
-                        StrOut.Write(GetLastErrorText);
-                    end
+                    if not DEFiskalyComm.SendDocument(Rec, DocumentJson, ResponseJson, DEAuditSetup) then
+                        DEAuditMgt.SetErrorMsg(Rec)
                     else
-                        DEAuditMgt.DeAuxInfoInsertResponse(Rec, ResponseJson);
+                        if not DEAuditMgt.DeAuxInfoInsertResponse(Rec, ResponseJson) then
+                            DEAuditMgt.SetErrorMsg(Rec);
 
                     DEAuditSetup.Modify();
                     Rec.Modify();
+                end;
+            }
+            action(GetTransactionInfo)
+            {
+                Caption = 'Get Transaction Info';
+                Image = GetEntries;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ApplicationArea = All;
+                ToolTip = 'Get transaction data from Fiskaly.';
+
+                trigger OnAction()
+                var
+                    DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+                    DEFiskalyComm: Codeunit "NPR DE Fiskaly Communication";
+                    ResponseJson: JsonObject;
+                    StrOut: OutStream;
+                    HasData: Label 'This record have data, do you really want to get data from Fiskaly?';
+                begin
+                    IF Rec."Time Format" <> '' THEN
+                        IF NOT CONFIRM(HasData) THEN
+                            EXIT;
+                    ResponseJson := DEFiskalyComm.GetTransaction(Format(Rec."TSS ID", 0, 4), Format(Rec."Transaction ID", 0, 4));
+
+                    IF NOT DEAuditMgt.DeAuxInfoInsertResponse(Rec, ResponseJson) THEN
+                        Message(GETLASTERRORTEXT);
+
+                    Rec.MODIFY;
                 end;
             }
             action(ShowError)
             {
                 Caption = 'Show Error';
                 Image = ShowWarning;
-                Visible = Rec.Error;
+                Visible = Rec."Has Error";
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
