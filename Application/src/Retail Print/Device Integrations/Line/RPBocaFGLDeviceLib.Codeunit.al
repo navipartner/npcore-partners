@@ -520,10 +520,76 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
 
         // Calculate receipt width
         case FontFace of
+            'F1':
+                begin
+                    FontHeight := 8 * HeightModifier;
+                    FontWidth := 7 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F2':
+                begin
+                    FontHeight := 18 * HeightModifier;
+                    FontWidth := 10 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F3':
+                begin
+                    FontHeight := 33 * HeightModifier;
+                    FontWidth := 20 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F4':
+                begin
+                    FontHeight := 11 * HeightModifier;
+                    FontWidth := 7 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F5':
+                begin
+                    FontHeight := 18 * HeightModifier;
+                    FontWidth := 10 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F6':
+                begin
+                    FontHeight := 56 * HeightModifier;
+                    FontWidth := 34 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F7':
+                begin
+                    FontHeight := 31 * HeightModifier;
+                    FontWidth := 20 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
             'F8':
                 begin
                     FontHeight := 30 * HeightModifier;
                     FontWidth := 20 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F9':
+                begin
+                    FontHeight := 22 * HeightModifier;
+                    FontWidth := 13 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F10':
+                begin
+                    FontHeight := 41 * HeightModifier;
+                    FontWidth := 28 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F11':
+                begin
+                    FontHeight := 49 * HeightModifier;
+                    FontWidth := 26 * WidthModifier;
+                    exit(PageWidth div FontWidth);
+                end;
+            'F12':
+                begin
+                    FontHeight := 91 * HeightModifier;
+                    FontWidth := 47 * WidthModifier;
                     exit(PageWidth div FontWidth);
                 end;
             'F13':
@@ -653,6 +719,19 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         AddOption(RetailList, 'CODE128 50', '');
         AddOption(RetailList, 'CODE128 100', '');
         AddOption(RetailList, 'CODE128 150', '');
+
+        // Fonts without Æ Ø Å:
+        AddOption(RetailList, 'F1', '');
+        AddOption(RetailList, 'F2', '');
+        AddOption(RetailList, 'F3', '');
+        AddOption(RetailList, 'F4', '');
+        AddOption(RetailList, 'F5', '');
+        AddOption(RetailList, 'F6', '');
+        AddOption(RetailList, 'F7', '');
+        AddOption(RetailList, 'F9', '');
+        AddOption(RetailList, 'F10', '');
+        AddOption(RetailList, 'F11', '');
+        AddOption(RetailList, 'F12', '');
     end;
 
     procedure ConstructCommandSelectionList(var RetailList: Record "NPR Retail List" temporary)
