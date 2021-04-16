@@ -244,27 +244,41 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
 
     procedure GetXmlText(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text
     var
-        Element2: XmlElement;
+        // Element2: XmlElement;
         Node: XmlNode;
     begin
-        if Element.IsEmpty() then begin
-            if Required then
+
+        if (not Element.SelectSingleNode(NodePath, Node)) then begin
+            if (Required) then
                 Error(Error003, NodePath, '');
             exit('');
         end;
 
-        Element.SelectSingleNode(NodePath, Node);
-        Element2 := Node.AsXmlElement();
-        if Element2.IsEmpty then begin
-            if Required then
-                Error(Error003, NodePath, Element.Name);
-            exit('');
-        end;
+        if (MaxLength > 0) then
+            exit(CopyStr(Node.AsXmlElement().InnerText(), 1, MaxLength));
 
-        if MaxLength > 0 then
-            exit(CopyStr(Element2.InnerText, 1, MaxLength));
+        exit(Node.AsXmlElement().InnerText());
 
-        exit(Element2.InnerText);
+        /*
+                if Element.IsEmpty() then begin
+                    if Required then
+                        Error(Error003, NodePath, '');
+                    exit('');
+                end;
+
+                Element.SelectSingleNode(NodePath, Node);
+                Element2 := Node.AsXmlElement();
+                if Element2.IsEmpty then begin
+                    if Required then
+                        Error(Error003, NodePath, Element.Name);
+                    exit('');
+                end;
+
+                if MaxLength > 0 then
+                    exit(CopyStr(Element2.InnerText, 1, MaxLength));
+
+                exit(Element2.InnerText);
+        */
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
