@@ -115,7 +115,8 @@
         TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
         TextEmailSuccess: Label 'File emailed to %1.';
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
-        SMTPMail: Codeunit "SMTP Mail";
+        MailManagement: Codeunit "Mail Management";
+        EmailItem: Record "Email Item" temporary;
         IStream: InStream;
         OStream: OutStream;
         TempBlob: Codeunit "Temp Blob";
@@ -123,70 +124,75 @@
         CCRecipients: List of [Text];
         BCCRecipients: List of [Text];
         Separators: List of [Text];
+        ErrorMessage: Text;
+        EmailSendingHandler: Codeunit "NPR Email Sending Handler";
     begin
         Separators.Add(';');
         Separators.Add(',');
         Recipients := NcEndpointEmail."Recipient E-Mail Address".Split(Separators);
-        SMTPMail.CreateMessage(NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address", Recipients, Subject, Body, true);
+        EmailSendingHandler.CreateEmailItem(EmailItem, NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address", Recipients, Subject, Body, true);
         TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
         OStream.WriteText(OutputText);
         TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
-        SMTPMail.AddAttachmentStream(IStream, Filename);
+        EmailSendingHandler.AddAttachmentFromStream(EmailItem, IStream, Filename);
 
         if NcEndpointEmail."CC E-Mail Address" <> '' then begin
             CCRecipients := NcEndpointEmail."CC E-Mail Address".Split(Separators);
-            SMTPMail.AddCC(CCRecipients);
+            EmailSendingHandler.AddRecipientCC(EmailItem, CCRecipients);
         end;
 
         if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
             BCCRecipients := NcEndpointEmail."BCC E-Mail Address".Split(Separators);
-            SMTPMail.AddBCC(BCCRecipients);
+            EmailSendingHandler.AddRecipientBCC(EmailItem, CCRecipients);
         end;
 
-        if SMTPMail.Send then begin
+        if EmailSendingHandler.Send(EmailItem) then begin
             //Positive Response
             NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccess, NcEndpointEmail."Recipient E-Mail Address"));
         end else begin
             //Negative Response
-            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", SMTPMail.GetLastSendMailErrorText);
+            EmailSendingHandler.GetLastError(ErrorMessage);
+            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
         end;
     end;
 
     local procedure EmailProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointEmail: Record "NPR Nc Endpoint E-mail")
     var
         TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
-        SMTPMail: Codeunit "SMTP Mail";
+        EmailItem: Record "Email Item" temporary;
         InStream: InStream;
         Recipients: List of [Text];
         CCRecipients: List of [Text];
         BCCRecipients: List of [Text];
         Separators: List of [Text];
+        ErrorMessageManagement: Codeunit "Error Message Management";
+        ErrorMessage: Text;
+        EmailSendingHandler: Codeunit "NPR Email Sending Handler";
     begin
         Separators.Add(';');
         Separators.Add(',');
 
-        //-NC2.12 [308107]
         Recipients := NcEndpointEmail."Recipient E-Mail Address".Split(Separators);
-        SMTPMail.CreateMessage(
+        EmailSendingHandler.CreateEmailItem(EmailItem,
           NcEndpointEmail."Sender Name", NcEndpointEmail."Sender E-Mail Address",
           Recipients, NcEndpointEmail."Subject Text", NcEndpointEmail."Body Text", true);
 
         NcTaskOutput.Data.CreateInStream(InStream, TEXTENCODING::UTF8);
-        SMTPMail.AddAttachmentStream(InStream, NcTaskOutput.Name);
-
+        EmailSendingHandler.AddAttachmentFromStream(EmailItem, InStream, NcTaskOutput.Name);
         if NcEndpointEmail."CC E-Mail Address" <> '' then begin
             CCRecipients := NcEndpointEmail."CC E-Mail Address".Split(Separators);
-            SMTPMail.AddCC(CCRecipients);
+            EmailSendingHandler.AddRecipientCC(EmailItem, CCRecipients);
         end;
 
         if NcEndpointEmail."BCC E-Mail Address" <> '' then begin
             BCCRecipients := NcEndpointEmail."BCC E-Mail Address".Split(Separators);
-            SMTPMail.AddBCC(BCCRecipients);
+            EmailSendingHandler.AddRecipientBCC(EmailItem, BCCRecipients);
         end;
 
-        if not SMTPMail.Send then
-            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", SMTPMail.GetLastSendMailErrorText);
-        //+NC2.12 [308107]
+        if not EmailSendingHandler.Send(EmailItem) then begin
+            EmailSendingHandler.GetLastError(ErrorMessage);
+            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
+        end;
     end;
 
     local procedure "---Subscribers"()

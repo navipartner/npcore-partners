@@ -1135,32 +1135,35 @@
     var
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
         EmailSetup: Record "NPR E-mail Setup";
-        SmtpMail: Codeunit "SMTP Mail";
         MailSeparators: List of [Text];
         Txt001: Label 'NaviDocs Error %1 - %2 %3';
-
+        MailManagement: Codeunit "Mail Management";
+        EmailItem: Record "Email Item" temporary;
+        EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         NaviDocsSetup.Get();
         if not NaviDocsSetup."Send Warming E-mail" then
             exit;
-        if not SmtpMail.IsEnabled() then
+        if not MailManagement.IsEnabled() then
             exit;
 
-        SmtpMail.Initialize();
-        SmtpMail.AddFrom(EmailSetup."From Name", EmailSetup."From E-mail Address");
+
         MailSeparators.Add(';');
         MailSeparators.Add(',');
 
-        SmtpMail.AddRecipients(NaviDocsSetup."Warning E-mail".Split(MailSeparators));
-        SmtpMail.AddSubject(StrSubstNo(Txt001, NaviDocsEntry."Document Description", NaviDocsEntry."No."));
+
+        EmailSenderHandler.CreateEmailItem(EmailItem, EmailSetup."From Name", EmailSetup."From E-mail Address",
+                                            NaviDocsSetup."Warning E-mail".Split(MailSeparators),
+                                            StrSubstNo(Txt001, NaviDocsEntry."Document Description", NaviDocsEntry."No."), '', true);
 
         NaviDocsEntryComment.SetRange("Entry No.", NaviDocsEntry."Entry No.");
         NaviDocsEntryComment.SetRange("Table No.", NaviDocsEntry."Table No.");
         NaviDocsEntryComment.SetRange("Document Type", NaviDocsEntry."Document Type");
         NaviDocsEntryComment.SetRange("Document No.", NaviDocsEntry."No.");
         if NaviDocsEntryComment.FindLast() then
-            SmtpMail.AppendBody(NaviDocsEntryComment.Description + '<br><br>');
-        SmtpMail.Send();
+            EmailSenderHandler.AppendBodyLine(EmailItem, NaviDocsEntryComment.Description + '<br><br>');
+
+        EmailSenderHandler.Send(EmailItem);
     end;
 
     procedure NaviDocsStatusUnhandled(): Integer
