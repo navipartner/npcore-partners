@@ -1036,6 +1036,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Category9;
                     Image = Camera;
+                    Visible = MagentoEnabled;
                     RunObject = page 6151455;
                     RunPageLink = "Item No." = field("No.");
                     ApplicationArea = All;

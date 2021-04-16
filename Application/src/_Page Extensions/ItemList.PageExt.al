@@ -235,7 +235,7 @@
                     Image = BinLedger;
                     Promoted = true;
                     PromotedOnly = true;
-                    PromotedCategory = Category5;
+                    PromotedCategory = Report;
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Price Label action';
@@ -257,7 +257,7 @@
                     Image = BinLedger;
                     Promoted = true;
                     PromotedOnly = true;
-                    PromotedCategory = Category5;
+                    PromotedCategory = Report;
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Shelf Label action';

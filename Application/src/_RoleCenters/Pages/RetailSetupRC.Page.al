@@ -437,13 +437,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the item worksheet Templates action';
                 }
-                action("Task Queue")
-                {
-                    Caption = 'Task Queue';
-                    RunObject = page "NPR Task Queue";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Task Queue action';
-                }
                 action("Job Queue")
                 {
                     Caption = 'Job Queue';
