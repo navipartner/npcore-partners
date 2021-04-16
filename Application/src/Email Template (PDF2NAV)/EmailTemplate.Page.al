@@ -86,7 +86,7 @@ page 6059791 "NPR E-mail Template"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Use HTML Template field';
                     }
-                    field("FORMAT(""HTML Template"".HASVALUE)"; Format("HTML Template".HasValue))
+                    field("FORMAT(""HTML Template"".HASVALUE)"; Format(Rec."HTML Template".HasValue))
                     {
                         ApplicationArea = All;
                         AssistEdit = true;

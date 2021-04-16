@@ -59,33 +59,35 @@ codeunit 6014582 "NPR Print Method Mgt."
     [Obsolete('Use the overload without DotNet. This method can be deleted when there are 0 references left')]
     procedure PrintViaEmail(PrinterName: Text; var Stream: DotNet NPRNetMemoryStream)
     var
-        SmtpMail: Codeunit "SMTP Mail";
         InStream: InStream;
         Separators: List of [Text];
+        EmailItem: Record "Email Item" temporary;
+        EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         if Stream.Length < 1 then
             exit;
         Separators.Add(';');
         Separators.Add(',');
 
-        SmtpMail.CreateMessage('NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
-        SmtpMail.AddAttachmentStream(Stream, 'Document.pdf');
-        SmtpMail.Send();
+        EmailSenderHandler.CreateEmailItem(EmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
+        EmailSenderHandler.AddAttachmentFromStream(EmailItem, Stream, 'Document.pdf');
+        EmailSenderHandler.Send(EmailItem);
     end;
 
     procedure PrintViaEmail(PrinterName: Text; var Stream: InStream)
     var
-        SmtpMail: Codeunit "SMTP Mail";
         Separators: List of [Text];
+        EmailItem: Record "Email Item" temporary;
+        EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         if Stream.EOS then
             exit;
         Separators.Add(';');
         Separators.Add(',');
 
-        SmtpMail.CreateMessage('NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
-        SmtpMail.AddAttachmentStream(Stream, 'Document.pdf');
-        SmtpMail.Send();
+        EmailSenderHandler.CreateEmailItem(EmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
+        EmailSenderHandler.AddAttachmentFromStream(EmailItem, Stream, 'Document.pdf');
+        EmailSenderHandler.Send(EmailItem);
     end;
 
     procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: DotNet NPRNetMemoryStream; DocumentDescription: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)

@@ -222,43 +222,38 @@
     procedure SendErrorMail(NcImportEntry: Record "NPR Nc Import Entry")
     var
         NcImportType: Record "NPR Nc Import Type";
-        SMTPMailSetup: Record "SMTP Mail Setup";
-        SMTPMail: Codeunit "SMTP Mail";
         InStream: InStream;
         Body: Text;
         SenderAddress: Text;
         Subject: Text;
         Separators: List of [Text];
+        EmailItem: Record "Email Item" temporary;
+        EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         Separators.Add(';');
         Separators.Add(',');
 
-        //-NC2.02 [262318]
         NcImportType.Get(NcImportEntry."Import Type");
         NcImportType.TestField("Send e-mail on Error");
         NcImportType.TestField("E-mail address on Error");
 
-        SMTPMailSetup.Get();
-
         SenderAddress := GetErrorMailSenderAddress(NcImportEntry);
         Subject := GetErrorMailSubject(NcImportEntry);
         Body := GetErrorMailBody(NcImportEntry);
-
-        SMTPMail.CreateMessage(
-          '',
-          SenderAddress,
-          NcImportType."E-mail address on Error".Split(Separators),
-          Subject,
-          Body,
-          true);
+        EmailSenderHandler.CreateEmailItem(EmailItem,
+                  '',
+                  SenderAddress,
+                  NcImportType."E-mail address on Error".Split(Separators),
+                  Subject,
+                  Body,
+                  true);
 
         if NcImportEntry."Document Source".HasValue() then begin
             NcImportEntry.CalcFields("Document Source");
             NcImportEntry."Document Source".CreateInStream(InStream);
-            SMTPMail.AddAttachmentStream(InStream, NcImportEntry."Document Name");
+            EmailSenderHandler.AddAttachmentFromStream(EmailItem, InStream, NcImportEntry."Document Name");
         end;
-        SMTPMail.Send;
-        //+NC2.02 [262318]
+        EmailSenderHandler.Send(EmailItem);
     end;
 
     procedure SendTestErrorMail(NcImportType: Record "NPR Nc Import Type")
