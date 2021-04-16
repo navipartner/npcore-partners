@@ -36,15 +36,15 @@ page 6151241 "NPR Retail Manager Role Center"
             {
                 ApplicationArea = All;
             }
-            part(Control21; "Report Inbox Part")
-            {
-                AccessByPermission = TableData "Report Inbox" = R;
-                ApplicationArea = Suite;
-            }
             part(MyjobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
                 ApplicationArea = All;
+            }
+            part(Control21; "Report Inbox Part")
+            {
+                AccessByPermission = TableData "Report Inbox" = R;
+                ApplicationArea = Suite;
             }
         }
     }
@@ -206,392 +206,400 @@ page 6151241 "NPR Retail Manager Role Center"
             group(Reports)
             {
                 Caption = 'List & Reports';
-                    group(Management)
-                    {
-                        Caption = 'Management';
-                        group(Salespersons)
+                group(Management)
+                {
+                    Caption = 'Management';
+                    group(Salespersons)
 
+                    {
+                        Caption = 'Salespersons';
+                        Image = SalesPerson;
+                        action("NPR Sales Person Top 20")
                         {
-                            Caption = 'Salespersons';
-                            Image = SalesPerson;
-                            action("NPR Sales Person Top 20")
+                            Caption = 'NPR Sales Person Top 20';
+                            Image = Report2;
+                            RunObject = Report "NPR Sales Person Top 20";
+                            ApplicationArea = All;
+                            ToolTip = 'Executes the NPR Sales Person Top 20 action';
+                        }
+                        action("NPR Sales code/Item group top")
+                        {
+                            Caption = 'NPR  Sales code/Item group top';
+                            Image = Report2;
+                            RunObject = Report "NPR Salesperson/Item Group Top";
+                            ApplicationArea = All;
+                            ToolTip = 'Executes the NPR  Sales code/Item group top action';
+                        }
+                        action("NPR Sale Statistics per Vendor")
+                        {
+                            Caption = 'NPR Sale Statistics per Vendor';
+                            Image = Report2;
+                            RunObject = Report "NPR Sale Statistics per Vendor";
+                            ApplicationArea = All;
+                            ToolTip = 'Executes the NPR Sale Statistics per Vendor action';
+                        }
+                        action("NPR Sales Statistics By Department")
+                        {
+                            Caption = 'NPR Sales Statistics By Department';
+                            Image = Report2;
+                            RunObject = Report "NPR Sales Statistics By Dept.";
+                            ApplicationArea = All;
+                            ToolTip = 'Executes the NPR Sales Statistics By Department action';
+                        }
+                    }
+                    group(History)
+                    {
+                        Caption = 'History';
+                        Image = History;
+
+                        group(HistoryList)
+                        {
+                            Caption = 'Lists';
+                            Image = List;
+
+                            action("Sales Ticket Statistics")
                             {
-                                Caption = 'NPR Sales Person Top 20';
+                                Caption = 'Sales Ticket Statistics';
                                 Image = Report2;
-                                RunObject = Report "NPR Sales Person Top 20";
+                                RunObject = page "NPR Sales Ticket Statistics";
                                 ApplicationArea = All;
-                                ToolTip = 'Executes the NPR Sales Person Top 20 action';
+                                ToolTip = 'Executes the Sales Ticket Statistics action';
                             }
-                            action("NPR Sales code/Item group top")
+                            action("Advanced Sales Statistics")
                             {
-                                Caption = 'NPR  Sales code/Item group top';
-                                Image = Report2;
-                                RunObject = Report "NPR Salesperson/Item Group Top";
+                                Caption = 'Advanced Sales Statistics';
+                                Image = ListPage;
+                                RunObject = page "NPR Advanced Sales Stats";
                                 ApplicationArea = All;
-                                ToolTip = 'Executes the NPR  Sales code/Item group top action';
-                            }
-                            action("NPR Sale Statistics per Vendor")
-                            {
-                                Caption = 'NPR Sale Statistics per Vendor';
-                                Image = Report2;
-                                RunObject = Report "NPR Sale Statistics per Vendor";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the NPR Sale Statistics per Vendor action';
+                                ToolTip = 'Executes the Advanced Sales Statistics action';
                             }
                         }
-                        group(History)
+                        group(HistoryReport)
                         {
-                            Caption = 'History';
-                            Image = History;
-
-                            group(HistoryList)
+                            Caption = 'Reports and Analysis';
+                            Image = AnalysisView;
+                            action("NPR Sales per week year/Last year")
                             {
-                                Caption = 'Lists';
-                                Image = List;
-
-                                action("Sales Ticket Statistics")
-                                {
-                                    Caption = 'Sales Ticket Statistics';
-                                    Image = Report2;
-                                    RunObject = page "NPR Sales Ticket Statistics";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Sales Ticket Statistics action';
-                                }
-                                action("Advanced Sales Statistics")
-                                {
-                                    Caption = 'Advanced Sales Statistics';
-                                    Image = ListPage;
-                                    RunObject = page "NPR Advanced Sales Stats";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Advanced Sales Statistics action';
-                                }
+                                Caption = 'NPR Sales per week year/Last year';
+                                Image = Report2;
+                                RunObject = Report "NPR Sales per week year/Last";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Sales per week year/Last year action';
                             }
-                            group(HistoryReport)
+                            action("NPR Discount Statistics")
                             {
-                                Caption = 'Reports and Analysis';
-                                Image = AnalysisView;
-                                action("NPR Sales per week year/Last year")
-                                {
-                                    Caption = 'NPR Sales per week year/Last year';
-                                    Image = Report2;
-                                    RunObject = Report "NPR Sales per week year/Last";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Sales per week year/Last year action';
-                                }
-                                action("NPR Discount Statistics")
-                                {
-                                    Caption = 'NPR Discount Statistics';
-                                    Image = Report2;
-                                    RunObject = Report "NPR Discount Statistics";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Discount Statistics action';
-                                }
+                                Caption = 'NPR Discount Statistics';
+                                Image = Report2;
+                                RunObject = Report "NPR Discount Statistics";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Discount Statistics action';
                             }
                         }
                     }
-                    group(ItemandPrices)
+                }
+                group(ItemandPrices)
+                {
+                    Caption = 'Item & Prices';
+                    Image = ItemCosts;
+                    group(Goods)
                     {
-                        Caption = 'Item & Prices';
-                        Image = ItemCosts;
-                        group(Goods)
+                        Caption = 'Goods';
+                        Image = Item;
+
+                        group(Lists)
                         {
-                            Caption = 'Goods';
-                            Image = Item;
-
-                            group(Lists)
+                            Caption = 'Lists';
+                            Image = List;
+                            action("Retail Item List")
                             {
-                                Caption = 'Lists';
-                                Image = List;
-                                action("Retail Item List")
-                                {
-                                    Caption = 'Retail Item';
-                                    Image = ListPage;
-                                    RunObject = page "Item List";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Retail Item action';
-                                }
-                                action(Items)
-                                {
-                                    Caption = 'Items';
-                                    Image = ListPage;
-                                    RunObject = page "Item List";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Items action';
-                                }
-                                action("Item AddOns")
-                                {
-                                    Caption = 'Item AddOns';
-                                    Image = ListPage;
-                                    RunObject = page "NPR NpIa Item AddOns";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Item AddOns action';
-                                }
+                                Caption = 'Retail Item';
+                                Image = ListPage;
+                                RunObject = page "Item List";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Retail Item action';
                             }
-                            group(ReportsGoods)
+                            action(Items)
                             {
-                                Caption = 'Reports and Analysis';
-                                Image = AnalysisView;
-                                action("NPR Inventory by age")
-                                {
-                                    Caption = 'NPR Inventory by age';
-                                    Image = Report;
-                                    RunObject = report "NPR Inventory by age";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Inventory by age action';
-                                }
-                                action("NPR Inv. Sales Statistics")
-                                {
-                                    Caption = 'NPR Inv. Sales Statistics';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Sales Stats/Provider";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Inv. Sales Statistics action';
-                                }
-                                action("NPR Inventory per Date")
-                                {
-                                    Caption = 'NPR Inventory per Date';
-                                    Image = Report;
-                                    RunObject = report "NPR Inventory per Date";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Inventory per Date action';
-                                }
-                                action("NPR Item Group Inventory Value")
-                                {
-                                    Caption = 'NPR Item Group Inventory Value';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Group Inv. Value";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Group Inventory Value action';
-                                }
-
-                                action("NPR Statistic - Sales")
-                                {
-                                    Caption = 'NPR Statistic - Sales';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Sales Postings";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Statistic - Sales action';
-                                }
-
-                                action("NPR Low Sales")
-                                {
-                                    Caption = 'NPR Low Sales';
-                                    Image = Report;
-                                    RunObject = report "NPR Items With Low Sales";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Low Sales action';
-                                }
-
-                                action("NPR Shrinkage")
-                                {
-                                    Caption = 'NPR Shrinkage';
-                                    Image = Report;
-                                    RunObject = report "NPR Item - Loss";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Shrinkage action';
-                                }
-
-                                action("NPR Item Loss - Return Reason")
-                                {
-                                    Caption = 'NPR Item Loss - Return Reason';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Loss - Ret. Reason";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Loss - Return Reason action';
-                                }
-                                action("NPR Sales Statistics Variant")
-                                {
-                                    Caption = 'NPR Sales Statistics Variant';
-                                    Image = Report;
-                                    RunObject = report "NPR Sales Stats Per Variety";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Sales Statistics Variant action';
-                                }
-                                action("NPR Inventory per Variant at date")
-                                {
-                                    Caption = 'NPR Inventory per Variant at date';
-                                    Image = Report;
-                                    RunObject = report "NPR Inventory per Variant/date";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Inventory per Variant at date action';
-                                }
-                                action("NPR Item Barcode Sheet")
-                                {
-                                    Caption = 'NPR Item Barcode Sheet';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Barcode Status Sheet";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Barcode Sheet action';
-                                }
-                                action("NPR Return Reason Code Statistics")
-                                {
-                                    Caption = 'NPR Return Reason Code Statistics';
-                                    Image = Report;
-                                    RunObject = report "NPR Return Reason Code Stat.";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Return Reason Code Statistics action';
-                                }
-
-                                action("NPR Adjust Cost - Item Entries")
-                                {
-                                    Caption = 'NPR Adjust Cost - Item Entries';
-                                    Image = Report;
-                                    RunObject = report "NPR Adjust Cost: ItemEntriesTQ";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Adjust Cost - Item Entries action';
-                                }
-
-                                action("NPR Item Sales Statistics")
-                                {
-                                    Caption = 'NPR Item Sales Statistics';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Sales Statistics";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Sales Statistics action';
-                                }
-                                action("NPR Item Group Top")
-                                {
-                                    Caption = 'NPR Item Group Top';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Group Top";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Group Top action';
-                                }
+                                Caption = 'Items';
+                                Image = ListPage;
+                                RunObject = page "Item List";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Items action';
+                            }
+                            action("Item AddOns")
+                            {
+                                Caption = 'Item AddOns';
+                                Image = ListPage;
+                                RunObject = page "NPR NpIa Item AddOns";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Item AddOns action';
                             }
                         }
-                        group(Lines)
+                        group(ReportsGoods)
                         {
-                            Caption = 'Lines';
-                            Image = AllLines;
-
-                            group(ListsLine)
+                            Caption = 'Reports and Analysis';
+                            Image = AnalysisView;
+                            action("NPR Inventory by age")
                             {
-
-                                Caption = 'Lists';
-                                Image = List;
-                                action("Item Groups")
-                                {
-                                    Caption = 'Item AddOns';
-                                    Image = ListPage;
-                                    RunObject = page "NPR NpIa Item AddOns";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Item AddOns action';
-                                }
-                                action("Sales Price Maintenance Setup")
-                                {
-                                    Caption = 'Sales Price Maintenance Setup';
-                                    Image = ListPage;
-                                    RunObject = page "NPR Sales Price Maint. Setup";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Sales Price Maintenance Setup action';
-                                }
-                                action("Retail Price Log Entries")
-                                {
-                                    Caption = 'Retail Price Log Entries';
-                                    Image = ListPage;
-                                    RunObject = page "NPR Retail Price Log Entries";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Retail Price Log Entries action';
-                                }
+                                Caption = 'NPR Inventory by age';
+                                Image = Report;
+                                RunObject = report "NPR Inventory by age";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Inventory by age action';
                             }
-                            group(LineReports)
+                            action("NPR Inv. Sales Statistics")
                             {
-
-                                Caption = 'Reports and Analysis';
-                                Image = AnalysisView;
-                                action("NPR Item Group Overview")
-                                {
-                                    Caption = 'NPR Item Group Overview';
-                                    Image = Report;
-                                    RunObject = Report "NPR Item Group Overview";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Group Overview action';
-                                }
-                                action("NPR Vendor sales per line")
-                                {
-                                    Caption = 'NPR Vendor sales per line';
-                                    Image = Report;
-                                    RunObject = report "NPR Vendor trx by Item group";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Vendor sales per line action';
-                                }
-                                action("NPR Sales Person Trn. by Item Gr.")
-                                {
-                                    Caption = 'NPR Sales Person Trn. by Item Gr.';
-                                    Image = Report;
-                                    RunObject = Report "NPR S.Person Trx by Item Gr.";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Sales Person Trn. by Item Gr. action';
-                                }
-                                action("NPR Sales Stat/Analysis")
-                                {
-                                    Caption = 'NPR Sales Stat/Analysis';
-                                    Image = Report;
-                                    RunObject = Report "NPR Sales Stat/Analysis";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Sales Stat/Analysis action';
-                                }
+                                Caption = 'NPR Inv. Sales Statistics';
+                                Image = Report;
+                                RunObject = report "NPR Item Sales Stats/Provider";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Inv. Sales Statistics action';
                             }
-                        }
-                        group(Discount)
-                        {
-                            Caption = 'Discount';
-                            Image = Discount;
-                            group(DiscountList)
+                            action("NPR Inventory per Date")
                             {
-                                Caption = 'Lists';
-                                Image = List;
-                                action("Item Groups Tree")
-                                {
-                                    Caption = 'Mix Discounts';
-                                    Image = ListPage;
-                                    RunObject = page "NPR Mixed Discount List";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Mix Discounts action';
-                                }
-                                action("Period Discounts")
-                                {
-                                    Caption = 'Period Discounts';
-                                    Image = ListPage;
-                                    RunObject = page "NPR Campaign Discount List";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Period Discounts action';
-                                }
-                                action("Retail Campaigns")
-                                {
-                                    Caption = 'Retail Campaigns';
-                                    Image = ListPage;
-                                    RunObject = page "NPR Retail Campaigns";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Retail Campaigns action';
-                                }
+                                Caption = 'NPR Inventory per Date';
+                                Image = Report;
+                                RunObject = report "NPR Inventory per Date";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Inventory per Date action';
                             }
-                            group(DiscountReports)
+                            action("NPR Item Group Inventory Value")
                             {
+                                Caption = 'NPR Item Group Inventory Value';
+                                Image = Report;
+                                RunObject = report "NPR Item Group Inv. Value";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Item Group Inventory Value action';
+                            }
 
-                                Caption = 'Reports and Analysis';
-                                Image = AnalysisView;
-                                action("NPR Period Discount Statistics")
-                                {
-                                    Caption = 'NPR Period Discount Statistics';
-                                    Image = Report;
-                                    RunObject = report "NPR Period Discount Stat.";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Period Discount Statistics action';
-                                }
+                            action("NPR Statistic - Sales")
+                            {
+                                Caption = 'NPR Statistic - Sales';
+                                Image = Report;
+                                RunObject = report "NPR Item Sales Postings";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Statistic - Sales action';
+                            }
 
-                                action("Inventory Campaign Stat.")
-                                {
-                                    Caption = 'Inventory Campaign Stat.';
-                                    Image = Report;
-                                    RunObject = Report "NPR Inventory Campaign Stat.";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Inventory Campaign Stat. action';
-                                }
+                            action("NPR Low Sales")
+                            {
+                                Caption = 'NPR Low Sales';
+                                Image = Report;
+                                RunObject = report "NPR Items With Low Sales";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Low Sales action';
+                            }
+
+                            action("NPR Shrinkage")
+                            {
+                                Caption = 'NPR Shrinkage';
+                                Image = Report;
+                                RunObject = report "NPR Item - Loss";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Shrinkage action';
+                            }
+
+                            action("NPR Item Loss - Return Reason")
+                            {
+                                Caption = 'NPR Item Loss - Return Reason';
+                                Image = Report;
+                                RunObject = report "NPR Item Loss - Ret. Reason";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Item Loss - Return Reason action';
+                            }
+                            action("NPR Sales Statistics Variant")
+                            {
+                                Caption = 'NPR Sales Statistics Variant';
+                                Image = Report;
+                                RunObject = report "NPR Sales Stats Per Variety";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Sales Statistics Variant action';
+                            }
+                            action("NPR Inventory per Variant at date")
+                            {
+                                Caption = 'NPR Inventory per Variant at date';
+                                Image = Report;
+                                RunObject = report "NPR Inventory per Variant/date";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Inventory per Variant at date action';
+                            }
+                            action("NPR Item Barcode Sheet")
+                            {
+                                Caption = 'NPR Item Barcode Sheet';
+                                Image = Report;
+                                RunObject = report "NPR Item Barcode Status Sheet";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Item Barcode Sheet action';
+                            }
+                            action("NPR Return Reason Code Statistics")
+                            {
+                                Caption = 'NPR Return Reason Code Statistics';
+                                Image = Report;
+                                RunObject = report "NPR Return Reason Code Stat.";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Return Reason Code Statistics action';
+                            }
+
+                            action("NPR Adjust Cost - Item Entries")
+                            {
+                                Caption = 'NPR Adjust Cost - Item Entries';
+                                Image = Report;
+                                RunObject = report "NPR Adjust Cost: ItemEntriesTQ";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Adjust Cost - Item Entries action';
+                            }
+
+                            action("NPR Item Sales Statistics")
+                            {
+                                Caption = 'NPR Item Sales Statistics';
+                                Image = Report;
+                                RunObject = report "NPR Item Sales Statistics";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Item Sales Statistics action';
+                            }
+                            action("NPR Item Group Top")
+                            {
+                                Caption = 'NPR Item Group Top';
+                                Image = Report;
+                                RunObject = report "NPR Item Group Top";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Item Group Top action';
                             }
                         }
                     }
-                
+                    group(Lines)
+                    {
+                        Caption = 'Lines';
+                        Image = AllLines;
+
+                        group(ListsLine)
+                        {
+
+                            Caption = 'Lists';
+                            Image = List;
+                            action("Item Groups")
+                            {
+                                Caption = 'Item AddOns';
+                                Image = ListPage;
+                                RunObject = page "NPR NpIa Item AddOns";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Item AddOns action';
+                            }
+                            action("Sales Price Maintenance Setup")
+                            {
+                                Caption = 'Sales Price Maintenance Setup';
+                                Image = ListPage;
+                                RunObject = page "NPR Sales Price Maint. Setup";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Sales Price Maintenance Setup action';
+                            }
+                            action("Retail Price Log Entries")
+                            {
+                                Caption = 'Retail Price Log Entries';
+                                Image = ListPage;
+                                RunObject = page "NPR Retail Price Log Entries";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Retail Price Log Entries action';
+                            }
+                        }
+                        group(LineReports)
+                        {
+
+                            Caption = 'Reports and Analysis';
+                            Image = AnalysisView;
+                            action("NPR Item Group Overview")
+                            {
+                                Caption = 'NPR Item Group Overview';
+                                Image = Report;
+                                RunObject = Report "NPR Item Group Overview";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Item Group Overview action';
+                            }
+                            action("NPR Vendor sales per line")
+                            {
+                                Caption = 'NPR Vendor sales per line';
+                                Image = Report;
+                                RunObject = report "NPR Vendor trx by Item group";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Vendor sales per line action';
+                            }
+                            action("NPR Sales Person Trn. by Item Gr.")
+                            {
+                                Caption = 'NPR Sales Person Trn. by Item Gr.';
+                                Image = Report;
+                                RunObject = Report "NPR S.Person Trx by Item Gr.";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Sales Person Trn. by Item Gr. action';
+                            }
+                            action("NPR Sales Stat/Analysis")
+                            {
+                                Caption = 'NPR Sales Stat/Analysis';
+                                Image = Report;
+                                RunObject = Report "NPR Sales Stat/Analysis";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Sales Stat/Analysis action';
+                            }
+                        }
+                    }
+                    group(Discount)
+                    {
+                        Caption = 'Discount';
+                        Image = Discount;
+                        group(DiscountList)
+                        {
+                            Caption = 'Lists';
+                            Image = List;
+                            action("Item Groups Tree")
+                            {
+                                Caption = 'Mix Discounts';
+                                Image = ListPage;
+                                RunObject = page "NPR Mixed Discount List";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Mix Discounts action';
+                            }
+                            action("Period Discounts")
+                            {
+                                Caption = 'Period Discounts';
+                                Image = ListPage;
+                                RunObject = page "NPR Campaign Discount List";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Period Discounts action';
+                            }
+                            action("Retail Campaigns")
+                            {
+                                Caption = 'Retail Campaigns';
+                                Image = ListPage;
+                                RunObject = page "NPR Retail Campaigns";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Retail Campaigns action';
+                            }
+                        }
+                        group(DiscountReports)
+                        {
+
+                            Caption = 'Reports and Analysis';
+                            Image = AnalysisView;
+                            action("NPR Period Discount Statistics")
+                            {
+                                Caption = 'NPR Period Discount Statistics';
+                                Image = Report;
+                                RunObject = report "NPR Period Discount Stat.";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Period Discount Statistics action';
+                            }
+
+                            action("Inventory Campaign Stat.")
+                            {
+                                Caption = 'Inventory Campaign Stat.';
+                                Image = Report;
+                                RunObject = Report "NPR Inventory Campaign Stat.";
+                                ApplicationArea = All;
+                                ToolTip = 'Executes the Inventory Campaign Stat. action';
+                            }
+                        }
+                    }
+                }
+
             }
 
         }
@@ -870,21 +878,6 @@ page 6151241 "NPR Retail Manager Role Center"
                 RunObject = Page "Purchase Return Order";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Purchase Return Order action';
-            }
-        }
-        area(Processing)
-        {
-            group(SalesAssistent)
-            {
-                Caption = 'Sales Assistent';
-                action("NPR Sales Statistics By Department")
-                {
-                    Caption = 'NPR Sales Statistics By Department';
-                    Image = Report2;
-                    RunObject = Report "NPR Sales Statistics By Dept.";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the NPR Sales Statistics By Department action';
-                }
             }
         }
     }

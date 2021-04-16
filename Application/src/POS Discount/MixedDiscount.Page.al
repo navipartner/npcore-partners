@@ -381,29 +381,6 @@
         }
         area(processing)
         {
-            group("&Line")
-            {
-                Caption = '&Line';
-                Image = Worksheets;
-                action("Item Card")
-                {
-                    Caption = 'Item Card';
-                    Image = Item;
-                    ShortCutKey = 'Shift+Ctrl+C';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Item Card action';
-
-                    trigger OnAction()
-                    var
-                        Item: Record Item;
-                        MixDiscLine: Record "NPR Mixed Discount Line";
-                    begin
-                        CurrPage.SubForm.PAGE.GetRecord(MixDiscLine);
-                        Item.Get(MixDiscLine."No.");
-                        PAGE.Run(PAGE::"Item Card", Item);
-                    end;
-                }
-            }
             group("&Function")
             {
                 Caption = '&Function';
