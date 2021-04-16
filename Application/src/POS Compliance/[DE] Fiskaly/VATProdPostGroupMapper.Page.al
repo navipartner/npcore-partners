@@ -4,7 +4,7 @@ page 6014434 "NPR VAT Prod Post Group Mapper"
     ApplicationArea = All;
     Caption = 'VAT Prod Post Group Mapper List';
     PageType = List;
-    SourceTable = "NPR VAT Prod Post Group Mapper";
+    SourceTable = "NPR VAT Posting Group Mapper";
     UsageCategory = Lists;
 
     layout
@@ -14,6 +14,14 @@ page 6014434 "NPR VAT Prod Post Group Mapper"
             repeater(General)
             {
                 field("VAT Prod. Pos. Group"; Rec."VAT Prod. Pos. Group")
+                {
+                    ApplicationArea = All;
+                }
+                field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
+                {
+                    ApplicationArea = All;
+                }
+                field("VAT Identifier"; Rec."VAT Identifier")
                 {
                     ApplicationArea = All;
                 }
