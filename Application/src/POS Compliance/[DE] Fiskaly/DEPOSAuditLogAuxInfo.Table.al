@@ -93,6 +93,13 @@ table 6014531 "NPR DE POS Audit Log Aux. Info"
         }
         field(180; "Error"; Boolean)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Wrong field name.';
+            Caption = 'Error';
+            DataClassification = CustomerContent;
+        }
+        field(190; "Has Error"; Boolean)
+        {
             Caption = 'Error';
             DataClassification = CustomerContent;
         }

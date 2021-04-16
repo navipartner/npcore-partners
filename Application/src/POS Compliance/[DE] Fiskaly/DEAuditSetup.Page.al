@@ -18,6 +18,12 @@ page 6014421 "NPR DE Audit Setup"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies URL of the API';
+
+                    trigger OnValidate()
+                    begin
+                        Clear(Rec."Last Fiskaly Context");
+                        Rec.Modify();
+                    end;
                 }
                 field(ApiKeyField; ApiKeyField)
                 {

@@ -20,14 +20,14 @@ codeunit 6014449 "NPR DE Fiskaly Job"
                 Clear(DocumentJson);
                 POSEntry.Get(DEPOSAuditLogAux."POS Entry No.");
                 POSUnitAux.Get(POSEntry."POS Unit No.");
+                DEAuditSetup.Get();
                 DEAuditMgt.CreateDocumentJson(DEPOSAuditLogAux."POS Entry No.", POSUnitAux, DocumentJson);
 
-                if not DEFiskalyComm.SendDocument(DEPOSAuditLogAux, DocumentJson, ResponseJson, DEAuditSetup) then begin
-                    DEPOSAuditLogAux."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
-                    StrOut.Write(GetLastErrorText);
-                end
+                if not DEFiskalyComm.SendDocument(DEPOSAuditLogAux, DocumentJson, ResponseJson, DEAuditSetup) then
+                    DEAuditMgt.SetErrorMsg(DEPOSAuditLogAux)
                 else
-                    DEAuditMgt.DeAuxInfoInsertResponse(DEPOSAuditLogAux, ResponseJson);
+                    if not DEAuditMgt.DeAuxInfoInsertResponse(DEPOSAuditLogAux, ResponseJson) then
+                        DEAuditMgt.SetErrorMsg(DEPOSAuditLogAux);
 
                 DEAuditSetup.Modify();
                 DEPOSAuditLogAux.Modify();

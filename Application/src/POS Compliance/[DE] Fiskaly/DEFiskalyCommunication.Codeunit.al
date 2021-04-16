@@ -24,6 +24,8 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
 
         ResponseJsonObject := EndTransaction(DocumentJsonObject);
         DeAuditAuxPar."Last Revision" := LastRevision;
+        Clear(StrOut);
+        DEAuditSetupPar."Last Fiskaly Context".CreateOutStream(StrOut, TextEncoding::UTF8);
         StrOut.Write(LastContext);
     end;
 
@@ -124,12 +126,14 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
     begin
         PosUnitAuxDE := PosUnitAuxDEPar;
         GetContext();
-        DEAuditSetup."Last Fiskaly Context".CreateOutStream(StrOut, TextEncoding::UTF8);
-        StrOut.Write(LastContext);
-        DEAuditSetup.Modify();
 
         CreateTSS();
         CreateClient();
+
+        Clear(DEAuditSetup."Last Fiskaly Context");
+        DEAuditSetup."Last Fiskaly Context".CreateOutStream(StrOut, TextEncoding::UTF8);
+        StrOut.Write(LastContext);
+        DEAuditSetup.Modify();
     end;
 
     local procedure CreateTSS()
@@ -194,6 +198,33 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         PosUnitAuxDE.Modify();
     end;
 
+    procedure GetTransaction(TssId: Text; TxId: Text): JsonObject
+    var
+        RequestObject: JsonObject;
+        HeadersObject: JsonObject;
+        RequestBody: JsonObject;
+        ResponseJson: JsonObject;
+        ParamsJson: JsonObject;
+        BodyToken: JsonToken;
+        Base64Body: Text;
+        BodyTxt: Text;
+    begin
+        GetContext();
+        DEAuditSetup.GET;
+
+        RequestObject.Add('method', 'GET');
+        RequestObject.Add('path', '/tss/' + TssId + '/tx/' + TxId);
+
+        ParamsJson.Add('request', RequestObject);
+        ParamsJson.Add('context', LastContext);
+
+        SendRequest(CreateRequestBody(ParamsJson, 'request'), ResponseJson);
+        ResponseJson.SelectToken('$.result.response.body', BodyToken);
+        BodyTxt := Base64Convert.FromBase64(BodyToken.AsValue().AsText());
+        ResponseJson.ReadFrom(BodyTxt);
+        EXIT(ResponseJson);
+    end;
+
     local procedure SendRequest(RequestBodyPar: JsonObject; ResponseJsonPar: JsonObject)
     var
         AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
@@ -239,7 +270,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         RequestBody.Add('jsonrpc', '2.0');
         RequestBody.Add('method', MethodPar);
         RequestBody.Add('params', ParamsJson);
-        RequestBody.Add('id', IdInt); //TODO: vidi za ovaj broj!!!
+        RequestBody.Add('id', IdInt);
     end;
 
     local procedure CheckForErrors(ResponseJsonPar: JsonObject; RequestJsonPar: Text)

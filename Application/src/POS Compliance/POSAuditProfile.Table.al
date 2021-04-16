@@ -84,8 +84,14 @@ table 6150650 "NPR POS Audit Profile"
             trigger OnLookup()
             var
                 POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+                DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
             begin
                 POSAuditLogMgt.LookupAuditHandler(Rec);
+
+                case "Audit Handler" of
+                    DEAuditMgt.HandlerCode():
+                        Page.Run(Page::"NPR DE Audit Setup");
+                end;
             end;
         }
         field(70; "Allow Zero Amount Sales"; Boolean)
