@@ -724,20 +724,6 @@
                 exit(RecRef.Field(102).Value);
             DATABASE::"Sales Header":
                 exit(RecRef.Field(6014414).Value);
-            DATABASE::"Sales Shipment Header":
-                exit(RecRef.Field(6014414).Value);
-            DATABASE::"Sales Invoice Header":
-                exit(RecRef.Field(6014414).Value);
-            DATABASE::"Sales Cr.Memo Header":
-                exit(RecRef.Field(6014414).Value);
-            DATABASE::"Purch. Cr. Memo Hdr.":
-                exit(RecRef.Field(6014414).Value);
-            DATABASE::"Purchase Header":
-                exit(RecRef.Field(6014414).Value);
-            DATABASE::"Purch. Inv. Header":
-                exit(RecRef.Field(6014414).Value);
-            DATABASE::"Purch. Rcpt. Header":
-                exit(RecRef.Field(6014414).Value);
             DATABASE::"Service Header":
                 exit(RecRef.Field(5916).Value);
             DATABASE::"Service Invoice Header":

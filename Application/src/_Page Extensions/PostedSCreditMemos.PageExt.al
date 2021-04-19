@@ -37,26 +37,5 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
                 }
             }
         }
-        addafter(ActivityLog)
-        {
-            group("NPR PDF2NAV")
-            {
-                Caption = 'PDF2NAV';
-                action("NPR EmailLog")
-                {
-                    Caption = 'E-mail Log';
-                    Image = Email;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the E-mail Log action';
-                }
-                action("NPR SendAsPDF")
-                {
-                    Caption = 'Send as PDF';
-                    Image = SendEmailPDF;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Send as PDF action';
-                }
-            }
-        }
     }
 }
