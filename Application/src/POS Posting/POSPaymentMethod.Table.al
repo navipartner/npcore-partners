@@ -121,12 +121,12 @@ table 6150616 "NPR POS Payment Method"
         }
         field(54; "Maximum Amount"; Decimal)
         {
-            Caption = 'Max amount';
+            Caption = 'Max Amount';
             DataClassification = CustomerContent;
         }
         field(55; "Minimum Amount"; Decimal)
         {
-            Caption = 'Min amount';
+            Caption = 'Min Amount';
             DataClassification = CustomerContent;
         }
         field(60; "Return Payment Method Code"; Code[10])
@@ -137,7 +137,7 @@ table 6150616 "NPR POS Payment Method"
         }
         field(68; "Forced Amount"; Boolean)
         {
-            Caption = 'Forced amount';
+            Caption = 'Forced Amount';
             DataClassification = CustomerContent;
         }
         field(75; "Match Sales Amount"; Boolean)
