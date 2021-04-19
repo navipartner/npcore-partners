@@ -1,6 +1,5 @@
 page 6014416 "NPR Pakke Foreign Shipm. Map."
 {
-    // NPR5.51/BHR /20190719 CASE 362106 Pakkelabels Foreign shipment mapping
 
     Caption = 'Pakke Foreign Shipment Mapping';
     PageType = List;

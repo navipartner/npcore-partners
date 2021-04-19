@@ -1,7 +1,7 @@
-table 6014471 "NPR Pacsoft Package Code"
+table 6014587 "NPR Package Code"
 {
 
-    Caption = 'Pacsoft Package Codes';
+    Caption = 'NPR Package Codes';
     DrillDownPageID = "NPR Pacsoft Package Codes";
     LookupPageID = "NPR Pacsoft Package Codes";
     DataClassification = CustomerContent;
@@ -18,12 +18,22 @@ table 6014471 "NPR Pacsoft Package Code"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-
+        field(3; "Shipping Agent Code"; Code[10])
+        {
+            Caption = 'Shipping Agent Code';
+            TableRelation = "Shipping Agent".Code;
+            DataClassification = CustomerContent;
+        }
+        field(4; Id; Integer)
+        {
+            Caption = 'ID';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
-        key(Key1; "Code")
+        key(Key1; "Shipping Agent Code", "Code")
         {
         }
     }

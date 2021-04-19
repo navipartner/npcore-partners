@@ -1,17 +1,5 @@
 page 6014574 "NPR Pacsoft Setup"
 {
-    // PS1.00/LS/20140509  CASE 190533 Pacsoft module Creation of Page
-    // PS1.01/LS/20141216  CASE 200974 Added fields "Create Pacsoft Document" & Create Shipping Services Line
-    // NPR5.00/RA/20160426  CASE 237639 Added field "Use Consignor"
-    // NPR5.26/BHR/20160921 CASE 248912 Fields for pakkelabels
-    // NPR5.29/BHR/20160921 CASE 248684 Field 'default weight' for pakkelabels
-    // NPR5.36/BHR/20170711 CASE 283061 Add field "Use Pakkelable Printer API"
-    // NPR5.36/BHR/20170920 CASE 290780 Field 'Send Delivery Instructions',  test connection to pakkelabels., check available balance
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
-    // NPR5.43/BHR/20180517 CASE 314692 Add field "Skip Pakkelabel Agreement"
-    // NPR5.43/NPKNAV/20180629  CASE 304453 Transport NPR5.43 - 29 June 2018
-    // NPR5.45/BHR /20180831 CASE 326205 Add field "Order No. to Ref." to Pakkelabel Tab
-
     Caption = 'Pacsoft Setup';
     PageType = Card;
     SourceTable = "NPR Pacsoft Setup";
@@ -43,13 +31,11 @@ page 6014574 "NPR Pacsoft Setup"
                     var
                         TempAllObjWithCaption: Record AllObjWithCaption temporary;
                     begin
-                        //-NPR5.29 [248912]
                         GetPackageProvider(TempAllObjWithCaption);
                         if PAGE.RunModal(PAGE::"All Objects with Caption", TempAllObjWithCaption) = ACTION::LookupOK then begin
                             Rec."Package Service Codeunit ID" := TempAllObjWithCaption."Object ID";
                             Rec."Package ServiceCodeunit Name" := TempAllObjWithCaption."Object Name";
                         end;
-                        //-NPR5.29 [248912]
                     end;
                 }
                 field("Package ServiceCodeunit Name"; Rec."Package ServiceCodeunit Name")
@@ -204,10 +190,6 @@ page 6014574 "NPR Pacsoft Setup"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Test Connection action';
 
-                trigger OnAction()
-                begin
-                    //-290780 [290780]
-                end;
             }
             action("Check Balance")
             {
@@ -216,10 +198,27 @@ page 6014574 "NPR Pacsoft Setup"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Check Balance action';
 
-                trigger OnAction()
-                begin
-                    //-290780 [290780]
-                end;
+            }
+            action("Shipment Mapping(Foreign Countries)")
+            {
+                Image = FiledOverview;
+                Caption = 'Mapping(Foreign Countries)';
+                RunObject = Page "NPR Pakke Foreign Shipm. Map.";
+                ApplicationArea = All;
+            }
+            action("Pakkelabels Printers")
+            {
+                Image = PrintInstallment;
+                Caption = 'Printer';
+                RunObject = Page "NPR Package Printers";
+                ApplicationArea = All;
+            }
+            action("Pakkelabels Shipping Agent")
+            {
+                Image = ServiceCode;
+                Caption = 'Shipping Agents';
+                RunObject = Page "NPR Package Shipping agents";
+                ApplicationArea = All;
             }
         }
     }
@@ -227,7 +226,7 @@ page 6014574 "NPR Pacsoft Setup"
     [IntegrationEvent(TRUE, FALSE)]
     procedure GetPackageProvider(var tmpAllObjWithCaption: Record AllObjWithCaption temporary)
     begin
-        //-NPR5.29 [248912]
+
     end;
 }
 

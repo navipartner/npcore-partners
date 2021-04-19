@@ -1,10 +1,5 @@
 page 6014486 "NPR Pacsoft Shipment Document"
 {
-    // PS1.00/LS/20140509  CASE 190533 Pacsoft module Creation of Page
-    // PS1.02/RA/20150121  CASE 190533 Added field "Document Source" and "Document Name"
-    // NPR5.29/BHR/20161209 CASE 258936 Set field None Editable
-    // NPR5.43/BHR/20180508 CASE 304453 Added Return label fields
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
 
     Caption = 'Pacsoft Shipment Document';
     DeleteAllowed = false;

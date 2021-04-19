@@ -1,9 +1,9 @@
-page 6014415 "NPR Pacsoft Package Codes"
+page 6014570 "NPR Package Codes"
 {
 
-    Caption = 'Pacsoft Package Codes';
-    PageType = Worksheet;
-    SourceTable = "NPR Pacsoft Package Code";
+    Caption = 'Package Codes';
+    PageType = ListPart;
+    SourceTable = "NPR Package Code";
     UsageCategory = Lists;
     ApplicationArea = All;
 
@@ -13,10 +13,15 @@ page 6014415 "NPR Pacsoft Package Codes"
         {
             repeater(Group)
             {
+
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
+                }
+                field(Id; Rec.Id)
+                {
+                    ApplicationArea = All;
                 }
                 field(Description; Rec.Description)
                 {
@@ -27,8 +32,5 @@ page 6014415 "NPR Pacsoft Package Codes"
         }
     }
 
-    actions
-    {
-    }
 }
 

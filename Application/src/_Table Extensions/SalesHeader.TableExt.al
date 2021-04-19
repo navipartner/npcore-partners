@@ -56,6 +56,12 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             Description = 'PS1.00';
         }
+        field(6014421; "NPR Package Code"; Code[20])
+        {
+            Caption = 'Package Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Package Code".Code;
+        }
         field(6014425; "NPR Order Type"; Option)
         {
             Caption = 'Order Type';
