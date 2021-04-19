@@ -592,12 +592,11 @@ table 6150701 "NPR POS Menu Button"
     end;
 
     procedure FilterSubtree(MenuButton: Record "NPR POS Menu Button"; IncludingThis: Boolean)
-    var
-        This: Text;
     begin
         if IncludingThis then
-            This := MenuButton.Path + '|';
-        Rec.SetFilter(Path, StrSubstNo('%2%1.*', MenuButton.Path, This));
+            Rec.SetFilter(Path, '%1|%2', MenuButton.Path, MenuButton.Path + '.*')
+        else
+            Rec.SetFilter(Path, '%1', MenuButton.Path)
     end;
 
     procedure IndentAllowed(): Boolean
