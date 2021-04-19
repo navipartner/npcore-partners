@@ -99,7 +99,7 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Forced Amount"; Rec."Forced Amount")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies which amount is forced when using selected POS Payment Method in transaction.';
+                    ToolTip = 'Specifies if amount is forced when using selected POS Payment Method in transaction or you can enter the amount yourself. Works on POS Payment Methods type EFT.';
                 }
                 field("Match Sales Amount"; Rec."Match Sales Amount")
                 {
