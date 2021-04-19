@@ -100,10 +100,13 @@ report 6014439 "NPR Item Sales Postings"
                 ValueEntry.SetFilter("Posting Date", GetFilter("Posting Date"));
                 ValueEntry.SetFilter("Salespers./Purch. Code", GetFilter("Salespers./Purch. Code"));
                 ValueEntry.SetRange("Item No.", AuxItemLedgerEntry."Item No.");
-                ValueEntry.CalcSums("Invoiced Quantity", "Sales Amount (Actual)", "Cost Amount (Actual)");
+                ValueEntry.CalcSums("Invoiced Quantity", "Sales Amount (Actual)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)");
                 ItemSalesQty := -ValueEntry."Invoiced Quantity";
                 ItemSalesAmount := ValueEntry."Sales Amount (Actual)";
-                ItemCOG := -ValueEntry."Cost Amount (Actual)";
+                if Item.Type = Item.Type::Service then
+                    ItemCOG := -ValueEntry."Cost Amount (Non-Invtbl.)"
+                else
+                    ItemCOG := -ValueEntry."Cost Amount (Actual)";
                 Profit := ItemSalesAmount - ItemCOG;
                 if ItemSalesAmount <> 0 then
                     ItemProfitPct := Round(Profit / ItemSalesAmount * 100, 0.1)
