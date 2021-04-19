@@ -1,6 +1,5 @@
 table 6014470 "NPR Pacsoft Shipm. Doc. Serv."
 {
-    // PS1.00/LS/20141201  CASE 200150 Pacsoft Module
 
     Caption = 'Pacsoft Shipment Document Services';
     DataClassification = CustomerContent;

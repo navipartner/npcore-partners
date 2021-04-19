@@ -1,24 +1,5 @@
 table 6014452 "NPR Pacsoft Shipment Document"
 {
-    // PS1.00/LS/20140509  CASE 190533 Settings taken from table 6014469 as setup
-    // PS1.01/LS/20141216  CASE 200974 : If the setup "Create Shipping Services Line" is checked and ShippingAgentServices is not default
-    //                                    then create a shipping Line
-    // PS1.02/RA/20150121   CASE 190533 Added field 800 and 801
-    // PS1.03/RA/20160809  CASE 228449
-    //   Renamed field 800 from "Document Source" to "Request XML"
-    //   Renamed field 801 from "Document Name" to "Request XML Name"
-    //   Added fields 802 and 803
-    // NPR5.26/BHR/20160831 CASE 248912 Add fields 850.. for pakkelabel
-    // NPR5.29/BHR/20160929 CASE 248684
-    //                                  fill Parcel Qty
-    //                                  Added field 6014455 Pick up point
-    //                                  Function moved to codeunit 6014490
-    // NPR5.34/BHR/20170703 CASE 282595 Correct Bug related to 'Ship-to Code'
-    // NPR5.36/BHR/20170926 CASE 290780 Add field "delivery Instructions", "External Document No.", "Your reference"
-    // NPR5.43/BHR/20180805 CASE 304453 Add field "Print Return Label"
-    // NPR5.45/BHR /20180831 CASE 326205 Add field Change caption For return Labels
-    // NPR5.51/BHR /20190716 CASE 361583 Add Track and Trace functionality for packkelabels
-
     Caption = 'Pacsoft Shipment Document';
     DrillDownPageID = "NPR Pacsoft Shipment Documents";
     LookupPageID = "NPR Pacsoft Shipment Documents";
@@ -56,6 +37,16 @@ table 6014452 "NPR Pacsoft Shipment Document"
             Caption = 'RecordID';
             DataClassification = CustomerContent;
         }
+        field(20; "Document Type"; Option)
+        {
+            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order","Posted Shipment","Posted Invoice";
+            DataClassification = CustomerContent;
+        }
+        field(21; "Document No."; Code[20])
+        {
+            Caption = 'Document No.';
+            DataClassification = CustomerContent;
+        }
         field(100; "Creation Time"; DateTime)
         {
             Caption = 'Creation Time';
@@ -64,6 +55,27 @@ table 6014452 "NPR Pacsoft Shipment Document"
         field(101; "Export Time"; DateTime)
         {
             Caption = 'Export Time';
+            DataClassification = CustomerContent;
+        }
+        Field(102; "User ID"; text[100])
+        {
+            TableRelation = user."User Security ID";
+            Caption = 'User ID';
+            DataClassification = CustomerContent;
+        }
+
+        field(7; "User Name"; text[100])
+        {
+            Caption = 'User Name';
+            FieldClass = FlowField;
+            CalcFormula = lookup(user."User Name" where("user security ID" = field("user ID")));
+
+        }
+
+        Field(103; "Location Code"; code[20])
+        {
+            Caption = 'Location';
+            TableRelation = Location;
             DataClassification = CustomerContent;
         }
         field(200; Status; Text[10])
@@ -176,10 +188,10 @@ table 6014452 "NPR Pacsoft Shipment Document"
                     DeleteShippingAgentServices(Rec, true);
             end;
         }
-        field(401; "Package Code"; Code[10])
+        field(401; "Package Code"; Code[20])
         {
             Caption = 'Package Code';
-            TableRelation = "NPR Pacsoft Package Code";
+            TableRelation = "NPR Pacsoft Package Code".Code;
             DataClassification = CustomerContent;
         }
         field(402; Reference; Text[35])
@@ -246,11 +258,8 @@ table 6014452 "NPR Pacsoft Shipment Document"
 
             trigger OnValidate()
             begin
-                //-248684 [248684]
-                //"Parcel Weight" := 0;
                 if "Parcel Qty." <> 0 then
                     "Parcel Weight" := "Total Weight" / "Parcel Qty.";
-                //+248684 [248684]
             end;
         }
         field(410; Marking; Text[30])
@@ -542,24 +551,16 @@ table 6014452 "NPR Pacsoft Shipment Document"
                     RecRef.SetTable(SalesHeader);
                     if SalesHeader.Find() then begin
                         Customer.Get(SalesHeader."Sell-to Customer No.");
-                        //-PS1.01
                         ShippingAgentServicesCode := SalesHeader."Shipping Agent Service Code";
-                        //+PS1.01
 
                         Clear(ShipToAddress);
                         if not ShipToAddress.Get(SalesHeader."Sell-to Customer No.", SalesHeader."Ship-to Code") then begin
-                            //-NPR5.34 [282595]
-                            //"Ship-to Code" := "Sell-to Customer No.";
-                            //+NPR5.34 [282595]
                             ShipToAddress."Phone No." := Customer."Phone No.";
                             ShipToAddress."Fax No." := Customer."Fax No.";
                             ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
 
-                        //-NPR5.34 [282595]
-                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
                         ShipmentDocument."Receiver ID" := SalesHeader."Sell-to Customer No.";
-                        //+NPR5.34 [282595]
                         ShipmentDocument.Name := SalesHeader."Ship-to Name";
                         ShipmentDocument.Address := SalesHeader."Ship-to Address";
                         ShipmentDocument."Address 2" := SalesHeader."Ship-to Address 2";
@@ -609,24 +610,16 @@ table 6014452 "NPR Pacsoft Shipment Document"
                     RecRef.SetTable(SalesShipmentHeader);
                     if SalesShipmentHeader.Find() then begin
                         Customer.Get(SalesShipmentHeader."Sell-to Customer No.");
-                        //-PS1.01
                         ShippingAgentServicesCode := SalesShipmentHeader."Shipping Agent Service Code";
-                        //+PS1.01
 
                         Clear(ShipToAddress);
                         if not ShipToAddress.Get(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code") then begin
-                            //-NPR5.34 [282595]
-                            //"Ship-to Code" := "Sell-to Customer No.";
-                            //+NPR5.34 [282595]
                             ShipToAddress."Phone No." := Customer."Phone No.";
                             ShipToAddress."Fax No." := Customer."Fax No.";
                             ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
-
-                        //-NPR5.34 [282595]
-                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
                         ShipmentDocument."Receiver ID" := SalesShipmentHeader."Sell-to Customer No.";
-                        //+NPR5.34 [282595]
+
                         ShipmentDocument.Name := SalesShipmentHeader."Ship-to Name";
                         ShipmentDocument.Address := SalesShipmentHeader."Ship-to Address";
                         ShipmentDocument."Address 2" := SalesShipmentHeader."Ship-to Address 2";
@@ -675,24 +668,18 @@ table 6014452 "NPR Pacsoft Shipment Document"
                     RecRef.SetTable(SalesInvoiceHeader);
                     if SalesInvoiceHeader.Find() then begin
                         Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
-                        //-PS1.01
+
                         ShippingAgentServicesCode := SalesInvoiceHeader."NPR Ship. Agent Serv. Code";
-                        //+PS1.01
 
                         Clear(ShipToAddress);
                         if not ShipToAddress.Get(SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."Ship-to Code") then begin
-                            //-NPR5.34 [282595]
-                            //"Ship-to Code" := "Sell-to Customer No.";
-                            //+NPR5.34 [282595]
+
                             ShipToAddress."Phone No." := Customer."Phone No.";
                             ShipToAddress."Fax No." := Customer."Fax No.";
                             ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
 
-                        //-NPR5.34 [282595]
-                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
                         ShipmentDocument."Receiver ID" := SalesInvoiceHeader."Sell-to Customer No.";
-                        //+NPR5.34 [282595]
                         ShipmentDocument.Name := SalesInvoiceHeader."Ship-to Name";
                         ShipmentDocument.Address := SalesInvoiceHeader."Ship-to Address";
                         ShipmentDocument."Address 2" := SalesInvoiceHeader."Ship-to Address 2";
@@ -719,18 +706,11 @@ table 6014452 "NPR Pacsoft Shipment Document"
 
                         Clear(ShipToAddress);
                         if not ShipToAddress.Get(SalesCrMemoHeader."Sell-to Customer No.", SalesCrMemoHeader."Ship-to Code") then begin
-                            //-NPR5.34 [282595]
-                            //"Ship-to Code" := "Sell-to Customer No.";
-                            //+NPR5.34 [282595]
                             ShipToAddress."Phone No." := Customer."Phone No.";
                             ShipToAddress."Fax No." := Customer."Fax No.";
                             ShipToAddress."E-Mail" := Customer."E-Mail";
                         end;
-
-                        //-NPR5.34 [282595]
-                        //ShipmentDocument."Receiver ID" := "Ship-to Code";
                         ShipmentDocument."Receiver ID" := SalesCrMemoHeader."Sell-to Customer No.";
-                        //+NPR5.34 [282595]
                         ShipmentDocument.Name := SalesCrMemoHeader."Ship-to Name";
                         ShipmentDocument.Address := SalesCrMemoHeader."Ship-to Address";
                         ShipmentDocument."Address 2" := SalesCrMemoHeader."Ship-to Address 2";
@@ -839,7 +819,6 @@ table 6014452 "NPR Pacsoft Shipment Document"
                     ShipmentDocServices.Validate("Shipping Agent Service Code", ShippingAgentServices.Code);
                     ShipmentDocServices.Insert(true);
                 until ShippingAgentServices.Next() = 0;
-                //-PS1.01
             end
             else begin
                 if (ShippingAgentServicesCode <> '') and (PacsoftSetup."Create Shipping Services Line") then begin
@@ -858,22 +837,19 @@ table 6014452 "NPR Pacsoft Shipment Document"
                         until ShippingAgentServices.Next() = 0;
                 end;
             end;
-            //+PS1.01
         end;
 
         if ShipmentDocument."Delivery Location" <> '' then
             if ShippingAgentServices.Get(ShipmentDocument."Shipping Agent Code", 'PUPOPT') then begin
-                //-228449
-                if not ShipmentDocServices.Get(ShipmentDocument."Entry No.", ShippingAgentServices."Shipping Agent Code", ShippingAgentServices.Code) then begin //-228449
-                                                                                                                                                                 //+228449
+                if not ShipmentDocServices.Get(ShipmentDocument."Entry No.", ShippingAgentServices."Shipping Agent Code", ShippingAgentServices.Code) then begin
+
                     Clear(ShipmentDocServices);
                     ShipmentDocServices.Validate("Entry No.", ShipmentDocument."Entry No.");
                     ShipmentDocServices.Validate("Shipping Agent Code", ShippingAgentServices."Shipping Agent Code");
                     ShipmentDocServices.Validate("Shipping Agent Service Code", ShippingAgentServices.Code);
                     ShipmentDocServices.Insert(true);
-                    //-228449
                 end;
-                //+228449
+
             end;
 
         if ShowWindow then begin
@@ -941,11 +917,9 @@ table 6014452 "NPR Pacsoft Shipment Document"
         pShipmentDocument.TestField("Shipping Agent Code");
         ShippingAgent.Get(pShipmentDocument."Shipping Agent Code");
         ShippingAgent.TestField("Internet Address");
-        //-NPR5.51 [361583]
         if pShipmentDocument."Response Package No." <> '' then
             TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", pShipmentDocument."Response Package No.")
         else
-            //+NPR5.51 [361583]
             TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", PacsoftSetup.User, pShipmentDocument."Entry No.");
         HyperLink(TrackingInternetAddr);
     end;
