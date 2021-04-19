@@ -1,38 +1,5 @@
 page 6151504 "NPR Nc Import List"
 {
-    // NC1.00 /MHA /20150113  CASE 199932 Refactored object from Web Integration
-    // NC1.01 /MHA /20150201  CASE 199932 Updated Layout and added functions:
-    //                                    SetPresetFilters(): Sets easy-to-use Preset Filters
-    //                                    CreateGambitCase(): Create Case
-    // NC1.02 /MHA /20150202  CASE 199932 Created Action-functions.
-    //                                    Added XmlValidation to EditXml().
-    // NC1.04 /MHA /20150206  CASE 206395 Add functionality for RunPageSalesInvoice().
-    // NC1.04 /TS  /20150212  CASE 201682 Add Change Caption Show Exported to Show Imported
-    // NC1.05 /MHA /20150223  CASE 206395 Update Action Image
-    // NC1.08 /MHA /20150310  CASE 206395 Replaced Automation Windows Script Host with .NET System.Diagnostics.Process for launching Applications
-    // NC1.14 /MHA /20150429  CASE 212845 Changed PageType from List to ListPlus and implemented WebClient functions
-    // NC1.16 /TS  /20150424  CASE 212103 Replaced references to hardcode Import Codeunit with NaviConnect Setup Import Codeunits
-    // NC1.17 /TS  /20150424  CASE 213378 Error Log for Import Contacts
-    // NC1.17 /MHA /20150623  CASE 215533 Moved import code to codeunit and added GetReturnDocuments()
-    // NC1.18 /MHA /20150709  CASE 218282 Sync. Mgt. is invoke for import instead of import mgt.
-    // NC1.21 /TTH /20151118  CASE 227358 Replacing Type option field with Import type, Added the import types to the list, removed old import type
-    // NC1.22 /MHA /20151202  CASE 227358 Added field 110 "Webservice Function"
-    // NC1.22 /TSA /20151207  CASE 228983 Added field 30,35 with visibility false
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01 /MHA /20160913  CASE 252048 Updated NC2.00 TableRelation for FilterImportType
-    // NC2.02 /MHA /20170227  CASE 262318 Added fields 15 "Last Error E-mail Sent at" and 17 "Last Error E-mail Sent to"
-    // NC2.08 /MHA /20171121  CASE 297159 Added function AddFile()
-    // NC2.08 /TS  /20180108  CASE 300893 Removed Caption on Control Container
-    // NC2.12/MHA /20180418  CASE 308107 Deleted function ShowXml() and added ShowDocumentSource() to enable multiple file types
-    // NC2.16/MHA /20180907  CASE 313184 Added fields 40,45,50 for diagnostics
-    // NC2.17/JDH /20181112 CASE 334163 Added Caption to Action Add File
-    // NC2.23/ZESO/20190819  CASE 360787 Added Export File and Import File for Web Client
-    // NC2.23/MHA /20190927  CASE 369170 Removed Gambit integration
-    // NC2.24/MHA /20191108  CASE 373525 Changed extension filter for Import File to reflect "Document Name"
-    // NPR5.54/CLVA/20200127 CASE 366790 Added function ShowFormattedDocumentSource
-    // NPR5.55/CLVA/20200506 CASE 366790 Changed error handling. Added function ShowFormattedDocByDocNo
-    // NPR5.55/MHA /20200604  CASE 408100 Reworked layout for better Web Client experience
-
     Caption = 'Import List';
     DelayedInsert = true;
     PageType = List;
@@ -45,6 +12,7 @@ page 6151504 "NPR Nc Import List"
 
     layout
     {
+
         area(content)
         {
             repeater(Control6150613)
@@ -102,9 +70,7 @@ page 6151504 "NPR Nc Import List"
                     var
                         NcImportMgt: Codeunit "NPR Nc Import Mgt.";
                     begin
-                        //-NPR5.55 [408100]
                         Message(NcImportMgt.GetErrorMessage(Rec, false));
-                        //+NPR5.55 [408100]
                     end;
                 }
                 field("Last Error E-mail Sent at"; Rec."Last Error E-mail Sent at")
@@ -169,6 +135,7 @@ page 6151504 "NPR Nc Import List"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
+
             }
             group(Control6014407)
             {
@@ -203,6 +170,7 @@ page 6151504 "NPR Nc Import List"
                 trigger OnAction()
                 begin
                     ImportSelected();
+
                 end;
             }
             action("Filter Imported")
@@ -254,9 +222,7 @@ page 6151504 "NPR Nc Import List"
 
                 trigger OnAction()
                 begin
-                    //-NC2.08 [297159]
                     AddFile();
-                    //+NC2.08 [297159]
                 end;
             }
             action("Show Document Source")
@@ -271,10 +237,7 @@ page 6151504 "NPR Nc Import List"
 
                 trigger OnAction()
                 begin
-                    //-NC2.12 [308107]
-                    //ShowXml();
                     ShowDocumentSource();
-                    //+NC2.12 [308107]
                 end;
             }
             action("Show Formatted Source")
@@ -289,9 +252,7 @@ page 6151504 "NPR Nc Import List"
 
                 trigger OnAction()
                 begin
-                    //-NPR5.54 [366790]
-                    ShowFormattedDocumentSource();
-                    //+NPR5.54 [366790]
+                    ShowFormattedDocument();
                 end;
             }
             action("Edit File")
@@ -306,9 +267,7 @@ page 6151504 "NPR Nc Import List"
 
                 trigger OnAction()
                 begin
-                    //-NC2.24 [373525]
                     EditFile();
-                    //+NC2.24 [373525]
                 end;
             }
             action("Export File")
@@ -327,13 +286,11 @@ page 6151504 "NPR Nc Import List"
                     FileMgt: Codeunit "File Management";
                     Path: Text;
                 begin
-                    //-NC2.23 [360787]
                     Rec.CalcFields("Document Source");
                     TempBlob.FromRecord(Rec, Rec.FieldNo("Document Source"));
                     if not TempBlob.HasValue() then
                         exit;
                     Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + Rec."Document Name", true);
-                    //+NC2.23 [360787]
                 end;
             }
             action("Import File")
@@ -354,14 +311,11 @@ page 6151504 "NPR Nc Import List"
                     Extension: Text;
                     RecRef: RecordRef;
                 begin
-                    //-NC2.23 [360787]
-                    //-NC2.24 [373525]
                     //FileName := FileMgt.BLOBImportWithFilter(TempBlob,'Import Layout','',FileFilterTxt,FileFilterTxt);
                     Extension := FileMgt.GetExtension(Rec."Document Name");
                     if Extension = '' then
                         Extension := '*';
                     FileName := FileMgt.BLOBImportWithFilter(TempBlob, Text005, Rec."Document Name", FileMgt.GetToFilterText('', Rec."Document Name"), '*.' + Extension);
-                    //+NC2.24 [373525]
                     if FileName = '' then
                         exit;
 
@@ -371,7 +325,6 @@ page 6151504 "NPR Nc Import List"
 
                     Rec.Modify(true);
                     Clear(TempBlob);
-                    //+NC2.23 [360787]
                 end;
             }
         }
@@ -398,14 +351,9 @@ page 6151504 "NPR Nc Import List"
 
     trigger OnOpenPage()
     begin
-        //-NPR5.55 [408100]
         Rec.SetRange(Imported, false);
         if Rec.FindFirst() then;
-        //+NPR5.55 [408100]
-
-        //-NC1.14
         WebClient := IsWebClient();
-        //+NC1.14
     end;
 
     var
@@ -425,7 +373,6 @@ page 6151504 "NPR Nc Import List"
         Filename: Text;
         RecRef: RecordRef;
     begin
-        //-NC2.08 [297159]
         Filename := FileMgt.BLOBImport(TempBlob, '*.*');
         if Filename = '' then
             exit;
@@ -443,7 +390,6 @@ page 6151504 "NPR Nc Import List"
         Rec.Date := CurrentDateTime;
         Rec.Insert(true);
         CurrPage.Update(false);
-        //+NC2.08 [297159]
     end;
 
     local procedure IsWebClient(): Boolean
@@ -474,11 +420,9 @@ page 6151504 "NPR Nc Import List"
 
         f.Open(Path);
         f.CreateInStream(InStr);
-        //-NC2.24 [373525]
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStr);
         CopyStream(OutStr, InStr);
-        //+NC2.24 [373525]
         f.Close();
         Erase(Path);
 
@@ -494,24 +438,18 @@ page 6151504 "NPR Nc Import List"
         ImportEntry: Record "NPR Nc Import Entry";
         ImportedCount: Integer;
     begin
-        //-NC1.21
         ImportedCount := 0;
         CurrPage.SetSelectionFilter(ImportEntry);
-        //-NPR5.55 [408100]
         ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
         Commit();
-        //+NPR5.55 [408100]
         if ImportEntry.FindSet() then
             repeat
-                //-NPR5.55 [408100]
                 CODEUNIT.Run(CODEUNIT::"NPR Nc Import Processor", ImportEntry);
-                //+NPR5.55 [408100]
                 ImportEntry.Get(ImportEntry."Entry No.");
                 ImportedCount += 1;
             until ImportEntry.Next() = 0;
         ImportEntry.SetRange("Runtime Error", true);
         Message(StrSubstNo(Text004, ImportedCount, ImportEntry.Count));
-        //+NC1.21
     end;
 
     local procedure RescheduleSelectedforImport()
@@ -521,19 +459,15 @@ page 6151504 "NPR Nc Import List"
     begin
         CurrPage.SetSelectionFilter(ImportEntry);
         if Confirm(StrSubstNo(Text002, ImportEntry.Count), true) then begin
-            //-NC2.16 [313184]
             //ImportEntry.MODIFYALL("Runtime Error",FALSE,TRUE);
             ImportEntry.ModifyAll(Imported, false, false);
             ImportEntry.ModifyAll("Runtime Error", false, false);
-            //+NC2.16 [313184]
-            //-NPR5.55 [408100]
             ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
             Commit();
             if ImportEntry.FindSet() then
                 repeat
                     NcImportProcessor.ScheduleImport(ImportEntry);
                 until ImportEntry.Next() = 0;
-            //+NPR5.55 [408100]
             CurrPage.Update(false);
         end;
     end;
@@ -552,18 +486,21 @@ page 6151504 "NPR Nc Import List"
     var
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;
+        tmp: Text;
     begin
-        //-NC2.12 [308107]
         Rec.CalcFields("Document Source");
         if "Document Source".HasValue() then
             if IsWebClient() then begin
                 "Document Source".CreateInStream(InStr);
-                StreamReader := StreamReader.StreamReader(InStr);
-                Content := StreamReader.ReadToEnd();
+                Content := '';
+                while not InStr.EOS()
+                do begin
+                    InStr.ReadText(tmp);
+                    Content += tmp + '\';
+                end;
                 Message(Content);
             end else begin
                 TempBlob.FromRecord(Rec, Rec.FieldNo("Document Source"));
@@ -572,132 +509,44 @@ page 6151504 "NPR Nc Import List"
             end
         else
             Message(Text001);
-        //+NC2.12 [308107]
     end;
 
-    procedure ShowFormattedDocumentSource()
+    procedure ShowFormattedDocument()
     var
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        Path: Text;
         NcImportType: Record "NPR Nc Import Type";
-        XMLStylesheetPath: Text;
-        [RunOnClient]
-        XslCompiledTransform: DotNet NPRNetXslCompiledTransform;
-        LocalTempFile: Text;
-        HtmlContent: Text;
-        ServerFileName: Text;
+        page: Page "NPR Nc Show Html";
+        stream: InStream;
+        xsltv: Text;
+        xmlv: Text;
+        xslt: Text;
+        xml: Text;
     begin
-        //-NPR5.54 [366790]
-        Rec.CalcFields("Document Source");
-        if "Document Source".HasValue() then begin
+        CalcFields("Document Source");
+        if "Document Source".HasValue then begin
 
-            Rec.TestField("Import Type");
-            NcImportType.Get(Rec."Import Type");
-
+            TestField("Import Type");
+            NcImportType.Get("Import Type");
             NcImportType.CalcFields("XML Stylesheet");
-            if not NcImportType."XML Stylesheet".HasValue() then
-                //-NPR5.55 [366790]
-                //ERROR(Text006);
-                Error(Text006, Rec."Import Type");
-            //+NPR5.55 [366790]
+            if not NcImportType."XML Stylesheet".HasValue then
+                ERROR(Text006);
 
-            TempBlob.FromRecord(NcImportType, NcImportType.FieldNo("XML Stylesheet"));
-            XMLStylesheetPath := FileMgt.BLOBExport(TempBlob, 'Stylesheet.xslt', false);
+            NcImportType."XML Stylesheet".CreateInStream(stream, TextEncoding::UTF8);
+            while not stream.EOS do begin
+                stream.ReadText(xsltv);
+                xslt := xslt + xsltv
+            end;
 
-            XslCompiledTransform := XslCompiledTransform.XslCompiledTransform;
-            XslCompiledTransform.Load(XMLStylesheetPath);
-
-            LocalTempFile := FileMgt.ClientTempFileName('html');
-
-            TempBlob.FromRecord(Rec, Rec.FieldNo("Document Source"));
-            Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + Rec."Document Name", false);
-
-            XslCompiledTransform.Transform(Path, LocalTempFile);
-
-            ServerFileName := FileMgt.UploadFileSilent(LocalTempFile);
-
-            HtmlContent := GetFormattedDocumentAsString(ServerFileName, true);
-            PreviewFormattedDocument(Rec."Document Name", HtmlContent);
+            Rec."Document Source".CreateInStream(stream, TextEncoding::UTF8);
+            stream.ReadText(xml);
+            while not stream.EOS do begin
+                stream.ReadText(xmlv);
+                xml := xml + xmlv
+            end;
+            page.SetData(xslt, xml);
+            page.Run();
 
         end else
             Message(Text001);
-        //+NPR5.54 [366790]
-    end;
-
-    local procedure GetFormattedDocumentAsString(FileName: Text; DeleteFile: Boolean) String: Text
-    var
-        TempFile: File;
-        Istream: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        Encoding: DotNet NPRNetEncoding;
-    begin
-        //-NPR5.54 [366790]
-        if Exists(FileName) then begin
-            TempFile.Open(FileName);
-            TempFile.CreateInStream(Istream);
-
-            StreamReader := StreamReader.StreamReader(Istream, Encoding.Unicode);
-            String := StreamReader.ReadToEnd();
-            TempFile.Close();
-
-            if DeleteFile then
-                FILE.Erase(FileName);
-
-            exit(String);
-        end;
-        //+NPR5.54 [366790]
-    end;
-
-    local procedure PreviewFormattedDocument(Title: Text; Content: Text)
-    var
-        [RunOnClient]
-        WinForm: DotNet NPRNetForm;
-        [RunOnClient]
-        WinText: DotNet NPRNetTextBox;
-        [RunOnClient]
-        Colour: DotNet NPRNetColor;
-        [RunOnClient]
-        DockStyle: DotNet NPRNetDockStyle;
-        [RunOnClient]
-        WebBrowser: DotNet NPRNetWebBrowser;
-        [RunOnClient]
-        FormWindowState: DotNet NPRNetFormWindowState;
-        ActiveFormAlHelper: Variant;
-    begin
-        //-NPR5.54 [366790]
-        if (Content = '') then
-            exit;
-
-        if CurrentClientType in [CLIENTTYPE::Tablet, CLIENTTYPE::Web, CLIENTTYPE::Phone] then begin
-            Message('Brigde framework is missing\Please use the RTC client for previewing');
-        end else begin
-            WinForm := WinForm.Form;
-            Colour := Colour.Color;
-            WinText := WinText.TextBox;
-            WinForm.Width := 1000;
-            WinForm.Height := 600;
-            ActiveFormAlHelper := WinForm.ActiveForm;
-            WinForm.Text := Title;
-            WinForm.WindowState := FormWindowState.Normal;
-            WinForm.ShowInTaskbar := false;
-            WinForm.ShowIcon := false;
-
-            WebBrowser := WebBrowser.WebBrowser;
-            WebBrowser.Dock := DockStyle.Fill;
-            WebBrowser.DocumentText := '0';
-            WebBrowser.Document.OpenNew(true);
-            WebBrowser.Document.Write(Content);
-            WebBrowser.Refresh();
-
-            WinForm.Controls.Add(WebBrowser);
-            WinForm.ShowDialog;
-            //-NPR5.55 [366790]
-            WinForm.Dispose();
-            Clear(WinForm);
-            //+NPR5.55 [366790]
-        end;
-        //+NPR5.54 [366790]
     end;
 
     procedure ShowFormattedDocByDocNo(DocNo: Text[100])
@@ -705,7 +554,6 @@ page 6151504 "NPR Nc Import List"
         NcImportEntry: Record "NPR Nc Import Entry";
         NcImportListPg: Page "NPR Nc Import List";
     begin
-        //-NPR5.55 [366790]
         if DocNo = '' then
             Error(Text001);
 
@@ -716,11 +564,10 @@ page 6151504 "NPR Nc Import List"
                 NcImportListPg.RunModal();
             end else begin
                 NcImportListPg.SetRecord(NcImportEntry);
-                NcImportListPg.ShowFormattedDocumentSource();
+                NcImportListPg.ShowFormattedDocument();
             end;
         end else
             Error(Text007, DocNo);
-        //+NPR5.55 [366790]
     end;
 }
 
