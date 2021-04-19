@@ -1,9 +1,13 @@
-pageextension 6014402 "NPR Default Dimensions" extends "Default Dimensions"
+﻿codeunit 6014560 "NPR Item Category Event Subs."
 {
-    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterInsertEvent', '', false, false)]
+    local procedure NPRDefaultDimensionOnAfterInsert(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
     begin
+        if not RunTrigger then
+            exit;
+
         if Rec.IsTemporary() then
             exit;
 
@@ -13,10 +17,15 @@ pageextension 6014402 "NPR Default Dimensions" extends "Default Dimensions"
         ItemCategoryMgt.ApplyDimensionsToChildren(Rec, false, true);
     end;
 
-    trigger OnModifyRecord(): Boolean
+
+    [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterModifyEvent', '', false, false)]
+    local procedure NPRDefaultDimensionOnAfterModify(var Rec: Record "Default Dimension"; var xRec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
     begin
+        if not RunTrigger then
+            exit;
+
         if Rec.IsTemporary() then
             exit;
 
@@ -29,10 +38,14 @@ pageextension 6014402 "NPR Default Dimensions" extends "Default Dimensions"
         ItemCategoryMgt.ApplyDimensionsToChildren(Rec, false, true);
     end;
 
-    trigger OnDeleteRecord(): Boolean
+    [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure NPRDefaultDimensionOnAfterDelete(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
     begin
+        if not RunTrigger then
+            exit;
+
         if Rec.IsTemporary() then
             exit;
 
