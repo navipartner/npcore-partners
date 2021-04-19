@@ -231,6 +231,7 @@
     var
         TaskSetup: Record "NPR Nc Task Setup";
     begin
+        OnBeforeProcessTask(Task);
         TaskReset(Task);
         TaskSetup.SetRange("Task Processor Code", Task."Task Processor Code");
         TaskSetup.SetRange("Table No.", Task."Table No.");
@@ -827,4 +828,11 @@
             Process.WaitForExit();
     end;
     #endregion UI
+
+    #region events
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeProcessTask(var Task: Record "NPR Nc Task")
+    begin
+    end;
+    #endregion events
 }
