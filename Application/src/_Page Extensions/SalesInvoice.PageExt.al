@@ -94,20 +94,6 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 }
             }
         }
-        addafter("Remove From Job Queue")
-        {
-            action("NPR PostAndSendPdf2Nav")
-            {
-                Caption = 'Post and Pdf2Nav';
-                Image = PostSendTo;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category6;
-                PromotedIsBig = true;
-                ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea = All;
-            }
-        }
     }
 
     var

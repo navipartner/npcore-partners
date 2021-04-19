@@ -26,23 +26,6 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
             }
         }
     }
-    actions
-    {
-        addafter(Post)
-        {
-            action("NPR PostAndSendPdf2Nav")
-            {
-                Caption = 'Post and Pdf2Nav';
-                Image = PostSendTo;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea = All;
-            }
-        }
-    }
 
     var
         [InDataSet]

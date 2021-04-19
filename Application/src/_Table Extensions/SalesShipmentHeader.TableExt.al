@@ -13,6 +13,8 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             Caption = 'Bill-to E-mail';
             Description = 'PN1.00';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {
