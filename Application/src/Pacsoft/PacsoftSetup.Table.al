@@ -1,16 +1,5 @@
 table 6014574 "NPR Pacsoft Setup"
 {
-    // PS1.00/LS/20140509  CASE 191871 Creation of Setup table to record Pacsoft settings
-    // PS1.01/LS/20141216  CASE 200974 Added fields 14 & 15
-    // NPR5.26/RA/20160426  CASE 237639 Added field 100 over time pacsoft and consignor modules should be merged
-    // NPR5.26/BHR/20160831 CASE 248912 Add field 150 for module Pakkelabels
-    // NPR5.29/BHR/20160831 CASE 248912 Add field Default Weight for module Pakkelabels
-    // NPR5.34/BHR/20170711 CASE 283061 Add Field "Use Pakkelable Printer API","Pakkelable Test Mode","Order No. to Ext Doc No"
-    // NPR5.36/BHR/20170926 CASE 290780 Add field Send Delivery Instrutions
-    // NPR5.38/BHR/20181101 CASE 290780 Set default weight from gram to decimal
-    // NPR5.43/BHR/20180508 CASE 304453 Add field "Print Return Ticket"
-    // NPR5.43/BHR/20180517 CASE 314692 Add field "Skip Pakkelabel Agreement"
-
     Caption = 'Pacsoft Setup';
     DataClassification = CustomerContent;
 

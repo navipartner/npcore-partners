@@ -1,6 +1,5 @@
 table 6014453 "NPR Pakke Foreign Shipm. Map."
 {
-    // NPR5.51/BHR /20190719 CASE 362106 Pakkelabels foreign shipment method mapping
 
     Caption = 'Pakke Foreign Shipment Mapping';
     DataClassification = CustomerContent;

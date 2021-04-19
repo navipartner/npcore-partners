@@ -42,6 +42,8 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
         ReasonPhrase: Text;
         BalanceMsg: Label 'Balance: %1';
     begin
+        if not InitPackageProvider() then
+            exit;
         Login(Token, Silent);
         if ErrorTextFound <> '' then
             exit;
@@ -63,6 +65,8 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
         Token: Text;
         ReasonPhrase: Text;
     begin
+        if not InitPackageProvider() then
+            exit;
         Login(Token, Silent);
         if ErrorTextFound <> '' then
             exit;
@@ -567,7 +571,7 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
     var
         SalesLine: Record "Sales Line";
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
         if Rec."Shipment Method Code" = '' then exit;
 
@@ -1163,7 +1167,8 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
         Token: Text;
     begin
         Login(Token, false);
-        Message(ConnectionSuccessfulMsg);
+        if Token <> '' then
+            Message(ConnectionSuccessfulMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 6014574, 'OnAfterActionEvent', 'Check Balance', false, false)]
