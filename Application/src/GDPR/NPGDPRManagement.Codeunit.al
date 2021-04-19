@@ -521,7 +521,6 @@
             SalesShipmentHdr."Sell-to Post Code" := '';
             SalesShipmentHdr."Sell-to County" := '';
             SalesShipmentHdr."Sell-to Country/Region Code" := '';
-            SalesShipmentHdr."NPR Bill-to E-mail" := '------@----';
             SalesShipmentHdr.Modify(true);
         until SalesShipmentHdr.Next() = 0;
     end;

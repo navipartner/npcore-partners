@@ -618,17 +618,6 @@ page 6014518 "NPR Sales Order Pick"
                         SalesPostPrint.PostAndEmail(Rec);
                     end;
                 }
-                action(PostAndSendPdf2Nav)
-                {
-                    Caption = 'Post and Pdf2Nav';
-                    Image = PostSendTo;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    ToolTip = 'Post and handle as set up in ''Document Processing''';
-                    ApplicationArea = All;
-                }
                 action("Test Report")
                 {
                     Caption = 'Test Report';
@@ -782,4 +771,3 @@ page 6014518 "NPR Sales Order Pick"
         DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::Order, Rec."No.");
     end;
 }
-

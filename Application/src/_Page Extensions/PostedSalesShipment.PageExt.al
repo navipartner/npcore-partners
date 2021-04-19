@@ -45,14 +45,6 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 ToolTip = 'Specifies the value of the Bill-to Name 2 field';
             }
         }
-        addafter("Bill-to Contact")
-        {
-            field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
-            }
-        }
     }
     actions
     {
@@ -71,24 +63,6 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 begin
                     ConsignorEntry.InsertFromShipmentHeader(Rec."No.");
                 end;
-            }
-            group("NPR PDF2NAV")
-            {
-                Caption = 'PDF2NAV';
-                action("NPR EmailLog")
-                {
-                    Caption = 'E-mail Log';
-                    Image = Email;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the E-mail Log action';
-                }
-                action("NPR SendAsPDF")
-                {
-                    Caption = 'Send as PDF';
-                    Image = SendEmailPDF;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Send as PDF action';
-                }
             }
             group("NPR Pacsoft")
             {

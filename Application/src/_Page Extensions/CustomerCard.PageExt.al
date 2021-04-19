@@ -254,24 +254,6 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     end;
                 }
             }
-            group("NPR PDF2NAV")
-            {
-                Caption = 'PDF2NAV';
-                action("NPR EmailLog")
-                {
-                    Caption = 'E-mail Log';
-                    Image = Email;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the E-mail Log action';
-                }
-                action("NPR SendAsPDF")
-                {
-                    Caption = 'Send Statement as PDF';
-                    Image = SendEmailPDF;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Send Statement as PDF action';
-                }
-            }
         }
         addafter(CustomerReportSelections)
         {

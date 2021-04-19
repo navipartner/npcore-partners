@@ -214,20 +214,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 }
             }
         }
-        addafter(PostAndSend)
-        {
-            action("NPR PostAndSendPdf2Nav")
-            {
-                Caption = 'Post and Pdf2Nav';
-                Image = PostSendTo;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ToolTip = 'Post and handle as set up in ''Document Processing''';
-                ApplicationArea = All;
-            }
-        }
         addafter("Pick Instruction")
         {
             action("NPR Consignor Label")
@@ -262,24 +248,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     RecRef.GetTable(SalesHeader);
                     LabelLibrary.PrintCustomShippingLabel(RecRef, '');
                 end;
-            }
-            group("NPR PDF2NAV")
-            {
-                Caption = 'PDF2NAV';
-                action("NPR EmailLog")
-                {
-                    Caption = 'E-mail Log';
-                    Image = Email;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the E-mail Log action';
-                }
-                action("NPR SendAsPDF")
-                {
-                    Caption = 'Send as PDF';
-                    Image = SendEmailPDF;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Send as PDF action';
-                }
             }
             group("NPR SMS")
             {
