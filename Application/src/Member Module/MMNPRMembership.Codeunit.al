@@ -1,3 +1,4 @@
+#pragma warning disable AA0139
 codeunit 6060147 "NPR MM NPR Membership"
 {
     var
@@ -1023,4 +1024,4 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(DelChr(InText, '<=>', '<>&/'));
     end;
 }
-
+#pragma warning restore
