@@ -533,8 +533,7 @@
           ReservationEntry."Qty. per Unit of Measure",
           0,
           Abs(ReservationEntry."Quantity (Base)"),
-          ReservationEntry."Serial No.",
-          ReservationEntry."Lot No.");
+          ReservationEntry);
         CreateReservEntry.CreateEntry(
           ReservationEntry."Item No.",
           ReservationEntry."Variant Code",
