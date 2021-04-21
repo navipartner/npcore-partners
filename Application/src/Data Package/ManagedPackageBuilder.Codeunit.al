@@ -60,14 +60,16 @@ codeunit 6014629 "NPR Managed Package Builder"
 
     procedure ExportToFile(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer)
     var
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
+        InStm: InStream;
+        OutStm: OutStream;
         FileName: Variant;
+        TempBlob: Codeunit "Temp Blob";
     begin
-        Encoding := Encoding.GetEncoding('utf-8');
-        MemoryStream := MemoryStream.MemoryStream(Encoding.GetBytes(CreateManifest(Name, Version, Description, PrimaryPackageTable)));
+        TempBlob.CreateOutStream(OutStm);
+        OutStm.WriteText(CreateManifest(Name, Version, Description, PrimaryPackageTable));
+        CopyStream(OutStm, InStm);
         FileName := StrSubstNo('%1 Package.json', Name);
-        DownloadFromStream(MemoryStream, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
+        DownloadFromStream(InStm, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
     end;
 
     procedure ExportToBlob(Name: Text; FileVersion: Text; Description: Text; PrimaryPackageTable: Integer; var TempBlobOut: Codeunit "Temp Blob")
