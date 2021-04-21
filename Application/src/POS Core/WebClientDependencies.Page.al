@@ -168,55 +168,62 @@ page 6014659 "NPR Web Client Dependencies"
 
     procedure ConvertImgToDataUri(InStr: InStream; var OutStr: OutStream)
     var
-        Convert: DotNet NPRNetConvert;
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
-        MemStrIn: DotNet NPRNetMemoryStream;
-        MemStrOut: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
         DataUri: Text;
+        i, p : integer;
+        b: Byte;
+        OutStm1: OutStream;
+        OutStm2: OutStream;
+        InStm1: InStream;
+        InStm2: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        Base64Convert: Codeunit "Base64 Convert";
+        ImageFormat: Codeunit "NPR Image Format";
     begin
         DataUri := 'data:image/';
 
-        Rec.CalcFields(BLOB);
-        MemStrIn := MemStrIn.MemoryStream();
-        CopyStream(MemStrIn, InStr);
-        Image := Image.FromStream(MemStrIn);
-        ImageFormat := Image.RawFormat;
-        case true of
-            ImageFormat.Equals(ImageFormat.Gif):
+        //duplicate in-stream for analysis
+        TempBlob.CreateOutStream(OutStm1);
+        TempBlob.CreateOutStream(OutStm2);
+        while not InStr.EOS do begin
+            InStr.Read(b);
+            p := p + 1;
+            if p <= 10 then //image header. 10 bytes in enough.
+                OutStm1.Write(b);
+            OutStm2.Write(b); //original in-stream copy               
+        end;
+        CopyStream(OutStm1, InStm1);
+        CopyStream(OutStm2, InStm2);
+
+        case ImageFormat.GetImageExtensionFromHeader(InStm1) of
+            'gif':
                 DataUri += 'gif';
-            ImageFormat.Equals(ImageFormat.Jpeg):
+            'jpg':
                 DataUri += 'jpg';
-            ImageFormat.Equals(ImageFormat.Png):
+            'png':
                 DataUri += 'png';
+            'jpeg':
+                DataUri += 'jpeg';
             else
                 Error(TextUnsupportedFormat);
         end;
-        DataUri += ';base64,' + Convert.ToBase64String(MemStrIn.ToArray());
-
-        MemStrOut := MemStrOut.MemoryStream(Encoding.UTF8.GetBytes(DataUri));
-        CopyStream(OutStr, MemStrOut);
+        DataUri += ';base64,' + Base64Convert.ToBase64(InStm2);
+        OutStr.WriteText(DataUri);
     end;
 
-    procedure ConvertSVGToDataUri(InStr: InStream; var OutStr: OutStream)
+    procedure ConvertSVGToDataUri(InStm: InStream; var OutStm: OutStream)
     var
-        Convert: DotNet NPRNetConvert;
-        MemStrIn: DotNet NPRNetMemoryStream;
-        MemStrOut: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
         DataUri: Text;
         SVGText: Text;
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
     begin
         DataUri := 'data:image/svg+xml;base64,';
-
         Rec.CalcFields(BLOB);
-        MemStrIn := MemStrIn.MemoryStream();
-        CopyStream(MemStrIn, InStr);
-        SVGText := CheckNamespaces(Encoding.UTF8.GetString(MemStrIn.ToArray()));
-        DataUri += Convert.ToBase64String(Encoding.UTF8.GetBytes(SVGText));
-        MemStrOut := MemStrOut.MemoryStream(Encoding.UTF8.GetBytes(DataUri));
-        CopyStream(OutStr, MemStrOut);
+        InStm.ReadText(SVGText);
+        SVGText := CheckNamespaces(SVGText);
+        DataUri := DataUri + Base64Convert.ToBase64(SVGText);
+        TempBlob.CreateOutStream(OutStm);
+        OutStm.WriteText(DataUri);
     end;
 
     local procedure CheckNamespaces(SVGText: Text): Text
