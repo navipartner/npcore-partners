@@ -1,12 +1,11 @@
 codeunit 6014519 "NPR MobilePayV10 Protocol"
 {
     var
-        AUTH_TOKEN_ERROR: Label 'Could not refresh MobilePay authorization token.\%1';
-        UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_ERROR: Label '%1 isn`t a supported %2 for %3. Only %4 and %5 are supported.';
-        MISSING_JOBQUEUE_ENTRY_CANCEL_DEAD_TRANSACTIONS: Label 'There is a missing Job Queue task to periodically detect and cancel dead (reserved) transactions.';
-        CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION: Label 'Cancel dead (reserved) MobilePay transactions.';
-        CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_PROPMPT: Label 'Do you want to create a Job Queue task to run cancellation of dead reserved MobilePay transactions?';
-        CANCELED_BY_USER_ERROR: Label 'Action canceled by user.';
+        AUTH_TOKEN_Err: Label 'Could not refresh MobilePay authorization token.\%1';
+        UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err: Label '%1 isn`t a supported %2 for %3. Only %4 and %5 are supported.';
+        CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION_Lbl: Label 'Cancel dead (reserved) MobilePay transactions.';
+        CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_Qst: Label 'Do you want to create a Job Queue task to run cancellation of dead reserved MobilePay transactions?';
+        CANCELED_BY_USER_Err: Label 'Action canceled by user.';
         AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         IsRunningOutOfPosSession: Boolean;
 
@@ -372,7 +371,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to poll', mobilePayPollRefundRequest.GetRequestResponse());
                 end;
             else begin
-                    Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_ERROR,
+                    Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
                         procEftTrxRequest."Processing Type",
                         procEftTrxRequest.FieldCaption("Processing Type"),
                         'PollTrxStatus',
@@ -433,7 +432,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelRefund.GetRequestResponse());
                 end;
             else begin
-                    Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_ERROR,
+                    Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
                         procEftTrxRequest."Processing Type",
                         procEftTrxRequest.FieldCaption("Processing Type"),
                         'RequestAbort',
@@ -507,7 +506,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             exit(token);
 
         eftTrxRequest.Find();
-        error(AUTH_TOKEN_ERROR, eftTrxRequest."NST Error");
+        error(AUTH_TOKEN_Err, eftTrxRequest."NST Error");
     end;
 
     internal procedure ExistCancelDeadTransactionsTask(): Boolean
@@ -525,12 +524,12 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         RecId: RecordId;
     begin
         if (WithPrompt) then begin
-            if not Confirm(CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_PROPMPT, true) then
-                Error(CANCELED_BY_USER_ERROR);
+            if not Confirm(CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_Qst, true) then
+                Error(CANCELED_BY_USER_Err);
         end;
 
         JobQueueEntry.Init();
-        JobQueueEntry.Description := CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION;
+        JobQueueEntry.Description := CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION_Lbl;
         JobQueueEntry.Insert(true);
         JobQueueEntry.ScheduleRecurrentJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MobilePayV10 CancelDead", RecId);
         JobQueueEntry.validate("Starting Time", 020000T);
@@ -740,8 +739,8 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         mobilePayFindPaymentReq: Codeunit "NPR MobilePayV10 Find Payment";
         mobilePayFindRefundReq: Codeunit "NPR MobilePayV10 Find Refund";
         originalEftTrxRequest: Record "NPR EFT Transaction Request";
-        MobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary;
-        MobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
+        tempMobilePayV10Payment: Record "NPR MobilePayV10 Payment" temporary;
+        tempMobilePayV10Refund: Record "NPR MobilePayV10 Refund" temporary;
         success: Boolean;
         paymentEftTrxRequest: Record "NPR EFT Transaction Request";
     begin
@@ -750,9 +749,9 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         case originalEftTrxRequest."Processing Type" of
             originalEftTrxRequest."Processing Type"::PAYMENT:
                 begin
-                    MobilePayV10PaymentBuff.Reset();
-                    MobilePayV10PaymentBuff.DeleteAll();
-                    mobilePayFindPaymentReq.SetPaymentDetailBuffer(MobilePayV10PaymentBuff);
+                    tempMobilePayV10Payment.Reset();
+                    tempMobilePayV10Payment.DeleteAll();
+                    mobilePayFindPaymentReq.SetPaymentDetailBuffer(tempMobilePayV10Payment);
 
                     mobilePayFindPaymentReq.SetFilter(StrSubstNo('orderId=%1&posId=%2',
                         format(originalEftTrxRequest."Entry No."),
@@ -763,27 +762,27 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     Commit();
 
                     if (success) then begin
-                        GetPaymentDetails(MobilePayV10PaymentBuff, EftSetup);
+                        GetPaymentDetails(tempMobilePayV10Payment, EftSetup);
                         //SelectLatestVersion();
 
-                        MobilePayV10PaymentBuff.Reset();
-                        //if MobilePayV10PaymentBuff.FindFirst() then;    // temp only to see if the values have been updated
+                        tempMobilePayV10Payment.Reset();
+                        //if tempMobilePayV10Payment.FindFirst() then;    // temp only to see if the values have been updated
                         if (ActiveOnly) then begin
-                            MobilePayV10PaymentBuff.SetFilter(Status, '%1|%2',
-                                MobilePayV10PaymentBuff.Status::Initiated,
-                                MobilePayV10PaymentBuff.Status::IssuedTouser);
+                            tempMobilePayV10Payment.SetFilter(Status, '%1|%2',
+                                tempMobilePayV10Payment.Status::Initiated,
+                                tempMobilePayV10Payment.Status::IssuedTouser);
                         end;
 
                         if (OnlyForOriginalEntryNo) then begin
-                            MobilePayV10PaymentBuff.SetRange(OrderId, Format(originalEftTrxRequest."Entry No."));
+                            tempMobilePayV10Payment.SetRange(OrderId, Format(originalEftTrxRequest."Entry No."));
                         end;
 
                         // There is just one (MobilePayV10 does allow only 1 by definition) active transaction or not:
-                        success := MobilePayV10PaymentBuff.FindFirst();
+                        success := tempMobilePayV10Payment.FindFirst();
 
                         if (success) then begin
                             if (EftTrxRequest."Reference Number Output" = '') then begin
-                                EftTrxRequest."Reference Number Output" := MobilePayV10PaymentBuff.PaymentId;
+                                EftTrxRequest."Reference Number Output" := tempMobilePayV10Payment.PaymentId;
                                 EftTrxRequest.Modify();
                             end;
                         end;
@@ -796,9 +795,9 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     paymentEftTrxRequest.TestField("Processing Type", paymentEftTrxRequest."Processing Type"::PAYMENT);
                     paymentEftTrxRequest.TestField("Reference Number Output");
 
-                    MobilePayV10RefundBuff.Reset();
-                    MobilePayV10RefundBuff.DeleteAll();
-                    mobilePayFindRefundReq.SetRefundDetailBuffer(MobilePayV10RefundBuff);
+                    tempMobilePayV10Refund.Reset();
+                    tempMobilePayV10Refund.DeleteAll();
+                    mobilePayFindRefundReq.SetRefundDetailBuffer(tempMobilePayV10Refund);
 
                     mobilePayFindRefundReq.SetFilter(StrSubstNo('paymentId=%1',
                         paymentEftTrxRequest."Reference Number Output"));
@@ -808,13 +807,13 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     Commit();
 
                     if (success) then begin
-                        MobilePayV10RefundBuff.Reset();
+                        tempMobilePayV10Refund.Reset();
                         // We assume only 1 refund per payment (full refunds only).
-                        success := MobilePayV10RefundBuff.FindFirst();
+                        success := tempMobilePayV10Refund.FindFirst();
 
                         if (success) then begin
                             if (EftTrxRequest."Reference Number Output" = '') then begin
-                                EftTrxRequest."Reference Number Output" := MobilePayV10RefundBuff.RefundId;
+                                EftTrxRequest."Reference Number Output" := tempMobilePayV10Refund.RefundId;
                                 EftTrxRequest.Modify();
                             end;
                         end;
@@ -825,35 +824,35 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         Exit(success);
     end;
 
-    local procedure GetPaymentDetails(var MobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary; EftSetup: Record "NPR EFT Setup")
+    local procedure GetPaymentDetails(var tempMobilePayV10Payment: Record "NPR MobilePayV10 Payment" temporary; EftSetup: Record "NPR EFT Setup")
     var
-        mobilePayV10PaymentBuff2: Record "NPR MobilePayV10 Payment" temporary;
+        tempMobilePayV10Payment2: Record "NPR MobilePayV10 Payment" temporary;
         eftTransRequest: Record "NPR EFT Transaction Request";
         eftFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         mobilePayV10GetPayment: Codeunit "NPR MobilePayV10 Get Payment";
         mobilePayV10AuxiliaryRequest: Enum "NPR MobilePayV10 Auxiliary Request";
         success: Boolean;
     begin
-        MobilePayV10PaymentBuff.Reset();
-        mobilePayV10PaymentBuff2.Copy(mobilePayV10PaymentBuff, true);
+        tempMobilePayV10Payment.Reset();
+        tempMobilePayV10Payment2.Copy(tempMobilePayV10Payment, true);
 
-        if (MobilePayV10PaymentBuff.FindSet()) then begin
+        if (tempMobilePayV10Payment.FindSet()) then begin
             repeat
 
-                mobilePayV10PaymentBuff2.Get(MobilePayV10PaymentBuff.PaymentId);
+                tempMobilePayV10Payment2.Get(tempMobilePayV10Payment.PaymentId);
 
                 Clear(eftTransRequest);
                 eftFrameworkMgt.CreateAuxRequest(eftTransRequest, EftSetup, mobilePayV10AuxiliaryRequest::GetPaymentDetail.AsInteger(), EftSetup."POS Unit No.", '');
-                eftTransRequest."Reference Number Output" := mobilePayV10PaymentBuff2.PaymentId;
+                eftTransRequest."Reference Number Output" := tempMobilePayV10Payment2.PaymentId;
                 eftTransRequest.Modify();
                 Commit();
 
-                mobilePayV10GetPayment.SetPaymentDetailBuffer(mobilePayV10PaymentBuff2);
+                mobilePayV10GetPayment.SetPaymentDetailBuffer(tempMobilePayV10Payment2);
                 success := mobilePayV10GetPayment.Run(eftTransRequest);
 
                 WriteLogEntry(eftSetup, not success, eftTransRequest."Entry No.", 'Invoked API to get trx ID', mobilePayV10GetPayment.GetRequestResponse());
 
-            until MobilePayV10PaymentBuff.Next() = 0;
+            until tempMobilePayV10Payment.Next() = 0;
         end;
     end;
 

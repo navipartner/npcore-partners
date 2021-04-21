@@ -25,14 +25,14 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         if (not FindAndSetDefaultMobilePayV10IntegrationType()) then
             exit;
 
-        OldEftSetupTempBuff.reset;
-        OldEftSetupTempBuff.DeleteAll(false);
+        TempOldEftSetupTemp.reset;
+        TempOldEftSetupTemp.DeleteAll(false);
 
-        OldEFTTypePOSUnitGenParamTempBuff.Reset();
-        OldEFTTypePOSUnitGenParamTempBuff.DeleteAll(false);
+        TempOldEFTTypePOSUnitGenParam.Reset();
+        TempOldEFTTypePOSUnitGenParam.DeleteAll(false);
 
-        OldEFTTypePOSUnitBLOBParamTempBuff.Reset();
-        OldEFTTypePOSUnitBLOBParamTempBuff.DeleteAll(false);
+        TempOldEFTTypePOSUnitBLOBParam.Reset();
+        TempOldEFTTypePOSUnitBLOBParam.DeleteAll(false);
 
         // Buffer old EFT setup data and delete the old records.
         ProcessAllOldMobilePayEftIntegrationTypes();
@@ -45,28 +45,28 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
     var
         mobilePayV10Integration: Codeunit "NPR MobilePayV10 Integration";
     begin
-        exit(mobilePayV10Integration.FindAndSetDefaultMobilePayV10IntegrationType(DefaultMobilePayEftIntType));
+        exit(mobilePayV10Integration.FindAndSetDefaultMobilePayV10IntegrationType(TempDefaultMobilePayEftIntType));
     end;
 
     local procedure ProcessAllOldMobilePayEftIntegrationTypes()
     var
-        EFTIntegrationTypeBuff: Record "NPR EFT Integration Type" temporary;
-        EFTIntegrationTypeBuff2: Record "NPR EFT Integration Type" temporary;
+        tempEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
+        tempEFTIntegrationType2: Record "NPR EFT Integration Type" temporary;
     begin
         FindAndSetDefaultMobilePayV10IntegrationType();
-        EFTIntegrationTypeBuff.Copy(DefaultMobilePayEftIntType, true);
-        EFTIntegrationTypeBuff2.Copy(DefaultMobilePayEftIntType, true);
+        tempEFTIntegrationType.Copy(TempDefaultMobilePayEftIntType, true);
+        tempEFTIntegrationType2.Copy(TempDefaultMobilePayEftIntType, true);
 
-        EFTIntegrationTypeBuff.Reset();
-        EFTIntegrationTypeBuff.SetRange("Codeunit ID", Codeunit::"NPR EFT MobilePay Integ.");
-        IF EFTIntegrationTypeBuff.FindSet() then begin
+        tempEFTIntegrationType.Reset();
+        tempEFTIntegrationType.SetRange("Codeunit ID", Codeunit::"NPR EFT MobilePay Integ.");
+        IF tempEFTIntegrationType.FindSet() then begin
             repeat
-                EFTIntegrationTypeBuff2 := EFTIntegrationTypeBuff;
-                ProcessAllOldMobilePayEftSetupRecords(EFTIntegrationTypeBuff2);
+                tempEFTIntegrationType2 := tempEFTIntegrationType;
+                ProcessAllOldMobilePayEftSetupRecords(tempEFTIntegrationType2);
 
             // TODO: Do we want to delete the old MobilePay integration type or not?
             //EFTIntegrationType2.Delete(false);
-            until EFTIntegrationTypeBuff.Next() = 0;
+            until tempEFTIntegrationType.Next() = 0;
         end;
     end;
 
@@ -99,9 +99,9 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         EFTTypePOSUnitGenParam.SetRange("POS Unit No.", OldEftSetup."POS Unit No.");
         if EFTTypePOSUnitGenParam.FindSet() then begin
             repeat
-                OldEFTTypePOSUnitGenParamTempBuff.Init();
-                OldEFTTypePOSUnitGenParamTempBuff.TransferFields(EFTTypePOSUnitGenParam, true);
-                OldEFTTypePOSUnitGenParamTempBuff.Insert(false);
+                TempOldEFTTypePOSUnitGenParam.Init();
+                TempOldEFTTypePOSUnitGenParam.TransferFields(EFTTypePOSUnitGenParam, true);
+                TempOldEFTTypePOSUnitGenParam.Insert(false);
             until EFTTypePOSUnitGenParam.next() = 0;
         end;
 
@@ -116,9 +116,9 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         EFTTypePOSUnitBLOBParam.SetRange("POS Unit No.", OldEftSetup."POS Unit No.");
         if EFTTypePOSUnitBLOBParam.FindSet() then begin
             repeat
-                OldEFTTypePOSUnitBLOBParamTempBuff.Init();
-                OldEFTTypePOSUnitBLOBParamTempBuff.TransferFields(EFTTypePOSUnitBLOBParam, true);
-                OldEFTTypePOSUnitBLOBParamTempBuff.Insert(false);
+                TempOldEFTTypePOSUnitBLOBParam.Init();
+                TempOldEFTTypePOSUnitBLOBParam.TransferFields(EFTTypePOSUnitBLOBParam, true);
+                TempOldEFTTypePOSUnitBLOBParam.Insert(false);
             until EFTTypePOSUnitBLOBParam.next() = 0;
         end;
 
@@ -132,28 +132,28 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         OldEftSetup.TestField("Payment Type POS");
         OldEftSetup.TestField("POS Unit No.");
 
-        OldEftSetupTempBuff.init();
-        OldEftSetupTempBuff.TransferFields(OldEftSetup, true);
-        OldEftSetupTempBuff.Insert(false);
+        TempOldEftSetupTemp.init();
+        TempOldEftSetupTemp.TransferFields(OldEftSetup, true);
+        TempOldEftSetupTemp.Insert(false);
     end;
 
     local procedure ProcessEftSetupBuffer()
     var
         EftSetup: Record "NPR EFT Setup";
     begin
-        OldEftSetupTempBuff.reset();
-        if OldEftSetupTempBuff.FindSet() then begin
+        TempOldEftSetupTemp.reset();
+        if TempOldEftSetupTemp.FindSet() then begin
             repeat
                 EftSetup.Init();
-                EftSetup."Payment Type POS" := OldEftSetupTempBuff."Payment Type POS";
-                EftSetup."POS Unit No." := OldEftSetupTempBuff."POS Unit No.";
+                EftSetup."Payment Type POS" := TempOldEftSetupTemp."Payment Type POS";
+                EftSetup."POS Unit No." := TempOldEftSetupTemp."POS Unit No.";
                 EftSetup.Insert();
-                EftSetup.Validate("EFT Integration Type", DefaultMobilePayEftIntType.Code);
+                EftSetup.Validate("EFT Integration Type", TempDefaultMobilePayEftIntType.Code);
                 EftSetup.Modify();
 
                 FillMobilePayV10PaymentSetup(EftSetup);
 
-            until OldEftSetupTempBuff.Next() = 0;
+            until TempOldEftSetupTemp.Next() = 0;
         end;
     end;
 
@@ -176,7 +176,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
             MobilePayPaymentSetup."Merchant VAT Number" := CompanyInfo."VAT Registration No.";
 
             // Environment
-            EftTypePayGenParam.GET(OldEftSetupTempBuff."EFT Integration Type", OldEftSetupTempBuff."Payment Type POS", 'Environment');
+            EftTypePayGenParam.GET(TempOldEftSetupTemp."EFT Integration Type", TempOldEftSetupTemp."Payment Type POS", 'Environment');
             // 0 = 'PROD', 1 = 'DEMO'
             case EftTypePayGenParam.Value of
                 '0', 'PROD':
@@ -184,7 +184,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
                 '1', 'DEMO':
                     MobilePayPaymentSetup.Environment := MobilePayPaymentSetup.Environment::Sandbox;
                 else
-                    EftTypePayGenParam.FieldError(Value, USUPPORTED_PARAM_VALUE);
+                    EftTypePayGenParam.FieldError(Value, USUPPORTED_PARAM_VALUE_Err);
             end;
 
             MobilePayPaymentSetup.Modify();
@@ -193,9 +193,9 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
     end;
 
     var
-        DefaultMobilePayEftIntType: Record "NPR EFT Integration Type" temporary;
-        OldEftSetupTempBuff: Record "NPR EFT Setup" temporary;
-        OldEFTTypePOSUnitGenParamTempBuff: Record "NPR EFTType POSUnit Gen.Param." temporary;
-        OldEFTTypePOSUnitBLOBParamTempBuff: Record "NPR EFTType POSUnit BLOBParam." temporary;
-        USUPPORTED_PARAM_VALUE: Label 'Unsupported value for the parameter.';
+        TempDefaultMobilePayEftIntType: Record "NPR EFT Integration Type" temporary;
+        TempOldEftSetupTemp: Record "NPR EFT Setup" temporary;
+        TempOldEFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param." temporary;
+        TempOldEFTTypePOSUnitBLOBParam: Record "NPR EFTType POSUnit BLOBParam." temporary;
+        USUPPORTED_PARAM_VALUE_Err: Label 'Unsupported value for the parameter.';
 }

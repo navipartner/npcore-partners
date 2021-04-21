@@ -9,8 +9,6 @@ codeunit 6014557 "NPR MobilePayV10 Start Refund"
         _responseHttpCode: Integer;
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -40,11 +38,8 @@ codeunit 6014557 "NPR MobilePayV10 Start Refund"
         respMessage: HttpResponseMessage;
         headers: HttpHeaders;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        jsonResponse: JsonObject;
         jsonRequest: JsonObject;
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        posUnit: Record "NPR POS Unit";
-        beaconTypes: JsonArray;
         eftSetup: Record "NPR EFT Setup";
         procEftTrxRequest: Record "NPR EFT Transaction Request";
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
@@ -89,13 +84,7 @@ codeunit 6014557 "NPR MobilePayV10 Start Refund"
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         jsonToken: JsonToken;
-        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: Text;
-        jsonArray: JsonArray;
-        paymentResult: Enum "NPR MobilePayV10 Result Code";
-        amount: Decimal;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');

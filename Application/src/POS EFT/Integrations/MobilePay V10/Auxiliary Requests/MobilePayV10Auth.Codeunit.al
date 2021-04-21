@@ -10,8 +10,6 @@ codeunit 6014515 "NPR MobilePayV10 Auth"
         _responseHttpCode: Integer;
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -34,7 +32,6 @@ codeunit 6014515 "NPR MobilePayV10 Auth"
         base64Convert: Codeunit "Base64 Convert";
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
         eftSetup: Record "NPR EFT Setup";
-        jsonResponse: JsonObject;
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
     begin
         eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
@@ -65,11 +62,8 @@ codeunit 6014515 "NPR MobilePayV10 Auth"
 
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
-        jsonToken: JsonToken;
         mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: text;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');

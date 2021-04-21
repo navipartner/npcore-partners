@@ -8,14 +8,11 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
         _response: text;
         _responseHttpCode: Integer;
         _filter: Text;
-        NOT_ONE_PAYMENT: Label 'Result did not contain a single payment';
         MobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary;
         MobilePayV10PaymentBuffInitiated: Boolean;
-        PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED: Label 'Payment detail buffer has not been initiated! This is a programming bug.';
+        PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err: Label 'Payment detail buffer has not been initiated! This is a programming bug.';
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -78,12 +75,8 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         jsonToken: JsonToken;
-        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: Text;
         jsonArray: JsonArray;
-        mobilePayAuxRequestType: Enum "NPR MobilePayV10 Auxiliary Request";
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
@@ -92,7 +85,7 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
         jsonArray := jsonToken.AsArray();
 
         if (not MobilePayV10PaymentBuffInitiated) then begin
-            Error(PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED);
+            Error(PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err);
         end;
 
         ParseMultiPaymentsAndInsertToBuffer(jsonArray, MobilePayV10PaymentBuff);

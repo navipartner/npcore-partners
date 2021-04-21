@@ -8,11 +8,9 @@ codeunit 6014556 "NPR MobilePayV10 Poll Refund"
         _response: text;
         _responseHttpCode: Integer;
 
-        _CANCELLED: Label 'Transaction cancelled';
+        CANCELLED_Lbl: Label 'Transaction cancelled';
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -31,11 +29,7 @@ codeunit 6014556 "NPR MobilePayV10 Poll Refund"
         httpClient: HttpClient;
         respMessage: HttpResponseMessage;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        jsonResponse: JsonObject;
-        jsonRequest: JsonObject;
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        posUnit: Record "NPR POS Unit";
-        beaconTypes: JsonArray;
         eftSetup: Record "NPR EFT Setup";
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
     begin
@@ -60,13 +54,8 @@ codeunit 6014556 "NPR MobilePayV10 Poll Refund"
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         jsonToken: JsonToken;
-        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: Text;
-        jsonArray: JsonArray;
         paymentResult: Enum "NPR MobilePayV10 Result Code";
-        amount: Decimal;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, GetEndpoint());
@@ -113,8 +102,8 @@ codeunit 6014556 "NPR MobilePayV10 Poll Refund"
                      paymentResult::ExpiredAndCancelled,
                      paymentResult::RejectedByMobilePayDueToAgeRestrictions] then begin
                 eftTrxRequest.Successful := false;
-                eftTrxRequest."Result Display Text" := _CANCELLED;
-                eftTrxRequest."Result Description" := _CANCELLED;
+                eftTrxRequest."Result Display Text" := CANCELLED_Lbl;
+                eftTrxRequest."Result Description" := CANCELLED_Lbl;
                 eftTrxRequest."External Result Known" := true;
                 eftTrxRequest.Modify();
             end;

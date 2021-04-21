@@ -7,13 +7,11 @@ codeunit 6014525 "NPR MobilePayV10 Get Payment"
         _request: text;
         _response: text;
         _responseHttpCode: Integer;
-        MobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary;
-        MobilePayV10PaymentBuffInitiated: Boolean;
-        PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED: Label 'Payment detail buffer has not been initiated! This is a programming bug.';
+        TempMobilePayV10Payment: Record "NPR MobilePayV10 Payment" temporary;
+        TempMobilePayV10PaymentInitiated: Boolean;
+        PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err: Label 'Payment detail buffer has not been initiated! This is a programming bug.';
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -26,10 +24,10 @@ codeunit 6014525 "NPR MobilePayV10 Get Payment"
         exit(StrSubstNo('==Request==\%1\\==Response==\(%2)\%3', _request, _responseHttpCode, _response));
     end;
 
-    internal procedure SetPaymentDetailBuffer(var MobilePayV10PaymentBuffer: Record "NPR MobilePayV10 Payment" temporary)
+    internal procedure SetPaymentDetailBuffer(var TempMobilePayV10Paymenter: Record "NPR MobilePayV10 Payment" temporary)
     begin
-        MobilePayV10PaymentBuff.Copy(MobilePayV10PaymentBuffer, true);
-        MobilePayV10PaymentBuffInitiated := true;
+        TempMobilePayV10Payment.Copy(TempMobilePayV10Paymenter, true);
+        TempMobilePayV10PaymentInitiated := true;
     end;
 
     local procedure SendRequest(var eftTrxRequest: Record "NPR EFT Transaction Request")
@@ -38,16 +36,12 @@ codeunit 6014525 "NPR MobilePayV10 Get Payment"
         httpClient: HttpClient;
         respMessage: HttpResponseMessage;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        jsonResponse: JsonObject;
-        jsonRequest: JsonObject;
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        posUnit: Record "NPR POS Unit";
-        beaconTypes: JsonArray;
         eftSetup: Record "NPR EFT Setup";
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
     begin
-        if (not MobilePayV10PaymentBuffInitiated) then begin
-            Error(PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED);
+        if (not TempMobilePayV10PaymentInitiated) then begin
+            Error(PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err);
         end;
 
         eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
@@ -70,11 +64,7 @@ codeunit 6014525 "NPR MobilePayV10 Get Payment"
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         jsonToken: JsonToken;
-        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: Text;
-        jsonArray: JsonArray;
         paymentId: Text;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
@@ -83,41 +73,41 @@ codeunit 6014525 "NPR MobilePayV10 Get Payment"
         jsonResponse.SelectToken('paymentId', jsonToken);
         Evaluate(paymentId, jsonToken.AsValue().AsText());
 
-        if (not MobilePayV10PaymentBuff.Get(paymentId)) then begin
-            MobilePayV10PaymentBuff.Init();
-            MobilePayV10PaymentBuff.PaymentId := paymentId;
-            MobilePayV10PaymentBuff.Insert();
+        if (not TempMobilePayV10Payment.Get(paymentId)) then begin
+            TempMobilePayV10Payment.Init();
+            TempMobilePayV10Payment.PaymentId := paymentId;
+            TempMobilePayV10Payment.Insert();
         end;
 
         jsonResponse.SelectToken('posId', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.PosId, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.PosId, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('orderId', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.OrderId, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.OrderId, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('amount', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.Amount, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.Amount, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('currencyCode', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.CurrencyCode, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.CurrencyCode, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('merchantPaymentLabel', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.MerchantPaymentLabel, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.MerchantPaymentLabel, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('plannedCaptureDelay', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.PlannedCaptureDelay, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.PlannedCaptureDelay, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('status', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.Status, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.Status, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('paymentExpiresAt', jsonToken);
-        Evaluate(MobilePayV10PaymentBuff.PaymentExpiresAt, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10Payment.PaymentExpiresAt, jsonToken.AsValue().AsText());
 
         if (jsonResponse.SelectToken('pollDelayInMs', jsonToken)) then begin
-            Evaluate(MobilePayV10PaymentBuff.PollDelayInMs, jsonToken.AsValue().AsText());
+            Evaluate(TempMobilePayV10Payment.PollDelayInMs, jsonToken.AsValue().AsText());
         end;
 
-        MobilePayV10PaymentBuff.Modify();
+        TempMobilePayV10Payment.Modify();
     end;
 
     local procedure GetEndpoint(): Text
