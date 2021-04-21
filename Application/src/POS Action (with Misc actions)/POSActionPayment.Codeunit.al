@@ -11,6 +11,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         ReadingErr: Label 'reading in %1';
         VoucherNotValid: Label 'Voucher %1 is not valid.';
         VoucherNotFound: Label 'Voucher %1 is not found.';
+        PaymentTypeErr: Label '%1 type %2 not supported.', Comment = '%1 = POS Payment Method table caption, %2 = Type Customer';
 
     procedure ActionCode(): Text
     begin
@@ -74,6 +75,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
+
     begin
 
         if not Action.IsThisAction(ActionCode()) then
@@ -125,7 +127,7 @@ codeunit 6150725 "NPR POS Action: Payment"
                 POSPaymentMethod."Processing Type"::EFT:
                     Handled := ConfigureCashTerminalWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
                 POSPaymentMethod."Processing Type"::CUSTOMER:
-                    Handled := ConfigureCustomerWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                    Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
                 POSPaymentMethod."Processing Type"::PAYOUT:
                     Handled := ConfigurePayoutWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
                 else                    // provide a resonable default
@@ -350,7 +352,7 @@ codeunit 6150725 "NPR POS Action: Payment"
                 POSPaymentMethod."Processing Type"::EFT:
                     Handled := CaptureEftPayment(AmountToCapture, POSSession, POSPaymentLine, POSLine, POSPaymentMethod, FrontEnd);
                 POSPaymentMethod."Processing Type"::CUSTOMER:
-                    Handled := CaptureCustomerPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
+                    Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
                 POSPaymentMethod."Processing Type"::PAYOUT:
                     Handled := CapturePayoutPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
                 else
