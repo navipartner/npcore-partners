@@ -17,6 +17,7 @@
         POSPriceRequest.GetRequest(TmpSalePOS, TmpSaleLinePOS);
 
         if (TryPosQuoteRequest(TmpSalePOS, TmpSaleLinePOS)) then begin
+            OnBeforeSetPOSQuoteResponse(TmpSalePOS, TmpSaleLinePOS);
             POSPriceRequest.SetResponse(TmpSalePOS, TmpSaleLinePOS);
         end else begin
             POSPriceRequest.SetErrorResponse(GetLastErrorText);
@@ -190,6 +191,7 @@
         ItemPriceRequest.GetSalesPriceRequest(TmpSalesPriceRequest);
 
         if (TryItemPriceRequest(TmpSalesPriceRequest, TmpPriceBracketResponse, TmpDiscountBracketResponse, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode)) then begin
+            OnBeforeSetSalesPriceResponse(TmpPricePointResponse, TmpSalesPriceResponse);
             ItemPriceRequest.SetSalesPriceResponse(TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
         end else begin
             ItemPriceRequest.SetErrorResponse(GetLastErrorText);
@@ -616,4 +618,16 @@
         GetWorkingDayCalendar.Import();
         GetWorkingDayCalendar.PrepareResponse();
     end;
+
+    #region Events
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetSalesPriceResponse(var TmpPricePointResponse: Record "NPR M2 Price Calc. Buffer" temporary; var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetPOSQuoteResponse(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    begin
+    end;
+    #endregion
 }
