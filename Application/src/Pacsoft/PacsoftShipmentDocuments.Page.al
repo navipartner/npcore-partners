@@ -1,14 +1,5 @@
 page 6014440 "NPR Pacsoft Shipment Documents"
 {
-    // PS1.00/LS/20140509  CASE 190533 Pacsoft module + Link to Page Pacsoft Setup
-    // NPR5.26/BHR/20160919 CASE 248912 Pakkelabels
-    // NPR5.29/BHR/20161207 CASE 258936 Action Print Document.
-    //                                  Add property cardPageId  to 6014486
-    //                                  Hide action 'Card'
-    // NPR5.43/BHR /20180508 CASE 304453 Add fields for returns
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-
     Caption = 'Pacsoft Shipment Documents';
     CardPageID = "NPR Pacsoft Shipment Document";
     Editable = false;
@@ -177,21 +168,15 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                     PacsoftMgt: Codeunit "NPR Pacsoft Management";
                     PacsoftSetup: Record "NPR Pacsoft Setup";
                 begin
-                    if Confirm(StrSubstNo(TextConfirm, Rec.FieldCaption("Entry No."), Rec."Entry No."), true) then
-
-                    //-NPR5.26 [248912]
-                    //  PacsoftMgt.SendDocument(Rec, TRUE);
-                    begin
+                    if Confirm(StrSubstNo(TextConfirm, Rec.FieldCaption("Entry No."), Rec."Entry No."), true) then begin
                         PacsoftSetup.Get();
                         if PacsoftSetup."Use Pacsoft integration" then begin
                             PacsoftMgt.SendDocument(Rec, true);
                             Clear(Rec);
                             CurrPage.Update(false);
                         end;
-                        //  ELSE IF PacsoftSetup."Use Pakkelabels" THEN
-                        //  PakkelabelsMgnt.CreateShipmentOwnCustomerNo(Rec);
+                        ;
                     end;
-                    //-NPR5.26 [248912]
                 end;
             }
             separator(Separator6150632)
@@ -214,7 +199,6 @@ page 6014440 "NPR Pacsoft Shipment Documents"
 
                 trigger OnAction()
                 begin
-                    //-NPR5.29 [258936]
                 end;
             }
         }
