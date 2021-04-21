@@ -143,7 +143,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         if not Node.SelectSingleNode(NodePath, NodeChild) then
             exit(false);
 
-        exit(not NodeChild.AsXmlElement().IsEmpty());
+        exit(true);
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -158,7 +158,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     begin
         Node.SelectNodes('//' + NodePath, NodeList);
 
-        exit(not (NodeList.Count() = 0));
+        exit(true);
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -258,27 +258,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             exit(CopyStr(Node.AsXmlElement().InnerText(), 1, MaxLength));
 
         exit(Node.AsXmlElement().InnerText());
-
-        /*
-                if Element.IsEmpty() then begin
-                    if Required then
-                        Error(Error003, NodePath, '');
-                    exit('');
-                end;
-
-                Element.SelectSingleNode(NodePath, Node);
-                Element2 := Node.AsXmlElement();
-                if Element2.IsEmpty then begin
-                    if Required then
-                        Error(Error003, NodePath, Element.Name);
-                    exit('');
-                end;
-
-                if MaxLength > 0 then
-                    exit(CopyStr(Element2.InnerText, 1, MaxLength));
-
-                exit(Element2.InnerText);
-        */
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -316,13 +295,13 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             exit('');
         end;
 
-        Element.SelectSingleNode(NodePath, XmlNsManager, Node);
-        Element2 := Node.AsXmlElement();
-        if Element2.IsEmpty then begin
+        if not Element.SelectSingleNode(NodePath, XmlNsManager, Node) then begin
             if Required then
                 Error(Error003, NodePath, Element.Name);
             exit('');
         end;
+
+        Element2 := Node.AsXmlElement();
 
         if MaxLength > 0 then
             exit(CopyStr(Element2.InnerText, 1, MaxLength));
@@ -471,15 +450,11 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
                 ClearLastError;
                 exit(false);
             end;
-
             Error(Text000, Element.Name + '/' + Path);
         end;
 
         Element2 := Node.AsXmlElement();
-        if Element2.IsEmpty() and Required then
-            Error(Text000, Element.Name + '/' + Path);
-
-        exit(not Element2.IsEmpty());
+        exit(true);
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
