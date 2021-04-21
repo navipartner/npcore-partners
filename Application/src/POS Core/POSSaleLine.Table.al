@@ -2293,30 +2293,12 @@ table 6014406 "NPR POS Sale Line"
 
     local procedure TestPaymentMethod(POSPaymentMethod: Record "NPR POS Payment Method")
     var
-        POSUnit: Record "NPR POS Unit";
-        SaleLinePOS: Record "NPR POS Sale Line";
+        PaymentTypeErr: Label '%1 type %2 not supported.', Comment = '%1 = POS Payment Method table caption, %2 = Type Customer';
     begin
-        POSUnit.Get("Register No.");
-
         POSPaymentMethod.TestField("Block POS Payment", false);
 
-        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::CUSTOMER then
-            exit;
-        GetPOSHeader;
-        SalePOS.TestField("Customer No.");
-
-        SaleLinePOS.SetRange("Register No.", "Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, Type::Payment);
-        SaleLinePOS.SetFilter("Line No.", '<>%1', "Line No.");
-        SaleLinePOS.SetFilter("No.", '<>%1', '');
-        if SaleLinePOS.FindSet() then
-            repeat
-                POSPaymentMethod.Get(SaleLinePOS."No.");
-                if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CUSTOMER then
-                    Error(Text000);
-            until SaleLinePOS.Next() = 0;
-
+        if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CUSTOMER then
+            Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
     end;
 
     local procedure CalcBaseQty(Qty: Decimal): Decimal
