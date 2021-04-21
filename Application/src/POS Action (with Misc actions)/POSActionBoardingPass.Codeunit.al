@@ -278,11 +278,25 @@ then begin
         end;
     end;
 
-    local procedure HexToInt(iHexValue: Text) oIntValue: Integer
+    local procedure HexToInt(HexValue: Text) Result: Integer
     var
-        Convert: DotNet NPRNetConvert;
+        i, Base, Len, j : Integer;
     begin
-        oIntValue := Convert.ToInt32(iHexValue, 16);
+        Base := 1;
+        Result := 0;
+        Len := STRLEN(HexValue);
+
+        for i := 0 to Len - 1 do begin
+            j := Len - i;
+            if (HexValue[j] >= '0') AND (HexValue[j] <= '9') then begin
+                Result := Result + (HexValue[j] - 48) * Base;
+                Base := Base * 16;
+            end else
+                if (HexValue[j] >= 'A') and (HexValue[j] <= 'F') then begin
+                    Result := Result + (HexValue[j] - 55) * Base;
+                    Base := Base * 16;
+                end;
+        end;
     end;
 
     local procedure JulianDateToDate(iJulianDate: Integer) oDate: Date
