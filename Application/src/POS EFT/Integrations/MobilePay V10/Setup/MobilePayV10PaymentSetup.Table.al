@@ -7,7 +7,7 @@ table 6014539 "NPR MobilePayV10 Payment Setup"
         field(1; "Payment Type POS"; Code[10])
         {
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
             Caption = 'POS Unit No.';
         }
         field(10; Environment; Enum "NPR MobilePayV10 Environment")

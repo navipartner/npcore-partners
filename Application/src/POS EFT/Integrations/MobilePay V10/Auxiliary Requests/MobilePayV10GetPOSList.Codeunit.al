@@ -10,8 +10,6 @@ codeunit 6014524 "NPR MobilePayV10 GetPOSList"
         _filter: text;
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -59,11 +57,7 @@ codeunit 6014524 "NPR MobilePayV10 GetPOSList"
 
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; respMessage: HttpResponseMessage)
     var
-        jsonToken: JsonToken;
-        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: Text;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');

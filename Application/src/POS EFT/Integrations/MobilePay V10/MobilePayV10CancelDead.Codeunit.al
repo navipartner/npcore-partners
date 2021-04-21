@@ -1,8 +1,7 @@
 codeunit 6014510 "NPR MobilePayV10 CancelDead"
 {
     var
-
-        DefaultMobilePayEftIntType: Record "NPR EFT Integration Type" temporary;
+        TempDefaultMobilePayEftIntType: Record "NPR EFT Integration Type" temporary;
 
     trigger OnRun()
     begin
@@ -14,17 +13,17 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         eftSetup: Record "NPR EFT Setup";
         mobilePayV10Integration: Codeunit "NPR MobilePayV10 Integration";
     begin
-        mobilePayV10Integration.FindAndSetDefaultMobilePayV10IntegrationType(DefaultMobilePayEftIntType);
-        if DefaultMobilePayEftIntType.FindSet() then begin
+        mobilePayV10Integration.FindAndSetDefaultMobilePayV10IntegrationType(TempDefaultMobilePayEftIntType);
+        if TempDefaultMobilePayEftIntType.FindSet() then begin
             repeat
-                eftSetup.SetRange("EFT Integration Type", DefaultMobilePayEftIntType.Code);
+                eftSetup.SetRange("EFT Integration Type", TempDefaultMobilePayEftIntType.Code);
                 if eftSetup.FindSet() then begin
                     repeat
                         FindAndProcessPayments(eftSetup);
                         FindAndProcessRefunds(eftSetup);
                     until eftSetup.Next() = 0;
                 end;
-            until DefaultMobilePayEftIntType.Next() = 0;
+            until TempDefaultMobilePayEftIntType.Next() = 0;
         end;
     end;
 
@@ -36,17 +35,17 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         eftTransRequest: Record "NPR EFT Transaction Request";
         mobilePayV10AuxiliaryRequest: Enum "NPR MobilePayV10 Auxiliary Request";
         mobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        MobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary;
-        mobilePayV10PaymentBuff2: Record "NPR MobilePayV10 Payment" temporary;
+        tempMobilePayV10Payment: Record "NPR MobilePayV10 Payment" temporary;
+        tempMobilePayV10Payment2: Record "NPR MobilePayV10 Payment" temporary;
         mobilePayCancelPayment: Codeunit "NPR MobilePayV10 Can.Payment";
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
         eftEntryNo: Integer;
         success: Boolean;
     begin
-        MobilePayV10PaymentBuff.Reset();
-        MobilePayV10PaymentBuff.DeleteAll();
+        tempMobilePayV10Payment.Reset();
+        tempMobilePayV10Payment.DeleteAll();
 
-        mobilePayV10PaymentBuff2.Copy(MobilePayV10PaymentBuff, true);
+        tempMobilePayV10Payment2.Copy(tempMobilePayV10Payment, true);
 
         mobilePayV10UnitSetup.Get(EftSetup."POS Unit No.");
 
@@ -55,35 +54,35 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         Commit();
 
         mobilePayV10FindPayments.SetFilter(StrSubstNo('posId=%1', mobilePayV10UnitSetup."MobilePay POS ID"));
-        mobilePayV10FindPayments.SetPaymentDetailBuffer(MobilePayV10PaymentBuff);
+        mobilePayV10FindPayments.SetPaymentDetailBuffer(tempMobilePayV10Payment);
         mobilePayV10FindPayments.Run(eftTransRequest);  // TODO: Handling... (I will move this to MobilePay protocol codeunit, only the part that returns list of payments).
 
-        MobilePayV10PaymentBuff.Reset();
-        if (MobilePayV10PaymentBuff.FindSet()) then begin
+        tempMobilePayV10Payment.Reset();
+        if (tempMobilePayV10Payment.FindSet()) then begin
             repeat
-                mobilePayV10PaymentBuff2 := MobilePayV10PaymentBuff;
+                tempMobilePayV10Payment2 := tempMobilePayV10Payment;
 
                 Clear(eftTransRequest);
                 eftFrameworkMgt.CreateAuxRequest(eftTransRequest, eftSetup, mobilePayV10AuxiliaryRequest::GetPaymentDetail.AsInteger(), EftSetup."POS Unit No.", '');
-                eftTransRequest."Reference Number Output" := mobilePayV10PaymentBuff2.PaymentId;
+                eftTransRequest."Reference Number Output" := tempMobilePayV10Payment2.PaymentId;
                 eftTransRequest.Modify();
                 Commit();
 
-                mobilePayV10GetPayment.SetPaymentDetailBuffer(mobilePayV10PaymentBuff2);
+                mobilePayV10GetPayment.SetPaymentDetailBuffer(tempMobilePayV10Payment2);
                 mobilePayV10GetPayment.Run(eftTransRequest);
 
-                mobilePayV10PaymentBuff2.Get(mobilePayV10PaymentBuff.PaymentId);
+                tempMobilePayV10Payment2.Get(tempMobilePayV10Payment.PaymentId);
 
-                Evaluate(eftEntryNo, mobilePayV10PaymentBuff2.OrderId);
+                Evaluate(eftEntryNo, tempMobilePayV10Payment2.OrderId);
                 eftTransRequest.Get(eftEntryNo);
                 if (eftTransRequest."Reference Number Output" = '') then begin
-                    eftTransRequest."Reference Number Output" := mobilePayV10PaymentBuff2.PaymentId;
+                    eftTransRequest."Reference Number Output" := tempMobilePayV10Payment2.PaymentId;
                     eftTransRequest.Modify();
                 end;
 
                 Commit();
 
-                case mobilePayV10PaymentBuff2.Status of
+                case tempMobilePayV10Payment2.Status of
                     "NPR MobilePayV10 Result Code"::Reserved:
                         begin
                             success := mobilePayCancelPayment.Run(eftTransRequest);
@@ -92,7 +91,7 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
                         end;
                 end;
 
-            until MobilePayV10PaymentBuff.Next() = 0;
+            until tempMobilePayV10Payment.Next() = 0;
         end;
     end;
 

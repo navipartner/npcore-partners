@@ -12,19 +12,19 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     end;
 
     var
-        INTEGRATIONTYPE: Label 'MOBILEPAY_V10', Locked = true;
-        DESCRIPTION: Label 'MobilePay V10 Integration';
-        NO_CASHBACK: Label 'Cashback is not supported for MobilePay';
-        POS_CREATION_SUCCESS: Label 'Created POS in MobilePay backend successfully';
-        POS_DELETE_SUCCESS: Label 'Deleted POS in MobilePay backend successfully';
+        Tok_INTEGRATIONTYPE: Label 'MOBILEPAY_V10', Locked = true;
+        Lbl_DESCRIPTION: Label 'MobilePay V10 Integration';
+        Lbl_NO_CASHBACK: Label 'Cashback is not supported for MobilePay';
+        Lbl_POS_CREATION_SUCCESS: Label 'Created POS in MobilePay backend successfully';
+        Lbl_POS_DELETE_SUCCESS: Label 'Deleted POS in MobilePay backend successfully';
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
         tmpEFTIntegrationType.Init;
-        tmpEFTIntegrationType.Code := INTEGRATIONTYPE;
-        tmpEFTIntegrationType.Description := DESCRIPTION;
+        tmpEFTIntegrationType.Code := Tok_INTEGRATIONTYPE;
+        tmpEFTIntegrationType.Description := Lbl_DESCRIPTION;
         tmpEFTIntegrationType."Codeunit ID" := Codeunit::"NPR MobilePayV10 Integration";
         tmpEFTIntegrationType.Insert;
     end;
@@ -35,55 +35,55 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         mobilePayAuxRequestType: Enum "NPR MobilePayV10 Auxiliary Request";
     begin
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::AuthTokenRequest.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::AuthTokenRequest);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::CreatePOSRequest.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::CreatePOSRequest);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::DeletePOSRequest.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::DeletePOSRequest);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::FindActivePayment.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::FindActivePayment);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::FindActiveRefund.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::FindActiveRefund);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::FindAllPayments.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::FindAllPayments);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::FindAllRefunds.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::FindAllRefunds);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::GetPaymentDetail.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::GetPaymentDetail);
         tmpEFTAuxOperation.Insert;
 
         tmpEFTAuxOperation.Init;
-        tmpEFTAuxOperation."Integration Type" := INTEGRATIONTYPE;
+        tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
         tmpEFTAuxOperation."Auxiliary ID" := mobilePayAuxRequestType::GetRefundDetail.AsInteger();
         tmpEFTAuxOperation.Description := Format(mobilePayAuxRequestType::GetRefundDetail);
         tmpEFTAuxOperation.Insert;
@@ -95,7 +95,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
         mobilePayUnitSetupPage: Page "NPR MobilePayV10 Unit Setup";
     begin
-        if EFTSetup."EFT Integration Type" <> INTEGRATIONTYPE then
+        if EFTSetup."EFT Integration Type" <> Tok_INTEGRATIONTYPE then
             exit;
 
         EFTSetup.TestField("POS Unit No.");
@@ -113,7 +113,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     var
         mobilePayPaymentSetup: Record "NPR MobilePayV10 Payment Setup";
     begin
-        if EFTSetup."EFT Integration Type" <> INTEGRATIONTYPE then
+        if EFTSetup."EFT Integration Type" <> Tok_INTEGRATIONTYPE then
             exit;
 
         GetPaymentTypeParameters(EFTSetup, mobilePayPaymentSetup);
@@ -126,12 +126,12 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     var
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
     begin
-        if not EftTransactionRequest.IsType(INTEGRATIONTYPE) then
+        if not EftTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
         Handled := true;
 
         if (EftTransactionRequest."Cashback Amount" > 0) then
-            Error(NO_CASHBACK);
+            Error(Lbl_NO_CASHBACK);
 
         mobilePayUnitSetup.Get(EftTransactionRequest."Register No.");
         mobilePayUnitSetup.TestField("MobilePay POS ID");
@@ -149,7 +149,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     var
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
     begin
-        if not EftTransactionRequest.IsType(INTEGRATIONTYPE) then
+        if not EftTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
         Handled := true;
 
@@ -167,7 +167,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateLookupTransactionRequest', '', false, false)]
     local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-        if not EftTransactionRequest.IsType(INTEGRATIONTYPE) then
+        if not EftTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
         Handled := true;
 
@@ -178,7 +178,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateAuxRequest', '', false, false)]
     local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-        if not EftTransactionRequest.IsType(INTEGRATIONTYPE) then
+        if not EftTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
         Handled := true;
 
@@ -191,7 +191,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     var
         EFTMobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
-        if not EftTransactionRequest.IsType(INTEGRATIONTYPE) then
+        if not EftTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
         Handled := true;
 
@@ -266,7 +266,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         Commit();
         eftTrxRequest.Find();
         if eftTrxRequest.Successful then
-            Message(POS_CREATION_SUCCESS);   // TODO: Problems with MESSAGE (BC17 RTM issue) - what to do now?
+            Message(Lbl_POS_CREATION_SUCCESS);   // TODO: Problems with MESSAGE (BC17 RTM issue) - what to do now?
     end;
 
     internal procedure DeletePOS(eftSetup: Record "NPR EFT Setup"; var mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup")
@@ -281,7 +281,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         Commit();
         eftTrxRequest.Find();
         if eftTrxRequest.Successful then begin
-            Message(POS_DELETE_SUCCESS);       // TODO: Problems with MESSAGE (BC17 RTM issue) - what to do now?
+            Message(Lbl_POS_DELETE_SUCCESS);       // TODO: Problems with MESSAGE (BC17 RTM issue) - what to do now?
             clear(mobilePayUnitSetup."Beacon ID");
             clear(mobilePayUnitSetup."MobilePay POS ID");
             mobilePayUnitSetup."Merchant POS ID" := mobilePayUnitSetup."POS Unit No.";
@@ -337,12 +337,12 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
 
     internal procedure LookupStore(eftSetup: Record "NPR EFT Setup"; var value: Text): Boolean
     var
-        tmpMobilePayStores: Record "NPR MobilePayV10 Store" temporary;
+        tempMobilePayStores: Record "NPR MobilePayV10 Store" temporary;
     begin
-        GetMobilePayStores(eftSetup, tmpMobilePayStores);
+        GetMobilePayStores(eftSetup, tempMobilePayStores);
 
-        if Page.RunModal(0, tmpMobilePayStores) = Action::LookupOK then begin
-            value := tmpMobilePayStores."Store ID";
+        if Page.RunModal(0, tempMobilePayStores) = Action::LookupOK then begin
+            value := tempMobilePayStores."Store ID";
             exit(true);
         end;
     end;
@@ -355,7 +355,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         jsonArray: JsonArray;
         jsonToken: JsonToken;
         jsonToken2: JsonToken;
-        tmpMobilePayPOS: Record "NPR MobilePayV10 POS" temporary;
+        tempMobilePayPOS: Record "NPR MobilePayV10 POS" temporary;
     begin
         mobilePayUnitSetup.TestField("Store ID");
         mobilePayPOSListRequest.SetFilter('storeId=' + mobilePayUnitSetup."Store ID");
@@ -365,28 +365,28 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         jsonArray := jsonToken.AsArray();
 
         foreach jsonToken in jsonArray do begin
-            tmpMobilePayPOS.init;
-            tmpMobilePayPOS."MobilePay POS ID" := jsonToken.AsValue().AsText();
-            mobilePayPOSRequest.SetPOSId(tmpMobilePayPOS."MobilePay POS ID");
+            tempMobilePayPOS.init;
+            tempMobilePayPOS."MobilePay POS ID" := jsonToken.AsValue().AsText();
+            mobilePayPOSRequest.SetPOSId(tempMobilePayPOS."MobilePay POS ID");
             mobilePayPOSRequest.Run(eftSetup);
             jsonObject.ReadFrom(mobilePayPOSRequest.GetResponse());
 
             if jsonObject.SelectToken('merchantPosId', jsonToken2) then
-                tmpMobilePayPOS."Merchant POS ID" := jsonToken2.AsValue().AsText();
+                tempMobilePayPOS."Merchant POS ID" := jsonToken2.AsValue().AsText();
 
             if jsonObject.SelectToken('name', jsonToken2) then
-                tmpMobilePayPOS.Name := jsonToken2.AsValue().AsText();
+                tempMobilePayPOS.Name := jsonToken2.AsValue().AsText();
 
             if jsonObject.SelectToken('beaconId', jsonToken2) then
-                tmpMobilePayPOS."Beacon ID" := jsonToken2.AsValue().AsText();
+                tempMobilePayPOS."Beacon ID" := jsonToken2.AsValue().AsText();
 
-            tmpMobilePayPOS.Insert();
+            tempMobilePayPOS.Insert();
         end;
 
-        if Page.RunModal(0, tmpMobilePayPOS) = Action::LookupOK then begin
-            mobilePayUnitSetup."MobilePay POS ID" := tmpMobilePayPOS."MobilePay POS ID";
-            mobilePayUnitSetup."Beacon ID" := tmpMobilePayPOS."Beacon ID";
-            mobilePayUnitSetup."Merchant POS ID" := tmpMobilePayPOS."Merchant POS ID";
+        if Page.RunModal(0, tempMobilePayPOS) = Action::LookupOK then begin
+            mobilePayUnitSetup."MobilePay POS ID" := tempMobilePayPOS."MobilePay POS ID";
+            mobilePayUnitSetup."Beacon ID" := tempMobilePayPOS."Beacon ID";
+            mobilePayUnitSetup."Merchant POS ID" := tempMobilePayPOS."Merchant POS ID";
             mobilePayUnitSetup.Modify();
             exit(true);
         end;
@@ -416,7 +416,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforePauseFrontEnd', '', false, false)]
     local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
-        if not EFTTransactionRequest.IsType(IntegrationType) then
+        if not EFTTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
 
         Skip := not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND])
@@ -428,7 +428,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
     begin
-        if not EFTTransactionRequest.IsType(IntegrationType) then
+        if not EFTTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
             exit;
         if not POSSession.GetSession(POSSession, false) then
             exit;

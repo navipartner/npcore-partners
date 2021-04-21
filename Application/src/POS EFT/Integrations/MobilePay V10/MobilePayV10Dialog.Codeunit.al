@@ -8,14 +8,12 @@ codeunit 6014517 "NPR MobilePayV10 Dialog"
         _trxEntryNo: Integer;
         _done: Boolean;
         _abortRequested: Boolean;
-        _transactionStartTime: DateTime;
         _firstAbortRequestedTime: DateTime;
-        _pollingDelayMs: Integer;
         _lastStatusCode: Integer;
 
-        TXT_ABORT: Label 'Abort';
-        TXT_FORCE_ABORT: Label 'Force Abort';
-        CONFIRM_FORCE_ABORT: Label 'WARNING:\Force abort will close the transaction dialog without receiving transaction result. This should only be used if mobilepay is unresponsive. Use lookup afterwards to recover any approved transactions!\Continue with force abort?';
+        Lbl_ABORT: Label 'Abort';
+        Lbl_FORCE_ABORT: Label 'Force Abort';
+        Lbl_CONFIRM_FORCE_ABORT: Label 'WARNING:\Force abort will close the transaction dialog without receiving transaction result. This should only be used if mobilepay is unresponsive. Use lookup afterwards to recover any approved transactions!\Continue with force abort?';
 
 
     internal procedure Initialize(POSFrontEnd: Codeunit "NPR POS Front End Management"; eftTrxRequest: Record "NPR EFT Transaction Request")
@@ -24,8 +22,6 @@ codeunit 6014517 "NPR MobilePayV10 Dialog"
         Clear(_firstAbortRequestedTime);
         Clear(_abortRequested);
         _trxEntryNo := eftTrxRequest."Entry No.";
-        _transactionStartTime := eftTrxRequest.Started;
-        _pollingDelayMs := 1000;
 
         ConstructTransactionDialog(eftTrxRequest);
         _activeModelID := POSFrontEnd.ShowModel(_model);
@@ -134,7 +130,7 @@ codeunit 6014517 "NPR MobilePayV10 Dialog"
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
-        if not Confirm(CONFIRM_FORCE_ABORT, false) then
+        if not Confirm(Lbl_CONFIRM_FORCE_ABORT, false) then
             exit;
         EFTTransactionRequest.Get(_trxEntryNo);
 
@@ -259,11 +255,11 @@ codeunit 6014517 "NPR MobilePayV10 Dialog"
         DialogAmount := Factory.Label(Format(EFTTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>')).Set('Class', 'mobilepay-dialog-item').Set('Id', 'mobilepay-amount');
         DialogAmount.FontSize('');
 
-        DialogForceAbortButton := Factory.Label(TXT_FORCE_ABORT).Set('Class', 'mobilepay-dialog-item').Set('Id', 'mobilepay-force-abort').SubscribeEvent('click');
+        DialogForceAbortButton := Factory.Label(Lbl_FORCE_ABORT).Set('Class', 'mobilepay-dialog-item').Set('Id', 'mobilepay-force-abort').SubscribeEvent('click');
         DialogForceAbortButton.Set('Visible', false);
         DialogForceAbortButton.FontSize('');
 
-        DialogAbortButton := Factory.Label(TXT_ABORT).Set('Class', 'mobilepay-dialog-item').Set('Id', 'mobilepay-abort').SubscribeEvent('click');
+        DialogAbortButton := Factory.Label(Lbl_ABORT).Set('Class', 'mobilepay-dialog-item').Set('Id', 'mobilepay-abort').SubscribeEvent('click');
         DialogAbortButton.FontSize('');
 
         Dialog.Append(
