@@ -551,6 +551,18 @@
             SalesHeader."Ship-to City" := NpXmlDomMgt.GetXmlText(XmlElement2, 'city', MaxStrLen(SalesHeader."Ship-to City"), true);
             SalesHeader."Ship-to Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2, 'country_code', MaxStrLen(SalesHeader."Ship-to Country/Region Code"), false));
             SalesHeader."Ship-to Contact" := NpXmlDomMgt.GetXmlText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Ship-to Contact"), false);
+        end else begin
+            // Ship-to node does not exist. Proceed with updating the ship-to address with sell-to fields from the xml! 
+            XmlElement.SelectSingleNode('sell_to_customer', XNode);
+            XmlElement2 := XNode.AsXmlElement();
+            SalesHeader."Ship-to Name" := NpXmlDomMgt.GetXmlText(XmlElement2, 'name', MaxStrLen(SalesHeader."Ship-to Name"), true);
+            SalesHeader."Ship-to Name 2" := NpXmlDomMgt.GetXmlText(XmlElement2, 'name_2', MaxStrLen(SalesHeader."Ship-to Name 2"), false);
+            SalesHeader."Ship-to Address" := NpXmlDomMgt.GetXmlText(XmlElement2, 'address', MaxStrLen(SalesHeader."Ship-to Address"), true);
+            SalesHeader."Ship-to Address 2" := NpXmlDomMgt.GetXmlText(XmlElement2, 'address_2', MaxStrLen(SalesHeader."Ship-to Address 2"), false);
+            SalesHeader."Ship-to Post Code" := UpperCase(NpXmlDomMgt.GetElementCode(XmlElement2, 'post_code', MaxStrLen(SalesHeader."Ship-to Post Code"), true));
+            SalesHeader."Ship-to City" := NpXmlDomMgt.GetXmlText(XmlElement2, 'city', MaxStrLen(SalesHeader."Ship-to City"), true);
+            SalesHeader."Ship-to Country/Region Code" := NpXmlDomMgt.GetElementCode(XmlElement2, 'country_code', MaxStrLen(SalesHeader."Ship-to Country/Region Code"), false);
+            SalesHeader."Ship-to Contact" := NpXmlDomMgt.GetElementText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Ship-to Contact"), false);
         end;
 
         SalesHeader.Validate("Salesperson Code", MagentoSetup."Salesperson Code");
