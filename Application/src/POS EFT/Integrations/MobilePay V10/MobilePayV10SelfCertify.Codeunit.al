@@ -3,10 +3,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     Subtype = Test;
     EventSubscriberInstance = Manual;
 
-    var
-        POS_CREATION_SUCCESS: Label 'Created POS in MobilePay backend successfully';
-        POS_DELETE_SUCCESS: Label 'Deleted POS in MobilePay backend successfully';
-
     /// <summary>
     /// Read more about self-certification here: https://developer.mobilepay.dk/products/point-of-sale/certification
     /// </summary>
@@ -192,7 +188,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     [MessageHandler]
     procedure DefaultMessageHandler(Message: Text[1024])
     begin
-        //Assert.IsTrue(StrPos(Message, POS_CREATION_SUCCESS) > 0, Message);
         Sleep(1);   // TODO: Write the handler code.
     end;
 

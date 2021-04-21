@@ -8,14 +8,11 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
         _response: text;
         _responseHttpCode: Integer;
         _filter: Text;
-        NOT_ONE_PAYMENT: Label 'Result did not contain a single payment';
         MobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
         MobilePayV10RefundBuffInitiated: Boolean;
-        REFUND_DETAIL_BUFFER_NOT_INITIALIZED: Label 'Refund detail buffer has not been initiated! This is a programming bug.';
+        REFUND_DETAIL_BUFFER_NOT_INITIALIZED_Err: Label 'Refund detail buffer has not been initiated! This is a programming bug.';
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -45,11 +42,7 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
         httpClient: HttpClient;
         respMessage: HttpResponseMessage;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        jsonResponse: JsonObject;
-        jsonRequest: JsonObject;
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        posUnit: Record "NPR POS Unit";
-        beaconTypes: JsonArray;
         eftSetup: Record "NPR EFT Setup";
         requestUrl: Text;
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
@@ -78,12 +71,8 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         jsonToken: JsonToken;
-        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: Text;
         jsonArray: JsonArray;
-        mobilePayAuxRequestType: Enum "NPR MobilePayV10 Auxiliary Request";
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
@@ -92,7 +81,7 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
         jsonArray := jsonToken.AsArray();
 
         if (not MobilePayV10RefundBuffInitiated) then begin
-            Error(REFUND_DETAIL_BUFFER_NOT_INITIALIZED);
+            Error(REFUND_DETAIL_BUFFER_NOT_INITIALIZED_Err);
         end;
 
         ParseMultiRefundsAndInsertToBuffer(jsonArray, MobilePayV10RefundBuff);

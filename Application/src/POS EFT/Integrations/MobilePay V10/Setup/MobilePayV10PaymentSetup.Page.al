@@ -11,16 +11,16 @@ page 6014437 "NPR MobilePayV10 Payment Setup"
         {
             group(GroupName)
             {
-                field(Environment; Environment)
+                field(Environment; Rec.Environment)
                 {
                     ApplicationArea = All;
 
                 }
-                field("Merchant VAT Number"; "Merchant VAT Number")
+                field("Merchant VAT Number"; Rec."Merchant VAT Number")
                 {
                     ApplicationArea = All;
                 }
-                field("Log Level"; "Log Level")
+                field("Log Level"; Rec."Log Level")
                 {
                     ApplicationArea = All;
                 }

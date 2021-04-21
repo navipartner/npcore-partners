@@ -7,11 +7,9 @@ codeunit 6014522 "NPR MobilePayV10 FindActi.Pay."
         _request: text;
         _response: text;
         _responseHttpCode: Integer;
-        NOT_ONE_PAYMENT: Label 'Result did not contain a single payment';
+        NOT_ONE_PAYMENT_Err: Label 'Result did not contain a single payment';
 
     trigger OnRun()
-    var
-        rawResponse: JsonObject;
     begin
         clear(_request);
         clear(_response);
@@ -30,11 +28,7 @@ codeunit 6014522 "NPR MobilePayV10 FindActi.Pay."
         httpClient: HttpClient;
         respMessage: HttpResponseMessage;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        jsonResponse: JsonObject;
-        jsonRequest: JsonObject;
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        posUnit: Record "NPR POS Unit";
-        beaconTypes: JsonArray;
         eftSetup: Record "NPR EFT Setup";
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
     begin
@@ -58,10 +52,7 @@ codeunit 6014522 "NPR MobilePayV10 FindActi.Pay."
     local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         jsonToken: JsonToken;
-        mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         jsonResponse: JsonObject;
-        stream: InStream;
-        errorCode: Text;
         jsonArray: JsonArray;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
@@ -70,7 +61,7 @@ codeunit 6014522 "NPR MobilePayV10 FindActi.Pay."
         jsonResponse.SelectToken('paymentIds', jsonToken);
         jsonArray := jsonToken.AsArray();
         if jsonArray.Count <> 1 then begin
-            error(NOT_ONE_PAYMENT);
+            error(NOT_ONE_PAYMENT_Err);
         end;
         if eftTrxRequest."Reference Number Output" <> '' then begin
             exit;

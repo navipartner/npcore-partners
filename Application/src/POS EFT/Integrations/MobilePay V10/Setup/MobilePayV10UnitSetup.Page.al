@@ -11,8 +11,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
         {
             group(GroupName)
             {
-                field("Store ID";
-                "Store ID")
+                field("Store ID"; Rec."Store ID")
                 {
                     ApplicationArea = All;
                     Lookup = true;
@@ -28,11 +27,11 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                         end;
                     end;
                 }
-                field("Merchant PoS ID"; "Merchant PoS ID")
+                field("Merchant PoS ID"; Rec."Merchant PoS ID")
                 {
                     ApplicationArea = All;
                 }
-                field("MobilePay POS ID"; "MobilePay POS ID")
+                field("MobilePay POS ID"; Rec."MobilePay POS ID")
                 {
                     ApplicationArea = All;
                     Lookup = true;
@@ -48,11 +47,11 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                         end;
                     end;
                 }
-                field("Beacon ID"; "Beacon ID")
+                field("Beacon ID"; Rec."Beacon ID")
                 {
                     ApplicationArea = All;
                 }
-                field("Only QR"; "Only QR")
+                field("Only QR"; Rec."Only QR")
                 {
                     ApplicationArea = All;
                 }
@@ -68,6 +67,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
             {
                 ApplicationArea = All;
                 Caption = 'Create In Mobilepay';
+                Image = CopyCostBudget;
 
                 trigger OnAction()
                 var
@@ -80,6 +80,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
             {
                 ApplicationArea = All;
                 Caption = 'Delete In Mobilepay';
+                Image = CloseDocument;
 
                 trigger OnAction()
                 var

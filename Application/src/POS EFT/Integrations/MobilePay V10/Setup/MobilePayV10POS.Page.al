@@ -12,19 +12,19 @@ page 6014436 "NPR MobilePayV10 POS"
         {
             repeater(GroupName)
             {
-                field("MobilePay POS ID"; "MobilePay POS ID")
+                field("MobilePay POS ID"; Rec."MobilePay POS ID")
                 {
                     ApplicationArea = All;
                 }
-                field("Merchant POS ID"; "Merchant POS ID")
+                field("Merchant POS ID"; Rec."Merchant POS ID")
                 {
                     ApplicationArea = All;
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                 }
-                field("Beacon ID"; "Beacon ID")
+                field("Beacon ID"; Rec."Beacon ID")
                 {
                     ApplicationArea = All;
                 }

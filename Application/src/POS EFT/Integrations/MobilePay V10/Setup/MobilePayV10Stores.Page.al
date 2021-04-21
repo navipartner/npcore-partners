@@ -13,33 +13,33 @@ page 6014435 "NPR MobilePayV10 Stores"
         {
             repeater(GroupName)
             {
-                field("Store ID"; "Store ID")
+                field("Store ID"; Rec."Store ID")
                 {
                     ApplicationArea = All;
                 }
-                field("Store Name"; "Store Name")
+                field("Store Name"; Rec."Store Name")
                 {
                     ApplicationArea = All;
                 }
-                field("Store City"; "Store City")
+                field("Store City"; Rec."Store City")
                 {
                     ApplicationArea = All;
                 }
-                field("Store Street"; "Store Street")
+                field("Store Street"; Rec."Store Street")
                 {
                     ApplicationArea = All;
                 }
-                field("Brand Name"; "Brand Name")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                }
-                field("Merchant Brand Id"; "Merchant Brand Id")
+                field("Brand Name"; Rec."Brand Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                 }
-                field("Merchant Location Id"; "Merchant Location Id")
+                field("Merchant Brand Id"; Rec."Merchant Brand Id")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                }
+                field("Merchant Location Id"; Rec."Merchant Location Id")
                 {
                     ApplicationArea = All;
                     Visible = false;
