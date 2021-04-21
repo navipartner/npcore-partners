@@ -22,7 +22,7 @@ table 6150616 "NPR POS Payment Method"
         {
             Caption = 'Processing Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Cash,Voucher,Check,EFT,Customer,PayOut';
+            OptionCaption = 'Cash,Voucher,Check,EFT,Customer - TBD,PayOut';
             OptionMembers = CASH,VOUCHER,CHECK,EFT,CUSTOMER,PAYOUT;
         }
         field(15; "Currency Code"; Code[10])
