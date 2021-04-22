@@ -42,11 +42,11 @@ report 6014426 "NPR Vendor Top/Sale"
                     VendorAmountLastYear."Vendor No." := "No.";
 
                     case ShowType of
-                        ShowType::Varesalg:
+                        ShowType::"Item Sales":
                             begin
                                 VendorAmountLastYear."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
                             end;
-                        ShowType::Avance:
+                        ShowType::Gains:
                             begin
                                 VendorAmountLastYear."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
                             end;
@@ -73,11 +73,11 @@ report 6014426 "NPR Vendor Top/Sale"
                 VendorAmount.Init();
                 VendorAmount."Vendor No." := "No.";
                 case ShowType of
-                    ShowType::Varesalg:
+                    ShowType::"Item Sales":
                         begin
                             VendorAmount."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
                         end;
-                    ShowType::Avance:
+                    ShowType::Gains:
                         begin
                             VendorAmount."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
                         end;
@@ -264,13 +264,13 @@ report 6014426 "NPR Vendor Top/Sale"
                     RankingLastYear := VendorAmountLastYear."Amount 2 (LCY)";
 
                 case ShowType of
-                    ShowType::Varesalg:
+                    ShowType::"Item Sales":
                         begin
                             AmountLastYear := Vendor2."NPR Sales (LCY)";
                             PctOfTotal := "Pct."(Vendor."NPR Sales (LCY)", VendorSales);
                             Index := "Pct."(Vendor."NPR Sales (LCY)", AmountLastYear);
                         end;
-                    ShowType::Avance:
+                    ShowType::Gains:
                         begin
                             AmountLastYear := Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)";
                             PctOfTotal := "Pct."(Vendor."NPR Sales (LCY)" - Vendor."NPR COGS (LCY)", VendorProfit);
@@ -354,7 +354,7 @@ report 6014426 "NPR Vendor Top/Sale"
                 field("Sorting"; Sorting)
                 {
                     Caption = 'Sorting';
-                    OptionCaption = 'Show Biggest/Smallest Deb.';
+                    OptionCaption = 'Show the highest first,Show the lowest first';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';
                 }
@@ -427,7 +427,7 @@ report 6014426 "NPR Vendor Top/Sale"
         if EndDate <> NormalDate(EndDate) then
             EndDateLastYear := ClosingDate(EndDateLastYear);
 
-        if Sorting = Sorting::Stoerste then
+        if Sorting = Sorting::Highest then
             Multipl := -1
         else
             Multipl := 1;
@@ -479,8 +479,8 @@ report 6014426 "NPR Vendor Top/Sale"
         VendorInt: Integer;
         Text10600002: Label 'Order by %1 ';
         Text10600001: Label 'Period: %1';
-        Sorting: Option Stoerste,Mindste;
-        ShowType: Option Varesalg,,Avance,Daekningsgrad;
+        Sorting: Option Highest,Lowest;
+        ShowType: Option "Item Sales",,Gains,Margin;
         j: Text[30];
         VendorDateFilter: Text[30];
         VendorFilter: Text[250];
