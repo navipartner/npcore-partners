@@ -354,7 +354,7 @@ report 6014426 "NPR Vendor Top/Sale"
                 field("Sorting"; Sorting)
                 {
                     Caption = 'Sorting';
-                    OptionCaption = 'Show Biggest,Show Smallest';
+                    OptionCaption = 'Show Biggest/Smallest Deb.';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';
                 }
