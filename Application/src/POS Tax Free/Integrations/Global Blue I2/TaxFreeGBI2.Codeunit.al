@@ -1673,16 +1673,16 @@
             XML += '<PurchaseItems>';
             repeat
                 Item.Get(PosSalesLine."No.");
-                if (Item.Type = Item.Type::Inventory) or (GlobalBlueParameters."Services Eligible") then
-                    XML +=
-                    '<PurchaseItem>' +
-                      '<VATRate>' + Format(PosSalesLine."VAT %", 0, '<Precision,2:2><Standard Format,2>') + '</VATRate>' +
-                      '<GrossAmount>' + Format(PosSalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</GrossAmount>' +
-                      '<VATAmount>' + Format(PosSalesLine."Amount Incl. VAT" - PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</VATAmount>' +
-                      '<NetAmount>' + Format(PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</NetAmount>' +
-                      '<Quantity>' + Format(Round(PosSalesLine.Quantity, 1, '>')) + '</Quantity>' + //Round up - They only accept integer quantity
-                      '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(PosSalesLine.Description), 1, 50)) + '</GoodDescription>' +
-                    '</PurchaseItem>';
+                if ((Item.Type = Item.Type::Inventory) or (GlobalBlueParameters."Services Eligible")) then begin
+                    XML += '<PurchaseItem>';
+                    XML += '<VATRate>' + Format(PosSalesLine."VAT %", 0, '<Precision,2:2><Standard Format,2>') + '</VATRate>';
+                    XML += '<GrossAmount>' + Format(PosSalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</GrossAmount>';
+                    XML += '<VATAmount>' + Format(PosSalesLine."Amount Incl. VAT" - PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</VATAmount>';
+                    XML += '<NetAmount>' + Format(PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</NetAmount>';
+                    XML += '<Quantity>' + Format(Round(PosSalesLine.Quantity, 1, '>')) + '</Quantity>'; //Round up - They only accept integer quantity
+                    XML += '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(PosSalesLine.Description), 1, 50)) + '</GoodDescription>';
+                    XML += '</PurchaseItem>';
+                end;
             until PosSalesLine.Next() = 0;
             XML += '</PurchaseItems>';
             XML += '</Receipt>';
