@@ -3,6 +3,11 @@
     "description": "These rules must be respected by all the AL code written within the company.",
     "rules": [
         {
+            "id": "AA0001",
+            "action":"Error",
+            "justification": "There must be exactly one space character on each side of a binary operator such as := + - AND OR =."
+        },
+        {
             "id": "AA0021",
             "action":"Hidden",
             "justification": "Variable declarations should be ordered by type."
