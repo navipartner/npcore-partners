@@ -561,6 +561,11 @@ table 6151198 "NPR NpCs Document"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(2060; "Ship-to Contact"; Text[100])
+        {
+            Caption = 'Ship-to Contact';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -627,6 +632,7 @@ table 6151198 "NPR NpCs Document"
     begin
         if SalesHeader.Get("Document Type", "Document No.") then begin
             "Sell-to Customer Name" := SalesHeader."Sell-to Customer Name";
+            "Ship-to Contact" := SalesHeader."Ship-to Contact";
             "Location Code" := SalesHeader."Location Code";
         end;
     end;

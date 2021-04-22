@@ -39,6 +39,12 @@
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Sell-to Customer Name field';
                     }
+                    field("Ship-to Contact"; Rec."Ship-to Contact")
+                    {
+                        ApplicationArea = All;
+                        Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Ship-to Contact field';
+                    }
                     field("Location Code"; Rec."Location Code")
                     {
                         ApplicationArea = All;
