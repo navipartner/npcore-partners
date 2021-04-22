@@ -62,13 +62,6 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
 
         OpenDrawer(CashDrawerNo, SalePOS);
 
-        if SalePOS.RecordId <> RecID then begin
-            SalePOS.Find();
-            SalePOS."Drawer Opened" := true;
-            SalePOS.Modify();
-            POSSale.Refresh(SalePOS);
-        end;
-
         Handled := true;
     end;
 

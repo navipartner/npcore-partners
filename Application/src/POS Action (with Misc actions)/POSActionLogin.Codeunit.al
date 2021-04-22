@@ -36,8 +36,6 @@ codeunit 6150721 "NPR POS Action - Login"
     var
         JSON: Codeunit "NPR POS JSON Management";
         Setup: Codeunit "NPR POS Setup";
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
         UserSetup: Record "User Setup";
         Type: Text;
         Password: Text;
@@ -49,24 +47,12 @@ codeunit 6150721 "NPR POS Action - Login"
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
-        // TODO:
-        // - Verify the login information
-        // - If everything is okay, call POSSession.StartTransaction
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         Type := JSON.GetStringOrFail('type', StrSubstNo(ReadingErr, ActionCode()));
         POSSession.GetSetup(Setup);
-
-        // Fallback - when framework is not providing the device identity
-        POSSession.GetSessionId(HardwareId, SessionName, HostName);
-        if (HardwareId = '') then begin
-            UserSetup.Get(UserId);
-            UserSetup.TestField("NPR Backoffice Register No.");
-            POSUnitIdentity.ConfigureTemporaryDevice(UserSetup."NPR Backoffice Register No.", POSUnitIdentityRec);
-            Setup.InitializeUsingPosUnitIdentity(POSUnitIdentityRec);
-            POSSession.InitializeSessionId(POSUnitIdentityRec."Device ID", SessionName, HostName);
-        end;
+        Setup.Initialize();
 
         Clear(SalespersonPurchaser);
         case Type of
@@ -184,7 +170,7 @@ codeunit 6150721 "NPR POS Action - Login"
         end;
     end;
 
-    local procedure StartPOS(POSSession: Codeunit "NPR POS Session"): Integer
+    procedure StartPOS(POSSession: Codeunit "NPR POS Session"): Integer
     var
         SalePOS: Record "NPR POS Sale";
         POSAction: Record "NPR POS Action";

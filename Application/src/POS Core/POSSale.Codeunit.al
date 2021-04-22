@@ -59,14 +59,12 @@
         Rec.Date := Today();
         Rec."Start Time" := Time;
         Rec."Sale type" := Rec."Sale type"::Sale;
-        Rec."Saved Sale" := false;
-        Rec.TouchScreen := true;
 
         if WorkDate() <> Today() then begin
             WorkDate := Today();
         end;
 
-        UpdateSaleDeviceID(Rec);
+        Rec."User ID" := UserId;
         Rec.Insert(true);
 
         Rec.Validate("Customer No.", '');
@@ -80,7 +78,6 @@
         Rec.FilterGroup := 0;
 
         IsModified := true;
-
     end;
 
     procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
@@ -97,11 +94,6 @@
         POSUnit.TestField("POS Audit Profile");
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         POSAuditProfile.TestField("Sales Ticket No. Series");
-
-        NoSeries.Get(POSAuditProfile."Sales Ticket No. Series");
-        NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, POSAuditProfile."Sales Ticket No. Series", Today);
-        NoSeriesLine.FindFirst();
-        NoSeriesLine.TestField("Allow Gaps in Nos.", true); //Receipt Number should be non-blocking. We have fiscal receipt number when sale ENDS for numbering without gaps, not when sale starts!        
 
         ReceiptNo := NoSeriesManagement.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today, true);
 
@@ -287,7 +279,7 @@
         SubTotal: Decimal;
     begin
         if not Initialized then
-            exit(false);
+            Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
 
         OnAttemptEndSale(Rec);
@@ -303,7 +295,20 @@
         exit(true);
     end;
 
-    procedure TryEndSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+
+    /// <summary>
+    /// Ends a POS sale by paying for it directly
+    /// </summary>
+    /// <param name="POSPaymentMethod">
+    /// The payment type just used in sale, triggering this end attempt.
+    /// </param>    
+    /// <param name="ReturnPOSPaymentMethod">
+    /// The payment type to use for round and change in case of overtender.
+    /// </param>
+    /// <returns>
+    /// True if sale ended
+    /// </returns>
+    procedure TryEndDirectSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
 
         SalesAmount: Decimal;
@@ -315,11 +320,8 @@
         ChangeAmount: Decimal;
         RoundAmount: Decimal;
     begin
-        //PaymentType: The payment type just used in sale, triggering this end attempt.
-        //ReturnPaymentType: The payment type to use for round & change in case of overtender.
-
         if not Initialized then
-            exit(false);
+            Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
 
         OnAttemptEndSale(Rec);
@@ -437,6 +439,7 @@
         ErrReturnCashExceeded: Label 'Return cash exceeded. Create credit voucher instead.';
         ErrSerialNumberRequired: Label 'Serial Number must be supplied for Item %1 - %2';
         Level: Integer;
+        ErrNoLines: Label 'Cannot end a sale with no lines';
     begin
         POSStore.Get(Sale."POS Store Code");
 
@@ -499,7 +502,7 @@
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
         if not SaleLinePOS.FindSet() then
-            Error('No lines');
+            Error(ErrNoLines);
 
         repeat
             if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and
@@ -590,7 +593,7 @@
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
     begin
         Rec := SalePOS_ToResume;
-        UpdateSaleDeviceID(Rec);
+        Rec."User ID" := UserId;
 
         Rec."Salesperson Code" := Setup.Salesperson();
         if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
@@ -640,19 +643,6 @@
         end;
 
         exit(Ok);
-    end;
-
-    local procedure UpdateSaleDeviceID(var SalePOS: Record "NPR POS Sale")
-    var
-        POSUnitIdentity: Record "NPR POS Unit Identity";
-    begin
-        Setup.GetPOSUnitIdentity(POSUnitIdentity);
-        if POSUnitIdentity."Entry No." = 0 then
-            SalePOS."Device ID" := ''  //Configured using temporary pos unit identity
-        else
-            SalePOS."Device ID" := POSUnitIdentity."Device ID";
-        SalePOS."Host Name" := POSUnitIdentity."Host Name";
-        SalePOS."User ID" := POSUnitIdentity."User ID";
     end;
 
     local procedure RunAfterEndSale_OnRun(xRec: Record "NPR POS Sale") Success: Boolean;

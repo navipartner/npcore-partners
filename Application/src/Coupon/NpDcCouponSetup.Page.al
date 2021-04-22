@@ -41,27 +41,6 @@ page 6151602 "NPR NpDc Coupon Setup"
         }
     }
 
-    actions
-    {
-        area(navigation)
-        {
-            action("How-to Videos")
-            {
-                Caption = 'How-to Videos';
-                Image = UserInterface;
-                ApplicationArea = All;
-                ToolTip = 'Executes the How-to Videos action';
-
-                trigger OnAction()
-                var
-                    EmbeddedVideoMgt: Codeunit "NPR Embedded Video Mgt.";
-                begin
-                    EmbeddedVideoMgt.ShowEmbeddedVideos('NPDC');
-                end;
-            }
-        }
-    }
-
     trigger OnOpenPage()
     begin
         if not Rec.Get() then

@@ -200,11 +200,6 @@
                     Visible = false;
                     ToolTip = 'Specifies the value of the Tax Area Code field';
                 }
-                field("POS Sale ID"; Rec."POS Sale ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Sale ID field';
-                }
                 field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = All;

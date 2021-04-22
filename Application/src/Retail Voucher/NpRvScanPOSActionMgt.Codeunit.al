@@ -181,7 +181,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
             exit;
 
         POSSession.GetSale(POSSale);
-        if not POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
+        if not POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
             exit;
     end;
 

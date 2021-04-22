@@ -34,9 +34,6 @@ codeunit 6150700 "NPR POS Session"
         ActionStateRecRef: array[1024] of RecordRef;
         ActionStateCurrentActionId: Guid;
         ActionStateCurrentAction: Text;
-        HardwareId: Text;
-        SessionName: Text;
-        HostName: Text;
         ActionStateRecRefCounter: Integer;
         ActionStateInAction: Boolean;
         InAction: Boolean;
@@ -81,13 +78,16 @@ codeunit 6150700 "NPR POS Session"
             This := SessionIn;
             Clear(Stargate);
 
+            Setup.Initialize();
+
             JavaScriptInterface.Initialize(SessionIn, FrontEndIn);
             FrontEndKeeper.Initialize(FrameworkIn, FrontEnd, This);
             BindSubscription(FrontEndKeeper);
 
             OnInitialize(FrontEnd);
-        end else
+        end else begin
             Message(Text001);
+        end;
 
         Initialized := true;
     end;
@@ -176,18 +176,6 @@ codeunit 6150700 "NPR POS Session"
         end;
     end;
 
-    procedure InitializeSessionId(HardwareIdIn: Text; SessionNameIn: Text; HostNameIn: Text)
-    var
-        HardwareIdInErr: Label 'Hardware ID from front end is blank. This is a programming error.';
-    begin
-        if HardwareIdIn = '' then
-            Error(HardwareIdInErr);
-        HardwareId := HardwareIdIn;
-        SessionName := SessionNameIn;
-        HostName := HostNameIn;
-        OnFrontEndId(HardwareId, SessionName, HostName, This, FrontEnd);
-    end;
-
     local procedure InitializeKeyboardBindings()
     var
         POSKeyboardBindingMgt: Codeunit "NPR POS Keyboard Binding Mgt.";
@@ -209,7 +197,7 @@ codeunit 6150700 "NPR POS Session"
     local procedure InitializePOSSession()
     begin
         Clear(Sale);
-        Setup.Initialize(UserId);
+        Setup.Initialize();
         Setup.GetPOSUnit(POSUnit);
         Sale.InitializeAtLogin(POSUnit, Setup);
     end;
@@ -498,13 +486,6 @@ codeunit 6150700 "NPR POS Session"
     begin
         CurrentView := View;
         InitializeDataSources();
-    end;
-
-    procedure GetSessionId(var HardwareIdOut: Text; var SessionNameOut: Text; var HostNameOut: Text)
-    begin
-        HardwareIdOut := HardwareId;
-        SessionNameOut := SessionName;
-        HostNameOut := HostName;
     end;
 
     procedure DebugWithTimestamp(Trace: Text)

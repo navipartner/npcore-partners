@@ -286,7 +286,7 @@
 
     local procedure GetSaleLineFromWaiterPadToPOS(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var POSSaleLine: Codeunit "NPR POS Sale Line")
     begin
-        SaleLinePOS.Silent := true;
+        SaleLinePOS.SetSkipUpdateDependantQuantity(true);
 
         SaleLinePOS.Type := WaiterPadLine.Type;
         SaleLinePOS."Sale Type" := WaiterPadLine."Sale Type";
@@ -300,7 +300,8 @@
         SaleLinePOS."Order Line No. from Web" := WaiterPadLine."Order Line No. from Web";
         if SaleLinePOS.Type = SaleLinePOS.Type::Item then
             SaleLinePOS.Validate("Unit of Measure Code");
-        SaleLinePOS.Silent := false;
+
+        SaleLinePOS.SetSkipUpdateDependantQuantity(false);
 
         SaleLinePOS.Validate(Quantity, WaiterPadLine.Quantity - WaiterPadLine."Billed Quantity");
         SaleLinePOS."Unit Price" := WaiterPadLine."Unit Price";

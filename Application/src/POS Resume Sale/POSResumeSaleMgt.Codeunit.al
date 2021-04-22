@@ -32,26 +32,15 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     procedure SelectUnfinishedSaleToResume(var SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; var POSQuoteEntryNo: Integer): Boolean
     var
         POSUnit: Record "NPR POS Unit";
-        POSUnitIdentity: Record "NPR POS Unit Identity";
         Setup: Codeunit "NPR POS Setup";
     begin
         POSSession.GetSetup(Setup);
-        Setup.GetPOSUnitIdentity(POSUnitIdentity);
         Setup.GetPOSUnit(POSUnit);
 
         SalePOS.FilterGroup(2);
         SalePOS.SetRange("Register No.", Setup.GetPOSUnitNo());
+        SalePOS.SetRange("User ID", UserId);
         SalePOS.FilterGroup(0);
-        //SalePOS.SETRANGE("Salesperson Code",Setup.Salesperson());
-        if POSUnitIdentity."Entry No." = 0 then
-            SalePOS.SetRange("Device ID", '')  //Configured using temporary pos unit identity
-        else
-            SalePOS.SetRange("Device ID", POSUnitIdentity."Device ID");
-        SalePOS.SetRange("Host Name", POSUnitIdentity."Host Name");
-        if (POSUnitIdentity."Session Type" in [POSUnitIdentity."Session Type"::RemoteDesktop, POSUnitIdentity."Session Type"::Citrix]) or
-           (POSUnitIdentity."Host Name" = '')  //Connected from web browser
-        then
-            SalePOS.SetRange("User ID", POSUnitIdentity."User ID");
         exit(SaleToResumeIsSelected(SalePOS, POSUnit, POSSession, POSQuoteEntryNo));
     end;
 
@@ -194,6 +183,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         POSTryCancelSale: Codeunit "NPR POS Try Resume&CancelSale";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         Position: Integer;
+
     begin
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
             WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, true);

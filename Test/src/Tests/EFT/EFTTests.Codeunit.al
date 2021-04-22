@@ -1,4 +1,4 @@
-﻿codeunit 85004 "NPR EFT Tests"
+codeunit 85004 "NPR EFT Tests"
 {
     // // [Feature] EFT Framework
 
@@ -1360,11 +1360,9 @@
         OriginalEFTTransactionRequest.Get(_LastTrxEntryNo);
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
-        SalePOS.Delete(true);  //NPR5.55 [391678]
+        POSActionSavePOSQuote.CreatePOSQuoteAndStartNewSale(_POSSession, POSQuoteEntry);
 
         // [Given] New sale is started
-        _POSSession.StartTransaction();
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
@@ -2206,11 +2204,9 @@
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         OriginalEFTTransactionRequest.Get(_LastTrxEntryNo);
-        POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
-        SalePOS.Delete(true);  //NPR5.55 [391678]
+        POSActionSavePOSQuote.CreatePOSQuoteAndStartNewSale(_POSSession, POSQuoteEntry);
 
         // [Given] Fresh sale
-        _POSSession.StartTransaction();
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
@@ -2454,14 +2450,14 @@
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.FindFirst();
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSPaymentLine.SetRange("Retail ID", EFTTransactionRequest."Sales Line ID");
+        POSPaymentLine.SetRange(SystemId, EFTTransactionRequest."Sales Line ID");
         POSPaymentLine.FindFirst();
         POSPaymentLine.TestField("Amount (LCY)", EFTTransactionRequest."Result Amount");
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSSalesLine.SetRange("Retail ID", EFTTransactionRequest."Fee Line ID");
+        POSSalesLine.SetRange(SystemId, EFTTransactionRequest."Fee Line ID");
         POSSalesLine.FindFirst();
         POSSalesLine.TestField("Amount Incl. VAT (LCY)", EFTTransactionRequest."Fee Amount");
-        POSSalesLine.SetRange("Retail ID", EFTTransactionRequest."Tip Line ID");
+        POSSalesLine.SetRange(SystemId, EFTTransactionRequest."Tip Line ID");
         POSSalesLine.FindFirst();
         POSSalesLine.TestField("Amount Incl. VAT (LCY)", EFTTransactionRequest."Tip Amount");
     end;
@@ -2791,11 +2787,11 @@
     begin
     end;
 
-    procedure AssertPaymentLine(LineRetailID: Guid; Amount: Decimal; ShouldExist: Boolean)
+    procedure AssertPaymentLine(LineSystemId: Guid; Amount: Decimal; ShouldExist: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        SaleLinePOS.SetRange("Retail ID", LineRetailID);
+        SaleLinePOS.SetRange(SystemId, LineSystemId);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
         if ShouldExist then begin
             SaleLinePOS.FindFirst();
@@ -2805,11 +2801,11 @@
         end;
     end;
 
-    procedure AssertServiceItemLine(LineRetailID: Guid; Amount: Decimal; ShouldExist: Boolean)
+    procedure AssertServiceItemLine(LineSystemId: Guid; Amount: Decimal; ShouldExist: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        SaleLinePOS.SetRange("Retail ID", LineRetailID);
+        SaleLinePOS.SetRange(SystemId, LineSystemId);
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
         if ShouldExist then begin
@@ -2820,11 +2816,11 @@
         end;
     end;
 
-    procedure AssertGLDepositLine(LineRetailID: Guid; Amount: Decimal; ShouldExist: Boolean)
+    procedure AssertGLDepositLine(LineSystemId: Guid; Amount: Decimal; ShouldExist: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        SaleLinePOS.SetRange("Retail ID", LineRetailID);
+        SaleLinePOS.SetRange(SystemId, LineSystemId);
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"G/L Entry");
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
         if ShouldExist then begin

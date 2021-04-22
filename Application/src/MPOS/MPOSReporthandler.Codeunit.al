@@ -26,7 +26,7 @@ codeunit 6059976 "NPR MPOS Report handler"
         UserSetup: Record "User Setup";
     begin
         if UserSetup.Get(UserId) then
-            RegisterId := UserSetup."NPR Backoffice Register No.";
+            RegisterId := UserSetup."NPR POS Unit No.";
 
         if POSUnit.Get(RegisterId) then begin
             if POSUnit.GetProfile(MPOSProfile) then

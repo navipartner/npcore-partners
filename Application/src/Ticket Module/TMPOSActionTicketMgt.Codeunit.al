@@ -867,7 +867,6 @@
         SaleLinePOS.Quantity := -1;
 
         SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
-        SaleLinePOS."Return Sale Line No." := Ticket."Line No.";
 
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.RefreshCurrent();
