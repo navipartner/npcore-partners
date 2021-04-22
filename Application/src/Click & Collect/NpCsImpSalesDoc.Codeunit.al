@@ -310,6 +310,7 @@
         SalesHeader.Validate("Salesperson Code", NpXmlDomMgt.GetElementCode(Element, 'salesperson_code', MaxStrLen(SalesHeader."Salesperson Code"), true));
         SalesHeader.Validate("Payment Method Code", NpXmlDomMgt.GetElementCode(Element, 'payment_method_code', MaxStrLen(SalesHeader."Payment Method Code"), true));
         SalesHeader.Validate("Shipment Method Code", NpXmlDomMgt.GetElementCode(Element, 'shipment_method_code', MaxStrLen(SalesHeader."Shipment Method Code"), true));
+        SalesHeader."Ship-to Contact" := NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(SalesHeader."Ship-to Contact"), false);
         SalesHeader.Modify(true);
     end;
 
@@ -349,6 +350,7 @@
         NpCsDocument."Customer No." := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocument."Customer No."), false);
         NpCsDocument."Customer E-mail" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(NpCsDocument."Customer E-mail"), false);
         NpCsDocument."Customer Phone No." := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(NpCsDocument."Customer Phone No."), false);
+        NpCsDocument."Ship-to Contact" := NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(NpCsDocument."Ship-to Contact"), false);
         NpCsDocument."Send Notification from Store" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/send_notification_from_store', false);
         NpCsDocument."Notify Customer via E-mail" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/notify_customer_via_email', false);
         NpCsDocument."E-mail Template (Pending)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_pending', MaxStrLen(NpCsDocument."E-mail Template (Pending)"), false);

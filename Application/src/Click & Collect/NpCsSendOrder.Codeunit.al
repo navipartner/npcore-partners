@@ -33,14 +33,12 @@ codeunit 6151197 "NPR NpCs Send Order"
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
         ContentHeader.Add('SOAPAction', 'ImportSalesDocuments');
-        ContentHeader.Remove('Connection');
-        ContentHeader := Client.DefaultRequestHeaders();
 
         Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
         Client.Post(NpCsStore."Service Url", RequestContent, Response);
 
         if not Response.IsSuccessStatusCode then begin
-            ExceptionMessage := Response.ReasonPhrase;
+            Response.Content().ReadAs(ExceptionMessage);
             if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
                     ExceptionMessage := Node.AsXmlElement().InnerText();
@@ -128,6 +126,7 @@ codeunit 6151197 "NPR NpCs Send Order"
                       '<delivery_expiry_days_qty>' + Format(NpCsDocument."Delivery Expiry Days (Qty.)", 0, 9) + '</delivery_expiry_days_qty>' +
                     '</notification>' +
                     '<bill_to_customer_no>' + NpCsStore."Bill-to Customer No." + '</bill_to_customer_no>' +
+                    '<ship_to_contact>' + NpCsDocument."Ship-to Contact" + '</ship_to_contact>' +
                     '<archive_on_delivery>' + Format(NpCsDocument."Archive on Delivery", 0, 9) + '</archive_on_delivery>' +
                     '<store_stock>' + Format(NpCsDocument."Store Stock", 0, 9) + '</store_stock>' +
                     '<post_on>' + Format(NpCsDocument."Post on", 0, 2) + '</post_on>' +
