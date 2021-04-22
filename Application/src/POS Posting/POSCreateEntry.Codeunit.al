@@ -154,6 +154,7 @@
         POSEntry."Dimension Set ID" := SalePOS."Dimension Set ID";
         POSEntry."POS Sale ID" := SalePOS."POS Sale ID";
         POSEntry."Retail ID" := SalePOS."Retail ID";
+        POSEntry.SystemId := SalePOS.SystemId;
         POSEntry."Starting Time" := SalePOS."Start Time";
         POSEntry."Ending Time" := Time;
         POSEntry."Posting Date" := SalePOS.Date;
@@ -189,7 +190,7 @@
             end;
         end;
 
-        POSEntry.Insert();
+        POSEntry.Insert(false, true);
     end;
 
     local procedure InsertPOSSaleLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Entry Sales Line")
@@ -305,11 +306,10 @@
 
         POSSalesLine."Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
         POSSalesLine."Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
-
         POSSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        POSSalesLine.SystemId := SaleLinePOS.SystemId;
 
         POSSalesLine."Item Category Code" := SaleLinePOS."Item Category Code";
-        POSSalesLine."Product Group Code" := SaleLinePOS."Product Group Code";
 
         POSSalesLine."Serial No." := SaleLinePOS."Serial No.";
         POSSalesLine."Retail Serial No." := SaleLinePOS."Serial No. not Created";
@@ -361,7 +361,7 @@
             POSSalesLine."VAT Difference" := -POSSalesLine."VAT Difference";
         end;
         OnBeforeInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
-        POSSalesLine.Insert();
+        POSSalesLine.Insert(false, true);
         OnAfterInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
     end;
 
@@ -410,6 +410,7 @@
         POSPaymentLine."Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
         POSPaymentLine."Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
         POSPaymentLine.EFT := SaleLinePOS."EFT Approved";
+        POSPaymentLine.SystemId := SaleLinePOS.SystemId;
 
         POSPaymentLine."Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
         POSPaymentLine."Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
@@ -428,7 +429,7 @@
 
         OnBeforeInsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
 
-        POSPaymentLine.Insert();
+        POSPaymentLine.Insert(false, true);
         OnAfterInsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
     end;
 

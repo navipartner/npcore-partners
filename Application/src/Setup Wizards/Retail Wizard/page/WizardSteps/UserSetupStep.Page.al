@@ -111,7 +111,7 @@ page 6014690 "NPR User Setup Step"
                     ApplicationArea = All;
                     ToolTip = 'Specifies if a user is a time sheet administrator. A time sheet administrator can access any time sheet and then edit, change, or delete it.';
                 }
-                field("Backoffice POS Unit No."; Rec."NPR Backoffice Register No.")
+                field("NPR POS Unit No."; "NPR POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Backoffice POS Unit No. field';
@@ -125,12 +125,12 @@ page 6014690 "NPR User Setup Step"
                         POSUnitsList.SetPOSUnitMode(true);
                         POSUnitsList.SetRec(TempAllPOSUnit);
 
-                        if Rec."NPR Backoffice Register No." <> '' then
-                            if TempAllPOSUnit.Get(Rec."NPR Backoffice Register No.") then
+                        if "NPR POS Unit No." <> '' then
+                            if TempAllPOSUnit.Get("NPR POS Unit No.") then
                                 POSUnitsList.SetRecord(TempAllPOSUnit);
 
                         if POSUnitsList.RunModal() = Action::LookupOK then
-                            Rec."NPR Backoffice Register No." := TempAllPOSUnit."No.";
+                            "NPR POS Unit No." := TempAllPOSUnit."No.";
 
                         POSUnitsList.SetPOSUnitMode(false);
                     end;

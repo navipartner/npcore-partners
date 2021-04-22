@@ -166,17 +166,16 @@
 
         InitLine();
 
-        // TODO: copy information from Line to Rec
         Rec.Type := Line.Type;
         Rec."Sale Type" := Line."Sale Type";
 
-        Rec.Silent := (Line."Variant Code" <> '');
+            Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
-        if ((Line.Type = Line.Type::Item) and (not Rec.Silent) and (ItemVariantIsRequired(Line."No."))) then begin
+            if ((Line.Type = Line.Type::Item) and (Line."Variant Code" = '') and (ItemVariantIsRequired(Line."No."))) then begin
             FillVariantThroughLookUp(Line."No.", Line."Variant Code");
             if Line."Variant Code" = '' then
                 Error(ITEM_REQUIRES_VARIANT, Line."No.");
-            Rec.Silent := (Line."Variant Code" <> '');
+                Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
         end;
 
         Rec."Variant Code" := Line."Variant Code";
@@ -184,14 +183,13 @@
         if Line."Unit of Measure Code" <> '' then
             Rec.Validate("Unit of Measure Code", Line."Unit of Measure Code");
 
-        Rec.Silent := false;
+            Rec.SetSkipUpdateDependantQuantity(false);
 
         if Line.Description <> '' then
             Rec.Description := Line.Description;
 
         Rec.Validate(Quantity, Line.Quantity);
 
-        Rec."Customer No. Line" := Line."Customer No. Line";
         Rec.Validate("NPRE Seating Code", Line."NPRE Seating Code");
 
         if (Rec."Sale Type" = Rec."Sale Type"::"Out payment") then begin

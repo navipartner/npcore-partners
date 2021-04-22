@@ -333,7 +333,7 @@
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         Commit();
 
-        POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, POSPaymentMethod);
+        POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, POSPaymentMethod);
 
         exit(true);
     end;

@@ -633,7 +633,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         if POSPaymentMethod."Auto End Sale" then begin
             POSUnit.Get(Setup.GetPOSUnitNo());
             ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
-            POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
+            POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
         end;
     end;
 }

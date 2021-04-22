@@ -40,8 +40,6 @@ then begin
     var
         JSON: Codeunit "NPR POS JSON Management";
         Setup: Codeunit "NPR POS Setup";
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
         UserSetup: Record "User Setup";
         SalespersonCode: Text;
         Type: Text;
@@ -61,16 +59,7 @@ then begin
         Type := JSON.GetString('type');
 
         POSSession.GetSetup(Setup);
-
-        // Fallback - when framework is not providing the device identity
-        POSSession.GetSessionId(HardwareId, SessionName, HostName);
-        if (HardwareId = '') then begin
-            UserSetup.Get(UserId);
-            UserSetup.TestField("NPR Backoffice Register No.");
-            POSUnitIdentity.ConfigureTemporaryDevice(UserSetup."NPR Backoffice Register No.", POSUnitIdentityRec);
-            Setup.InitializeUsingPosUnitIdentity(POSUnitIdentityRec);
-            POSSession.InitializeSessionId(POSUnitIdentityRec."Device ID", SessionName, HostName);
-        end;
+        Setup.Initialize();
 
         Clear(SalespersonPurchaser);
 

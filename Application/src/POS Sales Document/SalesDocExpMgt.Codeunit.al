@@ -188,10 +188,8 @@
             DoCustomerCreditCheck(SalesHeader);
         end;
 
-        Clear(SaleLinePOS);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.ModifyAll(Silent, true);
 
         if SaleLinePOS.FindSet() then begin
             CopySaleCommentLines(SalePOS, SalesHeader);
@@ -253,11 +251,6 @@
 
         if ShowCreationMessage then
             Message(Text000008, SalesHeader."Document Type", SalesHeader."No.");
-
-        if Posted then begin
-            SalePOS."Last Posting No." := SalesHeader."Last Posting No.";
-            SalePOS."Last Shipping No." := SalesHeader."Last Shipping No."
-        end;
 
         TicketManagement.PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
 
@@ -1068,13 +1061,12 @@
 
     local procedure UpdateActiveSaleWithDocumentChanges(SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
     var
-        RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
+        ImportSalesDocInPOS: Codeunit "NPR Import Sales Doc. In POS";
     begin
         SalePOS."Sales Document Type" := SalesHeader."Document Type";
         SalePOS."Sales Document No." := SalesHeader."No.";
-        SalePOS.Parameters := 'IMPORT_DOCUMENT_SYNC';
 
-        if not RetailSalesDocImpMgt.Run(SalePOS) then
+        if not ImportSalesDocInPOS.Run(SalePOS) then
             Error(ERR_ORDER_SALE_SYNC, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
 
         SalePOS.Get(SalePOS."Register No.", SalePOS."Sales Ticket No.");

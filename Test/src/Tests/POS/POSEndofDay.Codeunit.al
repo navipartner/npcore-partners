@@ -650,7 +650,7 @@ codeunit 85020 "NPR POS End of Day"
 
         // [Scenario] Check that foreign currency is added correctly for the End of Day summary
         InitializeSetupVoucher();
- 
+
         NumberOfSales := 1;
         SalesOffset := 4;
 
@@ -914,6 +914,9 @@ codeunit 85020 "NPR POS End of Day"
         NpRvVoucher.Setrange("Voucher Type", _VoucherType.Code);
         NpRvVoucher.FindFirst();
     end;
-   
 
+    procedure GetPOSUnitNo(): Text
+    begin
+        Exit(_POSUnit."No.");
+    end;
 }

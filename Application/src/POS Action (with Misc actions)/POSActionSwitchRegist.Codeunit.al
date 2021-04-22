@@ -104,19 +104,19 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
 
     local procedure SwitchRegister(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; NewUnitNo: Code[10])
     var
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
         Setup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
+        UserSetup: Record "User Setup";
     begin
         TestAllowUnitSwitch(NewUnitNo);
-        POSUnit.SetThisUnitNo(NewUnitNo);
+
+        UserSetup.Get(UserId);
+        UserSetup.Validate("NPR POS Unit No.", NewUnitNo);
+        UserSetup.Modify();
+        POSUnit.Get(NewUnitNo);
 
         POSSession.GetSetup(Setup);
-
-        POSUnitIdentity.SwitchToPosUnit(POSSession, NewUnitNo, POSUnitIdentityRec);
-        Setup.InitializeUsingPosUnitIdentity(POSUnitIdentityRec);
-
+        Setup.SetPOSUnit(POSUnit);
         POSSession.InitializeSession(true);
     end;
 

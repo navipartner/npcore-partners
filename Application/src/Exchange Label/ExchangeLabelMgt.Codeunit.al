@@ -9,11 +9,13 @@
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         String: Codeunit "NPR String Library";
         POSUnit: Record "NPR POS Unit";
+        UserSetup: Record "User Setup";
     begin
         ExchangeLabelSetup.Get();
         ExchangeLabel.Init();
 
-        if POSUnit.Get(POSUnit.GetCurrentPOSUnit()) then;
+        if UserSetup.Get(UserId) then
+            if POSUnit.Get(UserSetup."NPR POS Unit No.") then;
 
         if StrLen(POSUnit."POS Store Code") <> 3 then
             POSUnit."POS Store Code" := String.PadStrLeft(POSUnit."POS Store Code", 3, ' ', false);
@@ -170,9 +172,10 @@
         RecRef: RecordRef;
         ExchangeLabelRec: Record "NPR Exchange Label";
         POSUnit: Record "NPR POS Unit";
+        UserSetup: Record "User Setup";
     begin
-
-        RetailReportSelectionMgt.SetRegisterNo(POSUnit.GetCurrentPOSUnit());
+        UserSetup.Get(UserId);
+        RetailReportSelectionMgt.SetRegisterNo(UserSetup."NPR POS Unit No.");
 
         ExchangeLabel.SetRange("Packaged Batch", false);
         if ExchangeLabel.FindSet() then
@@ -464,8 +467,11 @@
         EAN1: Code[20];
         POSUnit: Record "NPR POS Unit";
         INVALID_EAN_VALUE: Label 'Only digits are allowed when creating EAN: %1';
+        UserSetup: Record "User Setup";
     begin
-        if POSUnit.Get(POSUnit.GetCurrentPOSUnit()) then;
+        if UserSetup.Get(UserId) then
+            if POSUnit.Get(UserSetup."NPR POS Unit No.") then;
+
         if StrLen(Prefix) + StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique)) > 12 then
             Error(ErrLength);
 

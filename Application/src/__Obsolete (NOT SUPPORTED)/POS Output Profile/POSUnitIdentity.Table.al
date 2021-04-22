@@ -4,6 +4,7 @@ table 6150715 "NPR POS Unit Identity"
 
     Caption = 'POS Unit Identity';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {

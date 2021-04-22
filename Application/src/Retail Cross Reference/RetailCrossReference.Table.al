@@ -8,6 +8,8 @@ table 6151180 "NPR Retail Cross Reference"
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Retail Cross References";
     LookupPageID = "NPR Retail Cross References";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Use systemID instead. (For POS sales, the same systemID is transferred from active sale header/lines to finished pos entry header/lines).';
 
     fields
     {

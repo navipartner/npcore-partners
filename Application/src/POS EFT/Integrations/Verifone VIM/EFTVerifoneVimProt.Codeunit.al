@@ -154,13 +154,8 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
     var
         EFTVerifoneVimIntegration: Codeunit "NPR EFT Verifone Vim Integ.";
         Licenceinformation: Codeunit "NPR License Information";
-        HardwareId: Text;
-        HostName: Text;
-        SessionName: Text;
         EFTVerifoneUnitParameter: Record "NPR EFT Verifone Unit Param.";
     begin
-        POSSession.GetSessionId(HardwareId, SessionName, HostName);
-
         TransactionRequest.EcrToGatewayData := StrSubstNo('%1 | %2', EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.");
         TransactionRequest.EcrID := EftTransactionRequest."Register No.";
         TransactionRequest.Currency := EftTransactionRequest."Currency Code";
@@ -177,7 +172,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         if EFTVerifoneVimIntegration.GetAutoOpenOnTransaction(EFTSetup) then begin
             TransactionRequest.AutoInitAndLoginBeforeTrx := true;
             TransactionRequest.LoginTimeoutMs := EFTVerifoneVimIntegration.GetLoginTimeout(EFTSetup) * 1000;
-            TransactionRequest.EcrSerial := HardwareId;
+            TransactionRequest.EcrSerial := 'cloud';
             TransactionRequest.ConnectionBrokenDetection := true;
             TransactionRequest.InitTimeoutMs := EFTVerifoneVimIntegration.GetInitTimeout(EFTSetup) * 1000;
             TransactionRequest.SoftwareManufacturer := 'NaviPartner ApS';
@@ -235,16 +230,12 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         EFTSetup: Record "NPR EFT Setup";
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
-        HardwareId: Text;
-        HostName: Text;
-        SessionName: Text;
         EFTVerifoneVimIntegration: Codeunit "NPR EFT Verifone Vim Integ.";
         Licenceinformation: Codeunit "NPR License Information";
         EFTVerifoneUnitParameter: Record "NPR EFT Verifone Unit Param.";
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
-        POSSession.GetSessionId(HardwareId, SessionName, HostName);
 
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
@@ -252,7 +243,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         LoginRequest.EftEntryNo := EftTransactionRequest."Entry No.";
         LoginRequest.LoginTimeoutMs := EFTVerifoneVimIntegration.GetLoginTimeout(EFTSetup) * 1000;
         LoginRequest.EcrID := EftTransactionRequest."Register No.";
-        LoginRequest.EcrSerial := HardwareId;
+        LoginRequest.EcrSerial := 'cloud';
         LoginRequest.ConnectionBrokenDetection := true;
         LoginRequest.InitTimeoutMs := EFTVerifoneVimIntegration.GetInitTimeout(EFTSetup) * 1000;
         LoginRequest.SoftwareManufacturer := 'NaviPartner ApS';

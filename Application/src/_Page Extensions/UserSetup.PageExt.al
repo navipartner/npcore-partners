@@ -4,10 +4,10 @@ pageextension 6014401 "NPR User Setup" extends "User Setup"
     {
         addafter("Time Sheet Admin.")
         {
-            field("NPR Backoffice Register No."; Rec."NPR Backoffice Register No.")
+            field("NPR POS Unit No."; Rec."NPR POS Unit No.")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Backoffice Register No. field';
+                ToolTip = 'The POS Unit that the user logs onto in the POS';
             }
             field("NPR Allow Register Switch"; Rec."NPR Allow Register Switch")
             {

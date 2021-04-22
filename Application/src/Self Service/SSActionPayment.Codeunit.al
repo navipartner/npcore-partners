@@ -87,7 +87,7 @@ codeunit 6151291 "NPR SS Action: Payment"
         POSPaymentMethod.Get(Context.GetStringParameterOrFail('PaymentType', ActionCode()));
         ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
 
-        POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
+        POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
     end;
 
     local procedure GetAmountSuggestion(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"): Decimal

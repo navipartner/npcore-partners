@@ -159,7 +159,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             'Protocol':
                 Method_Protocol(POSSession, FrontEnd, Context);
             'FrontEndId':
-                Method_FrontEndId(POSSession, FrontEnd, Context);
+                FrontEnd.HardwareInitializationComplete(); //TODO: Delete when gone from addin
             'Unlock':
                 Method_Unlock(POSSession, FrontEnd, Context, Self);
             'ProtocolUIResponse':
@@ -413,22 +413,6 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         EventName := JSON.GetStringOrFail('event', ReadingFromProtocolMethodErr);
         Callback := JSON.GetBooleanOrFail('callback', ReadingFromProtocolMethodErr);
         Stargate.AppGatewayProtocol(ActionName, Step, EventName, SerializedArguments, Callback, FrontEnd);
-    end;
-
-    local procedure Method_FrontEndId(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        HardwareId: Text;
-        SessionName: Text;
-        HostName: Text;
-        ReadingFrontEndIdErr: Label 'reading from FrontEndId method';
-    begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        HardwareId := JSON.GetStringOrFail('hardware', ReadingFrontEndIdErr);
-        SessionName := JSON.GetString('session');
-        HostName := JSON.GetString('host');
-        POSSession.InitializeSessionId(HardwareId, SessionName, HostName);
-        FrontEnd.HardwareInitializationComplete();
     end;
 
     local procedure Method_Unlock(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")

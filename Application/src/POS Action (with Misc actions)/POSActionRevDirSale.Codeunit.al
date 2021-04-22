@@ -227,7 +227,7 @@ then begin
     begin
         POSEntry.Get(POSSalesLine."POS Entry No.");
 
-        SaleLinePOS.Silent := true;
+        SaleLinePOS.SetSkipUpdateDependantQuantity(true);
         SaleLinePOS.Validate("No.", POSSalesLine."No.");
         SaleLinePOS.Description := POSSalesLine.Description;
 

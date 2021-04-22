@@ -445,7 +445,7 @@ codeunit 6184499 "NPR EFT Framework Mgt."
 
         if (POSUnitNo <> '') and (SalesReceiptNo <> '') then begin
             SalePOS.Get(POSUnitNo, SalesReceiptNo);
-            EFTTransactionRequest."Sales ID" := SalePOS."Retail ID";
+            EFTTransactionRequest."Sales ID" := SalePOS.SystemId;
         end;
     end;
 

@@ -123,6 +123,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Qty. Discount Code';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10; Description; Text[100])
         {
@@ -176,10 +177,8 @@ table 6014406 "NPR POS Sale Line"
                 case Type of
                     Type::"G/L Entry":
                         begin
-                            if not Silent then begin
-                                if Quantity = 0 then
-                                    Error(Err003);
-                            end;
+                            if Quantity = 0 then
+                                Error(Err003);
                             UpdateAmounts(Rec);
                         end;
                     Type::Item:
@@ -234,12 +233,15 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Invoice (Qty)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'No longer used except as dummy field.';
         }
         field(14; "To Ship (Qty)"; Decimal)
         {
             Caption = 'To Ship (Qty)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
+            ObsoleteState = Removed;
         }
         field(15; "Unit Price"; Decimal)
         {
@@ -334,6 +336,7 @@ table 6014406 "NPR POS Sale Line"
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
+            ObsoleteState = Removed;
         }
         field(19; "Discount %"; Decimal)
         {
@@ -528,6 +531,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Allow Quantity Discount';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
         }
         field(43; "Serial No."; Code[50])
         {
@@ -552,13 +556,14 @@ table 6014406 "NPR POS Sale Line"
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
+            ObsoleteState = Removed;
         }
         field(46; "Invoice to Customer No."; Code[20])
         {
             Caption = 'Invoice to Customer No.';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = Customer;
+            ObsoleteState = Removed;
         }
         field(47; "Invoice Discount Amount"; Decimal)
         {
@@ -604,6 +609,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Claim (LCY)';
             DataClassification = CustomerContent;
             Editable = false;
+            ObsoleteState = Removed;
         }
         field(54; "VAT Base Amount"; Decimal)
         {
@@ -622,7 +628,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Euro';
             DataClassification = CustomerContent;
-
+            ObsoleteState = Removed;
         }
         field(57; "Quantity (Base)"; Decimal)
         {
@@ -633,16 +639,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Period Discount code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Period Discount".Code;
-
-            trigger OnValidate()
-            begin
-                CreateDim(
-                  NPRDimMgt.TypeToTableNPR(Type), "No.",
-                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                  0, '');
-            end;
+            ObsoleteState = Removed;
         }
         field(59; "Lookup On No."; Boolean)
         {
@@ -847,6 +844,8 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Retail Document No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'No longer used except as dummy field.';
         }
         field(140; "Sales Document Type"; Enum "Sales Document Type")
         {
@@ -902,6 +901,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Customer Location No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(151; "Sales Document Prepay. Refund"; Boolean)
         {
@@ -963,18 +963,24 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Orig. POS Sale ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
         {
             Caption = 'Orig. POS Line No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(200; "Qty. per Unit of Measure"; Decimal)
         {
@@ -988,6 +994,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Return Sale POS Unit No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(301; "Return Sale Sales Ticket No."; Code[20])
         {
@@ -1000,21 +1007,25 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Payment1,Disbursement,Comment,,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Payment1,Disbursement,Comment,,"Open/Close";
+            ObsoleteState = Removed;
         }
         field(303; "Return Sale Line No."; Integer)
         {
             Caption = 'Return Sale Line No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(304; "Return Sale No."; Code[20])
         {
             Caption = 'Return Sale No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(305; "Return Sales Sales Date"; Date)
         {
             Caption = 'Return Sales Sales Date';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(400; "Discount Type"; Option)
         {
@@ -1193,12 +1204,14 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6004; Internal; Boolean)
         {
             Caption = 'Internal';
             DataClassification = CustomerContent;
             InitValue = false;
+            ObsoleteState = Removed;
         }
         field(6005; "Currency Amount"; Decimal)
         {
@@ -1343,11 +1356,13 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Foreign No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6037; GiftCrtLine; Integer)
         {
             Caption = 'Gift Certificate Line';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6038; "Label Date"; Date)
         {
@@ -1391,9 +1406,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            ObsoleteState = No;
-            //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
-            //ObsoleteTag = '15.0';
+            ObsoleteState = Removed;
         }
         field(6055; "Lock Code"; Code[10])
         {
@@ -1425,6 +1438,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Silent';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10001; Deleting; Boolean)
         {
@@ -1436,6 +1450,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'No Warning';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10003; CondFirstRun; Boolean)
         {
@@ -1466,16 +1481,19 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Insurrance';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10008; TestOnServer; Boolean)
         {
             Caption = 'Test on Server';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10009; "Customer No. Line"; Boolean)
         {
             Caption = 'Customer No. Line';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10010; ForceApris; Boolean)
         {
@@ -1514,6 +1532,7 @@ table 6014406 "NPR POS Sale Line"
             Editable = false;
             SQLTimestamp = true;
         }
+
     }
 
     keys
@@ -1522,19 +1541,6 @@ table 6014406 "NPR POS Sale Line"
         {
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Cost, "Discount Amount", Amount;
-        }
-        key(Key2; "Register No.", "Sales Ticket No.", "Sale Type", "Line No.")
-        {
-            MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
-        }
-
-        key(Key3; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Group", Quantity)
-        {
-            MaintainSIFTIndex = false;
-            SumIndexFields = "Amount Including VAT", Amount, Quantity;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Item Group is obsolete, same key with Item Category created instead (Key10).';
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Line No.")
         {
@@ -1563,14 +1569,6 @@ table 6014406 "NPR POS Sale Line"
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = Quantity;
-        }
-        key(Key9; "Insurance Category", "Register No.", "Sales Ticket No.", Date, "Sale Type", Type)
-        {
-            MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
-            SumIndexFields = "Amount Including VAT";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Insurance Category is obsolete. Use Key11 instead.';
         }
         key(Key10; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Category Code", Quantity)
         {
@@ -1622,17 +1620,6 @@ table 6014406 "NPR POS Sale Line"
             end;
         end;
 
-        if GiftCrtLine <> 0 then begin
-            SaleLinePOS.Reset();
-            SaleLinePOS.SetRange("Register No.", "Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-            SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::"Out payment");
-            SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"G/L Entry");
-            SaleLinePOS.SetRange("Line No.", GiftCrtLine);
-            if SaleLinePOS.FindFirst() then
-                SaleLinePOS.Delete();
-        end;
-
         TicketRequestManager.OnDeleteSaleLinePos(Rec);
     end;
 
@@ -1676,6 +1663,7 @@ table 6014406 "NPR POS Sale Line"
         Text003: Label 'Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
         ERR_EFT_DELETE: Label 'Cannot delete externally approved electronic funds transfer. Please attempt refund or void of the original transaction instead.';
+        SkipDependantQuantityUpdate: Boolean;
 
     local procedure GetPOSHeader()
     var
@@ -1798,7 +1786,6 @@ table 6014406 "NPR POS Sale Line"
 
         SalesLine."Inv. Discount Amount" := "Invoice Discount Amount";
         SalesLine."Currency Code" := "Currency Code";
-        SalesLine."Outstanding Amount (LCY)" := "Claim (LCY)";
         SalesLine."VAT Base Amount" := "VAT Base Amount";
         SalesLine."Unit Cost" := "Unit Cost";
         SalesLine."NPR Discount Type" := "Discount Type";
@@ -1911,12 +1898,12 @@ table 6014406 "NPR POS Sale Line"
                     if not SaleLinePOS.Insert(true) then
                         SaleLinePOS.Modify(true);
                     SaleLinePOS."No." := BOMComponent."No.";
-                    SaleLinePOS.Silent := true;
+                    SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                     SaleLinePOS.Validate("No.");
                     SaleLinePOS.Quantity := BOMComponent."Quantity per" * Rec.Quantity;
                     SaleLinePOS.Validate(Quantity);
                     Sum += SaleLinePOS."Unit Price" * SaleLinePOS.Quantity;
-                    SaleLinePOS.Silent := false;
+                    SaleLinePOS.SetSkipUpdateDependantQuantity(false);
                     if not SaleLinePOS.Modify(true) then
                         SaleLinePOS.Insert(true);
                     if FromLineNo = 0 then
@@ -2232,7 +2219,6 @@ table 6014406 "NPR POS Sale Line"
         "Tax Group Code" := Item."Tax Group Code";
         "Posting Group" := Item."Inventory Posting Group";
         "Item Disc. Group" := Item."Item Disc. Group";
-        "Vendor No." := Item."Vendor No.";
         "Custom Disc Blocked" := Item."NPR Custom Discount Blocked";
         if "Unit of Measure Code" = '' then
             "Unit of Measure Code" := Item."Base Unit of Measure";
@@ -2352,7 +2338,7 @@ table 6014406 "NPR POS Sale Line"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        if Silent then
+        if SkipDependantQuantityUpdate then
             exit;
 
         if xRec.Quantity = 0 then
@@ -2368,9 +2354,9 @@ table 6014406 "NPR POS Sale Line"
         SaleLinePOS.SetFilter("Main Item No.", '=%1', "No."); // not really required, would also be one solution for combination items below
         if (SaleLinePOS.FindSet(true, false)) then
             repeat
-                SaleLinePOS.Silent := true;
+                SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
-                SaleLinePOS.Silent := false;
+                SaleLinePOS.SetSkipUpdateDependantQuantity(false);
                 SaleLinePOS.SetSkipCalcDiscount(true);
                 SaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
@@ -2386,9 +2372,9 @@ table 6014406 "NPR POS Sale Line"
         SaleLinePOS.SetRange("Main Item No.", "No.");
         if SaleLinePOS.FindSet(true, false) then
             repeat
-                SaleLinePOS.Silent := true;
+                SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
-                SaleLinePOS.Silent := false;
+                SaleLinePOS.SetSkipUpdateDependantQuantity(false);
                 SaleLinePOS.SetSkipCalcDiscount(true);
                 SaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
@@ -2404,12 +2390,17 @@ table 6014406 "NPR POS Sale Line"
         SaleLinePOS.SetRange("Combination No.", "Combination No.");
         if SaleLinePOS.FindSet(true, false) then
             repeat
-                SaleLinePOS.Silent := true;
+                SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
-                SaleLinePOS.Silent := false;
+                SaleLinePOS.SetSkipUpdateDependantQuantity(false);
                 SaleLinePOS.SetSkipCalcDiscount(true);
                 SaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
+    end;
+
+    procedure SetSkipUpdateDependantQuantity(Skip: Boolean)
+    begin
+        SkipDependantQuantityUpdate := Skip;
     end;
 
     procedure SerialNoLookup()
@@ -2501,9 +2492,8 @@ table 6014406 "NPR POS Sale Line"
         if SaleLinePOS2.FindSet() then
             repeat
                 SalePOS.Get(SaleLinePOS2."Register No.", SaleLinePOS2."Sales Ticket No.");
-                if not SalePOS."Saved Sale" then
-                    if (SaleLinePOS2."Sales Ticket No." <> "Sales Ticket No.") or (SaleLinePOS2."Line No." <> "Line No.") then
-                        Error(Text004, FieldName("Serial No."), "Serial No.");
+                if (SaleLinePOS2."Sales Ticket No." <> "Sales Ticket No.") or (SaleLinePOS2."Line No." <> "Line No.") then
+                    Error(Text004, FieldName("Serial No."), "Serial No.");
             until SaleLinePOS2.Next() = 0;
 
         if Quantity <> Abs(1) then
@@ -2513,19 +2503,17 @@ table 6014406 "NPR POS Sale Line"
         if ItemTrackingCode."SN Specific Tracking" then begin
             CheckSerialNoApplication("No.", "Serial No.");
             CheckSerialNoAuditRoll("No.", "Serial No.", Positive);
-            if not NoWarning then begin
-                if Positive then begin
-                    TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - Quantity;
-                    if (TotalNonAppliedQuantity < 0) then begin
-                        Message(Txt004, "Serial No.", FieldName("Serial No."));
-                        "Serial No." := '';
-                    end;
-                end else begin
-                    TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - Quantity;
-                    if TotalNonAppliedQuantity > 1 then begin
-                        Message(Txt005, "Serial No.", FieldName("Serial No."));
-                        "Serial No." := '';
-                    end;
+            if Positive then begin
+                TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - Quantity;
+                if (TotalNonAppliedQuantity < 0) then begin
+                    Message(Txt004, "Serial No.", FieldName("Serial No."));
+                    "Serial No." := '';
+                end;
+            end else begin
+                TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - Quantity;
+                if TotalNonAppliedQuantity > 1 then begin
+                    Message(Txt005, "Serial No.", FieldName("Serial No."));
+                    "Serial No." := '';
                 end;
             end;
         end;

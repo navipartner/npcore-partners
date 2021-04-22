@@ -101,11 +101,11 @@
         if not UserSetup.Get(UserId) then begin
             UserSetup.Init();
             UserSetup."User ID" := UserId;
-            UserSetup."NPR Backoffice Register No." := POSUnit."No.";
+            UserSetup."NPR POS Unit No." := POSUnit."No.";
             UserSetup.Insert();
         end else
-            if UserSetup."NPR Backoffice Register No." = '' then begin
-                UserSetup."NPR Backoffice Register No." := POSUnit."No.";
+            if UserSetup."NPR POS Unit No." = '' then begin
+                UserSetup."NPR POS Unit No." := POSUnit."No.";
                 UserSetup.Modify();
             end;
 

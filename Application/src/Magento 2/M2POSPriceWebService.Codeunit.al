@@ -75,7 +75,7 @@
 
                     TmpSaleLinePOS."Customer Price Group" := TmpSalePOS."Customer Price Group";
                     TmpSaleLinePOS."Item Disc. Group" := Item."Item Disc. Group";
-                    TmpSaleLinePOS.Silent := true;
+                    TmpSaleLinePOS.SetSkipUpdateDependantQuantity(true);
 
                     POSSalesPriceCalcMgt.FindItemPrice(TmpSalePOS, TmpSaleLinePOS);
                     TmpSaleLinePOS.UpdateAmounts(TmpSaleLinePOS);

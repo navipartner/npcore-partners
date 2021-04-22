@@ -2,6 +2,7 @@ table 6059986 "NPR Sale POS Cue"
 {
     Caption = 'Sale POS Cue';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -9,15 +10,6 @@ table 6059986 "NPR Sale POS Cue"
         {
             Caption = 'Primary Key';
             DataClassification = CustomerContent;
-        }
-        field(2; "Saved Sales"; Integer)
-        {
-            CalcFormula = Count("NPR POS Sale" WHERE("Saved Sale" = CONST(true),
-                                                  "Register No." = FIELD("Register Filter"),
-                                                  "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                  Date = FIELD("Date Filter")));
-            Caption = 'Saved Sales';
-            FieldClass = FlowField;
         }
         field(20; "Date Filter"; Date)
         {

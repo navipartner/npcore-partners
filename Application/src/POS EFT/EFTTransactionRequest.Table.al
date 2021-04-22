@@ -1,29 +1,5 @@
 table 6184495 "NPR EFT Transaction Request"
 {
-    // NPR5.20/BR  /20160316  CASE 231481 Object Created
-    // NPR5.22/BR  /20160407  CASE 231481 Added Result Display Text
-    // NPR5.25/BR  /20160527  CASE 231481 Added Option "Install" to field Processing Type
-    // NPR5.30/BR  /20161206  CASE 260315 Aligned OptionString and OptionCaption of field Processing Type
-    // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT, added Fields Token, Integration Type and Transaction Subtype
-    // NPR5.30/BR  /20170117  CASE 263458 Added fields POS Description, Number of Attempts and Initiated from Entry No.
-    // NPR5.30/BR  /20170117  CASE 263458 Added Print Receipts Function
-    // NPR5.30/TJ  /20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.35/BR  /20170815  CASE 284379 Added Field Cashback Amount
-    // NPR5.36/MMV /20170711  CASE 283791 New terminal print flow.
-    // NPR5.38/MHA /20170109  CASE 295549 Added fields to be used with MobilPay Integration
-    // NPR5.46/MMV /20180713  CASE 290734 Renamed, added and deleted fields for more generic EFT purposes.
-    // NPR5.48/MMV /20181221  CASE 340754 Added lookup & drilldown pages.
-    // NPR5.48/MMV /20190110  CASE 341237 Added new fields.
-    //                                    Removed deprecated mobilepay fields.
-    // NPR5.49/MMV /20190410  CASE 347476 Renamed field 420
-    // NPR5.51/MMV /20190626  CASE 359385 Added giftcard types in field 450 and renamed all options for AL compatibility.
-    // NPR5.53/MMV /20191206 CASE 377533 Added fields 10000
-    // NPR5.54/MMV /20200218 CASE 387990 Renamed field "External Result Received" to "External Result Known" to better describe situations where lack of request/initialization implies known result.
-    // NPR5.54/MMV /20200219 CASE 364340 Created key on "Hardware ID,Processing Type".
-    //                                   Added options to "Authentication Method".
-    //                                   Added field "Result Processed" to distinguish between parsing external trx response with known result ("External Result Known" -> TRUE) and
-    //                                   parsing the EFT record information onto the POS sales lines. ("Result Processed" -> TRUE). Previously only indication was "Finished" timestamp 0DT.
-
     Caption = 'EFT Transaction Request';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR EFT Transaction Requests";
@@ -80,9 +56,6 @@ table 6184495 "NPR EFT Transaction Request"
         {
             Caption = 'User ID';
             DataClassification = CustomerContent;
-            TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(70; "Integration Version Code"; Code[10])
         {

@@ -264,14 +264,6 @@ codeunit 6150629 "NPR POS Entry Management"
         exit(POSEntryOut.FindFirst());
     end;
 
-    procedure FindPOSEntryViaPOSSaleID(POSSaleID: Integer; var POSEntryOut: Record "NPR POS Entry"): Boolean
-    begin
-        //POSSaleID = Unique, constant front end no. (=SalePOS."POS Sale ID")
-        Clear(POSEntryOut);
-        POSEntryOut.SetRange("POS Sale ID", POSSaleID);
-        exit(POSEntryOut.FindFirst());
-    end;
-
     procedure PrintEntry(POSEntry: Record "NPR POS Entry"; Large: Boolean)
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";

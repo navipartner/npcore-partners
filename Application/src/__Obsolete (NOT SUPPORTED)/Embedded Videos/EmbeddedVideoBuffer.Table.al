@@ -1,10 +1,8 @@
 table 6014697 "NPR Embedded Video Buffer"
 {
-    // NPR5.37/MHA /20171009  CASE 289471 Object created - Display Embedded Videos
-
     Caption = 'Embedded Video Buffer';
     DataClassification = CustomerContent;
-
+    ObsoleteState = Removed;
     fields
     {
         field(1; "Module Code"; Code[20])

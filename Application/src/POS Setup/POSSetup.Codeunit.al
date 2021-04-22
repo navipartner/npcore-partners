@@ -16,50 +16,35 @@ codeunit 6150708 "NPR POS Setup"
         POSStoreRec: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
-        POSUnitIdentityGlobal: Record "NPR POS Unit Identity";
         Initialized: Boolean;
         SetupInitialized: Boolean;
 
     #region Initialization
 
-    procedure Initialize(UserCode: Code[50])
-    var
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-    begin
-
-        if (Initialized) then
-            exit;
-
-        if UserCode = '' then
-            UserCode := UserId;
-
-        // Setup is initialied twice, first when the page has been initialized and then when framework send the the hardware ID
-        UserSetup.Get(UserId);
-        UserSetup.TestField("NPR Backoffice Register No.");
-        POSUnitIdentity.ConfigureTemporaryDevice(UserSetup."NPR Backoffice Register No.", POSUnitIdentityRec);
-
-        Initialized := true;
-    end;
-
-    procedure InitializeUsingPosUnitIdentity(POSUnitIdentity: Record "NPR POS Unit Identity")
+    procedure Initialize()
     var
         POSStore: Record "NPR POS Store";
     begin
-        POSUnitRec.Get(POSUnitIdentity."Default POS Unit No.");
+        if (Initialized) then
+            exit;
 
+        if not UserSetup.Get(UserId) then begin
+            UserSetup.Init;
+            UserSetup."User ID" := UserId;
+            UserSetup.Insert();
+        end;
+
+        if (UserSetup."NPR POS Unit No." = '') or (not POSUnitRec.Get(UserSetup."NPR POS Unit No.")) then begin
+            Commit();
+            while (not (Page.RunModal(Page::"NPR POS Unit Selection", POSUnitRec) = Action::LookupOK)) do;
+            UserSetup."NPR POS Unit No." := POSUnitRec."No.";
+            UserSetup.Modify();
+        end;
+
+        POSUnitRec.Get(UserSetup."NPR POS Unit No.");
         SetPOSUnit(POSUnitRec);
-        if POSStore.Get(POSUnitRec."POS Store Code") then
-            SetPOSStore(POSStore);
-
-        POSUnitIdentityGlobal := POSUnitIdentity;
 
         Initialized := true;
-    end;
-
-    local procedure InitializeDefault()
-    begin
-        Initialize('');
     end;
 
     local procedure InitializeSetup()
@@ -82,20 +67,13 @@ codeunit 6150708 "NPR POS Setup"
 
         FindPOSRestaurantProfile();
     end;
-
-    local procedure MakeSureIsInitialized()
-    begin
-        if not Initialized then
-            InitializeDefault();
-    end;
-
     #endregion Initialization
 
     #region Setup
 
     procedure GetPOSUnitNo(): Code[10]
     begin
-        MakeSureIsInitialized();
+        Initialize();
         exit(POSUnitRec."No.");
     end;
 
@@ -222,11 +200,6 @@ codeunit 6150708 "NPR POS Setup"
     procedure GetPOSStore(var POSStoreOut: Record "NPR POS Store")
     begin
         POSStoreOut := POSStoreRec;
-    end;
-
-    procedure GetPOSUnitIdentity(var POSUnitIdentity: Record "NPR POS Unit Identity")
-    begin
-        POSUnitIdentity := POSUnitIdentityGlobal;
     end;
 
     procedure GetPOSRestProfile(var POSRestaurantProfileOut: Record "NPR POS NPRE Rest. Profile")

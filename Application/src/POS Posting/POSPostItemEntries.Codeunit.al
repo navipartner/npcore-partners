@@ -149,7 +149,6 @@
         ItemJnlLine."Out-of-Stock Substitution" := POSSalesLine."Out-of-Stock Substitution";
         ItemJnlLine."Item Category Code" := POSSalesLine."Item Category Code";
         ItemJnlLine.Nonstock := POSSalesLine.Nonstock;
-        ItemJnlLine."Purchasing Code" := POSSalesLine."Product Group Code";
         ItemJnlLine."Return Reason Code" := POSSalesLine."Return Reason Code";
         ItemJnlLine."Planned Delivery Date" := POSSalesLine."Planned Delivery Date";
         ItemJnlLine."Order Date" := POSEntry."Entry Date";

@@ -542,11 +542,7 @@
                     //Create user information message
                     SaleLinePOS.FindFirst();
                     "Sale POS".Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
-                    if "Sale POS"."Saved Sale" then begin
-                        TextActiveSaved := TEXTSaved;
-                    end else begin
-                        TextActiveSaved := TEXTActive;
-                    end;
+                    TextActiveSaved := TEXTActive;
                     UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnSLP, SerialNumber, Item."No.", Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.", TEXTitemTracking_instructions);  //NPR5.55 [398263]
                 end;
             end;

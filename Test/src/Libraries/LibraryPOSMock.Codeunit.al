@@ -1,4 +1,4 @@
-﻿codeunit 85003 "NPR Library - POS Mock"
+codeunit 85003 "NPR Library - POS Mock"
 {
     trigger OnRun()
     begin
@@ -8,27 +8,28 @@
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
         POSMockFramework: Codeunit "NPR POS Framework: Mock";
-        "Action": Record "NPR POS Action" temporary;
+        POSAction: Record "NPR POS Action" temporary;
+        UserSetup: record "User Setup";
     begin
+        if UserSetup.Get(UserId) then;
+        UserSetup."User ID" := UserId;
+        UserSetup."NPR POS Unit No." := POSUnit."No.";
+        if not UserSetup.Insert() then
+            UserSetup.Modify();
+
         POSMockFramework.Constructor();
         POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, POSSession);
-        POSUnitIdentity.ConfigureTemporaryDevice(POSUnit."No.", POSUnitIdentityRec);
-        POSSetup.InitializeUsingPosUnitIdentity(POSUnitIdentityRec);
         POSSession.StartPOSSession();
 
-        Action.SetSession(POSSession);
-        Action.DiscoverActions();
+        POSAction.SetSession(POSSession);
+        POSAction.DiscoverActions();
     end;
 
     procedure InitializePOSSessionAndStartSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; var POSSale: Codeunit "NPR POS Sale")
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
     begin
         InitializePOSSession(POSSession, POSUnit);
         POSSession.StartTransaction();
@@ -39,8 +40,6 @@
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
     begin
         InitializePOSSession(POSSession, POSUnit);
         POSSession.GetSetup(POSSetup);
@@ -301,7 +300,7 @@
             exit(false);
 
         POSSession.GetSale(POSSale);
-        if not POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
+        if not POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
             exit(false);
         exit(true);
     end;

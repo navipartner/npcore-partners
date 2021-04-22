@@ -1,4 +1,4 @@
-codeunit 85007 "NPR POS Saved Sale Tests"
+codeunit 85007 "NPR POS Quote Tests"
 {
     Subtype = Test;
 
@@ -11,60 +11,19 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
-    procedure POSQuote_SaveAndLoad()
-    var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        Item: Record Item;
-        POSSale: Codeunit "NPR POS Sale";
-        Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSSvSl";
-        POSActionLoadPOSQuote: codeunit "NPR POS Action: LoadPOSSvSl";
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSQuoteLine: Record "NPR POS Saved Sale Line";
+    procedure Test1()
     begin
-        // [Given] POS & Payment setup
-        InitializeData();
-
-        // [Given] Active POS session & sale
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        // [Given] Item line worth 10 LCY
-        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
-        Item."Unit Price" := 10;
-        Item.Modify();
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-
-        POSSession.GetSale(POSSale);
-        POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
-
-        POSQuoteLine.SetRange("Quote Entry No.", POSQuoteEntry."Entry No.");
-        POSQuoteLine.FindFirst();
-
-        _POSSession.Destructor();
-        Clear(_POSSession);
-
-        // Load POS Saved Sale in the another POS session
-        InitializeData();
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        POSActionLoadPOSQuote.LoadFromQuote(POSQuoteEntry, SalePOS);
-
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
-        SaleLinePOS.FindFirst();
+        POSQuote_SaveAndLoad(Today, Today);
     end;
 
     [Test]
-    procedure POSQuote_SaveAndLoadDiffDate()
+    procedure Test2()
+    begin
+        POSQuote_SaveAndLoad(CalcDate('<-2D>', Today), Today);
+    end;
+
+
+    local procedure POSQuote_SaveAndLoad(InitialSaleDate: Date; LoadSaleDate: Date)
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -80,11 +39,11 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         POSActionLoadPOSQuote: codeunit "NPR POS Action: LoadPOSSvSl";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         POSQuoteLine: Record "NPR POS Saved Sale Line";
+        PreviousSaleSystemId: Guid;
+        PreviousSaleLineSystemId: Guid;
     begin
-        //Switch to previous date to make a quote
-        WorkDate(CalcDate('<-2D>', Today()));
-
         // [Given] POS & Payment setup
+        WorkDate(InitialSaleDate);
         InitializeData();
 
         // [Given] Active POS session & sale
@@ -94,33 +53,45 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         // [Given] Item line worth 10 LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         Item."Unit Price" := 10;
-        Item.Modify();
+        Item.Modify;
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.FindFirst();
+        PreviousSaleLineSystemId := SaleLinePOS.SystemId;
+        PreviousSaleSystemId := SalePOS.SystemId;
 
-        POSSession.GetSale(POSSale);
-        POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
+        // [When] Saving to POS quote
+        POSActionSavePOSQuote.CreatePOSQuoteAndStartNewSale(_POSSession, POSQuoteEntry);
 
+        // [Then] Correct data is saved
+        POSQuoteEntry.TestField(SystemId, SalePOS.SystemId);
+        POSQuoteEntry.TestField("Sales Ticket No.", SalePOS."Sales Ticket No.");
         POSQuoteLine.SetRange("Quote Entry No.", POSQuoteEntry."Entry No.");
         POSQuoteLine.FindFirst();
+        POSQuoteLine.TestField("No.", Item."No.");
+        POSQuoteLine.TestField("Unit Price", 10);
+        POSQuoteLine.TestField(SystemId, PreviousSaleLineSystemId);
 
+        // [When] Loading POS Quote in another POS session
         _POSSession.Destructor();
         Clear(_POSSession);
+        WorkDate(LoadSaleDate);
 
-        // Load POS Saved Sale in the another POS session
-
-        //Switch to current date to restore a quote
-        WorkDate(Today());
-
-        InitializeData();
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSActionLoadPOSQuote.LoadFromQuote(POSQuoteEntry, SalePOS);
 
+        // [Then] Sale loaded correct data
+        SalePOS.TestField(SystemId, PreviousSaleSystemId);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.FindFirst();
+        SaleLinePOS.TestField("No.", Item."No.");
+        SaleLinePOS.TestField("Unit Price", 10);
+        SaleLinePOS.TestField(SystemId, PreviousSaleLineSystemId);
     end;
 
     procedure InitializeData()
@@ -144,6 +115,6 @@ codeunit 85007 "NPR POS Saved Sale Tests"
             _Initialized := true;
         end;
 
-        Commit();
+        Commit;
     end;
 }

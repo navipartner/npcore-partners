@@ -76,31 +76,10 @@
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Amount field';
                 }
-                field("POS Sale ID"; Rec."POS Sale ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Sale ID field';
-                }
-                field("Retail ID"; Rec."Retail ID")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Retail ID field';
-                }
                 field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
-                }
-                field("Host Name"; Rec."Host Name")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Host Name field';
-                }
-                field("Device ID"; Rec."Device ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Device ID field';
                 }
             }
             part(SaleLines; "NPR POS Sale Lines Subpage")
