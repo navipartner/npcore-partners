@@ -40,7 +40,6 @@
 	"extensions": {
 		"recommendations": [
 			"ms-dynamics-smb.al",
-			"dkundel.vscode-new-file", //Set this on ctrl+n shortcut instead of default untitled tab for easy .al file creation - don't type a name upfront, let CRS rename the file after you've used a snippet to create it.
 			"coenraads.bracket-pair-colorizer-2",
 			"eamodio.gitlens",
 			"donjayamanne.githistory",

@@ -126,15 +126,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Unit List action';
                 }
-                action("POS Unit Identity")
-                {
-                    Caption = 'POS Unit Identity';
-                    Image = List;
-                    RunObject = page "NPR POS Unit Identity List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Unit Identity action';
-
-                }
                 action("POS Themes")
                 {
                     Caption = 'POS Themes';

@@ -411,10 +411,7 @@ then begin
                 SaleLinePOS."Location Code" := NpGpCrossCompanySetup."Location Code";
                 SaleLinePOS."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
                 SaleLinePOS."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
-                SaleLinePOS."Return Sale No." := SalePOS."Sales Ticket No.";
-                SaleLinePOS."Return Sale Register No." := SalePOS."Register No.";
                 SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
-                SaleLinePOS."Return Sales Sales Type" := SalePOS."Sale type";
                 SaleLinePOS."Return Reason Code" := ReturnReasonCode;
                 SaleLinePOS.Modify(true);
 

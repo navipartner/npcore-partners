@@ -330,17 +330,11 @@ table 6150615 "NPR POS Unit"
     procedure GetCurrentPOSUnit(): Code[10]
     var
         UserSetup: Record "User Setup";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
+        POSUnit: Record "NPR POS Unit";
     begin
-        if POSSession.GetSession(POSSession, false) then begin
-            POSSession.GetSetup(POSSetup);
-            exit(POSSetup.GetPOSUnitNo());
-        end;
-
-        if not UserSetup.Get(UserId) then
-            exit('?'); //Old syntax - kept in case anyone matches on question mark.
-        exit(UserSetup."NPR Backoffice Register No.");
+        UserSetup.Get(UserId);
+        POSUnit.Get(UserSetup."NPR POS Unit No.");
+        exit(POSUnit."No.");
     end;
 
     procedure FindActiveEventFromCurrPOSUnit(): Code[20]
@@ -362,21 +356,6 @@ table 6150615 "NPR POS Unit"
         POSUnitEvent: Record "NPR POS Unit Event";
     begin
         POSUnitEvent.DeleteActiveEvent(Rec."No.");
-    end;
-
-    procedure SetThisUnitNo(UnitNo: Code[10])
-    var
-        UserSetup: Record "User Setup";
-    begin
-        if UserSetup.Get(UserId) then begin
-            UserSetup."NPR Backoffice Register No." := UnitNo;
-            UserSetup.Modify();
-        end else begin
-            UserSetup.Init();
-            UserSetup."User ID" := UserId;
-            UserSetup."NPR Backoffice Register No." := UnitNo;
-            UserSetup.Insert();
-        end;
     end;
 }
 

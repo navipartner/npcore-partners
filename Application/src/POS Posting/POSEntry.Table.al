@@ -215,11 +215,15 @@ table 6150621 "NPR POS Entry"
         {
             Caption = 'POS Sale ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by SystemID';
         }
         field(180; "Event No."; Code[20])
         {

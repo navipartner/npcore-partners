@@ -55,32 +55,22 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        POSUnitIdentityRec: Record "NPR POS Unit Identity";
         UserSetup: Record "User Setup";
         Language: Record Language;
         POSSetup: Codeunit "NPR POS Setup";
         POSSale: Codeunit "NPR POS Sale";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
-        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
         POSUIManagement: Codeunit "NPR POS UI Management";
         OpeningEntryNo: Integer;
         HardwareId: Text;
         SessionName: Text;
         HostName: Text;
     begin
-
         DATABASE.SelectLatestVersion();
         POSSession.GetSetup(POSSetup);
 
-        POSSession.GetSessionId(HardwareId, SessionName, HostName);
-        if (HardwareId = '') then begin
-            UserSetup.Get(UserId);
-            UserSetup.TestField("NPR Backoffice Register No.");
-            POSUnitIdentity.ConfigureTemporaryDevice(UserSetup."NPR Backoffice Register No.", POSUnitIdentityRec);
-            POSSetup.InitializeUsingPosUnitIdentity(POSUnitIdentityRec);
-            POSSession.InitializeSessionId(POSUnitIdentityRec."Device ID", SessionName, HostName);
-        end;
+        POSSetup.Initialize();
 
         SalespersonPurchaser.Get(SalespersonCode);
         POSSetup.SetSalesperson(SalespersonPurchaser);

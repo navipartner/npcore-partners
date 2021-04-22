@@ -176,14 +176,6 @@ page 6150617 "NPR POS Unit Card"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Dimensions action';
             }
-            action("POS Unit Identity List")
-            {
-                Caption = 'POS Unit Identity List';
-                Image = List;
-                RunObject = Page "NPR POS Unit Identity List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the POS Unit Identity List action';
-            }
             action("POS Period Registers")
             {
                 Caption = 'POS Period Registers';

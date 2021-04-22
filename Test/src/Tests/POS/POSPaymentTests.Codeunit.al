@@ -66,8 +66,10 @@ codeunit 85006 "NPR POS Payment Tests"
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
+        SaleLineSystemId: Guid;
+        PaymentLineSystemId: Guid;
     begin
-        // [Scenario] Check that a successful cash payment is handled correctly via a created payment line, with sale ending as payment equalled the total.
+        // [Scenario] Check that a successful cash payment is handled correctly via a created payment line, with sale ending as payment equalled the total.        
 
         // [Given] POS & Payment setup
         InitializeData();
@@ -81,19 +83,32 @@ codeunit 85006 "NPR POS Payment Tests"
         Item."Unit Price" := 10;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.FindLast();
+        SaleLineSystemId := SaleLinePOS.SystemId;
 
-        // [When] Paying 4 LCY
-        SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 10, '');
+        // [When] Paying 2 LCY first and then 8 LCY
+        SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 2, '');
+        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Payment);
+        SaleLinePOS.FindLast();
+        PaymentLineSystemId := SaleLinePOS.SystemId;
+
+        SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 8, '');
 
         // [Then] Sale ended with information on new POS entry.
         Assert.IsTrue(SaleEnded, 'Sale ended');
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         Assert.IsTrue(POSEntry.FindFirst(), 'Sale was moved to POS Entry');
+        POSEntry.TestField(SystemId, SalePOS.SystemId);
 
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        Assert.IsTrue(POSPaymentLine.FindFirst, 'Payment line exist with matching info');
-        POSPaymentLine.TestField("Amount (LCY)", 10);
+        Assert.IsTrue(POSPaymentLine.FindSet, 'Payment lines exist with matching info');
+        POSPaymentLine.TestField("Amount (LCY)", 2);
+        POSPaymentLine.TestField("POS Payment Method Code", _POSPaymentMethod.Code);
+        POSPaymentLine.TestField(SystemId, PaymentLineSystemId);
+        POSPaymentLine.Next();
+        POSPaymentLine.TestField("Amount (LCY)", 8);
         POSPaymentLine.TestField("POS Payment Method Code", _POSPaymentMethod.Code);
 
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
@@ -101,6 +116,7 @@ codeunit 85006 "NPR POS Payment Tests"
         POSSalesLine.TestField("Amount Incl. VAT (LCY)", 10);
         POSSalesLine.TestField(Type, POSSalesLine.Type::Item);
         POSSalesLine.TestField("No.", Item."No.");
+        POSSalesLine.TestField(SystemId, SaleLineSystemId);
     end;
 
     [Test]
@@ -135,14 +151,15 @@ codeunit 85006 "NPR POS Payment Tests"
         Item."Unit Price" := 10;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
-        // [When] Paying 4 LCY
+
+        // [When] Paying 15 LCY
         SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 15, '');
 
         // [Then] Sale ended with information on new POS entry.
         Assert.IsTrue(SaleEnded, 'Sale ended');
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         Assert.IsTrue(POSEntry.FindFirst(), 'Sale was moved to POS Entry');
+        POSEntry.TestField(SystemId, SalePOS.SystemId);
 
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSPaymentLine.SetRange("POS Payment Method Code", _POSPaymentMethod.Code);

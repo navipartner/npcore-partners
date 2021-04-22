@@ -241,7 +241,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         POSSession.RequestRefreshData();
 
-        exit(SaleLinePOS."Retail ID");
+        exit(SaleLinePOS.SystemId);
     end;
 
     local procedure GiftCardLoopIterate(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")

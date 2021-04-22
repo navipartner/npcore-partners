@@ -317,11 +317,13 @@ table 6014405 "NPR POS Sale"
         {
             Caption = 'Last Shipping No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(40; "Last Posting No."; Code[20])
         {
             Caption = 'Last Posting No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(45; "Customer Disc. Group"; Code[20])
         {
@@ -334,11 +336,13 @@ table 6014405 "NPR POS Sale"
         {
             Caption = 'Drawer Opened';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(60; "Send Receipt Email"; Boolean)
         {
             Caption = 'Send Receipt Email';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(74; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -351,6 +355,7 @@ table 6014405 "NPR POS Sale"
         {
             Caption = 'Saved Sale';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(101; "Customer Relations"; Option)
         {
@@ -358,16 +363,19 @@ table 6014405 "NPR POS Sale"
             DataClassification = CustomerContent;
             OptionCaption = ' ,Customer,Cash Customer';
             OptionMembers = " ",Customer,"Cash Customer";
+            ObsoleteState = Removed;
         }
         field(102; "Last Sale"; Boolean)
         {
             Caption = 'Last Sale';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(105; Kontankundenr; Code[20])
         {
             Caption = 'Cash Customer No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(106; "Customer Type"; Option)
         {
@@ -380,11 +388,13 @@ table 6014405 "NPR POS Sale"
         {
             Caption = 'Original Ticket No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(108; "Non-editable sale"; Boolean)
         {
             Caption = 'Non-Editable Sale';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(109; "Sale type"; Option)
         {
@@ -397,28 +407,31 @@ table 6014405 "NPR POS Sale"
         {
             Caption = 'Reversesale Ticket No.';
             DataClassification = CustomerContent;
-            Description = 'Giver mulighed for at tilbagef¢re KUN ÉN bon - benyttet i CU Ekspeditionsmenu';
+            ObsoleteState = Removed;
         }
         field(112; Parameters; Text[250])
         {
             Caption = 'Parameters';
             DataClassification = CustomerContent;
-            Description = 'Overf¢r parametre fra ekspeditionen til underfunktioner. Brug f.eks.  Ÿ som separator';
+            ObsoleteState = Removed;
         }
         field(113; "From Quote no."; Code[20])
         {
             Caption = 'From Quote no.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(115; "Service No."; Code[20])
         {
             Caption = 'Service No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(116; "Stats - Customer Post Code"; Code[20])
         {
             Caption = 'Stats - Customer Post Code';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(117; "Retail Document Type"; Option)
         {
@@ -427,11 +440,13 @@ table 6014405 "NPR POS Sale"
             NotBlank = true;
             OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
             OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
+            ObsoleteState = Removed;
         }
         field(118; "Retail Document No."; Code[20])
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(119; "Payment Terms Code"; Code[10])
         {
@@ -480,16 +495,19 @@ table 6014405 "NPR POS Sale"
         {
             Caption = 'TouchScreen';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(123; Deposit; Decimal)
         {
             Caption = 'Deposit';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(126; "Alternative Register No."; Code[20])
         {
             Caption = 'Alternative POS Unit No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(127; "Country Code"; Code[10])
         {
@@ -506,11 +524,13 @@ table 6014405 "NPR POS Sale"
         {
             Caption = 'Custom Print Object ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(131; "Custom Print Object Type"; Text[10])
         {
             Caption = 'Custom Print Object Type';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(140; "Issue Tax Free Voucher"; Boolean)
         {
@@ -547,12 +567,16 @@ table 6014405 "NPR POS Sale"
             AutoIncrement = true;
             Caption = 'POS Sale ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(180; "Event No."; Code[20])
         {
@@ -576,20 +600,20 @@ table 6014405 "NPR POS Sale"
             Caption = 'Device ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
+            ObsoleteState = Removed;
         }
         field(201; "Host Name"; Text[100])
         {
             Caption = 'Host Name';
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
+            ObsoleteState = Removed;
         }
         field(210; "User ID"; Code[50])
         {
             Caption = 'User ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
-            TableRelation = User."User Name";
-            ValidateTableRelation = false;
         }
         field(300; Amount; Decimal)
         {
@@ -694,15 +718,6 @@ table 6014405 "NPR POS Sale"
     keys
     {
         key(Key1; "Register No.", "Sales Ticket No.")
-        {
-        }
-        key(Key2; "Salesperson Code", "Saved Sale")
-        {
-        }
-        key(Key3; "Register No.", "Saved Sale")
-        {
-        }
-        key(Key4; "Retail ID")
         {
         }
     }
@@ -846,8 +861,6 @@ table 6014405 "NPR POS Sale"
                     DimMgt.UpdateGlobalDimFromDimSetID(
                       SaleLinePOS."Dimension Set ID", SaleLinePOS."Shortcut Dimension 1 Code", SaleLinePOS."Shortcut Dimension 2 Code");
                     SaleLinePOS.Modify();
-                    // Investigate
-                    // ATOLink.UpdateAsmDimFromSalesLine(SalesLine);
                 end;
             until SaleLinePOS.Next() = 0;
     end;

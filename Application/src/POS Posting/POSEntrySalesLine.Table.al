@@ -340,18 +340,24 @@ table 6150622 "NPR POS Entry Sales Line"
             Caption = 'Orig. POS Sale ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by SystemID';
         }
         field(161; "Orig. POS Line No."; Integer)
         {
             Caption = 'Orig. POS Line No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by SystemID';
         }
         field(200; "Bin Code"; Code[20])
         {
@@ -411,9 +417,7 @@ table 6150622 "NPR POS Entry Sales Line"
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            ObsoleteState = No;
-            //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
-            //ObsoleteTag = '15.0';
+            ObsoleteState = Removed;
         }
         field(208; "Planned Delivery Date"; Date)
         {

@@ -361,7 +361,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
 
         EFTTransactionRequest."Sales Line No." := POSLine."Line No.";
-        EFTTransactionRequest."Sales Line ID" := POSLine."Retail ID";
+        EFTTransactionRequest."Sales Line ID" := POSLine.SystemId;
         EFTTransactionRequest.Modify();
     end;
 
@@ -449,7 +449,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
             SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + DescriptionPostFix, 1, MaxStrLen(SaleLinePOS.Description));
         end;
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        exit(SaleLinePOS."Retail ID");
+        exit(SaleLinePOS.SystemId);
     end;
 
     local procedure GiftCardLoadResponseReceived(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
@@ -499,7 +499,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         POSSaleLine.InsertLineRaw(SaleLinePOS, true);
 
         EFTTransactionRequest."Sales Line No." := SaleLinePOS."Line No.";
-        EFTTransactionRequest."Sales Line ID" := SaleLinePOS."Retail ID";
+        EFTTransactionRequest."Sales Line ID" := SaleLinePOS.SystemId;
         EFTTransactionRequest.Modify();
 
         POSSession.RequestRefreshData();
@@ -547,11 +547,11 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(not Annul);
     end;
 
-    local procedure SaleSuccessful(ReceiptNo: Text; RetailID: Guid): Boolean
+    local procedure SaleSuccessful(ReceiptNo: Text; SystemID: Guid): Boolean
     var
         POSEntry: Record "NPR POS Entry";
     begin
-        POSEntry.SetRange("Retail ID", RetailID);
+        POSEntry.SetRange(SystemId, SystemID);
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
         exit(not POSEntry.IsEmpty());
     end;
@@ -674,7 +674,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
             EFTTransactionRequest.Get(EFTTransactionRequest."Recovered by Entry No.");
         end;
 
-        if (not SaleSuccessful(EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Sales ID")) and (EFTTransactionRequest."Sales ID" <> SalePOS."Retail ID") then begin
+        if (not SaleSuccessful(EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Sales ID")) and (EFTTransactionRequest."Sales ID" <> SalePOS.SystemId) then begin
             Error(SALE_NOT_FOUND);
         end;
     end;
@@ -732,7 +732,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
         if (EFTTransactionRequest."Result Amount" <> 0) then begin
-            POSQuoteEntry.SetRange("Retail ID", OriginalEFTTransactionRequest."Sales ID");
+            POSQuoteEntry.SetRange(SystemId, OriginalEFTTransactionRequest."Sales ID");
             if (not POSQuoteEntry.IsEmpty) then begin
                 Message(QUOTE_OUT_OF_SYNC, POSQuoteEntry.TableCaption, POSQuoteEntry."Sales Ticket No.");
                 exit(true);
@@ -765,8 +765,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         SalePOS: Record "NPR POS Sale";
     begin
         if (EFTTransactionRequest."Result Amount" <> 0) and (EFTTransactionRequest."Sales ID" <> OriginalEFTTransactionRequest."Sales ID") then begin
-            SalePOS.SetRange("Retail ID", OriginalEFTTransactionRequest."Sales ID");
-            if (not SalePOS.IsEmpty) then begin
+            if SalePOS.GetBySystemId(OriginalEFTTransactionRequest."Sales ID") then begin
                 Message(CAPTION_RECOVER_WARN_STRONG,
                   EFTTransactionRequest."Integration Type",
                   OriginalEFTTransactionRequest."Sales Ticket No.",

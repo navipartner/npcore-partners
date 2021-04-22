@@ -476,10 +476,6 @@ xmlport 6150901 "NPR HC POS Entry"
                         {
                             MinOccurs = Zero;
                         }
-                        fieldelement(productgroupcode; possalesline."Product Group Code")
-                        {
-                            MinOccurs = Zero;
-                        }
                         fieldelement(planneddeliverydate; possalesline."Planned Delivery Date")
                         {
                             MinOccurs = Zero;

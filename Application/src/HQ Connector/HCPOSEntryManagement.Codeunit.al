@@ -262,7 +262,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
         Evaluate(TempPOSSalesLine."Originally Ordered Var. Code", NpXmlDomMgt.GetXmlText(Element, 'origninallyorderedvariantcode', 0, false), 9);
         Evaluate(TempPOSSalesLine."Out-of-Stock Substitution", NpXmlDomMgt.GetXmlText(Element, 'outofstocksubstitute', 0, false), 9);
         Evaluate(TempPOSSalesLine."Purchasing Code", NpXmlDomMgt.GetXmlText(Element, 'purchasingcode', 0, false), 9);
-        Evaluate(TempPOSSalesLine."Product Group Code", NpXmlDomMgt.GetXmlText(Element, 'productgroupcode', 0, false), 9);
         Evaluate(TempPOSSalesLine."Planned Delivery Date", NpXmlDomMgt.GetXmlText(Element, 'planneddeliverydate', 0, false), 9);
         Evaluate(TempPOSSalesLine."Reason Code", NpXmlDomMgt.GetXmlText(Element, 'reasoncode', 0, false), 9);
         Evaluate(TempPOSSalesLine."Discount Type", NpXmlDomMgt.GetXmlText(Element, 'discounttype', 0, false), 9);

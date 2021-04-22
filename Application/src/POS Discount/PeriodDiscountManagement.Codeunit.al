@@ -117,7 +117,6 @@
                 TempSaleLinePOS."Discount %" := 100 - PeriodDiscountLine."Campaign Unit Price" / UnitPrice * 100;
                 TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Campaign;
                 TempSaleLinePOS."Discount Code" := PeriodDiscountLine.Code;
-                TempSaleLinePOS."Period Discount code" := PeriodDiscountLine.Code;
                 PeriodDiscount.Get(PeriodDiscountLine.Code);
                 TempSaleLinePOS."Custom Disc Blocked" := PeriodDiscount."Block Custom Disc.";
             end;

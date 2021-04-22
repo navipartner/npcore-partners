@@ -587,7 +587,7 @@
         TempSaleLinePOS."Customer Price Group" := TempSalePOS."Customer Price Group";
 
         TempSaleLinePOS."Item Disc. Group" := Item."Item Disc. Group";
-        TempSaleLinePOS.Silent := true;
+        TempSaleLinePOS.SetSkipUpdateDependantQuantity(true);
         TempSaleLinePOS.Date := "Calculation Date";
         TempSaleLinePOS.Validate(Quantity, "Quantity for Discount Calc");
 #pragma warning disable AA0139        

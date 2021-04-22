@@ -389,9 +389,6 @@ then begin
         if not POSPaymentBin.Get(CashDrawerNo) then
             exit;
 
-        SalePOS."Drawer Opened" := true;
-        SalePOS.Modify();
-
         POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS);
     end;
 

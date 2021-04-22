@@ -84,6 +84,8 @@ table 6151002 "NPR POS Saved Sale Entry"
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Use SystemId instead';
         }
         field(200; "POS Sales Data"; BLOB)
         {
