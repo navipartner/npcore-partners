@@ -10,7 +10,7 @@ controladdin "NPR Dragonglass"
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.es.js',
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.fr.js',
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.nl.js',
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2295.19.js',
+        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2303.20.js',
         'src/_ControlAddins/Dragonglass/Scripts/moment.min.js',
         'src/_ControlAddins/Dragonglass/Scripts/no-ie.js';
 
@@ -19,7 +19,7 @@ controladdin "NPR Dragonglass"
         'src/_ControlAddins/Dragonglass/Fonts/fontawesome/css/all.min.css',
 
         'src/_ControlAddins/Dragonglass/Stylesheets/datepicker.css',
-        'src/_ControlAddins/Dragonglass/Stylesheets/themeFresh.css',
+        'src/_ControlAddins/Dragonglass/Stylesheets/themeDefault.css',
         'src/_ControlAddins/Dragonglass/Stylesheets/bundle.css';
 
     Images =
@@ -31,7 +31,7 @@ controladdin "NPR Dragonglass"
         'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-solid-900.woff2',
         'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-thin-100.woff2',
 
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2295.19.js.map',
+        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2303.20.js.map',
         'src/_ControlAddins/Dragonglass/Images/npretaillogo_med.png',
         'src/_ControlAddins/Dragonglass/Images/spinner-100-R.png',
         'src/_ControlAddins/Dragonglass/Images/mobilepay_logo_inverted_small.png',
