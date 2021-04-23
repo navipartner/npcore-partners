@@ -63,9 +63,10 @@ report 6060101 "NPR Data Cleanup Test"
                         "Data Cleanup GCVI".SetRange(Type, "Data Cleanup GCVI".Type::"G/L Account");
                 end;
 
-                if NoFilter <> '' then begin
+                if NoFilter <> '' then
+                  begin
                     "Data Cleanup GCVI".SetFilter("No.", NoFilter);
-                end;
+                  end;
             end;
         }
     }

@@ -74,17 +74,6 @@ table 6059944 "NPR NaviDocs Entry Attachment"
         TempBlob.FromRecord(Rec, FieldNo(Data));
         FileMgt.BLOBExport(TempBlob, StrSubstNo(FilenamePattern, "NaviDocs Entry No.", "File Extension"), true);
         exit;
-        Data.CreateInStream(InStr, TEXTENCODING::UTF8);
-        if IsWebClient() then begin
-            InStr.Read(Content);
-            Message(Content);
-        end else begin
-            Path := TemporaryPath + StrSubstNo(FilenamePattern, "NaviDocs Entry No.", "File Extension");
-            DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.xml', Path);
-            SyncMgt.RunProcess('notepad.exe', Path, false);
-            Sleep(100);
-            FileMgt.DeleteClientFile(Path);
-        end;
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,6 +1,5 @@
 ﻿codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
 {
-    // TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
     var
         ERRNoPadForSeating: Label 'No active waiter pad exists for seating %1.';
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
@@ -444,20 +443,11 @@
 
     procedure GetQtyUI(OrgQty: Decimal; Description: Text; var ioChosenQty: Decimal) OK: Boolean
     var
-    // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
-    //Marshaller: Codeunit "POS Event Marshaller";
     begin
-        //Used by page [Tmp POS Waiter Pad Lines] to chose a qty from a total qty
-        //Shall show numpad
         ioChosenQty := OrgQty;
 
-        // TODO: CTRLUPGRADE - Must be refactored to not use Marshaller
         Error('CTRLUPGRADE');
-        /*
-        if not Marshaller.NumPad((StrSubstNo(TXTQtyToMove, Description, OrgQty)), ioChosenQty, false, false) then
-            exit(false);
-        */
-        exit(true);
+
     end;
 
     procedure MoveWaiterPadToNewSeatingUI(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -466,7 +456,6 @@
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
         WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
-        //Called from Waiter pad page -  with UI used to change seating on waiter pad
         Seating.Get(SeatingManagement.UILookUpSeating('', ''));
 
         WaiterPad.CalcFields("Current Seating FF");
@@ -481,7 +470,6 @@
         MergeToWaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
-        //Called from Waiter pad card - with UI to chose a waiter pad and merge current waiter pad into it
         if SelectWaiterPadToMergeTo(WaiterPad, MergeToWaiterPad) then
             if WaiterPadManagement.MergeWaiterPad(WaiterPad, MergeToWaiterPad) then begin
                 WaiterPad.Get(MergeToWaiterPad."No.");
