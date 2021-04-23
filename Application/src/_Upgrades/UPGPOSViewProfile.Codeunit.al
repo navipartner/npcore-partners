@@ -22,14 +22,16 @@ codeunit 6150931 "NPR UPG POS View Profile"
     local procedure Upgrade()
     begin
         UpgradePOSViewProfile();
+        UpgradePOSViewProfileImage();
     end;
 
     local procedure UpgradePOSViewProfile()
     var
         POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
+        ModifyProfile: Boolean;
     begin
-        if not POSUnit.FindSet() then
+        if not POSUnit.FindSet(true) then
             exit;
         repeat
             if not POSUnit.GetProfile(POSViewProfile) then begin
@@ -37,13 +39,52 @@ codeunit 6150931 "NPR UPG POS View Profile"
                 POSViewProfile.Init();
                 POSViewProfile.Insert();
             end;
-            POSViewProfile."Lock Timeout" := "NPR POS View LockTimeout".FromInteger(POSUnit."Lock Timeout");
-            POSViewProfile.Modify();
+            if POSViewProfile."Lock Timeout" = POSViewProfile."Lock Timeout"::NEVER then begin
+                POSViewProfile."Lock Timeout" := "NPR POS View LockTimeout".FromInteger(POSUnit."Lock Timeout");
+                ModifyProfile := true;
+            end;
 
-            POSUnit."POS View Profile" := POSViewProfile.Code;
-            POSUnit.Modify();
+            if ModifyProfile then
+                POSViewProfile.Modify();
+
+            if POSUnit."POS View Profile" = '' then begin
+                POSUnit."POS View Profile" := POSViewProfile.Code;
+                POSUnit.Modify();
+            end;
         until POSUnit.Next() = 0;
     end;
 
-
+    local procedure UpgradePOSViewProfileImage()
+    var
+        POSViewProfile: Record "NPR POS View Profile";
+        TenantMedia: Record "Tenant Media";
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        TenantMediaDesc: Text;
+        ModifyProfile: Boolean;
+    begin
+        if not POSViewProfile.FindSet(true) then
+            exit;
+        repeat
+            if not POSViewProfile.Image.HasValue() then begin
+                if POSViewProfile.Picture.HasValue() then begin
+                    POSViewProfile.CalcFields(Picture);
+                    POSViewProfile.Picture.CreateInStream(InStr);
+                    TenantMediaDesc := POSViewProfile.Code + ' ' + POSViewProfile.Description;
+                    POSViewProfile.Image.ImportStream(InStr, CopyStr(TenantMediaDesc, 1, MaxStrLen(TenantMedia.Description)), StrSubstNo('image/%1', POSViewProfile.GetDefaultExtension()));
+                    ModifyProfile := true;
+                end;
+            end;
+            if not POSViewProfile."Culture Info (Serializ.)".HasValue() then begin
+                if POSViewProfile."Culture Info (Serialized)".HasValue() then begin
+                    POSViewProfile.CalcFields("Culture Info (Serialized)");
+                    POSViewProfile."Culture Info (Serialized)".CreateInStream(InStr);
+                    POSViewProfile."Culture Info (Serializ.)".ImportStream(InStr, POSViewProfile.FieldName("Culture Info (Serializ.)"));
+                    ModifyProfile := true;
+                end;
+            end;
+            if ModifyProfile then
+                POSViewProfile.Modify();
+        until POSViewProfile.Next() = 0;
+    end;
 }

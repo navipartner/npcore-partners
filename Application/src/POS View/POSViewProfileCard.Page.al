@@ -27,6 +27,11 @@ page 6150636 "NPR POS View Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
+                }
                 field("POS Theme Code"; Rec."POS Theme Code")
                 {
                     ApplicationArea = All;
