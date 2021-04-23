@@ -500,7 +500,7 @@
         end;
     end;
 
-    local procedure IdentifyFace(GroupID: Text; FacesJsonArray: JsonArray; var IdentifyJsonArray: JsonArray)
+    procedure IdentifyFace(GroupID: Text; FacesJsonArray: JsonArray; var IdentifyJsonArray: JsonArray)
     var
         MCSAPISetup: Record "NPR MCS API Setup";
         Uri: Text;
@@ -577,7 +577,7 @@
         PersistedFaceId := JsonTok.AsValue().AsText();
     end;
 
-    local procedure DetectFaces(ImageInStream: InStream; var FacesJsonArray: JsonArray)
+    procedure DetectFaces(ImageInStream: InStream; var FacesJsonArray: JsonArray)
     var
         MCSAPISetup: Record "NPR MCS API Setup";
         Uri: Text;
@@ -697,6 +697,24 @@
         JsonObj := JsonTok.AsObject();
         JsonObj.Get('message', JsonTok);
         Error(JsonTok.AsValue().AsText());
+    end;
+
+    procedure FindMember(PersonGroups: Record "NPR MCS Person Groups"; JsonFacesArr: JsonArray; JsonIdArr: JsonArray; PictureStream: InStream) PersonId: Text[50]
+    var
+        MCSPerson: Record "NPR MCS Person";
+        MCSFaces: Record "NPR MCS Faces";
+        JsonTok: JsonToken;
+        JsonObj: JsonObject;
+        JsonTokValue: JsonToken;
+        FaceId: Text;
+        PersonIdentified: Boolean;
+    begin
+        foreach JsonTok in JsonFacesArr do begin
+            JsonObj := JsonTok.AsObject();
+            JsonObj.Get('faceId', JsonTokValue);
+            FaceId := JsonTokValue.AsValue().AsText();
+            PersonId := IsPersonIdentified(FaceId, JsonIdArr);
+        end;
     end;
 }
 

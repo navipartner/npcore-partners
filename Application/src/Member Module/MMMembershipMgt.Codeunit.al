@@ -5097,6 +5097,32 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
+    internal procedure FindPersonByFacialRecognition(TableID: Integer) PersonId: Text[50]
+    var
+        MCSPersonGroupsSetup: Record "NPR MCS Person Groups Setup";
+        PersonGroups: Record "NPR MCS Person Groups";
+        Camera: Codeunit Camera;
+        MCSFaceServiceAPI: Codeunit "NPR MCS Face Service API";
+        PictureStream: InStream;
+        PictureName: Text;
+        JsonFacesArr, JsonIdArr : JsonArray;
+        NoFaceErr: Label 'No face detected.';
+        FaceNotIdentifiedErr: Label 'Face not identified.';
+    begin
+        if Camera.GetPicture(PictureStream, PictureName) then begin
+            MCSPersonGroupsSetup.Get(TableID);
+            PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
+            PersonGroups.TestField(PersonGroupId);
+            MCSFaceServiceAPI.DetectFaces(PictureStream, JsonFacesArr);
+            if JsonFacesArr.Count() = 0 then
+                Error(NoFaceErr);
+            MCSFaceServiceAPI.IdentifyFace(PersonGroups.PersonGroupId, JsonFacesArr, JsonIdArr);
+            if JsonIdArr.Count() = 0 then
+                Error(FaceNotIdentifiedErr);
+            PersonId := MCSFaceServiceAPI.FindMember(PersonGroups, JsonFacesArr, JsonIdArr, PictureStream);
+        end;
+    end;
+
     internal procedure TakeMemberInfoPicture(MMMemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         Camera: Codeunit Camera;
@@ -5122,7 +5148,26 @@ codeunit 6060127 "NPR MM Membership Mgt."
             MMMember.Picture.CreateOutStream(OStream);
             CopyStream(OStream, PictureStream);
             MMMember.Modify();
+            Commit();
+            TrainFacialRecognitionService(MMMember, PictureStream);
         end;
     end;
+
+    local procedure TrainFacialRecognitionService(MMMember: Record "NPR MM Member"; PictureStream: InStream)
+    var
+        RecRef: RecordRef;
+        MCSFaceServiceAPI: Codeunit "NPR MCS Face Service API";
+        MemberName: Text;
+    begin
+        RecRef.Get(MMMember.RecordId);
+        MemberName := MMMember."First Name";
+        if MMMember."Middle Name" <> '' then
+            MemberName := MemberName + ' ' + MMMember."Middle Name";
+        if MMMember."Last Name" <> '' then
+            MemberName := MemberName + ' ' + MMMember."Last Name";
+        MCSFaceServiceAPI.DetectIdentifyPicture(RecRef, MemberName, PictureStream);
+    end;
+
+
 }
 
