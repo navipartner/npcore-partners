@@ -72,4 +72,19 @@ page 6150635 "NPR POS View Profiles"
             }
         }
     }
+    actions
+    {
+        area(navigation)
+        {
+            action("&Picture")
+            {
+                ApplicationArea = BasicHR;
+                Caption = '&Picture';
+                Image = Picture;
+                RunObject = Page "NPR POS View Picture";
+                RunPageLink = Code = FIELD(Code);
+                ToolTip = 'View or add a picture, for example, the company''s logo.';
+            }
+        }
+    }
 }

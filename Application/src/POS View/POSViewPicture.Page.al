@@ -11,7 +11,7 @@ page 6014406 "NPR POS View Picture"
     {
         area(Content)
         {
-            field(Control6014403; Rec.Picture)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = All;
                 ShowCaption = false;
@@ -24,90 +24,100 @@ page 6014406 "NPR POS View Picture"
     {
         area(processing)
         {
-            action(Import)
+            action(ImportPicture)
             {
+                ApplicationArea = Basic, Suite;
                 Caption = 'Import';
                 Image = Import;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Import action';
+                ToolTip = 'Import a picture file.';
 
                 trigger OnAction()
                 var
-                    PicConfirmReplace: Label 'Replace the existing picture?';
-                    PicTooBig: Label 'The picture is too big, please choose another one that is less than 150 kB.';
-                    PictureExists: Boolean;
-                    FileMgt: Codeunit "File Management";
-                    Name: Text[250];
+                    FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
-                    TextName: Text[200];
-                    RecRef: RecordRef;
-                    Size: Integer;
+                    InStr: InStream;
+                    FileName: Text;
+                    ClientFileName: Text;
                 begin
-                    PictureExists := Rec.Picture.HasValue;
+                    Rec.TestField(Code);
 
-                    Clear(TempBlob);
-                    Name := FileMgt.BLOBImport(TempBlob, TextName);
-
-                    if Name = '' then
-                        exit;
-                    if PictureExists then
-                        if not Confirm(PicConfirmReplace, false) then
+                    if Rec.Image.HasValue() then
+                        if not Confirm(OverrideImageQst) then
                             exit;
 
+                    FileName := FileManagement.BLOBImport(TempBlob, '');
+                    if FileName = '' then
+                        exit;
 
-                    RecRef.GetTable(Rec);
-                    TempBlob.ToRecordRef(RecRef, Rec.FieldNo(Picture));
-                    RecRef.SetTable(Rec);
+                    if TempBlob.Length() > 150000 then
+                        Error(PicTooBigErr);
 
-
-                    Size := TempBlob.Length();
-                    if Size > 150000 then
-                        Error(PicTooBig);
-
-
-
-
-
-                    CurrPage.SaveRecord;
+                    Clear(Rec.Image);
+                    TempBlob.CreateInStream(InStr);
+                    Rec.Image.ImportStream(InStr, FileManagement.GetFileNameWithoutExtension(FileName), StrSubstNo('image/%1', Rec.GetDefaultExtension()));
+                    Rec.Modify(true);
                 end;
             }
-            action(Export)
+            action(ExportPicture)
             {
+                ApplicationArea = Basic, Suite;
                 Caption = 'Export';
+                Enabled = DeleteExportEnabled;
                 Image = Export;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Export action';
+                ToolTip = 'Export the picture to a file.';
 
                 trigger OnAction()
                 var
-                    FileMgt: Codeunit "File Management";
+                    DummyPictureEntity: Record "Picture Entity";
+                    FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
+                    OutStr: OutStream;
+                    ToFile: Text;
+                    ExportPath: Text;
                 begin
-                    if Rec.Picture.HasValue() then begin
-                        Rec.CalcFields(Picture);
-                        TempBlob.FromRecord(Rec, Rec.FieldNo(Picture));
-                        FileMgt.BLOBExport(TempBlob, '*.bmp', true);
-                    end;
+                    Rec.TestField(Code);
+
+                    ToFile := Rec.GetDefaultMediaDescription();
+                    TempBlob.CreateOutStream(OutStr);
+                    Rec.Image.ExportStream(OutStr);
+                    FileManagement.BLOBExport(TempBlob, ToFile, true);
                 end;
             }
-            action("Delete")
+            action(DeletePicture)
             {
+                ApplicationArea = Basic, Suite;
                 Caption = 'Delete';
+                Enabled = DeleteExportEnabled;
                 Image = Delete;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Delete action';
+                ToolTip = 'Delete the record.';
 
                 trigger OnAction()
-                var
-                    PicConfDelete: Label 'Delete the picture?';
                 begin
-                    if Rec.Picture.HasValue() then
-                        if Confirm(PicConfDelete, false) then begin
-                            Clear(Rec.Picture);
-                            CurrPage.SaveRecord;
-                        end;
+                    Rec.TestField(Code);
+
+                    if not Confirm(DeleteImageQst) then
+                        exit;
+
+                    Clear(Rec.Image);
+                    Rec.Modify(true);
                 end;
             }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        SetEditableOnPictureActions();
+    end;
+
+    var
+        DeleteImageQst: Label 'Are you sure you want to delete the picture?';
+        OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
+        PicTooBigErr: Label 'The picture is too big, please choose another one that is less than 150 KB.';
+        DeleteExportEnabled: Boolean;
+
+    local procedure SetEditableOnPictureActions()
+    begin
+        DeleteExportEnabled := Rec.Image.HasValue();
+    end;
 }
