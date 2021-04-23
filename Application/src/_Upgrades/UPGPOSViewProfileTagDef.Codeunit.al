@@ -9,7 +9,9 @@ codeunit 6150932 "NPR UPG POS View Prof Tag Def"
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
     procedure GetUpgradeTag(): Text
+    var
+        POSViewProfile: Record "NPR POS View Profile";
     begin
-        exit('NPRPOSUnit-2b3ad744-6f63-4e4a-9c96-d21d5512d60c');
+        exit(POSViewProfile.TableCaption() + '-' + Format(Today(), 0, 9));
     end;
 }

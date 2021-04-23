@@ -50,12 +50,26 @@ table 6150651 "NPR POS View Profile"
         {
             Caption = 'Culture Info (Serialized)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type. "NPR POS View Profile"."Culture Info (Serialized)" -> "NPR POS View Profile"."Culture Info (Serializ.)"';
+        }
+        field(15; "Culture Info (Serializ.)"; Media)
+        {
+            Caption = 'Culture Info (Serialized)';
+            DataClassification = CustomerContent;
         }
         field(20; Picture; Blob)
         {
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type. "NPR POS View Profile".Picture -> "NPR POS View Profile".Image';
+        }
+        field(21; Image; Media)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
         }
         field(30; "POS Theme Code"; Code[10])
         {
@@ -186,12 +200,14 @@ table 6150651 "NPR POS View Profile"
     [TryFunction]
     local procedure GetLocaleFormatsFromAzureAndCacheThem(var CultureJson: JsonObject);
     var
-        Stream: OutStream;
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
     begin
         GetLocaleFormatsFromAzure(CultureJson);
 
-        "Culture Info (Serialized)".CreateOutStream(Stream);
-        CultureJson.WriteTo(Stream);
+        TempBlob.CreateOutStream(OutStr);
+        "Culture Info (Serializ.)".ExportStream(OutStr);
+        CultureJson.WriteTo(OutStr);
     end;
 
     procedure DetectDecimalThousandsSeparator()
@@ -238,11 +254,12 @@ table 6150651 "NPR POS View Profile"
 
     procedure GetLocaleFormats() Formats: JsonObject;
     var
-        Stream: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
     begin
         TestField("Client Formatting Culture ID");
 
-        if not "Culture Info (Serialized)".HasValue() then begin
+        if not "Culture Info (Serializ.)".HasValue() then begin
             if not GetLocaleFormatsFromAzureAndCacheThem(Formats) then begin
                 exit(GetDefaultFormats());
             end;
@@ -251,9 +268,31 @@ table 6150651 "NPR POS View Profile"
             exit(Formats);
         end;
 
-        CalcFields("Culture Info (Serialized)");
-        "Culture Info (Serialized)".CreateInStream(Stream);
-        Formats.ReadFrom(Stream);
+        TempBlob.CreateInStream(InStr);
+        Rec."Culture Info (Serializ.)".ImportStream(InStr, Rec.FieldName("Culture Info (Serializ.)"));
+        Formats.ReadFrom(InStr);
         exit(Formats);
+    end;
+
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Image.HasValue() then
+            exit;
+        if TenantMedia.Get(Image.MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
+
+    procedure GetDefaultMediaDescription(): Text
+    var
+        MediaDescription: Text;
+    begin
+        MediaDescription := StrSubstNo('%1 %2.%3', Rec.Code, Rec.Description, GetDefaultExtension());
+        exit(MediaDescription);
+    end;
+
+    procedure GetDefaultExtension(): Text
+    begin
+        exit('png');
     end;
 }

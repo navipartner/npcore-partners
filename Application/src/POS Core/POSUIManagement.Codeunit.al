@@ -47,14 +47,21 @@ codeunit 6150702 "NPR POS UI Management"
     procedure InitializeLogo(POSUnit: Record "NPR POS Unit")
     var
         InStr: InStream;
+        OutStr: OutStream;
         Base64: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+
         POSViewProfile: Record "NPR POS View Profile";
     begin
-        if (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSViewProfile.Picture.HasValue()) then
+        if not POSViewProfile.Get(POSUnit."POS View Profile") then
+            exit;
+        if not POSViewProfile.Image.HasValue() then
             exit;
 
-        POSViewProfile.CalcFields(Picture);
-        POSViewProfile.Picture.CreateInStream(InStr);
+        TempBlob.CreateOutStream(OutStr);
+        POSViewProfile.Image.ExportStream(OutStr);
+        TempBlob.CreateInStream(InStr);
+
         FrontEnd.ConfigureLogo(Base64.ToBase64(InStr));
     end;
 
