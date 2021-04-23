@@ -111,26 +111,7 @@ then begin
             3, 4:
                 begin
                     JSON.GetJsonObjectOrFail('value', CalendarObject, StrSubstNo(ReadingErr, ActionCode()));
-
-                    // TODO: CTRLUPGRADE refactor this to use JsonObject that CalendarObject now is
                     Error('CTRLUPRADE');
-                    /*
-                    Evaluate(Count, CalendarObject.Item('Rows').Item('count').ToString);
-                    if Count < 1 then
-                        exit;
-        //-NPR5.51 [365704]
-        //      EVALUATE(Date, CalendarObject.Item('Date').ToString);
-              JSON.SetScope('value', StrSubstNo(SettingScopeErr, ActionCode()));
-              Date := JSON.GetDate('Date', true);
-        //+NPR5.51 [365704]
-
-                    for i := 1 to Count do begin
-                        Position := CalendarObject.Item('Rows').Item(Format(i - 1)).ToString;
-                        PrintLines.SetPosition(Position);
-                        PrintLines.Mark(true);
-                    end;
-                    */
-                    PrintLines.MarkedOnly(true);
                 end;
         end;
 

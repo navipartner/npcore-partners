@@ -228,8 +228,6 @@
         JSON.InitializeJObjectParser(Context, FrontEnd);
         FrontEnd.SetActionContext(ActionCode(), JSON);
         exit;
-
-        POSSession.RequestRefreshData();
     end;
 
     local procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)

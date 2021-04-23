@@ -427,7 +427,6 @@
     local procedure IssueVoucherActionVersion(): Text
     begin
         exit('1.1');
-        exit('1.0');
     end;
 }
 

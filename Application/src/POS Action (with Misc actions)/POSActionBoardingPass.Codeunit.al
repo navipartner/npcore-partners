@@ -26,19 +26,18 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     local procedure ActionVersion(): Text
     begin
         exit('1.1');
-        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep(
               'boardingpass_input',
                 'if(!param.BoardingPassString) {' +
@@ -49,7 +48,6 @@ then begin
             Sender.RegisterWorkflowStep('process', 'respond()');
 
             Sender.RegisterWorkflow(false);
-            //RegisterDataBinding();
             Sender.RegisterTextParameter('BoardingPassString', '');
             Sender.RegisterBooleanParameter('RequiredTravelToday', true);
             Sender.RegisterTextParameter('RequiredLegAirPortCode', '');
@@ -138,7 +136,7 @@ then begin
 
         Handled := true;
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        //BoardingPassString := JSON.GetStringParameter('BoardingPassString',TRUE);
+
         JSON.SetScope('$boardingpass_input', StrSubstNo(SettingScopeErr, ActionCode()));
         BoardingPassString := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
         JSON.SetScopeRoot();
@@ -150,29 +148,20 @@ then begin
         DecodeBoardingPassString(BoardingPassString, RequiredLegAirPortCode, RequiredLegAirPortCodeInTrip, RequiredLegAirPortFlightDate, TravelStartDate, TravelEndDate, TravelDescription, TravelSaveString);
 
         if (RequiredLegAirPortCode <> '') and (not RequiredLegAirPortCodeInTrip) then begin
-            //POSEventMarshaller.DisplayError(ERR, STRSUBSTNO(ERRAPCODE, RequiredLegAirPortCode, TravelDescription), FALSE);
-            //Handled := TRUE;
-            //EXIT;
+
             Error(ERRAPCODE, RequiredLegAirPortCode, TravelDescription);
         end;
 
         if (RequiredLegAirPortCode <> '') and (RequiredLegAirPortCodeInTrip) and (RequiredTravelToday) and (RequiredLegAirPortFlightDate <> WorkDate()) then begin
-            //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
-            //Handled := TRUE;
-            //EXIT;
             Error(ERRTRAVELDATE, WorkDate, TravelDescription);
         end;
 
         if RequiredTravelToday and ((WorkDate() < TravelStartDate) or (WorkDate() > TravelEndDate)) then begin
-            //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
-            //Handled := TRUE;
-            //EXIT;
             Error(ERRTRAVELDATE, WorkDate, TravelDescription);
         end;
 
 
         if ShowTripMessage then begin
-            //POSEventMarshaller.DisplayError(TXTBPASS, TravelDescription, FALSE);
             Message(TravelDescription);
         end;
 
@@ -210,7 +199,6 @@ then begin
         OperatorFlightNo: Code[8];
         FlightDate: Date;
     begin
-        //Identifies traveldate and airportcodes for trip on boarding pass
 
         if not Evaluate(NoOfLegs, CopyStr(iBoardingPassString, 2, 1)) then Error(ERRNOTVALID);
         if NoOfLegs = 0 then Error(ERRNOTVALID);
@@ -303,7 +291,6 @@ then begin
     var
         CalcDateFormula: Text;
     begin
-        //Takes julian day part and makes date
         oDate := CalcDate('<-CY>', WorkDate());
         CalcDateFormula := StrSubstNo('<+%1D>', iJulianDate - 1);
         oDate := CalcDate(CalcDateFormula, oDate);

@@ -781,18 +781,8 @@ table 6150905 "NPR HC Payment Type POS"
 
     trigger OnDelete()
     var
-        Trans0001: Label 'You cannot delete paymentmethod %1, since there non-posted postings in the audit roll';
     begin
-        exit;//Temp
-        AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
-        AuditRoll.SetRange(Posted, false);
-        AuditRoll.SetRange("No.", xRec."No.");
-        if AuditRoll.Find('-') then
-            Error(Trans0001, "No.");
-
-        DimMgt.DeleteDefaultDim(DATABASE::"NPR HC Payment Type POS", "No.");
+        exit;
     end;
 
     trigger OnInsert()
