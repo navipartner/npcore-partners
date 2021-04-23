@@ -165,8 +165,6 @@
 
         FrontEnd.SetActionContext(ActionCode(), JSON);
         exit;
-
-        POSSession.RequestRefreshData();
     end;
 
     local procedure Step_DecreaseQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")

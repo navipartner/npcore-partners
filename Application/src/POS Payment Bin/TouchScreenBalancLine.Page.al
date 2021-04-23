@@ -63,12 +63,7 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
 
                 trigger OnAction()
                 begin
-                    // TODO: CTRLUPGRADE - Refactor without Marshaller
                     Error('CTRLUPGRADE');
-                    recount;
-
-                    if Rec.FindFirst() then;
-                    setAmount(dec);
                 end;
             }
         }

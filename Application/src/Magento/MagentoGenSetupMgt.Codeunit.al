@@ -231,8 +231,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XmlDoc.GetRoot(XElement);
         Evaluate(Value, NpXmlDomMgt.GetXmlText(XElement, NodePath, 250, true), 9);
         exit(Value);
-
-        exit(0);
     end;
 
     procedure GetValueDecimal(var TempBlob: Codeunit "Temp Blob"; NodePath: Text) Value: Decimal
@@ -247,8 +245,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XmlDoc.GetRoot(XElement);
         Evaluate(Value, NpXmlDomMgt.GetXmlText(XElement, NodePath, 250, true), 9);
         exit(Value);
-
-        exit(0);
     end;
 
     procedure GetValueText(var TempBlob: Codeunit "Temp Blob"; NodePath: Text): Text[250]
@@ -263,7 +259,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XmlDoc.GetRoot(XElement);
         exit(Format(NpXmlDomMgt.GetXmlText(XElement, NodePath, 250, true), 0, 9));
 
-        exit('');
     end;
 
     procedure LoadGenericSetup(var TempBlob: Codeunit "Temp Blob"; var XmlDoc: XmlDocument): Boolean

@@ -48,6 +48,13 @@
             "justification": "A page of type API can only refer to the same subpage once."
         },
         {
+            "id": "AA0136",
+            "action":"Error",
+            "justification": "Do not write code that will never be hit."
+        },
+
+
+        {
             "id": "AA0161",
             "action":"Error",
             "justification": "Only use AssertError in Test Codeunits."

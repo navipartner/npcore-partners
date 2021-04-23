@@ -122,8 +122,6 @@
                     trigger OnAction()
                     begin
                         Error('Not Supported');
-                        POSResumeSale.DoSaveAsPOSQuote(POSSession, Rec, false, false);
-                        CurrPage.Update(false);
                     end;
                 }
                 action(CancelSale)
@@ -141,8 +139,6 @@
                     trigger OnAction()
                     begin
                         Error('Not Supported');
-                        POSResumeSale.DoCancelSale(Rec, POSSession);
-                        CurrPage.Update(false);
                     end;
                 }
             }

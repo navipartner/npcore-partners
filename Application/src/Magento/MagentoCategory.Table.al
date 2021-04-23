@@ -284,8 +284,8 @@ table 6151414 "NPR Magento Category"
         if Root then
             exit(Id);
 
-        if MagentoCategory.Get("Parent Category Id") then;
-        exit(MagentoCategory."Root No.");
+        if MagentoCategory.Get("Parent Category Id") then
+          exit(MagentoCategory."Root No.");
 
         exit('');
     end;
