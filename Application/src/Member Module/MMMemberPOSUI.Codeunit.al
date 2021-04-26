@@ -2,13 +2,11 @@ codeunit 6060135 "NPR MM Member POS UI"
 {
     procedure MemberSearchWithFacialRecognition(var MemberEntryNo: Integer) MemberFound: Boolean
     var
-        MCSWebcamAPI: Codeunit "NPR MCS Webcam API";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Member: Record "NPR MM Member";
         RecRef: RecordRef;
         FRec: FieldRef;
         MCSPersonBusinessEntities: Record "NPR MCS Person Bus. Entit.";
-        MCSWebcamArgumentTable: Record "NPR MCS Webcam Arg. Table";
         PersonId: text[50];
     begin
         MemberEntryNo := 0;
