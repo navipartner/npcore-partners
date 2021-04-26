@@ -50,8 +50,6 @@ codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializa
 
         Instance.SetCode(MenuButton."Action Code");
         Instance.Content.Add('Metadata', Metadata);
-        if MenuButton."Show Plus/Minus Buttons" then
-            Instance.Content.Add('ShowPlusMinus', true);
 
         ActionOut := Instance;
     end;

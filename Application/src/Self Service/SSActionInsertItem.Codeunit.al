@@ -20,8 +20,7 @@
 
     local procedure ActionVersion(): Text
     begin
-
-        exit('2.5');
+        exit('2.6');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -38,7 +37,7 @@
               'let workflowstep = "AddSalesLine";' +
               'let qtyDialogThreshold = 9;' +
               'let qtyMax = 100;' +
-              'let qtyMin = 1;' +
+              'let qtyMin = $parameters.minimumAllowedQuantity || 1;' +
 
               'if ($context.hasOwnProperty ("_additionalContext")) {' +
               '  if ($context._additionalContext.hasOwnProperty("plusMinus"))' +
@@ -72,6 +71,7 @@
             Sender.RegisterBooleanParameter('descriptionEdit', false);
             Sender.RegisterBooleanParameter('usePreSetUnitPrice', false);
             Sender.RegisterDecimalParameter('preSetUnitPrice', 0);
+            Sender.RegisterDecimalParameter('minimumAllowedQuantity', 1);
             Sender.RegisterBlockingUI(false);
             Sender.SetWorkflowTypeUnattended();
         end;
@@ -116,6 +116,7 @@
         HasPrompted: Boolean;
         UsePresetUnitPrice: Boolean;
         ItemQuantity: Decimal;
+        ItemMinQuantity: Decimal;
         PresetUnitPrice: Decimal;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemIdentifier: Text;
@@ -126,6 +127,7 @@
         ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_AddSalesLine', ActionCode()));
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
         ItemQuantity := JSON.GetDecimal('itemQuantity');
+        ItemMinQuantity := JSON.GetDecimal('minimumAllowedQuantity');
         UsePresetUnitPrice := JSON.GetBoolean('usePreSetUnitPrice');
         PresetUnitPrice := JSON.GetDecimal('preSetUnitPrice');
 
@@ -133,6 +135,9 @@
             ItemIdentifierType := 0;
 
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
+
+        if (ItemMinQuantity > 0) and (ItemQuantity < ItemMinQuantity) then
+            ItemQuantity := ItemMinQuantity;
 
         AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UsePresetUnitPrice, PresetUnitPrice, JSON, POSSession, FrontEnd);
     end;
@@ -174,17 +179,19 @@
         ItemIdentifier: Text;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemQuantity: Decimal;
+        ItemMinQuantity: Decimal;
     begin
         JSON.SetScopeParameters(ActionCode());
         ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_DecreaseQuantity', ActionCode()));
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
         ItemQuantity := JSON.GetDecimal('itemQuantity');
+        ItemMinQuantity := JSON.GetDecimal('minimumAllowedQuantity');
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
 
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
-        RemoveQuantityFromItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd);
+        RemoveQuantityFromItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, ItemMinQuantity, JSON, POSSession, FrontEnd);
     end;
 
     local procedure Step_IncreaseQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -192,6 +199,7 @@
         Item: Record Item;
         ItemReference: Record "Item Reference";
         ItemQuantity: Decimal;
+        ItemMinQuantity: Decimal;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemIdentifier: Text;
     begin
@@ -199,6 +207,7 @@
         ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_IncreaseQuantity', ActionCode()));
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
         ItemQuantity := JSON.GetDecimal('itemQuantity');
+        ItemMinQuantity := JSON.GetDecimal('minimumAllowedQuantity');
         JSON.SetScopeRoot();
 
         if ItemIdentifierType < 0 then
@@ -382,7 +391,7 @@
         POSSession.RequestRefreshData();
     end;
 
-    procedure AddQuantityToItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure AddQuantityToItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -408,7 +417,7 @@
         exit(true);
     end;
 
-    procedure RemoveQuantityFromItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure RemoveQuantityFromItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; ItemMinQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -429,7 +438,7 @@
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
 
-        if (SaleLinePOS.Quantity = ItemQuantity) then begin
+        if SaleLinePOS.Quantity - Abs(ItemQuantity) < ItemMinQuantity then begin
             SSActionDeletePOSLine.DeletePosLine(POSSession);
         end else begin
             SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, Abs(ItemQuantity));
