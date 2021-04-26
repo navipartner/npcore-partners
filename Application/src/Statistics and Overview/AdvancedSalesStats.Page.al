@@ -1,30 +1,12 @@
 page 6014585 "NPR Advanced Sales Stats"
 {
-    // //-NPR3.0b v.Simon Sch¢bel
-    //    Oversættelser
-    // 001, NPK, MIM, 25-07-07: Tilf¢jet update af subforme.
-    // NPR7.000.000,TS-26.10.12 : There were codes that were written on the Activate Trigger of the Subforms.
-    // NPR4.13/BHR/20150715 CASE 217113 Add "report Advanced Sales Statistics" 6014490
-    // 
-    // NPR4.21/RMT /20151028  CASE 226010 - corrections to filtering of subpages
-    // NPR4.21/TS  /20151028  CASE 226010 - corrections to filtering of subpages
-    // NPR5.29/MHA /20160106  CASE 257163 Enabled Lazy Load by setting PageType = List and removed Group around Repeater
-    // NPR5.31/TS  /20170308  CASE 267858 Added new Filters and commented some codes
-    // NPR5.40/THRO/20180326  CASE 308387 Removed unused function CopyLines
-    // NPR5.44/ZESO/20182906 CASE 312575 Added filter Item Category Code
-    // NPR5.48/TJ  /20181115 CASE 330832 Increased Length of variable ItemCategoryCodeFilter from 10 to 20
-    // NPR5.50/ZESO/20190430 CASE 353384 Removed Product Group Code filter
-    // NPR5.51/ZESO/20190620 CASE 358271 Flow Item Group Filter to Item Group Statistics
-    // NPR5.51/YAHA/20190822 CASE 365732 Flow Item Category Filter to Item Statistics
-    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
-
-    Caption = 'Advanced Sales Statistics';
+    Caption = 'Advanced Sales Statistics Page';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = List;
     SourceTable = Date;
-    UsageCategory = ReportsAndAnalysis;
+    UsageCategory = Lists;
     ApplicationArea = All;
 
     layout
