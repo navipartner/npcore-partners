@@ -1,7 +1,5 @@
 page 6151524 "NPR Nc Endpoint E-mail List"
 {
-    // NC2.01/BR /20160826  CASE 247479 NaviConnect
-
     Caption = 'Nc Endpoint E-mail List';
     CardPageID = "NPR Nc Endpoint E-mail Card";
     DeleteAllowed = false;

@@ -131,12 +131,16 @@ table 6151505 "NPR Nc Import Type"
             Caption = 'Server File Enabled';
             DataClassification = CustomerContent;
             Description = 'NC2.12';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field is not going to be used anymore. In Cloud environment we can not store files on server, so we will always store it on Client device. (Field value would always be true).';
         }
         field(405; "Server File Path"; Text[250])
         {
             Caption = 'Server File Path';
             DataClassification = CustomerContent;
             Description = 'NC2.12';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field is not going to be used anymore. In Cloud environment we can not store files on server, so we will always store it on Client device. (Field value would always be true).';
         }
         field(500; "XML Stylesheet"; BLOB)
         {
@@ -166,7 +170,6 @@ table 6151505 "NPR Nc Import Type"
             begin
                 if "Import List Update Handler" <> "Import List Update Handler"::Default then begin
                     "Ftp Enabled" := false;
-                    "Server File Enabled" := false;
                 end;
             end;
         }
@@ -180,10 +183,6 @@ table 6151505 "NPR Nc Import Type"
         key(Key2; "Webservice Codeunit ID")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

@@ -130,18 +130,6 @@ page 6151401 "NPR Magento Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Version No. field';
                     }
-                    field("Version Coverage"; Rec."Version Coverage")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Version Coverage field';
-
-                        trigger OnDrillDown()
-                        var
-                            MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
-                        begin
-                            MagentoSetupMgt.ShowMissingObjects(Rec);
-                        end;
-                    }
                 }
             }
             group(Moduler)

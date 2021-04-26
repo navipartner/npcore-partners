@@ -1,7 +1,5 @@
 table 6151508 "NPR Nc Task Output"
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - Multi Output per Nc Task
-
     Caption = 'Nc Task Output';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Task Output List";
@@ -64,10 +62,6 @@ table 6151508 "NPR Nc Task Output"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

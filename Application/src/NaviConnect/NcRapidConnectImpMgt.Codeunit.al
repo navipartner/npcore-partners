@@ -12,7 +12,7 @@
         RcApplyPackage: Codeunit "NPR Nc RapidConnect Apply Pckg";
         NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup";
         DataLogMgt: Codeunit "NPR Data Log Management";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         XmlLoaded: Boolean;
         TableIdFilter: Text;
     begin
@@ -45,31 +45,34 @@
         exit(false);
     end;
 
-    local procedure "--- Xml Import"()
-    begin
-    end;
-
-    local procedure ImportXmlPackage(NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup"; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure ImportXmlPackage(NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup"; var Document: XmlDocument)
     var
         ConfigPackageTable: Record "Config. Package Table";
         ConfigPackageRecord: Record "Config. Package Record";
         ConfigPackageData: Record "Config. Package Data";
         "Field": Record "Field";
-        XmlDocElement: DotNet NPRNetXmlElement;
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        DocumentElement: XmlElement;
+        Element: XmlElement;
+        Element2: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
+        NodeList2: XmlNodeList;
+        Node2: XmlNode;
+        Attribute: XmlAttribute;
         PackageNo: Integer;
         TableId: Integer;
     begin
-        if IsNull(XmlDoc) then
+        if not Document.GetRoot(DocumentElement) then
             exit;
 
-        XmlDocElement := XmlDoc.DocumentElement;
-        if IsNull(XmlDocElement) then
+        if DocumentElement.IsEmpty then
             exit;
 
-        foreach XmlElement in XmlDocElement.SelectNodes('record') do begin
-            Evaluate(TableId, XmlElement.GetAttribute('table_id'), 9);
+        DocumentElement.SelectNodes('//record', NodeList);
+        foreach Node in NodeList do begin
+            NpXmlDomMgt.GetAttributeFromElement(Node.AsXmlElement(), 'table_id', Attribute, true);
+            Evaluate(TableId, Attribute.Value, 9);
             ConfigPackageTable.Get(NcRapidConnectSetup."Package Code", TableId);
 
             Clear(ConfigPackageRecord);
@@ -85,13 +88,15 @@
             ConfigPackageRecord."No." := PackageNo;
             ConfigPackageRecord.Insert(true);
 
-            foreach XmlElement2 in XmlElement.SelectNodes('field') do begin
-                ConfigPackageData.Init();
+            Node.SelectNodes('//field', NodeList2);
+            foreach Node2 in NodeList2 do begin
+                ConfigPackageData.Init;
                 ConfigPackageData."Package Code" := ConfigPackageRecord."Package Code";
                 ConfigPackageData."Table ID" := ConfigPackageRecord."Table ID";
                 ConfigPackageData."No." := ConfigPackageRecord."No.";
-                Evaluate(ConfigPackageData."Field ID", XmlElement2.GetAttribute('field_no'), 9);
-                ConfigPackageData.Value := CopyStr(XmlElement2.InnerText, 1, MaxStrLen(ConfigPackageData.Value));
+                NpXmlDomMgt.GetAttributeFromElement(Node2.AsXmlElement(), 'field_no', Attribute, true);
+                Evaluate(ConfigPackageData."Field ID", Attribute.Value, 9);
+                ConfigPackageData.Value := CopyStr(Node2.AsXmlElement().InnerText, 1, MaxStrLen(ConfigPackageData.Value));
                 if Field.Get(ConfigPackageData."Table ID", ConfigPackageData."Field ID") then
                     ConfigPackageData.Value := CopyStr(FormatValue(Field, ConfigPackageData.Value), 1, MaxStrLen(ConfigPackageData.Value));
                 ConfigPackageData.Insert(true);
@@ -164,21 +169,26 @@
         end;
     end;
 
-    local procedure GetTableIdFilter(var XmlDoc: DotNet "NPRNetXmlDocument") TableIdFilter: Text
+    local procedure GetTableIdFilter(var Document: XmlDocument) TableIdFilter: Text
     var
         TempInteger: Record "Integer" temporary;
-        XmlDocElement: DotNet NPRNetXmlElement;
-        XmlElement: DotNet NPRNetXmlElement;
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        DocumentElement: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
+        Attribute: XmlAttribute;
         TableId: Integer;
     begin
-        if IsNull(XmlDoc) then
-            exit('=0&<>0');
-        XmlDocElement := XmlDoc.DocumentElement;
-        if IsNull(XmlDocElement) then
+        if not Document.GetRoot(DocumentElement) then
             exit('=0&<>0');
 
-        foreach XmlElement in XmlDocElement.SelectNodes('record') do begin
-            Evaluate(TableId, XmlElement.GetAttribute('table_id'), 9);
+        if DocumentElement.IsEmpty then
+            exit('=0&<>0');
+
+        DocumentElement.SelectNodes('//record', NodeList);
+        foreach Node in NodeList do begin
+            NpXmlDomMgt.GetAttributeFromElement(Node.AsXmlElement(), 'table_id', Attribute, true);
+            Evaluate(TableId, Attribute.Value, 9);
             if not TempInteger.Get(TableId) then begin
                 TempInteger.Init();
                 TempInteger.Number := TableId;
@@ -195,7 +205,7 @@
     end;
 
     [TryFunction]
-    local procedure TryLoadXml(var NcImportEntry: Record "NPR Nc Import Entry"; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure TryLoadXml(var NcImportEntry: Record "NPR Nc Import Entry"; var XmlDoc: XmlDocument)
     begin
         if not NcImportEntry.LoadXmlDoc(XmlDoc) then
             Error('');

@@ -1,7 +1,5 @@
 table 6151093 "NPR Nc RapidConnect Trig.Field"
 {
-    // NC2.14/MHA /20180716  CASE 322308 Object created - Partial Trigger functionality
-
     Caption = 'Nc RapidConnect Trigger Field';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc RapidConnect Trg.Fields";
@@ -66,10 +64,6 @@ table 6151093 "NPR Nc RapidConnect Trig.Field"
         key(Key1; "Setup Code", "Table ID", "Field No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

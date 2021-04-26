@@ -1,7 +1,5 @@
 page 6151093 "NPR Nc RapidConnect Endp. Sub."
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
-
     Caption = 'Endpoints';
     DelayedInsert = true;
     PageType = ListPart;
@@ -37,10 +35,6 @@ page 6151093 "NPR Nc RapidConnect Endp. Sub."
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

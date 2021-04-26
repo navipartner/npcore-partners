@@ -1,17 +1,5 @@
 ﻿codeunit 6151526 "NPR Nc Endpoint File Mgt."
 {
-    // NC2.01/BR  /20160829  CASE 248630 NaviConnect
-    // NC2.01/BR  /20161003  CASE 248630 Auto add directory implemented.
-    // NC2.01/JC  /20161014  CASE 254997 Add support for client file location, ProcessNcEndpointTrigger & ProcessEndPointTask set Local to No
-    // NC2.12/BR  /20161024  CASE 254072 Added support for textencoding
-    // NC2.12/MHA /20180418  CASE 308107 Added functions FileProcessOutput(),OnRunEndpoint()
-    // NC2.12/MHA /20180502  CASE 313362 Added explicit Client/Server Side definition in FileProcess() and FileProcessOutput()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TextFileDownloaded: Label 'The file was downloaded to %1.';
         TextFileExistsSkipped: Label 'The file was not exported because the file %1 already exists.';
@@ -114,8 +102,9 @@
     var
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
         FileMgt: Codeunit "File Management";
-        Encoding: DotNet NPRNetEncoding;
-        StreamWriter: DotNet NPRNetStreamWriter;
+        Encoding: TextEncoding;
+        UseDefaultEncoding: Boolean;
+        OutStr: OutStream;
         Tempfile: File;
         ExportFile: File;
         DirectoryPathfromFile: Text;
@@ -123,22 +112,6 @@
         ToFile: Text;
     begin
         NcEndpointFile.TestField(Path);
-        //-NC2.12 [313362]
-        // //-NC2.01 [#254997]
-        // IF COPYSTR(NcEndpointFile.Path,1,1) <> '\' THEN BEGIN
-        //  LocalPath := TRUE;
-        //  Tempfile.CREATETEMPFILE();
-        //  FullName := Tempfile.NAME;
-        //  Tempfile.CLOSE();
-        // END ELSE BEGIN
-        // //+NC2.01 [#254997]
-        //  FullName := STRSUBSTNO('%1\%2',DELCHR(NcEndpointFile.Path,'>','\'),Filename);
-        //  IF STRLEN(Filename) = (STRLEN(DELCHR(Filename,'=','\')) + 1) THEN BEGIN
-        //    DirectoryPathfromFile := NcEndpointFile.Path + '\' + COPYSTR(Filename,1,STRPOS(Filename,'\')-1);
-        //    IF NOT FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) THEN
-        //      FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
-        //  END;
-        // END;
         if NcEndpointFile."Client Path" then begin
             Tempfile.CreateTempFile();
             FullName := Tempfile.Name;
@@ -151,7 +124,6 @@
                     FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
             end;
         end;
-        //+NC2.12 [313362]
 
         if Exists(FullName) then begin
             case NcEndpointFile."Handle Exiting File" of
@@ -174,39 +146,23 @@
         end else begin
             NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExported, FullName), '\', '/'));
         end;
-        ExportFile.Create(FullName);
-        ExportFile.Close();
-        //-NC2.12 [#254072]
+
+        UseDefaultEncoding := false;
         case NcEndpointFile."File Encoding" of
             NcEndpointFile."File Encoding"::ANSI:
-                Encoding := Encoding.GetEncoding('windows-1252');
-            NcEndpointFile."File Encoding"::Unicode:
-                Encoding := Encoding.Unicode;
+                Encoding := TextEncoding::Windows;
             NcEndpointFile."File Encoding"::UTF8:
-                Encoding := Encoding.UTF8;
+                Encoding := TextEncoding::UTF8;
+            else
+                UseDefaultEncoding := true;
         end;
-        StreamWriter := StreamWriter.StreamWriter(FullName, true, Encoding);
-        StreamWriter.Write(OutputText);
-        StreamWriter.Flush;
-        StreamWriter.Close();
-        //+NC2.12 [#254072]
+        if UseDefaultEncoding then
+            ExportFile.Create(FullName)
+        else
+            ExportFile.Create(FullName, Encoding);
 
-        //-NC2.12 [313362]
-        // //-NC2.01 [#254997]
-        // IF LocalPath THEN BEGIN
-        //  ToFile:=NcEndpointFile.Path + Filename;
-        //  FileMgt.CopyServerFile(FullName,FullName+'.file', TRUE);
-        //  //-NC2.12 [#254072]
-        //  ExportFile.OPEN(FullName);
-        //  //+NC2.12 [#254072]
-        //  FileMgt.DownloadToFile(ExportFile.NAME +'.file', ToFile);
-        //  ExportFile.Close();
-        //  ERASE(FullName);
-        //  //-NC2.12 [#254072]
-        //  NcTriggerSyncMgt.AddResponse(NcTask,NewLine() + STRSUBSTNO(TextFileDownloaded,CONVERTSTR(ToFile,'\','/')));
-        //  //+NC2.12 [#254072]
-        // END;
-        // //+NC2.01 [#254997]
+        ExportFile.Write(OutputText);
+
         if NcEndpointFile."Client Path" then begin
             ToFile := NcEndpointFile.Path + Filename;
             FileMgt.CopyServerFile(FullName, FullName + '.file', true);
@@ -216,37 +172,23 @@
             Erase(FullName);
             NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + StrSubstNo(TextFileDownloaded, ConvertStr(ToFile, '\', '/')));
         end;
-        //+NC2.12 [313362]
     end;
 
     local procedure FileProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFile: Record "NPR Nc Endpoint File")
     var
         FileMgt: Codeunit "File Management";
-        Encoding: DotNet NPRNetEncoding;
-        StreamWriter: DotNet NPRNetStreamWriter;
+        Encoding: TextEncoding;
+        UseDefaultEncoding: Boolean;
         Tempfile: File;
         ExportFile: File;
-        InStream: InStream;
+        InStr: InStream;
+        OutStr: OutStream;
         DirectoryPathfromFile: Text;
         FullName: Text;
         ToFile: Text;
     begin
-        //-NC2.12 [308107]
         NcEndpointFile.TestField(Path);
-        //-NC2.12 [313362]
-        // IF COPYSTR(NcEndpointFile.Path,1,1) <> '\' THEN BEGIN
-        //  LocalPath := TRUE;
-        //  Tempfile.CREATETEMPFILE();
-        //  FullName := Tempfile.NAME;
-        //  Tempfile.CLOSE();
-        // END ELSE BEGIN
-        //  FullName := STRSUBSTNO('%1\%2',DELCHR(NcEndpointFile.Path,'>','\'),NcTaskOutput.Name);
-        //  IF STRLEN(NcTaskOutput.Name) = (STRLEN(DELCHR(NcTaskOutput.Name,'=','\')) + 1) THEN BEGIN
-        //    DirectoryPathfromFile := NcEndpointFile.Path + '\' + COPYSTR(NcTaskOutput.Name,1,STRPOS(NcTaskOutput.Name,'\')-1);
-        //    IF NOT FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) THEN
-        //      FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
-        //  END;
-        // END;
+
         if NcEndpointFile."Client Path" then begin
             Tempfile.CreateTempFile();
             FullName := Tempfile.Name;
@@ -259,7 +201,6 @@
                     FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
             end;
         end;
-        //+NC2.12 [313362]
 
         if Exists(FullName) then begin
             case NcEndpointFile."Handle Exiting File" of
@@ -272,33 +213,24 @@
             end;
         end;
 
-        //-NC2.12 [313362]
-        //TempBlob.Blob := NcTaskOutput.Data;
-        //FileMgt.BLOBExportToServerFile(TempBlob,FullName);
-        //
-        // IF LocalPath THEN BEGIN
-        //  ToFile := NcEndpointFile.Path + NcTaskOutput.Name;
-        //  FileMgt.CopyServerFile(FullName,FullName+'.file', TRUE);
-        //  ExportFile.OPEN(FullName);
-        //  FileMgt.DownloadToFile(ExportFile.NAME +'.file', ToFile);
-        //  ExportFile.Close();
-        //  ERASE(FullName);
-        // END;
-        NcTaskOutput.Data.CreateInStream(InStream);
-        ExportFile.Create(FullName);
-        ExportFile.Close();
+        NcTaskOutput.Data.CreateInStream(InStr);
+        UseDefaultEncoding := false;
         case NcEndpointFile."File Encoding" of
             NcEndpointFile."File Encoding"::ANSI:
-                Encoding := Encoding.GetEncoding('windows-1252');
-            NcEndpointFile."File Encoding"::Unicode:
-                Encoding := Encoding.Unicode;
+                Encoding := TextEncoding::Windows;
             NcEndpointFile."File Encoding"::UTF8:
-                Encoding := Encoding.UTF8;
+                Encoding := TextEncoding::UTF8;
+            else
+                UseDefaultEncoding := true;
         end;
-        StreamWriter := StreamWriter.StreamWriter(FullName, true, Encoding);
-        CopyStream(StreamWriter.BaseStream, InStream);
-        StreamWriter.Flush;
-        StreamWriter.Close();
+
+        if UseDefaultEncoding then
+            ExportFile.Create(FullName)
+        else
+            ExportFile.Create(FullName, Encoding);
+
+        ExportFile.CreateOutStream(OutStr);
+        CopyStream(OutStr, InStr);
 
         if NcEndpointFile."Client Path" then begin
             ToFile := NcEndpointFile.Path + NcTaskOutput.Name;
@@ -308,8 +240,6 @@
             ExportFile.Close();
             Erase(FullName);
         end;
-        //+NC2.12 [313362]
-        //+NC2.12 [308107]
     end;
 
     local procedure AddSuffixToFileName(FilePath: Text): Text
@@ -321,10 +251,6 @@
         exit(FileMgt.GetDirectoryName(FilePath) +
               '\' + FileMgt.GetFileNameWithoutExtension(FilePath) +
              Suffix + '.' + FileMgt.GetExtension(FilePath));
-    end;
-
-    local procedure "---Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
@@ -384,27 +310,19 @@
     var
         NcEndpointFile: Record "NPR Nc Endpoint File";
     begin
-        //-NC2.12 [308107]
         if NcEndpoint."Endpoint Type" <> NcEndpointFile.GetEndpointTypeCode() then
             exit;
         if not NcEndpointFile.Get(NcEndpoint.Code) then
             exit;
 
         FileProcessOutput(NcTaskOutput, NcEndpointFile);
-        //+NC2.12 [308107]
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure NewLine() CRLF: Text
     begin
-        //-NC2.12 [#254072]
         CRLF[1] := 13;
         CRLF[2] := 10;
         exit(CRLF);
-        //+NC2.12 [#254072]
     end;
 }
 

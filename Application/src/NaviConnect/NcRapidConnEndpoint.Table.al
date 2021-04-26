@@ -1,7 +1,5 @@
 table 6151092 "NPR Nc RapidConn. Endpoint"
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
-
     Caption = 'Nc RapidConnect Endpoint';
     DataClassification = CustomerContent;
 
@@ -51,10 +49,6 @@ table 6151092 "NPR Nc RapidConn. Endpoint"
         key(Key1; "Setup Code", "Endpoint Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

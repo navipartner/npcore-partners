@@ -8,11 +8,6 @@ codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpda
             NcSyncMgt.DownloadFtpType(ImportType);
             Commit();
         end;
-
-        if TaskLine.GetParameterBool(NcSyncMgt."Parameter.DownloadServerFile") then begin
-            NcSyncMgt.DownloadServerFile(ImportType);
-            Commit();
-        end;
     end;
 
     procedure Update(JobQueueEntry: Record "Job Queue Entry"; ImportType: Record "NPR Nc Import Type")
@@ -22,11 +17,6 @@ codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpda
     begin
         if NcImpListProcessing.HasParameter(JobQueueEntry, NcImpListProcessing.ParamDownloadFtp()) then begin
             NcSyncMgt.DownloadFtpType(ImportType);
-            Commit();
-        end;
-
-        if NcImpListProcessing.HasParameter(JobQueueEntry, NcImpListProcessing.ParamDownloadServerFile()) then begin
-            NcSyncMgt.DownloadServerFile(ImportType);
             Commit();
         end;
     end;

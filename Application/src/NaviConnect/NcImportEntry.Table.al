@@ -1,22 +1,5 @@
 table 6151504 "NPR Nc Import Entry"
 {
-    // NC1.00/MHA /20150113  CASE 199932 Refactored object from Web Integration
-    // NC1.01/MHA /20150120  CASE 204133 Added Field 6 Type
-    // NC1.16/TS  /20150423  CASE 212103 Added Options "Return Order" and "Customer" to field 6 Type
-    //                                   Added Field 20 Import Count
-    // NC1.17/MHA /20150622  CASE 216970 Updated caption for field 70220322 "NaviPartner Case Url"
-    // NC1.21/TTH /20151118  CASE 227358 Replacing Type option field with Import type and deleted field 20 "Import Count"
-    // NC1.22/TSA /20151207  CASE 228983 Added fields 30 Document ID, 35 Sequence No.
-    //                                   Changed field 7 length from 50 to 100
-    //                                   Added new key on field 30, 35
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161014  CASE 255397 Added key to be used with Cleanup: Import Type,Date,Imported
-    // NC2.02/MHA /20170227  CASE 262318 Added fields 15 "Last Error E-mail Sent at" and 17 "Last Error E-mail Sent to"
-    // NC2.12/MHA /20180418  CASE 308107 Length of field 3 "Code" extended from 10 to 20 and caption added to fields 30,35
-    // NC2.16/MHA /20180907  CASE 313184 Added fields 40,45,50 for diagnostics
-    // NC2.23/MHA /20190927  CASE 369170 Field 70220322 "NaviPartner Case Url" Removed
-    // NPR5.55/MHA /20200604  CASE 408100 Added fields 60 "Import Count", 70 "Import Started by", 80 "Server Instance Id", 90 "Session Id"
-
     Caption = 'Nc Import Entry';
     DataClassification = CustomerContent;
 
@@ -77,15 +60,6 @@ table 6151504 "NPR Nc Import Entry"
         {
             Caption = 'Last Error Message';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                //-NC1.16
-                //CALCFIELDS("Last Error Message");
-                //"Last Error Message".EXPORT(TEMPORARYPATH + 'ErrorMessage.txt');
-                //Utility.RunCmdModal('C:\windows\system32\notepad.exe' + ' ' + TEMPORARYPATH + 'ErrorMessage.txt')
-                //+NC1.16
-            end;
         }
         field(12; "Error Message"; Text[250])
         {
@@ -184,10 +158,6 @@ table 6151504 "NPR Nc Import Entry"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         if Date = 0DT then
@@ -202,7 +172,6 @@ table 6151504 "NPR Nc Import Entry"
     var
         InStr: InStream;
     begin
-        //-NC1.16
         CalcFields("Document Source");
         if not "Document Source".HasValue() then
             exit(false);
@@ -215,7 +184,6 @@ table 6151504 "NPR Nc Import Entry"
         NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
         Clear(InStr);
         exit(true);
-        //+NC1.16
     end;
 
     procedure LoadXmlDoc(var Document: XmlDocument): Boolean
@@ -230,6 +198,7 @@ table 6151504 "NPR Nc Import Entry"
             exit(false);
 
         "Document Source".CreateInStream(InStr, TextEncoding::UTF8);
+        XML := '';
         while not InStr.EOS() do begin
             InStr.ReadText(BufferText);
             XML += BufferText;
@@ -247,7 +216,6 @@ table 6151504 "NPR Nc Import Entry"
     var
         ActiveSession: Record "Active Session";
     begin
-        //-NPR5.55 [408100]
         if "Import Completed at" > "Import Started at" then
             exit(false);
 
@@ -258,12 +226,10 @@ table 6151504 "NPR Nc Import Entry"
             exit(false);
 
         exit(ActiveSession."Login Datetime" <= "Import Started at");
-        //+NPR5.55 [408100]
     end;
 
     local procedure GetActiveSession(var ActiveSession: Record "Active Session"): Boolean
     begin
-        //-NPR5.55 [408100]
         Clear(ActiveSession);
 
         if "Server Instance Id" <= 0 then
@@ -272,7 +238,6 @@ table 6151504 "NPR Nc Import Entry"
             exit(false);
 
         exit(ActiveSession.Get("Server Instance Id", "Session Id"));
-        //+NPR5.55 [408100]
     end;
 }
 

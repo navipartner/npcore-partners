@@ -130,7 +130,6 @@ codeunit 6151509 "NPR Nc Import List Processing"
 
         ParameterString := ParamImportType() + '=';
         ParameterString += ',' + ParamDownloadFtp();
-        ParameterString += ',' + ParamDownloadServerFile();
         ParameterString += ',' + ParamProcessImport();
 
         Rec.Validate("Parameter String", CopyStr(ParameterString, 1, MaxStrLen(Rec."Parameter String")));
@@ -156,9 +155,6 @@ codeunit 6151509 "NPR Nc Import List Processing"
         if HasParameter(Rec, ParamDownloadFtp()) then
             Description += ' | ' + Text000;
 
-        if HasParameter(Rec, ParamDownloadServerFile()) then
-            Description += ' | ' + Text001;
-
         if HasParameter(Rec, ParamProcessImport()) then
             Description += ' | ' + Text002;
 
@@ -178,11 +174,6 @@ codeunit 6151509 "NPR Nc Import List Processing"
     procedure ParamDownloadFtp(): Text
     begin
         exit('download_ftp');
-    end;
-
-    procedure ParamDownloadServerFile(): Text
-    begin
-        exit('download_server_file');
     end;
 
     local procedure ParamProcessImport(): Text

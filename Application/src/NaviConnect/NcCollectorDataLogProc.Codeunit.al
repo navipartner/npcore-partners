@@ -1,10 +1,5 @@
 ﻿codeunit 6151527 "NPR Nc Collector DataLog Proc."
 {
-    // NC2.01/BR  /20160909  CASE 250447 Object created, to be set up in table Data Log Subscriber
-    // NC2.08/BR  /20171220  CASE 300634 Added field Collect When Modified
-    // NC2.13/MHA /20180528  CASE 314683 Added DataLog Insert Trigger to consider Autoincrement Primary Key and function AssignValue() in CheckFilter()
-    // NC2.17/JKL /20181012 CASE 331978 Added parameter TableID to procedure CheckModifyTriggers and CheckFilter for better key performance
-
     TableNo = "NPR Data Log Record";
 
     trigger OnRun()
@@ -40,11 +35,9 @@
             if not CheckFilter(DataLogRecord, NcCollectorCode) then
                 exit;
 
-        //-NC2.08 [300634]
         if DataLogRecord."Type of Change" = DataLogRecord."Type of Change"::Modify then
             if not CheckModifyTriggers(DataLogRecord, NcCollectorCode) then
                 exit;
-        //+NC2.08 [300634]
         NcCollectionLine.Init();
         NcCollectionLine."No." := 0;
         NcCollectionLine."Collector Code" := NcCollectorCode;
@@ -56,10 +49,8 @@
         NcCollectionLine."Data log Record No." := DataLogRecord."Entry No.";
         NcCollectorManagement.PopulatePKFields(NcCollectionLine, RecRef);
         NcCollectionLine.Insert(true);
-        //-NC2.13 [314683]
         RecRef.GetTable(NcCollectionLine);
         DataLogMgt.OnDatabaseInsert(RecRef);
-        //+NC2.13 [314683]
 
         if NcCollectionLine."Type of Change" in [NcCollectionLine."Type of Change"::Modify, NcCollectionLine."Type of Change"::Delete] then
             NcCollectorManagement.MarkPreviousCollectionLinesAsObsolete(NcCollectionLine);
@@ -85,16 +76,12 @@
                 FieldRefTemp := RecReftemp.Field(NcCollectorFilter."Field No.");
                 FieldRefChange := RecRefchange.Field(NcCollectorFilter."Field No.");
                 FieldRefTemp.Value := FieldRefChange.Value;
-                //-NC2.13 [314683]
-                //-NC2.17 [331978]
                 DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
-                //+NC2.17 [331978]
                 DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
                 DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");
                 DataLogField.SetRange("Field Value Changed", true);
                 if DataLogField.FindFirst() then
                     AssignValue(FieldRefTemp, DataLogField."Field Value");
-                //+NC2.13 [314683]
                 RecReftemp.Insert();
                 FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
                 if RecReftemp.IsEmpty then
@@ -111,7 +98,6 @@
         DataLogField: Record "NPR Data Log Field";
         DataLogSetupTable: Record "NPR Data Log Setup (Table)";
     begin
-        //-NC2.08 [300634]
         if not DataLogSetupTable.Get(DataLogRecord."Table ID") then
             exit(true);
         if DataLogSetupTable."Log Modification" = DataLogSetupTable."Log Modification"::Simple then
@@ -123,9 +109,7 @@
         if NcCollectorFilter.FindSet() then begin
             repeat
                 DataLogField.Reset();
-                //-NC2.17 [331978]
                 DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
-                //+NC2.17 [331978]
                 DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
                 DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");
                 DataLogField.SetRange("Field Value Changed", true);
@@ -135,7 +119,6 @@
             exit(false);
         end else
             exit(true);
-        //+NC2.08 [300634]
     end;
 
     local procedure AssignValue(var FieldRef: FieldRef; Value: Text[250])
@@ -150,7 +133,6 @@
         BigIntegerValue: BigInteger;
         DateTimeValue: DateTime;
     begin
-        //-NC2.13 [314683]
         case LowerCase(Format(FieldRef.Type)) of
             'code', 'text':
                 begin
@@ -214,7 +196,6 @@
                     FieldRef.Value := TimeValue;
                 end;
         end;
-        //+NC2.13 [314683]
     end;
 }
 

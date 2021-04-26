@@ -1,7 +1,5 @@
 codeunit 6151093 "NPR Nc RapidConnect Imp. Look."
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

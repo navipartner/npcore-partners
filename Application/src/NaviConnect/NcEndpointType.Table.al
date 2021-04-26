@@ -1,7 +1,5 @@
 table 6151531 "NPR Nc Endpoint Type"
 {
-    // NC2.01\BR\20160921  CASE 248630 Object created
-
     Caption = 'Nc Endpoint Type';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint Types";
@@ -22,10 +20,6 @@ table 6151531 "NPR Nc Endpoint Type"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     procedure SetupEndpointTypes()

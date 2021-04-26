@@ -1,8 +1,5 @@
 page 6151529 "NPR Nc Collector Card"
 {
-    // NC2.01 /BR  /20160909  CASE 250447 Object created
-    // NC2.04 /BR  /20170510  CASE 274524 Removed field Send when Max. Lines
-
     Caption = 'Nc Collector Card';
     PageType = Card;
     UsageCategory = Administration;

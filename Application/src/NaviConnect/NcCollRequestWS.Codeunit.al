@@ -1,12 +1,5 @@
 codeunit 6151532 "NPR Nc Coll.  Request WS"
 {
-    // NC2.01\BR\20160912  CASE 250447 NaviConnect: Object created
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         SETUP_MISSING: Label 'Setup is missing for %1';
 
@@ -48,13 +41,8 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
         Commit();
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
     begin
-
         ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR Nc Coll.  Request WS", WebserviceFunction);
@@ -88,15 +76,10 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
         exit(ImportEntry."Sequence No." + 1);
     end;
 
-    local procedure InitSetup(): Text
-    begin
-    end;
-
     local procedure CollectorIntegrationSetup()
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-
         ImportType.SetFilter("Webservice Codeunit ID", '=%1', CODEUNIT::"NPR Nc Coll.  Request WS");
         if (not ImportType.IsEmpty()) then
             ImportType.DeleteAll();
@@ -108,7 +91,6 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-
         ImportType.Code := Code;
         ImportType.Description := Description;
         ImportType."Webservice Function" := FunctionName;
@@ -124,7 +106,6 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-
         Clear(ImportType);
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", '%1', CopyStr(WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));

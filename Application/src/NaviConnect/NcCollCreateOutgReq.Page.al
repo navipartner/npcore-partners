@@ -1,7 +1,5 @@
 page 6151535 "NPR Nc Coll. Create Outg. Req."
 {
-    // NC2.01\BR\20160913  CASE 250447 Object created
-
     Caption = 'Create Outgoing Collector Req.';
     DataCaptionExpression = TextCreateNew;
     PageType = Document;

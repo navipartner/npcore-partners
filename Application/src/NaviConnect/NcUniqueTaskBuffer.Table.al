@@ -1,7 +1,5 @@
 table 6151509 "NPR Nc Unique Task Buffer"
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - Buffer Table for checking Unique Task
-
     Caption = 'Nc Unique Task Buffer';
     DataClassification = CustomerContent;
 
@@ -43,10 +41,6 @@ table 6151509 "NPR Nc Unique Task Buffer"
         key(Key1; "Table No.", "Task Processor Code", "Record Position", "Codeunit ID", "Processing Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

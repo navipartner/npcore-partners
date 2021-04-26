@@ -1,16 +1,5 @@
 ﻿codeunit 6151521 "NPR Nc Trigger Scheduler"
 {
-    // NC2.01/BR /20160809  CASE 247479 NaviConnect: Object created
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure "--- Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 6151520, 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertNcTriggerInsertTaskLine(var Rec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin
@@ -33,10 +22,6 @@
     local procedure OnBeforeModifyNcTriggerModifyTaskLine(var Rec: Record "NPR Nc Trigger"; var xRec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin
         ModfiyTriggerLine(xRec, Rec);
-    end;
-
-    local procedure "--- Database"()
-    begin
     end;
 
     local procedure InsertTaskLine(NcTrigger: Record "NPR Nc Trigger")
@@ -112,10 +97,6 @@
         TaskLine.Modify(true);
     end;
 
-    local procedure "--- Helpers"()
-    begin
-    end;
-
     local procedure GetAndCheckNcTriggerSetup(var NcTriggerSetup: Record "NPR Nc Trigger Setup")
     var
         NcSetup: Record "NPR Nc Setup";
@@ -158,10 +139,6 @@
                     exit(true);
             until TaskLine.Next() = 0;
         exit(false);
-    end;
-
-    local procedure "--- Constants"()
-    begin
     end;
 
     procedure GetParamName(): Text

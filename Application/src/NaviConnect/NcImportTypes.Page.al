@@ -71,16 +71,6 @@ page 6151505 "NPR Nc Import Types"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ftp Host field';
                 }
-                field("Server File Enabled"; Rec."Server File Enabled")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Server File Enabled field';
-                }
-                field("Server File Path"; Rec."Server File Path")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Server File Path field';
-                }
             }
         }
     }
@@ -106,25 +96,6 @@ page 6151505 "NPR Nc Import Types"
                     NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
                 begin
                     NcSyncMgt.DownloadFtpType(Rec);
-                end;
-            }
-            action("Download Server File")
-            {
-                Caption = 'Download Server File';
-                Image = Save;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                Visible = Rec."Server File Enabled";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Download Server File action';
-
-                trigger OnAction()
-                var
-                    NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-                begin
-                    NcSyncMgt.DownloadServerFile(Rec);
                 end;
             }
             action(SendTestErrorMail)
