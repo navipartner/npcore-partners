@@ -1,13 +1,5 @@
 codeunit 6151523 "NPR Nc Trigger Sample Sub."
 {
-    // NC2.01/BR /20160809  CASE 247479 NaviConnect: Object created
-    // NC2.01/BR/20161219  CASE 261431 Added subscriber codeunit to trigger
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         CRLFString: Text[20];
 
@@ -25,10 +17,6 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
         CRLFString[2] := 10;
         //Header
         WriteText(Output);
-    end;
-
-    local procedure "--- Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnRunNcTriggerTask', '', false, false)]
@@ -52,14 +40,8 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
         NcTrigger.Init();
         NcTrigger.Validate(Code, GetTriggerCode);
         NcTrigger.Validate(Description, GetTriggerDescription);
-        //-NC2.01 [261431]
         NcTrigger.Validate("Subscriber Codeunit ID", CODEUNIT::"NPR Nc Trigger Sample Sub.");
-        //+NC2.01 [261431]
         NcTrigger.Insert(true);
-    end;
-
-    local procedure "--- Constants"()
-    begin
     end;
 
     local procedure GetTriggerCode(): Code[20]

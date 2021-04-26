@@ -1,7 +1,5 @@
 page 6151537 "NPR Nc Endpoint Types"
 {
-    // NC2.01\BR\20160921  CASE 247479 Object created
-
     Caption = 'Nc Endpoint Types';
     DeleteAllowed = false;
     Editable = false;

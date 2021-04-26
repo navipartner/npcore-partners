@@ -1,15 +1,5 @@
 ﻿codeunit 6151528 "NPR Nc Collector Management"
 {
-    // NC2.01/BR  /20160909  CASE 250447 NaviConnect: Object created
-    // NC2.04/BR  /20170510  CASE 274524 Fix potential update conflicts
-    // NC2.09/BR  /20180130  CASE 303885 Fix "Send as Modify" function
-    // NC2.13/MHA /20180528  CASE 314683 Added DataLog Insert Trigger to consider Autoincrement Primary Key
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure GetNcCollectionNo(CollectorCode: Code[20]): BigInteger
     var
         NcCollection: Record "NPR Nc Collection";
@@ -28,12 +18,6 @@
             NcCollection.CalcFields("No. of Lines");
             if NcCollection."No. of Lines" < NcCollector."Max. Lines per Collection" then
                 exit(NcCollection."No.");
-            //-NC2.04 [274524]
-            //IF NcCollector."Send when Max. Lines" THEN BEGIN
-            //  VALIDATE(Status,Status::"Ready to Send");
-            //  MODIFY(TRUE);
-            //END;
-            //+NC2.04 [274524]
         end;
         NcCollection.Init();
         NcCollection."No." := 0;
@@ -42,10 +26,8 @@
         NcCollection."Table No." := NcCollector."Table No.";
         NcCollection."Creation Date" := CurrentDateTime;
         NcCollection.Insert(true);
-        //-NC2.13 [314683]
         RecRef.GetTable(NcCollection);
         DataLogMgt.OnDatabaseInsert(RecRef);
-        //+NC2.13 [314683]
         exit(NcCollection."No.");
     end;
 
@@ -124,10 +106,7 @@
                         RecReftemp.Delete();
                     until (NcCollectorFilter.Next() = 0) or SkipRecord;
                 if not SkipRecord then
-                    //-NC2.09 [303885]
-                    //InsertModifyCollectionLine(RecReftemp,NcCollector.Code);
                     InsertModifyCollectionLine(RecRef, NcCollector.Code);
-            //+NC2.09 [303885]
             until RecRef.Next() = 0;
     end;
 
@@ -142,16 +121,13 @@
         NcCollectionLine."Collector Code" := NcCollectorCode;
         NcCollectionLine."Collection No." := GetNcCollectionNo(NcCollectorCode);
         NcCollectionLine."Type of Change" := NcCollectionLine."Type of Change"::Modify;
-        //"Record ID" := DataLogRecord."Record ID";
         NcCollectionLine."Record Position" := RecRef.GetPosition(false);
         NcCollectionLine."Table No." := RecRef.Number;
         NcCollectionLine."Data log Record No." := 0;
         PopulatePKFields(NcCollectionLine, RecRef);
         NcCollectionLine.Insert(true);
-        //-NC2.13 [314683]
         RecRef2.GetTable(NcCollectionLine);
         DataLogMgt.OnDatabaseInsert(RecRef2);
-        //+NC2.13 [314683]
 
         MarkPreviousCollectionLinesAsObsolete(NcCollectionLine);
     end;
@@ -262,10 +238,8 @@
         NcCollectorRequest.Validate(Name, RequestName);
         NcCollectorRequest.Validate("Only New and Modified Records", OnlyNewAndModified);
         NcCollectorRequest.Insert(true);
-        //-NC2.13 [314683]
         RecRef2.GetTable(NcCollectorRequest);
         DataLogMgt.OnDatabaseInsert(RecRef2);
-        //+NC2.13 [314683]
 
         RecRef.GetTable(RecordToRequest);
         InsertFilterRecords(NcCollectorRequest, RecRef);
@@ -299,14 +273,11 @@
                         NcCollectorRequestFilter.Validate("Field No.", FldRef.Number);
                         NcCollectorRequestFilter.Validate("Filter Text", FilterText);
                         NcCollectorRequestFilter.Insert(true);
-                        //-NC2.13 [314683]
                         RecRef2.GetTable(NcCollectorRequestFilter);
                         DataLogMgt.OnDatabaseInsert(RecRef2);
-                        //-NC2.13 [314683]
                     end;
                 until FieldRec.Next() = 0;
         end;
-        //+NPR5.25
     end;
 }
 

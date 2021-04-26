@@ -1,7 +1,5 @@
 page 6151532 "NPR Nc Collection Lines"
 {
-    // NC2.01\BR\20160909  CASE 250447 Object created
-
     Caption = 'Nc Collection Lines';
     Editable = false;
     PageType = List;
@@ -82,10 +80,6 @@ page 6151532 "NPR Nc Collection Lines"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

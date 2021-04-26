@@ -1,7 +1,5 @@
 page 6151528 "NPR Nc Collector List"
 {
-    // NC2.01\BR\20160909  CASE 250447 Object created
-
     Caption = 'Nc Collector List';
     CardPageID = "NPR Nc Collector Card";
     Editable = false;

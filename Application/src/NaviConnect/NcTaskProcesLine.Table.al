@@ -1,8 +1,5 @@
 table 6151506 "NPR Nc Task Proces. Line"
 {
-    // NC1.22/MHA/20160415 CASE 231214 Object created
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'Nc Task Proces. Line';
     DataClassification = CustomerContent;
 
@@ -50,10 +47,6 @@ table 6151506 "NPR Nc Task Proces. Line"
         key(Key1; "Task Processor Code", "Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     procedure DataLogCode(): Code[20]

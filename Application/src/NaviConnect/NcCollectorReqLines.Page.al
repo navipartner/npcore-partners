@@ -1,7 +1,5 @@
 page 6151533 "NPR Nc Collector Req. Lines"
 {
-    // NC2.01\BR\20160909  CASE 250447 Object created
-
     Caption = 'Nc Collector Request Lines';
     PageType = List;
     SourceTable = "NPR Nc Collector Request";
@@ -111,10 +109,6 @@ page 6151533 "NPR Nc Collector Req. Lines"
                 ApplicationArea = All;
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

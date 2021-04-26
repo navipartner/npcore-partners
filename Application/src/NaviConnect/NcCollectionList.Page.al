@@ -1,7 +1,5 @@
 page 6151531 "NPR Nc Collection List"
 {
-    // NC2.01\BR\20160909  CASE 250447 Object created
-
     Caption = 'Nc Collection List';
     Editable = false;
     PageType = List;

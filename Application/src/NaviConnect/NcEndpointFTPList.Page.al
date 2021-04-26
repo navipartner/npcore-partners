@@ -1,7 +1,5 @@
 page 6151522 "NPR Nc Endpoint FTP List"
 {
-    // NC2.01/BR /20160818  CASE 248630 NaviConnect
-
     Caption = 'Nc Endpoint FTP List';
     CardPageID = "NPR Nc Endpoint FTP Card";
     DeleteAllowed = false;

@@ -148,23 +148,6 @@ page 6151509 "NPR Nc Import Type Card"
                         ToolTip = 'Specifies the value of the Ftp Filename field';
                     }
                 }
-                group("File")
-                {
-                    Caption = 'File';
-                    Enabled = Rec."Import List Update Handler" = Rec."Import List Update Handler"::Default;
-                    Visible = Rec."Import List Update Handler" = Rec."Import List Update Handler"::Default;
-
-                    field("Server File Enabled"; Rec."Server File Enabled")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Server File Enabled field';
-                    }
-                    field("Server File Path"; Rec."Server File Path")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Server File Path field';
-                    }
-                }
             }
             group("XML Stylesheet")
             {
@@ -237,25 +220,6 @@ page 6151509 "NPR Nc Import Type Card"
                     NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
                 begin
                     NcSyncMgt.DownloadFtpType(Rec);
-                end;
-            }
-            action("Download Server File")
-            {
-                Caption = 'Download Server File';
-                Image = Save;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                Visible = Rec."Server File Enabled";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Download Server File action';
-
-                trigger OnAction()
-                var
-                    NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-                begin
-                    NcSyncMgt.DownloadServerFile(Rec);
                 end;
             }
             action(SendTestErrorMail)

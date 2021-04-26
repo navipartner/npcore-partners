@@ -1,9 +1,5 @@
 table 6151090 "NPR Nc RapidConnect Setup"
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
-    // NC2.17/MHA /20181122  CASE 335927 Added field 110 "Export File Type"
-    // NC14.00.2.22/MHA /20190715  CASE 361941 Removed Option value ".xlsx" from field 110 "Export File Type"
-
     Caption = 'Nc RapidConnect Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc RapidConnect Setup";
@@ -123,10 +119,6 @@ table 6151090 "NPR Nc RapidConnect Setup"
         key(Key2; "Package Code", "Export Enabled", "Task Processor Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

@@ -1,8 +1,5 @@
 table 6151507 "NPR Nc Task Processor"
 {
-    // NC1.22/MHA/20160125 CASE 239371 Object created
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'NaviConnect Task Processor';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Task Proces. List";
@@ -32,10 +29,6 @@ table 6151507 "NPR Nc Task Processor"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

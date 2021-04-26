@@ -1,16 +1,10 @@
 ﻿codeunit 6151529 "NPR Nc Collector Send Collect."
 {
-    // NC2.01 /BR  /20160909  CASE 250447 NaviConnect: Object created
-    // NC2.04 /BR  /20170510  CASE 274524 Call cleanup function
-
-
     trigger OnRun()
     begin
         CheckMaxLines;
         CheckWaitingLines;
-        //-NC2.04
         DeleteOldCollections;
-        //+NC2.04
     end;
 
     local procedure CheckMaxLines()

@@ -1,7 +1,5 @@
 table 6151528 "NPR Nc Collection Line"
 {
-    // NC2.01\BR\20160909  CASE 250447 NaviConnect: Object created
-
     Caption = 'Nc Collection Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Collection Lines";
@@ -112,10 +110,6 @@ table 6151528 "NPR Nc Collection Line"
         key(Key3; "Collection No.", "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

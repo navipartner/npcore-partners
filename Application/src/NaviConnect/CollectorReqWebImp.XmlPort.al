@@ -1,8 +1,5 @@
 xmlport 6151530 "NPR Collector Req. Web Imp."
 {
-    // NC2.01/BR  /20160912  CASE 250447 NaviConnect: Object created
-    // NC2.08/BR  /20171123  CASE 297355 Deleted unused variables
-
     Caption = 'Collector Request Web Import';
     DefaultNamespace = 'urn:microsoft-dynamics-schemas/codeunit/endpointquery_services';
     FormatEvaluate = Xml;
@@ -92,18 +89,6 @@ xmlport 6151530 "NPR Collector Req. Web Imp."
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnPreXmlPort()
     begin
     end;
@@ -114,36 +99,9 @@ xmlport 6151530 "NPR Collector Req. Web Imp."
         exit(messageid);
     end;
 
-    procedure GetSummary(): Text[30]
-    begin
-        //EXIT (STRSUBSTNO ('%1-%2', Testfile, QtySum));
-        exit('Testfile');
-    end;
-
     procedure SetCollectorRequestResult(ParReturnValue: Text)
     begin
-        //tmpTicketReservationResponse.DELETEALL ();
-        //TicketReservationResponse.SETFILTER ("Session Token ID", '=%1', DocumentID);
-        //TicketReservationResponse.FindLast() ();
-
-        //tmpTicketReservationResponse.TRANSFERFIELDS (TicketReservationResponse, TRUE);
-        //tmpTicketReservationResponse.INSERT ();
-        //tmpTicketReservationResponse.RESET ();
-        //Commit();
-
         ReturnValue := ParReturnValue;
-    end;
-
-    local procedure FindBooleanOptionValue(InputText: Text): Integer
-    begin
-        case UpperCase(InputText) of
-            'TRUE', 'YES', '1':
-                exit(1);
-            'FALSE', 'NO', '0':
-                exit(0);
-            else
-                exit(3);
-        end;
     end;
 }
 

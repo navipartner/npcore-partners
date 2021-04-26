@@ -1,8 +1,5 @@
 page 6151530 "NPR Nc Collec. Filters"
 {
-    // NC2.01/BR  /20160909  CASE 250447 Object created
-    // NC2.08/BR  /20171220  CASE 300634 Added field Collect When Modified
-
     Caption = 'Nc Collector Filters';
     DelayedInsert = true;
     MultipleNewLines = false;
@@ -42,10 +39,6 @@ page 6151530 "NPR Nc Collec. Filters"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         SetTableNo;
@@ -61,10 +54,8 @@ page 6151530 "NPR Nc Collec. Filters"
         NcCollector: Record "NPR Nc Collector";
     begin
         if (Rec."Collector Code" <> '') and (Rec."Table No." = 0) then begin
-            if NcCollector.Get(Rec."Collector Code") then begin
+            if NcCollector.Get(Rec."Collector Code") then
                 Rec."Table No." := NcCollector."Table No.";
-
-            end;
         end;
     end;
 }

@@ -1,9 +1,5 @@
 ﻿codeunit 6151530 "NPR Nc Collector NpXml Value"
 {
-    // NC2.01/BR  /20160912  CASE 250447 NaviConnect: Object created
-    // NC2.13/MHA /20180530  CASE 312958 Added functions CollectionLine2Item(),IsElementSubscriber()
-    // NC2.14/MHA /20180726  CASE 312958 Removed direct reference to NPR table
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
@@ -38,10 +34,6 @@
         end;
     end;
 
-    local procedure "------- Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
     local procedure OnGetXMLValueMarkAsProcessed(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
@@ -66,10 +58,6 @@
         end;
     end;
 
-    local procedure "--- NpXml Element Child Table"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151551, 'OnSetupGenericChildTable', '', true, true)]
     local procedure CollectionLine2Item(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var
@@ -80,7 +68,6 @@
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        //-NC2.13 [312958]
         if Handled then
             exit;
         if not IsElementSubscriber(NpXmlElement, 'CollectionLine2Item') then
@@ -126,14 +113,8 @@
                     TempItem := Item;
                     TempItem.Insert();
                 end;
-        //+NC2.14 [312958]
         end;
         ChildRecRef.GetTable(TempItem);
-        //+NC2.13 [312958]
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -143,14 +124,12 @@
 
     local procedure IsElementSubscriber(NpXmlElement: Record "NPR NpXml Element"; GenericTableFunction: Text): Boolean
     begin
-        //-NC2.13 [312958]
         if NpXmlElement."Generic Child Codeunit ID" <> CurrCodeunitId() then
             exit(false);
         if NpXmlElement."Generic Child Function" <> GenericTableFunction then
             exit(false);
 
         exit(true);
-        //+NC2.13 [312958]
     end;
 }
 

@@ -1,7 +1,5 @@
 ﻿table 6151523 "NPR Nc Endpoint E-mail"
 {
-    // NC2.01/BR /20160818  CASE 248630 NaviConnect
-
     Caption = 'Nc Endpoint E-mail';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint E-mail List";
@@ -103,10 +101,6 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
         NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
@@ -132,7 +126,6 @@
     begin
         Clear(NcEndpointTriggerLinks);
         NcEndpointTriggerLink.Reset();
-        //NcEndpointTriggerLink.SETRANGE("Endpoint Type Code",GetEndpointTypeCode);
         NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
         NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
         NcEndpointTriggerLinks.RunModal();

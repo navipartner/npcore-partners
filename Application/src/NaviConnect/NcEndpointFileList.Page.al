@@ -1,8 +1,5 @@
 page 6151526 "NPR Nc Endpoint File List"
 {
-    // NC2.01/BR  /20160826  CASE 247479 NaviConnect
-    // NC2.12/MHA /20180502  CASE 313362 Added field 105 "Client Path"
-
     Caption = 'Nc Endpoint File List';
     CardPageID = "NPR Nc Endpoint File Card";
     DeleteAllowed = false;
