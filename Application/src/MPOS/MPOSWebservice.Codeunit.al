@@ -2,18 +2,21 @@ codeunit 6059965 "NPR MPOS Webservice"
 {
     trigger OnRun()
     var
-        WebService: Record "Web Service";
+        WebServiceMgt: Codeunit "Web Service Management";
     begin
-        Clear(WebService);
+        WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR MPOS Webservice", 'mpos_service', true);
+    end;
 
-        if not WebService.Get(WebService."Object Type"::Codeunit, 'mpos_service') then begin
-            WebService.Init;
-            WebService."Object Type" := WebService."Object Type"::Codeunit;
-            WebService."Service Name" := 'mpos_service';
-            WebService."Object ID" := 6059965;
-            WebService.Published := true;
-            WebService.Insert;
-        end;
+    [EventSubscriber(ObjectType::Table, Database::"Web Service Aggregate", 'OnBeforeInsertEvent', '', true, true)]
+    local procedure OnBeforeInsertWebServiceAggregate(var Rec: Record "Web Service Aggregate"; RunTrigger: Boolean)
+    var
+    begin
+        if Rec."Object Type" <> Rec."Object Type"::Codeunit then
+            exit;
+        if Rec."Service Name" <> 'mpos_service' then
+            exit;
+
+        Rec."All Tenants" := false;
     end;
 
     var
