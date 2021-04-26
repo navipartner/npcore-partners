@@ -1,7 +1,5 @@
 codeunit 6059942 "NPR VAN Doc. Endpoint Deliv."
 {
-    // NPR5.55/THRO/20200504 CASE 380787 Delivery Codeunit for Electronic Documents. Sends file to a NC Endpoint
-
     TableNo = "Record Export Buffer";
 
     trigger OnRun()

@@ -1,7 +1,5 @@
 page 6151510 "NPR Nc Task Output List"
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - Multi Output per Nc Task
-
     Caption = 'Task Output List';
     Editable = false;
     PageType = List;
@@ -201,16 +199,19 @@ page 6151510 "NPR Nc Task Output List"
 
     local procedure UpdateResponseText()
     var
-        InStream: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
+        InStr: InStream;
+        BufferText: Text;
     begin
         ResponseText := '';
-        if not Response.HasValue() then
+        if not Rec.Response.HasValue() then
             exit;
         Rec.CalcFields(Response);
-        Response.CreateInStream(InStream, TEXTENCODING::UTF8);
-        StreamReader := StreamReader.StreamReader(InStream);
-        ResponseText := StreamReader.ReadToEnd();
+        Rec.Response.CreateInStream(InStr, TextEncoding::UTF8);
+        BufferText := '';
+        while not InStr.EOS do begin
+            InStr.ReadText(BufferText);
+            ResponseText += BufferText;
+        end;
     end;
 }
 

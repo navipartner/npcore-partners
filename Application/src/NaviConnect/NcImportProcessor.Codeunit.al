@@ -1,7 +1,5 @@
 codeunit 6151511 "NPR Nc Import Processor"
 {
-    // NPR5.55/MHA /20200604  CASE 408100 Object created - Processes Nc Import
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

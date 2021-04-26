@@ -1,9 +1,5 @@
 page 6151090 "NPR Nc RapidConnect Setup Card"
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
-    // NC2.17/MHA /20181122  CASE 335927 Added field 110 "Export File Type"
-    // NC14.00.2.22/MHA /20190715  CASE 361941 Removed Action "Export to Excel"
-
     UsageCategory = None;
     Caption = 'RapidConnect Setup';
     SourceTable = "NPR Nc RapidConnect Setup";
@@ -194,6 +190,5 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
             }
         }
     }
-
 }
 

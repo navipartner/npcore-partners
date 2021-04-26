@@ -98,13 +98,13 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
             until FieldRecord.Next() = 0;
     end;
 
-    procedure GetOutput(NcTaskentryNo: Integer): Text
+    procedure GetOutput(NcTaskentryNo: Integer) OutputText: Text
     var
         NcTask: Record "NPR Nc Task";
         TextNoOutput: Label 'FTP Task not executed because there was no output to send.';
         TextOutputNotFound: Label 'Output Task %1 could not be found. The task with output may have been deleted before it could be transferred.';
-        IStream: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
+        InStr: InStream;
+        BufferText: Text;
     begin
         if not NcTask.Get(NcTaskentryNo) then
             Error(TextOutputNotFound, Format(NcTaskentryNo));
@@ -113,9 +113,12 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
             Error(TextNoOutput);
 
         NcTask.CalcFields("Data Output");
-        NcTask."Data Output".CreateInStream(IStream, TextEncoding::UTF8);
-        StreamReader := StreamReader.StreamReader(IStream);
-        exit(StreamReader.ReadToEnd());
+        NcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+        BufferText := '';
+        while not InStr.EOS do begin
+            InStr.ReadText(BufferText);
+            OutputText += BufferText;
+        end;
     end;
 
     local procedure InsertSetup(var NcTaskSetup: Record "NPR Nc Task Setup"; RecRef: RecordRef)

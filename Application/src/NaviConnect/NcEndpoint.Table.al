@@ -1,7 +1,5 @@
 ﻿table 6151533 "NPR Nc Endpoint"
 {
-    // NC2.01\BR\20160921  CASE 248630 Object created
-
     Caption = 'Nc Endpoint';
     DataClassification = CustomerContent;
 
@@ -50,10 +48,6 @@
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

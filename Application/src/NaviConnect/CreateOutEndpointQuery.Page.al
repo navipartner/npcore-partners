@@ -1,9 +1,5 @@
 page 6014686 "NPR Create Out. Endpoint Query"
 {
-    // NPR5.25\BR\20160803  CASE 234602 Object created
-    // NPR5.48/JDH /20181109 CASE 334163 Added Action Captions and object caption
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-
     Caption = 'Create Outgoing Endpoint Query';
     DataCaptionExpression = TextCreateNew;
     PageType = Document;

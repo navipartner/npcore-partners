@@ -1,5 +1,10 @@
 ﻿codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 {
+    var
+        FTPClient: Codeunit "NPR AF FTP Client";
+        SFTPClient: Codeunit "NPR AF SFTP Client";
+        AuthorizationFailedErrorText: Label 'Authorization failed. Wrong FTP username/password.';
+
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; Filename: Text; var NcTask: Record "NPR Nc Task")
     var
         NcEndpoint: Record "NPR Nc Endpoint";
@@ -136,86 +141,137 @@
 
     local procedure SendDotNetFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        Encoding: DotNet NPRNetUTF8Encoding;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        IoStream: DotNet NPRNetStream;
         Servername: Text;
+        TempBlob: Codeunit "Temp Blob";
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
+        InStr: InStream;
+        OutStr: OutStream;
+        ErrorDescription: Text;
+        FtpPort: Integer;
+        Encoding: TextEncoding;
+        UseDefaultEncoding: Boolean;
     begin
         Servername := BuildFTPServerName(NcEndpointFTP.Server);
 
         if NcEndpointFTP.Directory <> '' then
-            ConnectionString := (Servername + '/' + NcEndpointFTP.Directory + '/' + Filename)
+            ConnectionString := (NcEndpointFTP.Directory + '/' + Filename)
         else
-            ConnectionString := (Servername + '/' + Filename);
-        FtpWebRequest := FtpWebRequest.Create(ConnectionString);
+            ConnectionString := (Filename);
 
-        FtpWebRequest.KeepAlive := true;
-        FtpWebRequest.UseBinary := true;
-        FtpWebRequest.UsePassive := NcEndpointFTP.Passive;
-
-        FtpWebRequest.Method := 'STOR';
-        FtpWebRequest.Credentials := Credential.NetworkCredential(NcEndpointFTP.Username, NcEndpointFTP.Password);
+        UseDefaultEncoding := false;
         case NcEndpointFTP."File Encoding" of
             NcEndpointFTP."File Encoding"::ANSI:
-                Encoding := Encoding.GetEncoding('windows-1252');
-            NcEndpointFTP."File Encoding"::Unicode:
-                Encoding := Encoding.Unicode;
+                Encoding := TextEncoding::Windows;
             NcEndpointFTP."File Encoding"::UTF8:
-                Encoding := Encoding.UTF8;
+                Encoding := TextEncoding::UTF8;
+            else
+                UseDefaultEncoding := true;
+        end;
+        if UseDefaultEncoding then
+            TempBlob.CreateOutStream(OutStr)
+        else
+            TempBlob.CreateOutStream(OutStr, Encoding);
+
+        OutStr.Write(OutputText);
+
+        if UseDefaultEncoding then
+            TempBlob.CreateInStream(InStr)
+        else
+            TempBlob.CreateInStream(InStr, Encoding);
+
+        FtpPort := NcEndpointFTP.Port;
+        If FtpPort = 0 then
+            FtpPort := 21;
+
+        InitializeFTP(Servername, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive);
+        FTPResponse := FTPClient.UploadFile(InStr, ConnectionString);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    FTPResponse.Get('Decription', JToken);
+                    ResponseDescriptionText := JToken.AsValue.AsText();
+                    exit(true);
+                end;
+            '401':
+                ResponseDescriptionText := AuthorizationFailedErrorText;
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    ResponseDescriptionText := JToken.AsValue.AsText();
+                end;
         end;
 
-        FtpWebRequest.ContentLength := Encoding.GetBytes(OutputText).Length;
-        IoStream := FtpWebRequest.GetRequestStream;
-        IoStream.Write(Encoding.GetBytes(OutputText), 0, FtpWebRequest.ContentLength);
-        IoStream.Flush;
-        IoStream.Close();
-        Clear(IoStream);
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        ResponseDescriptionText := FtpWebResponse.StatusDescription;
-        ResponseCodeText := Format(FtpWebResponse.StatusCode);
-        exit(true);
+        exit(false);
     end;
 
     local procedure SendSharpSFTP(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
     var
-        Encoding: DotNet NPRNetUTF8Encoding;
-        SharpSFtp: DotNet NPRNetSftp0;
-        StreamWriter: DotNet NPRNetStreamWriter;
-        UploadFile: File;
-        LocalPath: Text;
         RemotePath: Text;
+        TempBlob: Codeunit "Temp Blob";
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
+        InStr: InStream;
+        OutStr: OutStream;
+        ErrorDescription: Text;
+        FtpPort: Integer;
+        Encoding: TextEncoding;
+        UseDefaultEncoding: Boolean;
     begin
-        LocalPath := TemporaryPath;
-        UploadFile.Create(LocalPath + Filename);
-        UploadFile.Close();
-
-        case NcEndpointFTP."File Encoding" of
-            NcEndpointFTP."File Encoding"::ANSI:
-                Encoding := Encoding.GetEncoding('windows-1252');
-            NcEndpointFTP."File Encoding"::Unicode:
-                Encoding := Encoding.Unicode;
-            NcEndpointFTP."File Encoding"::UTF8:
-                Encoding := Encoding.UTF8;
-        end;
-        StreamWriter := StreamWriter.StreamWriter(LocalPath + Filename, true, Encoding);
-        StreamWriter.Write(OutputText);
-        StreamWriter.Flush;
-        StreamWriter.Close();
-
-        SharpSFtp := SharpSFtp.Sftp(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password);
-        SharpSFtp.Connect(NcEndpointFTP.Port);
-
         if NcEndpointFTP.Directory <> '' then
             RemotePath := '/' + NcEndpointFTP.Directory + '/'
         else
             RemotePath := '/';
-        SharpSFtp.Put(LocalPath + Filename, RemotePath + Filename);
 
-        ResponseDescriptionText := '200 The requested action has been successfully completed';
-        ResponseCodeText := '200';
-        exit(true);
+        UseDefaultEncoding := false;
+        case NcEndpointFTP."File Encoding" of
+            NcEndpointFTP."File Encoding"::ANSI:
+                Encoding := TextEncoding::Windows;
+            NcEndpointFTP."File Encoding"::UTF8:
+                Encoding := TextEncoding::UTF8;
+            else
+                UseDefaultEncoding := true;
+        end;
+        if UseDefaultEncoding then
+            TempBlob.CreateOutStream(OutStr)
+        else
+            TempBlob.CreateOutStream(OutStr, Encoding);
+
+        OutStr.Write(OutputText);
+
+        if UseDefaultEncoding then
+            TempBlob.CreateInStream(InStr)
+        else
+            TempBlob.CreateInStream(InStr, Encoding);
+
+        FtpPort := NcEndpointFTP.Port;
+        If FtpPort = 0 then
+            FtpPort := 21;
+
+        InitializeSFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort);
+        FTPResponse := SFTPClient.UploadFile(InStr, RemotePath + Filename);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    ResponseDescriptionText := '200 The requested action has been successfully completed';
+                    exit(true);
+                end;
+            '401':
+                ResponseDescriptionText := AuthorizationFailedErrorText;
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    ResponseDescriptionText := JToken.AsValue.AsText();
+                end;
+        end;
+
+        exit(false);
     end;
 
     local procedure SendFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP")
@@ -235,40 +291,25 @@
 
     local procedure SendDotNetFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP"): Boolean
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        Stream: DotNet NPRNetStream;
-        Uri: DotNet NPRNetUri;
-        InStream: InStream;
+        FtpPort: Integer;
+        InStr: InStream;
         ServerName: Text;
-        Url: Text;
+        FilePath: Text;
     begin
         ServerName := BuildFTPServerName(NcEndpointFTP.Server);
 
-        Url := (ServerName + '/' + NcTaskOutput.Name);
+        FilePath := (NcTaskOutput.Name);
         if NcEndpointFTP.Directory <> '' then
-            Url := (ServerName + '/' + NcEndpointFTP.Directory + '/' + NcTaskOutput.Name);
+            FilePath := (NcEndpointFTP.Directory + '/' + NcTaskOutput.Name);
 
-        FtpWebRequest := FtpWebRequest.Create(Uri.Uri(Url));
-        FtpWebRequest.KeepAlive := true;
-        FtpWebRequest.UseBinary := true;
-        FtpWebRequest.UsePassive := NcEndpointFTP.Passive;
+        NcTaskOutput.Data.CreateInStream(InStr);
 
-        FtpWebRequest.Method := 'STOR';
-        FtpWebRequest.Credentials := Credential.NetworkCredential(NcEndpointFTP.Username, NcEndpointFTP.Password);
-        NcTaskOutput.Data.CreateInStream(InStream);
-        Stream := FtpWebRequest.GetRequestStream;
-        CopyStream(Stream, InStream);
-        Stream.Flush;
-        Stream.Close();
-        Clear(Stream);
+        FtpPort := NcEndpointFTP.Port;
+        If FtpPort = 0 then
+            FtpPort := 21;
 
-        FtpWebResponse := FtpWebRequest.GetResponse;
-    end;
-
-    local procedure SetupNCTaskLine()
-    begin
+        InitializeFTP(ServerName, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive);
+        FTPClient.UploadFile(InStr, FilePath);
     end;
 
     local procedure BuildFTPServerName(Servername: Text): Text
@@ -288,33 +329,38 @@
 
     local procedure InitEndpoint(NcEndpointFTP: Record "NPR Nc Endpoint FTP")
     var
-        Credential: DotNet NPRNetNetworkCredential;
         FtpFolders: Text;
         FtpPath: Text;
-        List: Text;
+        DirectoryList: List of [Text];
+        FtpPort: Integer;
     begin
-        Credential := Credential.NetworkCredential(NcEndpointFTP.Username, NcEndpointFTP.Password);
-        FtpPath := NcEndpointFTP.Server;
-        TryListFtpDirectory(FtpPath, Credential, List);
+        FtpPath := '/';
+
+        FtpPort := NcEndpointFTP.Port;
+        If FtpPort = 0 then
+            FtpPort := 21;
+
+        InitializeFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive);
+        TryListFtpDirectory(FtpPath, DirectoryList);
 
         if NcEndpointFTP.Directory = '' then
             exit;
 
         FtpFolders := NcEndpointFTP.Directory;
-        CreateFtpFolders(NcEndpointFTP.Server, Credential, FtpFolders);
+        CreateFtpFolders(NcEndpointFTP.Server, FtpFolders);
     end;
 
-    local procedure CreateFtpFolders(FtpServer: Text; var Credential: DotNet NPRNetNetworkCredential; FtpFolders: Text)
+    local procedure CreateFtpFolders(FtpServer: Text; FtpFolders: Text)
     var
         FtpFolder: Text;
         FtpPath: Text;
-        List: Text;
+        DirectoryList: List of [Text];
     begin
         FtpPath := FtpServer;
         while CutNextFtpFolder(FtpFolders, FtpFolder) do begin
             FtpPath += '/' + FtpFolder;
-            if (not TryListFtpDirectory(FtpPath, Credential, List)) or (List = '') then
-                TryCreateFtpFolder(FtpPath, Credential);
+            if (not TryListFtpDirectory(FtpPath, DirectoryList)) or (DirectoryList.Count = 0) then
+                TryCreateFtpFolder(FtpPath);
         end;
     end;
 
@@ -342,46 +388,68 @@
     end;
 
     [TryFunction]
-    local procedure TryCreateFtpFolder(FtpPath: Text; var Credential: DotNet NPRNetNetworkCredential)
+    local procedure TryCreateFtpFolder(FtpPath: Text)
     var
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        FTPResponse: JsonObject;
+        ResponseCodeText: Text;
+        JToken: JsonToken;
     begin
-        FtpWebRequest := FtpWebRequest.Create(FtpPath);
-        FtpWebRequest.Method := 'MKD';
-        FtpWebRequest.Credentials := Credential;
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
-        FtpWebRequest.Abort();
-        Clear(FtpWebRequest);
+        FTPResponse := FTPClient.CreateDirectory(FtpPath);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        case ResponseCodeText of
+            '200':
+                exit;
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
+        end;
     end;
 
     [TryFunction]
-    local procedure TryListFtpDirectory(FtpPath: Text; var Credential: DotNet NPRNetNetworkCredential; var List: Text)
+    local procedure TryListFtpDirectory(FtpPath: Text; var DirectoryList: List of [Text])
     var
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        StreamReader: DotNet NPRNetStreamReader;
+        FTPResponse: JsonObject;
+        FileObject: JsonObject;
+        JToken: JsonToken;
+        JArray: JsonArray;
+        i: Integer;
+        ResponseCodeText: Text;
     begin
-        FtpWebRequest := FtpWebRequest.Create(FtpPath);
-        FtpWebRequest.Method := 'LIST';
-        FtpWebRequest.Credentials := Credential;
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
+        FTPResponse := FTPClient.ListDirectory('/');
 
-        StreamReader := StreamReader.StreamReader(MemoryStream);
-        List := StreamReader.ReadToEnd;
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
 
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
-        FtpWebRequest.Abort();
-        Clear(FtpWebRequest);
+        case ResponseCodeText of
+            '200':
+                begin
+                    FTPResponse.Get('Files', JToken);
+                    JArray := JToken.AsArray();
+
+                    for i := 0 to JArray.Count - 1 do begin
+                        JArray.Get(i, JToken);
+                        FileObject := JToken.AsObject();
+
+                        FileObject.Get('Directory', JToken);
+                        if Jtoken.AsValue.AsBoolean() then begin
+                            FileObject.Get('File', JToken);
+                            DirectoryList.Add(JToken.AsValue().AsText());
+                        end;
+                    end;
+                end;
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Endpoint Mgt.", 'OnHasInitEndpoint', '', true, true)]
@@ -493,6 +561,16 @@
             exit;
 
         SendFtpOutput(NcTaskOutput, NcEndpointFTP);
+    end;
+
+    local procedure InitializeFTP(ServerName: Text; Username: Text; Password: Text; FtpPort: Integer; Passive: Boolean)
+    begin
+        FTPClient.Construct(ServerName, Username, Password, FtpPort, 10000, Passive);
+    end;
+
+    local procedure InitializeSFTP(ServerName: Text; Username: Text; Password: Text; FtpPort: Integer)
+    begin
+        SFTPClient.Construct(ServerName, Username, Password, FtpPort, 10000);
     end;
 }
 

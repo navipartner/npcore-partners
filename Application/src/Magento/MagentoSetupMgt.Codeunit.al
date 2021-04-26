@@ -884,17 +884,6 @@
     #endregion
 
     #region Managed Nav Modules
-
-    procedure ShowMissingObjects(var MagentoSetup: Record "NPR Magento Setup")
-    var
-        TempObject: Record AllObj temporary;
-    begin
-        // NcManagedNavModulesMgt.FindMissingObjects(MagentoVersionId(), MagentoSetup."Version No.",
-        //   MagentoSetup."Managed Nav Api Url", MagentoSetup."Managed Nav Api Username", MagentoSetup.GetNavApiPassword(), TempObject);
-
-        PAGE.Run(PAGE::"Code Coverage AL Object", TempObject);
-    end;
-
     procedure MagentoVersionId(): Text
     begin
         exit('MAG');

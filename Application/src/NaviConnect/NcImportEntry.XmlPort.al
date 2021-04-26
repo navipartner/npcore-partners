@@ -1,7 +1,5 @@
 xmlport 6151500 "NPR Nc Import Entry"
 {
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'Nc Import Entry';
 
     schema
@@ -17,13 +15,15 @@ xmlport 6151500 "NPR Nc Import Entry"
 
                     trigger OnBeforePassField()
                     var
-                        InStream: InStream;
-                        StreamReader: DotNet NPRNetStreamReader;
+                        InStr: InStream;
+                        BufferText: Text;
                     begin
                         Clear(TempNcImportEntry."Document Source");
-                        TempNcImportEntry."Document Source".CreateInStream(InStream, TEXTENCODING::UTF8);
-                        StreamReader := StreamReader.StreamReader(InStream);
-                        document_source := StreamReader.ReadToEnd;
+                        TempNcImportEntry."Document Source".CreateInStream(InStr, TextEncoding::UTF8);
+                        while not InStr.EOS do begin
+                            InStr.ReadText(BufferText);
+                            document_source += BufferText;
+                        end;
                     end;
 
                     trigger OnAfterAssignField()
@@ -31,7 +31,7 @@ xmlport 6151500 "NPR Nc Import Entry"
                         OutStream: OutStream;
                     begin
                         Clear(TempNcImportEntry."Document Source");
-                        TempNcImportEntry."Document Source".CreateOutStream(OutStream, TEXTENCODING::UTF8);
+                        TempNcImportEntry."Document Source".CreateOutStream(OutStream, TextEncoding::UTF8);
                         OutStream.WriteText(document_source);
                     end;
                 }
@@ -48,18 +48,6 @@ xmlport 6151500 "NPR Nc Import Entry"
                     TempNcImportEntry."Entry No." := EntryNo;
                 end;
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

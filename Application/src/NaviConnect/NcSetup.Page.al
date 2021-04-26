@@ -62,34 +62,19 @@
                     NaviConnectMgt: Codeunit "NPR Nc Setup Mgt.";
                 begin
                     CurrPage.Update(true);
-                    //-NC1.17
-                    //MagentoMgt.SetupTaskQueue();
                     NaviConnectMgt.SetupTaskQueue();
-                    //+NC1.17
                 end;
             }
         }
     }
-
-    trigger OnClosePage()
-    begin
-        //-NC1.05
-        //GiftVoucherVisible := FALSE ;
-        //+NC1.05
-    end;
 
     trigger OnOpenPage()
     var
         NaviConnectMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
         Rec.Reset();
-        //-NC1.17
-        //IF NOT GET THEN BEGIN
-        //  MagentoMgt.InitNaviConnectSetup();
-        //END;
         if not Rec.Get() then
             NaviConnectMgt.InitNaviConnectSetup();
-        //+NC1.17
     end;
 }
 

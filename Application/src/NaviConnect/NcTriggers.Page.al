@@ -1,9 +1,5 @@
 page 6151520 "NPR Nc Triggers"
 {
-    // NC2.01/BR /20160809  CASE 247479 NaviConnect
-    // NC2.01/BR /20161219 CASE 261431 Added fields Subscriber Codeunit ID and - Name, added Naviagtion to Tasks
-    // NC2.03/BR /20170103  CASE 271242 Added field Error on Empty Output
-
     Caption = 'Nc Triggers';
     PageType = List;
     SourceTable = "NPR Nc Trigger";

@@ -6,20 +6,21 @@ codeunit 6151611 "NPR AF FTP Client"
         gConvert: Codeunit "Base64 Convert";
         gAzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         //CodeUnit Constants
-        gHttpUrlConst, gHttpUsernameConst, gHttpPasswordConst, gHttpPortConst, gHttpFilePathConst : Text;
+        gHttpUrlConst, gHttpUsernameConst, gHttpPasswordConst, gHttpPortConst, gHttpFilePathConst, gHttpPasiveConst : Text;
         gHttpPathConst, gHttpFileContentConst, gHttpTimeoutMsConst, gHttpHostKey : Text;
         gErrorConst, gErrMsg_Post_Fail, gErrMsg_Parse_Fail : Text;
         gResponseMsg_StatusCode, gResponseMsg_ServerJson : Text;
         //ftpParameters
         gHost, gUsername, gPassword : Text;
         gPort, gTimeoutMs : Integer;
+        gPassive: Boolean;
 
-    procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer)
+    procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean)
     begin
-        CommonConstruct(Host, Username, Password, Port, TimeoutMs);
+        CommonConstruct(Host, Username, Password, Port, TimeoutMs, Passive);
     end;
 
-    local procedure CommonConstruct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer)
+    local procedure CommonConstruct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean)
     var
         baseurl: Text;
     begin
@@ -28,6 +29,7 @@ codeunit 6151611 "NPR AF FTP Client"
         gPassword := Password;
         gPort := Port;
         gTimeoutMs := TimeoutMs;
+        gPassive := Passive;
         baseurl := gAzureKeyVault.GetSecret('FtpAzureFunctionUrl');
         FtpClient.SetBaseAddress(baseurl);
         gHttpUrlConst := 'url';
@@ -38,6 +40,7 @@ codeunit 6151611 "NPR AF FTP Client"
         gHttpFilePathConst := 'filepath';
         gHttpFileContentConst := 'filecontent';
         gHttpTimeoutMsConst := 'timeoutms';
+        gHttpPasiveConst := 'passive';
         gErrMsg_Post_Fail := 'Post request failed';
         gErrMsg_Parse_Fail := 'Parsing of input failed';
         gResponseMsg_StatusCode := 'StatusCode';
@@ -378,7 +381,8 @@ codeunit 6151611 "NPR AF FTP Client"
             reqContent.Add(gHttpUrlConst, gHost) and
             reqContent.Add(gHttpUsernameConst, gUsername) and
             reqContent.Add(gHttpPasswordConst, gPassword) and
-            reqContent.Add(gHttpPortConst, gPort)
+            reqContent.Add(gHttpPortConst, gPort) and
+            reqContent.Add(gHttpPasiveConst, gPassive)
         );
         if (gTimeoutMs <> -1)
         then begin

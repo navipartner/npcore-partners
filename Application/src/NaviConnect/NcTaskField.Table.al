@@ -1,11 +1,5 @@
 table 6151503 "NPR Nc Task Field"
 {
-    // NC1.00/MH/20150113  CASE 199932 Refactored object from Web Integration
-    // NC1.01/MH/20150126  CASE 199932 Added Field 9 Processed for cleanup filter
-    // NC1.07/MH/20150309  CASE 208131 Updated captions
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-    // NC2.05 /MHA /20170615  CASE 280860 Added field 1000 "Task Exists" and deleted field 9 Processed
-
     Caption = 'Nc Task Field';
     DataClassification = CustomerContent;
 
@@ -75,10 +69,6 @@ table 6151503 "NPR Nc Task Field"
         key(Key3; "Task Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

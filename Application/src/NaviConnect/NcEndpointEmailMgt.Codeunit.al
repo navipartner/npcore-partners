@@ -1,14 +1,5 @@
 ﻿codeunit 6151525 "NPR Nc Endpoint Email Mgt."
 {
-    // NC2.01/BR /20160818  CASE 248630 NaviConnect
-    // NC2.01/BR /20161028  CASE 248630 Fix BCC
-    // NC2.12/MHA /20180418  CASE 308107 Added functions EmailProcessOutput(),OnRunEndpoint()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     var
         NcEndpoint: Record "NPR Nc Endpoint";
@@ -146,11 +137,9 @@
             EmailSendingHandler.AddRecipientBCC(EmailItem, CCRecipients);
         end;
 
-        if EmailSendingHandler.Send(EmailItem) then begin
-            //Positive Response
-            NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccess, NcEndpointEmail."Recipient E-Mail Address"));
-        end else begin
-            //Negative Response
+        if EmailSendingHandler.Send(EmailItem) then
+            NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccess, NcEndpointEmail."Recipient E-Mail Address"))
+        else begin
             EmailSendingHandler.GetLastError(ErrorMessage);
             Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
         end;
@@ -193,10 +182,6 @@
             EmailSendingHandler.GetLastError(ErrorMessage);
             Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
         end;
-    end;
-
-    local procedure "---Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
@@ -256,14 +241,12 @@
     var
         NcEndpointEmail: Record "NPR Nc Endpoint E-mail";
     begin
-        //-NC2.12 [308107]
         if NcEndpoint."Endpoint Type" <> NcEndpointEmail.GetEndpointTypeCode() then
             exit;
         if not NcEndpointEmail.Get(NcEndpoint.Code) then
             exit;
 
         EmailProcessOutput(NcTaskOutput, NcEndpointEmail);
-        //+NC2.12 [308107]
     end;
 }
 

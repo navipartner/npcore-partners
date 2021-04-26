@@ -1,7 +1,5 @@
 table 6151530 "NPR Nc Collector Req. Filter"
 {
-    // NC2.01\BR\20160909  CASE 250447 NaviConnect: Object created
-
     Caption = 'Nc Collector Request Filter';
     DataClassification = CustomerContent;
 
@@ -60,10 +58,6 @@ table 6151530 "NPR Nc Collector Req. Filter"
         key(Key1; "Nc Collector Request No.", "Table No.", "Field No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

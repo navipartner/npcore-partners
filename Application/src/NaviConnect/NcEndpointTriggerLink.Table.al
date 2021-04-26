@@ -1,7 +1,5 @@
 table 6151532 "NPR Nc Endpoint Trigger Link"
 {
-    // NC2.01\BR\20160921  CASE 248630 Object created
-
     Caption = 'Nc Endpoint Trigger Link';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint Trigger Links";
@@ -31,10 +29,6 @@ table 6151532 "NPR Nc Endpoint Trigger Link"
         key(Key2; "Trigger Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

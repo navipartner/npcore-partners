@@ -1,7 +1,5 @@
 page 6151094 "NPR Nc RapidConnect Trg.Fields"
 {
-    // NC2.14/MHA /20180716  CASE 322308 Object created - Partial Trigger functionality
-
     Caption = 'RapidConnect Trigger Fields';
     DelayedInsert = true;
     PageType = List;
@@ -27,10 +25,6 @@ page 6151094 "NPR Nc RapidConnect Trg.Fields"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

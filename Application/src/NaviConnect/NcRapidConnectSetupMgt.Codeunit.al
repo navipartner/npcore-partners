@@ -1,17 +1,5 @@
 ﻿codeunit 6151090 "NPR Nc RapidConnect Setup Mgt."
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
-    // NC2.14/MHA /20180716  CASE 322308 Updated Trigger fields to support Partial Trigger functionality
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure "--- InitSetup"()
-    begin
-    end;
-
     local procedure RunInitExportSetup(NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup")
     var
         NcRapidConnectTrigger: Record "NPR Nc RapidConnect Trig.Table";
@@ -42,12 +30,8 @@
     begin
         if not ExportEnabled(NcRapidConnectSetup) then
             exit;
-        //-NC2.14 [322308]
-        //IF NOT (NcRapidConnectTrigger."Insert Trigger" OR NcRapidConnectTrigger."Modify Trigger") THEN
-        //  EXIT;
         if not (InsertTriggerEnabled(NcRapidConnectTrigger) or ModifyTriggerEnabled(NcRapidConnectTrigger)) then
             exit;
-        //+NC2.14 [322308]
 
         InitNcTaskSetup(NcRapidConnectSetup, NcRapidConnectTrigger);
         InitDataLogSetup(NcRapidConnectTrigger);
@@ -62,32 +46,20 @@
         if not DataLogSetup.Get(NcRapidConnectTrigger."Table ID") then begin
             DataLogSetup.Init();
             DataLogSetup."Table ID" := NcRapidConnectTrigger."Table ID";
-            //-NC2.14 [322308]
-            // IF NcRapidConnectTrigger."Insert Trigger" THEN
-            //  DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
-            // IF NcRapidConnectTrigger."Modify Trigger" THEN
-            //  DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
             if InsertTriggerEnabled(NcRapidConnectTrigger) then
                 DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
             if ModifyTriggerEnabled(NcRapidConnectTrigger) then
                 DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
-            //+NC2.14 [322308]
             DataLogSetup."Keep Log for" := 1000 * 60;
             DataLogSetup.Insert(true);
         end;
 
         PrevRec := Format(DataLogSetup);
 
-        //-NC2.14 [322308]
-        // IF NcRapidConnectTrigger."Insert Trigger" AND (DataLogSetup."Log Insertion" < DataLogSetup."Log Insertion"::Simple) THEN
-        //  DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
-        // IF NcRapidConnectTrigger."Modify Trigger" AND (DataLogSetup."Log Modification" < DataLogSetup."Log Modification"::Changes) THEN
-        //  DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
         if InsertTriggerEnabled(NcRapidConnectTrigger) and (DataLogSetup."Log Insertion" < DataLogSetup."Log Insertion"::Simple) then
             DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
         if ModifyTriggerEnabled(NcRapidConnectTrigger) and (DataLogSetup."Log Modification" < DataLogSetup."Log Modification"::Changes) then
             DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
-        //+NC2.14 [322308]
 
         if PrevRec <> Format(DataLogSetup) then
             DataLogSetup.Modify(true);
@@ -143,12 +115,8 @@
                 NcRapidConnectTrigger.Init();
                 NcRapidConnectTrigger."Setup Code" := NcRapidConnectSetup.Code;
                 NcRapidConnectTrigger."Table ID" := ConfigPackageTable."Table ID";
-                //-NC2.14 [322308]
-                //NcRapidConnectTrigger."Insert Trigger" := FALSE;
-                //NcRapidConnectTrigger."Modify Trigger" := FALSE;
                 NcRapidConnectTrigger."Insert Trigger" := NcRapidConnectTrigger."Insert Trigger"::None;
                 NcRapidConnectTrigger."Modify Trigger" := NcRapidConnectTrigger."Modify Trigger"::None;
-                //+NC2.14 [322308]
                 NcRapidConnectTrigger.Insert(true);
             end;
         until ConfigPackageTable.Next() = 0;
@@ -209,10 +177,6 @@
             NcImportType.Modify(true);
 
         NcRapidConnectSetup."Import Type" := NcImportType.Code;
-    end;
-
-    local procedure "--- Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6151091, 'OnAfterInsertEvent', '', true, true)]
@@ -304,10 +268,6 @@
         RunInitImportSetup(Rec);
     end;
 
-    local procedure "--- Lookup"()
-    begin
-    end;
-
     procedure IsValidTableID(SetupCode: Code[20]; TableID: Integer): Boolean
     var
         ConfigPackageTable: Record "Config. Package Table";
@@ -358,10 +318,6 @@
                     TempAllObjWithCaption.Insert();
                 end;
             until ConfigPackageTable.Next() = 0;
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure ExportEnabled(NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup"): Boolean
@@ -425,16 +381,12 @@
 
     local procedure InsertTriggerEnabled(NcRapidConnectTrigger: Record "NPR Nc RapidConnect Trig.Table"): Boolean
     begin
-        //-NC2.14 [322308]
         exit(NcRapidConnectTrigger."Insert Trigger" <> NcRapidConnectTrigger."Insert Trigger"::None);
-        //+NC2.14 [322308]
     end;
 
     local procedure ModifyTriggerEnabled(NcRapidConnectTrigger: Record "NPR Nc RapidConnect Trig.Table"): Boolean
     begin
-        //-NC2.14 [322308]
         exit(NcRapidConnectTrigger."Modify Trigger" <> NcRapidConnectTrigger."Modify Trigger"::None);
-        //+NC2.14 [322308]
     end;
 }
 

@@ -4,6 +4,9 @@
         Text000: Label 'NaviConnect Default';
         Text001: Label 'Error during Ftp Backup (%1):\\%2';
         SyncEndTime: DateTime;
+        AuthorizationFailedErrorText: Label 'Authorization failed. Wrong FTP username/password.';
+        FTPClient: Codeunit "NPR AF FTP Client";
+        SFTPClient: Codeunit "NPR AF SFTP Client";
 
     #region "Download Ftp"
 
@@ -12,6 +15,7 @@
         ImportEntryTmp: Record "NPR Nc Import Entry" temporary;
         Filename: Text;
         ListDirectory: Text;
+        ListOfDirectory: List of [Text];
     begin
         case true of
             ImportType."Ftp Filename" <> '':
@@ -19,22 +23,17 @@
                     SaveNewEntry(ImportEntryTmp);
 
             ImportType.Sftp:
-                if DownloadSftpFilenames(ImportType, ListDirectory) then begin
-                    while CutNextFilename(ListDirectory, Filename) do
+                if DownloadSftpFilenames(ImportType, ListOfDirectory) then begin
+                    foreach Filename in ListOfDirectory do
                         if TryImportNewEntrySftp(ImportEntryTmp, ImportType, Filename) then
                             SaveNewEntry(ImportEntryTmp);
                 end;
 
-            DownloadFtpListDirectory(ImportType, ListDirectory):
-                while CutNextFilename(ListDirectory, Filename) do
+            DownloadFtpListDirectoryDetails(ImportType, ListOfDirectory):
+                foreach FileName in ListOfDirectory do begin
                     if TryImportNewEntry(ImportEntryTmp, ImportType, Filename) then
                         SaveNewEntry(ImportEntryTmp);
-
-            DownloadFtpListDirectoryDetails(ImportType, ListDirectory):
-                while CutNextFilenameDetailed(ListDirectory, Filename) do
-                    if TryImportNewEntry(ImportEntryTmp, ImportType, Filename) then
-                        SaveNewEntry(ImportEntryTmp);
-
+                end;
             else
                 exit(false);
         end;
@@ -44,160 +43,143 @@
 
     local procedure SaveNewEntry(var ImportEntryTmp: Record "NPR Nc Import Entry" temporary)
     begin
-        ImportEntryTmp.Insert();
         StoreImportEntries(ImportEntryTmp);
         Commit();
     end;
 
     [TryFunction]
-    procedure TryImportNewEntry(var ImportEntry: Record "NPR Nc Import Entry"; ImportType: Record "NPR Nc Import Type"; Filename: Text)
+    procedure TryImportNewEntry(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        SourceUri: DotNet NPRNetUri;
-        TargetUri: DotNet NPRNetUri;
-        OutStream: OutStream;
+        SourceUri: Text;
+        TargetUri: Text;
+        OutStr: OutStream;
+        Base64Convert: Codeunit "Base64 Convert";
+        FtpPort: Integer;
+        FTPResponse: JsonObject;
+        FileObject: JsonObject;
+        JToken: JsonToken;
+        ResponseCodeText: Text;
+        FileContent: Text;
     begin
         if not ValidFilename(Filename) then
             exit;
 
-        SourceUri := SourceUri.Uri(ImportType."Ftp Host" + '/' + ImportType."Ftp Path" + '/');
-        FtpWebRequest := FtpWebRequest.Create(SourceUri.AbsoluteUri + Filename);
-        FtpWebRequest.Method := 'RETR'; //WebRequestMethods.Ftp.DownloadFile
-        if ImportType."Ftp Binary" then
-            FtpWebRequest.UseBinary := true;
-        FtpWebRequest.KeepAlive := false;
-        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User", ImportType."Ftp Password");
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
+        SourceUri := ManagePathSlashes(ImportType."Ftp Path");
 
-        Clear(ImportEntry);
-        ImportEntry."Import Type" := ImportType.Code;
-        ImportEntry.Date := CurrentDateTime;
-        ImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(ImportEntry."Document Name"));
-        ImportEntry.Imported := false;
-        ImportEntry."Runtime Error" := false;
-        ImportEntry."Document Source".CreateOutStream(OutStream);
+        FtpPort := ImportType."Ftp Port";
+        if FtpPort = 0 then
+            FtpPort := 21;
 
-        CopyStream(OutStream, MemoryStream);
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
+        //Check for Binary property (probably not needed anymore): if ImportType."Ftp Binary" then FtpWebRequest.UseBinary := true;
+
+        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive");
+        FTPResponse := FTPClient.DownloadFile(SourceUri + Filename);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        case ResponseCodeText of
+            '200':
+                FTPResponse.Get('base64String', JToken);
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
+        end;
+
+        Clear(TempImportEntry);
+        TempImportEntry."Import Type" := ImportType.Code;
+        TempImportEntry.Date := CurrentDateTime;
+        TempImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(TempImportEntry."Document Name"));
+        TempImportEntry.Imported := false;
+        TempImportEntry."Runtime Error" := false;
+        TempImportEntry."Document Source".CreateOutStream(OutStr);
+
+        FileContent := Base64Convert.FromBase64(JToken.AsValue().AsText());
+        OutStr.WriteText(FileContent);
 
         if ImportType."Ftp Backup Path" = '' then begin
-            if not DeleteFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password") then
+            if not DeleteFtpFile(SourceUri + Filename) then
                 Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end else begin
-            TargetUri := TargetUri.Uri(SourceUri.AbsoluteUri + ImportType."Ftp Backup Path" + '/');
-            if (not CheckFtpUrlExists(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password")) and
-              (not CheckFtpUrlExists2(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password"))
-            then begin
-                if MakeFtpUrl(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password") then;
-            end;
+            TargetUri := ManagePathSlashes(ImportType."Ftp Backup Path");
+            if not CheckFtpUrlExists(TargetUri) then
+                if MakeFtpUrl(TargetUri) then;
 
-            if not RenameFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password", ImportType."Ftp Backup Path" + '/' + Filename) then
+            if not RenameFtpFile(ManagePathSlashes(SourceUri) + Filename, ManagePathSlashes(ImportType."Ftp Backup Path") + Filename) then
                 Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end;
+
+        TempImportEntry.Insert();
+        FTPClient.Destruct();
     end;
 
     [TryFunction]
-    procedure TryImportNewEntrySftp(var ImportEntry: Record "NPR Nc Import Entry"; ImportType: Record "NPR Nc Import Type"; Filename: Text)
+    procedure TryImportNewEntrySftp(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
-        SharpSFtp: DotNet NPRNetSftp0;
-        IOStream: DotNet NPRNetStream;
-        OutStream: OutStream;
+        OutStr: OutStream;
         RemotePath: Text;
         NewRemotePath: Text;
+        Base64Convert: Codeunit "Base64 Convert";
+        FtpPort: Integer;
+        FTPResponse: JsonObject;
+        FileObject: JsonObject;
+        JToken: JsonToken;
+        JArray: JsonArray;
+        i: Integer;
+        ResponseCodeText: Text;
+        FileContent: Text;
     begin
         if not ValidFilename(Filename) then
             exit;
 
-        SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password");
-        SharpSFtp.Connect(ImportType."Ftp Port");
-        RemotePath := '/';
-        if ImportType."Ftp Path" <> '' then begin
-            RemotePath += ImportType."Ftp Path";
-            if CopyStr(RemotePath, StrLen(RemotePath), 1) <> '/' then
-                RemotePath += '/';
+        RemotePath := ManagePathSlashes(ImportType."Ftp Path");
+
+        FtpPort := ImportType."Ftp Port";
+        if FtpPort = 0 then
+            FtpPort := 21;
+
+        SFTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
+        FTPResponse := SFTPClient.DownloadFile(RemotePath + Filename);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        case ResponseCodeText of
+            '200':
+                FTPResponse.Get('base64String', JToken);
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
         end;
 
-        Clear(ImportEntry);
-        ImportEntry."Import Type" := ImportType.Code;
-        ImportEntry.Date := CurrentDateTime;
-        ImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(ImportEntry."Document Name"));
-        ImportEntry.Imported := false;
-        ImportEntry."Runtime Error" := false;
-        ImportEntry."Document Source".CreateOutStream(OutStream);
-        IOStream := OutStream;
-        SharpSFtp.Get(RemotePath + Filename, IOStream);
+        Clear(TempImportEntry);
+        TempImportEntry."Import Type" := ImportType.Code;
+        TempImportEntry.Date := CurrentDateTime;
+        TempImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(TempImportEntry."Document Name"));
+        TempImportEntry.Imported := false;
+        TempImportEntry."Runtime Error" := false;
+        TempImportEntry."Document Source".CreateOutStream(OutStr);
+
+        FileContent := Base64Convert.FromBase64(JToken.AsValue().AsText());
+        OutStr.WriteText(FileContent);
 
         if ImportType."Ftp Backup Path" = '' then
-            SharpSFtp.DeleteFile(RemotePath + Filename)
+            SFTPClient.DeleteFile(RemotePath + Filename)
         else begin
-            NewRemotePath := RemotePath + ImportType."Ftp Backup Path";
-            if CopyStr(NewRemotePath, StrLen(NewRemotePath), 1) <> '/' then
-                NewRemotePath += '/';
-
-            SharpSFtp.RenameFile(RemotePath + Filename, NewRemotePath + Filename);
+            NewRemotePath := ManagePathSlashes(RemotePath + ImportType."Ftp Backup Path");
+            SFTPClient.MoveFile(RemotePath + Filename, NewRemotePath + Filename);
         end;
 
-        SharpSFtp.Close();
+        TempImportEntry.Insert();
+        SFTPClient.Destruct();
     end;
     #endregion "Download Ftp"
-
-    #region "Downlod Server File"
-
-    procedure DownloadServerFile(NcImportType: Record "NPR Nc Import Type")
-    var
-        NcImportEntryTmp: Record "NPR Nc Import Entry" temporary;
-    begin
-        DownloadServerFile(NcImportType, NcImportEntryTmp);
-        StoreImportEntries(NcImportEntryTmp);
-    end;
-
-    procedure DownloadServerFile(NcImportType: Record "NPR Nc Import Type"; var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary)
-    var
-        ArrayHelper: DotNet NPRNetArray;
-        ServerDirectoryHelper: DotNet NPRNetDirectory;
-        i: Integer;
-        Filename: Text;
-    begin
-        NcImportType.TestField("Server File Enabled");
-        NcImportType.TestField("Server File Path");
-
-        ArrayHelper := ServerDirectoryHelper.GetFiles(NcImportType."Server File Path");
-        for i := 0 to ArrayHelper.GetLength(0) - 1 do begin
-            Filename := ArrayHelper.GetValue(i);
-            InsertImportEntry2(NcImportType, NcImportEntryTmp, Filename);
-        end;
-    end;
-
-    [TryFunction]
-    local procedure InsertImportEntry2(NcImportType: Record "NPR Nc Import Type"; var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary; Filename: Text)
-    var
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        RecRef: RecordRef;
-    begin
-        FileMgt.BLOBImportFromServerFile(TempBlob, Filename);
-
-        NcImportEntryTmp.Init();
-        NcImportEntryTmp."Entry No." := 0;
-        NcImportEntryTmp."Import Type" := NcImportType.Code;
-        NcImportEntryTmp.Date := CurrentDateTime;
-        NcImportEntryTmp."Document Name" := GetDocName(FileMgt.GetFileName(Filename), MaxStrLen(NcImportEntryTmp."Document Name"));
-        NcImportEntryTmp.Imported := false;
-        NcImportEntryTmp."Runtime Error" := false;
-
-        RecRef.GetTable(NcImportEntryTmp);
-        TempBlob.ToRecordRef(RecRef, NcImportEntryTmp.FieldNo("Document Source"));
-        RecRef.SetTable(NcImportEntryTmp);
-
-        NcImportEntryTmp.Insert();
-        if Erase(Filename) then;
-    end;
 
     local procedure StoreImportEntries(var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary)
     var
@@ -210,12 +192,10 @@
             exit;
         repeat
             NcImportEntry := NcImportEntryTmp;
-            NcImportEntry."Entry No." := 0;
             NcImportEntry.Insert(true);
         until NcImportEntryTmp.Next() = 0;
         NcImportEntryTmp.DeleteAll();
     end;
-    #endregion "Downlod Server File"
 
     #region "Process Import"
     procedure ProcessImportEntry(var ImportEntry: Record "NPR Nc Import Entry"): Boolean
@@ -351,294 +331,192 @@
     #endregion "Status Mgt."
 
     #region "Ftp List"
-    local procedure CreateFtpWebRequest(ImportType: Record "NPR Nc Import Type"; var FtpWebRequest: DotNet NPRNetFtpWebRequest)
-    var
-        Uri: DotNet NPRNetUri;
-    begin
-        Uri := Uri.Uri(ImportType."Ftp Host" + '/' + ImportType."Ftp Path" + '/');
-        FtpWebRequest := FtpWebRequest.Create(Uri);
-        if ImportType."Ftp Binary" then
-            FtpWebRequest.UseBinary := true;
-        FtpWebRequest.KeepAlive := false;
-    end;
-
-    local procedure CutNextFilename(var ListDirectoryDetails: Text; var Filename: Text): Boolean
-    var
-        Details: Text;
-    begin
-        if ListDirectoryDetails = '' then
-            exit(false);
-
-        Filename := '';
-        repeat
-            CutNextLine(ListDirectoryDetails, Details);
-            Filename := Details;
-        until (Filename <> '') or (ListDirectoryDetails = '');
-
-        exit((Filename <> '') or (ListDirectoryDetails <> ''));
-    end;
-
-    local procedure CutNextFilenameDetailed(var ListDirectoryDetails: Text; var Filename: Text): Boolean
-    var
-        Details: Text;
-    begin
-        if ListDirectoryDetails = '' then
-            exit(false);
-
-        Filename := '';
-        repeat
-            CutNextLineDetailed(ListDirectoryDetails, Details);
-            Filename := ParseFilename(Details);
-        until (Filename <> '') or (ListDirectoryDetails = '');
-
-        exit((Filename <> '') or (ListDirectoryDetails <> ''));
-    end;
-
-    local procedure CutNextLine(var ListDirectoryDetails: Text; var Details: Text)
-    var
-        Position: Integer;
-    begin
-        if ListDirectoryDetails = '' then
-            exit;
-
-        Position := StrPos(ListDirectoryDetails, NewLine());
-        while Position = 1 do begin
-            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, 2);
-            Position := StrPos(ListDirectoryDetails, NewLine());
-        end;
-
-        if Position = 0 then begin
-            Details := ListDirectoryDetails;
-            ListDirectoryDetails := '';
-        end else begin
-            Details := CopyStr(ListDirectoryDetails, 1, Position - 1);
-            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, Position + 1);
-        end;
-    end;
-
-    local procedure CutNextLineDetailed(var ListDirectoryDetails: Text; var Details: Text)
-    var
-        Position: Integer;
-    begin
-        if ListDirectoryDetails = '' then
-            exit;
-
-        Position := StrPos(ListDirectoryDetails, NewLine());
-        while Position = 1 do begin
-            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, 2);
-            Position := StrPos(ListDirectoryDetails, NewLine());
-        end;
-
-        if Position = 0 then begin
-            Details := ListDirectoryDetails;
-            ListDirectoryDetails := '';
-        end else begin
-            Details := CopyStr(ListDirectoryDetails, 1, Position - 1);
-            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, Position + 2);
-        end;
-    end;
-
     [TryFunction]
-    procedure DownloadFtpListDirectory(ImportType: Record "NPR Nc Import Type"; var ListDirectory: Text)
+    procedure DownloadFtpListDirectory(ImportType: Record "NPR Nc Import Type"; var DirectoryList: List of [Text])
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        StreamReader: DotNet NPRNetStreamReader;
+        FtpPort: Integer;
+        FTPResponse: JsonObject;
+        FileObject: JsonObject;
+        JToken: JsonToken;
+        JArray: JsonArray;
+        i: Integer;
+        ResponseCodeText: Text;
     begin
-        ListDirectory := '';
+        Clear(DirectoryList);
 
         if not ImportType."Ftp Enabled" then
             exit;
 
-        CreateFtpWebRequest(ImportType, FtpWebRequest);
-        FtpWebRequest.Method := 'NLST'; //WebRequestMethods.Ftp.ListDirectory
-        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User", ImportType."Ftp Password");
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
-        StreamReader := StreamReader.StreamReader(MemoryStream);
-        ListDirectory := StreamReader.ReadToEnd;
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
+        FtpPort := ImportType."Ftp Port";
+        IF FtpPort = 0 then
+            FtpPort := 21;
+
+        //Check for Binary property (probably not needed anymore): if ImportType."Ftp Binary" then FtpWebRequest.UseBinary := true;
+
+        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive");
+        FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        FTPClient.Destruct();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    FTPResponse.Get('Files', JToken);
+                    JArray := JToken.AsArray();
+
+                    for i := 0 to JArray.Count - 1 do begin
+                        JArray.Get(i, JToken);
+                        FileObject := JToken.AsObject();
+
+                        FileObject.Get('IsDirectory', JToken);
+                        if Jtoken.AsValue.AsBoolean() then begin
+                            FileObject.Get('Name', JToken);
+                            DirectoryList.Add(JToken.AsValue().AsText());
+                        end;
+                    end;
+                end;
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
+        end;
     end;
 
     [TryFunction]
-    procedure DownloadFtpListDirectoryDetails(ImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: Text)
+    procedure DownloadFtpListDirectoryDetails(ImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: List of [Text])
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        StreamReader: DotNet NPRNetStreamReader;
+        FtpPort: Integer;
+        FTPResponse: JsonObject;
+        FileObject: JsonObject;
+        JToken: JsonToken;
+        JArray: JsonArray;
+        i: Integer;
+        ResponseCodeText: Text;
     begin
-        ListDirectoryDetails := '';
+        Clear(ListDirectoryDetails);
 
         if not ImportType."Ftp Enabled" then
             exit;
 
-        CreateFtpWebRequest(ImportType, FtpWebRequest);
-        FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectoryDetails
-        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User", ImportType."Ftp Password");
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
-        StreamReader := StreamReader.StreamReader(MemoryStream);
-        ListDirectoryDetails := StreamReader.ReadToEnd;
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
+        FtpPort := ImportType."Ftp Port";
+        IF FtpPort = 0 then
+            FtpPort := 21;
+
+        FTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive");
+        FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        FTPClient.Destruct();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    FTPResponse.Get('Files', JToken);
+                    JArray := JToken.AsArray();
+
+                    for i := 0 to JArray.Count - 1 do begin
+                        JArray.Get(i, JToken);
+                        FileObject := JToken.AsObject();
+
+                        FileObject.Get('IsDirectory', JToken);
+                        if not Jtoken.AsValue.AsBoolean() then begin
+                            FileObject.Get('Name', JToken);
+                            ListDirectoryDetails.Add(JToken.AsValue().AsText());
+                        end;
+                    end;
+                end;
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
+        end;
     end;
 
     [TryFunction]
-    local procedure DownloadSftpFilenames(ImportType: Record "NPR Nc Import Type"; var ListDirectory: Text)
+    local procedure DownloadSftpFilenames(ImportType: Record "NPR Nc Import Type"; var ListDirectory: List of [Text])
     var
-        SharpSFtp: DotNet NPRNetSftp0;
-        FileList: DotNet NPRNetIList;
-        LsEntry: DotNet NPRNetChannelSftp_LsEntry;
         RemotePath: Text;
-        NetConvHelper: Variant;
+        FtpPort: Integer;
+        FTPResponse: JsonObject;
+        FileObject: JsonObject;
+        JToken: JsonToken;
+        JArray: JsonArray;
+        i: Integer;
+        ResponseCodeText: Text;
     begin
-        SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password");
-        SharpSFtp.Connect(ImportType."Ftp Port");
+        FtpPort := ImportType."Ftp Port";
+        IF FtpPort = 0 then
+            FtpPort := 21;
 
-        RemotePath := '*';
-        if ImportType."Ftp Path" <> '' then
-            RemotePath := ImportType."Ftp Path";
+        RemotePath := ManagePathSlashes(ImportType."Ftp Path");
 
-        NetConvHelper := SharpSFtp.GetFileList(RemotePath);
-        FileList := NetConvHelper;
-        foreach LsEntry in FileList do begin
-            if ListDirectory <> '' then
-                ListDirectory += NewLine();
-            ListDirectory += LsEntry.Filename;
+        SFTPClient.Construct(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
+        FTPResponse := SFTPClient.ListDirectory(RemotePath);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        SFTPClient.Destruct();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    FTPResponse.Get('Files', JToken);
+                    JArray := JToken.AsArray();
+
+                    for i := 0 to JArray.Count - 1 do begin
+                        JArray.Get(i, JToken);
+                        FileObject := JToken.AsObject();
+
+                        FileObject.Get('IsDirectory', JToken);
+                        if not Jtoken.AsValue.AsBoolean() then begin
+                            FileObject.Get('Name', JToken);
+                            ListDirectory.Add(JToken.AsValue().AsText());
+                        end;
+                    end;
+                end;
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
         end;
-        SharpSFtp.Close();
     end;
 
-    local procedure ParseFilename(Details: Text) Filename: Text
-    var
-        Position: Integer;
+    local procedure ManagePathSlashes(RemotePath: Text) FormattedPath: Text
     begin
-        if Details = '' then
-            exit('');
+        if StrPos(RemotePath, '/') > 1 then
+            FormattedPath := '/';
+        FormattedPath += RemotePath;
+        if CopyStr(FormattedPath, StrLen(FormattedPath), 1) <> '/' then
+            FormattedPath += '/';
+    end;
 
-        Filename := RegExMatch(Details);
-        if ValidFilename(Filename) then
-            exit(Filename);
+    local procedure PathOneLevelUp(RemotePath: Text; var ReturnedFromFolder: Text): Text
+    var
+        i: Integer;
+        lastSlashPosition: Integer;
+    begin
+        if CopyStr(RemotePath, StrLen(RemotePath), 1) = '/' then
+            RemotePath := CopyStr(RemotePath, 1, StrLen(RemotePath) - 1);
 
-        Filename := RegExMatch2(Details);
-        if ValidFilename(Filename) then
-            exit(Filename);
-
-        Filename := RegExMatch3(Details);
-        if ValidFilename(Filename) then
-            exit(Filename);
-
-        Filename := RegExMatch4(Details);
-        if ValidFilename(Filename) then
-            exit(Filename);
-
-        while Position > 0 do begin
-            Details := DelStr(Details, 1, Position + 3);
-            Position := StrPos(Details, ':');
+        for i := 1 to StrLen(RemotePath) do begin
+            if RemotePath[StrLen(RemotePath) + 1 - i] = '/' then
+                lastSlashPosition := StrLen(RemotePath) - i;
         end;
 
-        Filename := Details;
-        if ValidFilename(Details) then
-            Filename := Details;
-
-        exit('');
-    end;
-
-    local procedure RegExMatch(Details: Text): Text
-    var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
-    begin
-        if Details = '' then
-            exit('');
-
-        Match := RegEx.Match(Details, '^' +
-                                      '(?<dir>[\-ld])' +
-                                      '(?<permission>([\-r][\-w][\-xs]){3})' +
-                                      '\s+(?<filecode>\d+)' +
-                                      '\s+(?<owner>\w+)' +
-                                      '\s+(?<group>\w+)' +
-                                      '\s+(?<size>\d+)' +
-                                      '\s+(?<timestamp>((?<month>\w{3})' +
-                                      '\s+(?<day>\d{1,2})' +
-                                      '\s+(?<hour>\d{1,2}):(?<minute>\d{2}))|((?<month>\w{3})' +
-                                      '\s+(?<day>\d{2})' +
-                                      '\s+(?<year>\d{4})))' +
-                                      '\s+(?<filename>(.+\..+))' +
-                                      '$');
-        exit(Match.Groups.Item('filename').Value);
-    end;
-
-    local procedure RegExMatch2(Details: Text): Text
-    var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
-    begin
-        if Details = '' then
-            exit('');
-
-        Match := RegEx.Match(Details, '^' +
-                                      '(?<dir>[\-ld])' +
-                                      '(?<permission>[\-rwx]{9})' +
-                                      '\s+(?<filecode>\d+)' +
-                                      '\s+(?<owner>\w+)' +
-                                      '\s+(?<group>\w+)' +
-                                      '\s+(?<size>\d+)' +
-                                      '\s+(?<month>\w{3})' +
-                                      '\s+(?<day>\d{1,2})' +
-                                      '\s+(?<timeyear>[\d:]{4,5})' +
-                                      '\s+(?<filename>(.+\..+))' +
-                                      '$');
-
-        exit(Match.Groups.Item('filename').Value);
-    end;
-
-    local procedure RegExMatch3(Details: Text): Text
-    var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
-    begin
-        if Details = '' then
-            exit('');
-
-        Match := RegEx.Match(Details, '^' +
-                                      '(?<permission>([\-r][\-w][\-xs]){3})' +
-                                      '\s+(?<filecode>\d+)' +
-                                      '\s+(?<owner>\w+)' +
-                                      '\s+(?<group>\w+)' +
-                                      '\s+(?<size>\d+)' +
-                                      '\s+(?<month>\w{3})' +
-                                      '\s+(?<day>\d{1,2})' +
-                                      '\s+(?<hour>\d{1,2}):(?<minute>\d{2})' +
-                                      '\s+(?<filename>(.+\..+))' +
-                                      '$');
-
-        exit(Match.Groups.Item('filename').Value);
-    end;
-
-    local procedure RegExMatch4(Details: Text): Text
-    var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
-    begin
-        if Details = '' then
-            exit('');
-
-        Match := RegEx.Match(Details, '^' +
-                                      '(?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})' +
-                                      '\s+(?<hour>\d{1,2}):(?<minute>\d{2})\w{2}' +
-                                      '\s+(?<size>\d+)' +
-                                      '\s+(?<filename>(.+\..+))' +
-                                      '$');
-
-        exit(Match.Groups.Item('filename').Value);
+        ReturnedFromFolder := CopyStr(RemotePath, lastSlashPosition, StrLen(RemotePath));
+        exit(CopyStr(RemotePath, 1, lastSlashPosition - 1));
     end;
 
     local procedure ValidFilename(Filename: Text): Boolean
@@ -660,58 +538,68 @@
 
     #region Aux
     [TryFunction]
-    local procedure CheckFtpUrlExists(FtpUrl: Text; Username: Text; Password: Text)
+    local procedure CheckFtpUrlExists(FtpUrl: Text)
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
+        ResponseCodeText: Text;
+        FolderName: Text;
+        i: Integer;
+        FolderExist: Boolean;
+        JArray: JsonArray;
+        FileObject: JsonObject;
     begin
-        FtpWebRequest := FtpWebRequest.Create(FtpUrl);
-        FtpWebRequest.Method := 'NLST'; //WebRequestMethods.Ftp.ListDirectory
-        FtpWebRequest.KeepAlive := false;
-        if Username <> '' then
-            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
+        FtpUrl := PathOneLevelUp(FtpUrl, FolderName);
+
+        FTPResponse := FTPClient.ListDirectory(FtpUrl);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        SFTPClient.Destruct();
+
+        case ResponseCodeText of
+            '200':
+                begin
+                    FTPResponse.Get('Files', JToken);
+                    JArray := JToken.AsArray();
+
+                    for i := 0 to JArray.Count - 1 do begin
+                        JArray.Get(i, JToken);
+                        FileObject := JToken.AsObject();
+
+                        FileObject.Get('IsDirectory', JToken);
+                        if Jtoken.AsValue.AsBoolean() then begin
+                            FileObject.Get('Name', JToken);
+                            if JToken.AsValue().AsText() = FolderName then
+                                FolderExist := true;
+                        end;
+                    end;
+                end;
+            '401':
+                Error(AuthorizationFailedErrorText);
+            else begin
+                    FTPResponse.Get('Error', JToken);
+                    Error(JToken.AsValue.AsText());
+                end;
+        end;
+
+        exit(FolderExist);
     end;
 
     [TryFunction]
-    local procedure CheckFtpUrlExists2(FtpUrl: Text; Username: Text; Password: Text)
+    local procedure DeleteFtpFile(FtpUrl: Text)
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
+        ResponseCodeText: Text;
     begin
-        FtpWebRequest := FtpWebRequest.Create(FtpUrl);
-        FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectory
-        FtpWebRequest.KeepAlive := false;
-        if Username <> '' then
-            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
-    end;
+        FTPResponse := FTPClient.DeleteFile(FtpUrl);
 
-    [TryFunction]
-    local procedure DeleteFtpFile(FtpUrl: Text; Username: Text; Password: Text)
-    var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-    begin
-        FtpWebRequest := FtpWebRequest.Create(FtpUrl);
-        if Username <> '' then
-            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
-        FtpWebRequest.Method := 'DELE'; //WebRequestMethods.Ftp.DeleteFile
-        FtpWebRequest.KeepAlive := false;
-        FtpWebResponse := FtpWebRequest.GetResponse;
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        exit(ResponseCodeText = '200');
     end;
 
     local procedure GetDocName(Filename: Text; MaxLength: Integer) DocName: Text
@@ -735,50 +623,33 @@
     end;
 
     [TryFunction]
-    local procedure MakeFtpUrl(FtpUrl: Text; Username: Text; Password: Text)
+    local procedure MakeFtpUrl(FtpUrl: Text)
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
+        ResponseCodeText: Text;
     begin
-        FtpWebRequest := FtpWebRequest.Create(FtpUrl);
-        FtpWebRequest.Method := 'MKD'; //WebRequestMethods.Ftp.MakeDirectory
-        FtpWebRequest.KeepAlive := false;
-        if Username <> '' then
-            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
-        FtpWebResponse := FtpWebRequest.GetResponse;
-        MemoryStream := FtpWebResponse.GetResponseStream();
-        MemoryStream.Flush;
-        MemoryStream.Close();
-        Clear(MemoryStream);
-    end;
+        FTPClient.CreateDirectory(FtpUrl);
 
-    procedure NewLine(): Text[2]
-    var
-        Cr: Char;
-        Lf: Char;
-    begin
-        Cr := 13;
-        Lf := 10;
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
 
-        exit(Format(Cr) + Format(Lf));
+        exit(ResponseCodeText = '200');
     end;
 
     [TryFunction]
-    local procedure RenameFtpFile(FtpUrl: Text; Username: Text; Password: Text; RenameTo: Text)
+    local procedure RenameFtpFile(FtpUrl: Text; RenameTo: Text)
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
+        ResponseCodeText: Text;
     begin
-        FtpWebRequest := FtpWebRequest.Create(FtpUrl);
-        if Username <> '' then
-            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
-        FtpWebRequest.Method := 'RENAME'; //WebRequestMethods.Ftp.Rename
-        FtpWebRequest.KeepAlive := false;
-        FtpWebRequest.RenameTo := RenameTo;
-        FtpWebResponse := FtpWebRequest.GetResponse;
+        FTPResponse := FTPClient.RenameFile(FtpUrl, RenameTo);
+
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue.AsText();
+
+        exit(ResponseCodeText = '200');
     end;
     #endregion Aux
 
@@ -788,9 +659,9 @@
         exit('DOWNLOAD_FTP');
     end;
 
-    procedure "Parameter.DownloadServerFile"(): Code[20]
+    procedure "Parameter.DownloadType"(): Code[20]
     begin
-        exit('DOWNLOAD_SERVER_FILE');
+        exit('DOWNLOAD_IMPORT_TYPE');
     end;
 
     procedure "Parameter.ImportNewTasks"(): Code[20]
@@ -815,17 +686,8 @@
     #endregion Constants
 
     #region UI
-    procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
-    var
-        [RunOnClient]
-        Process: DotNet NPRNetProcess;
-        [RunOnClient]
-        ProcessStartInfo: DotNet NPRNetProcessStartInfo;
+    local procedure GetMaxSyncDuration() SyncDuration: Duration
     begin
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
-        Process := Process.Start(ProcessStartInfo);
-        if Modal then
-            Process.WaitForExit();
     end;
     #endregion UI
 

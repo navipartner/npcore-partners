@@ -1,9 +1,5 @@
 page 6151501 "NPR Nc Task Setup"
 {
-    // NC1.00/MH/20150113  CASE 199932 Refactored object from Web Integration
-    // NC1.01/MH/20150115  CASE 199932 Changed SourceTableView to SORTING(Table No.)
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'NaviConnect Task Setup';
     PageType = List;
     SourceTable = "NPR Nc Task Setup";
@@ -45,10 +41,6 @@ page 6151501 "NPR Nc Task Setup"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -832,7 +832,7 @@
         AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server");
         OutputTempBlob.CreateInStream(InStr);
 
-        FTPClient.Construct(NPXmlTemplate."FTP Server", NPXmlTemplate."FTP Username", NPXmlTemplate."FTP Password", NPXmlTemplate."FTP Port", 10000);
+        FTPClient.Construct(NPXmlTemplate."FTP Server", NPXmlTemplate."FTP Username", NPXmlTemplate."FTP Password", NPXmlTemplate."FTP Port", 10000, NPXmlTemplate."FTP Passive");
         FTPResponse := FTPClient.UploadFile(InStr, NPXmlTemplate."FTP Directory" + '/' + Filename);
 
         FTPResponse.Get('StatusCode', JToken);

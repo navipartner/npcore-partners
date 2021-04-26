@@ -1,8 +1,5 @@
 ﻿table 6151524 "NPR Nc Endpoint File"
 {
-    // NC2.01/BR  /20160829  CASE 248630 NaviConnect
-    // NC2.12/MHA /20180502  CASE 313362 Added field 105 "Client Path"
-
     Caption = 'Nc Endpoint File';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint File List";
@@ -91,10 +88,6 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
         NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
@@ -120,7 +113,6 @@
     begin
         Clear(NcEndpointTriggerLinks);
         NcEndpointTriggerLink.Reset();
-        //NcEndpointTriggerLink.SETRANGE("Endpoint Type Code",GetEndpointTypeCode);
         NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
         NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
         NcEndpointTriggerLinks.RunModal();

@@ -1,8 +1,5 @@
 table 6151526 "NPR Nc Collector Filter"
 {
-    // NC2.01/BR  /20160909  CASE 250447 NaviConnect: Object created
-    // NC2.08/BR  /20171220  CASE 300634 Added field Collect When Modified
-
     Caption = 'Nc Collector Filter';
     DataClassification = CustomerContent;
 
@@ -66,10 +63,6 @@ table 6151526 "NPR Nc Collector Filter"
         key(Key1; "Collector Code", "Table No.", "Field No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

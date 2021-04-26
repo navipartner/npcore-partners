@@ -1,28 +1,5 @@
 page 6151502 "NPR Nc Task List"
 {
-    // NC1.00/MH/20150113  CASE 199932 Refactored object from Web Integration
-    // NC1.01/MH/20150201  CASE 199932 Updated Layout and added functions:
-    //                                 - SetPresetFilters(): Sets easy-to-use Preset Filters
-    //                                 - CreateGambitCase(): Create Gambit Case
-    // NC1.02/MH/20150202  CASE 199932 Created Action-functions
-    // NC1.07/MH/20150223  CASE 206395 Renamed function RunItemCard to RunSourceCard
-    // NC1.08/MH/20150310  CASE 206395 Replaced Automation Windows Script Host with .NET System.Diagnostics.Process for launching Applications
-    // NC1.14/MH/20150414  CASE 211360 Added Primary Key Fields fields for easier record identification
-    // NC1.14/MH/20150415  CASE 211360 Added Timestamp Fields
-    // NC1.14/MH/20150429  CASE 212845 Changed PageType from List to ListPlus and implemented WebClient functions
-    // NC1.17/MH/20150619  CASE 216851 NaviConnect related functions moved to NaviConnect Mgt
-    // NC1.22/MHA/20160108 CASE 231618 Updated caption of "Show Processed"
-    // NC1.22/MHA/20160125 CASE 232733 Task Queue Worker Group replaced by NaviConnect Task Processor and added Task Processor Filter
-    // NC1.22/MHA/20160415 CASE 231214 Added field 7 Company Name
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20160913  CASE 252048 Added Task Processor filter and added TextEncoding Utf8 to Data Output and Response
-    // NC2.08/TS  /20180108  CASE 300893 Removed Caption on Control Container
-    // NC2.12/MHA /20180418  CASE 308107 Added Action: Output
-    // NC2.13/MHA /20180605  CASE 312583 "Fields" PagePart moved to NAVIGATE Action "Fields" and removed empty fields under "Show Processed" to reduce Header Area
-    // NC2.16/MHA /20181003  CASE 328785 Removed delete of file in ShowOutput()
-    // NC2.17/MHA /20181121  CASE 335927 ShowOutput() now takes last Nc Task Output if Rec output is blank
-    // NC2.23/MHA /20190927  CASE 369170 Removed Gambit integration
-
     Caption = 'Task List';
     InsertAllowed = false;
     PageType = List;
@@ -225,10 +202,6 @@ page 6151502 "NPR Nc Task List"
             {
                 Caption = 'Reschedule for Processing';
                 Image = UpdateXML;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
                 ShortCutKey = 'F9';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Reschedule for Processing action';
@@ -280,10 +253,7 @@ page 6151502 "NPR Nc Task List"
 
                 trigger OnAction()
                 begin
-                    //-NC1.07
-                    //RunItemCard();
                     RunSourceCard();
-                    //+NC1.07
                 end;
             }
             action(Output)
@@ -336,75 +306,41 @@ page 6151502 "NPR Nc Task List"
     var
         CurrentEntryNo: BigInteger;
     begin
-        //-NC1.01
         CurrentEntryNo := Rec."Entry No.";
         Rec.FilterGroup(2);
-        //-NC2.01 [252048]
         Rec.SetFilter("Task Processor Code", TaskProcessorFilter);
-        //+NC2.01 [252048]
 
-        //-NC2.00
-        //RESET;
-        //+NC2.00
         if ShowProcessed then
             Rec.SetRange(Processed)
         else
             Rec.SetRange(Processed, false);
 
-        //-NC2.00
-        // IF ItemNo <> '' THEN BEGIN
-        //  NaviConnectMgt.SetItemNoFilter(Rec,ItemNo);
-        //  MARKEDONLY(TRUE);
-        // END;
-        //
-        // //-NC1.22
-        // SETFILTER("Task Processor Code",NaviConnectTaskProcessorCode);
-        // //+NC1.22
-        //+NC2.00
         Rec.FilterGroup(0);
         if Rec.Get(CurrentEntryNo) then;
         CurrPage.Update(false);
-        //+NC1.01
     end;
 
     local procedure UpdateResponseText()
     var
-        InStream: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
+        InStr: InStream;
+        BufferText: Text;
     begin
-        //-NC2.01 [252048]
-        // LF := 10;
-        // CR := 13;
-        // ResponseText := '';
-        // CALCFIELDS(Response);
-        // Response.CREATEINSTREAM(InStream);
-        // WHILE NOT InStream.EOS DO BEGIN
-        //  InStream.READTEXT(Line);
-        //  IF ResponseText <> '' THEN
-        //    ResponseText += FORMAT(CR) + FORMAT(LF);
-        //  ResponseText += Line;
-        // END;
         ResponseText := '';
-        if not Response.HasValue() then
+        if not Rec.Response.HasValue() then
             exit;
         Rec.CalcFields(Response);
-        Response.CreateInStream(InStream, TEXTENCODING::UTF8);
-        StreamReader := StreamReader.StreamReader(InStream);
-        ResponseText := StreamReader.ReadToEnd();
-        //+NC2.01 [252048]
-    end;
-
-    local procedure "--- Actions"()
-    begin
+        Rec.Response.CreateInStream(InStr, TextEncoding::UTF8);
+        BufferText := '';
+        while not InStr.EOS do begin
+            InStr.ReadText(BufferText);
+            ResponseText += BufferText;
+        end;
     end;
 
     local procedure ImportNewTasks()
     var
         TaskProcessor: Record "NPR Nc Task Processor";
     begin
-        //-NC1.22
-        //IF PAGE.RUNMODAL(PAGE::"Task Worker Group",TaskWorkerGroup) = ACTION::LookupOK THEN
-        //  TaskMgt.UpdateTasks(TaskWorkerGroup.Code);
         if not TaskProcessor.FindSet() then begin
             SyncMgt.UpdateTaskProcessor(TaskProcessor);
             Commit();
@@ -414,7 +350,6 @@ page 6151502 "NPR Nc Task List"
 
         TaskMgt.UpdateTasks(TaskProcessor);
         Clear(TaskMgt);
-        //+NC1.22
     end;
 
     local procedure ProcessManually()
@@ -451,14 +386,13 @@ page 6151502 "NPR Nc Task List"
     var
         NcTaskOutput: Record "NPR Nc Task Output";
         FileMgt: Codeunit "File Management";
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;
+        BufferText: Text;
     begin
         Rec.CalcFields("Data Output");
-        if not "Data Output".HasValue() then begin
-            //-NC2.17 [335927]
+        if not Rec."Data Output".HasValue() then begin
             NcTaskOutput.SetRange("Task Entry No.", Rec."Entry No.");
             if NcTaskOutput.FindLast() and NcTaskOutput.Data.HasValue() then begin
                 NcTaskOutput.CalcFields(Data);
@@ -468,33 +402,17 @@ page 6151502 "NPR Nc Task List"
                 HyperLink(Path);
                 exit;
             end;
-            //+NC2.17 [335927]
             Message(Text001);
             exit;
         end;
-        //-NC2.01 [252048]
-        "Data Output".CreateInStream(InStr, TEXTENCODING::UTF8);
-        //+NC2.01 [252048]
+        Rec."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
         if IsWebClient() then begin
-            //-NC2.01 [252048]
-            //"Data Output".CREATEINSTREAM(InStr);
-            //+NC2.01 [252048]
-            StreamReader := StreamReader.StreamReader(InStr);
-            Content := StreamReader.ReadToEnd();
+            BufferText := '';
+            while not InStr.EOS do begin
+                InStr.ReadText(BufferText);
+                Content += BufferText;
+            end;
             Message(Content);
-        end else begin
-            //-NC2.01 [252048]
-            //TempBlob.Blob := "Data Output";
-            //Path := FileMgt.BLOBExport(TempBlob,TEMPORARYPATH + 'Task-' + FORMAT("Entry No.") + '.xml',FALSE);
-            Path := TemporaryPath + 'Task-' + Format(Rec."Entry No.") + '.xml';
-            StreamReader := StreamReader.StreamReader(InStr);
-            DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.xml', Path);
-            //+NC2.01 [252048]
-            SyncMgt.RunProcess('notepad.exe', Path, false);
-            //-#285886 [285886]
-            // SLEEP(100);
-            // FileMgt.DeleteClientFile(Path);
-            //+#285886 [285886]
         end;
     end;
 
@@ -502,10 +420,7 @@ page 6151502 "NPR Nc Task List"
     var
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
     begin
-        //-NC2.00
-        //NaviConnectMgt.RunSourceCard(Rec);
         NcTaskMgt.RunSourceCard(Rec);
-        //+NC2.00
     end;
 }
 

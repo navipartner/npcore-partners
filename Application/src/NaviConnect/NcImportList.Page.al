@@ -200,10 +200,6 @@ page 6151504 "NPR Nc Import List"
             {
                 Caption = 'Reschedule Selected for Import';
                 Image = UpdateXML;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
                 ShortCutKey = 'F9';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Reschedule Selected for Import action';
@@ -259,23 +255,19 @@ page 6151504 "NPR Nc Import List"
             {
                 Caption = 'Edit File';
                 Image = EditAttachment;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 Visible = NOT WebClient;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Edit File action';
 
                 trigger OnAction()
                 begin
-                    EditFile();
+                    Message(Text008);
                 end;
             }
             action("Export File")
             {
                 Caption = 'Export File';
                 Image = ExportAttachment;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 Visible = WebClient;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Export File action';
@@ -297,8 +289,6 @@ page 6151504 "NPR Nc Import List"
             {
                 Caption = 'Import File';
                 Image = ImportCodes;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 Visible = WebClient;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import File action';
@@ -311,7 +301,6 @@ page 6151504 "NPR Nc Import List"
                     Extension: Text;
                     RecRef: RecordRef;
                 begin
-                    //FileName := FileMgt.BLOBImportWithFilter(TempBlob,'Import Layout','',FileFilterTxt,FileFilterTxt);
                     Extension := FileMgt.GetExtension(Rec."Document Name");
                     if Extension = '' then
                         Extension := '*';
@@ -365,6 +354,7 @@ page 6151504 "NPR Nc Import List"
         Text005: Label 'Import File';
         Text006: Label 'XML Stylesheet is empty for Import Type: %1';
         Text007: Label 'No Import Filenames matched %1';
+        Text008: Label 'In cloud environments files can not be stored on the server. Please use Export action to download the file, change it and then use Import action to return it into Database.';
 
     local procedure AddFile()
     var
@@ -401,38 +391,6 @@ page 6151504 "NPR Nc Import List"
         exit(false);
     end;
 
-    local procedure EditFile()
-    var
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        SyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        f: File;
-        InStr: InStream;
-        OutStr: OutStream;
-        Path: Text;
-        RecRef: RecordRef;
-    begin
-        Rec.CalcFields("Document Source");
-        TempBlob.FromRecord(Rec, Rec.FieldNo("Document Source"));
-        Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + Rec."Document Name", false);
-        SyncMgt.RunProcess('notepad.exe', Path, true);
-        Path := FileMgt.UploadFileSilent(Path);
-
-        f.Open(Path);
-        f.CreateInStream(InStr);
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(OutStr);
-        CopyStream(OutStr, InStr);
-        f.Close();
-        Erase(Path);
-
-        RecRef.GetTable(Rec);
-        TempBlob.ToRecordRef(RecRef, Rec.FieldNo("Document Source"));
-        RecRef.SetTable(Rec);
-        Rec.Modify(true);
-        Clear(TempBlob);
-    end;
-
     local procedure ImportSelected()
     var
         ImportEntry: Record "NPR Nc Import Entry";
@@ -459,7 +417,6 @@ page 6151504 "NPR Nc Import List"
     begin
         CurrPage.SetSelectionFilter(ImportEntry);
         if Confirm(StrSubstNo(Text002, ImportEntry.Count), true) then begin
-            //ImportEntry.MODIFYALL("Runtime Error",FALSE,TRUE);
             ImportEntry.ModifyAll(Imported, false, false);
             ImportEntry.ModifyAll("Runtime Error", false, false);
             ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
@@ -492,9 +449,9 @@ page 6151504 "NPR Nc Import List"
         tmp: Text;
     begin
         Rec.CalcFields("Document Source");
-        if "Document Source".HasValue() then
+        if Rec."Document Source".HasValue() then
             if IsWebClient() then begin
-                "Document Source".CreateInStream(InStr);
+                Rec."Document Source".CreateInStream(InStr);
                 Content := '';
                 while not InStr.EOS()
                 do begin
@@ -521,14 +478,14 @@ page 6151504 "NPR Nc Import List"
         xslt: Text;
         xml: Text;
     begin
-        CalcFields("Document Source");
-        if "Document Source".HasValue then begin
+        Rec.CalcFields("Document Source");
+        if Rec."Document Source".HasValue() then begin
 
-            TestField("Import Type");
-            NcImportType.Get("Import Type");
+            Rec.TestField("Import Type");
+            NcImportType.Get(Rec."Import Type");
             NcImportType.CalcFields("XML Stylesheet");
-            if not NcImportType."XML Stylesheet".HasValue then
-                ERROR(Text006);
+            if not NcImportType."XML Stylesheet".HasValue() then
+                Error(Text006, Rec."Import Type");
 
             NcImportType."XML Stylesheet".CreateInStream(stream, TextEncoding::UTF8);
             while not stream.EOS do begin

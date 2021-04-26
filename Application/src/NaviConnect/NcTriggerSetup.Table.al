@@ -1,7 +1,5 @@
 table 6151521 "NPR Nc Trigger Setup"
 {
-    // NC2.01/BR /20160809  CASE 247479 NaviConnect: Object created
-
     Caption = 'Nc Trigger Setup';
     DataClassification = CustomerContent;
 
@@ -31,10 +29,6 @@ table 6151521 "NPR Nc Trigger Setup"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

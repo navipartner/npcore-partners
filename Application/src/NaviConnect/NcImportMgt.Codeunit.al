@@ -1,15 +1,5 @@
 ﻿codeunit 6151504 "NPR Nc Import Mgt."
 {
-    // NC1.17/MHA /20150623  CASE 216851 Object created
-    // NC1.21/TTH /20151118  CASE 227358 Replacing Type option field with "Import type".
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161014  CASE 255397 Added functions CleanupImportEntries() and CleanupImportEntry()
-    // NC2.02/MHA /20170227  CASE 262318 Added Try function SendErrorMail()
-    // NC2.06/BR  /20170921  CASE 290771 Changed TryFunction call to support NAV 2017
-    // NC2.12/MHA /20180502  CASE 313362 Bumped Version List to remove NPR5.36
-    // NC2.23/MHA /20190927  CASE 369170 SendErrorMail() is no longer a Try function as it contains MODIFY transaction
-    // NPR5.55/MHA /20200604  CASE 408100 Removed transaction in SendErrorMail() to conform as Try function
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
@@ -66,42 +56,26 @@
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-        //-NC2.02 [262318]
         ClearLastError;
-        //+NC2.02 [262318]
         ImportType.Get(ImportEntry."Import Type");
-        //-NC2.01 [255397]
-        //-NC2.06 [290771]
-        //IF CleanupImportType(ImportType) THEN
         CleanupImportType(ImportType);
-        //+NC2.06 [290771]
         Commit();
-        //+NC2.01 [255397]
 
         ImportType.TestField("Import Codeunit ID");
         CODEUNIT.Run(ImportType."Import Codeunit ID", ImportEntry);
-    end;
-
-    local procedure "--- Cleanup"()
-    begin
     end;
 
     procedure CleanupImportTypes()
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-        //-NC2.01 [255397]
         if not ImportType.FindSet() then
             exit;
 
         repeat
-            //-NC2.06 [290771]
-            //IF CleanupImportType(ImportType) THEN
             CleanupImportType(ImportType);
-            //+NC2.06 [290771]
             Commit();
         until ImportType.Next() = 0;
-        //+NC2.01 [255397]
     end;
 
     [TryFunction]
@@ -110,7 +84,6 @@
         ImportEntry: Record "NPR Nc Import Entry";
         CleanupDate: DateTime;
     begin
-        //-NC2.01 [255397]
         if ImportType."Keep Import Entries for" = 0 then begin
             ImportType."Keep Import Entries for" := 1000 * 60 * 60 * 24;
             ImportType."Keep Import Entries for" := ImportType."Keep Import Entries for" * 30;
@@ -125,38 +98,29 @@
             exit;
 
         ImportEntry.DeleteAll();
-        //+NC2.01 [255397]
-    end;
-
-    local procedure "--- Error Management"()
-    begin
     end;
 
     procedure GetErrorMessage(NcImportEntry: Record "NPR Nc Import Entry"; HtmlFormat: Boolean) ErrorText: Text
     var
-        InStream: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        String: DotNet NPRNetString;
+        InStr: InStream;
+        BufferText: Text;
     begin
-        //-NC2.02 [262318]
         ErrorText := '';
         if not NcImportEntry."Last Error Message".HasValue() then
             exit('');
 
         NcImportEntry.CalcFields("Last Error Message");
-        //-NPR5.55 [408100]
-        NcImportEntry."Last Error Message".CreateInStream(InStream, TEXTENCODING::UTF8);
-        //+NPR5.55 [408100]
-        StreamReader := StreamReader.StreamReader(InStream);
-        ErrorText := StreamReader.ReadToEnd();
+        NcImportEntry."Last Error Message".CreateInStream(InStr, TextEncoding::UTF8);
+        while not InStr.EOS do begin
+            InStr.ReadText(BufferText);
+            ErrorText += BufferText;
+        end;
         if not HtmlFormat then
             exit(ErrorText);
 
-        String := ErrorText;
-        ErrorText := String.Replace(NewLine(), '<br />');
+        ErrorText := ErrorText.Replace(NewLine(), '<br />');
 
         exit(ErrorText);
-        //+NC2.02 [262318]
     end;
 
     local procedure GetErrorMailBody(var NcImportEntry: Record "NPR Nc Import Entry") Body: Text
@@ -164,7 +128,6 @@
         ActiveSession: Record "Active Session";
         ErrorMessage: Text;
     begin
-        //-NC2.02 [262318]
         ErrorMessage := GetErrorMessage(NcImportEntry, true);
 
         Body := '<h3>Nc Import Error</h3><br />' +
@@ -190,32 +153,25 @@
                 '</dl>';
 
         exit(Body);
-        //+NC2.02 [262318]
     end;
 
     local procedure GetErrorMailSenderAddress(NcImportEntry: Record "NPR Nc Import Entry"): Text
     begin
-        //-NC2.02 [262318]
         exit('noreply@navipartner.com');
-        //+NC2.02 [262318]
     end;
 
     local procedure GetErrorMailSubject(NcImportEntry: Record "NPR Nc Import Entry") Subject: Text
     begin
-        //-NC2.02 [262318]
         Subject := 'Nc Import Error: ' + NcImportEntry."Document Name";
 
         exit(Subject);
-        //+NC2.02 [262318]
     end;
 
     local procedure NewLine() CRLF: Text[2]
     begin
-        //-NC2.02 [262318]
         CRLF[1] := 13;
         CRLF[2] := 10;
         exit(CRLF);
-        //+NC2.02 [262318]
     end;
 
     [TryFunction]
@@ -261,7 +217,6 @@
         TempNcImportEntry: Record "NPR Nc Import Entry";
         OutStream: OutStream;
     begin
-        //-NC2.02 [262318]
         TempNcImportEntry.Init();
         TempNcImportEntry."Import Type" := NcImportType.Code;
         TempNcImportEntry.Date := CurrentDateTime;
@@ -272,7 +227,6 @@
 
         SendErrorMail(TempNcImportEntry);
         Message(Text000, NcImportType."E-mail address on Error");
-        //+NC2.02 [262318]
     end;
 }
 

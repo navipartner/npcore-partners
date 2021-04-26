@@ -1,8 +1,5 @@
 table 6151525 "NPR Nc Collector"
 {
-    // NC2.01 /BR  /20160909  CASE 250447 NaviConnect: Object created
-    // NC2.04 /BR  /20170510  CASE 274524 Removed field 60: Send when Max. Lines, added checks for Activation
-
     Caption = 'Nc Collector';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Collector List";
@@ -53,9 +50,7 @@ table 6151525 "NPR Nc Collector"
 
             trigger OnValidate()
             begin
-                //-NC2.04 [274524]
                 CheckCriteriaActiveCollector;
-                //+NC2.04 [274524]
             end;
         }
         field(50; "Max. Lines per Collection"; Integer)
@@ -65,9 +60,7 @@ table 6151525 "NPR Nc Collector"
 
             trigger OnValidate()
             begin
-                //-NC2.04 [274524]
                 CheckCriteriaActiveCollector;
-                //+NC2.04 [274524]
             end;
         }
         field(70; "Wait to Send"; Duration)
@@ -77,9 +70,7 @@ table 6151525 "NPR Nc Collector"
 
             trigger OnValidate()
             begin
-                //-NC2.04 [274524]
                 CheckCriteriaActiveCollector;
-                //+NC2.04 [274524]
             end;
         }
         field(80; "Delete Obsolete Lines"; Boolean)
@@ -146,10 +137,6 @@ table 6151525 "NPR Nc Collector"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         NcCollection: Record "NPR Nc Collection";
@@ -167,16 +154,10 @@ table 6151525 "NPR Nc Collector"
         TxtCannotDelete: Label 'You cannot delete %1 %2 because there are %1 records for this record.';
         TxtActivationNotAllowed: Label 'Collector %1 must have a value in field %2 and-or field %3 to be active. ';
 
-    local procedure LinkedSetupExists(): Boolean
-    begin
-    end;
-
     local procedure CheckCriteriaActiveCollector()
     begin
-        //-NC2.04 [274524]
         if Active and ("Wait to Send" = 0) and ("Max. Lines per Collection" = 0) then
             Error(StrSubstNo(TxtActivationNotAllowed, Code, FieldCaption("Wait to Send"), FieldCaption("Max. Lines per Collection")));
-        //+NC2.04 [274524]
     end;
 }
 

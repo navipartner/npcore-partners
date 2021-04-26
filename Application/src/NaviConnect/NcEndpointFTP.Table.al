@@ -1,8 +1,5 @@
 ﻿table 6151522 "NPR Nc Endpoint FTP"
 {
-    // NC2.01/BR   /20160818  CASE 248630 NaviConnect
-    // NC2.01/BR  /20161220  CASE 261431 Added Option SharpSFTP in field type,Added field 170 File Encoding and Removed Chilkat options from field 100 Type
-
     Caption = 'Nc Endpoint FTP';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint FTP List";
@@ -118,10 +115,6 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
         NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
@@ -147,7 +140,6 @@
     begin
         Clear(NcEndpointTriggerLinks);
         NcEndpointTriggerLink.Reset();
-        //NcEndpointTriggerLink.SETRANGE("Endpoint Type Code",GetEndpointTypeCode);
         NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
         NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
         NcEndpointTriggerLinks.RunModal();

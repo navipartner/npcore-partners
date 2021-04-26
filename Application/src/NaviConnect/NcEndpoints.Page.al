@@ -1,8 +1,5 @@
 page 6151539 "NPR Nc Endpoints"
 {
-    // NC2.01/BR  /20160921  CASE 247479 Object created
-    // NC2.13/MHA /20180613  CASE 318934 Added Action "Init Endpoint"
-
     Caption = 'Nc Endpoints';
     PageType = List;
     SourceTable = "NPR Nc Endpoint";
@@ -100,9 +97,7 @@ page 6151539 "NPR Nc Endpoints"
                 var
                     NcEndpointMgt: Codeunit "NPR Nc Endpoint Mgt.";
                 begin
-                    //-NC2.13 [318934]
                     NcEndpointMgt.InitEndpoint(Rec);
-                    //+NC2.13 [318934]
                 end;
             }
         }
@@ -112,9 +107,7 @@ page 6151539 "NPR Nc Endpoints"
     var
         NcEndpointMgt: Codeunit "NPR Nc Endpoint Mgt.";
     begin
-        //-NC2.13 [318934]
         EndpointHasInit := NcEndpointMgt.HasInitEndpoint(Rec);
-        //+NC2.13 [318934]
     end;
 
     var

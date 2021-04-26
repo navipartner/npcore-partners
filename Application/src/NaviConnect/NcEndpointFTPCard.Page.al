@@ -1,8 +1,5 @@
 page 6151523 "NPR Nc Endpoint FTP Card"
 {
-    // NC2.01/BR   /20160818  CASE 248630 NaviConnect
-    // NC2.01/BR  /20161220  CASE 261431 Added field "File Encoding"
-
     Caption = 'Nc Endpoint FTP Card';
     DeleteAllowed = false;
     InsertAllowed = false;

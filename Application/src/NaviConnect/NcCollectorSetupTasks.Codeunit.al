@@ -1,11 +1,5 @@
 codeunit 6151531 "NPR Nc Collector Setup Tasks"
 {
-    // NC2.01\BR\20160912  CASE 250447 NaviConnect: Object created
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         NaviConnectSetup: Record "NPR Nc Setup";

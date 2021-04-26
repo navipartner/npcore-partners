@@ -108,47 +108,46 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
         NcEndpointFtp: Record "NPR Nc Endpoint FTP";
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
-        StreamReader: DotNet NPRNetStreamReader;
-        InStream: InStream;
-        Outstream: OutStream;
+        InStr: InStream;
+        Outstr: OutStream;
         RecRef: RecordRef;
-        FieldRef: FieldRef;
+        FieldReference: FieldRef;
         OutputEntryNo: Integer;
+        BufferText: Text;
     begin
         if NcTask."Data Output".HasValue() then begin
             NcTask.CalcFields("Data Output");
-            NcTask."Data Output".CreateInStream(InStream, TEXTENCODING::UTF8);
-            StreamReader := StreamReader.StreamReader(InStream);
-            Output := StreamReader.ReadToEnd();
+            NcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+            BufferText := '';
+            while not InStr.EOS do begin
+                InStr.ReadText(BufferText);
+                Output += BufferText;
+            end;
             exit;
         end;
 
         NcTaskMgt.RestoreRecord(NcTask."Entry No.", RecRef);
         case RecRef.Number() of
             DATABASE::"NPR Nc Endpoint FTP":
-                FieldRef := RecRef.Field(NcEndpointFtp.FieldNo("Output Nc Task Entry No."));
+                FieldReference := RecRef.Field(NcEndpointFtp.FieldNo("Output Nc Task Entry No."));
             DATABASE::"NPR Nc Endpoint E-mail":
-                FieldRef := RecRef.Field(NcEndpointEmail.FieldNo("Output Nc Task Entry No."));
+                FieldReference := RecRef.Field(NcEndpointEmail.FieldNo("Output Nc Task Entry No."));
             DATABASE::"NPR Nc Endpoint File":
-                FieldRef := RecRef.Field(NcEndpointFile.FieldNo("Output Nc Task Entry No."));
+                FieldReference := RecRef.Field(NcEndpointFile.FieldNo("Output Nc Task Entry No."));
             else
                 exit;
         end;
 
-        OutputEntryNo := FieldRef.Value();
+        OutputEntryNo := FieldReference.Value();
         Output := NcTriggerSyncMgt.GetOutput(OutputEntryNo);
-        NcTask."Data Output".CreateOutStream(Outstream, TEXTENCODING::UTF8);
-        Outstream.WriteText(Output);
+        NcTask."Data Output".CreateOutStream(Outstr, TextEncoding::UTF8);
+        Outstr.WriteText(Output);
         NcTask.Modify(true);
     end;
 
     procedure TransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var Filename: Text; var Subject: Text; var Body: Text)
     begin
         OnAfterGetOutputTriggerTask(NcTriggerCode, Output, NcTask, Filename, Subject, Body);
-    end;
-
-    local procedure InsertNCTaskPerEndpoint(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text)
-    begin
     end;
 
     procedure ManualTransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var Filename: Text; var Subject: Text; var Body: Text): Boolean

@@ -1,7 +1,5 @@
 page 6151521 "NPR Nc Trigger Setup"
 {
-    // NC2.01/BR /20160816  CASE 247479 NaviConnect
-
     Caption = 'Nc Trigger Setup';
     PageType = Card;
     SourceTable = "NPR Nc Trigger Setup";
@@ -26,10 +24,6 @@ page 6151521 "NPR Nc Trigger Setup"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

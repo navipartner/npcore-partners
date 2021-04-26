@@ -1,9 +1,5 @@
 ﻿codeunit 6151500 "NPR Nc Setup Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         NaviConnectSetup: Record "NPR Nc Setup";
 
@@ -52,10 +48,6 @@
         SetupCleanUpTask(TaskCode, TaskCode, TaskLineNo, TaskDescription + ' Delete Old Entries', TaskCode);
         SetupTaskLineParameterBool(TaskCode, TaskCode, TaskLineNo, 'DEL DATA LOG', true);
         SetTaskLineEnabled(TaskCode, TaskCode, TaskLineNo, NaviConnectSetup."Task Queue Enabled");
-    end;
-
-    local procedure "--- Task Queue Setup"()
-    begin
     end;
 
     local procedure SetTaskLineEnabled(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; Enabled: Boolean)
@@ -238,10 +230,6 @@
         end;
     end;
 
-    procedure "--- Aux"()
-    begin
-    end;
-
     procedure GetImportTypeCode(WebServiceCodeunitID: Integer; WebserviceFunction: Text): Code[20]
     var
         ImportType: Record "NPR Nc Import Type";
@@ -253,10 +241,6 @@
             exit(ImportType.Code);
 
         exit('');
-    end;
-
-    local procedure "----"()
-    begin
     end;
 
     local procedure FindLineNo(TemplateName: Code[10]; BatchName: Code[10]; TaskDescription: Text; var LineNo: Integer)

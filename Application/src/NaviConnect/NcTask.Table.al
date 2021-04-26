@@ -1,18 +1,5 @@
 table 6151502 "NPR Nc Task"
 {
-    // NC1.00/MHA /20150113  CASE 199932 Refactored object from Web Integration
-    // NC1.01/MHA /20150128  CASE 199932 Added Field 12 "Process Count" for managing retry of failed tasks.
-    // NC1.07/MHA /20150309  CASE 208131 Updated captions
-    // NC1.13/MHA /20150414  CASE 211360 Added Primary Key Fields fields for easier record identification
-    // NC1.14/MHA /20150415  CASE 211360 Added Timestamp Fields
-    // NC1.22/MHA /20160125  CASE 232733 Task Queue Worker Group replaced by NaviConnect Task Processor
-    // NC1.22/MHA /20160415  CASE 231214 Added field 7 Company Name
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.05/MHA /20170615  CASE 280860 NcTaskField.Processed has been deleted
-    // NC2.12/MHA /20180418  CASE 308107 Added Task Output to OnDelete()
-    // NC2.14/MHA /20180629  CASE 320762 Added field 25 "Record ID"
-    // NC2.23/MHA /20190927  CASE 369170 Field 70220322 "NaviPartner Case Url" Removed
-
     Caption = 'Nc Task';
     DataClassification = CustomerContent;
 
@@ -162,10 +149,6 @@ table 6151502 "NPR Nc Task"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         NaviConnectTaskField: Record "NPR Nc Task Field";
@@ -174,10 +157,8 @@ table 6151502 "NPR Nc Task"
         NaviConnectTaskField.SetRange("Task Entry No.", "Entry No.");
         NaviConnectTaskField.DeleteAll();
 
-        //-NC2.12 [308107]
         NcTaskOutput.SetRange("Task Entry No.", "Entry No.");
         NcTaskOutput.DeleteAll();
-        //+NC2.12 [308107]
     end;
 }
 
