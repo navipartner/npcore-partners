@@ -214,12 +214,6 @@ table 6150701 "NPR POS Menu Button"
             Caption = 'Show Plus/Minus Buttons';
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
-
-            trigger OnValidate()
-            begin
-                if "Show Plus/Minus Buttons" then
-                    TestField("Action Type", "Action Type"::Item);
-            end;
         }
         field(41; "Register Type"; Code[20])
         {
@@ -518,6 +512,8 @@ table 6150701 "NPR POS Menu Button"
 
         ActionInterface := "Action Type";
         ActionInterface.ConfigureFromMenuButton(Rec, POSSession, ActionOut);
+        if Rec."Show Plus/Minus Buttons" then
+            ActionOut.Content.Add('ShowPlusMinus', true);
 
         StoreButtonParameters(ActionOut, POSParameterValue);
         StoreDataSource(ActionOut);
