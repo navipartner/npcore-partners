@@ -101,15 +101,6 @@ page 6150639 "NPR POS Post. Profile Card"
                     }
                 }
             }
-            group(Numbering)
-            {
-                Caption = 'Numbering';
-                field("Default POS Entry No. Series"; Rec."Default POS Entry No. Series")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Default POS Entry No. Series field';
-                }
-            }
         }
     }
 }

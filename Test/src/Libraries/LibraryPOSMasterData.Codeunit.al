@@ -325,8 +325,6 @@
     var
         LibraryERM: Codeunit "Library - ERM";
         LibraryUtility: Codeunit "Library - Utility";
-        NoSeries: Record "No. Series";
-        NoSeriesLine: Record "No. Series Line";
         GeneralPostingSetup: Record "General Posting Setup";
         VATPostingSetup: Record "VAT Posting Setup";
     begin
@@ -339,10 +337,6 @@
         POSPostingProfile."Max. POS Posting Diff. (LCY)" := 0.5;
         POSPostingProfile."POS Sales Rounding Account" := LibraryERM.CreateGLAccountWithSalesSetup();
         POSPostingProfile."POS Sales Amt. Rndng Precision" := 0.5;
-
-        LibraryUtility.CreateNoSeries(NoSeries, true, false, true);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_PE_1', 'TEST_PE_999999999');
-        POSPostingProfile."Default POS Entry No. Series" := NoSeries.Code;
 
         LibraryERM.CreateGeneralPostingSetupInvt(GeneralPostingSetup);
         POSPostingProfile.Validate("Gen. Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group");
