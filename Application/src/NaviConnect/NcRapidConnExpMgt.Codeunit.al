@@ -78,7 +78,7 @@
         if not NcTaskMgt.GetRecRef(NcTask, RecRef) then
             exit;
 
-        NpXmlDomMgt.InitDoc(Document, DocumentNode, 'rapid_connect');
+        NpXmlDomMgt.InitDoc(Document, DocumentNode, 'rapid_connect', '');
         DocumentElement := DocumentNode.AsXmlElement();
         repeat
             NpXmlDomMgt.AddElement(DocumentElement, 'record', Element);

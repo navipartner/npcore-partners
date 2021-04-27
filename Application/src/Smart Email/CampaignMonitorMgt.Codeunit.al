@@ -207,7 +207,8 @@
             RecRef2 := RecRef.Duplicate();
             RecRef2.SetRecFilter();
             NpXmlMgt.Initialize(NpXmlTemplate, RecRef2, NpXmlValueMgt.GetPrimaryKeyValue(RecRef2), true);
-            NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name");
+            NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name", NpXmlTemplate."Custom Namespace for XMLNS");
+            NpXmlDomMgt.AddRootAttributes(XmlDocNode, NpXmlTemplate);
 
             NpXmlMgt.ParseDataToXmlDocNode(RecRef2, true, XmlDocNode);
             JObject.Add('Data', NpXmlMgt.Xml2Json(XmlDoc, NpXmlTemplate));

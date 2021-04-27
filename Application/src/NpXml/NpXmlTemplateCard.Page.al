@@ -88,6 +88,41 @@
                         end;
                     }
                 }
+                field("Root Element Attr. Enabled"; Rec."Root Element Attr. Enabled")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if Attributes from Xml Root should be visible.';
+                }
+                group(ControlXmlRootAttributes)
+                {
+                    ShowCaption = false;
+                    Visible = Rec."Root Element Attr. Enabled";
+                    field("Root Element Attr. 1 Name"; Rec."Root Element Attr. 1 Name")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the Name of 1st Xml Root Attribute';
+                    }
+                    field("Root Element Attr. 1 Value"; Rec."Root Element Attr. 1 Value")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the Value of 1st Xml Root Attribute';
+                    }
+                    field("Root Element Attr. 2 Name"; Rec."Root Element Attr. 2 Name")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the Name of 2nd Xml Root Attribute';
+                    }
+                    field("Root Element Attr. 2 Value"; Rec."Root Element Attr. 2 Value")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the Value of 2nd Xml Root Attribute';
+                    }
+                }
+                field("Custom Namespace for XMLNS"; Rec."Custom Namespace for XMLNS")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the custom URI for default prefix/alias (xmlns).';
+                }
                 group(Control6150677)
                 {
                     ShowCaption = false;
