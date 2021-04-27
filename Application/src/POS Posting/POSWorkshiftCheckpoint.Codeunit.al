@@ -747,13 +747,13 @@
 
     local procedure StoreCountedDenominations(UnitNo: Code[10]; WorkshiftEntryNo: Integer)
     var
-        PaymentTypeDetailed: Record "NPR Payment Type - Detailed";
+        EODDenomination: Record "NPR EOD Denomination";
         POSPaymentBinDenomination: Record "NPR POS Paym. Bin Denomin.";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
 
-        PaymentTypeDetailed.SetFilter("Register No.", '=%1', UnitNo);
-        if (PaymentTypeDetailed.IsEmpty()) then
+        EODDenomination.SetFilter("POS Unit No.", '=%1', UnitNo);
+        if (EODDenomination.IsEmpty()) then
             exit;
 
         POSPaymentBinCheckpoint.Reset();
@@ -762,8 +762,9 @@
         POSPaymentBinCheckpoint.SetFilter(Status, '=%1', POSPaymentBinCheckpoint.Status::TRANSFERED);
         if (POSPaymentBinCheckpoint.FindSet()) then begin
             repeat
-                PaymentTypeDetailed.SetFilter("Payment No.", '=%1', POSPaymentBinCheckpoint."Payment Type No.");
-                if (PaymentTypeDetailed.FindSet()) then begin
+                EODDenomination.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckpoint."Payment Type No.");
+                EODDenomination.SetFilter(Quantity, '<>0');
+                if (EODDenomination.FindSet()) then begin
                     repeat
                         POSPaymentBinDenomination."Entry No." := 0;
                         POSPaymentBinDenomination."Payment Method No." := POSPaymentBinCheckpoint."Payment Method No.";
@@ -771,23 +772,18 @@
                         POSPaymentBinDenomination."POS Unit No." := UnitNo;
                         POSPaymentBinDenomination."Workshift Checkpoint Entry No." := WorkshiftEntryNo;
                         POSPaymentBinDenomination."Bin Checkpoint Entry No." := POSPaymentBinCheckpoint."Entry No.";
+                        POSPaymentBinDenomination.Denomination := EODDenomination.Denomination;
+                        POSPaymentBinDenomination.Quantity := EODDenomination.Quantity;
+                        POSPaymentBinDenomination.Amount := EODDenomination.Amount;
+                        POSPaymentBinDenomination.Insert();
 
-                        POSPaymentBinDenomination.Denomination := PaymentTypeDetailed.Weight;
-                        POSPaymentBinDenomination.Quantity := PaymentTypeDetailed.Quantity;
-                        POSPaymentBinDenomination.Amount := PaymentTypeDetailed.Amount;
-
-                        if (POSPaymentBinDenomination.Quantity <> 0) then
-                            POSPaymentBinDenomination.Insert();
-
-                    until (PaymentTypeDetailed.Next() = 0);
+                    until (EODDenomination.Next() = 0);
                 end;
             until (POSPaymentBinCheckpoint.Next() = 0);
         end;
-
-        PaymentTypeDetailed.Reset();
-        PaymentTypeDetailed.SetFilter("Register No.", '=%1', UnitNo);
-        PaymentTypeDetailed.DeleteAll();
-
+        EODDenomination.Reset();
+        EODDenomination.SetFilter("POS Unit No.", '=%1', UnitNo);
+        EODDenomination.DeleteAll();
     end;
 
     local procedure CalculateCheckpointStatistics(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
