@@ -130,13 +130,16 @@ page 6014659 "NPR Web Client Dependencies"
         if FileName <> '' then begin
             TempBlob.CreateInStream(InStr);
             Rec.BLOB.CreateOutStream(OutStr);
-            if Rec.Type = Rec.Type::DataUri then
-                ConvertImgToDataUri(InStr, OutStr)
-            else
-                if Rec.Type = Rec.Type::SVG then begin
+
+            case Rec.Type of
+                Rec.Type::DataUri:
+                    ConvertImgToDataUri(InStr, OutStr);
+                Rec.Type::SVG:
                     ConvertSVGToDataUri(InStr, OutStr);
-                end else
+                else
                     CopyStream(OutStr, InStr);
+            end;
+
             CurrPage.Update(true);
         end;
     end;
