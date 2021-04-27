@@ -1,8 +1,8 @@
 table 6014437 "NPR Payment Type - Detailed"
 {
-
     Caption = 'Payment Type - Detailed';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {

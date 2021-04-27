@@ -16,7 +16,7 @@
             {
                 repeater(Control6014417)
                 {
-                    Editable = ViewMode = FALSE;
+                    Editable = ViewMode = false;
                     ShowCaption = false;
                     Visible = ShowCountingSection;
                     field(PaymentTypeNo; Rec."Payment Type No.")
@@ -67,7 +67,7 @@
                     {
                         ApplicationArea = All;
                         Editable = false;
-                        Visible = NOT IsBlindCount;
+                        Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
                     }
                     field(CountingDifference; CountingDifference)
@@ -76,7 +76,7 @@
                         Caption = 'Difference';
                         Style = Unfavorable;
                         StyleExpr = CountingDifference <> 0;
-                        Visible = NOT IsBlindCount;
+                        Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Difference field';
 
                         trigger OnValidate()
@@ -90,7 +90,7 @@
                     field(Comment1; Rec.Comment)
                     {
                         ApplicationArea = All;
-                        Visible = NOT IsBlindCount;
+                        Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Comment field';
                     }
                 }
@@ -99,7 +99,7 @@
             {
                 repeater(Control6014403)
                 {
-                    Editable = ViewMode = FALSE;
+                    Editable = ViewMode = false;
                     ShowCaption = false;
                     Visible = ShowClosingSection;
                     field("Payment Type No."; Rec."Payment Type No.")
@@ -171,7 +171,7 @@
                     {
                         ApplicationArea = All;
                         Editable = false;
-                        Visible = NOT IsBlindCount;
+                        Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
                     }
                     field("New Float Amount"; Rec."New Float Amount")
@@ -180,7 +180,7 @@
                         Editable = PageMode = PageMode::FINAL_COUNT;
                         MinValue = 0;
                         Style = Strong;
-                        StyleExpr = TRUE;
+                        StyleExpr = true;
                         ToolTip = 'Specifies the value of the New Float Amount field';
 
                         trigger OnValidate()
@@ -286,7 +286,7 @@
     {
         area(processing)
         {
-            action("Count")
+            Action("Count")
             {
                 Caption = 'Count';
                 Ellipsis = true;
@@ -345,45 +345,17 @@
 
     local procedure OnAssistEditCounting()
     var
-        PaymentTypeDetailed: Record "NPR Payment Type - Detailed";
-        TouchScreenBalancingLine: Page "NPR Touch Screen: Balanc.Line";
+        EODDenomination: Record "NPR EOD Denomination";
+        EODDenominationCount: Page "NPR EOD Denomination Count";
         POSCountingDenomination: Record "NPR POS Counting Denomination";
     begin
+        FillDenominationBuffer(EODDenomination);
 
-        PaymentTypeDetailed.SetFilter("Payment No.", '=%1', Rec."Payment Type No.");
-        PaymentTypeDetailed.SetFilter("Register No.", '=%1', GetRegisterNo());
-        if (PaymentTypeDetailed.IsEmpty()) then begin
-            POSCountingDenomination.SetFilter("Payment Type", '=%1', Rec."Payment Type No.");
-            if POSCountingDenomination.FindSet() then begin
-                repeat
-                    PaymentTypeDetailed.Init();
-                    PaymentTypeDetailed."Payment No." := Rec."Payment Type No.";
-                    PaymentTypeDetailed."Register No." := GetRegisterNo();
-                    PaymentTypeDetailed.Weight := POSCountingDenomination.Weight;
-                    PaymentTypeDetailed.Insert();
-
-                until (POSCountingDenomination.Next() = 0);
-                Commit();
-            end;
-        end;
-
-        if (PaymentTypeDetailed.IsEmpty()) then
+        if (EODDenomination.IsEmpty()) then
             Error(TextSetupPaymentTypeMissing, Rec."Payment Type No.");
 
-        TouchScreenBalancingLine.SetTableView(PaymentTypeDetailed);
-        TouchScreenBalancingLine.LookupMode(true);
-        TouchScreenBalancingLine.Editable(true);
+        CountDenominations(EODDenomination);
 
-        IF (TouchScreenBalancingLine.RUNMODAL() = ACTION::LookupOK) THEN BEGIN
-
-            Rec."Counted Amount Incl. Float" := 0;
-            if (PaymentTypeDetailed.FindSet()) then begin
-                repeat
-                    Rec."Counted Amount Incl. Float" += PaymentTypeDetailed.Amount;
-
-                until (PaymentTypeDetailed.Next() = 0);
-            end;
-        END;
         CountingDifference := CalculatedDifference();
         CalculateNewFloatAmount();
         CurrPage.Update(true);
@@ -574,6 +546,45 @@
         end;
     end;
 
+    local procedure FillDenominationBuffer(var EODDenomination: Record "NPR EOD Denomination")
+    var
+        PaymentMethodDenom: Record "NPR Payment Method Denom";
+    begin
+        EODDenomination.SetFilter("POS Payment Method Code", '=%1', Rec."Payment Type No.");
+        EODDenomination.SetFilter("POS Unit No.", '=%1', GetRegisterNo());
+        if (EODDenomination.IsEmpty()) then begin
+            PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', Rec."Payment Type No.");
+            if PaymentMethodDenom.FindSet() then begin
+                repeat
+                    EODDenomination.Init();
+                    EODDenomination."POS Payment Method Code" := Rec."Payment Type No.";
+                    EODDenomination."POS Unit No." := GetRegisterNo();
+                    EODDenomination.Denomination := PaymentMethodDenom.Denomination;
+                    EODDenomination.Insert();
+
+                until (PaymentMethodDenom.Next() = 0);
+                Commit();
+            end;
+        end;
+    end;
+
+    local procedure CountDenominations(var EODDenomination: Record "NPR EOD Denomination")
+    var
+        EODDenominationCount: Page "NPR EOD Denomination Count";
+    begin
+        EODDenominationCount.SetTableView(EODDenomination);
+        EODDenominationCount.LookupMode(true);
+        EODDenominationCount.Editable(true);
+
+        if (EODDenominationCount.RunModal() = Action::LookupOK) then begin
+            Rec."Counted Amount Incl. Float" := 0;
+            if (EODDenomination.FindSet()) then
+                repeat
+                    Rec."Counted Amount Incl. Float" += EODDenomination.Amount;
+                until (EODDenomination.Next() = 0);
+        end;
+    end;
+
     procedure SetBlindCount(HideFields: Boolean)
     begin
         IsBlindCount := HideFields;
@@ -601,7 +612,7 @@
                 repeat
                     POSPaymentMethod.Get(POSPaymentBinCheckpoint."Payment Method No.");
                     if (POSPaymentMethod."Bin for Virtual-Count" = '') then
-                        Error(AutoCountBin, POSPaymentMethod.TableCaption, POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption("Bin for Virtual-Count"));
+                        Error(AutoCountBin, POSPaymentMethod.TableCaption(), POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption("Bin for Virtual-Count"));
 
                     POSPaymentBin.Get(POSPaymentMethod."Bin for Virtual-Count");
 
