@@ -2045,28 +2045,28 @@
             if (RecRef.FieldExist(FieldNo)) then begin
 
                 FieldRef := RecRef.Field(FieldNo);
-                if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
+                if FieldRef.Class = FieldClass::FlowField then
                     FieldRef.CalcField;
-
                 NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
 
-                if (UpperCase(Format(Format(FieldRef.Type)))) = 'OPTION' then begin
-                    OptionCaption := Format(FieldRef.OptionMembers);
-                    Evaluate(OptionInt, Format(FieldRef.Value));
-                    for i := 1 to OptionInt do
-                        OptionCaption := DelStr(OptionCaption, 1, StrPos(OptionCaption, ','));
-                    if (StrPos(OptionCaption, ',') <> 0) then
-                        OptionCaption := DelStr(OptionCaption, StrPos(OptionCaption, ','));
-                    NewLine := InsStr(NewLine, OptionCaption, StartPos);
-                end else
-                    if (UpperCase(Format(Format(FieldRef.Type)))) = 'DATETIME' then begin
-                        NewLine := InsStr(NewLine, Format(FieldRef.Value, 0, 9), StartPos);
-                    end else
-                        if (UpperCase(Format(Format(FieldRef.Type)))) = 'BOOLEAN' then begin
-                            NewLine := InsStr(NewLine, LowerCase(Format(FieldRef.Value, 0, 9)), StartPos);
-                        end else begin
-                            NewLine := InsStr(NewLine, DelChr(Format(FieldRef.Value), '<=>', '"'), StartPos);
+                case FieldRef.Type of
+                    FieldType::Option:
+                        begin
+                            OptionCaption := Format(FieldRef.OptionMembers);
+                            Evaluate(OptionInt, Format(FieldRef.Value));
+                            for i := 1 to OptionInt do
+                                OptionCaption := DelStr(OptionCaption, 1, StrPos(OptionCaption, ','));
+                            if (StrPos(OptionCaption, ',') <> 0) then
+                                OptionCaption := DelStr(OptionCaption, StrPos(OptionCaption, ','));
+                            NewLine := InsStr(NewLine, OptionCaption, StartPos);
                         end;
+                    FieldType::DateTime:
+                        NewLine := InsStr(NewLine, Format(FieldRef.Value, 0, 9), StartPos);
+                    FieldType::Boolean:
+                        NewLine := InsStr(NewLine, LowerCase(Format(FieldRef.Value, 0, 9)), StartPos);
+                    else
+                        NewLine := InsStr(NewLine, DelChr(Format(FieldRef.Value), '<=>', '"'), StartPos);
+                end;
             end else
                 ERROR(BAD_REFERENCE, FieldNo, Line);
         end;
