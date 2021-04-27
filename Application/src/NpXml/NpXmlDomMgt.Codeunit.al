@@ -174,13 +174,33 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         XmlDocNode := XmlDoc.DocumentElement();
     end;
 
-    procedure InitDoc(var XmlDoc: XmlDocument; var XmlDocNode: XmlNode; NodeName: Text[1024])
+    procedure InitDoc(var XmlDoc: XmlDocument; var XmlDocNode: XmlNode; NodeName: Text[1024]; CustomNamespaceForXMLNS: Text[100])
     var
         Element: XmlElement;
     begin
         Clear(XmlDoc);
-        XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?>' + '<' + NodeName + ' />', XmlDoc);
+        if CustomNamespaceForXMLNS = '' then
+            XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?>' + '<' + NodeName + ' />', XmlDoc)
+        else
+            XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?>' + '<' + NodeName + ' xmlns="' + CustomNamespaceForXMLNS + '" />', XmlDoc);
         XmlDoc.GetRoot(Element);
+        XmlDocNode := Element.AsXmlNode();
+    end;
+
+    procedure AddRootAttributes(var XmlDocNode: XmlNode; NpXmlTemplate: Record "NPR NpXml Template")
+    var
+        Element: XmlElement;
+    begin
+        if not NpXmlTemplate."Root Element Attr. Enabled" then
+            exit;
+
+        Element := XmlDocNode.AsXmlElement();
+        if (NpXmlTemplate."Root Element Attr. 1 Name" <> '') and (NpXmlTemplate."Root Element Attr. 1 Name" <> 'xmlns') then
+            Element.SetAttribute(NpXmlTemplate."Root Element Attr. 1 Name", NpXmlTemplate."Root Element Attr. 1 Value");
+
+        if (NpXmlTemplate."Root Element Attr. 2 Name" <> '') and (NpXmlTemplate."Root Element Attr. 2 Name" <> 'xmlns') then
+            Element.SetAttribute(NpXmlTemplate."Root Element Attr. 2 Name", NpXmlTemplate."Root Element Attr. 2 Value");
+
         XmlDocNode := Element.AsXmlNode();
     end;
 
