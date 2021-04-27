@@ -13,6 +13,11 @@
             "justification": "Variable declarations should be ordered by type."
         },
         {
+            "id": "AA0022",
+            "action": "Error",
+            "justification": "An IF followed by two or more ELSE IF should be replaced with a CASE"
+        },
+        {
             "id": "AA0072",
             "action":"Hidden",
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
