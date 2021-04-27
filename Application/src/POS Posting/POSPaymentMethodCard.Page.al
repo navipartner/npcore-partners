@@ -73,7 +73,7 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Fixed Rate"; Rec."Fixed Rate")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'You can specify Fixed rate which will be used for converting foreign currency amounts.';
+                    ToolTip = 'You can specify the Fixed Rate which will be used to convert 100 units of foreign currency into local currency. For example 1 FCY = 6.15 LCY , hence the value to be inserted = 100 x 6.15 = 615 instead of 6.15.';
                 }
                 field("Post Condensed"; Rec."Post Condensed")
                 {
@@ -181,7 +181,7 @@ page 6150619 "NPR POS Payment Method Card"
     {
         area(navigation)
         {
-            action(POSPostingSetup)
+            Action(POSPostingSetup)
             {
                 Caption = 'POS Posting Setup';
                 Image = GeneralPostingSetup;
@@ -190,14 +190,27 @@ page 6150619 "NPR POS Payment Method Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
-                RunPageLink = "POS Payment Method Code" = FIELD(Code);
+                RunPageLink = "POS Payment Method Code" = field(Code);
                 ApplicationArea = All;
                 ToolTip = 'Action opens POS Posting Setup for selected POS Payment Method';
+            }
+            Action(Denominations)
+            {
+                Caption = 'Denominations';
+                Image = Currency;
+                ShortCutKey = 'Ctrl+F5';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPR Payment Method Denom";
+                RunPageLink = "POS Payment Method Code" = field(Code);
+                ApplicationArea = All;
+                ToolTip = 'Executes the Denominations action';
             }
             group(History)
             {
                 Caption = 'History';
-                action("POS Payment Lines")
+                Action("POS Payment Lines")
                 {
                     Caption = 'POS Payment Lines';
                     Image = LedgerEntries;
@@ -206,7 +219,7 @@ page 6150619 "NPR POS Payment Method Card"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Pmt. Line List";
-                    RunPageLink = "POS Payment Method Code" = FIELD(Code);
+                    RunPageLink = "POS Payment Method Code" = field(Code);
                     ApplicationArea = All;
                     ToolTip = 'Action opens POS Payment Lines for selected POS Payment Method.';
                 }
