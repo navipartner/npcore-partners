@@ -3,6 +3,7 @@
     var
         Text000: Label 'NaviConnect Default';
         Text001: Label 'Error during Ftp Backup (%1):\\%2';
+        FileIsNotValidErr: Label 'File %1 is not valid';
         SyncEndTime: DateTime;
         AuthorizationFailedErrorText: Label 'Authorization failed. Wrong FTP username/password.';
         FTPClient: Codeunit "NPR AF FTP Client";
@@ -62,7 +63,7 @@
         FileContent: Text;
     begin
         if not ValidFilename(Filename) then
-            exit;
+            Error(FileIsNotValidErr, Filename);
 
         SourceUri := ManagePathSlashes(ImportType."Ftp Path");
 
@@ -133,7 +134,7 @@
         FileContent: Text;
     begin
         if not ValidFilename(Filename) then
-            exit;
+            Error(FileIsNotValidErr, Filename);
 
         RemotePath := ManagePathSlashes(ImportType."Ftp Path");
 
@@ -191,7 +192,9 @@
         if not NcImportEntryTmp.FindSet() then
             exit;
         repeat
+            NcImportEntryTmp.CalcFields("Document Source");
             NcImportEntry := NcImportEntryTmp;
+            NcImportEntry."Entry No." := 0;
             NcImportEntry.Insert(true);
         until NcImportEntryTmp.Next() = 0;
         NcImportEntryTmp.DeleteAll();
@@ -530,7 +533,7 @@
         if (Position = 1) or (Position = 0) then
             exit(false);
         if Position = StrLen(Filename) then
-            exit;
+            exit(false);
 
         exit(true);
     end;
