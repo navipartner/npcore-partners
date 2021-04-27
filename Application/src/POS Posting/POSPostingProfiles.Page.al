@@ -24,12 +24,6 @@ page 6150638 "NPR POS Posting Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Default POS Entry No. Series"; Rec."Default POS Entry No. Series")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Default POS Entry No. Series field';
-                }
                 field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                 {
                     ApplicationArea = All;
