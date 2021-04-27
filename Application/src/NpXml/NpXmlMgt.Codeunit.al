@@ -48,8 +48,9 @@ codeunit 6151551 "NPR NpXml Mgt."
             NpXmlTemplate2."Max Records per File" := 10000000;
 
         XmlEntityCount := 0;
-        NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name");
-        RecordSetExists := RecRef.FindSet;
+        NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
+        NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
+        RecordSetExists := RecRef.FindSet();
         repeat
             Counter += 1;
             UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition);
@@ -60,7 +61,8 @@ codeunit 6151551 "NPR NpXml Mgt."
             if XmlEntityCount >= NpXmlTemplate2."Max Records per File" then begin
                 FinalizeDoc(Document, NpXmlTemplate2, GetFilename(NpXmlTemplate2."Xml Root Name", PrimaryKeyValue, Counter));
                 XmlEntityCount := 0;
-                NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name");
+                NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
+                NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
             end;
         until RecRef.Next = 0;
 
@@ -203,8 +205,6 @@ codeunit 6151551 "NPR NpXml Mgt."
         NpXmlElementChild: Record "NPR NpXml Element";
         RecRefFilter: RecordRef;
         RecRefChild: RecordRef;
-        Finished: Boolean;
-        ElementName: Text;
         Namespace: Text;
         ChildNodesList: XmlNodeList;
         ChildNode: XmlNode;
@@ -218,9 +218,8 @@ codeunit 6151551 "NPR NpXml Mgt."
         RecRefFilter.SetRecFilter;
 
         if not NpXmlElement.Hidden then begin
-            ElementName := GetXmlElementName(NpXmlElement);
             Namespace := GetXmlNamespace(NpXmlElement);
-            NpXmlDomMgt.AddElementNamespace(Node, ElementName, Namespace, NewXmlNode);
+            NpXmlDomMgt.AddElementNamespace(Node, NpXmlElement."Element Name", Namespace, NewXmlNode);
             AddXmlValue(NewXmlNode, NpXmlElement, RecRefFilter);
         end else
             NewXmlNode := Node;
@@ -390,7 +389,7 @@ codeunit 6151551 "NPR NpXml Mgt."
             end;
         end else
             if ElementValue <> '' then begin
-                NewElement := XmlElement.Create(Node.AsXmlElement.LocalName);
+                NewElement := XmlElement.Create(Node.AsXmlElement().LocalName, Node.AsXmlElement().NamespaceUri);
                 NewElement.Add(ElementValue);
 
                 if Node.AsXmlElement.HasAttributes then begin
@@ -1288,7 +1287,8 @@ codeunit 6151551 "NPR NpXml Mgt."
 
         PrimaryKeyValue := NpXmlValueMgt.GetPrimaryKeyValue(RecRef);
         Filename := GetFilename(NpXmlTemplate."Xml Root Name", PrimaryKeyValue, 1);
-        NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name");
+        NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name", NpXmlTemplate."Custom Namespace for XMLNS");
+        NpXmlDomMgt.AddRootAttributes(XmlDocNode, NpXmlTemplate);
 
         NpXmlElement.Reset;
         NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);

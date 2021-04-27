@@ -166,6 +166,16 @@ page 6151553 "NPR NpXml Elements"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reverse Sign field';
                 }
+                field("Round Precision"; Rec."Round Precision")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies rounding precision for number values. For example: 0.01 means that value will have 2 decimals; 100 means that it could be 100, 200, 300...';
+                }
+                field("Round Direction"; Rec."Round Direction")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies rounding direction for number values. There are three options: ''<'' (rounds down), ''>'' (rounds up) and ''='' (rounds up or down to the nearest value (default). Values of 5 or greater are rounded up. Values less than 5 are rounded down)';
+                }
                 field("Lower Case"; "Lower Case")
                 {
                     ApplicationArea = All;
@@ -215,7 +225,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Sibling)';
                     Image = New;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Insert';
                     ApplicationArea = All;
@@ -231,7 +241,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Child)';
                     Image = New;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Insert';
                     ApplicationArea = All;
@@ -247,7 +257,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Parent)';
                     Image = New;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Alt+Insert';
                     ApplicationArea = All;
@@ -263,7 +273,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Delete';
                     Image = Delete;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Delete';
@@ -304,7 +314,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Preview Xml';
                     Image = XMLFile;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -338,7 +348,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Move Up';
                     Image = MoveUp;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -354,7 +364,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Move Down';
                     Image = MoveDown;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -370,7 +380,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Decrement Level';
                     Image = PreviousRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -386,7 +396,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Increment Level';
                     Image = NextRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;

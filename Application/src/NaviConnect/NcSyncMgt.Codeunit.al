@@ -60,6 +60,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         Text000: Label 'NaviConnect Default';
         Text001: Label 'Error during Ftp Backup (%1):\\%2';
         SyncStartTime: DateTime;
+        FileIsNotValidErr: Label 'File %1 is not valid';
         SyncEndTime: DateTime;
 
     #region "Download Ftp"
@@ -138,7 +139,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         OutStream: OutStream;
     begin
         if not ValidFilename(Filename) then
-            exit;
+            Error(FileIsNotValidErr, Filename);
 
         SourceUri := SourceUri.Uri(ImportType."Ftp Host" + '/' + ImportType."Ftp Path" + '/');
         FtpWebRequest := FtpWebRequest.Create(SourceUri.AbsoluteUri + Filename);
@@ -189,7 +190,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         NewRemotePath: Text;
     begin
         if not ValidFilename(Filename) then
-            exit;
+            Error(FileIsNotValidErr, Filename);
 
         SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password");
         SharpSFtp.Connect(ImportType."Ftp Port");
@@ -315,6 +316,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if not NcImportEntryTmp.FindSet() then
             exit;
         repeat
+            NcImportEntryTmp.CalcFields("Document Source");
             NcImportEntry := NcImportEntryTmp;
             NcImportEntry."Entry No." := 0;
             NcImportEntry.Insert(true);
@@ -776,7 +778,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if (Position = 1) or (Position = 0) then
             exit(false);
         if Position = StrLen(Filename) then
-            exit;
+            exit(false);
 
         exit(true);
     end;

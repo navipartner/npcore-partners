@@ -375,7 +375,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         if (SmartEmail."NpXml Template Code" <> '') and NpXmlTemplate.Get(SmartEmail."NpXml Template Code") then begin
             RecRef.SetRecFilter;
             NpXmlMgt.Initialize(NpXmlTemplate, RecRef, NpXmlValueMgt.GetPrimaryKeyValue(RecRef), true);
-            NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name");
+            NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name", NpXmlTemplate."Custom Namespace for XMLNS");
             NpXmlMgt.ParseDataToXmlDocNode(RecRef, true, XmlDocNode);
             JObject := JObject.Parse(NpXmlMgt.Xml2Json(XmlDoc, NpXmlTemplate));
             ArrayName := XmlDoc.DocumentElement.FirstChild.Name;

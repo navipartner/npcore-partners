@@ -383,6 +383,40 @@ table 6151552 "NPR NpXml Element"
             DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
+        field(5235; "Round Precision"; Decimal)
+        {
+            Caption = 'Round Precision';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
+            MinValue = 0;
+            MaxValue = 100;
+            BlankZero = true;
+
+            trigger OnValidate()
+            begin
+                if "Round Precision" > 0 then
+                    "Round Direction" := '='
+                else
+                    "Round Direction" := '';
+            end;
+        }
+        field(5236; "Round Direction"; Text[1])
+        {
+            Caption = 'Round Direction';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ValuesAllowed: Boolean;
+                ErrorText: Label 'Value ''%1'' is not a valid value. The following values can be used: ,<,>,=';
+            begin
+                if "Round Direction" in ['', '<', '>', '='] then
+                    ValuesAllowed := true;
+
+                if not ValuesAllowed then
+                    Error(ErrorText, "Round Direction");
+            end;
+        }
         field(5240; "Lower Case"; Boolean)
         {
             Caption = 'Lower Case';

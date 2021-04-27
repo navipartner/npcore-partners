@@ -162,25 +162,50 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
-    procedure InitDoc(var XmlDoc: DotNet "NPRNetXmlDocument"; var XmlDocNode: DotNet NPRNetXmlNode; NodeName: Text[1024])
+    procedure InitDoc(var XmlDoc: DotNet "NPRNetXmlDocument"; var XmlDocNode: DotNet NPRNetXmlNode; NodeName: Text[1024]; CustomNamespaceForXMLNS: Text[100])
     begin
+        //Had to change this (OLD) DotNet function in Hotfix Branch because NaviConnect module is still on DotNet version. In Master it's transfered to Native AL
         if not IsNull(XmlDoc) then
             Clear(XmlDoc);
 
         XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml('<?xml version="1.0" encoding="utf-8"?>' +
-                       '<' + NodeName + ' />');
+        if CustomNamespaceForXMLNS = '' then
+            XmlDoc.LoadXml('<?xml version="1.0" encoding="utf-8"?>' +
+                        '<' + NodeName + ' />')
+        else
+            XmlDoc.LoadXml('<?xml version="1.0" encoding="utf-8"?>' +
+                        '<' + NodeName + ' xmlns="' + CustomNamespaceForXMLNS + '" />');
 
         XmlDocNode := XmlDoc.DocumentElement();
     end;
 
-    procedure InitDoc(var XmlDoc: XmlDocument; var XmlDocNode: XmlNode; NodeName: Text[1024])
+    procedure InitDoc(var XmlDoc: XmlDocument; var XmlDocNode: XmlNode; NodeName: Text[1024]; CustomNamespaceForXMLNS: Text[100])
     var
         Element: XmlElement;
     begin
         Clear(XmlDoc);
-        XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?>' + '<' + NodeName + ' />', XmlDoc);
+        if CustomNamespaceForXMLNS = '' then
+            XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?>' + '<' + NodeName + ' />', XmlDoc)
+        else
+            XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?>' + '<' + NodeName + ' xmlns="' + CustomNamespaceForXMLNS + '" />', XmlDoc);
         XmlDoc.GetRoot(Element);
+        XmlDocNode := Element.AsXmlNode();
+    end;
+
+    procedure AddRootAttributes(var XmlDocNode: XmlNode; NpXmlTemplate: Record "NPR NpXml Template")
+    var
+        Element: XmlElement;
+    begin
+        if not NpXmlTemplate."Root Element Attr. Enabled" then
+            exit;
+
+        Element := XmlDocNode.AsXmlElement();
+        if (NpXmlTemplate."Root Element Attr. 1 Name" <> '') and (NpXmlTemplate."Root Element Attr. 1 Name" <> 'xmlns') then
+            Element.SetAttribute(NpXmlTemplate."Root Element Attr. 1 Name", NpXmlTemplate."Root Element Attr. 1 Value");
+
+        if (NpXmlTemplate."Root Element Attr. 2 Name" <> '') and (NpXmlTemplate."Root Element Attr. 2 Name" <> 'xmlns') then
+            Element.SetAttribute(NpXmlTemplate."Root Element Attr. 2 Name", NpXmlTemplate."Root Element Attr. 2 Value");
+
         XmlDocNode := Element.AsXmlNode();
     end;
 
