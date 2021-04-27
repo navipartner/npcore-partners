@@ -23,6 +23,8 @@ table 6150653 "NPR POS Posting Profile"
             Caption = 'Default POS Entry No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'It''s not used anywhere';
         }
         field(30; "Max. POS Posting Diff. (LCY)"; Decimal)
         {

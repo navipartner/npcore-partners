@@ -53,11 +53,6 @@ page 6014681 "NPR POS Posting Profiles Step"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rounding Type field';
                 }
-                field("Default POS Entry No. Series"; Rec."Default POS Entry No. Series")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Default POS Entry No. Series field';
-                }
             }
         }
     }
