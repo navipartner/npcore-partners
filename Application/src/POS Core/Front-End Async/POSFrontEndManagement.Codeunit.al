@@ -27,6 +27,8 @@
         Text013: Label 'A method call was made on an uninitialized instance of the POS Front End Management codeunit, that requires an active and initialized instance to succeed.';
         Text015: Label 'A function that requires Workflow 2.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
         ErrorDoNotCallSetActionContext: Label 'You have invoked SetActionContext from within a Workflows 2.0 action. This is an invalid operation.\\If you want to pass context to front end from a Workflows 2.0 action, it is enough to write to the Context object. In Workflows 2.0, context is automatically synchronized between AL and JavaScript.';
+        DragonglassResponseContextLbl: Label '_dragonglassResponseContext', Locked = true;
+        DragonglassInvocationRespondedLbl: Label '_dragonglassResponseContext', Locked = true;
 
     procedure Initialize(FrameworkIn: Interface "NPR Framework Interface"; SessionIn: Codeunit "NPR POS Session")
     begin
@@ -937,6 +939,81 @@
         MakeSureFrameworkIsAvailableIn20(true);
         QueuedWorkflows.Add(StrSubstNo('%1;%2', ActionCode, Context));
     end;
+
+    #region Dragonglass Awaitable Methods Response Context
+
+    /// <summary>
+    /// Inspects the context objects to determine if it contains a Dragonglass back-end invocation response context. This context
+    /// is present on those back-end custom methods that await a response from the back-end upon invocation.
+    /// </summary>
+    /// <param name="Context">Context object</param>
+    /// <returns></returns>
+    procedure HasDragonglassResponseContext(Context: JsonObject): Boolean
+    begin
+        exit(Context.Contains(DragonglassResponseContextLbl));
+    end;
+
+    /// <summary>
+    /// Responds to an awaitable Dragonglass back-end invocation. The method will first inspect context to confirm that it is
+    /// being invoked inside a OnCustomMethod invocation stack made for an awaitable method. If this cannot be confirmed, then
+    /// invoking this method has no effect. Then, the method will provide the response to the front end. Finally, the method will
+    /// mark the response in the context object so that the infrastructure can validate if the response was sent to the front end.
+    /// Awaitable methods must invoke `RespondToFrontEndMethod` before completing their call stack.
+    /// </summary>
+    /// <param name="Context">Original method invocation context</param>
+    /// <param name="Response">Response objet to send to the front end. Awaitable method invocation will receive this object as response.</param>
+    /// <param name="This">Current instance of Front-end Management.</param>
+    procedure RespondToFrontEndMethod(Context: JsonObject; Response: JsonObject; This: Codeunit "NPR POS Front End Management")
+    var
+        Request: Codeunit "NPR Front-End: Generic";
+        JSON: Codeunit "NPR POS JSON Management";
+        DragonglassContext: JsonObject;
+        Id: Text;
+        Method: Text;
+        RetrievingMethodContextErr: Label 'reading Dragonglass method invocation context';
+    begin
+        if not HasDragonglassResponseContext(Context) then
+            exit;
+
+        JSON.InitializeJObjectParser(Context, This);
+        JSON.SetScope(DragonglassResponseContextLbl);
+        Id := JSON.GetStringOrFail('invocationId', RetrievingMethodContextErr);
+        Method := JSON.GetStringOrFail('method', RetrievingMethodContextErr);
+        Request.SetMethod('BackEndMethodInvocationResult');
+        Request.GetContent().Add('id', Id);
+        Request.GetContent().Add('method', Method);
+        Request.GetContent().Add('response', Response);
+
+        InvokeFrontEndAsync(Request);
+
+        JSON.SetScopeRoot();
+        DragonglassContext := JSON.GetJsonObject(DragonglassResponseContextLbl);
+        DragonglassContext.Add(DragonglassInvocationRespondedLbl, true);
+    end;
+
+    /// <summary>
+    /// Checks if custom awaitable method has responded to Dragonglass. Awaitable methods must provide their
+    /// response.
+    /// </summary>
+    /// <param name="Context">Original invocation context</param>
+    /// <returns>Boolean value indicating whether the response was sent to Dragonglass</returns>
+    procedure IsDragonglassInvocationResponded(Context: JsonObject): Boolean
+    var
+        Token: JsonToken;
+        DragonglassContext: JsonObject;
+    begin
+        if not Context.Get(DragonglassResponseContextLbl, Token) or not Token.IsObject() then
+            exit(false);
+
+        DragonglassContext := Token.AsObject();
+
+        if not DragonglassContext.Get(DragonglassInvocationRespondedLbl, Token) or not Token.IsValue() then
+            exit(false);
+
+        exit(Token.AsValue().AsBoolean());
+    end;
+
+    #endregion
 
     #region Tracing
     local procedure PrepareTraceObject(Request: Interface "NPR Front-End Async Request"; TraceKey: Text) TraceObject: JsonObject;

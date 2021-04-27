@@ -174,9 +174,21 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Handled: Boolean;
+        ExpectsResponse: Boolean;
         ContextString: Text;
+        CustomMethodWithoutResponseErr: Label 'Custom awaitable method %1 was invoked, but it did not provide a response. This is a bug in the custom method handler codeunit.';
     begin
+        if (Context.Contains('_dragonglassResponseContext')) then begin
+            ExpectsResponse := true;
+        end;
+
         OnCustomMethod(Method, Context, POSSession, FrontEnd, Handled);
+
+        if ExpectsResponse then begin
+            if not FrontEnd.IsDragonglassInvocationResponded(Context) then
+                FrontEnd.ReportBugAndThrowError(StrSubstNo(CustomMethodWithoutResponseErr, Method));
+        end;
+
         if not Handled then begin
             Context.WriteTo(ContextString);
             FrontEnd.ReportInvalidCustomMethod(StrSubstNo(Text002, Method, ContextString), Method);
