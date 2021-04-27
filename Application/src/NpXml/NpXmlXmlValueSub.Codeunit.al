@@ -77,6 +77,19 @@ codeunit 6151562 "NPR NpXml Xml Value Sub."
         XmlValue := Format(Stock, 0, 9);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
+    local procedure GetCurrentDateAndTime(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if not IsSubscriber(NpXmlElement, 'GetCurrentDateAndTime') then
+            exit;
+
+        Handled := true;
+
+        XmlValue := Format(CurrentDateTime, 0, 9);
+    end;
+
     local procedure IsSubscriber(NpXmlElement: Record "NPR NpXml Element"; XmlValueFunction: Text): Boolean
     begin
         if NpXmlElement."Xml Value Codeunit ID" <> CODEUNIT::"NPR NpXml Xml Value Sub." then

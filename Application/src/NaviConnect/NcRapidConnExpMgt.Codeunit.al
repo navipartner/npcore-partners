@@ -118,7 +118,7 @@ codeunit 6151091 "NPR Nc RapidConn. Exp. Mgt."
         if not NcTaskMgt.GetRecRef(NcTask, RecRef) then
             exit;
 
-        NpXmlDomMgt.InitDoc(XmlDoc, XmlDocElement, 'rapid_connect');
+        NpXmlDomMgt.InitDoc(XmlDoc, XmlDocElement, 'rapid_connect', '');
         repeat
             NpXmlDomMgt.AddElement(XmlDocElement, 'record', XmlElement);
             NpXmlDomMgt.AddAttribute(XmlElement, 'table_id', Format(ConfigPackageTable."Table ID"));

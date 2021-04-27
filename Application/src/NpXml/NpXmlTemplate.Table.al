@@ -38,6 +38,36 @@ table 6151551 "NPR NpXml Template"
             DataClassification = CustomerContent;
             Description = 'NC1.22';
         }
+        field(40; "Custom Namespace for XMLNS"; Text[100])
+        {
+            Caption = 'Custom Namespace for XMLNS Alias';
+            DataClassification = CustomerContent;
+        }
+        field(50; "Root Element Attr. Enabled"; Boolean)
+        {
+            Caption = 'Root Attributes Enabled';
+            DataClassification = CustomerContent;
+        }
+        field(60; "Root Element Attr. 1 Name"; Text[30])
+        {
+            Caption = 'Root Attr. 1 Name';
+            DataClassification = CustomerContent;
+        }
+        field(70; "Root Element Attr. 1 Value"; Text[30])
+        {
+            Caption = 'Root Attr. 1 Value';
+            DataClassification = CustomerContent;
+        }
+        field(80; "Root Element Attr. 2 Name"; Text[30])
+        {
+            Caption = 'Root Attr. 2 Name';
+            DataClassification = CustomerContent;
+        }
+        field(90; "Root Element Attr. 2 Value"; Text[30])
+        {
+            Caption = 'Root Attr. 2 Value';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Transaction Task"; Boolean)
         {
             Caption = 'Transaction Task';
