@@ -48,6 +48,8 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                             exit('');
                         if NpXmlElement."Reverse Sign" then
                             DecBuffer := -1 * DecBuffer;
+                        if NpXmlElement."Round Precision" > 0 then
+                            DecBuffer := Round(DecBuffer, NpXmlElement."Round Precision", NpXmlElement."Round Direction");
                         XmlValue := Format(DecBuffer, 0, 9);
                     end;
                 'option':
@@ -161,6 +163,7 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         TempNpXmlCustomValueBuffer: Record "NPR NpXml Custom Val. Buffer" temporary;
         InStr: InStream;
         Line: Text;
+        DecimalValue: Decimal;
     begin
         if NPXmlElement."Custom Codeunit ID" <= 0 then
             exit('');
@@ -173,6 +176,12 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         while not InStr.EOS do begin
             InStr.ReadText(Line);
             Value += Line;
+        end;
+        if NPXmlElement."Round Precision" > 0 then begin
+            if Evaluate(DecimalValue, Value) then begin
+                DecimalValue := Round(DecimalValue, NpXmlElement."Round Precision", NpXmlElement."Round Direction");
+                Value := Format(DecimalValue, 0, 9)
+            end;
         end;
         exit(Value);
     end;

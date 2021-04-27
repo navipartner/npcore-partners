@@ -166,6 +166,16 @@
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reverse Sign field';
                 }
+                field("Round Precision"; Rec."Round Precision")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies rounding precision for number values. For example: 0.01 means that value will have 2 decimals; 100 means that it could be 100, 200, 300...';
+                }
+                field("Round Direction"; Rec."Round Direction")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies rounding direction for number values. There are three options: ''<'' (rounds down), ''>'' (rounds up) and ''='' (rounds up or down to the nearest value (default). Values of 5 or greater are rounded up. Values less than 5 are rounded down)';
+                }
                 field("Lower Case"; Rec."Lower Case")
                 {
                     ApplicationArea = All;
