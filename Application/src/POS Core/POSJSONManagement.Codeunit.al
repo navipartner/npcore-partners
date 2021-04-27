@@ -13,7 +13,7 @@ codeunit 6150703 "NPR POS JSON Management"
         JObjectBefore: JsonObject;
         JRoot: JsonObject;
         Initialized: Boolean;
-        UnsupportedPropertyTypeErr: Label 'Attempting to add property %1 of non-serializable type %2 to JSON object';
+        UnsupportedPropertyTypeErr: Label 'Attempting to add property %1 of a non-serializable type to JSON object';
 
     /// <summary>
     /// Initializes the JSON object parser over the provided JSON object.
@@ -101,11 +101,6 @@ codeunit 6150703 "NPR POS JSON Management"
             FrontEnd.ReportBugAndThrowError(StrSubstNo(PropertyNotInObjectErr, Property, OperationDescription, TextTemp));
         end else
             JToken := JTokenTemp;
-    end;
-
-    local procedure ObjectToVariant("Object": DotNet NPRNetObject; var Variant: Variant)
-    begin
-        Variant := Object;
     end;
 
     /// <summary>
@@ -775,7 +770,7 @@ codeunit 6150703 "NPR POS JSON Management"
                     Target.Add(PropertyName, ValueAsInteger);
                 end;
             else
-                Error(UnsupportedPropertyTypeErr, PropertyName, GetDotNetType(PropertyValue));
+                Error(UnsupportedPropertyTypeErr, PropertyName);
         end;
     end;
 
