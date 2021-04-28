@@ -11,6 +11,8 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         CHECKPOINT_PROGRESS: Label 'Creating checkpoints for: %1 %2\\@1@@@@@@@@';
         ALL_REGISTERS_MUST_BE_BALANCED: Label 'Not all %1 have %2 %3! Only %1 with %2 %3 will have their balance transfered. Do you want to continue anyway?';
         NOT_ALL_CR_HAVE_POS_UNIT: Label 'All %1 must have a %2 when activating POS Entry posting. %1 %3 is missing its %2.';
+        MaxNoOfRecords: Integer;
+        MaxDuration: Integer;
 
     trigger OnRun()
     var
@@ -22,14 +24,14 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
             exit;
 
         // Run upgrade code
-        UpgradeAuditRollStep1;
-        OnActivatePosEntryPosting();
+        if UpgradeAuditRollStep1() then
+            OnActivatePosEntryPosting();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
     end;
 
-    local procedure UpgradeAuditRollStep1()
+    local procedure UpgradeAuditRollStep1(): Boolean
     var
         AuditRoll: Record "NPR Audit Roll";
         xAuditRoll: Record "NPR Audit Roll";
@@ -46,6 +48,8 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
         POSTaxAmountLine: Record "NPR POS Tax Amount Line";
         p: Dialog;
+        StopProcessing: Boolean;
+        CurrDuration: Integer;
     begin
         //Use "Audit Roll to POS Entry Link" to determine how far the Migration has come, and if new Datamodel have been disabled and therefore
         //needs to be rolled up to date again.
@@ -56,7 +60,7 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         AuditRoll.SetCurrentKey("Clustered Key");
         AuditRolltoPOSEntryLink.LockTable;
         if AuditRolltoPOSEntryLink.FindLast then
-            AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Link Entry No.")
+            AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Audit Roll Clustered Key")
         else
             InitDatamodel;
 
@@ -71,6 +75,19 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         c := AuditRoll.Count;
         if AuditRoll.FindSet then begin
             repeat
+                i := i + 1;
+                if (MaxNoOfRecords > 0) and (i >= MaxNoOfRecords) then
+                    StopProcessing := true;
+
+                if MaxDuration > 0 then begin
+                    CurrDuration := (StartDateTime - CurrentDateTime) / (60 * 1000);
+                    if CurrDuration >= MaxDuration then
+                        StopProcessing := StopProcessing or true;
+                end;
+
+                if ((i mod 1000) = 0) or ((c - i) < 1000) then
+                    if GuiAllowed then p.Update(1, StrSubstNo('%1/%2...', i, c));
+
                 if AuditRoll."Sales Ticket No." = '' then
                     AuditRoll."Sales Ticket No." := AuditRoll."Offline receipt no.";
 
@@ -145,10 +162,7 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
                 end;
                 UpdatePOSEntry(POSEntry, AuditRoll);
                 xAuditRoll := AuditRoll;
-                i := i + 1;
-                if ((i mod 1000) = 0) or ((c - i) < 1000) then
-                    if GuiAllowed then p.Update(1, StrSubstNo('%1/%2...', i, c));
-            until AuditRoll.Next = 0;
+            until (AuditRoll.Next = 0) or StopProcessing;
 
             if NoOfPOSEntriesCreated > 0 then begin
                 if GuiAllowed then p.Update(1, 'Finalizing...');
@@ -158,6 +172,7 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
             end;
         end;
         if GuiAllowed then p.Close();
+        exit(i = c);
     end;
 
     local procedure UpgradeAuditRoll(Step: Integer)
@@ -874,4 +889,14 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         end;
     end;
     #endregion    
+
+    procedure SetMaxNoOfRecords(NewValue: Integer)
+    begin
+        MaxNoOfRecords := NewValue;
+    end;
+
+    procedure SetMaxDuration(NewValue: Integer)
+    begin
+        MaxDuration := NewValue;
+    end;
 }

@@ -15,10 +15,9 @@ page 6014570 "NPR Retail Tools"
 
                 trigger OnAction()
                 var
-                    RetailDataModelUpgrade: Codeunit "NPR UPG RetDataMod AR Upgr.";
+                    RetailDataModelUpgrade: Report "NPR UPG RetDataMod AR Upgr.";
                 begin
-                    if Confirm('Start data migration?', false) then
-                        RetailDataModelUpgrade.Run();
+                    RetailDataModelUpgrade.Run();
                 end;
             }
             action(NPRAction2)
