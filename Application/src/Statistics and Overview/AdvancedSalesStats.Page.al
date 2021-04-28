@@ -1,6 +1,6 @@
 page 6014585 "NPR Advanced Sales Stats"
 {
-    Caption = 'Advanced Sales Statistics';
+    Caption = 'Advanced Sales Statistics Page';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
