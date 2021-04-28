@@ -32,6 +32,16 @@ extends:
     stepList:
     - checkout: self
 
+    - task: XplatGenerateReleaseNotes@3
+      inputs: 
+        outputfile: '$(Build.ArtifactStagingDirectory)\releasenotes.html'
+        templatefile: '$(ScriptsRootFolder)/ReleaseNotesTemplates/build-handlebars-template.html'
+        replaceFile: TRUE
+        showOnlyPrimary: TRUE
+        getIndirectPullRequests: FALSE
+      displayName: Generate Release Notes
+      #condition: and(succeeded(), eq(variables['PrereleasePackage'], FALSE))    
+
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         majorVersion: $(majorVersion)
@@ -61,16 +71,7 @@ extends:
           publish:
             enabled: TRUE
             #tags: $(artifactURL) - No artifact URL with precompiled images
-            additionalFiles:
-            - '$(Build.ArtifactStagingDirectory)\releasenotes.html'
+#            additionalFiles:
+#              {{ if eq(variables['PrereleasePackage'], FALSE) }}:
+#              - '$(Build.ArtifactStagingDirectory)\releasenotes.html'
         runtimePackage: TRUE
-
-    - task: XplatGenerateReleaseNotes@3
-      inputs: 
-        outputfile: '$(Build.ArtifactStagingDirectory)\releasenotes.html'
-        templatefile: '$(ScriptsRootFolder)/ReleaseNotesTemplates/build-handlebars-template.html'
-        replaceFile: TRUE
-        showOnlyPrimary: TRUE
-        getIndirectPullRequests: FALSE
-      displayName: Generate Release Notes
-      condition: and(succeeded(), eq(variables['PrereleasePackage'], FALSE))
