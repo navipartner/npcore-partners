@@ -60,7 +60,7 @@ extends:
           id: NaviPartner.NPCore.BC$(majorVersion)
           publish:
             enabled: TRUE
-            tags: $(artifactURL)
+            #tags: $(artifactURL) - No artifact URL with precompiled images
             additionalFiles:
             - '$(Build.ArtifactStagingDirectory)\releasenotes.html'
         runtimePackage: TRUE
