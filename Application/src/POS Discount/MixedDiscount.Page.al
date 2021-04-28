@@ -147,150 +147,145 @@
                             }
                         }
                     }
-                    grid(Control6150660)
+                    group(Control2)
                     {
-                        GridLayout = Rows;
                         ShowCaption = false;
-                        group(Control2)
+                        group(Control6014420)
                         {
                             ShowCaption = false;
-                            group(Control6014420)
+                            Visible = (Rec."Mix Type" <> 2);
+
+                            field(Status; Rec.Status)
+                            {
+                                ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Status field';
+                            }
+                            field("Discount Type"; Rec."Discount Type")
+                            {
+                                ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Discount Type field';
+
+                                trigger OnValidate()
+                                begin
+                                    UpdateLineView();
+                                    CurrPage.Update(true);
+                                end;
+                            }
+                            group(Control6014403)
                             {
                                 ShowCaption = false;
-                                Visible = (Rec."Mix Type" <> 2);
-
-                                field(Status; Rec.Status)
+                                Visible = (Rec."Discount Type" = Rec."Discount Type"::"Total Amount per Min. Qty.");
+                                field("Total Amount"; Rec."Total Amount")
                                 {
                                     ApplicationArea = All;
-                                    ToolTip = 'Specifies the value of the Status field';
-                                }
-                                field("Discount Type"; Rec."Discount Type")
-                                {
-                                    ApplicationArea = All;
-                                    ToolTip = 'Specifies the value of the Discount Type field';
+                                    ToolTip = 'Specifies the value of the Total Amount field';
 
                                     trigger OnValidate()
                                     begin
-                                        UpdateLineView();
                                         CurrPage.Update(true);
                                     end;
                                 }
-                                group(Control6014403)
-                                {
-                                    ShowCaption = false;
-                                    Visible = (Rec."Discount Type" = Rec."Discount Type"::"Total Amount per Min. Qty.");
-                                    field("Total Amount"; Rec."Total Amount")
-                                    {
-                                        ApplicationArea = All;
-                                        ToolTip = 'Specifies the value of the Total Amount field';
-
-                                        trigger OnValidate()
-                                        begin
-                                            CurrPage.Update(true);
-                                        end;
-                                    }
-                                    field("Total Amount Excl. VAT"; Rec."Total Amount Excl. VAT")
-                                    {
-                                        ApplicationArea = All;
-                                        ToolTip = 'Specifies the value of the Total Amount Excl. VAT field';
-                                    }
-                                }
-                                group(Control6014426)
-                                {
-                                    ShowCaption = false;
-                                    Visible = (Rec."Discount Type" = Rec."Discount Type"::"Multiple Discount Levels");
-                                    field(DiscAmountExclVAT; Rec."Total Amount Excl. VAT")
-                                    {
-                                        ApplicationArea = All;
-                                        Caption = 'Discount Amount Excl. VAT';
-                                        ToolTip = 'Specifies the value of the Discount Amount Excl. VAT field';
-
-                                        trigger OnValidate()
-                                        begin
-                                            CurrPage.Update();
-                                        end;
-                                    }
-                                }
-                                group(Control6014404)
-                                {
-                                    ShowCaption = false;
-                                    Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount %";
-                                    field("Total Discount %"; Rec."Total Discount %")
-                                    {
-                                        ApplicationArea = All;
-                                        ToolTip = 'Specifies the value of the Total Discount % field';
-
-                                        trigger OnValidate()
-                                        begin
-                                            CurrPage.Update(true);
-                                        end;
-                                    }
-                                }
-                                group(Control6014405)
-                                {
-                                    ShowCaption = false;
-                                    Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount Amt. per Min. Qty.";
-                                    field("Total Discount Amount"; Rec."Total Discount Amount")
-                                    {
-                                        ApplicationArea = All;
-                                        ToolTip = 'Specifies the value of the Total Discount Amount field';
-
-                                        trigger OnValidate()
-                                        begin
-                                            CurrPage.Update(true);
-                                        end;
-                                    }
-                                }
-                                group(Control6014416)
-                                {
-                                    ShowCaption = false;
-                                    Visible = Rec."Discount Type" = Rec."Discount Type"::"Priority Discount per Min. Qty";
-                                    field("Item Discount Qty."; Rec."Item Discount Qty.")
-                                    {
-                                        ApplicationArea = All;
-                                        ToolTip = 'Specifies the value of the Item Discount Quantity field';
-
-                                        trigger OnValidate()
-                                        begin
-                                            CurrPage.Update(true);
-                                        end;
-                                    }
-                                    field("Item Discount %"; Rec."Item Discount %")
-                                    {
-                                        ApplicationArea = All;
-                                        ToolTip = 'Specifies the value of the Item Discount % field';
-
-                                        trigger OnValidate()
-                                        begin
-                                            CurrPage.Update(true);
-                                        end;
-                                    }
-                                }
-
-                            }
-
-                            group(Control6014411)
-                            {
-                                ShowCaption = false;
-                                Visible = Rec."Mix Type" <> 2;
-                                field("Block Custom Discount"; Rec."Block Custom Discount")
+                                field("Total Amount Excl. VAT"; Rec."Total Amount Excl. VAT")
                                 {
                                     ApplicationArea = All;
-                                    ToolTip = 'Specifies the value of the Block Custom Discount field';
+                                    ToolTip = 'Specifies the value of the Total Amount Excl. VAT field';
                                 }
                             }
-                            field("Created the"; Rec."Created the")
+                            group(Control6014426)
+                            {
+                                ShowCaption = false;
+                                Visible = (Rec."Discount Type" = Rec."Discount Type"::"Multiple Discount Levels");
+                                field(DiscAmountExclVAT; Rec."Total Amount Excl. VAT")
+                                {
+                                    ApplicationArea = All;
+                                    Caption = 'Discount Amount Excl. VAT';
+                                    ToolTip = 'Specifies the value of the Discount Amount Excl. VAT field';
+
+                                    trigger OnValidate()
+                                    begin
+                                        CurrPage.Update();
+                                    end;
+                                }
+                            }
+                            group(Control6014404)
+                            {
+                                ShowCaption = false;
+                                Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount %";
+                                field("Total Discount %"; Rec."Total Discount %")
+                                {
+                                    ApplicationArea = All;
+                                    ToolTip = 'Specifies the value of the Total Discount % field';
+
+                                    trigger OnValidate()
+                                    begin
+                                        CurrPage.Update(true);
+                                    end;
+                                }
+                            }
+                            group(Control6014405)
+                            {
+                                ShowCaption = false;
+                                Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount Amt. per Min. Qty.";
+                                field("Total Discount Amount"; Rec."Total Discount Amount")
+                                {
+                                    ApplicationArea = All;
+                                    ToolTip = 'Specifies the value of the Total Discount Amount field';
+
+                                    trigger OnValidate()
+                                    begin
+                                        CurrPage.Update(true);
+                                    end;
+                                }
+                            }
+                            group(Control6014416)
+                            {
+                                ShowCaption = false;
+                                Visible = Rec."Discount Type" = Rec."Discount Type"::"Priority Discount per Min. Qty";
+                                field("Item Discount Qty."; Rec."Item Discount Qty.")
+                                {
+                                    ApplicationArea = All;
+                                    ToolTip = 'Specifies the value of the Item Discount Quantity field';
+
+                                    trigger OnValidate()
+                                    begin
+                                        CurrPage.Update(true);
+                                    end;
+                                }
+                                field("Item Discount %"; Rec."Item Discount %")
+                                {
+                                    ApplicationArea = All;
+                                    ToolTip = 'Specifies the value of the Item Discount % field';
+
+                                    trigger OnValidate()
+                                    begin
+                                        CurrPage.Update(true);
+                                    end;
+                                }
+                            }
+
+                        }
+
+                        group(Control6014411)
+                        {
+                            ShowCaption = false;
+                            Visible = Rec."Mix Type" <> 2;
+                            field("Block Custom Discount"; Rec."Block Custom Discount")
                             {
                                 ApplicationArea = All;
-                                Editable = false;
-                                ToolTip = 'Specifies the value of the Created Date field';
+                                ToolTip = 'Specifies the value of the Block Custom Discount field';
                             }
-                            field("Last Date Modified"; Rec."Last Date Modified")
-                            {
-                                ApplicationArea = All;
-                                Editable = false;
-                                ToolTip = 'Specifies the value of the Last Date Modified field';
-                            }
+                        }
+                        field("Created the"; Rec."Created the")
+                        {
+                            ApplicationArea = All;
+                            Editable = false;
+                            ToolTip = 'Specifies the value of the Created Date field';
+                        }
+                        field("Last Date Modified"; Rec."Last Date Modified")
+                        {
+                            ApplicationArea = All;
+                            Editable = false;
+                            ToolTip = 'Specifies the value of the Last Date Modified field';
                         }
                     }
                 }
