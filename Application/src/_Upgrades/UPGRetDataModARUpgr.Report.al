@@ -14,11 +14,13 @@ report 6014423 "NPR UPG RetDataMod AR Upgr."
                     {
                         Caption = 'Max No. of Records';
                         ToolTip = 'At least one parameter must be specified. Use "-1" to remove limitation.';
+                        ApplicationArea = All;
                     }
                     field(MaxDuration; MaxDuration)
                     {
                         Caption = 'Max Duration (minutes)';
                         ToolTip = 'At least one parameter must be specified. Use "-1" to remove limitation.';
+                        ApplicationArea = All;
                     }
                 }
                 group(AuditRollStats)
@@ -27,11 +29,13 @@ report 6014423 "NPR UPG RetDataMod AR Upgr."
                     {
                         Caption = 'Total No. of Records';
                         Editable = false;
+                        ApplicationArea = All;
                     }
                     field(AuditRollNoOfRecordsLeft; AuditRollNoOfRecordsLeft)
                     {
                         Caption = 'No. of Records left';
                         Editable = false;
+                        ApplicationArea = All;
                     }
                 }
             }
