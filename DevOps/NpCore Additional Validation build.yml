@@ -34,8 +34,8 @@ jobs:
     jobName: First_build
     jobDisplayName: Build AL app - Localised base apps
     timeoutInMinutes: 180
-    containerImageName: mcr.microsoft.com/businesscentral:10.0.17763.1757
-    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
+    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
+    artifactUrl: https://bcartifacts.blob.core.windows.net/onprem/17.0.16993.0/w1
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
     containerAdminUsername: $(containerAdminUsername) 
@@ -145,7 +145,7 @@ jobs:
     timeoutInMinutes: 180
     jobCondition: False
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig-insider.json'
+    artifactUrl: https://bcartifacts.blob.core.windows.net/onprem/17.0.16993.0/w1
     containerName: Build-$(Build.BuildId)-2
     serverInstanceName: $(serverInstanceName)
     containerAdminUsername: $(containerAdminUsername) 

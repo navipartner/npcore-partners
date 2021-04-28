@@ -5,7 +5,8 @@ resources:
   - repository: scriptsRepo
     type: git
     name: 'NpCore/NpDevOps'
-
+    ref: 'refs/heads/releases/1.0'
+    
 pool:
   name: NP Core Pull Request Pipelines
   demands: 
@@ -15,27 +16,15 @@ pool:
   - Agent.OS -equals Windows_NT
   - Agent.OSVersion -equals 10.0.17763
 
-variables:
-  containerName: Build-$(Build.BuildId)
-  serverInstanceName: BC
-  containerAdminUsername: admin
-  containerAdminPassword: P@ssword1
-
-jobs:
-- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
+extends:
+  template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
   parameters:
-    timeoutInMinutes: 180
-    containerImageName: mcr.microsoft.com/businesscentral:10.0.17763.1757
-    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig-Insider.json'
-    containerName: $(containerName)
-    serverInstanceName: $(serverInstanceName)
-    containerAdminUsername: $(containerAdminUsername) 
-    containerAdminPassword: $(containerAdminPassword)
-    licenseSecureFileName: 'DEV_BC OP 17.flf'
-    scriptsRepo: ScriptsRepo
+    scriptsRepo: scriptsRepo
     stepList:
+    - checkout: self
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
+        majorVersion: $(majorVersion)
         containerName: $(containerName)
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
@@ -52,12 +41,16 @@ jobs:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
             id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
             destinationPath: '$(ServiceTierFolder)/Add-Ins'
-        latestPrereleaseAppNuGetSource: 
+        appNuGetSource: 
           source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-          id: NaviPartner.NPCore.BC170
+          id: NaviPartner.NPCore.BC$(majorVersion)
+          download:
+            enabled: true
+            prerelease: true
 
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
+        majorVersion: $(majorVersion)      
         containerName: $(containerName)
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
