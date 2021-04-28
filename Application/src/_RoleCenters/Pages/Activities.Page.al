@@ -12,8 +12,8 @@
         {
             cuegroup(Control6150623)
             {
-                Caption = 'SALES';
-                ShowCaption = true;
+                Caption = 'miscellaneous';
+                ShowCaption = false;
                 field("Import Pending"; Rec."Import Pending")
                 {
                     ApplicationArea = All;
@@ -29,6 +29,11 @@
                     DrillDownPageId = "NPR Nc Task List";
                     ToolTip = 'Specifies the value of the Task List field';
                 }
+            }
+            cuegroup(Control6150624)
+            {
+                Caption = 'SALES'; 
+                ShowCaption = true; 
                 field("Daily Sales Orders"; Rec."Daily Sales Orders")
                 {
                     ApplicationArea = All;

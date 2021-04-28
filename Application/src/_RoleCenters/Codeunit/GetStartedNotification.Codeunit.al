@@ -5,7 +5,7 @@ codeunit 6014441 "NPR Get Started Notification"
         if not IsNotificationEnabled() then
             exit;
 
-        SendGetStartedNotification();
+       // SendGetStartedNotification();
     end;
 
     local procedure SendGetStartedNotification()
@@ -18,6 +18,14 @@ codeunit 6014441 "NPR Get Started Notification"
         GettingStartedNotification.AddAction(GetStartedNotificationActionTxt, Codeunit::"NPR Get Started Notification", 'GetStartedVideoAction');
         GettingStartedNotification.AddAction(DontShowNotificationAgain, Codeunit::"NPR Get Started Notification", 'DisableNotificationAction');
         GettingStartedNotification.Send();
+    end;
+
+    local procedure RecallGetStartedNotification()
+    var
+        GettingStartedNotification: Notification;
+    begin 
+        GettingStartedNotification.ID := NotificationIDLbl;
+        GettingStartedNotification.Recall();
     end;
 
     procedure DisableNotificationAction(Notification: Notification)
