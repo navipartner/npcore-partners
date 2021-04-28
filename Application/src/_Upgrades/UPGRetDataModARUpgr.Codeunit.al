@@ -24,11 +24,11 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
             exit;
 
         // Run upgrade code
-        if UpgradeAuditRollStep1() then
+        if UpgradeAuditRollStep1() then begin
             OnActivatePosEntryPosting();
-
-        // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+            // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+        end;
     end;
 
     local procedure UpgradeAuditRollStep1(): Boolean
