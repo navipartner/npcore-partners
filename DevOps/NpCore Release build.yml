@@ -42,7 +42,7 @@ extends:
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
 
         translationsTargetRepoName: NpCore-Translations
-        translationsTargetRepoBranchName: i10n_master
+        translationsTargetRepoBranchName: master
         translationsRepo: translations
 
         keyVaultCert:
