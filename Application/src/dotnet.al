@@ -1244,6 +1244,13 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.PdfWriter")
     {
+#if BC17
+        Version = '17.0.0.0';
+#endif
+
+#if BC18
+        Version = '18.0.0.0';
+#endif
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
