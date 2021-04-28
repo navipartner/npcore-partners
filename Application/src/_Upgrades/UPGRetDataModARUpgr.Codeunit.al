@@ -20,14 +20,14 @@ codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
-            exit;
+        //if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
+        //    exit;
 
         // Run upgrade code
         if UpgradeAuditRollStep1() then begin
             OnActivatePosEntryPosting();
             // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+            //UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
         end;
     end;
 
