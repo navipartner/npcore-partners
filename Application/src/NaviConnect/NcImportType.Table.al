@@ -29,7 +29,7 @@ table 6151505 "NPR Nc Import Type"
             Caption = 'Lookup Codeunit ID';
             DataClassification = CustomerContent;
             Description = 'NC2.12';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ValidateTableRelation = false;
         }
         field(20; "Import Codeunit ID"; Integer)
@@ -37,7 +37,7 @@ table 6151505 "NPR Nc Import Type"
             Caption = 'Import Codeunit ID';
             DataClassification = CustomerContent;
             Description = 'NC2.12';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ValidateTableRelation = false;
         }
         field(100; "Webservice Enabled"; Boolean)

@@ -13,7 +13,7 @@ table 6059769 "NPR NaviDocs Entry Comment"
         field(5; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(10; "Document Type"; Integer)

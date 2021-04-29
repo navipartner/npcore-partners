@@ -15,7 +15,7 @@ table 6151526 "NPR Nc Collector Filter"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(30; "Field No."; Integer)
         {

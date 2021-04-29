@@ -426,15 +426,13 @@
         if (not Handled) or (NpXmlElement."Generic Child Codeunit ID" = 0) then begin
             RecRef2.Open(NpXmlElement."Table No.");
             if RecRef.Number = NpXmlElement."Table No." then
-                RecRef2 := RecRef.Duplicate();
+                RecRef2.Get(RecRef.RecordId);
         end;
-        if RecRef.Number = NpXmlElement."Table No." then
-            RecRef2.SetRecFilter();
 
         i := 40;
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        if NpXmlFilter.FindSet() then
+        if NpXmlFilter.FindSet() then begin
             repeat
                 i += 1;
                 RecRef2.FilterGroup(i);
@@ -475,7 +473,11 @@
                 end;
             until NpXmlFilter.Next() = 0;
 
-        RecRef2.FilterGroup(0);
+            RecRef2.FilterGroup(0);
+        end else
+            if RecRef.Number = NpXmlElement."Table No." then
+                RecRef2.SetRecFilter();
+
 
         case NpXmlElement."Iteration Type" of
             NpXmlElement."Iteration Type"::First:

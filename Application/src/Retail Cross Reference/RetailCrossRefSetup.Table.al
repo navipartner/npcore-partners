@@ -14,7 +14,7 @@ table 6151181 "NPR Retail Cross Ref. Setup"
             Caption = 'Table ID';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(5; "Reference No. Pattern"; Code[50])
         {

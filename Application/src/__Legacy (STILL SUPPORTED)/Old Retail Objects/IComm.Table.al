@@ -132,7 +132,7 @@ table 6014510 "NPR I-Comm"
         {
             Caption = 'Number Info Codeunit ID';
             Description = 'NPR5.23';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
             DataClassification = CustomerContent;
         }
         field(171; "Number Info Codeunit Name"; Text[250])

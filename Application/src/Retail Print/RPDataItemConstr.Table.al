@@ -31,7 +31,7 @@ table 6014563 "NPR RP Data Item Constr."
         field(5; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(6; "Table Name"; Text[50])

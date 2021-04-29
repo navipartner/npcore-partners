@@ -25,7 +25,7 @@ table 6014674 "NPR Endpoint"
         field(30; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
 
             trigger OnValidate()

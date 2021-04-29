@@ -21,7 +21,7 @@
         {
             Caption = 'Test Report ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
         }
         field(70; "Register Lines"; Boolean)
         {

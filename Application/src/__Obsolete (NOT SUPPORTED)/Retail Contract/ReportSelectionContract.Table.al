@@ -24,7 +24,7 @@ table 6014520 "NPR Report Selection: Contract"
         field(3; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
         }
         field(4; "Report Name"; Text[30])
@@ -38,7 +38,7 @@ table 6014520 "NPR Report Selection: Contract"
         field(5; "XML Port ID"; Integer)
         {
             Caption = 'XML Port ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(XMLport));
             DataClassification = CustomerContent;
         }
         field(6; "XML Port Name"; Text[30])
@@ -58,7 +58,7 @@ table 6014520 "NPR Report Selection: Contract"
         field(8; "Codeunit ID"; Integer)
         {
             Caption = 'Codeunit ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(9; "Codeunit Name"; Text[30])

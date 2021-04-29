@@ -116,7 +116,7 @@ table 6014574 "NPR Pacsoft Setup"
         field(156; "Package Service Codeunit ID"; Integer)
         {
             Caption = 'Package Service Codeunit ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
             DataClassification = CustomerContent;
         }
         field(157; "Package ServiceCodeunit Name"; Text[249])
