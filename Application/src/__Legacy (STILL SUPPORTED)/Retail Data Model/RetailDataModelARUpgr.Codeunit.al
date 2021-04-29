@@ -66,7 +66,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         AuditRoll.SetCurrentKey("Clustered Key");
         AuditRolltoPOSEntryLink.LockTable;
         if AuditRolltoPOSEntryLink.FindLast then
-            AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Link Entry No.")
+            AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Audit Roll Clustered Key")
         else
             InitDatamodel;
 
@@ -654,19 +654,17 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
            (not POSPaymentLine.IsEmpty) or
            (not POSBalancingLine.IsEmpty) or
            (not POSLedgerRegister.IsEmpty) or
-           (not POSEntryCommentLine.IsEmpty) then begin
-            if Confirm('It seems that this is the inital Poseidon activation, but data exits in data tables. Do you want to delete all data in these tables to proceed?', false) then begin
-                POSEntry.DeleteAll;
-                POSSalesLine.DeleteAll;
-                POSPaymentLine.DeleteAll;
-                POSBalancingLine.DeleteAll;
-                POSLedgerRegister.DeleteAll;
-                POSEntryCommentLine.DeleteAll;
-                //-NPR5.55 [404019]
-                POSTaxAmountLine.DeleteAll;
-                //+NPR5.55 [404019]
-            end else
-                Error('Can not initialize Poseidon Datamodel.');
+           (not POSEntryCommentLine.IsEmpty)
+        then begin
+            POSEntry.DeleteAll;
+            POSSalesLine.DeleteAll;
+            POSPaymentLine.DeleteAll;
+            POSBalancingLine.DeleteAll;
+            POSLedgerRegister.DeleteAll;
+            POSEntryCommentLine.DeleteAll;
+            //-NPR5.55 [404019]
+            POSTaxAmountLine.DeleteAll;
+            //+NPR5.55 [404019]
         end;
     end;
 
