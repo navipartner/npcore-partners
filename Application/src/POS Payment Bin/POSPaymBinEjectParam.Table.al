@@ -1,9 +1,5 @@
 table 6150633 "NPR POS Paym. Bin Eject Param."
 {
-    // NPR5.40/MMV /20180228 CASE 300600 Created object
-    // NPR5.41/MMV /20180425 CASE 312990 Renamed object.
-    // NPR5.50/MMV /20190417 CASE Add events for lookup & validation
-
     Caption = 'POS Payment Bin Eject Param.';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Paym. Bin Eject Params";
@@ -56,15 +52,11 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
-        BoolYes: Label 'Yes';
-        BoolNo: Label 'No';
-        FieldErrorBase: Label 'is not a valid %1';
-        FieldErrorOption: Label 'does not contain a valid option (%1)';
+        BoolYesLbl: Label 'Yes';
+        BoolNoLbl: Label 'No';
+        FieldBaseErr: Label 'is not a valid %1';
+        FieldOptionErr: Label 'does not contain a valid option (%1)';
 
     procedure FindOrCreateRecord(BinNoIn: Code[10]; NameIn: Text; DataType: Integer; DefaultValue: Variant; OptionStringIn: Text)
     begin
@@ -83,13 +75,11 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
     procedure LookupValue()
     var
         tmpRetailList: Record "NPR Retail List" temporary;
-        Parts: DotNet NPRNetArray;
-        "Part": DotNet NPRNetString;
+        Parts: List of [Text];
+        "Part": Text;
         OptionStringCaption: Text;
     begin
-        //-NPR5.50 [350812]
         OnLookupParameter(Rec);
-        //+NPR5.50 [350812]
 
         if "Data Type" <> "Data Type"::Option then
             exit;
@@ -130,12 +120,12 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
                             Value := Format(Boolean, 0, 9);
                         Evaluate(Boolean, Value):
                             Value := Format(Boolean, 0, 9);
-                        UpperCase(Value) = UpperCase(BoolYes):
+                        UpperCase(Value) = UpperCase(BoolYesLbl):
                             Value := Format(true, 0, 9);
-                        UpperCase(Value) = UpperCase(BoolNo):
+                        UpperCase(Value) = UpperCase(BoolNoLbl):
                             Value := Format(false, 0, 9);
                         else
-                            FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                            FieldError(Value, StrSubstNo(FieldBaseErr, "Data Type"));
                     end;
                 end;
             "Data Type"::Date:
@@ -145,7 +135,7 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
                     Evaluate(Date, Value):
                         Value := Format(Date, 0, 9);
                     else
-                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                        FieldError(Value, StrSubstNo(FieldBaseErr, "Data Type"));
                 end;
             "Data Type"::Integer:
                 case true of
@@ -154,7 +144,7 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
                     Evaluate(Integer, Value):
                         Value := Format(Integer, 0, 9);
                     else
-                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                        FieldError(Value, StrSubstNo(FieldBaseErr, "Data Type"));
                 end;
             "Data Type"::Decimal:
                 case true of
@@ -163,7 +153,7 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
                     Evaluate(Decimal, Value):
                         Value := Format(Decimal, 0, 9);
                     else
-                        FieldError(Value, StrSubstNo(FieldErrorBase, "Data Type"));
+                        FieldError(Value, StrSubstNo(FieldBaseErr, "Data Type"));
                 end;
             "Data Type"::Option:
                 begin
@@ -177,22 +167,16 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
                         Evaluate(Integer, Value):
                             begin
                                 if not TrySelectStr(Integer, OptionString, OptionOut) then
-                                    FieldError(Value, StrSubstNo(FieldErrorOption, Value));
+                                    FieldError(Value, StrSubstNo(FieldOptionErr, Value));
                                 Value := Format(Integer);
                             end;
                         GetOptionInt(Value, OptionString) >= 0:
                             Value := Format(GetOptionInt(Value, OptionString));
                         else
-                            FieldError(Value, StrSubstNo(FieldErrorOption, Value));
+                            FieldError(Value, StrSubstNo(FieldOptionErr, Value));
                     end;
                 end;
         end;
-    end;
-
-    local procedure ValidateOptions(Ordinal: Integer; OptionStringIn: Text)
-    begin
-        if GetOptionInt(Value, OptionStringIn) = -1 then
-            Value := GetDefaultOption(OptionStringIn);
     end;
 
     procedure GetOptionInt(Value: Text; OptionStringIn: Text) Result: Integer
@@ -226,14 +210,14 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
         OptionOut := SelectStr(Ordinal + 1, OptionStringIn);
     end;
 
-    local procedure SplitString(Text: Text; var Parts: DotNet NPRNetArray)
+    local procedure SplitString(Text: Text; var Parts: List of [Text])
     var
-        String: DotNet NPRNetString;
-        Char: DotNet NPRNetString;
+        String: Text;
+        CharTxt: Text;
     begin
         String := Text;
-        Char := ',';
-        Parts := String.Split(Char.ToCharArray());
+        CharTxt := ',';
+        Parts := String.Split(CharTxt);
     end;
 
     [IntegrationEvent(false, false)]
