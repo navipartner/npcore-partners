@@ -32,11 +32,11 @@
     var
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
     begin
-        TempSaleLinePOS."Discount Calculated" := true;
-        TempSaleLinePOS.Modify();
-
         if not TempSaleLinePOS."Allow Line Discount" then
             exit;
+
+        TempSaleLinePOS."Discount Calculated" := true;
+        TempSaleLinePOS.Modify();
 
         if TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::" " then begin
             ApplyCustomerDiscountOnLine(SalePOS, TempSaleLinePOS);
