@@ -2,9 +2,7 @@ page 6151552 "NPR NpXml Template List"
 {
     Caption = 'Xml Templates';
     CardPageID = "NPR NpXml Template Card";
-    DelayedInsert = true;
     Editable = false;
-    InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR NpXml Template";
     UsageCategory = Administration;

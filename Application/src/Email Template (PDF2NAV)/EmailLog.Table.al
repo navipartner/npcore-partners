@@ -14,7 +14,7 @@ table 6014460 "NPR E-mail Log"
         field(2; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(5; "Primary Key"; Text[250])

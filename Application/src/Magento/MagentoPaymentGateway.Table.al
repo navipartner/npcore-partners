@@ -61,7 +61,7 @@ table 6151413 "NPR Magento Payment Gateway"
             BlankZero = true;
             Caption = 'Capture codeunit-id';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
 
             trigger OnLookup()
             var
@@ -81,7 +81,7 @@ table 6151413 "NPR Magento Payment Gateway"
             BlankZero = true;
             Caption = 'Refund codeunit-id';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
 
             trigger OnLookup()
             var
@@ -101,7 +101,7 @@ table 6151413 "NPR Magento Payment Gateway"
             BlankZero = true;
             Caption = 'Cancel Codeunit Id';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
 
             trigger OnLookup()
             var

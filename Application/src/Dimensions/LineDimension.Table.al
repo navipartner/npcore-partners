@@ -9,7 +9,7 @@
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(2; "Register No."; Code[10])

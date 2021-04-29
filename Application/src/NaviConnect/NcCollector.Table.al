@@ -22,7 +22,7 @@ table 6151525 "NPR Nc Collector"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
 
             trigger OnValidate()
             var

@@ -123,7 +123,7 @@ table 6059771 "NPR Member Card Types"
         field(200; "Card Action 1 Codeunit"; Integer)
         {
             Caption = 'Card Action 1 Codeunit';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(201; "Card Action 1 Parameter"; Code[20])
@@ -139,7 +139,7 @@ table 6059771 "NPR Member Card Types"
         field(203; "Card Action 2 Codeunit"; Integer)
         {
             Caption = 'Card Action 2 Codeunit';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(204; "Card Action 2 Parameter"; Code[20])
@@ -155,7 +155,7 @@ table 6059771 "NPR Member Card Types"
         field(206; "Card Action 3 Codeunit"; Integer)
         {
             Caption = 'Card Action 3 Codeunit';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(207; "Card Action 3 Parameter"; Code[20])

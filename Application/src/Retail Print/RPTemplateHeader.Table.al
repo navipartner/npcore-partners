@@ -84,7 +84,7 @@ table 6014446 "NPR RP Template Header"
         field(70; "Pre Processing Codeunit"; Integer)
         {
             Caption = 'Pre Processing Codeunit';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
             DataClassification = CustomerContent;
         }
         field(71; "Print Processing Object Type"; Option)
@@ -114,7 +114,7 @@ table 6014446 "NPR RP Template Header"
         field(73; "Post Processing Codeunit"; Integer)
         {
             Caption = 'Post Processing Codeunit';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
             DataClassification = CustomerContent;
         }
         field(78; "Two Column Width 1"; Decimal)

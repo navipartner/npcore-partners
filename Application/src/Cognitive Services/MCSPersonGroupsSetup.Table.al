@@ -10,7 +10,7 @@ table 6059956 "NPR MCS Person Groups Setup"
         {
             Caption = 'Table Id';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(11; "Person Groups Id"; Integer)
         {

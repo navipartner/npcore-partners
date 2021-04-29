@@ -113,7 +113,7 @@ table 6014445 "NPR RP Template Line"
         {
             BlankZero = true;
             Caption = 'Table';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
 
             trigger OnLookup()
@@ -329,7 +329,7 @@ table 6014445 "NPR RP Template Line"
         field(35; "Processing Codeunit"; Integer)
         {
             Caption = 'Processing Codeunit';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
 
             trigger OnLookup()

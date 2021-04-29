@@ -9,7 +9,7 @@ table 6014431 "NPR Record Field Setup"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(2; "Custom Field No. 1"; Code[20])

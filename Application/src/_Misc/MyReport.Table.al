@@ -16,7 +16,7 @@ table 6014618 "NPR My Report"
         {
             Caption = 'Report No.';
             NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
         }
     }

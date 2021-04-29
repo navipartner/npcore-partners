@@ -20,7 +20,8 @@ table 6151552 "NPR NpXml Element"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
+
         }
         field(20; "Template Version No."; Code[20])
         {
@@ -83,7 +84,7 @@ table 6151552 "NPR NpXml Element"
         {
             Caption = 'Parent Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(300; Comment; Text[250])
         {
@@ -320,7 +321,7 @@ table 6151552 "NPR NpXml Element"
             Caption = 'Custom Codeunit ID';
             DataClassification = CustomerContent;
             Description = 'NC1.01,NC1.07,NC1.10,NC1.16';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit),
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit),
                                                       "Object Name" = FILTER('NpXml Value*'));
             //This property is currently not supported
             //TestTableRelation = false;
