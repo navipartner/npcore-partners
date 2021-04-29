@@ -286,6 +286,20 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Voucher Partners action';
                 }
+                action("Reimbursement Modules")
+                {
+                    Caption = 'Reimbursement Modules';
+                    RunObject = Page "NPR NpRi Reimburs. Modules";
+                    ApplicationArea = All; 
+                    ToolTip = 'View the Reimbursement Modules';
+                }
+                action("Reimbursement List")
+                {
+                    Caption = 'Reimbursements'; 
+                    RunObject = Page "NPR NpRi Reimbursements";
+                    ApplicationArea = All; 
+                    ToolTip = 'View the Reimbursements';
+                }
             }
             group("Collect in Store")
             {
