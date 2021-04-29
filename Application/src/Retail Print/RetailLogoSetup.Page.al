@@ -1,8 +1,5 @@
 page 6014566 "NPR Retail Logo Setup"
 {
-    // NPR4.21/MMV/20160223 CASE 223223 Created page
-    // NPR5.46/BHR /20180906 CASE 327525 Export Logo
-    // NPR5.55/MITH/20200619  CASE 404276 Added visual indicator of whether or not a logo is compatible with the Boca printer (it will be compatible after reupload)
 
     Caption = 'Retail Logo Setup';
     InsertAllowed = false;
@@ -15,6 +12,28 @@ page 6014566 "NPR Retail Logo Setup"
     {
         area(content)
         {
+            usercontrol("NPR ResizeImage"; "NPR ResizeImage")
+            {
+                ApplicationArea = All;
+                trigger OnCtrlReady()
+                begin
+                    RetailLogoMgtCtrl.InitializeResizeImage(CurrPage."NPR ResizeImage");
+                end;
+
+                trigger returnImage(resizedImage: Text; escpos: Text)
+                begin
+                    RetailLogoMgtCtrl.CreateRecord(RetailLogo, resizedImage, escpos);
+                end;
+
+                trigger returnESCPOSBytes(Hi: Integer; Lo: Integer; CmdHi: Integer; CmdLo: Integer)
+                begin
+                    RetailLogo."ESCPOS Height Low Byte" := Lo;
+                    RetailLogo."ESCPOS Height High Byte" := Hi;
+                    RetailLogo."ESCPOS Cmd Low Byte" := CmdLo;
+                    RetailLogo."ESCPOS Cmd High Byte" := CmdHi;
+                    RetailLogo.Modify();
+                end;
+            }
             repeater(Group)
             {
                 field(Sequence; Rec.Sequence)
@@ -50,6 +69,7 @@ page 6014566 "NPR Retail Logo Setup"
                     ToolTip = 'Specifies the value of the Boca Compatible field';
                 }
             }
+
         }
         area(factboxes)
         {
@@ -77,13 +97,13 @@ page 6014566 "NPR Retail Logo Setup"
                 ToolTip = 'Executes the Import Logo action';
 
                 trigger OnAction()
-                var
-                    RetailLogoMgt: Codeunit "NPR Retail Logo Mgt.";
                 begin
-                    if RetailLogoMgt.UploadLogoFromFile('') then
-                        Rec.FindLast();
+                    RetailLogoMgtCtrl.UploadLogo();
+                    CurrPage.Update();
+                    if Rec.FindLast() then;
                 end;
             }
+
             action("Export Logo")
             {
                 Caption = 'Export Logo';
@@ -99,12 +119,14 @@ page 6014566 "NPR Retail Logo Setup"
                 var
                     RetailLogoMgt: Codeunit "NPR Retail Logo Mgt.";
                 begin
-                    //-NPR5.46 [327525]
                     RetailLogoMgt.ExportImageBMP(Rec);
-                    //+NPR5.46 [327525]
                 end;
             }
         }
     }
+    var
+        RetailLogoMgtCtrl: Codeunit "NPR Retail Logo Mgt.";
+
+        RetailLogo: Record "NPR Retail Logo";
 }
 
