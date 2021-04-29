@@ -59,6 +59,7 @@
         // but will be filtered out later in FindMatchingMixDiscounts()
 
         TempSaleLinePOS.SetRange("Discount Type", TempSaleLinePOS."Discount Type"::" ");
+        TempSaleLinePOS.SetRange("Allow Line Discount", true);
         if not TempSaleLinePOS.FindSet() then
             exit;
 
@@ -69,6 +70,8 @@
                 FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             until TempSaleLinePOS.Next() = 0;
         end else begin
+            if not Rec."Allow Line Discount" then
+                exit;
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, Rec."No.", Rec."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", Rec."Item Disc. Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);

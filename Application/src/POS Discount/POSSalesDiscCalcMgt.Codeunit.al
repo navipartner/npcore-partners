@@ -328,7 +328,7 @@
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
-
+        SaleLinePOS.SetRange("Allow Line Discount", true);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         if SaleLinePOS.FindSet() then
             repeat

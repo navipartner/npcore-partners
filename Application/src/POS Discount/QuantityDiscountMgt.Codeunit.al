@@ -11,7 +11,6 @@
         ItemQuantity: Decimal;
         DiscountPercent: Decimal;
     begin
-
         if TempSaleLinePOS."Customer Price Group" <> '' then
             exit;
 
@@ -20,7 +19,7 @@
         if not RecalculateAllLines then
             TempSaleLinePOS.SetRange("No.", Rec."No.");
         TempSaleLinePOS.SetRange("Discount Type", TempSaleLinePOS."Discount Type"::" ");
-
+        TempSaleLinePOS.SetRange("Allow Line Discount", true);
         if TempSaleLinePOS.IsEmpty then
             exit;
 
