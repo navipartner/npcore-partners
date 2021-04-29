@@ -27,13 +27,13 @@ table 6059900 "NPR Task Template"
         field(5; "Test Report ID"; Integer)
         {
             Caption = 'Test Report ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
         }
         field(6; "Page ID"; Integer)
         {
             Caption = 'Form ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Page));
             DataClassification = CustomerContent;
 
             trigger OnValidate()

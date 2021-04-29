@@ -50,7 +50,7 @@ table 6151555 "NPR NpXml Template Trigger"
             DataClassification = CustomerContent;
             Description = 'NC1.11';
             Editable = false;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(120; "Xml Template Table Name"; Text[50])
         {
@@ -64,7 +64,7 @@ table 6151555 "NPR NpXml Template Trigger"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(220; "Table Name"; Text[50])
         {

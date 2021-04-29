@@ -64,7 +64,7 @@ table 6059960 "NPR MCS Webcam Arg. Table"
         {
             Caption = 'Table Id';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(13; "Image Orientation"; Option)
         {

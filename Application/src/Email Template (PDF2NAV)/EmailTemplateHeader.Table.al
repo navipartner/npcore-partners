@@ -21,7 +21,7 @@ table 6014462 "NPR E-mail Template Header"
         field(10; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(20; "HTML Template"; BLOB)

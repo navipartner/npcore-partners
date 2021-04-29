@@ -50,7 +50,7 @@ table 6014404 "NPR Report Selection Retail"
         {
             Caption = 'Report ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
 
             trigger OnValidate()
             begin
@@ -69,7 +69,7 @@ table 6014404 "NPR Report Selection Retail"
         {
             Caption = 'XML Port ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(XMLport));
 
             trigger OnValidate()
             begin
@@ -94,7 +94,7 @@ table 6014404 "NPR Report Selection Retail"
         {
             Caption = 'Codeunit ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
 
             trigger OnValidate()
             begin
@@ -119,7 +119,7 @@ table 6014404 "NPR Report Selection Retail"
         {
             Caption = 'Filter Object ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(13; "Record Filter"; TableFilter)
         {

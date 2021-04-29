@@ -18,7 +18,7 @@ table 6014556 "NPR Attribute Key"
         field(10; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(11; "MDR Code PK"; Code[20])

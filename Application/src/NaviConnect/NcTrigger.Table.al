@@ -51,7 +51,7 @@ table 6151520 "NPR Nc Trigger"
             Caption = 'Subscriber Codeunit ID';
             DataClassification = CustomerContent;
             Description = 'NC2.01';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(80; "Subscriber Codeunit Name"; Text[50])
         {

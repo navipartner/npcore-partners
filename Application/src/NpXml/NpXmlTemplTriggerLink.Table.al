@@ -37,7 +37,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
             DataClassification = CustomerContent;
             Description = 'NC1.11';
             Editable = false;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(110; "Parent Field No."; Integer)
         {
@@ -90,7 +90,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(210; "Field No."; Integer)
         {

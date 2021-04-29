@@ -31,7 +31,7 @@ table 6151554 "NPR NpXml Attribute"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(110; "Attribute Name"; Text[50])
         {

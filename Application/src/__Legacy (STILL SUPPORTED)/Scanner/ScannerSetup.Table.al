@@ -183,7 +183,7 @@ table 6014447 "NPR Scanner - Setup"
         field(40; "Alt. Import Codeunit"; Integer)
         {
             Caption = 'Alt. import codeunit';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             DataClassification = CustomerContent;
         }
         field(41; "Import to Server Folder First"; Text[250])

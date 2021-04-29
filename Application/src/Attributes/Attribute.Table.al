@@ -77,7 +77,7 @@ table 6014552 "NPR Attribute"
         field(24; "LookUp Table Id"; Integer)
         {
             Caption = 'LookUp Table Id';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(25; "LookUp Table Name"; Text[30])

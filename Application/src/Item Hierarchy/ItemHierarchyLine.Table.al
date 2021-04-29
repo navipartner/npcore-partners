@@ -32,7 +32,7 @@ table 6151052 "NPR Item Hierarchy Line"
         {
             Caption = 'Related Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(11; "Related Table Name"; Text[30])
         {

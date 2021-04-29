@@ -37,7 +37,7 @@ table 6151553 "NPR NpXml Filter"
             Caption = 'Parent Table No.';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(110; "Parent Field No."; Integer)
         {
@@ -87,7 +87,7 @@ table 6151553 "NPR NpXml Filter"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(210; "Field No."; Integer)
         {
