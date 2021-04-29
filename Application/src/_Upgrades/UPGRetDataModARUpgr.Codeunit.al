@@ -723,7 +723,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         OpeningEntryNo: Integer;
     begin
-
+        POSUnit.SetFilter("POS Store Code", '<>%1', '');
         if (POSUnit.FindSet()) then begin
             repeat
 
