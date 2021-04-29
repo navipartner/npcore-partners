@@ -291,7 +291,7 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Gift Voucher Report';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
         }
         field(320; "Gift Voucher Code Pattern"; Code[20])
         {
@@ -318,7 +318,7 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Credit Voucher Report';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
         }
         field(410; "Credit Voucher Valid Period"; DateFormula)
         {
@@ -515,7 +515,7 @@ table 6151401 "NPR Magento Setup"
             BlankZero = true;
             Caption = 'Stock Codeunit Id';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(830; "Stock Codeunit Name"; Text[30])
         {

@@ -16,7 +16,7 @@ table 6151571 "NPR AF Test Objects"
         {
             Caption = 'Object ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = FIELD("Object Type"));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FIELD("Object Type"));
         }
         field(10; "Object Name"; Text[30])
         {

@@ -24,7 +24,7 @@
             Caption = 'Table No.';
             DataClassification = CustomerContent;
             Description = 'Table to Export';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(20; "Template Version"; Code[20])
         {

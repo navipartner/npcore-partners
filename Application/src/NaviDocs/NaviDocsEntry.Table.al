@@ -14,7 +14,7 @@ table 6059768 "NPR NaviDocs Entry"
         field(5; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(10; "Document Type"; Integer)
@@ -71,7 +71,7 @@ table 6059768 "NPR NaviDocs Entry"
         field(45; "Report No."; Integer)
         {
             Caption = 'Report No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
         }
         field(50; "Posting Date"; Date)
