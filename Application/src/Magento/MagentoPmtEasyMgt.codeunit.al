@@ -19,7 +19,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
     begin
         if PaymentGateway."Capture Codeunit Id" <> CurrCodeunitId() then
             exit;
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Invoice Header"]) then
+        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Cr.Memo Header"]) then
             exit;
 
         RefundPayment(PaymentGateway, PaymentLine);
@@ -32,6 +32,9 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
             exit;
         if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Invoice Header"]) then
             exit;
+
+        if PaymentLine."Charge ID" <> '' then
+            Exit;
 
         CancelPayment(PaymentGateway, PaymentLine);
     end;
