@@ -29,6 +29,9 @@
     var
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
     begin
+        if not TempSaleLinePOS."Allow Line Discount" then
+            exit;
+
         if TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::" " then begin
             ApplyPeriodDiscountOnLine(TempSaleLinePOS, TempSalePOS);
             TempSaleLinePOS.Modify();
