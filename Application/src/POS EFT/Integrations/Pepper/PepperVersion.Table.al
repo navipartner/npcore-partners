@@ -27,7 +27,7 @@ table 6184494 "NPR Pepper Version"
         {
             Caption = 'XMLport Configuration';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(XMLport));
         }
         field(105; "XMLport Configuration Name"; Text[30])
         {
@@ -41,7 +41,7 @@ table 6184494 "NPR Pepper Version"
         {
             Caption = 'Codeunit Begin Workshift';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(205; "Codeunit Begin Workshift Name"; Text[30])
         {
@@ -55,7 +55,7 @@ table 6184494 "NPR Pepper Version"
         {
             Caption = 'Codeunit Transaction';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(215; "Codeunit Transaction Name"; Text[30])
         {
@@ -69,7 +69,7 @@ table 6184494 "NPR Pepper Version"
         {
             Caption = 'Codeunit End Workshift';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(225; "Codeunit End Workshift Name"; Text[30])
         {
@@ -83,7 +83,7 @@ table 6184494 "NPR Pepper Version"
         {
             Caption = 'Codeunit Auxiliary Functions';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(235; "Codeunit Auxiliary Name"; Text[30])
         {
@@ -97,7 +97,7 @@ table 6184494 "NPR Pepper Version"
         {
             Caption = 'Codeunit Install';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(245; "Codeunit Install Name"; Text[30])
         {

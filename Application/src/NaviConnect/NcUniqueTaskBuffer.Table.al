@@ -11,7 +11,7 @@ table 6151509 "NPR Nc Unique Task Buffer"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(5; "Task Processor Code"; Code[20])
         {
@@ -29,7 +29,7 @@ table 6151509 "NPR Nc Unique Task Buffer"
         {
             Caption = 'Codeunit ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(20; "Processing Code"; Code[20])
         {

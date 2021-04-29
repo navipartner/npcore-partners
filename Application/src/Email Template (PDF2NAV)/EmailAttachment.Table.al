@@ -8,7 +8,7 @@ table 6014458 "NPR E-mail Attachment"
         field(1; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(10; "Primary Key"; Text[200])

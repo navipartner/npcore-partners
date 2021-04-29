@@ -14,7 +14,7 @@ table 6014461 "NPR E-mail Templ. Report"
         field(2; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
 
             trigger OnValidate()

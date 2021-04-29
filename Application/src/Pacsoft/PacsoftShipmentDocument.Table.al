@@ -48,7 +48,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
         field(5; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(10; "RecordID"; RecordID)

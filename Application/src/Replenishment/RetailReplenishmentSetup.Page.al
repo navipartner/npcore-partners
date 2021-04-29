@@ -18,7 +18,7 @@ page 6151073 "NPR Retail Replenishment Setup"
                 field("Item Demand Calc. Codeunit"; "Item Demand Calc. Codeunit")
                 {
                     ApplicationArea = All;
-                    TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+                    TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
                     ToolTip = 'Specifies the value of the Item Demand Calc. Codeunit field';
                 }
                 field("Default Transit Location"; "Default Transit Location")

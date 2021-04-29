@@ -19,13 +19,11 @@ table 6151571 "NPR AF Test Objects"
         {
             Caption = 'Object ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = FIELD("Object Type"));
-            //This property is currently not supported
-            //TestTableRelation = true;
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FIELD("Object Type"));
         }
         field(10; "Object Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Object ID")));
             Caption = 'Object Name';
             Editable = false;

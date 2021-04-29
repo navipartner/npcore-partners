@@ -1,9 +1,6 @@
 page 6151559 "NPR NpXml Templ. Trigger List"
 {
-    AutoSplitKey = true;
     Caption = 'Xml Template Triggers';
-    CardPageID = "NPR NpXml Template Card";
-    DelayedInsert = true;
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;

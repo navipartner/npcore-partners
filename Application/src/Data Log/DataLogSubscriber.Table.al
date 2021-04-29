@@ -28,7 +28,7 @@ table 6059896 "NPR Data Log Subscriber"
         field(2; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(3; "Company Name"; Text[30])

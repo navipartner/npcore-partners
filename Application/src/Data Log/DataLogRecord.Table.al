@@ -30,7 +30,7 @@ table 6059898 "NPR Data Log Record"
         field(10; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(20; "Log Date"; DateTime)

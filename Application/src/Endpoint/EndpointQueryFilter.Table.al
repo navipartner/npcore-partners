@@ -17,7 +17,7 @@ table 6014679 "NPR Endpoint Query Filter"
         field(20; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
         field(30; "Field No."; Integer)

@@ -23,7 +23,7 @@ table 6151501 "NPR Nc Task Setup"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(6; "Table Name"; Text[30])
         {
@@ -37,7 +37,7 @@ table 6151501 "NPR Nc Task Setup"
         {
             Caption = 'Codeunit ID';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
         }
         field(11; "Codeunit Name"; Text[30])
         {

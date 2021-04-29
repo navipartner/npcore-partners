@@ -83,7 +83,7 @@ table 6151051 "NPR Item Hierarchy Level"
         {
             Caption = 'Link Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
 
             trigger OnValidate()
             var
@@ -145,7 +145,7 @@ table 6151051 "NPR Item Hierarchy Level"
         {
             Caption = 'Level Link Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(24; "Level Link Field No."; Integer)
         {
@@ -181,7 +181,7 @@ table 6151051 "NPR Item Hierarchy Level"
         {
             Caption = 'Second Level Link Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(27; "Second Level Link Field No."; Integer)
         {

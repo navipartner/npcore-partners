@@ -40,7 +40,7 @@ table 6150716 "NPR POS Menu Filter Line"
         {
             Caption = 'Table No.';
             DataClassification = CustomerContent;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             ValidateTableRelation = true;
         }
         field(7; "Field No."; Integer)
