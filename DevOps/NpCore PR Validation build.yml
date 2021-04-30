@@ -16,7 +16,8 @@ pool:
   - Agent.OS -equals Windows_NT
   - Agent.OSVersion -equals 10.0.17763
 
-  template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
+jobs:
+- template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
   parameters:
     scriptsRepo: scriptsRepo
     stepList:
