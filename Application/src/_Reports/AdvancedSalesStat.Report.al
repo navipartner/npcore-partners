@@ -202,20 +202,21 @@ report 6014490 "NPR Advanced Sales Stat."
             {
                 field(Periodestart; Periodestart)
                 {
-                    Caption = 'Period Start';
                     ApplicationArea = All;
+                    Caption = 'Period Start';
                     ToolTip = 'Specifies the value of the Period Start field';
                 }
                 field(SortBy; SortBy)
                 {
-                    Caption = 'Sort by';
                     ApplicationArea = All;
+                    Caption = 'Sort by';
+                    OptionCaption = 'No.,Description,Period Start,Sales qty.,Sales qty. last year,Sales LCY,Sales LCY last year,Profit LCY,Profit LCY last year,Profit %,Profit % last year';
                     ToolTip = 'Specifies the value of the Sort by field';
                 }
                 field(Lines; Lines)
                 {
-                    Caption = 'Lines';
                     ApplicationArea = All;
+                    Caption = 'Lines';
                     ToolTip = 'Specifies the value of the Lines field';
                 }
             }

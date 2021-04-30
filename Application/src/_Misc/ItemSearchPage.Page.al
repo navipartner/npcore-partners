@@ -19,6 +19,7 @@ page 6060045 "NPR Item Search Page"
                 {
                     ApplicationArea = All;
                     Caption = 'External Type';
+                    OptionCaption = 'All,VendorItemNo,Barcode,CrossReference,AlternativeNo';
                     ToolTip = 'Specifies the value of the External Type field';
                 }
                 field(VendorNo; VendorNo)
