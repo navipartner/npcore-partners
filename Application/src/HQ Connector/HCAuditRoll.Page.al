@@ -18,6 +18,7 @@ page 6150900 "NPR HC Audit Roll"
             {
                 ApplicationArea = All;
                 Caption = 'Type Filter';
+                OptionCaption = ' ,G/L,Item,Payment,Open/Close,Customer,Debit Sale,Cancelled,Comment';
                 Visible = false;
                 ToolTip = 'Specifies the value of the Type Filter field';
 

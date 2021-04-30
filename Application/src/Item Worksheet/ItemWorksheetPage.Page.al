@@ -40,6 +40,7 @@ page 6060042 "NPR Item Worksheet Page"
                 field("Show Variety Level"; ShowExpanded)
                 {
                     ApplicationArea = All;
+                    OptionCaption = 'Variety 1,Variety 1+2,Variety 1+2+3,Variety 1+2+3+4';
                     ToolTip = 'Specifies the value of the ShowExpanded field.';
 
                     trigger OnValidate()

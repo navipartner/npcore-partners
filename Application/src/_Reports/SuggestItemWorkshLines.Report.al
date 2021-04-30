@@ -78,11 +78,13 @@
                 field(Variants; OptVariants)
                 {
                     ApplicationArea = All;
+                    OptionCaption = 'None,Variants,Varieties Without Variants,All';
                     ToolTip = 'Specifies the value of the OptVariants field';
                 }
                 field(Defaults; OptDefaultAction)
                 {
                     ApplicationArea = All;
+                    OptionCaption = 'Skip,Create New,Update Only,Update and Create Variants';
                     ToolTip = 'Specifies the value of the OptDefaultAction field';
                 }
             }

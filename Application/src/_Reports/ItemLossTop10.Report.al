@@ -174,20 +174,21 @@ report 6014543 "NPR Item - Loss - Top 10"
                     ShowCaption = false;
                     field(SourceCodeFilter; SourceCodeFilter)
                     {
-                        Caption = 'Source Code Filter';
                         ApplicationArea = All;
+                        Caption = 'Source Code Filter';
                         ToolTip = 'Specifies the value of the Source Code Filter field';
                     }
                     field("Sorting"; Sorting)
                     {
-                        Caption = 'Quantity';
                         ApplicationArea = All;
+                        Caption = 'Quantity';
+                        OptionCaption = 'Quantity,CostAmount,Shrinkage';
                         ToolTip = 'Specifies the value of the Quantity field';
                     }
                     field(NoOfRecordsToPrint; NoOfRecordsToPrint)
                     {
-                        Caption = 'Print Lines';
                         ApplicationArea = All;
+                        Caption = 'Print Lines';
                         ToolTip = 'Specifies the value of the Print Lines field';
                     }
                 }

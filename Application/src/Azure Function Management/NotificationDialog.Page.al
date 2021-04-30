@@ -27,12 +27,14 @@ page 6151040 "NPR Notification Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Notification Color';
+                    OptionCaption = 'Red,Green,Blue,Yellow,Dark';
                     ToolTip = 'Specifies the value of the Notification Color field';
                 }
                 field(ActionType; ActionType)
                 {
                     ApplicationArea = All;
                     Caption = 'Action Type';
+                    OptionCaption = 'Message,Phone Call,Facetime Video,Facetime Audio';
                     ToolTip = 'Specifies the value of the Action Type field';
                 }
                 field(ActionValue; ActionValue)
