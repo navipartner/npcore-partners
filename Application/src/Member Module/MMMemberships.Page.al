@@ -237,7 +237,7 @@ page 6060127 "NPR MM Memberships"
     {
         area(navigation)
         {
-            action(Membership)
+            action(OpenMembershipCard)
             {
                 Caption = 'Membership';
                 Ellipsis = true;

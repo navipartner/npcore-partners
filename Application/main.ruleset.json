@@ -85,6 +85,11 @@
             "justification": "When ApplicationArea is set to 'Basic', you must also specify 'Suite'."
         },
         {
+            "id": "AA0202",
+            "action":"Error",
+            "justification": "To avoid confusion, do not give local variables the same name as fields, methods or actions in the same scope."
+        },
+        {
             "id": "AA0203",
             "action":"Error",
             "justification": "To avoid confusion, do not give methods the same name as fields or actions in the same scope."

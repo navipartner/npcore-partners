@@ -979,7 +979,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                     trigger OnAction()
                     begin
-                        OrderPromisingLine();
+                        ShowOrderPromisingLines();
                     end;
                 }
                 group("Assemble to Order")
@@ -1324,9 +1324,9 @@ page 6014519 "NPR Sales Order Pick Subform"
         SalesPriceCalcMgt.GetSalesLineLineDisc(SalesHeader, Rec);
     end;
 
-    procedure OrderPromisingLine()
+    procedure ShowOrderPromisingLines()
     var
-        OrderPromisingLine: Record "Order Promising Line" temporary;
+        OrderPromisingLine: Record "Order Promising Line";
         OrderPromisingLines: Page "Order Promising Lines";
     begin
         OrderPromisingLine.SetRange("Source Type", Rec."Document Type");

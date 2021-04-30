@@ -309,16 +309,16 @@
 
                             trigger OnAfterGetRecord()
                             var
-                                PeriodStart: Date;
+                                PeriodStartDate: Date;
                             begin
 
-                                PeriodStart := DateResponse."Period Start";
+                                PeriodStartDate := DateResponse."Period Start";
                                 if (ViewAsOption = ViewAsOption::BALANCEATDATE) then
-                                    PeriodStart := 0D;
+                                    PeriodStartDate := 0D;
 
-                                GetNotShippedItems(PeriodStart, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
-                                GetShippedItems(PeriodStart, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
-                                GetInvoicedItems(PeriodStart, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
+                                GetNotShippedItems(PeriodStartDate, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
+                                GetShippedItems(PeriodStartDate, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
+                                GetInvoicedItems(PeriodStartDate, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
                             end;
                         }
                     }
@@ -353,8 +353,8 @@
         InvalidDate: Boolean;
         ItemExists: Boolean;
         PartialResult: Boolean;
-        PeriodStart: Date;
-        PeriodEnd: Date;
+        PeriodStartDate: Date;
+        PeriodEndDate: Date;
     begin
 
         if (TmpItemResponse.IsTemporary()) then
@@ -385,34 +385,34 @@
             case TmpDateRequest."Period Type" of
                 TmpDateRequest."Period Type"::Date:
                     begin
-                        PeriodStart := TmpDateRequest."Period Start";
-                        PeriodEnd := TmpDateRequest."Period End";
+                        PeriodStartDate := TmpDateRequest."Period Start";
+                        PeriodEndDate := TmpDateRequest."Period End";
                     end;
                 TmpDateRequest."Period Type"::Week:
                     begin
-                        PeriodStart := CalcDate('<-1W+CW+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CW>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1W+CW+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CW>', TmpDateRequest."Period End");
                     end;
 
                 TmpDateRequest."Period Type"::Month:
                     begin
-                        PeriodStart := CalcDate('<-1M+CM+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CM>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1M+CM+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CM>', TmpDateRequest."Period End");
                     end;
 
                 TmpDateRequest."Period Type"::Quarter:
                     begin
-                        PeriodStart := CalcDate('<-1Q+CQ+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CQ>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1Q+CQ+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CQ>', TmpDateRequest."Period End");
                     end;
                 TmpDateRequest."Period Type"::Year:
                     begin
-                        PeriodStart := CalcDate('<-1Y+CY+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CY>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1Y+CY+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CY>', TmpDateRequest."Period End");
                     end;
             end;
-            TmpDateRequest."Period Start" := PeriodStart;
-            TmpDateRequest."Period End" := PeriodEnd;
+            TmpDateRequest."Period Start" := PeriodStartDate;
+            TmpDateRequest."Period End" := PeriodEndDate;
 
             DateResponse.SetFilter("Period Start", '%1..%2', TmpDateRequest."Period Start", TmpDateRequest."Period End");
             DateResponse.SetFilter("Period Type", '=%1', TmpDateRequest."Period Type");
@@ -463,7 +463,7 @@
                 TmpItemResponse.DeleteAll();
     end;
 
-    local procedure GetNotShippedItems(PeriodStart: Date; PeriodEnd: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
+    local procedure GetNotShippedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
     var
         SalesLine: Record "Sales Line";
     begin
@@ -475,7 +475,7 @@
         SalesLine.SetFilter(Type, '=%1', SalesLine.Type::Item);
         SalesLine.SetFilter("No.", '=%1', ItemNo);
         SalesLine.SetFilter("Sell-to Customer No.", '=%1', SellToCustomerNo);
-        SalesLine.SetFilter("Planned Shipment Date", '%1..%2', PeriodStart, PeriodEnd);
+        SalesLine.SetFilter("Planned Shipment Date", '%1..%2', PeriodStartDate, PeriodEndDate);
         SalesLine.SetFilter("Variant Code", '=%1', VariantCode);
         if (LocationCode <> '') then
             SalesLine.SetFilter("Location Code", '=%1', LocationCode);
@@ -500,7 +500,7 @@
         end;
     end;
 
-    local procedure GetShippedItems(PeriodStart: Date; PeriodEnd: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
+    local procedure GetShippedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -517,7 +517,7 @@
             ItemLedgerEntry.SetFilter("Location Code", '=%1', LocationCode);
         ItemLedgerEntry.SetFilter("Source Type", '=%1', ItemLedgerEntry."Source Type"::Customer);
         ItemLedgerEntry.SetFilter("Source No.", '=%1', SellToCustomerNo);
-        ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', PeriodStart, PeriodEnd);
+        ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', PeriodStartDate, PeriodEndDate);
 
         if (ItemLedgerEntry.FindSet()) then begin
             repeat
@@ -551,7 +551,7 @@
         end;
     end;
 
-    local procedure GetInvoicedItems(PeriodStart: Date; PeriodEnd: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
+    local procedure GetInvoicedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
     var
         ValueEntry: Record "Value Entry";
     begin
@@ -566,7 +566,7 @@
             ValueEntry.SetFilter("Location Code", '=%1', LocationCode);
         ValueEntry.SetFilter("Source Type", '=%1', ValueEntry."Source Type"::Customer);
         ValueEntry.SetFilter("Source No.", '=%1', SellToCustomerNo);
-        ValueEntry.SetFilter("Posting Date", '%1..%2', PeriodStart, PeriodEnd);
+        ValueEntry.SetFilter("Posting Date", '%1..%2', PeriodStartDate, PeriodEndDate);
         ValueEntry.SetFilter("Document Type", '=%1|=%2', ValueEntry."Document Type"::"Sales Invoice", ValueEntry."Document Type"::"Sales Credit Memo");
 
         if (ValueEntry.FindSet()) then begin

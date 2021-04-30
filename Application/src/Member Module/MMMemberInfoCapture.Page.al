@@ -10,7 +10,7 @@ page 6060134 "NPR MM Member Info Capture"
     {
         area(content)
         {
-            group(Membership)
+            group(MembershipLookupGroup)
             {
                 Caption = 'Membership Lookup';
                 Visible = ShowAddToMembershipSection;
@@ -1322,13 +1322,13 @@ page 6060134 "NPR MM Member Info Capture"
     local procedure ImportMembers()
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        ImportMembers: Codeunit "NPR MM Import Members";
+        ImportMembersCU: Codeunit "NPR MM Import Members";
     begin
 
         CurrPage.SetSelectionFilter(MemberInfoCapture);
         if (MemberInfoCapture.FindSet()) then begin
             repeat
-                ImportMembers.insertMember(MemberInfoCapture."Entry No.");
+                ImportMembersCU.insertMember(MemberInfoCapture."Entry No.");
             until (MemberInfoCapture.Next() = 0);
         end;
     end;

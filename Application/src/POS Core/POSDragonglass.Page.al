@@ -67,10 +67,10 @@ page 6150750 "NPR POS (Dragonglass)"
 
     local procedure Initialize()
     var
-        Framework: Codeunit "NPR Framework: Dragonglass";
+        FrameworkDragonGlass: Codeunit "NPR Framework: Dragonglass";
     begin
-        Framework.Constructor(CurrPage.Framework);
-        POSSession.Constructor(Framework, FrontEnd, Setup, POSSession);
+        FrameworkDragonGlass.Constructor(CurrPage.Framework);
+        POSSession.Constructor(FrameworkDragonGlass, FrontEnd, Setup, POSSession);
     end;
 
     local procedure Finalize()

@@ -540,12 +540,12 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, T, nnn, ItalicText, Bold, Space, x, y, char));
     end;
 
-    local procedure Width(nnn: Integer)
-    begin
-        // Ref sheet 92-93
-        TempPattern := 'WIDTH %1';
-        AddToBuffer(StrSubstNo(TempPattern, nnn));
-    end;
+    // Case 462311 function not used - local procedure Width(nnn: Integer)
+    // begin
+    //     // Ref sheet 92-93
+    //     TempPattern := 'WIDTH %1';
+    //     AddToBuffer(StrSubstNo(TempPattern, nnn));
+    // end;
     #endregion
 
     #region Aux Functions

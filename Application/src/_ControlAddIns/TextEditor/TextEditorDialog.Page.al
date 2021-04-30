@@ -105,13 +105,13 @@
 
     procedure EditText(var Content: Text): Boolean
     var
-        TextEditor: Page "NPR Text Editor Dialog";
+        TextEditorDialog: Page "NPR Text Editor Dialog";
     begin
-        TextEditor.SetContent(Content);
-        TextEditor.SetOptionValueBuffer(OptionValueBuffer);
-        if TextEditor.RunModal() = ACTION::OK then;
-        if TextEditor.GetOKClicked() then begin
-            Content := TextEditor.GetContent();
+        TextEditorDialog.SetContent(Content);
+        TextEditorDialog.SetOptionValueBuffer(OptionValueBuffer);
+        if TextEditorDialog.RunModal() = ACTION::OK then;
+        if TextEditorDialog.GetOKClicked() then begin
+            Content := TextEditorDialog.GetContent();
             exit(true);
         end;
     end;

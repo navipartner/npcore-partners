@@ -100,7 +100,7 @@ page 6151133 "NPR TM Ticket Wizard"
             group(Advanced)
             {
                 Caption = 'Advanced';
-                group(TicketType)
+                group(TicketTypeGroup)
                 {
                     Caption = 'Ticket Type';
                     field(TicketTypeDescription; TmpTicketTypeDescription)
@@ -119,7 +119,7 @@ page 6151133 "NPR TM Ticket Wizard"
                         ToolTip = 'Specifies the value of the Ticket Type Template Code field';
                     }
                 }
-                group(Admission)
+                group(AdmissionGroup)
                 {
                     Caption = 'Admission';
                     field(AdmissionCode; TmpAdmissionCode)
