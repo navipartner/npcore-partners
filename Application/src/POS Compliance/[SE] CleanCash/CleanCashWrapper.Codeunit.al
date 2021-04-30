@@ -165,5 +165,16 @@ codeunit 6184500 "NPR CleanCash Wrapper"
 
         exit(ResponseMessage = '');
     end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
+    local procedure OnHandlePOSAuditProfileAdditionalSetup(POSAuditProfile: Record "NPR POS Audit Profile")
+    var
+        CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
+    begin
+        if PosAuditProfile."Audit Handler" <> UpperCase(CleanCashXCCSP.HandlerCode()) then
+            exit;
+
+        Page.Run(Page::"NPR CleanCash Setup List");
+    end;
 }
 

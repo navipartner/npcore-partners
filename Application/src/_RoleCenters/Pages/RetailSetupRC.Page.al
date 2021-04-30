@@ -290,14 +290,14 @@ page 6151245 "NPR Retail Setup RC"
                 {
                     Caption = 'Reimbursement Modules';
                     RunObject = Page "NPR NpRi Reimburs. Modules";
-                    ApplicationArea = All; 
+                    ApplicationArea = All;
                     ToolTip = 'View the Reimbursement Modules';
                 }
                 action("Reimbursement List")
                 {
-                    Caption = 'Reimbursements'; 
+                    Caption = 'Reimbursements';
                     RunObject = Page "NPR NpRi Reimbursements";
-                    ApplicationArea = All; 
+                    ApplicationArea = All;
                     ToolTip = 'View the Reimbursements';
                 }
             }
@@ -453,15 +453,8 @@ page 6151245 "NPR Retail Setup RC"
                 {
                     Caption = 'Job Queue Entries';
                     RunObject = page "Job Queue Entries";
-                    ApplicationArea = All; 
-                    Tooltip = 'View Job Queue Entries'; 
-                }
-                action("CleanCash Setup List")
-                {
-                    Caption = 'CleanCash Setup List';
-                    RunObject = page "NPR CleanCash Setup List";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the CleanCash Setup List action';
+                    Tooltip = 'View Job Queue Entries';
                 }
                 action("Retention Policy Setup List")
                 {

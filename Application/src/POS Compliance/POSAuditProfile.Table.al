@@ -85,12 +85,15 @@ table 6150650 "NPR POS Audit Profile"
             var
                 POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
                 DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+                CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
             begin
                 POSAuditLogMgt.LookupAuditHandler(Rec);
 
                 case "Audit Handler" of
                     DEAuditMgt.HandlerCode():
                         Page.Run(Page::"NPR DE Audit Setup");
+                    CleanCashXCCSP.HandlerCode():
+                        Page.Run(Page::"NPR CleanCash Setup List");
                 end;
             end;
         }
