@@ -33,12 +33,12 @@
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
-  ActionDescriptionCaption,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
+            ActionCode,
+            ActionDescriptionCaption,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep('getReferenceNumber',
                 'if (param.ReferenceBarcode === "")' +
                 '{' +
@@ -170,16 +170,13 @@ then begin
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
         JSON: Codeunit "NPR POS JSON Management";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Credential: DotNet NPRNetNetworkCredential;
-        XmlNamespaceManager: DotNet NPRNetXmlNamespaceManager;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        WebException: DotNet NPRNetWebException;
+        NamespaceManager: XmlNamespaceManager;
+        XmlDoc: XmlDocument;
+        Element: XmlElement;
+        Element2: XmlElement;
+        RootElement: XmlElement;
+        NodeList: XmlNodeList;
+        Node1: XmlNode;
         Response: Text;
         ServiceName: Text;
         FirstNode: Text;
@@ -187,6 +184,11 @@ then begin
         NameSpace: Text;
         FullSale: Boolean;
         InterCompSetup: Boolean;
+        WebClient: HttpClient;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        Headers: HttpHeaders;
+        ContentHeaders: HttpHeaders;
     begin
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
@@ -199,24 +201,19 @@ then begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        Clear(HttpWebRequest);
-        HttpWebRequest := HttpWebRequest.Create(NpGpPOSSalesSetup."Service Url");
-        HttpWebRequest.Timeout := 5000;
-
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        WebClient.SetBaseAddress(NpGpPOSSalesSetup."Service Url");
+        WebClient.Timeout := 5000;
 
         if not IsolatedStorage.Get(NpGpPOSSalesSetup."Service Password", DataScope::Company, ServicePassword) then
             Error(ServicePasswordErr, NpGpPOSSalesSetupCard.Caption);
 
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpGpPOSSalesSetup."Service Username", ServicePassword);
-        HttpWebRequest.Credentials(Credential);
+        WebClient.UseWindowsAuthentication(NpGpPOSSalesSetup."Service Username", ServicePassword);
 
         ServiceName := GetServiceName(NpGpPOSSalesSetup."Service Url");
 
         Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+
+        XmlDocument.ReadFrom('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
                        '  <soapenv:Header />' +
                        '  <soapenv:Body>' +
                        '    <GetGlobalSale xmlns="urn:microsoft-dynamics-schemas/codeunit/' + ServiceName + '">' +
@@ -225,45 +222,58 @@ then begin
                        '       <npGpPOSEntries />' +
                        '    </GetGlobalSale>' +
                        '  </soapenv:Body>' +
-                       '</soapenv:Envelope>');
+                       '</soapenv:Envelope>', XmlDoc);
 
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'GetGlobalSale');
-        XmlElement := XmlDoc.DocumentElement.LastChild.LastChild;
+        WebRequest.Method := 'POST';
+        WebRequest.GetHeaders(Headers);
+        if Headers.Contains('SOAPAction') then
+            Headers.Remove('SOAPAction');
+        Headers.Add('SOAPAction', 'GetGlobalSale');
 
-        XmlNamespaceManager := XmlNamespaceManager.XmlNamespaceManager(XmlDoc.NameTable);
-        XmlNamespaceManager.AddNamespace('ms', 'urn:microsoft-dynamics-schemas/codeunit/' + ServiceName);
+        WebRequest.Content.GetHeaders(ContentHeaders);
+        if ContentHeaders.Contains('Content-Type') then
+            ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
 
-        XmlElement2 := XmlElement.SelectSingleNode('ms:referenceNumber', XmlNamespaceManager);
-        XmlElement2.InnerText := Format(ReferenceNo);
+        XmlDoc.GetRoot(RootElement);
+        NodeList := RootElement.GetChildElements();
+        NodeList.Get(NodeList.Count, Node1); //.LastChild
+        NodeList := Node1.AsXmlElement().GetChildElements();
+        NodeList.Get(NodeList.Count, Node1); //.LastChild
+        Element := Node1.AsXmlElement();
+
+        NamespaceManager.NameTable := XmlDoc.NameTable;
+        NamespaceManager.AddNamespace('ms', 'urn:microsoft-dynamics-schemas/codeunit/' + ServiceName);
+
+        Element.SelectSingleNode('ms:referenceNumber', NamespaceManager, Node1);
+        Element2 := Node1.AsXmlElement();
+        Element2.ReplaceNodes(XmlText.Create(ReferenceNo));
 
         FullSale := JSON.GetBooleanParameterOrFail('ShowFullSale', ActionCode());
 
-        XmlElement2 := XmlElement.SelectSingleNode('ms:fullSale', XmlNamespaceManager);
-        XmlElement2.InnerText := Format(FullSale, 0, 9);
+        Element.SelectSingleNode('ms:fullSale', NamespaceManager, Node1);
+        Element2 := Node1.AsXmlElement();
+        Element2.ReplaceNodes(XmlText.Create(Format(FullSale, 0, 9)));
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then
-            Error(WebSrvErr, WebException.InnerException.Message);
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            Error(WebResponse.ReasonPhrase);
 
-        Stream := HttpWebResponse.GetResponseStream;
-        StreamReader := StreamReader.StreamReader(Stream);
-        Response := StreamReader.ReadToEnd;
-        Stream.Flush;
-        Stream.Close();
-        HttpWebResponse.Close();
+        WebResponse.Content.ReadAs(Response);
 
-        NameSpace := GetObjectInfoByTag(ObjectMetadata."Object Type"::XMLport, XMLPORT::"NPR NpGp POS Entries", 'DefaultNamespace', 1);
-        FirstNode := GetObjectInfoByTag(ObjectMetadata."Object Type"::XMLport, XMLPORT::"NPR NpGp POS Entries", 'NodeName', 1);
-        SecondNode := GetObjectInfoByTag(ObjectMetadata."Object Type"::XMLport, XMLPORT::"NPR NpGp POS Entries", 'NodeName', 2);
+        //Object Metadata table is accessible only for OnPrem target
+        NameSpace := 'urn:microsoft-dynamics-nav/xmlports/global_pos_sales';
+        FirstNode := 'sales_entries';
+        SecondNode := 'tempnpgppossalesentry';
 
         if StrPos(Response, SecondNode) = 0 then
             Error(NoGlobalSaleErr);
 
-        XmlDoc.LoadXml('<' + FirstNode + ' xmlns="' + NameSpace + '">' +
-                      CopyStr(Response, StrPos(Response, '<' + SecondNode),
-                      StrPos(Response, '</npGpPOSEntries>') - StrPos(Response, '<' + SecondNode)) +
-                      '</' + FirstNode + '>');
+        XmlDocument.ReadFrom('<' + FirstNode + ' xmlns="' + NameSpace + '">' +
+                CopyStr(Response, StrPos(Response, '<' + SecondNode),
+                StrPos(Response, '</npGpPOSEntries>') - StrPos(Response, '<' + SecondNode)) +
+                '</' + FirstNode + '>',
+            XmlDoc);
 
         GetRecordsFromXml(XmlDoc, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
 
@@ -289,58 +299,31 @@ then begin
     local procedure GetServiceName(Url: Text) ServiceName: Text
     var
         NamePosition: Integer;
-        HttpUtility: DotNet NPRNetHttpUtility;
-        String: DotNet NPRNetString;
+        TypeHelper: Codeunit "Type Helper";
+        String: Text;
     begin
-        String := HttpUtility.UrlDecode(Url);
+        String := TypeHelper.UrlDecode(Url);
         NamePosition := String.LastIndexOf('/') + 1;
-        ServiceName := String.Substring(NamePosition, String.Length - NamePosition);
+        ServiceName := String.Substring(NamePosition, StrLen(String) - NamePosition);
     end;
 
-    local procedure GetRecordsFromXml(XmlDoc: DotNet "NPRNetXmlDocument"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
+    local procedure GetRecordsFromXml(XmlDoc: XmlDocument; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary;
+        var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
     var
         NpGpPOSEntries: XMLport "NPR NpGp POS Entries";
-        IOStream: DotNet NPRNetMemoryStream;
+        OutStm: OutStream;
         TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary;
-        IOStreamVariant: Variant;
+        TempBlob: Codeunit "Temp Blob";
+        InStm: InStream;
     begin
-        IOStream := IOStream.MemoryStream;
-
-        XmlDoc.Save(IOStream);
-
-        IOStreamVariant := IOStream;
-        NpGpPOSEntries.SetSource(IOStreamVariant);
+        XmlDoc.WriteTo(OutStm);
+        TempBlob.CreateInStream(InStm);
+        CopyStream(OutStm, InStm);
+        NpGpPOSEntries.SetSource(InStm);
         NpGpPOSEntries.Import();
         NpGpPOSEntries.GetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
 
-        if TempNpGpPOSSalesEntry.FindFirst() and
-          TempNpGpPOSSalesLine.FindSet() then
-            ;
-    end;
-
-    local procedure GetObjectInfoByTag(Type: Integer; Id: Integer; Tag: Text; NodeNumber: Integer) Property: Text
-    var
-        ObjectMetadata: Record "Object Metadata";
-        i: Integer;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        IOStream: OutStream;
-    begin
-        ObjectMetadata.SetRange("Object Type", Type);
-        ObjectMetadata.SetRange("Object ID", Id);
-        ObjectMetadata.FindFirst();
-        ObjectMetadata.CalcFields(Metadata);
-
-        ObjectMetadata.Metadata.CreateOutStream(IOStream);
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(IOStream);
-        foreach XmlElement in XmlDoc.GetElementsByTagName(Tag) do begin
-            i += 1;
-            if i = NodeNumber then begin
-                Property := XmlElement.InnerText;
-            end;
-        end;
+        if TempNpGpPOSSalesLine.FindSet() then;
     end;
 
     local procedure CreateGlobalReverseSale(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry")
@@ -415,7 +398,7 @@ then begin
                 SaleLinePOS."Return Reason Code" := ReturnReasonCode;
                 SaleLinePOS.Modify(true);
 
-                RetailCrossReference."Retail ID" := SaleLinePOS."Retail ID";
+                RetailCrossReference."Retail ID" := SaleLinePOS.SystemId;
                 RetailCrossReference.Insert;
 
                 RetailCrossReference."Reference No." := TempNpGpPOSSalesLine."Global Reference";
@@ -519,7 +502,7 @@ then begin
             RetailCrossReference.SetRange("Reference No.", TempNpGpPOSSalesLine."Global Reference");
             if RetailCrossReference.FindSet() then
                 repeat
-                    SaleLinePOS.SetRange("Retail ID", RetailCrossReference."Retail ID");
+                    SaleLinePOS.SetRange(SystemId, RetailCrossReference."Retail ID");
                     if SaleLinePOS.FindFirst() then
                         TempNpGpPOSSalesLine.Quantity += SaleLinePOS.Quantity;
                 until RetailCrossReference.Next() = 0;
