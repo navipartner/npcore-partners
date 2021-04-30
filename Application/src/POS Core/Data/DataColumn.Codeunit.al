@@ -50,11 +50,11 @@ codeunit 6150894 "NPR Data Column" implements "NPR IJsonSerializable"
 
     procedure DataType(): Enum "NPR Data Type";
     var
-        DataType: Enum "NPR Data Type";
+        DataTypeEnum: Enum "NPR Data Type";
     begin
         MakeSureIsConstructed();
-        DataType := "NPR Data Type".FromInteger(_dataType.AsValue().AsInteger());
-        exit(DataType);
+        DataTypeEnum := "NPR Data Type".FromInteger(_dataType.AsValue().AsInteger());
+        exit(DataTypeEnum);
     end;
 
     procedure Format(): Text;
@@ -182,7 +182,7 @@ codeunit 6150894 "NPR Data Column" implements "NPR IJsonSerializable"
 
     procedure Constructor(FromToken: JsonToken);
     var
-        DataType: Enum "NPR Data Type";
+        DataTypeEnum: Enum "NPR Data Type";
     begin
         Initialize();
 
@@ -194,7 +194,7 @@ codeunit 6150894 "NPR Data Column" implements "NPR IJsonSerializable"
         end;
 
         if not _json.Get(LabelDataType, _dataType) then begin
-            _json.Add(LabelDataType, DataType::Undefined.AsInteger());
+            _json.Add(LabelDataType, DataTypeEnum::Undefined.AsInteger());
             _json.Get(LabelDataType, _dataType);
         end;
 

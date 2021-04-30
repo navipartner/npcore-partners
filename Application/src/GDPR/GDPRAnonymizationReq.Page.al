@@ -111,7 +111,7 @@
         Customer: Record Customer;
         GDPRManagement: Codeunit "NPR MM GDPR Management";
         NPGDPRManagement: Codeunit "NPR NP GDPR Management";
-        Reason: Text;
+        ReasonTxt: Text;
         MembershipEntryNo: Integer;
     begin
 
@@ -119,7 +119,7 @@
 
         if (GDPRAnonymizationRequest.FindSet()) then begin
             repeat
-                Reason := '';
+                ReasonTxt := '';
                 GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::PENDING;
                 GDPRAnonymizationRequest."Processed At" := CURRENTDATETIME();
 
@@ -129,11 +129,11 @@
                         true:
                             begin
                                 if (CancelMembership(MembershipEntryNo)) then
-                                    if (GDPRManagement.AnonymizeMembership(MembershipEntryNo, false, Reason)) then begin
+                                    if (GDPRManagement.AnonymizeMembership(MembershipEntryNo, false, ReasonTxt)) then begin
                                         GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
                                         InsertLogEntry(Rec."Customer No.");
                                     end;
-                                GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                                GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
                                 GDPRAnonymizationRequest.Modify();
                             end;
 
@@ -141,14 +141,14 @@
                             begin
 
                                 if (Customer.Get(GDPRAnonymizationRequest."Customer No.")) then begin
-                                    if (NPGDPRManagement.DoAnonymization(GDPRAnonymizationRequest."Customer No.", Reason)) then begin
+                                    if (NPGDPRManagement.DoAnonymization(GDPRAnonymizationRequest."Customer No.", ReasonTxt)) then begin
                                         GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
                                     end;
-                                    GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                                    GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
                                     GDPRAnonymizationRequest.Modify();
                                 end else begin
                                     Reason := 'Customer not found.';
-                                    GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                                    GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
                                     GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
                                     GDPRAnonymizationRequest.Modify();
                                 end;
@@ -159,9 +159,9 @@
                 end;
 
                 if (GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::PERSON) then begin
-                    Reason := 'Contact of type person does not have authority to request anonymization.';
+                    ReasonTxt := 'Contact of type person does not have authority to request anonymization.';
 
-                    GDPRAnonymizationRequest.Reason := CopyStr(Reason, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                    GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
                     GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
 
                     GDPRAnonymizationRequest.Modify();

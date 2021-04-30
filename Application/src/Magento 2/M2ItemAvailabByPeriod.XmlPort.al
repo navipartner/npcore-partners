@@ -523,8 +523,8 @@
         ItemExists: Boolean;
         PartialResult: Boolean;
         InvalidDate: Boolean;
-        PeriodStart: Date;
-        PeriodEnd: Date;
+        PeriodStartDate: Date;
+        PeriodEndDate: Date;
     begin
         if (CustomerNumberIn <> '') then
             if (Customer.Get(CustomerNumberIn)) then
@@ -561,34 +561,34 @@
             case TmpDateRequest."Period Type" of
                 TmpDateRequest."Period Type"::Date:
                     begin
-                        PeriodStart := TmpDateRequest."Period Start";
-                        PeriodEnd := TmpDateRequest."Period End";
+                        PeriodStartDate := TmpDateRequest."Period Start";
+                        PeriodEndDate := TmpDateRequest."Period End";
                     end;
                 TmpDateRequest."Period Type"::Week:
                     begin
-                        PeriodStart := CalcDate('<-1W+CW+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CW>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1W+CW+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CW>', TmpDateRequest."Period End");
                     end;
 
                 TmpDateRequest."Period Type"::Month:
                     begin
-                        PeriodStart := CalcDate('<-1M+CM+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CM>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1M+CM+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CM>', TmpDateRequest."Period End");
                     end;
 
                 TmpDateRequest."Period Type"::Quarter:
                     begin
-                        PeriodStart := CalcDate('<-1Q+CQ+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CQ>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1Q+CQ+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CQ>', TmpDateRequest."Period End");
                     end;
                 TmpDateRequest."Period Type"::Year:
                     begin
-                        PeriodStart := CalcDate('<-1Y+CY+1D>', TmpDateRequest."Period Start");
-                        PeriodEnd := CalcDate('<CY>', TmpDateRequest."Period End");
+                        PeriodStartDate := CalcDate('<-1Y+CY+1D>', TmpDateRequest."Period Start");
+                        PeriodEndDate := CalcDate('<CY>', TmpDateRequest."Period End");
                     end;
             end;
-            TmpDateRequest."Period Start" := PeriodStart;
-            TmpDateRequest."Period End" := PeriodEnd;
+            TmpDateRequest."Period Start" := PeriodStartDate;
+            TmpDateRequest."Period End" := PeriodEndDate;
 
             ItemAvailabilityByPeriod.SetFilter("Period Start", '%1..%2', TmpDateRequest."Period Start", TmpDateRequest."Period End");
             ItemAvailabilityByPeriod.SetFilter("Period Type", '=%1', TmpDateRequest."Period Type");

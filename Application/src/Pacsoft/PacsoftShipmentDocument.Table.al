@@ -478,7 +478,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
         PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
         ShipToAddress: Record "Ship-to Address";
         Job: Record Job;
-        Contact: Record Contact;
+        ContactRec: Record Contact;
         ShippingAgentServices: Record "Shipping Agent Services";
         PacsoftMgt: Codeunit "NPR Pacsoft Management";
         TextNotActivated: Label 'The Pacsoft integration is not activated.';
@@ -773,25 +773,25 @@ table 6014452 "NPR Pacsoft Shipment Document"
                 end;
             DATABASE::Contact:
                 begin
-                    RecRef.SetTable(Contact);
-                    if Contact.Find() then begin
-                        ShipmentDocument."Receiver ID" := Contact."No.";
-                        ShipmentDocument.Name := Contact."Company Name";
-                        ShipmentDocument.Address := Contact.Address;
-                        ShipmentDocument."Address 2" := Contact."Address 2";
-                        ShipmentDocument."Post Code" := Contact."Post Code";
-                        ShipmentDocument.City := Contact.City;
-                        ShipmentDocument.County := Contact.County;
-                        ShipmentDocument."Country/Region Code" := Contact."Country/Region Code";
-                        if Contact.Type = Contact.Type::Person then
-                            ShipmentDocument.Contact := Contact.Name;
+                    RecRef.SetTable(ContactRec);
+                    if ContactRec.Find() then begin
+                        ShipmentDocument."Receiver ID" := ContactRec."No.";
+                        ShipmentDocument.Name := ContactRec."Company Name";
+                        ShipmentDocument.Address := ContactRec.Address;
+                        ShipmentDocument."Address 2" := ContactRec."Address 2";
+                        ShipmentDocument."Post Code" := ContactRec."Post Code";
+                        ShipmentDocument.City := ContactRec.City;
+                        ShipmentDocument.County := ContactRec.County;
+                        ShipmentDocument."Country/Region Code" := ContactRec."Country/Region Code";
+                        if ContactRec.Type = ContactRec.Type::Person then
+                            ShipmentDocument.Contact := ContactRec.Name;
                         ShipmentDocument.Reference := '';
                         ShipmentDocument."Shipment Date" := Today();
-                        ShipmentDocument."Phone No." := Contact."Phone No.";
-                        ShipmentDocument."Fax No." := Contact."Fax No.";
-                        ShipmentDocument."VAT Registration No." := Contact."VAT Registration No.";
-                        ShipmentDocument."E-Mail" := Contact."E-Mail";
-                        ShipmentDocument."SMS No." := Contact."Mobile Phone No.";
+                        ShipmentDocument."Phone No." := ContactRec."Phone No.";
+                        ShipmentDocument."Fax No." := ContactRec."Fax No.";
+                        ShipmentDocument."VAT Registration No." := ContactRec."VAT Registration No.";
+                        ShipmentDocument."E-Mail" := ContactRec."E-Mail";
+                        ShipmentDocument."SMS No." := ContactRec."Mobile Phone No.";
                         ShipmentDocument."Shipping Agent Code" := "Shipping Agent Code";
                     end;
                 end;
