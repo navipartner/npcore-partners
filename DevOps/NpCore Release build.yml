@@ -1,15 +1,20 @@
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+    - masters/*
 
 resources:
   repositories:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
+    ref: 'refs/heads/topic/handle-translations-pushing'
 
   - repository: translations
     type: git
     name: 'NpCore/NpCore-Translations'
-    ref: 'refs/heads/i10n_master'
+    ref: 'refs/heads/master'
 
 pool:
   name: NP Core Pipelines
@@ -20,58 +25,53 @@ pool:
   - Agent.OS -equals Windows_NT
   - Agent.OSVersion -equals 10.0.17763
 
-variables:
-  containerName: Build-$(Build.BuildId)
-  serverInstanceName: BC
-  containerAdminUsername: admin
-  containerAdminPassword: P@ssword1
-
 jobs:
-- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
+- template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
   parameters:
-    timeoutInMinutes: 180
-    containerImageName: mcr.microsoft.com/businesscentral:10.0.17763.1757
-    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
-    containerName: $(containerName)
-    serverInstanceName: $(serverInstanceName)
-    containerAdminUsername: $(containerAdminUsername) 
-    containerAdminPassword: $(containerAdminPassword)
-    licenseSecureFileName: 'DEV_BC OP 17.flf'
-    scriptsRepo: ScriptsRepo
+    scriptsRepo: scriptsRepo
     stepList:
+    - checkout: self
+
     - task: XplatGenerateReleaseNotes@3
       inputs: 
         outputfile: '$(Build.ArtifactStagingDirectory)\releasenotes.html'
         templatefile: '$(ScriptsRootFolder)/ReleaseNotesTemplates/build-handlebars-template.html'
-        replaceFile: true
-        showOnlyPrimary: true
-        getIndirectPullRequests: false
-      displayName: Generate Release Notes    
+        replaceFile: TRUE
+        showOnlyPrimary: TRUE
+        getIndirectPullRequests: FALSE
+      displayName: Generate Release Notes
+      #condition: and(succeeded(), eq(variables['PrereleasePackage'], FALSE))    
+
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
+        majorVersion: $(majorVersion)
         containerName: $(containerName)
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
+
+        translationsTargetRepoName: NpCore-Translations
+        translationsTargetRepoBranchName: master
         translationsRepo: translations
+
+        keyVaultCert:
+          keyVaultCertPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
+          certPassword: 498eH$??nhxUSSFS
+          azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
+          azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0  
         dependancies:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
             id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
             destinationPath: '$(ServiceTierFolder)/Add-Ins'
         appNuGetSource: 
-            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-            id: NaviPartner.NPCore.BC170
-            tags: $(artifactURL)
-            additionalFiles:
-            - '$(Build.ArtifactStagingDirectory)\releasenotes.html'
-        versionVariableName: 'LastUsedVerNo'
-        versionRevisionSeed: 10000
+          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
+          id: NaviPartner.NPCore.BC$(majorVersion)
+          publish:
+            enabled: TRUE
+            #tags: $(artifactURL) - No artifact URL with precompiled images
+  #            additionalFiles:
+  #              {{ if eq(variables['PrereleasePackage'], FALSE) }}:
+  #              - '$(Build.ArtifactStagingDirectory)\releasenotes.html'
         runtimePackage: TRUE
-    # - task: PowerShell@2
-    #   inputs:
-    #     targetType: inline
-    #     script: >
-    #       Write-Host "##vso[task.uploadsummary]$(Build.ArtifactStagingDirectory)\releasenotes.html" 
-    #   displayName: Publish Release Notes
