@@ -245,32 +245,33 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     Caption = 'Setting';
                     field(ValueDate; ValueDate)
                     {
-                        Caption = 'Value Date';
                         ApplicationArea = All;
+                        Caption = 'Value Date';
                         ToolTip = 'Specifies the value of the Value Date field';
                     }
                     field(ShowItemWithSales; ShowItemWithSales)
                     {
-                        Caption = 'Only Items With Sale';
                         ApplicationArea = All;
+                        Caption = 'Only Items With Sale';
                         ToolTip = 'Specifies the value of the Only Items With Sale field';
                     }
                     field(ShowItem; ShowItem)
                     {
-                        Caption = 'View Items';
                         ApplicationArea = All;
+                        Caption = 'View Items';
                         ToolTip = 'Specifies the value of the View Items field';
                     }
                     field(ShowItemGroup; ShowItemGroup)
                     {
-                        Caption = 'Show Item Groups';
                         ApplicationArea = All;
+                        Caption = 'Show Item Groups';
                         ToolTip = 'Specifies the value of the Show Item Groups field';
                     }
                     field(InventoryValueIsBasedOn; ValueMethod)
                     {
-                        Caption = 'Inventory Value Is Based On:';
                         ApplicationArea = All;
+                        Caption = 'Inventory Value Is Based On:';
+                        OptionCaption = 'sidste koebspris,kostpris (gns.)';
                         ToolTip = 'Specifies the value of the Inventory Value Is Based On: field';
                     }
                 }

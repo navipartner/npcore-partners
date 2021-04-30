@@ -63,10 +63,9 @@ report 6060101 "NPR Data Cleanup Test"
                         "Data Cleanup GCVI".SetRange(Type, "Data Cleanup GCVI".Type::"G/L Account");
                 end;
 
-                if NoFilter <> '' then
-                  begin
+                if NoFilter <> '' then begin
                     "Data Cleanup GCVI".SetFilter("No.", NoFilter);
-                  end;
+                end;
             end;
         }
     }
@@ -80,20 +79,22 @@ report 6060101 "NPR Data Cleanup Test"
             {
                 field(CleanupAction; CleanupAction)
                 {
-                    Caption = 'Cleanup Action';
                     ApplicationArea = All;
+                    Caption = 'Cleanup Action';
+                    OptionCaption = 'Delete,Rename,Both';
                     ToolTip = 'Specifies the value of the Cleanup Action field';
                 }
                 field(TableOption; TableOption)
                 {
-                    Caption = 'Table Option';
                     ApplicationArea = All;
+                    Caption = 'Table Option';
+                    OptionCaption = 'Option All,Customer,Vendor,Item,GLAccount';
                     ToolTip = 'Specifies the value of the Table Option field';
                 }
                 field(NoFilter; NoFilter)
                 {
-                    Caption = 'No. Filter';
                     ApplicationArea = All;
+                    Caption = 'No. Filter';
                     ToolTip = 'Specifies the value of the No. Filter field';
                 }
             }

@@ -18,8 +18,9 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
             }
             field(ChartType; ChartType)
             {
-                Caption = 'Chart type';
                 ApplicationArea = Basic;
+                Caption = 'Chart type';
+                OptionCaption = 'Dimension 1,Dimension 2';
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;

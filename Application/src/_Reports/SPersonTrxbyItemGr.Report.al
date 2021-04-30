@@ -223,26 +223,28 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                     Caption = 'Setting';
                     field("Show itemgroups with no sales"; ShowItemsGrpWithoutSale)
                     {
-                        Caption = 'Show Item Groups With No Sales';
                         ApplicationArea = All;
+                        Caption = 'Show Item Groups With No Sales';
                         ToolTip = 'Specifies the value of the Show Item Groups With No Sales field';
                     }
                     field("Sort salespersons"; SortSalesPerson)
                     {
-                        Caption = 'Sort Salespersons';
                         ApplicationArea = All;
+                        Caption = 'Sort Salespersons';
                         ToolTip = 'Specifies the value of the Sort Salespersons field';
                     }
                     field(SortBy; SortBy)
                     {
-                        Enabled = sortSalesPerson;
                         ApplicationArea = All;
+                        Enabled = sortSalesPerson;
+                        OptionCaption = 'Quantity,Turnover,DB';
                         ToolTip = 'Specifies the value of the SortBy field';
                     }
                     field(Sort; Sort)
                     {
-                        Editable = sortSalesPerson;
                         ApplicationArea = All;
+                        Editable = sortSalesPerson;
+                        OptionCaption = 'Highest,Lowest';
                         ToolTip = 'Specifies the value of the Sort field';
                     }
                 }

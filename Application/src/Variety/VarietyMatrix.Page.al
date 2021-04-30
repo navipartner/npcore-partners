@@ -47,6 +47,7 @@ page 6059974 "NPR Variety Matrix"
                 {
                     ApplicationArea = All;
                     Caption = 'Show Horisontal';
+                    OptionCaption = 'Variety1,Variety2,Variety3,Variety4';
                     ToolTip = 'Specifies the value of the Show Horisontal field';
 
                     trigger OnValidate()

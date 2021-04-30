@@ -109,6 +109,7 @@ page 6059902 "NPR Task Journal"
                     ApplicationArea = All;
                     Caption = 'Last Status';
                     Editable = false;
+                    OptionCaption = ' ,Started,Error,Succes,Message';
                     ToolTip = 'Specifies the value of the Last Status field';
                 }
                 field(LastExecutionTime; LastExecutionTime)

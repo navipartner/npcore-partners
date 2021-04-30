@@ -50,6 +50,7 @@ page 6014591 "NPR Sales Stats Time Period"
                     ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Statistics By';
+                    OptionCaption = ',Item,Item Category';
                     ToolTip = 'Specifies the value of the Statistics By field';
                 }
                 field(ItemNoFilter; ItemNoFilter)

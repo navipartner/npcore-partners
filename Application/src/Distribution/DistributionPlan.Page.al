@@ -39,6 +39,7 @@ page 6151060 "NPR Distribution Plan"
                 {
                     ApplicationArea = All;
                     Caption = 'View';
+                    OptionCaption = 'Distributions,Demands,Inventory';
                     Visible = false;
                     ToolTip = 'Specifies the value of the View field';
                 }

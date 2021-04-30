@@ -110,6 +110,11 @@
             "justification": "The value of the Tooltip property of Fields must be filled."
         },
         {
+            "id": "AA0221",
+            "action":"Error",
+            "justification": "You must specify a OptionCaption property for all fields which source expressions is not a table field."
+        },
+        {
             "id": "AA0222",
             "action":"Error",
             "justification": "SIFT index should not be used on primary or unique key."

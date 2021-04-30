@@ -28,6 +28,7 @@
             {
                 ApplicationArea = All;
                 Caption = 'Select a Period';
+                OptionCaption = 'Day,Week,Month,Quarter,Year';
                 ToolTip = 'Specifies the value of the Select a Period field';
 
                 trigger OnValidate()

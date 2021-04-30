@@ -78,6 +78,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Days Of The Week';
+                    OptionCaption = 'All,Some';
                     ToolTip = 'Specifies the value of the Days Of The Week field';
 
                     trigger OnValidate()

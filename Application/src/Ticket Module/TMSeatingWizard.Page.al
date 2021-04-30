@@ -114,6 +114,7 @@ page 6151132 "NPR TM Seating Wizard"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Horizontal,Vertical,Diagonal (Left to Right),Diagonal (Right to Left)';
+                    OptionCaption = 'HORIZONTAL,VERTICAL,DIAGONAL_LR,DIAGONAL_RL';
                     ToolTip = 'Specifies the value of the Horizontal,Vertical,Diagonal (Left to Right),Diagonal (Right to Left) field';
                 }
                 field(SplitList; SplitList)
