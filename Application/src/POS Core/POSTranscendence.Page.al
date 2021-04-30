@@ -81,7 +81,7 @@ page 6150700 "NPR POS (Transcendence)"
 
     local procedure Initialize()
     var
-        Framework: Codeunit "NPR Framework: Transcendence";
+        FrameworkTranscendence: Codeunit "NPR Framework: Transcendence";
     begin
         //-NPR5.43 [318028]
         // FrontEnd.Initialize(CurrPage.Framework,POSSession);
@@ -90,8 +90,8 @@ page 6150700 "NPR POS (Transcendence)"
         //
         // FrontEndKeeper.Initialize(CurrPage.Framework,FrontEnd,POSSession);
         // BINDSUBSCRIPTION(FrontEndKeeper);
-        Framework.Constructor(CurrPage.Framework);
-        POSSession.Constructor(Framework, FrontEnd, Setup, POSSession);
+        FrameworkTranscendence.Constructor(CurrPage.Framework);
+        POSSession.Constructor(FrameworkTranscendence, FrontEnd, Setup, POSSession);
         //+NPR5.43 [318028]
     end;
 

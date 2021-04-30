@@ -181,7 +181,7 @@
         }
         area(navigation)
         {
-            action(Membership)
+            action(OpenMembershipCard)
             {
                 Caption = 'Membership';
                 Ellipsis = true;
@@ -195,7 +195,7 @@
                 ApplicationArea = All;
                 ToolTip = 'Executes the Membership action';
             }
-            action(MembershipSetup)
+            action(OpenMembershipSetup)
             {
                 Caption = 'MembershipSetup';
                 Image = SetupList;

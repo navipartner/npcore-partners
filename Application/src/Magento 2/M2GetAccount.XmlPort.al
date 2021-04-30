@@ -518,7 +518,7 @@ xmlport 6151152 "NPR M2 Get Account"
     procedure SetResponse(var TmpContactIn: Record Contact temporary; var TmpSellToCustomerIn: Record Customer temporary; var TmpBillToCustomerIn: Record Customer temporary; var TmpShipToAddressIn: Record "Ship-to Address" temporary)
     var
         ContactBusinessRelation: Record "Contact Business Relation";
-        Contact: Record Contact;
+        ContactRec: Record Contact;
         MembershipRole: Record "NPR MM Membership Role";
     begin
         ResponseMessage := 'Contact Id is unknown.';
@@ -557,8 +557,8 @@ xmlport 6151152 "NPR M2 Get Account"
                 ContactBusinessRelation.SetFilter("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
                 ContactBusinessRelation.SetFilter("No.", '=%1', TmpSellToCustomer."No.");
                 if (ContactBusinessRelation.FindFirst()) then begin
-                    if (Contact.Get(ContactBusinessRelation."Contact No.")) then begin
-                        TmpSellToCustomerContact.TransferFields(Contact);
+                    if (ContactRec.Get(ContactBusinessRelation."Contact No.")) then begin
+                        TmpSellToCustomerContact.TransferFields(ContactRec);
                         TmpSellToCustomerContact.Insert();
                     end;
                 end;
@@ -568,8 +568,8 @@ xmlport 6151152 "NPR M2 Get Account"
                 ContactBusinessRelation.SetFilter("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
                 ContactBusinessRelation.SetFilter("No.", '=%1', TmpBillToCustomer."No.");
                 if (ContactBusinessRelation.FindFirst()) then begin
-                    if (Contact.Get(ContactBusinessRelation."Contact No.")) then begin
-                        TmpBillToCustomerContact.TransferFields(Contact);
+                    if (ContactRec.Get(ContactBusinessRelation."Contact No.")) then begin
+                        TmpBillToCustomerContact.TransferFields(ContactRec);
                         TmpBillToCustomerContact.Insert();
                     end;
                 end;
