@@ -9,12 +9,16 @@ resources:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
-    ref: 'refs/heads/releases/1.0'
+    #ref: 'refs/heads/releases/1.0'
+    ref: 'refs/heads/topic/publish-translations-only-on-prerelease'
 
   - repository: translations
     type: git
     name: 'NpCore/NpCore-Translations'
     ref: 'refs/heads/i10n_master'
+
+variables:
+  PrereleaseApp: FALSE
 
 pool:
   name: NP Core Pipelines
@@ -32,6 +36,15 @@ jobs:
     stepList:
     - checkout: self
 
+    - task: PowerShell@2
+      inputs:
+        filePath: $(psScriptsFolder)/BuildDeploy/CalculateNewVersion.ps1
+        arguments: >
+          -MajorVersion $(majorVersion)
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      displayName: 'Calculate new version'
+
     - task: XplatGenerateReleaseNotes@3
       inputs: 
         outputfile: '$(Build.ArtifactStagingDirectory)\releasenotes.html'
@@ -40,20 +53,23 @@ jobs:
         showOnlyPrimary: TRUE
         getIndirectPullRequests: FALSE
       displayName: Generate Release Notes
-      #condition: and(succeeded(), eq(variables['PrereleasePackage'], FALSE))    
+      condition: and(succeeded(), eq(variables.PrereleaseApp, FALSE))    
 
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
-        majorVersion: $(majorVersion)
         containerName: $(containerName)
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
+        appVersion: $(NewAppVersion)
+        ${{ if variables.PrereleaseApp }}:
+          prereleaseApp: true
 
-        translationsTargetRepoName: NpCore-Translations
-        translationsTargetRepoBranchName: master
-        translationsRepo: translations
+        ${{ if variables.PrereleaseApp }}:
+          translationsTargetRepoName: NpCore-Translations
+          translationsTargetRepoBranchName: master
+          translationsRepo: translations
 
         keyVaultCert:
           keyVaultCertPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
