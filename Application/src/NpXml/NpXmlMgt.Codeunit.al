@@ -507,7 +507,7 @@
         if not NPXmlTemplate."File Transfer" then
             exit;
 
-        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || File Transfer: ' + NPXmlTemplate."File Path");
+        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || File Transfer: ' + NPXmlTemplate."File Path", NPXmlTemplate."Do Not Add Comment Line");
 
         Field.Get(DATABASE::"NPR NpXml Template", NPXmlTemplate.FieldNo("File Transfer"));
         AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NPXmlTemplate."File Path" + ' -->' + GetChar(13) + GetChar(10));
@@ -534,7 +534,7 @@
         if Transfered then
             exit;
 
-        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || No Transfer');
+        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || No Transfer', NPXmlTemplate."Do Not Add Comment Line");
     end;
 
     local procedure SendApi(NpXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument)
@@ -829,7 +829,7 @@
         if NPXmlTemplate."FTP Filename (Fixed)" <> '' then
             Filename := NPXmlTemplate."FTP Filename (Fixed)";
 
-        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server");
+        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server", NPXmlTemplate."Do Not Add Comment Line");
         OutputTempBlob.CreateInStream(InStr);
 
         FTPClient.Construct(NPXmlTemplate."FTP Server", NPXmlTemplate."FTP Username", NPXmlTemplate."FTP Password", NPXmlTemplate."FTP Port", 10000, NPXmlTemplate."FTP Passive");
@@ -921,13 +921,13 @@
         OutputOutStr.Write(OutputText);
     end;
 
-    local procedure AddXmlToOutputTempBlob(var XmlDoc: XmlDocument; Comment: Text)
+    local procedure AddXmlToOutputTempBlob(var XmlDoc: XmlDocument; Comment: Text; DoNotAddComment: Boolean)
     begin
         InitializeOutput();
         if OutputTempBlob.HasValue() then begin
             OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
         end;
-        if Comment <> '' then
+        if (Comment <> '') and not DoNotAddComment then
             OutputOutStr.WriteText('<!--' + Comment + '-->' + GetChar(13) + GetChar(10));
         XmlDoc.WriteTo(OutputOutStr);
     end;
