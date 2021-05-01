@@ -231,6 +231,12 @@
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Before Transfer Function field';
                 }
+                field("Do Not Add Comment Line"; Rec."Do Not Add Comment Line")
+                {
+                    ApplicationArea = All;
+                    Importance = Additional;
+                    ToolTip = 'Specifies whether a comment line should be added to the output file before transferring it to the destination resource';
+                }
                 group("File")
                 {
                     Caption = 'File';
