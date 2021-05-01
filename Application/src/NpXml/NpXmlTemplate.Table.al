@@ -297,6 +297,11 @@
             Caption = 'FTP Passive';
             DataClassification = CustomerContent;
         }
+        field(5190; "Do Not Add Comment Line"; Boolean)
+        {
+            Caption = 'Do Not Add Comment Line';
+            DataClassification = CustomerContent;
+        }
         field(5200; "API Transfer"; Boolean)
         {
             Caption = 'API Transfer';
