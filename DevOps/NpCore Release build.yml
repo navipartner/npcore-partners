@@ -9,7 +9,7 @@ resources:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
-    ref: 'ref: 'refs/heads/releases/1.0''
+    ref: 'refs/heads/releases/1.0'
 
   - repository: translations
     type: git
