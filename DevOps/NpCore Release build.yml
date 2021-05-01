@@ -9,12 +9,12 @@ resources:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
-    ref: 'refs/heads/releases/1.0'
+    ref: 'refs/heads/topic/handle-translations-pushing'
 
   - repository: translations
     type: git
     name: 'NpCore/NpCore-Translations'
-    ref: 'refs/heads/master'
+    ref: 'refs/heads/i10n_master'
 
 pool:
   name: NP Core Pipelines
