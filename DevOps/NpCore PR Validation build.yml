@@ -24,7 +24,6 @@ jobs:
     - checkout: self
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
-        majorVersion: $(majorVersion)
         containerName: $(containerName)
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
@@ -50,7 +49,6 @@ jobs:
 
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
-        majorVersion: $(majorVersion)      
         containerName: $(containerName)
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
