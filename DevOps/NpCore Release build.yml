@@ -9,8 +9,7 @@ resources:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
-    #ref: 'refs/heads/releases/1.0'
-    ref: 'refs/heads/topic/publish-translations-only-on-prerelease'
+    ref: 'refs/heads/releases/1.0'
 
   - repository: translations
     type: git
