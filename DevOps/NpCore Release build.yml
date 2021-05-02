@@ -52,7 +52,7 @@ jobs:
         showOnlyPrimary: TRUE
         getIndirectPullRequests: FALSE
       displayName: Generate Release Notes
-      condition: and(succeeded(), eq(variables.PrereleaseApp, False))    
+      condition: and(succeeded(), eq(variables.PrereleaseApp, 'False'))    
 
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
@@ -62,11 +62,11 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
-        ${{ if eq(variables.PrereleaseApp,True) }}:
+        ${{ if eq(variables.PrereleaseApp,'True') }}:
           prereleaseApp: true
 
         translationsRepo: translations
-        ${{ if eq(variables.PrereleaseApp,True) }}:
+        ${{ if eq(variables.PrereleaseApp,'True') }}:
           translationsTargetRepoName: NpCore-Translations
           translationsTargetRepoBranchName: master
         
