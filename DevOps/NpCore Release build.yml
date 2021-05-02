@@ -65,11 +65,11 @@ jobs:
         ${{ if variables.PrereleaseApp }}:
           prereleaseApp: true
 
-        ${{ if variables.PrereleaseApp }}:
+        translationsRepo: translations
+        ${{ if eq(variables.PrereleaseApp,TRUE) }}:
           translationsTargetRepoName: NpCore-Translations
           translationsTargetRepoBranchName: master
-          translationsRepo: translations
-
+        
         keyVaultCert:
           keyVaultCertPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
           certPassword: 498eH$??nhxUSSFS
