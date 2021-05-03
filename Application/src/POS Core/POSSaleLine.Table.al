@@ -124,6 +124,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Qty. Discount Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10; Description; Text[100])
         {
@@ -242,6 +243,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(15; "Unit Price"; Decimal)
         {
@@ -337,6 +339,7 @@ table 6014406 "NPR POS Sale Line"
             MaxValue = 100;
             MinValue = 0;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(19; "Discount %"; Decimal)
         {
@@ -532,6 +535,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(43; "Serial No."; Code[50])
         {
@@ -557,6 +561,7 @@ table 6014406 "NPR POS Sale Line"
             MaxValue = 100;
             MinValue = 0;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(46; "Invoice to Customer No."; Code[20])
         {
@@ -564,6 +569,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(47; "Invoice Discount Amount"; Decimal)
         {
@@ -610,6 +616,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(54; "VAT Base Amount"; Decimal)
         {
@@ -629,6 +636,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Euro';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(57; "Quantity (Base)"; Decimal)
         {
@@ -640,12 +648,14 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Period Discount code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(59; "Lookup On No."; Boolean)
         {
             Caption = 'Lookup On No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])
         {
@@ -798,6 +808,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'System-Created Entry';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(102; "Variant Code"; Code[10])
         {
@@ -839,6 +850,7 @@ table 6014406 "NPR POS Sale Line"
             OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
             OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(118; "Retail Document No."; Code[20])
         {
@@ -902,6 +914,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Customer Location No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(151; "Sales Document Prepay. Refund"; Boolean)
         {
@@ -995,6 +1008,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Return Sale POS Unit No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(301; "Return Sale Sales Ticket No."; Code[20])
         {
@@ -1008,24 +1022,28 @@ table 6014406 "NPR POS Sale Line"
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Payment1,Disbursement,Comment,,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Payment1,Disbursement,Comment,,"Open/Close";
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(303; "Return Sale Line No."; Integer)
         {
             Caption = 'Return Sale Line No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(304; "Return Sale No."; Code[20])
         {
             Caption = 'Return Sale No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(305; "Return Sales Sales Date"; Date)
         {
             Caption = 'Return Sales Sales Date';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(400; "Discount Type"; Option)
         {
@@ -1116,6 +1134,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             Description = 'Only to be set if Cash Terminal Approved';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
 
         }
         field(550; "Drawer Opened"; Boolean)
@@ -1124,6 +1143,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             Description = 'NPR4.002.005, for indication of opening on drawer.';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(600; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
@@ -1158,12 +1178,14 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Color';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(5003; Size; Code[20])
         {
             Caption = 'Size';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(5004; Clearing; Option)
         {
@@ -1172,18 +1194,21 @@ table 6014406 "NPR POS Sale Line"
             OptionCaption = ' ,Gift Voucher,Credit Voucher';
             OptionMembers = " ",Gavekort,Tilgodebevis;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(5008; "External Document No."; Code[20])
         {
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(5999; "Buffer Ref. No."; Integer)
         {
             Caption = 'Buffer Ref. No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6000; "Buffer Document Type"; Enum "Gen. Journal Document Type")
         {
@@ -1205,6 +1230,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6004; Internal; Boolean)
         {
@@ -1212,6 +1238,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             InitValue = false;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6005; "Currency Amount"; Decimal)
         {
@@ -1284,6 +1311,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'NegPriceZero';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6021; Reference; Text[50])
         {
@@ -1295,18 +1323,21 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Rep. No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6023; "Gift Voucher Ref."; Code[20])
         {
             Caption = 'Gift Voucher Ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6024; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6025; "Custom Cost"; Boolean)
         {
@@ -1318,12 +1349,14 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Wish list';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6027; "Wish List Line No."; Integer)
         {
             Caption = 'Wish List Line No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6028; "Item group accessory"; Boolean)
         {
@@ -1340,12 +1373,14 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Label Quantity';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6033; "Offline Sales Ticket No"; Code[20])
         {
             Caption = 'Emergency Ticket No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6034; "Custom Descr"; Boolean)
         {
@@ -1357,18 +1392,21 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Foreign No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6037; GiftCrtLine; Integer)
         {
             Caption = 'Gift Certificate Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6038; "Label Date"; Date)
         {
             Caption = 'Label Date';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6039; "Description 2"; Text[50])
         {
@@ -1407,12 +1445,14 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6055; "Lock Code"; Code[10])
         {
             Caption = 'Lock Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6060; "Magento Brand"; Code[20])
         {
@@ -1439,36 +1479,42 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Silent';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10001; Deleting; Boolean)
         {
             Caption = 'Deleting';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10002; NoWarning; Boolean)
         {
             Caption = 'No Warning';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10003; CondFirstRun; Boolean)
         {
             Caption = 'Conditioned First Run';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10004; CurrencySilent; Boolean)
         {
             Caption = 'Currency (Silent)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10005; StyklisteSilent; Boolean)
         {
             Caption = 'Bill of materials (Silent)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10006; "Cust Forsikring"; Boolean)
         {
@@ -1482,24 +1528,28 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Insurrance';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10008; TestOnServer; Boolean)
         {
             Caption = 'Test on Server';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10009; "Customer No. Line"; Boolean)
         {
             Caption = 'Customer No. Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10010; ForceApris; Boolean)
         {
             Caption = 'Force A-Price';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10011; GuaranteePrinted; Boolean)
         {
@@ -1507,6 +1557,7 @@ table 6014406 "NPR POS Sale Line"
             DataClassification = CustomerContent;
             Description = 'Field set true, if guarantee certificate has been printed';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(10012; "Custom Disc Blocked"; Boolean)
         {
@@ -1518,12 +1569,14 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Invoiz Guid';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6014512; "SQL Server Timestamp"; BigInteger)
         {

@@ -3,6 +3,7 @@ table 6014450 "NPR Imp. Exp. Media Buffer"
     Caption = 'Import Export Media Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

@@ -1,4 +1,4 @@
-﻿table 6014413 "NPR Period Discount"
+table 6014413 "NPR Period Discount"
 {
     Caption = 'Period Discount';
     LookupPageID = "NPR Campaign Discount List";

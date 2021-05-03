@@ -9,6 +9,7 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
             Description = 'NPR7.100.000';
             TableRelation = "NPR POS Unit";
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6014401; "NPR POS Unit No."; Code[10])
         {

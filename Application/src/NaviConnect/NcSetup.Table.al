@@ -1,4 +1,4 @@
-﻿table 6151500 "NPR Nc Setup"
+table 6151500 "NPR Nc Setup"
 {
     Caption = 'Nc Setup';
     DataClassification = CustomerContent;

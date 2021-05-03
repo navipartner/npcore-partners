@@ -1,4 +1,4 @@
-﻿table 6151523 "NPR Nc Endpoint E-mail"
+table 6151523 "NPR Nc Endpoint E-mail"
 {
     Caption = 'Nc Endpoint E-mail';
     DataClassification = CustomerContent;

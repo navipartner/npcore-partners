@@ -1,4 +1,4 @@
-﻿table 6151555 "NPR NpXml Template Trigger"
+table 6151555 "NPR NpXml Template Trigger"
 {
     Caption = 'NpXml Template Trigger';
     DataClassification = CustomerContent;

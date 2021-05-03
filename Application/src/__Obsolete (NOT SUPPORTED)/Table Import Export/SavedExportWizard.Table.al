@@ -4,6 +4,7 @@ table 6014511 "NPR Saved Export Wizard"
     DataCaptionFields = "Code", Description;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

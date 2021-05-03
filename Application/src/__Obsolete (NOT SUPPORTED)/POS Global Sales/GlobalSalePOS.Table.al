@@ -4,6 +4,7 @@ table 6060104 "NPR Global Sale POS"
     DataClassification = CustomerContent;
     DataPerCompany = false;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {
