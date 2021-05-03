@@ -3,6 +3,7 @@ table 6059787 "NPR Ticket Access Cap. Slots"
     Caption = 'Access Capacity';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

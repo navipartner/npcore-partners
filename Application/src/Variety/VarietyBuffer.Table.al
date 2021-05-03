@@ -1,4 +1,4 @@
-﻿table 6059974 "NPR Variety Buffer"
+table 6059974 "NPR Variety Buffer"
 {
     // VRT1.11/JDH /20160602 CASE 242940 Added captions
     // NPR5.29/TJ  /20170119 CASE 263917 Changed how to call GetFromVariety function in function LoadAll

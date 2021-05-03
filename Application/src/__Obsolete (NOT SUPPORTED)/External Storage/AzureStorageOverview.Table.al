@@ -3,6 +3,7 @@ table 6184861 "NPR Azure Storage Overview"
     Caption = 'Azure Storage Overview';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

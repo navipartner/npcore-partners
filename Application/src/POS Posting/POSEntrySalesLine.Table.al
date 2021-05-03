@@ -418,6 +418,7 @@ table 6150622 "NPR POS Entry Sales Line"
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(208; "Planned Delivery Date"; Date)
         {

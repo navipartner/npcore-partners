@@ -3,6 +3,7 @@ table 6059986 "NPR Sale POS Cue"
     Caption = 'Sale POS Cue';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

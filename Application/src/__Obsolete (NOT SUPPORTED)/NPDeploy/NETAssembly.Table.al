@@ -3,6 +3,7 @@ table 6014623 "NPR .NET Assembly"
     Caption = '.NET Assembly';
     DataPerCompany = false;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

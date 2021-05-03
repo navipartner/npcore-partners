@@ -1,4 +1,4 @@
-﻿table 6151524 "NPR Nc Endpoint File"
+table 6151524 "NPR Nc Endpoint File"
 {
     Caption = 'Nc Endpoint File';
     DataClassification = CustomerContent;

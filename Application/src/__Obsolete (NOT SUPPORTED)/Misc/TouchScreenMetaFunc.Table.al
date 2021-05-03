@@ -5,6 +5,7 @@ table 6014435 "NPR Touch Screen: Meta Func."
 
     Caption = 'Touch Screen - Meta Functions';
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     DataClassification = CustomerContent;
 
     fields
