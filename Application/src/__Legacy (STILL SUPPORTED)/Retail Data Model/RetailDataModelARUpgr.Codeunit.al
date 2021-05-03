@@ -744,8 +744,11 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         POSUnit: Record "NPR POS Unit";
         POSLedgerRegister: Record "NPR POS Period Register";
         HasOpenPOSLedgerRegister: Boolean;
+        NPRetailSetup: Record "NPR NP Retail Setup";
     begin
-
+        NPRetailSetup.Get();
+        if not NPRetailSetup."Advanced Posting Activated" then
+            exit;
         //-NPR5.38 [297087]
         if (SalesTicketNo = '') then
             exit;
