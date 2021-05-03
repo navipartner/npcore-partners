@@ -163,6 +163,7 @@ table 6014412 "NPR Mixed Discount Line"
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
         }
         field(210; "Cross-Reference No."; Code[50])
         {

@@ -4,6 +4,7 @@ table 6059778 "NPR Sync Profile Setup"
     DataPerCompany = false;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

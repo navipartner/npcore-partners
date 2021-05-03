@@ -4,6 +4,7 @@ table 6059780 "NPR Companies in Profile"
     DataPerCompany = false;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

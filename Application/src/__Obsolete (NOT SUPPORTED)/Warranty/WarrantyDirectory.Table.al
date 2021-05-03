@@ -3,6 +3,7 @@ table 6014509 "NPR Warranty Directory"
     Caption = 'Warranty Directory';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

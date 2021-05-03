@@ -3,6 +3,7 @@ table 6014425 "NPR Retail Document Header"
     Caption = 'Retail Document Header';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

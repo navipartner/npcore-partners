@@ -265,6 +265,11 @@
             "justification": "Changing a table extension's target is not allowed."
         },
         {
+            "id":"AS0075",
+            "action": "Error",
+            "justification": "Obsolete Reason must be set."
+        },
+        {
             "id": "AS0080",
             "action":"Hidden",
             "justification": "Decreasing the length of a field is not allowed. This might break the upgrade of existing installations and dependent extensions. If the field part of the primary key, the field length cannot change."

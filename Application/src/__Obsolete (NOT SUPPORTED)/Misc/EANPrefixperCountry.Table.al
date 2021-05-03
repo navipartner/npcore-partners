@@ -3,6 +3,7 @@ table 6060064 "NPR EAN Prefix per Country"
     Caption = 'EAN Prefix per Country';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

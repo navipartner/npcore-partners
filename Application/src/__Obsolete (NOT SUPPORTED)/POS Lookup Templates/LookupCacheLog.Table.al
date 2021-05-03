@@ -3,6 +3,7 @@ table 6014628 "NPR Lookup Cache Log"
     Caption = 'Lookup Cache Log';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

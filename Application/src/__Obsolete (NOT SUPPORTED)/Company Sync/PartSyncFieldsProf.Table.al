@@ -4,6 +4,7 @@ table 6059779 "NPR Part. Sync Fields Prof."
     DataPerCompany = false;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

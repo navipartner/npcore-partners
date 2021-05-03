@@ -1,4 +1,4 @@
-﻿table 6151551 "NPR NpXml Template"
+table 6151551 "NPR NpXml Template"
 {
     Caption = 'NpXml Template';
     DataClassification = CustomerContent;

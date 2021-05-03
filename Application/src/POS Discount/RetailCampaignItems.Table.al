@@ -1,4 +1,4 @@
-﻿table 6014612 "NPR Retail Campaign Items"
+table 6014612 "NPR Retail Campaign Items"
 {
     Caption = 'Period Discount Items';
     DataClassification = CustomerContent;

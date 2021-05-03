@@ -4,6 +4,7 @@ table 6059999 "NPR Client Diagnostics"
     Caption = 'Client Diagnostics';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

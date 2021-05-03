@@ -81,6 +81,7 @@ table 6059965 "NPR MPOS Adyen Transactions"
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(23; "Merchant Id"; Text[30])
         {

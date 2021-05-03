@@ -3,6 +3,7 @@ table 6184892 "NPR Storage Setup"
     Caption = 'External Storage Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     fields
     {
         field(1; "Storage ID"; Text[24])

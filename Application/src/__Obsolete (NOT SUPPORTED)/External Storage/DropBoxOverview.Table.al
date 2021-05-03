@@ -3,6 +3,7 @@ table 6184871 "NPR DropBox Overview"
     Caption = 'DropBox Overview';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

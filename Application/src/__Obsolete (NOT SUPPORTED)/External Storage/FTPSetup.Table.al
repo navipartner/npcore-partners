@@ -3,6 +3,7 @@ table 6184880 "NPR FTP Setup"
     Caption = 'FTP Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

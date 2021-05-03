@@ -1,4 +1,4 @@
-﻿table 6060043 "NPR Item Worksh. Variant Line"
+table 6060043 "NPR Item Worksh. Variant Line"
 {
     Caption = 'Item Worksheet Variant Line';
     DataClassification = CustomerContent;
