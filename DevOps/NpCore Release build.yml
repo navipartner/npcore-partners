@@ -62,8 +62,7 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
-        ${{ if eq(variables['PrereleaseApp'],'True') }}:
-          prereleaseApp: true
+        prereleaseApp: $(PrereleaseApp)
 
         translationsRepo: translations
         ${{ if eq(variables['PrereleaseApp'],'True') }}:
