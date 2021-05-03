@@ -1,4 +1,4 @@
-﻿table 6184492 "NPR Pepper Terminal"
+table 6184492 "NPR Pepper Terminal"
 {
     Caption = 'Pepper Terminal';
     DataClassification = CustomerContent;

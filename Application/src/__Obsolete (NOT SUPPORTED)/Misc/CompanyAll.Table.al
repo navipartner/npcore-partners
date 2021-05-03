@@ -4,6 +4,7 @@ table 6014441 "NPR Company All"
     DataPerCompany = false;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

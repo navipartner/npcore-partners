@@ -62,6 +62,7 @@ table 6150700 "NPR POS Menu"
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(45; "Available in App"; Boolean)
         {
@@ -69,6 +70,7 @@ table 6150700 "NPR POS Menu"
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
     }
 

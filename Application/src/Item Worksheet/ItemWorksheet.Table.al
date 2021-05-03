@@ -1,4 +1,4 @@
-﻿table 6060041 "NPR Item Worksheet"
+table 6060041 "NPR Item Worksheet"
 {
     Caption = 'Item Worksheet Batch';
     DataCaptionFields = Name, Description;

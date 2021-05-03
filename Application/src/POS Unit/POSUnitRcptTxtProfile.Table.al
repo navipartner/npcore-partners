@@ -25,6 +25,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             OptionCaption = 'Pos Unit,Comment';
             OptionMembers = "Pos Unit",Comment;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(11; "Sales Ticket Line Text1"; Code[50])
         {
@@ -32,6 +33,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(12; "Sales Ticket Line Text2"; Code[50])
         {
@@ -39,6 +41,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(13; "Sales Ticket Line Text3"; Code[50])
         {
@@ -46,6 +49,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(14; "Sales Ticket Line Text4"; Code[50])
         {
@@ -53,6 +57,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(15; "Sales Ticket Line Text5"; Code[50])
         {
@@ -60,6 +65,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(16; "Sales Ticket Line Text6"; Code[50])
         {
@@ -67,6 +73,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(17; "Sales Ticket Line Text7"; Code[50])
         {
@@ -74,6 +81,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(18; "Sales Ticket Line Text8"; Code[50])
         {
@@ -81,6 +89,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(19; "Sales Ticket Line Text9"; Code[50])
         {
@@ -88,6 +97,7 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(20; "Sales Ticket Rcpt. Text"; Text[2048])
         {

@@ -2,6 +2,7 @@ table 6014442 "NPR Touch Screen - Layout"
 {
     Caption = 'Touch Screen - Layout';
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     DataClassification = CustomerContent;
 
     fields

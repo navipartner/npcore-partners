@@ -3,6 +3,7 @@ table 6014697 "NPR Embedded Video Buffer"
     Caption = 'Embedded Video Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     fields
     {
         field(1; "Module Code"; Code[20])

@@ -1,4 +1,4 @@
-﻿table 6060040 "NPR Item Worksh. Template"
+table 6060040 "NPR Item Worksh. Template"
 {
     Caption = 'Item Worksheet Template';
     DataClassification = CustomerContent;

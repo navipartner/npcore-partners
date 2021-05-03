@@ -1,4 +1,4 @@
-﻿table 6151522 "NPR Nc Endpoint FTP"
+table 6151522 "NPR Nc Endpoint FTP"
 {
     Caption = 'Nc Endpoint FTP';
     DataClassification = CustomerContent;

@@ -1,4 +1,4 @@
-﻿table 6059902 "NPR Task Line"
+table 6059902 "NPR Task Line"
 {
     // TQ1.16/JDH/20140916 CASE 179044 added field "Send Only if File Exists" -possible to send ok emails only if a file has been generated
     // TQ1.17/JDH/20141008 CASE 179044 added function, so a manual check can be done, if the line is still valid to run (timeslot expired)
