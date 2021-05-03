@@ -1,4 +1,8 @@
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+    - masters/*
 
 resources:
   repositories:
@@ -33,18 +37,10 @@ jobs:
         filePath: $(psScriptsFolder)/BuildDeploy/CalculateNewVersion.ps1
         arguments: >
           -MajorVersion $(majorVersion)
+          -Prerelese
       env:
         SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       displayName: 'Calculate new version'
-
-    - task: XplatGenerateReleaseNotes@3
-      inputs: 
-        outputfile: '$(Build.ArtifactStagingDirectory)\releasenotes.html'
-        templatefile: '$(ScriptsRootFolder)/ReleaseNotesTemplates/build-handlebars-template.html'
-        replaceFile: TRUE
-        showOnlyPrimary: TRUE
-        getIndirectPullRequests: FALSE
-      displayName: Generate Release Notes
 
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
@@ -56,6 +52,8 @@ jobs:
         appVersion: $(NewAppVersion)
 
         translationsRepo: translations
+        translationsTargetRepoName: NpCore-Translations
+        translationsTargetRepoBranchName: master
         
         keyVaultCert:
           keyVaultCertPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
@@ -72,7 +70,7 @@ jobs:
           id: NaviPartner.NPCore.BC$(majorVersion)
           publish:
             enabled: TRUE
-            prerelease: FALSE
+            prerelease: TRUE
             #tags: $(artifactURL) - No artifact URL with precompiled images
   #            additionalFiles:
   #              {{ if eq(variables['PrereleasePackage'], FALSE) }}:
