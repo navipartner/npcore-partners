@@ -73,37 +73,6 @@
         CloseDialog;
     end;
 
-    [Obsolete('Use native Business Central objects instead of dotnet classes.', '')]
-    procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var XmlDocNode: DotNet NPRNetXmlNode) Success: Boolean
-    var
-        NpXmlElement: Record "NPR NpXml Element";
-        RecRef2: RecordRef;
-    begin
-        if IsNull(XmlDocNode) then
-            exit(false);
-
-        NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate2.Code);
-        NpXmlElement.SetFilter("Parent Line No.", '=%1', 0);
-        NpXmlElement.SetRange(Active, true);
-        if not NpXmlElement.FindSet() then
-            exit(false);
-
-        Success := true;
-        repeat
-            SetRecRefXmlFilter(NpXmlElement, RecRef, RecRef2);
-            if RecordSetExists or (RecRef.Number <> RecRef2.Number) then begin
-                if RecRef2.FindSet() then
-                    repeat
-                        Success := AddXmlElement(XmlDocNode, NpXmlElement, RecRef2, 0) and Success;
-                    until RecRef2.Next() = 0;
-            end else
-                Success := AddXmlElement(XmlDocNode, NpXmlElement, RecRef2, 0);
-            RecRef2.Close();
-        until NpXmlElement.Next() = 0;
-
-        exit(Success);
-    end;
-
     procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var Node: XmlNode) Success: Boolean
     var
         NpXmlElement: Record "NPR NpXml Element";
@@ -141,60 +110,6 @@
         PrimaryKeyValue := NewPrimaryKeyValue;
         HideDialog := NewHideDialog;
         Initialized := true;
-    end;
-
-    [Obsolete('Use native Business Central objects instead of dotnet classes.', '')]
-    local procedure AddXmlElement(var XmlNode: DotNet NPRNetXmlNode; NpXmlElement: Record "NPR NpXml Element"; var RecRef: RecordRef; CurrLevel: Integer) LevelAppended: Boolean
-    var
-        NewXmlNode: DotNet NPRNetXmlElement;
-        NpXmlElementChild: Record "NPR NpXml Element";
-        RecRefFilter: RecordRef;
-        RecRefChild: RecordRef;
-        XmlComment: DotNet NPRNetXmlComment;
-        Finished: Boolean;
-        Namespace: Text;
-    begin
-        if not NpXmlElement.Active then
-            exit;
-
-        Clear(RecRefFilter);
-        RecRefFilter.Open(RecRef.Number);
-        RecRefFilter := RecRef.Duplicate();
-        RecRefFilter.SetRecFilter();
-
-        if not NpXmlElement.Hidden then begin
-            Namespace := GetXmlNamespace(NpXmlElement);
-            NpXmlDomMgt.AddElementNamespace(XmlNode, NpXmlElement."Element Name", Namespace, NewXmlNode);
-            AddXmlValue(NewXmlNode, NpXmlElement, RecRefFilter);
-        end else
-            NewXmlNode := XmlNode;
-
-        Clear(NpXmlElementChild);
-        NpXmlElementChild.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
-        NpXmlElementChild.SetRange("Parent Line No.", NpXmlElement."Line No.");
-        NpXmlElementChild.SetRange(Active, true);
-        if NpXmlElementChild.FindSet() then
-            repeat
-                SetRecRefXmlFilter(NpXmlElementChild, RecRefFilter, RecRefChild);
-                if RecRefChild.FindSet() then
-                    repeat
-                        AddXmlElement(NewXmlNode, NpXmlElementChild, RecRefChild, CurrLevel + 1);
-                    until RecRefChild.Next() = 0;
-            until (NpXmlElementChild.Next() = 0);
-
-        if NpXmlElement.Hidden then
-            exit(true);
-
-        NewXmlNode.IsEmpty(NewXmlNode.InnerXml = '');
-        if NpXmlElement."Only with Value" and NewXmlNode.IsEmpty then
-            XmlNode.RemoveChild(NewXmlNode)
-        else
-            if NpXmlElement.Comment <> '' then begin
-                XmlComment := XmlNode.OwnerDocument.CreateComment(NpXmlElement.Comment);
-                XmlNode.InsertBefore(XmlComment, NewXmlNode);
-            end;
-
-        exit(true);
     end;
 
     local procedure AddXmlElement(var Node: XmlNode; NpXmlElement: Record "NPR NpXml Element"; var RecRef: RecordRef; CurrLevel: Integer): Boolean
@@ -271,58 +186,6 @@
         repeat
             NpXmlDomMgt.AddNamespaceDeclaration(Element, NpXmlNamespaces.Alias, NpXmlNamespaces.Namespace);
         until NpXmlNamespaces.Next() = 0;
-    end;
-
-    [Obsolete('Use native Business Central objects instead of dotnet classes.', '')]
-    local procedure AddXmlValue(var XmlNode: DotNet NPRNetXmlElement; var NPXmlElement: Record "NPR NpXml Element"; RecRef: RecordRef)
-    var
-        NpXmlAttribute: Record "NPR NpXml Attribute";
-        NPXmlElement2: Record "NPR NpXml Element";
-        NpXmlNamespace: Record "NPR NpXml Namespace";
-        XmlCDATA: DotNet NPRNetXmlCDataSection;
-        AttributeValue: Text;
-        ElementValue: Text;
-    begin
-        ElementValue := '';
-        Clear(NpXmlAttribute);
-        NpXmlAttribute.SetRange("Xml Template Code", NPXmlElement."Xml Template Code");
-        NpXmlAttribute.SetRange("Xml Element Line No.", NPXmlElement."Line No.");
-        NpXmlAttribute.SetFilter("Attribute Name", '<>%1', '');
-        if NpXmlAttribute.FindSet() then
-            repeat
-                AttributeValue := '';
-                if NpXmlAttribute."Attribute Field No." <> 0 then
-                    NPXmlElement2 := NPXmlElement;
-                if NpXmlAttribute."Default Field Type" then
-                    NPXmlElement2."Field Type" := NPXmlElement2."Field Type"::" ";
-                if NpXmlAttribute."Default Field Type" then begin
-                    NPXmlElement2."Custom Codeunit ID" := 0;
-                    NPXmlElement2."Xml Value Codeunit ID" := 0;
-                end;
-                AttributeValue := NpXmlValueMgt.GetXmlValue(RecRef, NPXmlElement2, NpXmlAttribute."Attribute Field No.");
-                if (NpXmlAttribute."Default Value" <> '') and (AttributeValue = '') then
-                    AttributeValue := NpXmlAttribute."Default Value";
-                if NpXmlAttribute.Namespace = '' then
-                    NpXmlDomMgt.AddAttribute(XmlNode, NpXmlAttribute."Attribute Name", AttributeValue)
-                else begin
-                    NpXmlNamespace.Get(NpXmlAttribute."Xml Template Code", NpXmlAttribute.Namespace);
-                    NpXmlDomMgt.AddAttributeNamespace(XmlNode, NpXmlAttribute.Namespace + ':' + NpXmlAttribute."Attribute Name", NpXmlNamespace.Namespace, AttributeValue);
-                end;
-            until NpXmlAttribute.Next() = 0;
-
-        if NPXmlElement."Field No." <> 0 then
-            ElementValue := NpXmlValueMgt.GetXmlValue(RecRef, NPXmlElement, NPXmlElement."Field No.");
-        if (NPXmlElement."Default Value" <> '') and (ElementValue = '') then
-            ElementValue := NPXmlElement."Default Value";
-        XmlNode.IsEmpty(ElementValue = '');
-        if NPXmlElement.CDATA then begin
-            if ElementValue <> '' then begin
-                XmlCDATA := XmlNode.OwnerDocument.CreateCDataSection('');
-                XmlNode.AppendChild(XmlCDATA);
-                XmlCDATA.AppendData(ElementValue);
-            end;
-        end else
-            XmlNode.InnerText := ElementValue;
     end;
 
     local procedure AddXmlValue(var Node: XmlNode; var NPXmlElement: Record "NPR NpXml Element"; RecRef: RecordRef)
@@ -1105,33 +968,6 @@
         exit(Output);
     end;
 
-    [Obsolete('Use native Business Central objects instead of dotnet classes.', '')]
-    local procedure MarkContainersAsArray(var XmlElement: DotNet NPRNetXmlElement)
-    var
-        XmlElementNextChild: DotNet NPRNetXmlElement;
-        XmlElementChild: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
-    begin
-        if IsNull(XmlElement) then
-            exit;
-        if NpXmlDomMgt.IsLeafNode(XmlElement) then
-            exit;
-
-        XmlNodeList := XmlElement.ChildNodes;
-        XmlElementChild := XmlElement.FirstChild;
-        repeat
-            XmlElementNextChild := XmlElementChild.NextSibling;
-
-            if XmlElementChild.Name = '#text' then
-                XmlElement.RemoveChild(XmlElementChild)
-            else
-                MarkContainersAsArray(XmlElementChild);
-
-            XmlElementChild := XmlElementNextChild;
-        until IsNull(XmlElementChild);
-    end;
-
     local procedure MarkContainersAsArray(var XmlElement: XmlElement)
     var
         NodeList: XmlNodeList;
@@ -1152,42 +988,6 @@
                 MarkContainersAsArray(Element);
         end;
 
-    end;
-
-    [Obsolete('Use native Business Central objects instead of dotnet classes.', '')]
-    procedure Xml2Json(var XmlDoc: DotNet "NPRNetXmlDocument"; NpXmlTemplate: Record "NPR NpXml Template") JsonString: Text
-    var
-        XmlDoc2: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        JsonConvert: DotNet JsonConvert;
-        JsonFormatting: DotNet NPRNetFormatting;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        JToken: DotNet JToken;
-        JContainer: DotNet NPRNetJContainer;
-        JArray: DotNet JArray;
-        RegEx: DotNet NPRNetRegex;
-        i: Integer;
-    begin
-        XmlDoc2 := XmlDoc.Clone;
-        XmlNodeList := XmlDoc2.DocumentElement.ChildNodes;
-        for i := 0 to XmlNodeList.Count() - 1 do begin
-            XmlElement := XmlNodeList.Item(i);
-            MarkContainersAsArray(XmlElement);
-        end;
-        if NpXmlTemplate."JSON Root is Array" then begin
-            JsonString := JsonConvert.SerializeXmlNode(XmlDoc2.DocumentElement, JsonFormatting.Indented, false);
-            JContainer := JContainer.Parse(JsonString);
-            JArray := JContainer.SelectTokens(NpXmlTemplate."Xml Root Name", true);
-            JsonString := JsonConvert.SerializeObject(JArray, JsonFormatting.Indented);
-        end else
-            JsonString := JsonConvert.SerializeXmlNode(XmlDoc2.DocumentElement, JsonFormatting.Indented, true);
-
-        if NpXmlTemplate."Use JSON Numbers" then
-            JsonString := RegEx.Replace(JsonString, '"(\d*\.?\d*)"(?!:)', '$1');
-
-        JsonString := RegEx.Replace(JsonString, '(?i)#string#', '');
-
-        exit(JsonString);
     end;
 
     procedure Xml2Json(var Document: XmlDocument; NpXmlTemplate: Record "NPR NpXml Template") JsonString: Text
