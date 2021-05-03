@@ -1,27 +1,11 @@
 codeunit 6151571 "NPR AF Helper Functions"
 {
-
-
-    [Obsolete('Use native Business Central objects')]
-    procedure GetValueAsText(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Text
-    begin
-        ReturnValue := JObject.GetValue(PropertyName).ToString;
-    end;
-
     procedure GetValueAsText(JObject: JsonObject; PropertyName: Text) ReturnValue: Text
     var
         Jtoken: JsonToken;
     begin
         JObject.Get(PropertyName, Jtoken);
         ReturnValue := Jtoken.AsValue().AsText();
-    end;
-
-    [Obsolete('Use native Business Central objects')]
-    procedure GetValueAsInteger(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Integer
-    var
-        DotNetInteger: DotNet NPRNetInt32;
-    begin
-        ReturnValue := DotNetInteger.Parse(JObject.GetValue(PropertyName).ToString);
     end;
 
     procedure GetValueAsInteger(JObject: JsonObject; PropertyName: Text) ReturnValue: Integer
@@ -32,33 +16,12 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := Jtoken.AsValue().AsInteger();
     end;
 
-    [Obsolete('Use native Business Central objects')]
-    procedure GetValueAsDecimal(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Decimal
-    var
-        DotNetDecimal: DotNet NPRNetDecimal;
-        CultureInfo: DotNet NPRNetCultureInfo;
-    begin
-        ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString, CultureInfo.InvariantCulture);
-    end;
-
     procedure GetValueAsDecimal(JObject: JsonObject; PropertyName: Text) ReturnValue: Decimal
     var
         Jtoken: JsonToken;
     begin
         JObject.Get(PropertyName, Jtoken);
         ReturnValue := Jtoken.AsValue().AsDecimal();
-    end;
-
-    [Obsolete('Use native Business Central objects')]
-    procedure GetValueAsDate(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Date
-    var
-        DotNetDateTime: DotNet NPRNetDateTime;
-        CultureInfo: DotNet NPRNetCultureInfo;
-        DtDataType: DotNet NPRNetType;
-    begin
-        DtDataType := GetDotNetType(DotNetDateTime);
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
-        ReturnValue := DT2Date(DotNetDateTime);
     end;
 
     procedure GetValueAsDate(JObject: JsonObject; PropertyName: Text) ReturnValue: Date
@@ -69,18 +32,6 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := Jtoken.AsValue().AsDate();
     end;
 
-    [Obsolete('Use native Business Central objects')]
-    procedure GetValueAsTime(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Time
-    var
-        DotNetDateTime: DotNet NPRNetDateTime;
-        CultureInfo: DotNet NPRNetCultureInfo;
-        DtDataType: DotNet NPRNetType;
-    begin
-        DtDataType := GetDotNetType(DotNetDateTime);
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
-        ReturnValue := DT2Time(DotNetDateTime);
-    end;
-
     procedure GetValueAsTime(JObject: JsonObject; PropertyName: Text) ReturnValue: Time
     var
         Jtoken: JsonToken;
@@ -89,32 +40,12 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := Jtoken.AsValue().AsTime();
     end;
 
-    [Obsolete('Use native Business Central objects')]
-    procedure GetValueAsDateTime(JObject: DotNet JObject; PropertyName: Text) ReturnValue: DateTime
-    var
-        DotNetDateTime: DotNet NPRNetDateTime;
-        CultureInfo: DotNet NPRNetCultureInfo;
-        DtDataType: DotNet NPRNetType;
-    begin
-        DtDataType := GetDotNetType(DotNetDateTime);
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
-        ReturnValue := DotNetDateTime;
-    end;
-
     procedure GetValueAsDateTime(JObject: JsonObject; PropertyName: Text) ReturnValue: DateTime
     var
         Jtoken: JsonToken;
     begin
         JObject.Get(PropertyName, Jtoken);
         ReturnValue := Jtoken.AsValue().AsDateTime();
-    end;
-
-    [Obsolete('Use native Business Central objects')]
-    procedure GetValueAsBoolean(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Boolean
-    var
-        DotNetBoolean: DotNet NPRNetBoolean;
-    begin
-        ReturnValue := DotNetBoolean.Parse(JObject.GetValue(PropertyName).ToString);
     end;
 
     procedure GetValueAsBoolean(JObject: JsonObject; PropertyName: Text) ReturnValue: Boolean
@@ -151,13 +82,6 @@ codeunit 6151571 "NPR AF Helper Functions"
             TextToTrim := TextToTrim.Remove(Index, StrLen(CharToTrim));
 
         exit(TextToTrim);
-    end;
-
-    [Obsolete('Use native Business Central objects')]
-    [TryFunction]
-    procedure TryParse(json: Text; var JToken: DotNet JToken)
-    begin
-        JToken := JToken.Parse(json);
     end;
 
     [TryFunction]

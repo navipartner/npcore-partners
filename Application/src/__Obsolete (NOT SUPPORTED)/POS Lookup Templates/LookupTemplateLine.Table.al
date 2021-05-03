@@ -3,6 +3,7 @@ table 6014627 "NPR Lookup Template Line"
     Caption = 'Lookup Template Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     fields
     {
         field(1; "Lookup Template Table No."; Integer)

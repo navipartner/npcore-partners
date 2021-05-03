@@ -4,6 +4,7 @@ table 6150613 "NPR NP Retail Setup"
     Caption = 'NP Retail Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

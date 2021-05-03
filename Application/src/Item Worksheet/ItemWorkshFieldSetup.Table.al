@@ -1,4 +1,4 @@
-﻿table 6060052 "NPR Item Worksh. Field Setup"
+table 6060052 "NPR Item Worksh. Field Setup"
 {
     Caption = 'Item Worksheet Field Setup';
     DataClassification = CustomerContent;

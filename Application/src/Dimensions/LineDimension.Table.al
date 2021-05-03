@@ -1,4 +1,4 @@
-ï»¿table 6014430 "NPR Line Dimension"
+table 6014430 "NPR Line Dimension"
 {
     Caption = 'NPR Line Dimension';
     DataClassification = CustomerContent;
@@ -321,7 +321,7 @@
         if not NPRLineDimLine.FindFirst() then
             exit;
 
-        // GennemlÂ¢b alle dimensionerne pÃ¥ "Ekspedition" EFTER dim er blevet opdateret.
+        // Genneml¢b alle dimensionerne på "Ekspedition" EFTER dim er blevet opdateret.
         if NPRLineDimHeader.FindSet() then
             repeat
                 if (not OldNPRLineDimHeader.Get(NPRLineDimHeader."Table ID", NPRLineDimHeader."Register No.", NPRLineDimHeader."Sales Ticket No.", NPRLineDimHeader.Date, NPRLineDimHeader."Sale Type", NPRLineDimHeader."Line No.", '', NPRLineDimHeader."Dimension Code"
@@ -344,8 +344,8 @@
                 end;
             until NPRLineDimHeader.Next() = 0;
 
-        // GennemlÂ¢b alle dimensionerne pÃ¥ "Ekspedition" FÂ¥R dim er blevet opdateret.
-        // hvis Dimensionskoden vare der fÂ¢r men ikke mere, sÃ¥ slettes Dimensionslinjerne med denne Dimensionskode
+        // Genneml¢b alle dimensionerne på "Ekspedition" F¥R dim er blevet opdateret.
+        // hvis Dimensionskoden vare der f¢r men ikke mere, så slettes Dimensionslinjerne med denne Dimensionskode
         if OldNPRLineDimHeader.FindSet() then
             repeat
                 if not NPRLineDimHeader.Get(OldNPRLineDimHeader."Table ID", Kassenr, Bonnr, Dato2, EkspArt, OldNPRLineDimHeader."Line No.", '', OldNPRLineDimHeader."Dimension Code") then begin

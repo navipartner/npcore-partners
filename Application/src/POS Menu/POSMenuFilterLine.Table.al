@@ -1,4 +1,4 @@
-﻿table 6150716 "NPR POS Menu Filter Line"
+table 6150716 "NPR POS Menu Filter Line"
 {
     Caption = 'POS Menu Filter';
     DataClassification = CustomerContent;

@@ -3,6 +3,7 @@ table 6014444 "Touch Screen - Meta F. Trans"
     Caption = 'Touch Screen - Meta F. Trans';
     DataCaptionFields = "Language Code", Description;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     DataClassification = CustomerContent;
 
     fields

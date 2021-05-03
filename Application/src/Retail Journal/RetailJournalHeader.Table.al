@@ -1,4 +1,4 @@
-﻿table 6014451 "NPR Retail Journal Header"
+table 6014451 "NPR Retail Journal Header"
 {
     Caption = 'Label Printing Header';
     LookupPageID = "NPR Retail Journal List";
