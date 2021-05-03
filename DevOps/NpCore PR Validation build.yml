@@ -67,6 +67,7 @@ jobs:
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test
+        appVersion: $(NewAppVersion)
         dependancies:
         - appsToDeploy:
           - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
