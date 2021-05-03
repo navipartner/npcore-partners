@@ -52,7 +52,7 @@ jobs:
         showOnlyPrimary: TRUE
         getIndirectPullRequests: FALSE
       displayName: Generate Release Notes
-      condition: and(succeeded(), eq(variables.PrereleaseApp, FALSE))    
+      condition: and(succeeded(), eq(variables.['PrereleaseApp'], 'false'))    
 
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
