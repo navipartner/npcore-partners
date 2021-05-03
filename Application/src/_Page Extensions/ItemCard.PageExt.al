@@ -116,10 +116,6 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Statistics Group field';
-                trigger OnValidate()
-                begin
-                    NPR_CheckItemGroup();
-                end;
             }
 
             field("NPR Condition"; "NPR Condition")
@@ -143,121 +139,6 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 ToolTip = 'Specifies the value of the NPR Explode BOM auto field';
             }
         }
-
-        modify("Search Description")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify(Blocked)
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Costing Method")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Standard Cost")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Last Direct Cost")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Price/Profit Calculation")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Profit %")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Unit Price")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Gen. Prod. Posting Group")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("VAT Prod. Posting Group")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Sales Unit of Measure")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Purch. Unit of Measure")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-
-        modify("Reorder Point")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Maximum Inventory")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-
 
         addafter("Sales Blocked")
         {
@@ -922,7 +803,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         modify(ItemsByLocation)
         {
             Promoted = true;
-			PromotedOnly = true;
+            PromotedOnly = true;
             PromotedCategory = Process;
         }
         addafter("Va&riants")
@@ -973,7 +854,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 Caption = 'Retail Item Journal';
                 Image = Journals;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014402;
                 ApplicationArea = All;
@@ -985,7 +866,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 Caption = 'Retail Item Reclassification Journal';
                 Image = Journals;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014403;
                 ApplicationArea = All;
@@ -1070,7 +951,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Price Label';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Image = BinLedger;
                     ShortcutKey = 'Shift+F8';
@@ -1097,7 +978,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Variety Matrix';
                     Promoted = True;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     PromotedCategory = Category5;
                     Image = ItemVariant;
@@ -1117,7 +998,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Variety Maintenance';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Image = ItemVariant;
                     ApplicationArea = All;
@@ -1135,7 +1016,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Add missing Barcode(s)';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     Image = BarCode;
                     ApplicationArea = All;
@@ -1254,7 +1135,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Pictures';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
                     Image = Picture;
@@ -1277,7 +1158,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Videos';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Image = Camera;
                     RunObject = page 6151455;
@@ -1290,7 +1171,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Webshops';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled and MagentoEnabledMultistore;
                     Image = Web;
@@ -1315,7 +1196,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Display Config';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
                     Image = ViewPage;
@@ -1489,12 +1370,6 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         MagentoPictureVarietyTypeVisible :=
           (MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety) and
           (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
-    end;
-
-    procedure NPR_CheckItemGroup()
-    begin
-        IF ("NPR Item Group" = '') THEN
-            FIELDERROR("NPR Item Group");
     end;
 
     procedure NPR_ReplicateItem()
