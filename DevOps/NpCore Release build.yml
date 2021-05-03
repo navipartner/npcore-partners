@@ -62,11 +62,11 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
-        ${{ if eq(variables.PrereleaseApp,'True') }}:
+        ${{ if eq(variables['PrereleaseApp'],'True') }}:
           prereleaseApp: true
 
         translationsRepo: translations
-        ${{ if eq(variables.PrereleaseApp,'True') }}:
+        ${{ if eq(variables['PrereleaseApp'],'True') }}:
           translationsTargetRepoName: NpCore-Translations
           translationsTargetRepoBranchName: master
         
