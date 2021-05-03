@@ -28,11 +28,11 @@ jobs:
         filePath: $(psScriptsFolder)/BuildDeploy/CalculateNewVersion.ps1
         arguments: >
           -MajorVersion $(majorVersion)
-          -Prerelese
+          -Prerelease
       env:
         SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       displayName: 'Calculate new version'
-          
+
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         containerName: $(containerName)
