@@ -21,7 +21,6 @@ table 6151552 "NPR NpXml Element"
             Caption = 'Table No.';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
-
         }
         field(20; "Template Version No."; Code[20])
         {
@@ -434,6 +433,11 @@ table 6151552 "NPR NpXml Element"
             Caption = 'Last Modified at';
             DataClassification = CustomerContent;
             Description = 'NC1.21';
+        }
+        field(5260; "Replace Inherited Filters"; Boolean)
+        {
+            Caption = 'Replace Inherited Filters';
+            DataClassification = CustomerContent;
         }
         field(100000; "Has Filter"; Boolean)
         {
