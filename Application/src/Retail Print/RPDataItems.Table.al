@@ -1,4 +1,4 @@
-﻿table 6014561 "NPR RP Data Items"
+table 6014561 "NPR RP Data Items"
 {
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
     // NPR5.34/MMV /20170724 CASE 284505 TESTFIELD on critical fields.

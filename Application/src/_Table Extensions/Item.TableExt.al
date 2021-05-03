@@ -54,6 +54,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Label barcode';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6014418; "NPR Explode BOM auto"; Boolean)
         {
@@ -84,12 +85,14 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Last Changed at';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6014440; "NPR Last Changed by"; Code[50])
         {
             Caption = 'Last Changed by';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6014500; "NPR Second-hand number"; Code[20])
         {
@@ -170,6 +173,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Std. Sales Qty.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6014630; "NPR Blocked on Pos"; Boolean)
         {
@@ -202,6 +206,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Shelf Label Type';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6059784; "NPR Ticket Type"; Code[10])
         {

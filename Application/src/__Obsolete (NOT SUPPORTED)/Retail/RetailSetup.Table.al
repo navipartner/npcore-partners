@@ -1718,6 +1718,7 @@ table 6014400 "NPR Retail Setup"
             OptionCaption = 'Core,Extended,None';
             OptionMembers = Core,Extended,"None";
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(6310; "Customer Config. Template"; Code[10])
         {

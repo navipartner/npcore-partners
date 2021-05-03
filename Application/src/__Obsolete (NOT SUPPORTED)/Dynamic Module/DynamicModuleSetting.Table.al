@@ -3,6 +3,7 @@ table 6014480 "NPR Dynamic Module Setting"
     Caption = 'Dynamic Module Setting';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

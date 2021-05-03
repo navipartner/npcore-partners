@@ -3,6 +3,7 @@ table 6184860 "NPR Azure Storage API Setup"
     Caption = 'Azure Storage API Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

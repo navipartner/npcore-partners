@@ -3,6 +3,7 @@ table 6014443 "NPR Touch Screen: MetaTriggers"
 
     Caption = 'Touch Screen - MetaTriggers';
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     DataClassification = CustomerContent;
 
     fields

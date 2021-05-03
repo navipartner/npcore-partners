@@ -1,4 +1,4 @@
-﻿table 6060051 "NPR Item Worksh. Excel Column"
+table 6060051 "NPR Item Worksh. Excel Column"
 {
     Caption = 'Item Worksheet Excel Column';
     DataClassification = CustomerContent;

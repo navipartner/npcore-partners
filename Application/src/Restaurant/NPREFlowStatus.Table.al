@@ -1,4 +1,4 @@
-﻿table 6150664 "NPR NPRE Flow Status"
+table 6150664 "NPR NPRE Flow Status"
 {
     Caption = 'Status';
     DataClassification = CustomerContent;

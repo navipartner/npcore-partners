@@ -82,6 +82,7 @@ table 6059968 "NPR MPOS Nets Transactions"
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(23; "Merchant Id"; Text[30])
         {

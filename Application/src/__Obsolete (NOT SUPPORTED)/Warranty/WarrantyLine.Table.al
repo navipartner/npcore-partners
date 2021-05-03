@@ -3,6 +3,7 @@ table 6014519 "NPR Warranty Line"
     Caption = 'Warranty Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

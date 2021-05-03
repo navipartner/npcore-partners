@@ -3,6 +3,7 @@ table 6014500 "NPR Used Goods Registration"
     Caption = 'Used Goods Registration';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

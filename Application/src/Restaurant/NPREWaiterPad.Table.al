@@ -1,4 +1,4 @@
-﻿table 6150660 "NPR NPRE Waiter Pad"
+table 6150660 "NPR NPRE Waiter Pad"
 {
     Caption = 'Waiter Pad';
     DataClassification = CustomerContent;

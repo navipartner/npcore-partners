@@ -3,6 +3,7 @@ table 6014426 "NPR Retail Document Lines"
     Caption = 'Retail Document Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

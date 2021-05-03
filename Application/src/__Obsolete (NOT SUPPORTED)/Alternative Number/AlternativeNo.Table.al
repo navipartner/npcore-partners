@@ -3,6 +3,7 @@ table 6014416 "NPR Alternative No."
     Caption = 'Alternative No.';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

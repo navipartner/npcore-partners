@@ -3,6 +3,7 @@ table 6184891 "NPR Storage Operation Type"
     Caption = 'Storage Operations';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
     fields
     {
         field(1; "Storage Type"; Code[20])

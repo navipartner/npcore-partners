@@ -3,6 +3,7 @@ table 6059788 "NPR Ticket Access Reserv."
     Caption = 'Ticket Access Reservation';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {
