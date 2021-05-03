@@ -37,6 +37,7 @@ jobs:
         filePath: $(psScriptsFolder)/BuildDeploy/CalculateNewVersion.ps1
         arguments: >
           -MajorVersion $(majorVersion)
+          -Prerelese
       env:
         SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       displayName: 'Calculate new version'
