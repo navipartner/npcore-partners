@@ -1220,7 +1220,13 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.Integration.Office")
     {
+#if BC17
         Version = '17.0.0.0';
+#endif
+
+#if BC18
+        Version = '18.0.0.0';
+#endif
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1235,7 +1241,13 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.DocumentReport")
     {
+#if BC17
         Version = '17.0.0.0';
+#endif
+
+#if BC18
+        Version = '18.0.0.0';
+#endif
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1246,7 +1258,13 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.PdfWriter")
     {
+#if BC17
         Version = '17.0.0.0';
+#endif
+
+#if BC18
+        Version = '18.0.0.0';
+#endif
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1257,7 +1275,13 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.EwsWrapper")
     {
+#if BC17
         Version = '17.0.0.0';
+#endif
+
+#if BC18
+        Version = '18.0.0.0';
+#endif
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1755,7 +1779,13 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.ClientExtensions")
     {
+#if BC17
         Version = '17.0.0.0';
+#endif
+
+#if BC18
+        Version = '18.0.0.0';
+#endif
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
