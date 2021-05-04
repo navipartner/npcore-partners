@@ -6,6 +6,7 @@
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         WasModified: Boolean;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
@@ -64,18 +65,23 @@
             repeat
                 case SaleLinePOS."Sale Type" of
                     SaleLinePOS."Sale Type"::Sale,
-                  SaleLinePOS."Sale Type"::Deposit:
-                        InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, false, POSSalesLine);
+                    SaleLinePOS."Sale Type"::Deposit:
+                        begin
+                            InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, false, POSSalesLine);
+                            InsertPOSTaxAmount(SaleLinePOS.SystemId, POSEntry);
+                        end;
                     SaleLinePOS."Sale Type"::"Out payment":
-                        if SaleLinePOS.Type = SaleLinePOS.Type::"G/L Entry" then
-                            InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, true, POSSalesLine)
-                        else
+                        if SaleLinePOS.Type = SaleLinePOS.Type::"G/L Entry" then begin
+                            InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, true, POSSalesLine);
+                        end else
                             InsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
                     SaleLinePOS."Sale Type"::Comment:
                         ; //To-do Comments
                     SaleLinePOS."Sale Type"::"Debit Sale":
-                        InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, false, POSSalesLine);
-
+                        begin
+                            InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, false, POSSalesLine);
+                            InsertPOSTaxAmount(SaleLinePOS.SystemId, POSEntry);
+                        end;
                     SaleLinePOS."Sale Type"::"Open/Close":
                         ; //To do Open / Close
                     SaleLinePOS."Sale Type"::Payment:
@@ -1323,7 +1329,6 @@
 
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text[1024]; DocNoOfRecords: Integer): Integer
     begin
-
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);
 
@@ -1337,7 +1342,13 @@
         DocumentEntry.Insert();
 
         exit(DocNoOfRecords);
+    end;
 
+    local procedure InsertPOSTaxAmount(SystemId: Guid; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryTaxCalc: codeunit "NPR POS Entry Tax Calc.";
+    begin
+        POSEntryTaxCalc.PostPOSTaxAmountCalculation(POSEntry."Entry No.", SystemId);
     end;
 }
 

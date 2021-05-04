@@ -48,7 +48,9 @@ codeunit 6150636 "NPR POS Rounding"
         SaleLinePOS.Description := GLAccount.Name;
         SaleLinePOS.Quantity := 0;
         SaleLinePOS."Unit Price" := Amount;
+        SaleLinePOS.Amount := Amount;
         SaleLinePOS."Amount Including VAT" := Amount;
+        SaleLinePOS."VAT Base Amount" := Amount;
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Rounding; // This is the only thing that differentiates a rounding line from a normal out payment line later on!
         SaleLinePOS.Insert(true);
     end;

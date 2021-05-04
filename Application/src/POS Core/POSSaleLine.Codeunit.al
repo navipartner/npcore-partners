@@ -493,6 +493,7 @@
             ReturnValue := true;
         end;
 
+        Rec.UpdateAmounts(Rec);
         POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOS(Rec);
         InvokeOnAfterInsertSaleLineWorkflow(Rec);
         POSSale.RefreshCurrent();

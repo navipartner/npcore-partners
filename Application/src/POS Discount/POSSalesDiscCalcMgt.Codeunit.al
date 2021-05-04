@@ -25,10 +25,6 @@
     //    and discount is removed on physical record.
     //    Since all other lines in the sale has "Discount Calculated" = false, the module immediately skips comparison for these.
 
-    trigger OnRun()
-    begin
-    end;
-
     procedure RecalculateAllSaleLinePOS(SalePOS: Record "NPR POS Sale")
     var
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
@@ -219,12 +215,11 @@
                         or (SaleLinePOS.Quantity <> TempSaleLinePOS.Quantity)
                     then begin
                         SaleLinePOS.TransferFields(TempSaleLinePOS, false);
-                        SaleLinePOS.Modify();
                     end;
                 end else begin
                     SaleLinePOS.Init();
                     SaleLinePOS := TempSaleLinePOS;
-                    SaleLinePOS.Insert();
+                    SaleLinePOS.Insert(false, true);
                 end;
 
                 SaleLinePOS.CreateDim(
@@ -235,10 +230,6 @@
                 SaleLinePOS.Modify();
             end;
         until TempSaleLinePOS.Next() = 0;
-    end;
-
-    local procedure "--- Checks"()
-    begin
     end;
 
     local procedure CheckDiscTrigger(var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
@@ -310,10 +301,6 @@
         exit(Result);
     end;
 
-    local procedure "--- Setup"()
-    begin
-    end;
-
     procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         Item: Record Item;
@@ -340,13 +327,11 @@
                 TempSaleLinePOS."Discount Amount" := 0;
                 TempSaleLinePOS."MR Anvendt antal" := 0;
                 TempSaleLinePOS."Custom Disc Blocked" := false;
-                TempSaleLinePOS.UpdateLineVatAmounts(TempSaleLinePOS, 0, 0, 0, 0);
                 TempSaleLinePOS.Insert();
+                if (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::" ") or (SaleLinePOS."Discount %" <> 0) then
+                    TempSaleLinePOS.UpdateLineVatAmounts(TempSaleLinePOS);
+                TempSaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure LogStopwatch(Keyword: Text; Duration: Duration)
@@ -358,10 +343,6 @@
             exit;
         FrontEnd.GetSession(POSSession);
         POSSession.AddServerStopwatch(Keyword, Duration);
-    end;
-
-    local procedure "--- Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

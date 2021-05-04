@@ -5,7 +5,7 @@ page 6060134 "NPR MM Member Info Capture"
     DataCaptionExpression = Rec."External Member No";
     InsertAllowed = false;
     SourceTable = "NPR MM Member Info Capture";
-    PageType = Card;
+    PageType = List;
     layout
     {
         area(content)
@@ -236,51 +236,7 @@ page 6060134 "NPR MM Member Info Capture"
                     end;
                 }
             }
-            group(Overview)
-            {
-                Visible = ShowMemberOverviewSection;
-                field("Entry No."; Rec."Entry No.")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Entry No. field';
-                }
-                field("R_PhoneNo"; Rec."Phone No.")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = phonenomandatory;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Phone No. field';
-                }
-                field("R_FirstName"; Rec."First Name")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the First Name field';
-                }
-                field("R_LastName"; Rec."Last Name")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Last Name field';
-                }
-                field("R_Email"; Rec."E-Mail Address")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the E-Mail Address field';
 
-                    trigger OnValidate()
-                    begin
-                        CheckEmail();
-                    end;
-                }
-                field("R_ExternalCardNo"; Rec."External Card No.")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = ExternalCardNoMandatory;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the External Card No. field';
-                }
-            }
             group(General)
             {
                 Visible = ShowNewMemberSection;

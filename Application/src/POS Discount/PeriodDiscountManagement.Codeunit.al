@@ -55,7 +55,7 @@
         PeriodDiscountLine: Record "NPR Period Discount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
-        POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Price: Decimal;
         UnitPrice: Decimal;
         BestCode: Code[20];
@@ -101,9 +101,9 @@
             PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
             if Customer.Get(TempSalePOS."Customer No.") and PeriodDiscountLine."Unit Price Incl. VAT" then begin
                 if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-                    POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                 if VATPostingSetup2.Get(Customer."VAT Bus. Posting Group", TempSaleLinePOS."VAT Prod. Posting Group") then
-                    POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup2, Handled);
+                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup2, Handled);
                 PeriodDiscountLine."Campaign Unit Price" :=
                     PeriodDiscountLine."Campaign Unit Price" / (100 + VATPostingSetup."VAT %") * (100 + VATPostingSetup2."VAT %");
             end;

@@ -38,7 +38,6 @@ codeunit 6150629 "NPR POS Entry Management"
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
         CalcItemSalesAmount: Decimal;
         CalcDiscountAmount: Decimal;
         CalcSalesQty: Decimal;
@@ -54,10 +53,8 @@ codeunit 6150629 "NPR POS Entry Management"
     begin
         if POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted then
             exit;
-        POSTaxCalculation.RefreshPOSTaxLines(POSEntry);
 
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSSalesLine.SetRange("Exclude from Posting", false);
         POSSalesLine.SetRange("Exclude from Posting", false);
         if POSSalesLine.FindSet() then
             repeat

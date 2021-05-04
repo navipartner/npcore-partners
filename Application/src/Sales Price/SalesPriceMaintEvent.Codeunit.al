@@ -88,7 +88,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         BreakLoop: Boolean;
         SalesPriceMaintenanceGroups: Record "NPR Sales Price Maint. Groups2";
         TmpItem: Record Item;
-        POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Handled: Boolean;
     begin
         RecRef.GetTable(Item);
@@ -145,7 +145,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                         SalesPriceMaintenanceSetup."Sales Type"::"All Customers":
                             begin
                                 if VATPostingSetup.Get(SalesPriceMaintenanceSetup."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
-                                    POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                                     VATPct := VATPostingSetup."VAT %";
                                     VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
                                 end;
@@ -159,7 +159,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                                 Customer.Get(SalesPriceMaintenanceSetup."Sales Code");
                                 if Customer."VAT Bus. Posting Group" <> '' then
                                     if VATPostingSetup.Get(Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group") then begin
-                                        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                                         VATPct := VATPostingSetup."VAT %";
                                         VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
                                     end;
@@ -169,7 +169,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                                 CustomerPriceGroup.Get(SalesPriceMaintenanceSetup."Sales Code");
                                 if CustomerPriceGroup."Price Includes VAT" and (CustomerPriceGroup."VAT Bus. Posting Gr. (Price)" <> '') then
                                     if VATPostingSetup.Get(CustomerPriceGroup."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
-                                        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                                         VATPct := VATPostingSetup."VAT %";
                                         VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
                                     end;

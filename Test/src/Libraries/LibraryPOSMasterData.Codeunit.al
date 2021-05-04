@@ -6,6 +6,7 @@
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSPaymentBin: record "NPR POS Payment Bin";
+        POSPricingProfile: Record "NPR POS Pricing Profile";
         LibraryUtility: Codeunit "Library - Utility";
     begin
         POSUnit.Init();
@@ -320,7 +321,6 @@
         CreateDefaultPostingProfile(POSPostingProfile);
     end;
 
-
     local procedure CreateDefaultPostingProfile(var POSPostingProfile: Record "NPR POS Posting Profile")
     var
         LibraryERM: Codeunit "Library - ERM";
@@ -492,6 +492,25 @@
         CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
     end;
 
+    procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store"; VATProductPostingGroup: Record "VAT Product Posting Group")
+    var
+        NPRLibraryInventory: Codeunit "NPR Library - Inventory";
+        LibraryRandom: Codeunit "Library - Random";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        POSStore.GetProfile(POSPostingProfile);
+        NPRLibraryInventory.CreateItem(Item);
+        Item.Validate("VAT Prod. Posting Group", VATProductPostingGroup.Code);
+        Item.Validate("VAT Bus. Posting Gr. (Price)", POSPostingProfile."VAT Bus. Posting Group");
+
+        Item."Price Includes VAT" := true;
+        Item."Unit Price" := LibraryRandom.RandDec(1000, 2) + 1; //more than 1
+        Item."Unit Cost" := LibraryRandom.RandDecInDecimalRange(0.01, Item."Unit Price", 1);
+        Item.Modify;
+
+        CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
+    end;
+
     procedure CreateSalespersonForPOSUsage(var Salesperson: Record "Salesperson/Purchaser")
     var
         LibrarySales: Codeunit "Library - Sales";
@@ -499,6 +518,57 @@
         LibrarySales.CreateSalesperson(Salesperson);
         Salesperson."NPR Register Password" := '1';
         Salesperson.Modify();
+    end;
+
+    procedure CreatePOSViewProfile(var POSViewProfile: Record "NPR POS View Profile")
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        POSViewProfile.Init();
+        POSViewProfile.Validate(
+          Code,
+          CopyStr(
+            LibraryUtility.GenerateRandomCode(POSViewProfile.FieldNo(Code), DATABASE::"NPR POS View Profile"), 1,
+            LibraryUtility.GetFieldLength(DATABASE::"NPR POS Audit Profile", POSViewProfile.FieldNo(Code))));
+
+        POSViewProfile.Insert();
+    end;
+
+    procedure AssignPOSViewProfileToPOSUnit(var POSUnit: Record "NPR POS Unit"; POSViewProfileCode: Code[20])
+    begin
+        POSUnit."POS View Profile" := POSViewProfileCode;
+        POSUnit.Modify();
+    end;
+
+    procedure AssignVATBusPostGroupToPOSPostingProfile(POSStore: Record "NPR POS Store"; VATBusPostingGroupCode: Code[20])
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        POSStore.GetProfile(POSPostingProfile);
+        POSPostingProfile."VAT Bus. Posting Group" := VATBusPostingGroupCode;
+        POSPostingProfile.Modify();
+    end;
+
+    procedure AssignTaxDetailToPOSPostingProfile(POSStore: Record "NPR POS Store"; TaxAreaCode: Code[20]; TaxLiable: Boolean)
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        POSStore.GetProfile(POSPostingProfile);
+        POSPostingProfile."Tax Area Code" := TaxAreaCode;
+        POSPostingProfile."Tax Liable" := TaxLiable;
+        POSPostingProfile.Modify();
+    end;
+
+    procedure AssignVATProdPostGroupToPOSSalesRoundingAcc(POSStore: Record "NPR POS Store"; VATProdPostingGroupCode: Code[20])
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        GLAcc: Record "G/L Account";
+    begin
+        POSStore.GetProfile(POSPostingProfile);
+        GLAcc."No." := POSPostingProfile."POS Sales Rounding Account";
+        GLAcc.Find();
+        GLAcc."VAT Prod. Posting Group" := VATProdPostingGroupCode;
+        GLAcc.Modify();
     end;
 
     procedure ItemReferenceCleanup()
