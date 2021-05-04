@@ -71,6 +71,8 @@ codeunit 6014478 "NPR MobilePayV10 CreatePOS"
         jsonRequest.WriteTo(_request);
         reqMessage.Content.WriteFrom(_request);
         reqMessage.Content.GetHeaders(headers);
+        headers.Clear();
+        headers.Add('Content-Type', 'application/json');
         reqMessage.Method := 'POST';
         reqMessage.SetRequestUri(mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/pointofsales');
 
