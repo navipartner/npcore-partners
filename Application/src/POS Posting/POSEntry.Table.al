@@ -443,7 +443,7 @@ table 6150621 "NPR POS Entry"
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
-        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
+        POSEntryTaxCalc: codeunit "NPR POS Entry Tax Calc.";
     begin
         POSSalesLine.SetRange("POS Entry No.", "Entry No.");
         POSSalesLine.DeleteAll();
@@ -452,9 +452,8 @@ table 6150621 "NPR POS Entry"
         POSBalancingLine.SetRange("POS Entry No.", "Entry No.");
         POSBalancingLine.DeleteAll();
         POSEntryCommentLine.SetRange("POS Entry No.", "Entry No.");
-        POSEntryCommentLine.DeleteAll();
-        POSTaxAmountLine.SetRange("POS Entry No.", "Entry No.");
-        POSTaxAmountLine.DeleteAll();
+        POSEntryCommentLine.DeleteAll;
+        POSEntryTaxCalc.DeleteAllLines(Rec."Entry No.");
     end;
 
     procedure Recalculate()

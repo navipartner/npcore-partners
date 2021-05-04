@@ -134,7 +134,7 @@ table 6014414 "NPR Period Discount Line"
             trigger OnValidate()
             var
                 ItemCategory: Record "Item Category";
-                POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
+                POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
                 Handled: Boolean;
                 UnitCost: Decimal;
             begin
@@ -143,7 +143,7 @@ table 6014414 "NPR Period Discount Line"
                     ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
                         if VATPostingSetup.Get(ItemCategory."NPR VAT Bus. Posting Group", ItemCategory."NPR VAT Prod. Posting Group") then begin
-                            POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                            POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;
                     end else
@@ -310,7 +310,7 @@ table 6014414 "NPR Period Discount Line"
             var
                 GLSetup: Record "General Ledger Setup";
                 ItemCategory: Record "Item Category";
-                POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
+                POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
                 Handled: Boolean;
                 UnitCost: Decimal;
             begin
@@ -319,7 +319,7 @@ table 6014414 "NPR Period Discount Line"
                     ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
                         if VATPostingSetup.Get(ItemCategory."NPR VAT Bus. Posting Group", ItemCategory."NPR VAT Prod. Posting Group") then begin
-                            POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                            POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;
                     end else

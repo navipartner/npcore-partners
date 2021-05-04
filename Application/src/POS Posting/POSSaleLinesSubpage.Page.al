@@ -85,6 +85,24 @@ page 6150748 "NPR POS Sale Lines Subpage"
                     PAGE.Run(PAGE::"NPR Unfinished POS Sale Trx", SalePOS);
                 end;
             }
+            action(ShowTaxCalculation)
+            {
+                Caption = 'Show Sales Tax Calculation';
+                Image = TaxDetail;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ApplicationArea = All;
+                ToolTip = 'Show sales tax calculation for active sale line.';
+
+                trigger OnAction()
+                var
+                    POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
+                begin
+                    POSSaleTaxCalc.Show(Rec.SystemId);
+                end;
+            }
         }
     }
 }

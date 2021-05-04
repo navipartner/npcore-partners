@@ -1,9 +1,5 @@
 ﻿codeunit 6014416 "NPR Mixed Discount Management"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         CustDiscGroupTmp: Record "Customer Discount Group" temporary;
         GLSetup: Record "General Ledger Setup";
@@ -41,10 +37,6 @@
         until (TempMixedDiscount.Next() = 0);
 
         Clear(TempSaleLinePOS);
-    end;
-
-    local procedure "--- Impact"()
-    begin
     end;
 
     local procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
@@ -993,12 +985,6 @@
                     TempSaleLinePOS.FindLast();
                 end;
                 TempSaleLinePOSApply."Invoice (Qty)" := TempSaleLinePOSApply."MR Anvendt antal";
-                if not TempSaleLinePOSApply."Price Includes VAT" and
-                   (TempSaleLinePOSApply.Amount <> 0) and
-                   (TempSaleLinePOSApply.Amount <> TempSaleLinePOSApply."Amount Including VAT")
-                then
-                    TempSaleLinePOSApply."Unit Price" :=
-                      TempSaleLinePOSApply."Unit Price" / TempSaleLinePOSApply.Amount * TempSaleLinePOSApply."Amount Including VAT";
                 TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price";
                 TempSaleLinePOSApply."VAT Base Amount" := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."Amount Including VAT" / (1 + TempSaleLinePOSApply."VAT %" / 100);
                 TempSaleLinePOSApply.Amount := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."VAT Base Amount";
@@ -1028,8 +1014,7 @@
                 TempSaleLinePOS := TempSaleLinePOSApply;
                 TempSaleLinePOS.Insert();
             end;
-            if not TempSaleLinePOS."Price Includes VAT" then
-                TempSaleLinePOSApply."Discount Amount" := TempSaleLinePOSApply."Discount Amount" / (1 + TempSaleLinePOS."VAT %" / 100);
+            TempSaleLinePOSApply."Discount Amount" := TempSaleLinePOSApply."Discount Amount";
             RemainingQty := TempSaleLinePOSApply.Quantity - TempSaleLinePOSApply."MR Anvendt antal";  //need this for "Multiple Discount Levels" type of discounts
             TempSaleLinePOS.Validate(Quantity, TempSaleLinePOSApply."MR Anvendt antal");
             NonDiscQty := 0;

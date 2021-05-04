@@ -25,14 +25,14 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
     procedure InitTempPOSItemSale(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSalePOS: Record "NPR POS Sale" temporary)
     var
         VATPostingSetup: Record "VAT Posting Setup";
-        POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Handled: Boolean;
     begin
         if not Item.Get(TempSaleLinePOS."No.") then
             exit;
 
         VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
-        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
 
         TempSalePOS.Date := Today();
         TempSalePOS."Prices Including VAT" := TempSaleLinePOS."Price Includes VAT";
@@ -296,13 +296,12 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
     local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATProdPostingGr: Code[20]; FromVATBusPostingGr: Code[20]; var UnitPrice: Decimal)
     var
         VATPostingSetup: Record "VAT Posting Setup";
-        POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Handled: Boolean;
     begin
         if FromPricesInclVAT then begin
             VATPostingSetup.Get(FromVATBusPostingGr, FromVATProdPostingGr);
-            POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
-
+            POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
             case VATPostingSetup."VAT Calculation Type" of
                 VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT":
                     VATPostingSetup."VAT %" := 0;

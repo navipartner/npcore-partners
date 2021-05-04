@@ -536,14 +536,14 @@ table 6014612 "NPR Retail Campaign Items"
     var
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Handled: Boolean;
         VATPct: Decimal;
     begin
         if Item.Get("Item No.") then begin
             VATPct := 0;
             if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
-                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                 VATPct := VATPostingSetup."VAT %";
             end;
 
