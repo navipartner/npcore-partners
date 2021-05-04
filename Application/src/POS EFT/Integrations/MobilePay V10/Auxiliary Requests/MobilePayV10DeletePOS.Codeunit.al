@@ -54,7 +54,7 @@ codeunit 6014529 "NPR MobilePayV10 Delete POS"
         jsonResponse: JsonObject;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
     begin
-        mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
+        mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, false, '');
 
         eftTrxRequest."External Result Known" := true;
         eftTrxRequest.Successful := true;

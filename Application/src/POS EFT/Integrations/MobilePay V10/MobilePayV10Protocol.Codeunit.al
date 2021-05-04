@@ -7,6 +7,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_Qst: Label 'Do you want to create a Job Queue task to run cancellation of dead reserved MobilePay transactions?';
         CANCELED_BY_USER_Err: Label 'Action canceled by user.';
         AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
+        MobilePayResponseExpectedButEmptyErr: Label 'This is a programming bug!!!\MobilePay response content expected but empty.\Can''t read any JSON response content.';
         IsRunningOutOfPosSession: Boolean;
 
     internal procedure SendTrxRequest(EftTrxRequest: record "NPR EFT Transaction Request")
@@ -721,10 +722,10 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
         // Response is successful
         respMessage.Content.ReadAs(stream);
-        if (ResponseBodyExpected) then begin
-            jsonResponse.ReadFrom(stream);
-        end else begin
-            if not jsonResponse.ReadFrom(stream) then;
+        if not jsonResponse.ReadFrom(stream) then begin
+            if (ResponseBodyExpected) then begin
+                error(MobilePayResponseExpectedButEmptyErr);
+            end;
         end;
 
         if (PollingEndpoint <> '') then begin

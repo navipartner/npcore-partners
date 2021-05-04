@@ -84,6 +84,7 @@ codeunit 6014517 "NPR MobilePayV10 Dialog"
 
         if eftTrxRequest."Result Code" in
             [mobilePayResultCode::Captured.AsInteger(),
+            mobilePayResultCode::CancelledByUser.AsInteger(),
              mobilePayResultCode::CancelledByClient.AsInteger(),
              mobilePayResultCode::CancelledByMobilePay.AsInteger(),
              mobilePayResultCode::ExpiredAndCancelled.AsInteger(),
