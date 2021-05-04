@@ -1,3 +1,5 @@
+$ErrorActionPreference = “Stop”
+
 Add-Type -Path ".\.scripts\NUglify.dll" # https://github.com/trullock/NUglify
 
 $fileList = Get-ChildItem -Path .\src\ -Filter *.al -Recurse
