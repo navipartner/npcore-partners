@@ -237,7 +237,6 @@
                 CopyFilter("Date Filter", AuxValueEntry."Posting Date");
                 CopyFilter("NPR Item Category Filter", AuxValueEntry."Item Category Code");
                 CopyFilter("NPR Global Dimension 1 Filter", AuxValueEntry."Global Dimension 1 Code");
-                AuxValueEntry.CalcFields("Sales Amount (Actual)", "Cost Amount (Actual)");
 
                 SalesLCY := AuxValueEntry."Sales Amount (Actual)";
                 CogsLCY := -AuxValueEntry."Cost Amount (Actual)";
