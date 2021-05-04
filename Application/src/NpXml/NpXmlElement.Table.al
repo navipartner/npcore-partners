@@ -21,7 +21,6 @@ table 6151552 "NPR NpXml Element"
             Caption = 'Table No.';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
-
         }
         field(20; "Template Version No."; Code[20])
         {

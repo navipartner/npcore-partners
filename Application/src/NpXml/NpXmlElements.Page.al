@@ -186,6 +186,11 @@
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blank Zero field';
                 }
+                field("Replace Inherited Filters"; Rec."Replace Inherited Filters")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies whether it is allowed to replaces filters, inherited from parent Xml elements, if another filter has been set up for the same field for current Xml Element. If the option is not activated, both filters will be applied for the field at the same time (using different FilterGroups)';
+                }
                 field("Has Filter"; Rec."Has Filter")
                 {
                     ApplicationArea = All;
