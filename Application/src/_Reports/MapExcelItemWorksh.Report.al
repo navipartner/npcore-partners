@@ -42,11 +42,13 @@ report 6060044 "NPR Map Excel Item Worksh."
                 field("Header Row"; HeaderRow)
                 {
                     ApplicationArea = All;
+                    Caption = 'Header Row';
                     ToolTip = 'Specifies the value of the HeaderRow field';
                 }
                 field("Try to match fields automatically"; BoolTryMatch)
                 {
                     ApplicationArea = All;
+                    Caption = 'Try to match fields automatically';
                     ToolTip = 'Specifies the value of the BoolTryMatch field';
                 }
             }

@@ -13,6 +13,7 @@ page 6014627 "NPR Hardware Connector"
             field(PageCaption; PageCaption)
             {
                 ApplicationArea = All;
+                Caption = 'Page Caption';
                 Style = Strong;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the PageCaption field';

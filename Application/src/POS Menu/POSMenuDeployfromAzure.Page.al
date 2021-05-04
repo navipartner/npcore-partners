@@ -12,6 +12,7 @@ page 6150709 "NPR POS Menu Deploy from Azure"
             field("POS Menu"; PosMenu)
             {
                 ApplicationArea = All;
+                Caption = 'POS Menu';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the PosMenu field';
                 trigger OnLookup(var value: Text): Boolean

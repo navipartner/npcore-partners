@@ -12,6 +12,7 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
             field("XML Template"; XmlTemplates)
             {
                 ApplicationArea = All;
+                Caption = 'XML Template';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the XmlTemplate field';
                 trigger OnLookup(var SelectedValues: Text): Boolean

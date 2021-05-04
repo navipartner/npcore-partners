@@ -16,6 +16,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
             field("Package Name"; package)
             {
                 ApplicationArea = All;
+                Caption = 'Package Name';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the package field';
                 trigger OnLookup(var value: Text): Boolean

@@ -432,6 +432,11 @@ table 6151552 "NPR NpXml Element"
             DataClassification = CustomerContent;
             Description = 'NC1.21';
         }
+        field(5260; "Replace Inherited Filters"; Boolean)
+        {
+            Caption = 'Replace Inherited Filters';
+            DataClassification = CustomerContent;
+        }
         field(100000; "Has Filter"; Boolean)
         {
             CalcFormula = Exist("NPR NpXml Filter" WHERE("Xml Template Code" = FIELD("Xml Template Code"),

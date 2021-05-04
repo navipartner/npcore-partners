@@ -42,6 +42,7 @@ page 6184497 "NPR Pepper Version Card"
                 field("Zip File"; HasZipFile)
                 {
                     ApplicationArea = All;
+                    Caption = 'Zip File';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasZipFile field';
                 }

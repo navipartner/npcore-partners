@@ -15,6 +15,7 @@ page 6014688 "NPR POS Posting Setup Step"
                 field("POS Store Code"; POSStoreCode)
                 {
                     ApplicationArea = All;
+                    Caption = 'POS Store Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSStoreCode field';
 
@@ -32,6 +33,7 @@ page 6014688 "NPR POS Posting Setup Step"
                 field("POS Payment Method Code"; POSPaymentMethodCode)
                 {
                     ApplicationArea = All;
+                    Caption = 'POS Payment Method Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSPaymentMethodCode field';
 
@@ -49,6 +51,7 @@ page 6014688 "NPR POS Posting Setup Step"
                 field("POS Payment Bin Code"; POSPaymentBinNo)
                 {
                     ApplicationArea = All;
+                    Caption = 'POS Payment Bin Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSPaymentBinNo field';
 
@@ -66,6 +69,7 @@ page 6014688 "NPR POS Posting Setup Step"
                 field("Close to POS Bin No."; CloseToPOSPaymentBinNo)
                 {
                     ApplicationArea = All;
+                    Caption = 'Close to POS Bin No.';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the CloseToPOSPaymentBinNo field';
 

@@ -221,6 +221,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field("Unit Price"; SalesPriceText)
                 {
                     ApplicationArea = All;
+                    Caption = 'Unit Price';
                     Style = StandardAccent;
                     StyleExpr = SalesPriceBold;
                     ToolTip = 'Specifies the value of the SalesPriceText field.';
@@ -257,6 +258,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field("Unit Cost"; PurchasePriceText)
                 {
                     ApplicationArea = All;
+                    Caption = 'Unit Cost';
                     Style = StandardAccent;
                     StyleExpr = PurchasePriceBold;
                     ToolTip = 'Specifies the value of the PurchasePriceText field.';

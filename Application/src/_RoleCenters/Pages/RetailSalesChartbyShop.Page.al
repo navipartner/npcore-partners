@@ -12,6 +12,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
             field("Date Range"; StatusText)
             {
                 ApplicationArea = Basic;
+                Caption = 'Date Range';
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;

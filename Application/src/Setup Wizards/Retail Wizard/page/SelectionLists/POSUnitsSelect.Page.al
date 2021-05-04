@@ -28,39 +28,42 @@ page 6059780 "NPR POS Units Select"
                 }
                 field(Status; Rec.Status)
                 {
-                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
+                    Visible = POSUnitMode;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    Visible = POSUnitMode;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    Visible = POSUnitMode;
                 }
                 field(LocationCode; LocationCode)
                 {
-                    Visible = POSUnitMode;
                     ApplicationArea = All;
+                    Caption = 'Location Code';
                     ToolTip = 'Specifies the value of the LocationCode field';
+                    Visible = POSUnitMode;
                 }
                 field(OpeningCash; OpeningCash)
                 {
-                    Visible = POSUnitMode;
                     ApplicationArea = All;
+                    Caption = 'Opening Cash';
                     ToolTip = 'Specifies the value of the OpeningCash field';
+                    Visible = POSUnitMode;
                 }
                 field(ClosingCash; ClosingCash)
                 {
-                    Visible = POSUnitMode;
                     ApplicationArea = All;
+                    Caption = 'Closing Cash';
                     ToolTip = 'Specifies the value of the ClosingCash field';
+                    Visible = POSUnitMode;
                 }
             }
         }

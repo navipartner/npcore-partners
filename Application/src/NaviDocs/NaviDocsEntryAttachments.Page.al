@@ -29,9 +29,10 @@ page 6059949 "NPR NaviDocs Entry Attachments"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the File Extension field';
                 }
-                field(Data; Data.HasValue)
+                field(Data; Rec.Data.HasValue)
                 {
                     ApplicationArea = All;
+                    Caption = 'Has Data';
                     ToolTip = 'Specifies the value of the Data.HasValue() field';
                 }
             }

@@ -221,6 +221,7 @@ report 6014550 "NPR Statement E-Mail"
                         field("Delay sending until"; NaviDocsDelayUntil)
                         {
                             ApplicationArea = All;
+                            Caption = 'Delay sending until';
                             ToolTip = 'Specifies the value of the NaviDocsDelayUntil field';
                         }
                     }

@@ -58,12 +58,14 @@ page 6184490 "NPR Pepper Config. Card"
                 field(License; HasLicense)
                 {
                     ApplicationArea = All;
+                    Caption = 'License';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasLicense field';
                 }
                 field("Additional Parameters"; HasAdditionalParameters)
                 {
                     ApplicationArea = All;
+                    Caption = 'Additional Parameters';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasAdditionalParameters field';
                 }

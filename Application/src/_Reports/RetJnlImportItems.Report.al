@@ -100,6 +100,7 @@
                 field("Only Inventory"; OnlyInventory)
                 {
                     ApplicationArea = All;
+                    Caption = 'Only Inventory';
                     ToolTip = 'Specifies the value of the OnlyInventory field';
                 }
             }
