@@ -69,9 +69,10 @@ page 6014651 "NPR Retail Wizard"
                     Caption = 'Create Company';
                     field(EmptyVar; EmptyVar)
                     {
-                        Visible = false;
                         ApplicationArea = All;
+                        Caption = ' ';
                         ToolTip = 'Specifies the value of the EmptyVar field';
+                        Visible = false;
                     }
                 }
                 group(CompanyInfo)
@@ -97,9 +98,10 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         field(EmptyVar2; EmptyVar)
                         {
-                            Visible = false;
                             ApplicationArea = All;
+                            Caption = ' ';
                             ToolTip = 'Specifies the value of the EmptyVar field';
+                            Visible = false;
                         }
                     }
                     part(POSStoreListPG; "NPR POS Store List Step")
@@ -275,118 +277,129 @@ page 6014651 "NPR Retail Wizard"
 
                 group(MissingData)
                 {
-                    Caption = '';
+                    Caption = 'The following data won''t be created: ';
+                    Visible = not AllDataFilledIn;
                     group(MandatoryDataMissing)
                     {
-                        Caption = 'The following data won''t be created: ';
-                        Visible = not AllDataFilledIn;
+                        Caption = '';
                         group(CompanyInfoDataMissing)
                         {
                             Caption = '';
                             Visible = not CompanyInfoDataToCreate;
-                            field(CompanyInfoLabel; CompanyInfoLabel)
+                            label(CompanyInfoLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- Company Information';
                                 ToolTip = 'Specifies the value of the CompanyInfoLabel field';
+
                             }
                         }
                         group(POSStoreDataMissing)
                         {
                             Caption = '';
                             Visible = not POSStoreDataToCreate;
-                            field(POSStoreLabel; POSStoreLabel)
+
+                            label(POSStoreLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- POS Store';
                                 ToolTip = 'Specifies the value of the POSStoreLabel field';
+
                             }
                         }
                         group(Profiles)
                         {
                             Caption = '';
                             Visible = POSProfileDataMissing;
-                            field(ProfilesLabel; ProfilesLabel)
+                            label(ProfilesLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- Profiles: ';
                                 ToolTip = 'Specifies the value of the ProfilesLabel field';
+
                             }
                             group(POSAuditProfileDataMissing)
                             {
                                 Caption = '';
                                 Visible = not POSAuditProfileDataToCreate;
-                                field(POSAuditProfileLabel; POSAuditProfileLabel)
+                                label(POSAuditProfileLabel)
                                 {
-                                    Caption = '';
                                     ApplicationArea = All;
+                                    Caption = '---- POS Audit Profile';
                                     ToolTip = 'Specifies the value of the POSAuditProfileLabel field';
+
                                 }
                             }
                             group(POSViewProfileDataMissing)
                             {
                                 Caption = '';
                                 Visible = not POSViewProfileDataToCreate;
-                                field(POSViewProfileLabel; POSViewProfileLabel)
+                                label(POSViewProfileLabel)
                                 {
-                                    Caption = '';
                                     ApplicationArea = All;
+                                    Caption = '---- POS View Profile';
                                     ToolTip = 'Specifies the value of the POSViewProfileLabel field';
+
                                 }
                             }
                             group(POSEndOfDayProfileDataMissing)
                             {
                                 Caption = '';
                                 Visible = not POSEndOfDayProfileDataToCreate;
-                                field(POSEndOfDayProfileLabel; POSEndOfDayProfileLabel)
+                                label(POSEndOfDayProfileLabel)
                                 {
-                                    Caption = '';
                                     ApplicationArea = All;
+                                    Caption = '---- POS End of Day Profile';
                                     ToolTip = 'Specifies the value of the POSEndOfDayProfileLabel field';
+
                                 }
                             }
                             group(POSPostingProfileDataMissing)
                             {
                                 Caption = '';
                                 Visible = not POSPostingProfileDataToCreate;
-                                field(POSPostingProfileLabel; POSPostingProfileLabel)
+                                label(POSPostingProfileLabel)
                                 {
-                                    Caption = '';
                                     ApplicationArea = All;
+                                    Caption = '---- POS Posting Profile';
                                     ToolTip = 'Specifies the value of the POSPostingProfileLabel field';
+
                                 }
                             }
                             group(EanBoxSetupDataMissing)
                             {
                                 Caption = '';
                                 Visible = not EanBoxSetupDataToCreate;
-                                field(EanBoxSalesSetupLabel; EanBoxSetupLabel)
+                                label(EanBoxSalesSetupLabel)
                                 {
-                                    Caption = '';
                                     ApplicationArea = All;
+                                    Caption = '---- Ean Box Setup';
                                     ToolTip = 'Specifies the value of the EanBoxSetupLabel field';
+
                                 }
                             }
                             group(POSSalesWorkflowSetDataMissing)
                             {
                                 Caption = '';
                                 Visible = not POSSalesWorkflowSetDataToCreate;
-                                field(POSSalesWorkflowLabel; POSSalesWorkflowLabel)
+                                label(POSSalesWorkflowLabel)
                                 {
-                                    Caption = '';
                                     ApplicationArea = All;
+                                    Caption = '---- POS Sales Workflow Set';
                                     ToolTip = 'Specifies the value of the POSSalesWorkflowLabel field';
+
                                 }
                             }
                             group(GlobalPOSSalesSetupDataMissing)
                             {
                                 Caption = '';
                                 Visible = not GlobalPOSSalesSetupDataToCreate;
-                                field(GlobalPOSSalesSetupLabel; GlobalPOSSalesSetupLabel)
+                                label(GlobalPOSSalesSetupLabel)
                                 {
-                                    Caption = '';
                                     ApplicationArea = All;
+                                    Caption = '---- Global POS Sales Setup';
                                     ToolTip = 'Specifies the value of the GlobalPOSSalesSetupLabel field';
+
                                 }
                             }
                         }
@@ -394,66 +407,72 @@ page 6014651 "NPR Retail Wizard"
                         {
                             Caption = '';
                             Visible = not POSUnitDataToCreate;
-                            field(POSUnitLabel; POSUnitLabel)
+                            label(POSUnitLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- POS Unit';
                                 ToolTip = 'Specifies the value of the POSUnitLabel field';
+
                             }
                         }
                         group(POSPaymentBinDataMissing)
                         {
                             Caption = '';
                             Visible = not POSPaymentBinDataToCreate;
-                            field(POSPaymentBinLabel; POSPaymentBinLabel)
+                            label(POSPaymentBinLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- POS Payment Bin';
                                 ToolTip = 'Specifies the value of the POSPaymentBinLabel field';
+
                             }
                         }
                         group(POSPaymentMethodDataMissing)
                         {
                             Caption = '';
                             Visible = not POSPaymentMethodDataToCreate;
-                            field(POSPaymentMethodLabel; POSPaymentMethodLabel)
+                            label(POSPaymentMethodLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- POS Payment Method';
                                 ToolTip = 'Specifies the value of the POSPaymentMethodLabel field';
+
                             }
                         }
                         group(POSPostingSetupDataMissing)
                         {
                             Caption = '';
                             Visible = not POSPostingSetupDataToCreate;
-                            field(POSPostingSetupLabel; POSPostingSetupLabel)
+                            label(POSPostingSetupLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- POS Posting Setup';
                                 ToolTip = 'Specifies the value of the POSPostingSetupLabel field';
+
                             }
                         }
                         group(SalespersonDataMissing)
                         {
                             Caption = '';
                             Visible = not SalespersonDataToCreate;
-                            field(SalespersonLabel; SalespersonLabel)
+                            label(SalespersonLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- Salespeople';
                                 ToolTip = 'Specifies the value of the SalespersonLabel field';
+
                             }
                         }
                         group(UserSetupDataMissing)
                         {
                             Caption = '';
                             Visible = not UserSetupDataToCreate;
-                            field(UserSetupLabel; UserSetupLabel)
+                            label(UserSetupLabel)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
+                                Caption = '- User Setup';
                                 ToolTip = 'Specifies the value of the UserSetupLabel field';
+
                             }
                         }
                     }
@@ -464,185 +483,189 @@ page 6014651 "NPR Retail Wizard"
                     InstructionalText = 'Please go back and review.';
                     Visible = not AllDataFilledIn;
                 }
-                group(MandatoryDataFilledIn)
+                group(FilledInData)
                 {
                     Caption = 'The following data will be created: ';
                     Visible = AnyDataToCreate;
+                    group(MandatoryDataFilledIn)
+                    {
+                        Caption = '';
+                        group(CompanyInfoDataExists)
+                        {
+                            Caption = '';
+                            Visible = CompanyInfoDataToCreate;
+                            label(CompanyInfoLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Company Information';
+                                ToolTip = 'Specifies the value of the CompanyInfoLabel field';
 
-                    group(CompanyInfoDataExists)
-                    {
-                        Caption = '';
-                        Visible = CompanyInfoDataToCreate;
-                        field(CompanyInfoLabel1; CompanyInfoLabel)
-                        {
-                            Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the CompanyInfoLabel field';
-                        }
-                    }
-                    group(POSStoreDataExists)
-                    {
-                        Caption = '';
-                        Visible = POSStoreDataToCreate;
-                        field(POSStoreLabel1; POSStoreLabel)
-                        {
-                            Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the POSStoreLabel field';
-                        }
-                    }
-                    group(Profiles1)
-                    {
-                        Caption = '';
-                        Visible = POSProfileDataToCreate;
-                        field(ProfilesLabel1; ProfilesLabel)
-                        {
-                            Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the ProfilesLabel field';
-                        }
-                        group(POSAuditProfileDataExists)
-                        {
-                            Caption = '';
-                            Visible = POSAuditProfileDataToCreate;
-                            field(POSAuditProfileLabel1; POSAuditProfileLabel)
-                            {
-                                Caption = '';
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the POSAuditProfileLabel field';
                             }
                         }
-                        group(POSViewProfileDataExists)
+                        group(POSStoreDataExists)
                         {
                             Caption = '';
-                            Visible = POSViewProfileDataToCreate;
-                            field(POSViewProfileLabel1; POSViewProfileLabel)
+                            Visible = POSStoreDataToCreate;
+                            label(POSStoreLabel1)
                             {
-                                Caption = '';
                                 ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the POSViewProfileLabel field';
+                                Caption = '- POS Store';
+                                ToolTip = 'Specifies the value of the POSStoreLabel field';
                             }
                         }
-                        group(POSEndOfDayProfileExists)
+                        group(Profiles1)
                         {
                             Caption = '';
-                            Visible = POSEndOfDayProfileDataToCreate;
-                            field(POSEndOfDayProfileLabel1; POSEndOfDayProfileLabel)
+                            Visible = POSProfileDataToCreate;
+                            label(ProfilesLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Profiles: ';
+                                ToolTip = 'Specifies the value of the ProfilesLabel field';
+                            }
+                            group(POSAuditProfileDataExists)
                             {
                                 Caption = '';
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the POSEndOfDayProfileLabel field';
+                                Visible = POSAuditProfileDataToCreate;
+                                label(POSAuditProfileLabel1)
+                                {
+                                    ApplicationArea = All;
+                                    Caption = '---- POS Audit Profile';
+                                    ToolTip = 'Specifies the value of the POSAuditProfileLabel field';
+                                }
                             }
-                        }
-                        group(POSPostingProfileDataExists)
-                        {
-                            Caption = '';
-                            Visible = POSPostingProfileDataToCreate;
-                            field(POSPostingProfileLabel1; POSPostingProfileLabel)
+                            group(POSViewProfileDataExists)
                             {
                                 Caption = '';
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the POSPostingProfileLabel field';
+                                Visible = POSViewProfileDataToCreate;
+                                label(POSViewProfileLabel1)
+                                {
+                                    ApplicationArea = All;
+                                    Caption = '---- POS View Profile';
+                                    ToolTip = 'Specifies the value of the POSViewProfileLabel field';
+                                }
                             }
-                        }
-                        group(EanBoxSetupDataExists)
-                        {
-                            Caption = '';
-                            Visible = EanBoxSetupDataToCreate;
-                            field(EanBoxSalesSetupLabel1; EanBoxSetupLabel)
+                            group(POSEndOfDayProfileExists)
                             {
                                 Caption = '';
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the EanBoxSetupLabel field';
+                                Visible = POSEndOfDayProfileDataToCreate;
+                                label(POSEndOfDayProfileLabel1)
+                                {
+                                    ApplicationArea = All;
+                                    Caption = '---- POS End of Day Profile';
+                                    ToolTip = 'Specifies the value of the POSEndOfDayProfileLabel field';
+                                }
                             }
-                        }
-                        group(POSSalesWorkflowSetDataExisting)
-                        {
-                            Caption = '';
-                            Visible = POSSalesWorkflowSetDataToCreate;
-                            field(POSSalesWorkflowLabel1; POSSalesWorkflowLabel)
+                            group(POSPostingProfileDataExists)
                             {
                                 Caption = '';
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the POSSalesWorkflowLabel field';
+                                Visible = POSPostingProfileDataToCreate;
+                                label(POSPostingProfileLabel1)
+                                {
+                                    ApplicationArea = All;
+                                    Caption = '---- POS Posting Profile';
+                                    ToolTip = 'Specifies the value of the POSPostingProfileLabel field';
+                                }
                             }
-                        }
-                        group(GlobalPOSSalesSetupDataExists)
-                        {
-                            Caption = '';
-                            Visible = GlobalPOSSalesSetupDataToCreate;
-                            field(GlobalPOSSalesSetupLabel1; GlobalPOSSalesSetupLabel)
+                            group(EanBoxSetupDataExists)
                             {
                                 Caption = '';
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the GlobalPOSSalesSetupLabel field';
+                                Visible = EanBoxSetupDataToCreate;
+                                label(EanBoxSalesSetupLabel1)
+                                {
+                                    ApplicationArea = All;
+                                    Caption = '---- Ean Box Setup';
+                                    ToolTip = 'Specifies the value of the EanBoxSetupLabel field';
+                                }
+                            }
+                            group(POSSalesWorkflowSetDataExisting)
+                            {
+                                Caption = '';
+                                Visible = POSSalesWorkflowSetDataToCreate;
+                                label(POSSalesWorkflowLabel1)
+                                {
+                                    ApplicationArea = All;
+                                    Caption = '---- POS Sales Workflow Set';
+                                    ToolTip = 'Specifies the value of the POSSalesWorkflowLabel field';
+                                }
+                            }
+                            group(GlobalPOSSalesSetupDataExists)
+                            {
+                                Caption = '';
+                                Visible = GlobalPOSSalesSetupDataToCreate;
+                                label(GlobalPOSSalesSetupLabel1)
+                                {
+                                    ApplicationArea = All;
+                                    Caption = '---- Global POS Sales Setup';
+                                    ToolTip = 'Specifies the value of the GlobalPOSSalesSetupLabel field';
+                                }
                             }
                         }
-                    }
-                    group(POSUnitDataExists)
-                    {
-                        Caption = '';
-                        Visible = POSUnitDataToCreate;
-                        field(POSUnitLabel1; POSUnitLabel)
+                        group(POSUnitDataExists)
                         {
                             Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the POSUnitLabel field';
+                            Visible = POSUnitDataToCreate;
+                            label(POSUnitLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- POS Unit';
+                                ToolTip = 'Specifies the value of the POSUnitLabel field';
+                            }
                         }
-                    }
-                    group(POSPaymentBinDataExists)
-                    {
-                        Caption = '';
-                        Visible = POSPaymentBinDataToCreate;
-                        field(POSPaymentBinLabel1; POSPaymentBinLabel)
+                        group(POSPaymentBinDataExists)
                         {
                             Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the POSPaymentBinLabel field';
+                            Visible = POSPaymentBinDataToCreate;
+                            label(POSPaymentBinLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- POS Payment Bin';
+                                ToolTip = 'Specifies the value of the POSPaymentBinLabel field';
+                            }
                         }
-                    }
-                    group(POSPaymentMethodDataExists)
-                    {
-                        Caption = '';
-                        Visible = POSPaymentMethodDataToCreate;
-                        field(POSPaymentMethodLabel1; POSPaymentMethodLabel)
+                        group(POSPaymentMethodDataExists)
                         {
                             Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the POSPaymentMethodLabel field';
+                            Visible = POSPaymentMethodDataToCreate;
+                            label(POSPaymentMethodLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- POS Payment Method';
+                                ToolTip = 'Specifies the value of the POSPaymentMethodLabel field';
+                            }
                         }
-                    }
-                    group(POSPostingSetupDataExists)
-                    {
-                        Caption = '';
-                        Visible = POSPostingSetupDataToCreate;
-                        field(POSPostingSetupLabel1; POSPostingSetupLabel)
+                        group(POSPostingSetupDataExists)
                         {
                             Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the POSPostingSetupLabel field';
+                            Visible = POSPostingSetupDataToCreate;
+                            label(POSPostingSetupLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- POS Posting Setup';
+                                ToolTip = 'Specifies the value of the POSPostingSetupLabel field';
+                            }
                         }
-                    }
-                    group(SalespersonDataExists)
-                    {
-                        Caption = '';
-                        Visible = SalespersonDataToCreate;
-                        field(SalespersonLabel1; SalespersonLabel)
+                        group(SalespersonDataExists)
                         {
                             Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the SalespersonLabel field';
+                            Visible = SalespersonDataToCreate;
+                            label(SalespersonLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Salespeople';
+                                ToolTip = 'Specifies the value of the SalespersonLabel field';
+                            }
                         }
-                    }
-                    group(UserSetupDataExists)
-                    {
-                        Caption = '';
-                        Visible = UserSetupDataToCreate;
-                        field(UserSetupLabel1; UserSetupLabel)
+                        group(UserSetupDataExists)
                         {
                             Caption = '';
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the UserSetupLabel field';
+                            Visible = UserSetupDataToCreate;
+                            label(UserSetupLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- User Setup';
+                                ToolTip = 'Specifies the value of the UserSetupLabel field';
+                            }
                         }
                     }
                 }
@@ -779,22 +802,6 @@ page 6014651 "NPR Retail Wizard"
         SalespersonDataToCreate: Boolean;
         UserSetupDataToCreate: Boolean;
         AnyDataToCreate: Boolean;
-        CompanyInfoLabel: Label '- Company Information';
-        POSStoreLabel: Label '- POS Store';
-        ProfilesLabel: Label '- Profiles: ';
-        POSAuditProfileLabel: Label '---- POS Audit Profile';
-        POSViewProfileLabel: Label '---- POS View Profile';
-        POSEndOfDayProfileLabel: Label '---- POS End of Day Profile';
-        POSPostingProfileLabel: Label '---- POS Posting Profile';
-        EanBoxSetupLabel: Label '---- Ean Box Setup';
-        POSSalesWorkflowLabel: Label '---- POS Sales Workflow Set';
-        GlobalPOSSalesSetupLabel: Label '---- Global POS Sales Setup';
-        POSUnitLabel: Label '- POS Unit';
-        POSPaymentBinLabel: Label '- POS Payment Bin';
-        POSPaymentMethodLabel: Label '- POS Payment Method';
-        POSPostingSetupLabel: Label '- POS Posting Setup';
-        SalespersonLabel: Label '- Salespeople';
-        UserSetupLabel: Label '- User Setup';
 
     local procedure EnableControls();
     begin

@@ -32,6 +32,7 @@ page 6184496 "NPR Pepper Version List"
                 field("Zip File"; HasInstallFile)
                 {
                     ApplicationArea = All;
+                    Caption = 'Zip File';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasInstallFile field';
                 }

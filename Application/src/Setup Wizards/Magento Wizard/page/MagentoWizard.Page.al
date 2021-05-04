@@ -196,19 +196,20 @@ page 6014400 "NPR Magento Wizard"
                 }
                 group(MissingData)
                 {
-                    Caption = '';
+                    Caption = 'The following data won''t be created: ';
+                    Visible = not AllDataFilledIn;
+
                     group(MandatoryDataMissing)
                     {
-                        Caption = 'The following data won''t be created: ';
-                        Visible = not AllDataFilledIn;
+                        Caption = '';
                         group(MagentoStoreMissing)
                         {
                             Caption = '';
                             Visible = not MagentoStoreDataFilledIn;
-                            field(MagentoStoreLabel; MagentoStoreLabel)
+                            label(MagentoStoreLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Store';
                                 ToolTip = 'Specifies the value of the MagentoStoreLabel field';
                             }
                         }
@@ -216,10 +217,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoWebsiteDataFilledIn;
-                            field(MagentoWebsiteLabel; MagentoWebsiteLabel)
+                            label(MagentoWebsiteLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Website';
                                 ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
                             }
                         }
@@ -227,10 +228,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoCustomerMappingDataFilledIn;
-                            field(MagentoCustomerMappingLabel; MagentoCustomerMappingLabel)
+                            label(MagentoCustomerMappingLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Customer Mapping';
                                 ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
                             }
                         }
@@ -238,10 +239,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoPaymentGatewayDataFilledIn;
-                            field(MagentoPaymentGatewayLabel; MagentoPaymentGatewayLabel)
+                            label(MagentoPaymentGatewayLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Payment Gateway';
                                 ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
                             }
                         }
@@ -249,10 +250,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoPaymentMappingDataFilledIn;
-                            field(MagentoPaymentMappingLabel; MagentoPaymentMappingLabel)
+                            label(MagentoPaymentMappingLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Payment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
                             }
                         }
@@ -260,10 +261,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoShippmentMappingDataFilledIn;
-                            field(MagentoShippmentMappingLabel; MagentoShippmentMappingLabel)
+                            label(MagentoShippmentMappingLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Shippment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
                             }
                         }
@@ -271,10 +272,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoBrandDataFilledIn;
-                            field(MagentoBrandsLabel; MagentoBrandLabel)
+                            label(MagentoBrandsLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Brand';
                                 ToolTip = 'Specifies the value of the MagentoBrandLabel field';
                             }
                         }
@@ -282,10 +283,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoDisplayGroupDataFilledIn;
-                            field(MagentoDisplayGroupLabel; MagentoDisplayGroupLabel)
+                            label(MagentoDisplayGroupLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Display Group';
                                 ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
                             }
                         }
@@ -293,10 +294,10 @@ page 6014400 "NPR Magento Wizard"
                         {
                             Caption = '';
                             Visible = not MagentoDisplayConfigDataFilledIn;
-                            field(MagentoDisplayConfigLabel; MagentoDisplayConfigLabel)
+                            label(MagentoDisplayConfigLabel)
                             {
                                 ApplicationArea = All;
-                                Caption = '';
+                                Caption = '- Magento Display Config';
                                 ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
                             }
                         }
@@ -308,108 +309,111 @@ page 6014400 "NPR Magento Wizard"
                     InstructionalText = 'Please go back and review.';
                     Visible = not AllDataFilledIn;
                 }
-                group(MandatoryDataFilledIn)
+                group(FilledInData)
                 {
                     Caption = 'The following data will be created: ';
                     Visible = AnyDataToCreate;
-
-                    group(MagentoStoreExists)
+                    group(MandatoryDataFilledIn)
                     {
                         Caption = '';
-                        Visible = MagentoStoreDataFilledIn;
-                        field(MagentoStoreLabel1; MagentoStoreLabel)
+                        group(MagentoStoreExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoStoreLabel field';
+                            Visible = MagentoStoreDataFilledIn;
+                            label(MagentoStoreLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Store';
+                                ToolTip = 'Specifies the value of the MagentoStoreLabel field';
+                            }
                         }
-                    }
-                    group(MagentoWebsiteExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoWebsiteDataFilledIn;
-                        field(MagentoWebsiteLabel1; MagentoWebsiteLabel)
+                        group(MagentoWebsiteExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
+                            Visible = MagentoWebsiteDataFilledIn;
+                            label(MagentoWebsiteLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Website';
+                                ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
+                            }
                         }
-                    }
-                    group(MagentoCustomerMappingExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoCustomerMappingDataFilledIn;
-                        field(MagentoCustomerMappingLabel1; MagentoCustomerMappingLabel)
+                        group(MagentoCustomerMappingExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
+                            Visible = MagentoCustomerMappingDataFilledIn;
+                            label(MagentoCustomerMappingLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Customer Mapping';
+                                ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
+                            }
                         }
-                    }
-                    group(MagentoPaymentGatewaygExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoPaymentGatewayDataFilledIn;
-                        field(MagentoPaymentGatewayLabel1; MagentoPaymentGatewayLabel)
+                        group(MagentoPaymentGatewaygExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
+                            Visible = MagentoPaymentGatewayDataFilledIn;
+                            label(MagentoPaymentGatewayLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Payment Gateway';
+                                ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
+                            }
                         }
-                    }
-                    group(MagentoPaymentMappingExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoPaymentMappingDataFilledIn;
-                        field(MagentoPaymentMappingLabel1; MagentoPaymentMappingLabel)
+                        group(MagentoPaymentMappingExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
+                            Visible = MagentoPaymentMappingDataFilledIn;
+                            label(MagentoPaymentMappingLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Payment Mapping';
+                                ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
+                            }
                         }
-                    }
-                    group(MagentoShippmentMappingExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoShippmentMappingDataFilledIn;
-                        field(MagentoShippmentMappingLabel1; MagentoShippmentMappingLabel)
+                        group(MagentoShippmentMappingExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
+                            Visible = MagentoShippmentMappingDataFilledIn;
+                            label(MagentoShippmentMappingLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Shippment Mapping';
+                                ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
+                            }
                         }
-                    }
-                    group(MagentoBrandsExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoBrandDataFilledIn;
-                        field(MagentoBrandsLabel1; MagentoBrandLabel)
+                        group(MagentoBrandsExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoBrandLabel field';
+                            Visible = MagentoBrandDataFilledIn;
+                            label(MagentoBrandsLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Brand';
+                                ToolTip = 'Specifies the value of the MagentoBrandLabel field';
+                            }
                         }
-                    }
-                    group(MagentoDisplayGroupExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoDisplayGroupDataFilledIn;
-                        field(MagentoDisplayGroupLabel1; MagentoDisplayGroupLabel)
+                        group(MagentoDisplayGroupExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
+                            Visible = MagentoDisplayGroupDataFilledIn;
+                            label(MagentoDisplayGroupLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Display Group';
+                                ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
+                            }
                         }
-                    }
-                    group(MagentoDisplayConfigExists)
-                    {
-                        Caption = '';
-                        Visible = MagentoDisplayConfigDataFilledIn;
-                        field(MagentoDisplayConfigLabel1; MagentoDisplayConfigLabel)
+                        group(MagentoDisplayConfigExists)
                         {
-                            ApplicationArea = All;
                             Caption = '';
-                            ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
+                            Visible = MagentoDisplayConfigDataFilledIn;
+                            label(MagentoDisplayConfigLabel1)
+                            {
+                                ApplicationArea = All;
+                                Caption = '- Magento Display Config';
+                                ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
+                            }
                         }
                     }
                 }
@@ -517,15 +521,6 @@ page 6014400 "NPR Magento Wizard"
         MagentoDisplayConfigDataFilledIn: Boolean;
         AllDataFilledIn: Boolean;
         AnyDataToCreate: Boolean;
-        MagentoWebsiteLabel: Label '- Magento Website';
-        MagentoStoreLabel: Label '- Magento Store';
-        MagentoCustomerMappingLabel: Label '- Magento Customer Mapping';
-        MagentoPaymentGatewayLabel: Label '- Magento Payment Gateway';
-        MagentoPaymentMappingLabel: Label '- Magento Payment Mapping';
-        MagentoShippmentMappingLabel: Label '- Magento Shippment Mapping';
-        MagentoBrandLabel: Label '- Magento Brand';
-        MagentoDisplayGroupLabel: Label '- Magento Display Group';
-        MagentoDisplayConfigLabel: Label '- Magento Display Config';
 
     local procedure EnableControls();
     begin

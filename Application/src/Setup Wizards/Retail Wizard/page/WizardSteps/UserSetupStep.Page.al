@@ -15,6 +15,7 @@ page 6014690 "NPR User Setup Step"
                 field("User ID"; UserId)
                 {
                     ApplicationArea = All;
+                    Caption = 'User Id';
                     ToolTip = 'Specifies the ID of the user who posted the entry, to be used, for example, in the change log.';
 
                     Lookup = true;
@@ -45,6 +46,7 @@ page 6014690 "NPR User Setup Step"
                 field("Salespers./Purch. Code"; SalespersonCode)
                 {
                     ApplicationArea = All;
+                    Caption = 'Salesperson Code';
                     ToolTip = 'Specifies the code for the salesperson or purchaser for the user.';
 
                     Lookup = true;

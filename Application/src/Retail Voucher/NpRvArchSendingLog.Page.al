@@ -51,6 +51,7 @@ page 6151030 "NPR NpRv Arch. Sending Log"
                 field(ErrorMessage; Rec.GetErrorMessage())
                 {
                     ApplicationArea = All;
+                    Caption = 'Error Message';
                     ToolTip = 'Specifies the value of the GetErrorMessage() field';
 
                     trigger OnDrillDown()

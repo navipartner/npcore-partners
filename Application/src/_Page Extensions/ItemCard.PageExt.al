@@ -33,6 +33,7 @@
             field("NPR NPR_AverageCostACY"; AverageCostACY)
             {
                 ApplicationArea = All;
+                Caption = 'Average Cost ACY';
                 ToolTip = 'Specifies the value of the AverageCostACY field';
                 trigger OnDrillDown()
                 begin
@@ -999,7 +1000,7 @@
                 }
             }
         }
-    
+
 
         addafter(Resources)
         {

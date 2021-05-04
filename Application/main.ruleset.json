@@ -135,6 +135,11 @@
             "justification": "The number of option captions specified in the OptionCaption property must match the number of option values available for a variable or a field on a page or report."
         },
         {
+            "id": "AA0225",
+            "action":"Error",
+            "justification": "You must specify a caption in the Caption property for Fields that exist on page objects."
+        },
+        {
             "id": "AA0226",
             "action":"Error",
             "justification": "The value of the Caption property of Fields must be filled in."
