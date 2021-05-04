@@ -95,6 +95,11 @@
             "justification": "To avoid confusion, do not give methods the same name as fields or actions in the same scope."
         },
         {
+            "id": "AA0211",
+            "action":"Error",
+            "justification": "The CalcFields method should only be used with FlowFields or fields of type Blob. The field Cost Amount (Actual) is not a FlowField or of type Blob."
+        },
+        {
             "id": "AA0215",
             "action":"Hidden",
             "justification": "Follow the style guide about the best practices for naming."
