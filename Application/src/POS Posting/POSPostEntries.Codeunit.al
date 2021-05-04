@@ -197,9 +197,7 @@
                     OnCheckPostingRestrictions(POSEntry, false);
                     OnBeforePostPOSEntry(POSEntry, false);
 
-                    POSEntry.Recalculate;
-                    if not CheckPOSTaxAmountLines(POSEntry, true) then
-                        Error(TextErrorTaxMismatch, POSEntry."Entry No.");
+                    POSEntry.Recalculate();
 
                     if (POSEntry."POS Period Register No." <> PreviousPOSPeriodRegister) and (PreviousPOSPeriodRegister <> 0) then
                         Error(TextErrorMultiple, POSEntry."POS Period Register No.", PreviousPOSPeriodRegister, POSPeriodRegister.TableCaption);
@@ -268,63 +266,80 @@
                             case POSPostingBuffer.Type of
                                 POSPostingBuffer.Type::Item:
                                     begin
-                                        GeneralPostingSetup.Get(POSPostingBuffer."Gen. Bus. Posting Group", POSPostingBuffer."Gen. Prod. Posting Group");
-                                        GeneralPostingSetup.TestField("Sales Account");
-                                        if SalesReceivablesSetup."Discount Posting" in [SalesReceivablesSetup."Discount Posting"::"Line Discounts", SalesReceivablesSetup."Discount Posting"::"All Discounts"] then begin
-                                            MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
-                                              Round(POSPostingBuffer.Amount + POSPostingBuffer."Discount Amount", Currency."Amount Rounding Precision"),
-                                              Round(POSPostingBuffer."Amount (LCY)" + POSPostingBuffer."Discount Amount (LCY)", Currency."Amount Rounding Precision"),
-                                              GenJournalLine."Gen. Posting Type"::Sale,
-                                              GenJournalLine."Account Type"::"G/L Account",
-                                              GeneralPostingSetup."Sales Account",
-                                              GenJournalLine."Account Type"::"G/L Account",
-                                              '',
-                                              Round(POSPostingBuffer."VAT Amount" + POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
-                                              Round(POSPostingBuffer."VAT Amount (LCY)" + POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
-                                              GenJournalLine);
-
-                                            if (POSPostingBuffer."Discount Amount" <> 0) or (POSPostingBuffer."Discount Amount (LCY)" <> 0) or
-                                               (POSPostingBuffer."VAT Amount Discount" <> 0) or (POSPostingBuffer."VAT Amount Discount (LCY)" <> 0) then begin
-                                                GeneralPostingSetup.TestField("Sales Line Disc. Account");
+                                        if POSPostingBuffer."VAT Calculation Type" <> POSPostingBuffer."VAT Calculation Type"::"Sales Tax" then begin
+                                            GeneralPostingSetup.Get(POSPostingBuffer."Gen. Bus. Posting Group", POSPostingBuffer."Gen. Prod. Posting Group");
+                                            GeneralPostingSetup.TestField("Sales Account");
+                                            if SalesReceivablesSetup."Discount Posting" in [SalesReceivablesSetup."Discount Posting"::"Line Discounts", SalesReceivablesSetup."Discount Posting"::"All Discounts"] then begin
                                                 MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
-                                                  Round(-POSPostingBuffer."Discount Amount", Currency."Amount Rounding Precision"),
-                                                  Round(-POSPostingBuffer."Discount Amount (LCY)", Currency."Amount Rounding Precision"),
+                                                  Round(POSPostingBuffer.Amount + POSPostingBuffer."Discount Amount", Currency."Amount Rounding Precision"),
+                                                  Round(POSPostingBuffer."Amount (LCY)" + POSPostingBuffer."Discount Amount (LCY)", Currency."Amount Rounding Precision"),
                                                   GenJournalLine."Gen. Posting Type"::Sale,
                                                   GenJournalLine."Account Type"::"G/L Account",
-                                                  GeneralPostingSetup."Sales Line Disc. Account",
+                                                  GeneralPostingSetup."Sales Account",
                                                   GenJournalLine."Account Type"::"G/L Account",
                                                   '',
-                                                  Round(-POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
-                                                  Round(-POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
+                                                  Round(POSPostingBuffer."VAT Amount" + POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
+                                                  Round(POSPostingBuffer."VAT Amount (LCY)" + POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
                                                   GenJournalLine);
+
+                                                if (POSPostingBuffer."Discount Amount" <> 0) or (POSPostingBuffer."Discount Amount (LCY)" <> 0) or
+                                                   (POSPostingBuffer."VAT Amount Discount" <> 0) or (POSPostingBuffer."VAT Amount Discount (LCY)" <> 0) then begin
+                                                    GeneralPostingSetup.TestField("Sales Line Disc. Account");
+                                                    MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                      Round(-POSPostingBuffer."Discount Amount", Currency."Amount Rounding Precision"),
+                                                      Round(-POSPostingBuffer."Discount Amount (LCY)", Currency."Amount Rounding Precision"),
+                                                      GenJournalLine."Gen. Posting Type"::Sale,
+                                                      GenJournalLine."Account Type"::"G/L Account",
+                                                      GeneralPostingSetup."Sales Line Disc. Account",
+                                                      GenJournalLine."Account Type"::"G/L Account",
+                                                      '',
+                                                      Round(-POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
+                                                      Round(-POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
+                                                      GenJournalLine);
+                                                end;
+                                            end else begin
+                                                MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                   POSPostingBuffer.Amount,
+                                                   POSPostingBuffer."Amount (LCY)",
+                                                   GenJournalLine."Gen. Posting Type"::Sale,
+                                                   GenJournalLine."Account Type"::"G/L Account",
+                                                   GeneralPostingSetup."Sales Account",
+                                                   GenJournalLine."Account Type"::"G/L Account",
+                                                   '',
+                                                   POSPostingBuffer."VAT Amount",
+                                                   POSPostingBuffer."VAT Amount (LCY)",
+                                                   GenJournalLine);
                                             end;
-                                        end else begin
-                                            MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
-                                               POSPostingBuffer.Amount,
-                                               POSPostingBuffer."Amount (LCY)",
-                                               GenJournalLine."Gen. Posting Type"::Sale,
-                                               GenJournalLine."Account Type"::"G/L Account",
-                                               GeneralPostingSetup."Sales Account",
-                                               GenJournalLine."Account Type"::"G/L Account",
-                                               '',
-                                               POSPostingBuffer."VAT Amount",
-                                               POSPostingBuffer."VAT Amount (LCY)",
-                                               GenJournalLine);
                                         end;
                                     end;
                                 POSPostingBuffer.Type::"G/L Account", POSPostingBuffer.Type::Voucher:
                                     begin
-                                        MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
-                                            POSPostingBuffer.Amount,
-                                            POSPostingBuffer."Amount (LCY)",
-                                            GenJournalLine."Gen. Posting Type"::Sale,
-                                            GenJournalLine."Account Type"::"G/L Account",
-                                            POSPostingBuffer."No.",
-                                            GenJournalLine."Account Type"::"G/L Account",
-                                            '',
-                                            POSPostingBuffer."VAT Amount",
-                                            POSPostingBuffer."VAT Amount (LCY)",
-                                            GenJournalLine);
+                                        if POSPostingBuffer."Rounding Amount (LCY)" <> 0 then begin
+                                            GenPostingType := GenJournalLine."Gen. Posting Type"::" ";
+                                            MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                POSPostingBuffer."Rounding Amount",
+                                                POSPostingBuffer."Rounding Amount (LCY)",
+                                                GenPostingType,
+                                                GenJournalLine."Account Type"::"G/L Account",
+                                                POSPostingBuffer."No.",
+                                                GenJournalLine."Account Type"::"G/L Account",
+                                                '',
+                                                POSPostingBuffer."VAT Amount",
+                                                POSPostingBuffer."VAT Amount (LCY)",
+                                                GenJournalLine);
+                                        end else begin
+                                            MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                POSPostingBuffer.Amount,
+                                                POSPostingBuffer."Amount (LCY)",
+                                                GenJournalLine."Gen. Posting Type"::Sale,
+                                                GenJournalLine."Account Type"::"G/L Account",
+                                                POSPostingBuffer."No.",
+                                                GenJournalLine."Account Type"::"G/L Account",
+                                                '',
+                                                POSPostingBuffer."VAT Amount",
+                                                POSPostingBuffer."VAT Amount (LCY)",
+                                                GenJournalLine);
+                                        end;
                                     end;
                                 POSPostingBuffer.Type::Customer:
                                     begin
@@ -640,6 +655,7 @@
               0,
               '',
               POSPostingProfile."Source Code",
+              "Tax Calculation Type"::"Normal VAT",
               GenJournalLine);
         end;
 
@@ -685,71 +701,6 @@
         StopOnErrorVar := StopOnErrorIn;
     end;
 
-    procedure CheckPOSTaxAmountLines(var POSEntry: Record "NPR POS Entry"; ThrowError: Boolean) Result: Boolean
-    begin
-        ClearLastError();
-        Result := TryCheckPOSTaxAmountLines(POSEntry);
-        if (not Result) and ThrowError then
-            Error(GetLastErrorText);
-    end;
-
-    [TryFunction]
-    local procedure TryCheckPOSTaxAmountLines(var POSEntry: Record "NPR POS Entry")
-    var
-        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
-        TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        TempPOSSalesLine: Record "NPR POS Entry Sales Line" temporary;
-        Currency: Record Currency;
-        TaxAmountSalesLines: Decimal;
-        RemSalesTaxAmt: Decimal;
-        TaxJurisdiction: Record "Tax Jurisdiction";
-    begin
-        if POSEntry."Currency Code" <> '' then
-            Currency.Get(POSEntry."Currency Code")
-        else
-            Currency.Init();
-        TaxAmountSalesLines := 0;
-
-        POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSTaxAmountLine.FindSet() then
-            repeat
-                if POSTaxAmountLine."Tax Calculation Type" = POSTaxAmountLine."Tax Calculation Type"::"Sales Tax" then begin
-                    if POSTaxAmountLine."Tax Jurisdiction Code" <> TaxJurisdiction.Code then begin
-                        TaxJurisdiction.Get(POSTaxAmountLine."Tax Jurisdiction Code");
-                        RemSalesTaxAmt := 0;
-                    end;
-                    RemSalesTaxAmt := RemSalesTaxAmt + POSTaxAmountLine."Tax Amount";
-                    TempPOSTaxAmountLine."Tax Amount" += Round(RemSalesTaxAmt);
-                    RemSalesTaxAmt := RemSalesTaxAmt - Round(RemSalesTaxAmt);
-                end else begin
-                    TempPOSTaxAmountLine."Tax Amount" += Round(POSTaxAmountLine."Tax Amount", Currency."Amount Rounding Precision");
-                    TempPOSTaxAmountLine."Amount Including Tax" += Round(POSTaxAmountLine."Amount Including Tax", Currency."Amount Rounding Precision");
-                    TempPOSTaxAmountLine."Tax Base Amount" += Round(POSTaxAmountLine."Tax Base Amount", Currency."Amount Rounding Precision");
-                end;
-            until POSTaxAmountLine.Next() = 0;
-
-        POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSSalesLine.SetFilter(Type, '<>%1', POSSalesLine.Type::Rounding);
-        POSSalesLine.SetRange("Exclude from Posting", false);
-        if POSSalesLine.FindSet() then
-            repeat
-                if POSSalesLine."VAT Calculation Type" = POSSalesLine."VAT Calculation Type"::"Sales Tax" then begin
-                    TaxAmountSalesLines := TaxAmountSalesLines + (POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT");
-                end else begin
-                    TaxAmountSalesLines := TaxAmountSalesLines + (POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT");
-                    TempPOSSalesLine."Amount Incl. VAT" += POSSalesLine."Amount Incl. VAT";
-                    TempPOSSalesLine."Amount Excl. VAT" += POSSalesLine."Amount Excl. VAT";
-                end;
-            until POSSalesLine.Next() = 0;
-
-        if TempPOSTaxAmountLine."Tax Amount" <> TaxAmountSalesLines then
-            Error(TextSalesTaxDiscrepancy, TempPOSTaxAmountLine.FieldCaption("Tax Amount"), TaxAmountSalesLines, TempPOSTaxAmountLine."Tax Amount");
-        if TempPOSTaxAmountLine."Amount Including Tax" <> TempPOSSalesLine."Amount Incl. VAT" then
-            Error(TextSalesTaxDiscrepancy, TempPOSTaxAmountLine.FieldCaption("Amount Including Tax"), TempPOSSalesLine."Amount Incl. VAT", TempPOSTaxAmountLine."Amount Including Tax");
-        if TempPOSTaxAmountLine."Tax Base Amount" <> TempPOSSalesLine."Amount Excl. VAT" then
-            Error(TextSalesTaxDiscrepancy, TempPOSTaxAmountLine.FieldCaption("Tax Base Amount"), TempPOSSalesLine."Amount Excl. VAT", TempPOSTaxAmountLine."Tax Base Amount");
-    end;
 
     local procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
     var
@@ -859,6 +810,8 @@
                     POSPostingBuffer."Amount (LCY)" := 0;
                     POSPostingBuffer."VAT Amount Discount" := 0;
                     POSPostingBuffer."VAT Amount Discount (LCY)" := 0;
+                    POSPostingBuffer."Rounding Amount" := 0;
+                    POSPostingBuffer."Rounding Amount (LCY)" := 0;
                     POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
                     POSPostingBuffer.Insert();
                 end;
@@ -873,8 +826,12 @@
                 POSPostingBuffer."Amount (LCY)" := POSPostingBuffer."Amount (LCY)" - POSSalesLineToBeCompressed."Amount Excl. VAT (LCY)";
                 POSPostingBuffer."VAT Amount Discount" := POSPostingBuffer."VAT Amount Discount" - (POSSalesLineToBeCompressed."Line Discount Amount Incl. VAT" - POSSalesLineToBeCompressed."Line Discount Amount Excl. VAT");
                 POSPostingBuffer."VAT Amount Discount (LCY)" := POSPostingBuffer."VAT Amount Discount (LCY)" - (POSSalesLineToBeCompressed."Line Dsc. Amt. Incl. VAT (LCY)" - POSSalesLineToBeCompressed."Line Dsc. Amt. Excl. VAT (LCY)");
-                POSPostingBuffer.Modify();
-            until POSSalesLineToBeCompressed.Next() = 0;
+                if POSSalesLineToBeCompressed.Type = POSSalesLineToBeCompressed.Type::Rounding then begin
+                    POSPostingBuffer."Rounding Amount" -= POSSalesLineToBeCompressed."Amount Incl. VAT";
+                    POSPostingBuffer."Rounding Amount (LCY)" -= POSSalesLineToBeCompressed."Amount Incl. VAT (LCY)";
+                end;
+                POSPostingBuffer.Modify;
+            until POSSalesLineToBeCompressed.Next = 0;
     end;
 
     local procedure CreatePostingBufferLinesFromPOSSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
@@ -1227,6 +1184,7 @@
           VATAmountInLCY,
           POSPostingProfile."VAT Customer No.",
           POSPostingProfile."Source Code",
+          POSPostingBuffer."VAT Calculation Type",
           GenJournalLine);
 
         OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
@@ -1273,12 +1231,13 @@
           0,
           '',
           POSPostingProfile."Source Code",
+          "Tax Calculation Type"::"Normal VAT",
           GenJournalLine);
 
         OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
     end;
 
-    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
     begin
         LineNumber := LineNumber + 10000;
         GenJournalLine.Init();
@@ -1316,30 +1275,25 @@
         GenJournalLine."Source Currency Amount" := PostingAmount;
 
         if GenPostingType in [GenJournalLine."Gen. Posting Type"::Sale, GenJournalLine."Gen. Posting Type"::Purchase] then begin
-            if TaxAreaCode = '' then begin
-                GenJournalLine."VAT %" := VATPerc;
-                GenJournalLine."Source Curr. VAT Amount" := VATAmount;
-                GenJournalLine."Source Curr. VAT Base Amount" := PostingAmount;
-                GenJournalLine."Use Tax" := Usetax;
-                GenJournalLine."VAT Posting" := GenJournalLine."VAT Posting"::"Manual VAT Entry";
-                GenJournalLine."VAT Amount" := VATAmount;
-                GenJournalLine."VAT Amount (LCY)" := VATAmountLCY;
-                GenJournalLine."Tax Area Code" := TaxAreaCode;
-                GenJournalLine."Tax Liable" := TaxLiable;
-                GenJournalLine."Tax Group Code" := TaxGroupCode;
-                GenJournalLine."VAT Bus. Posting Group" := VATBusPostingGroup;
-                GenJournalLine."VAT Prod. Posting Group" := VATProdPostingGroup;
+            GenJournalLine."VAT %" := VATPerc;
+            GenJournalLine."Source Curr. VAT Amount" := VATAmount;
+            GenJournalLine."Source Curr. VAT Base Amount" := PostingAmount;
+            GenJournalLine."Use Tax" := Usetax;
+            GenJournalLine."VAT Amount" := VATAmount;
+            GenJournalLine."VAT Amount (LCY)" := VATAmountLCY;
 
-                if GenPostingType = GenJournalLine."Gen. Posting Type"::Sale then
-                    GenJournalLine."Bill-to/Pay-to No." := VATCustomerNo;
+            if GenPostingType = GenJournalLine."Gen. Posting Type"::Sale then
+                GenJournalLine."Bill-to/Pay-to No." := VATCustomerNo;
 
-            end else
-                GenJournalLine."VAT Calculation Type" := GenJournalLine."VAT Calculation Type"::"Sales Tax";
+            GenJournalLine."VAT Posting" := GenJournalLine."VAT Posting"::"Manual VAT Entry";
+            GenJournalLine."Gen. Bus. Posting Group" := GenBusPostingGroup;
+            GenJournalLine."Gen. Prod. Posting Group" := GenProdPostingGroup;
+            GenJournalLine."VAT Bus. Posting Group" := VATBusPostingGroup;
+            GenJournalLine."VAT Prod. Posting Group" := VATProdPostingGroup;
+            GenJournalLine."VAT Calculation Type" := TaxCalcType;
         end;
 
         GenJournalLine."Posting Group" := PostingGroup;
-        GenJournalLine."Gen. Bus. Posting Group" := GenBusPostingGroup;
-        GenJournalLine."Gen. Prod. Posting Group" := GenProdPostingGroup;
         GenJournalLine."Shortcut Dimension 1 Code" := ShortcutDim1;
         GenJournalLine."Shortcut Dimension 2 Code" := ShortcutDim2;
         GenJournalLine."Dimension Set ID" := DimSetID;
@@ -1352,273 +1306,452 @@
     local procedure CreateGenJournalLinesFromSalesTax(var POSEntry: Record "NPR POS Entry"; var GenJnlLine: Record "Gen. Journal Line")
     var
         POSEntry2: Record "NPR POS Entry";
-        TaxJurisdiction: Record "Tax Jurisdiction";
-        CurrExchRate: Record "Currency Exchange Rate";
-        CustPostingGr: Record "Customer Posting Group";
-        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
-        TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
-        Currency: Record Currency;
-        GLSetup: Record "General Ledger Setup";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
-        TaxLineCount: Integer;
+        TaxSetup: Record "Tax Setup";
+        IsNALocalized: Boolean;
+    begin
+        if (TempPOSEntryTaxLine.IsTemporary()) then
+            TempPOSEntryTaxLine.DeleteAll();
+
+        IsNALocalized := NALocalizationEnabled(GenJnlLine);
+        TaxSetup.Get();
+
+        if IsNALocalized then begin
+            POSEntry2.CopyFilters(POSEntry);
+            POSEntry2.SetFilter("Post Entry Status", '=%1|=%2', POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
+            if POSEntry2.FindSet then
+                repeat
+                    POSEntryTaxLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
+                    POSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
+                    if POSEntryTaxLine.FindSet then begin
+                        repeat
+                            TempPOSEntryTaxLine := POSEntryTaxLine;
+                            TempPOSEntryTaxLine.Insert();
+                        until POSEntryTaxLine.Next = 0;
+                    end;
+                    TempPOSEntryTaxLine.Reset();
+                until POSEntry2.Next() = 0;
+
+            TempPOSEntryTaxLine.Reset();
+            if TempPOSEntryTaxLine.Isempty() then
+                exit;
+
+            if POSEntry.Find('-') then begin
+                repeat
+                    POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
+                    TempPOSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                    TempPOSEntryTaxLine.SetRange("Tax Calculation Type", TempPOSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
+                    if TempPOSEntryTaxLine.FindSet() then begin
+                        repeat
+                            LineNumber := LineNumber + 10000;
+                            if ((TempPOSEntryTaxLine."Tax Base Amount" <> 0) and
+                                (TempPOSEntryTaxLine."Tax Type" = TempPOSEntryTaxLine."Tax Type"::"Sales and Use Tax")) or
+                               ((TempPOSEntryTaxLine.Quantity <> 0) and
+                                (TempPOSEntryTaxLine."Tax Type" = TempPOSEntryTaxLine."Tax Type"::"Excise Tax"))
+                            then begin
+                                if TempPOSEntryTaxLine."Tax Liable" then begin
+                                    CreateGenJournalLinesFromSalesTaxLiableNA(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile);
+                                end else begin
+                                    CreateGenJournalLinesFromSalesTaxUnliableNA(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile, TaxSetup);
+                                end;
+                            end;
+                        until TempPOSEntryTaxLine.Next() = 0;
+                    end;
+                until POSEntry.Next() = 0;
+            end;
+        end else begin
+            POSEntry2.CopyFilters(POSEntry);
+            POSEntry2.SetFilter("Post Entry Status", '=%1|=%2', POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
+            if POSEntry2.FindSet then
+                repeat
+                    POSEntryTaxLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
+                    POSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
+                    if POSEntryTaxLine.FindSet then begin
+                        repeat
+                            TempPOSEntryTaxLine.Reset();
+                            TempPOSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type");
+                            TempPOSEntryTaxLine.SetRange("Tax Area Code", POSEntryTaxLine."Tax Area Code");
+                            TempPOSEntryTaxLine.SetRange("Tax Group Code", POSEntryTaxLine."Tax Group Code");
+                            TempPOSEntryTaxLine.SetRange("Use Tax", POSEntryTaxLine."Use Tax");
+                            TempPOSEntryTaxLine.SetRange("Tax Area Code for Key", POSEntryTaxLine."Tax Area Code for Key");
+                            TempPOSEntryTaxLine.SetRange("Tax %", POSEntryTaxLine."Tax %");
+                            if not TempPOSEntryTaxLine.FindFirst() then begin
+                                TempPOSEntryTaxLine := POSEntryTaxLine;
+                                TempPOSEntryTaxLine.Insert();
+                            end else begin
+                                TempPOSEntryTaxLine.Quantity := TempPOSEntryTaxLine.Quantity + POSEntryTaxLine.Quantity;
+                                TempPOSEntryTaxLine."Calculated Tax Amount" := TempPOSEntryTaxLine."Calculated Tax Amount" + POSEntryTaxLine."Calculated Tax Amount";
+                                TempPOSEntryTaxLine."Tax Difference" := TempPOSEntryTaxLine."Tax Difference" + POSEntryTaxLine."Tax Difference";
+                                TempPOSEntryTaxLine."Invoice Discount Amount" := TempPOSEntryTaxLine."Invoice Discount Amount" + POSEntryTaxLine."Invoice Discount Amount";
+                                TempPOSEntryTaxLine."Tax Amount" := TempPOSEntryTaxLine."Tax Amount" + POSEntryTaxLine."Tax Amount";
+                                TempPOSEntryTaxLine."Amount Including Tax" := TempPOSEntryTaxLine."Amount Including Tax" + POSEntryTaxLine."Amount Including Tax";
+                                TempPOSEntryTaxLine."Tax Base Amount FCY" := TempPOSEntryTaxLine."Tax Base Amount FCY" + POSEntryTaxLine."Tax Base Amount FCY";
+                                TempPOSEntryTaxLine."Tax Base Amount" := TempPOSEntryTaxLine."Tax Base Amount" + POSEntryTaxLine."Tax Base Amount";
+                                TempPOSEntryTaxLine.Modify();
+                            end;
+                        until POSEntryTaxLine.Next() = 0;
+                    end;
+                    TempPOSEntryTaxLine.Reset();
+                until POSEntry2.Next() = 0;
+
+            TempPOSEntryTaxLine.Reset();
+            if TempPOSEntryTaxLine.Isempty() then
+                exit;
+
+            if POSEntry.Find('-') then begin
+                repeat
+                    POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
+                    TempPOSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                    TempPOSEntryTaxLine.SetRange("Tax Calculation Type", TempPOSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
+                    if TempPOSEntryTaxLine.FindSet() then begin
+                        repeat
+                            LineNumber := LineNumber + 10000;
+                            if ((TempPOSEntryTaxLine."Tax Base Amount" <> 0) and
+                                (TempPOSEntryTaxLine."Tax Type" = TempPOSEntryTaxLine."Tax Type"::"Sales and Use Tax")) or
+                               ((TempPOSEntryTaxLine.Quantity <> 0) and
+                                (TempPOSEntryTaxLine."Tax Type" = TempPOSEntryTaxLine."Tax Type"::"Excise Tax"))
+                            then begin
+                                if TempPOSEntryTaxLine."Tax Liable" then begin
+                                    CreateGenJournalLinesFromSalesTaxLiable(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile);
+                                end else begin
+                                    CreateGenJournalLinesFromSalesTaxUnliable(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile, TaxSetup);
+                                end;
+                            end;
+                        until TempPOSEntryTaxLine.Next() = 0;
+                    end;
+                until POSEntry.Next() = 0;
+            end;
+        end;
+    end;
+
+    local procedure NALocalizationEnabled(GenJnlLine: Record "Gen. Journal Line"): Boolean
+    var
+        DataTypeMgt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+        FieldReference: FieldRef;
+        Enabled: Boolean;
+        Handled: Boolean;
+    begin
+        OnNALocalizationEnabled(GenJnlLine, Handled, Enabled);
+        if Handled then
+            exit(Enabled);
+
+        DataTypeMgt.GetRecordRef(GenJnlLine, RecRef);
+        Exit(DataTypeMgt.FindFieldByName(RecRef, FieldReference, 'Tax Jurisdiction Code'));
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnNALocalizationEnabled(GenJnlLine: Record "Gen. Journal Line"; var Handled: Boolean; var Enabled: Boolean)
+    begin
+    end;
+
+    local procedure CreateGenJournalLinesFromSalesTaxLiable(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile")
+    var
+        TaxJurisdiction: Record "Tax Jurisdiction";
+        CurrExchRate: Record "Currency Exchange Rate";
+        RemSalesTaxAmt: Decimal;
+        RemSalesTaxSrcAmt: Decimal;
+    begin
+        GenJnlLine.Init();
+        GenJnlLine."Posting Date" := POSEntry."Posting Date";
+        GenJnlLine."Document Date" := POSEntry."Document Date";
+        GenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(GenJnlLine.Description));
+        GenJnlLine."Line No." := LineNumber;
+        GenJnlLine."Reason Code" := POSEntry."Reason Code";
+        GenJnlLine."Document No." := POSEntry."Document No.";
+        GenJnlLine."System-Created Entry" := true;
+        GenJnlLine."Source Currency Code" := POSEntry."Currency Code";
+        GenJnlLine.Quantity := TempPOSEntryTaxLine.Quantity;
+        GenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
+        GenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
+        GenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
+        GenJnlLine."Source Code" := POSPostingProfile."Source Code";
+        GenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
+        GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
+        GenJnlLine."Source No." := POSEntry."Customer No.";
+        GenJnlLine."Source Curr. VAT Base Amount" :=
+          CurrExchRate.ExchangeAmtLCYToFCY(
+            POSEntry."Posting Date", POSEntry."Currency Code", TempPOSEntryTaxLine."Tax Base Amount", POSEntry."Currency Factor");
+
+        GenJnlLine."VAT Base Amount (LCY)" := TempPOSEntryTaxLine."Tax Base Amount";
+        GenJnlLine."VAT Base Amount" := GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine.Amount := GenJnlLine."VAT Base Amount";
+        GenJnlLine."Amount (LCY)" := GenJnlLine.Amount;
+        GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
+
+        if TaxJurisdiction.Code <> TempPOSEntryTaxLine."Tax Jurisdiction Code" then begin
+            TaxJurisdiction.Get(TempPOSEntryTaxLine."Tax Jurisdiction Code");
+        end;
+
+        GenJnlLine."Copy VAT Setup to Jnl. Lines" := true;
+        if TaxJurisdiction."Unrealized VAT Type" > 0 then begin
+            TaxJurisdiction.TestField("Unreal. Tax Acc. (Sales)");
+            GenJnlLine.validate("Account No.", TaxJurisdiction."Unreal. Tax Acc. (Sales)");
+        end else begin
+            TaxJurisdiction.TestField("Tax Account (Sales)");
+            GenJnlLine.validate("Account No.", TaxJurisdiction."Tax Account (Sales)");
+        end;
+        if TaxJurisdiction.Code <> TempPOSEntryTaxLine."Tax Jurisdiction Code" then begin
+            TaxJurisdiction.Get(TempPOSEntryTaxLine."Tax Jurisdiction Code");
+            RemSalesTaxAmt := 0;
+            RemSalesTaxSrcAmt := 0;
+        end;
+        GenJnlLine."VAT Difference" := TempPOSEntryTaxLine."Tax Difference";
+        RemSalesTaxSrcAmt := TempPOSEntryTaxLine."Tax Amount";
+        GenJnlLine."Source Curr. VAT Amount" := RemSalesTaxSrcAmt;
+        RemSalesTaxSrcAmt := RemSalesTaxSrcAmt - GenJnlLine."Source Curr. VAT Amount";
+        RemSalesTaxAmt := RemSalesTaxAmt + TempPOSEntryTaxLine."Tax Amount";
+        GenJnlLine."VAT Amount (LCY)" := RemSalesTaxAmt;
+        RemSalesTaxAmt := RemSalesTaxAmt - GenJnlLine."VAT Amount (LCY)";
+        GenJnlLine."VAT Amount" := GenJnlLine."VAT Amount (LCY)";
+
+        GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::Sale;
+        GenJnlLine."Tax Group Code" := TempPOSEntryTaxLine."Tax Group Code";
+        GenJnlLine."Tax Liable" := TempPOSEntryTaxLine."Tax Liable";
+        GenJnlLine."Tax Area Code" := TempPOSEntryTaxLine."Tax Area Code";
+        GenJnlLine."VAT Calculation Type" := GenJnlLine."VAT Calculation Type"::"Sales Tax";
+        GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
+
+        GenJnlLine."Source Curr. VAT Base Amount" := -GenJnlLine."Source Curr. VAT Base Amount";
+        GenJnlLine."VAT Base Amount (LCY)" := -GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine."VAT Base Amount" := -GenJnlLine."VAT Base Amount";
+        GenJnlLine.Amount := -GenJnlLine.Amount;
+        GenJnlLine."Amount (LCY)" := -GenJnlLine."Amount (LCY)";
+        GenJnlLine."Source Currency Amount" := -GenJnlLine."Source Currency Amount";
+        GenJnlLine."Source Curr. VAT Amount" := -GenJnlLine."Source Curr. VAT Amount";
+        GenJnlLine."VAT Amount (LCY)" := -GenJnlLine."VAT Amount (LCY)";
+        GenJnlLine."VAT Amount" := -GenJnlLine."VAT Amount";
+        GenJnlLine.Quantity := -GenJnlLine.Quantity;
+        GenJnlLine."VAT Difference" := -GenJnlLine."VAT Difference";
+        GenJnlLine.UpdateLineBalance();
+        GenJnlLine.Insert();
+    end;
+
+    local procedure CreateGenJournalLinesFromSalesTaxUnliable(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile"; TaxSetup: Record "Tax Setup")
+    var
+        CurrExchRate: Record "Currency Exchange Rate";
+    begin
+        GenJnlLine.Init();
+        GenJnlLine."Posting Date" := POSEntry."Posting Date";
+        GenJnlLine."Document Date" := POSEntry."Document Date";
+        GenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(GenJnlLine.Description));
+        GenJnlLine."Line No." := LineNumber;
+        GenJnlLine."Reason Code" := POSEntry."Reason Code";
+        GenJnlLine."Document No." := POSEntry."Document No.";
+        GenJnlLine."System-Created Entry" := true;
+        GenJnlLine."Source Currency Code" := POSEntry."Currency Code";
+        GenJnlLine.Quantity := TempPOSEntryTaxLine.Quantity;
+        GenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
+        GenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
+        GenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
+        GenJnlLine."Source Code" := POSPostingProfile."Source Code";
+        GenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
+        GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
+        GenJnlLine."Source No." := POSEntry."Customer No.";
+        GenJnlLine."Source Curr. VAT Base Amount" :=
+          CurrExchRate.ExchangeAmtLCYToFCY(
+            POSEntry."Posting Date", POSEntry."Currency Code", TempPOSEntryTaxLine."Tax Base Amount", POSEntry."Currency Factor");
+
+        GenJnlLine."VAT Base Amount (LCY)" := TempPOSEntryTaxLine."Tax Base Amount";
+        GenJnlLine."VAT Base Amount" := GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine.Amount := GenJnlLine."VAT Base Amount";
+        GenJnlLine."Amount (LCY)" := GenJnlLine.Amount;
+        GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
+
+        GenJnlLine."Source Curr. VAT Amount" := 0;
+        GenJnlLine."VAT Amount (LCY)" := 0;
+        GenJnlLine."VAT Amount" := 0;
+        GenJnlLine."VAT Difference" := 0;
+
+        GenJnlLine."Copy VAT Setup to Jnl. Lines" := false;
+        TaxSetup.TestField("Tax Account (Sales)");
+        GenJnlLine.validate("Account No.", TaxSetup."Tax Account (Sales)");
+        GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::" ";
+        GenJnlLine."Tax Group Code" := TempPOSEntryTaxLine."Tax Group Code";
+        GenJnlLine."Tax Liable" := TempPOSEntryTaxLine."Tax Liable";
+        GenJnlLine."Tax Area Code" := TempPOSEntryTaxLine."Tax Area Code";
+        GenJnlLine."VAT Calculation Type" := GenJnlLine."VAT Calculation Type"::"Sales Tax";
+        GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
+        GenJnlLine."Source Curr. VAT Base Amount" := -GenJnlLine."Source Curr. VAT Base Amount";
+        GenJnlLine."VAT Base Amount (LCY)" := -GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine."VAT Base Amount" := -GenJnlLine."VAT Base Amount";
+        GenJnlLine.Amount := -GenJnlLine.Amount;
+        GenJnlLine."Amount (LCY)" := -GenJnlLine."Amount (LCY)";
+        GenJnlLine."Source Currency Amount" := -GenJnlLine."Source Currency Amount";
+        GenJnlLine."Source Curr. VAT Amount" := -GenJnlLine."Source Curr. VAT Amount";
+        GenJnlLine."VAT Amount (LCY)" := -GenJnlLine."VAT Amount (LCY)";
+        GenJnlLine."VAT Amount" := -GenJnlLine."VAT Amount";
+        GenJnlLine.Quantity := -GenJnlLine.Quantity;
+        GenJnlLine."VAT Difference" := 0;
+        GenJnlLine.UpdateLineBalance();
+        GenJnlLine.Insert();
+    end;
+
+    local procedure CreateGenJournalLinesFromSalesTaxLiableNA(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile")
+    var
+        TaxJurisdiction: Record "Tax Jurisdiction";
+        CurrExchRate: Record "Currency Exchange Rate";
+        DataTypeMgt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+        RemSalesTaxAmt: Decimal;
+        RemSalesTaxSrcAmt: Decimal;
+    begin
+        GenJnlLine.Init();
+        GenJnlLine."Posting Date" := POSEntry."Posting Date";
+        GenJnlLine."Document Date" := POSEntry."Document Date";
+        GenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(GenJnlLine.Description));
+        GenJnlLine."Line No." := LineNumber;
+        GenJnlLine."Reason Code" := POSEntry."Reason Code";
+        GenJnlLine."Document No." := POSEntry."Document No.";
+        GenJnlLine."System-Created Entry" := true;
+        GenJnlLine."Source Currency Code" := POSEntry."Currency Code";
+
+        DataTypeMgt.GetRecordRef(GenJnlLine, RecRef);
+        if DataTypeMgt.FindFieldByName(RecRef, FldRef, 'Tax Jurisdiction Code') then
+            FldRef.Value := TempPOSEntryTaxLine."Tax Jurisdiction Code";
+        if DataTypeMgt.FindFieldByName(RecRef, FldRef, 'Tax Type') then
+            FldRef.Value := TempPOSEntryTaxLine."Tax Type";
+        RecRef.SetTable(GenJnlLine);
+
+        GenJnlLine.Quantity := TempPOSEntryTaxLine.Quantity;
+        GenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
+        GenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
+        GenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
+        GenJnlLine."Source Code" := POSPostingProfile."Source Code";
+        GenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
+        GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
+        GenJnlLine."Source No." := POSEntry."Customer No.";
+        GenJnlLine."Source Curr. VAT Base Amount" :=
+          CurrExchRate.ExchangeAmtLCYToFCY(
+            POSEntry."Posting Date", POSEntry."Currency Code", TempPOSEntryTaxLine."Tax Base Amount", POSEntry."Currency Factor");
+
+        GenJnlLine."VAT Base Amount (LCY)" := TempPOSEntryTaxLine."Tax Base Amount";
+        GenJnlLine."VAT Base Amount" := GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine.Amount := GenJnlLine."VAT Base Amount";
+        GenJnlLine."Amount (LCY)" := GenJnlLine.Amount;
+        GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
+
+        if TaxJurisdiction.Code <> TempPOSEntryTaxLine."Tax Jurisdiction Code" then begin
+            TaxJurisdiction.Get(TempPOSEntryTaxLine."Tax Jurisdiction Code");
+        end;
+
+        GenJnlLine."Copy VAT Setup to Jnl. Lines" := true;
+        if TaxJurisdiction."Unrealized VAT Type" > 0 then begin
+            TaxJurisdiction.TestField("Unreal. Tax Acc. (Sales)");
+            GenJnlLine.validate("Account No.", TaxJurisdiction."Unreal. Tax Acc. (Sales)");
+        end else begin
+            TaxJurisdiction.TestField("Tax Account (Sales)");
+            GenJnlLine.validate("Account No.", TaxJurisdiction."Tax Account (Sales)");
+        end;
+        if TaxJurisdiction.Code <> TempPOSEntryTaxLine."Tax Jurisdiction Code" then begin
+            TaxJurisdiction.Get(TempPOSEntryTaxLine."Tax Jurisdiction Code");
+            RemSalesTaxAmt := 0;
+            RemSalesTaxSrcAmt := 0;
+        end;
+
+        RemSalesTaxSrcAmt := RemSalesTaxSrcAmt +
+          TempPOSEntryTaxLine."Tax Base Amount FCY" * TempPOSEntryTaxLine."Tax %" / 100;
+        GenJnlLine."Source Curr. VAT Amount" := RemSalesTaxSrcAmt;
+        RemSalesTaxSrcAmt := RemSalesTaxSrcAmt - GenJnlLine."Source Curr. VAT Amount";
+        RemSalesTaxAmt := RemSalesTaxAmt + TempPOSEntryTaxLine."Tax Amount";
+        GenJnlLine."VAT Amount (LCY)" := RemSalesTaxAmt;
+        RemSalesTaxAmt := RemSalesTaxAmt - GenJnlLine."VAT Amount (LCY)";
+        GenJnlLine."VAT Amount" := GenJnlLine."VAT Amount (LCY)";
+        GenJnlLine."VAT Difference" := TempPOSEntryTaxLine."Tax Difference";
+        GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::Sale;
+        GenJnlLine."Tax Group Code" := TempPOSEntryTaxLine."Tax Group Code";
+        GenJnlLine."Tax Liable" := TempPOSEntryTaxLine."Tax Liable";
+        GenJnlLine."Tax Area Code" := TempPOSEntryTaxLine."Tax Area Code";
+        GenJnlLine."VAT Calculation Type" := GenJnlLine."VAT Calculation Type"::"Sales Tax";
+        GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
+
+        GenJnlLine."Source Curr. VAT Base Amount" := -GenJnlLine."Source Curr. VAT Base Amount";
+        GenJnlLine."VAT Base Amount (LCY)" := -GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine."VAT Base Amount" := -GenJnlLine."VAT Base Amount";
+        GenJnlLine.Amount := -GenJnlLine.Amount;
+        GenJnlLine."Amount (LCY)" := -GenJnlLine."Amount (LCY)";
+        GenJnlLine."Source Currency Amount" := -GenJnlLine."Source Currency Amount";
+        GenJnlLine."Source Curr. VAT Amount" := -GenJnlLine."Source Curr. VAT Amount";
+        GenJnlLine."VAT Amount (LCY)" := -GenJnlLine."VAT Amount (LCY)";
+        GenJnlLine."VAT Amount" := -GenJnlLine."VAT Amount";
+        GenJnlLine.Quantity := -GenJnlLine.Quantity;
+        GenJnlLine."VAT Difference" := -GenJnlLine."VAT Difference";
+        GenJnlLine.UpdateLineBalance();
+        GenJnlLine.Insert();
+    end;
+
+    local procedure CreateGenJournalLinesFromSalesTaxUnliableNA(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile"; TaxSetup: Record "Tax Setup")
+    var
+        CurrExchRate: Record "Currency Exchange Rate";
         RemSalesTaxAmt: Decimal;
         RemSalesTaxSrcAmt: Decimal;
         RecRef: RecordRef;
         FldRef: FieldRef;
-        IsNALocalized: Boolean;
     begin
-        GLSetup.Get();
+        GenJnlLine.Init();
+        GenJnlLine."Posting Date" := POSEntry."Posting Date";
+        GenJnlLine."Document Date" := POSEntry."Document Date";
+        GenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(GenJnlLine.Description));
+        GenJnlLine."Line No." := LineNumber;
+        GenJnlLine."Reason Code" := POSEntry."Reason Code";
+        GenJnlLine."Document No." := POSEntry."Document No.";
+        GenJnlLine."System-Created Entry" := true;
+        GenJnlLine."Source Currency Code" := POSEntry."Currency Code";
+
         RecRef.GetTable(GenJnlLine);
-        IsNALocalized := RecRef.FieldExist(10011);
+        FldRef := RecRef.Field(10012);
+        FldRef.Value := TempPOSEntryTaxLine."Tax Type";
+        RecRef.SetTable(GenJnlLine);
 
-        if (TempPOSTaxAmountLine.IsTemporary()) then
-            TempPOSTaxAmountLine.DeleteAll();
+        GenJnlLine.Quantity := TempPOSEntryTaxLine.Quantity;
+        GenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
+        GenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
+        GenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
+        GenJnlLine."Source Code" := POSPostingProfile."Source Code";
+        GenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
+        GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
+        GenJnlLine."Source No." := POSEntry."Customer No.";
+        GenJnlLine."Source Curr. VAT Base Amount" :=
+          CurrExchRate.ExchangeAmtLCYToFCY(
+            POSEntry."Posting Date", POSEntry."Currency Code", TempPOSEntryTaxLine."Tax Base Amount", POSEntry."Currency Factor");
 
-        POSEntry2.CopyFilters(POSEntry);
-        POSEntry2.SetFilter("Post Entry Status", '=%1|=%2', POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
-        if POSEntry2.FindSet() then
-            repeat
-                POSTaxAmountLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
-                POSTaxAmountLine.SetRange("Tax Calculation Type", TempPOSTaxAmountLine."Tax Calculation Type"::"Sales Tax");
-                if POSTaxAmountLine.FindSet() then
-                    repeat
-                        if IsNALocalized then begin
-                            TempPOSTaxAmountLine := POSTaxAmountLine;
-                            TempPOSTaxAmountLine.Insert();
-                        end else begin
-                            //IF Not in NA database, post as one line because of checks in Standard NAV
-                            TempPOSTaxAmountLine.Reset();
-                            TempPOSTaxAmountLine.SetRange("Tax Calculation Type", POSTaxAmountLine."Tax Calculation Type");
-                            TempPOSTaxAmountLine.SetRange("Tax Area Code", POSTaxAmountLine."Tax Area Code");
-                            TempPOSTaxAmountLine.SetRange("Tax Group Code", POSTaxAmountLine."Tax Group Code");
-                            TempPOSTaxAmountLine.SetRange("Use Tax", POSTaxAmountLine."Use Tax");
-                            TempPOSTaxAmountLine.SetRange("Tax Area Code for Key", POSTaxAmountLine."Tax Area Code for Key");
-                            if not TempPOSTaxAmountLine.FindFirst() then begin
-                                TempPOSTaxAmountLine := POSTaxAmountLine;
-                                TempPOSTaxAmountLine.Insert();
-                            end else begin
-                                TempPOSTaxAmountLine.Quantity := TempPOSTaxAmountLine.Quantity + POSTaxAmountLine.Quantity;
-                                TempPOSTaxAmountLine."Calculated Tax Amount" := TempPOSTaxAmountLine."Calculated Tax Amount" + POSTaxAmountLine."Calculated Tax Amount";
-                                TempPOSTaxAmountLine."Tax Difference" := TempPOSTaxAmountLine."Tax Difference" + POSTaxAmountLine."Tax Difference";
-                                TempPOSTaxAmountLine."Invoice Discount Amount" := TempPOSTaxAmountLine."Invoice Discount Amount" + POSTaxAmountLine."Invoice Discount Amount";
-                                TempPOSTaxAmountLine."Tax Amount" := TempPOSTaxAmountLine."Tax Amount" + POSTaxAmountLine."Tax Amount";
-                                TempPOSTaxAmountLine."Amount Including Tax" := TempPOSTaxAmountLine."Amount Including Tax" + POSTaxAmountLine."Tax Amount";
-                                TempPOSTaxAmountLine."Tax Base Amount FCY" := TempPOSTaxAmountLine."Tax Base Amount FCY" + POSTaxAmountLine."Tax Base Amount FCY";
-                                TempPOSTaxAmountLine.Modify();
-                            end;
-                        end;
-                    until POSTaxAmountLine.Next() = 0;
-                TempPOSTaxAmountLine.Reset();
-            until (POSEntry2.Next() = 0);
+        GenJnlLine."VAT Base Amount (LCY)" := TempPOSEntryTaxLine."Tax Base Amount";
+        GenJnlLine."VAT Base Amount" := GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine.Amount := GenJnlLine."VAT Base Amount";
+        GenJnlLine."Amount (LCY)" := GenJnlLine.Amount;
+        GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
 
-        TempPOSTaxAmountLine.Reset();
+        GenJnlLine."Source Curr. VAT Amount" := 0;
+        GenJnlLine."VAT Amount (LCY)" := 0;
+        GenJnlLine."VAT Amount" := 0;
+        GenJnlLine."VAT Difference" := 0;
 
-        if POSEntry.FindFirst() then
-            repeat
-                POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
-                TaxLineCount := 0;
-                RemSalesTaxAmt := 0;
-                RemSalesTaxSrcAmt := 0;
-                if POSEntry."Currency Code" <> '' then
-                    Currency.Get(POSEntry."Currency Code")
-                else
-                    Currency.Init();
-                TempPOSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                TempPOSTaxAmountLine.SetRange("Tax Calculation Type", TempPOSTaxAmountLine."Tax Calculation Type"::"Sales Tax");
-                if TempPOSTaxAmountLine.FindFirst() then begin
-                    repeat
-                        LineNumber := LineNumber + 10000;
-                        TaxLineCount := TaxLineCount + 1;
-                        if ((TempPOSTaxAmountLine."Tax Base Amount" <> 0) and
-                            (TempPOSTaxAmountLine."Tax Type" = TempPOSTaxAmountLine."Tax Type"::"Sales and Use Tax")) or
-                           ((TempPOSTaxAmountLine.Quantity <> 0) and
-                            (TempPOSTaxAmountLine."Tax Type" = TempPOSTaxAmountLine."Tax Type"::"Excise Tax"))
-                        then begin
-                            GenJnlLine.Init();
-                            GenJnlLine."Posting Date" := POSEntry."Posting Date";
-                            GenJnlLine."Document Date" := POSEntry."Document Date";
-                            GenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(GenJnlLine.Description));
-                            GenJnlLine."Line No." := LineNumber;
-                            GenJnlLine."Reason Code" := POSEntry."Reason Code";
-                            GenJnlLine."Document No." := POSEntry."Document No.";
-                            GenJnlLine."System-Created Entry" := true;
-                            GenJnlLine.Amount := 0;
-                            GenJnlLine."Source Currency Code" := POSEntry."Currency Code";
-                            GenJnlLine."Source Currency Amount" := 0;
-                            GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::Sale;
-                            GenJnlLine."Tax Area Code" := TempPOSTaxAmountLine."Tax Area Code";
-                            if IsNALocalized then begin
-                                RecRef.GetTable(GenJnlLine);
-                                FldRef := RecRef.Field(10011);
-                                FldRef.Value := TempPOSTaxAmountLine."Tax Jurisdiction Code";
-                                FldRef := RecRef.Field(10012);
-                                FldRef.Value := TempPOSTaxAmountLine."Tax Type";
-                                RecRef.SetTable(GenJnlLine);
-                            end;
-                            GenJnlLine."Tax Group Code" := TempPOSTaxAmountLine."Tax Group Code";
-                            GenJnlLine."Tax Liable" := TempPOSTaxAmountLine."Tax Liable";
-                            GenJnlLine.Quantity := TempPOSTaxAmountLine.Quantity;
-                            GenJnlLine."VAT Calculation Type" := GenJnlLine."VAT Calculation Type"::"Sales Tax";
-                            GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
-                            GenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
-                            GenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
-                            GenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
-                            GenJnlLine."Source Code" := POSPostingProfile."Source Code";
-                            GenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
-                            GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
-                            GenJnlLine."Source No." := POSEntry."Customer No.";
-                            //GenJnlLine."STE Transaction ID"  //Only in NA Version
-                            GenJnlLine."Source Curr. VAT Base Amount" :=
-                              CurrExchRate.ExchangeAmtLCYToFCY(
-                                POSEntry."Posting Date", POSEntry."Currency Code", TempPOSTaxAmountLine."Tax Base Amount", POSEntry."Currency Factor");
-                            GenJnlLine."VAT Base Amount (LCY)" :=
-                              Round(TempPOSTaxAmountLine."Tax Base Amount");
-                            GenJnlLine."VAT Base Amount" := GenJnlLine."VAT Base Amount (LCY)";
-
-                            if TaxJurisdiction.Code <> TempPOSTaxAmountLine."Tax Jurisdiction Code" then begin
-                                TaxJurisdiction.Get(TempPOSTaxAmountLine."Tax Jurisdiction Code");
-                                RemSalesTaxAmt := 0;
-                                RemSalesTaxSrcAmt := 0;
-                            end;
-                            if TaxJurisdiction."Unrealized VAT Type" > 0 then begin
-                                TaxJurisdiction.TestField("Unreal. Tax Acc. (Sales)");
-                                GenJnlLine."Account No." := TaxJurisdiction."Unreal. Tax Acc. (Sales)";
-                            end else begin
-                                TaxJurisdiction.TestField("Tax Account (Sales)");
-                                GenJnlLine."Account No." := TaxJurisdiction."Tax Account (Sales)";
-                            end;
-                            if TempPOSTaxAmountLine."Tax Amount" <> 0 then begin
-                                if IsNALocalized then
-                                    RemSalesTaxSrcAmt := RemSalesTaxSrcAmt +
-                                      TempPOSTaxAmountLine."Tax Base Amount FCY" * TempPOSTaxAmountLine."Tax %" / 100
-                                else
-                                    RemSalesTaxSrcAmt := TempPOSTaxAmountLine."Tax Amount";
-                                GenJnlLine."Source Curr. VAT Amount" := Round(RemSalesTaxSrcAmt, Currency."Amount Rounding Precision");
-                                RemSalesTaxSrcAmt := RemSalesTaxSrcAmt - GenJnlLine."Source Curr. VAT Amount";
-                                RemSalesTaxAmt := RemSalesTaxAmt + TempPOSTaxAmountLine."Tax Amount";
-                                GenJnlLine."VAT Amount (LCY)" := Round(RemSalesTaxAmt, GLSetup."Amount Rounding Precision");
-                                RemSalesTaxAmt := RemSalesTaxAmt - GenJnlLine."VAT Amount (LCY)";
-                                GenJnlLine."VAT Amount" := GenJnlLine."VAT Amount (LCY)";
-                            end;
-                            GenJnlLine."VAT Difference" := TempPOSTaxAmountLine."Tax Difference";
-                            GenJnlLine."Source Curr. VAT Base Amount" := -GenJnlLine."Source Curr. VAT Base Amount";
-                            GenJnlLine."VAT Base Amount (LCY)" := -GenJnlLine."VAT Base Amount (LCY)";
-                            GenJnlLine."VAT Base Amount" := -GenJnlLine."VAT Base Amount";
-                            GenJnlLine."Source Curr. VAT Amount" := -GenJnlLine."Source Curr. VAT Amount";
-                            GenJnlLine."VAT Amount (LCY)" := -GenJnlLine."VAT Amount (LCY)";
-                            GenJnlLine."VAT Amount" := -GenJnlLine."VAT Amount";
-                            GenJnlLine.Quantity := -GenJnlLine.Quantity;
-                            GenJnlLine."VAT Difference" := -GenJnlLine."VAT Difference";
-                            GenJnlLine.Insert();
-                        end;
-                    until TempPOSTaxAmountLine.Next() = 0;
-                end;
-            until POSEntry.Next() = 0;
-    end;
-
-    local procedure PostSalesTaxToGL(var POSEntry: Record "NPR POS Entry")
-    var
-        TaxJurisdiction: Record "Tax Jurisdiction";
-        CurrExchRate: Record "Currency Exchange Rate";
-        CustPostingGr: Record "Customer Posting Group";
-        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
-        TempGenJnlLine: Record "Gen. Journal Line" temporary;
-        Currency: Record Currency;
-        GLSetup: Record "General Ledger Setup";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        POSStore: Record "NPR POS Store";
-        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
-        TaxLineCount: Integer;
-        RemSalesTaxAmt: Decimal;
-        RemSalesTaxSrcAmt: Decimal;
-    begin
-        POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
-        GLSetup.Get();
-        TaxLineCount := 0;
-        RemSalesTaxAmt := 0;
-        RemSalesTaxSrcAmt := 0;
-        if POSEntry."Currency Code" <> '' then
-            Currency.Get(POSEntry."Currency Code")
-        else
-            Currency.Init();
-        POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSTaxAmountLine.FindFirst() then begin
-            repeat
-                TaxLineCount := TaxLineCount + 1;
-                if ((POSTaxAmountLine."Tax Base Amount" <> 0) and
-                    (POSTaxAmountLine."Tax Type" = POSTaxAmountLine."Tax Type"::"Sales and Use Tax")) or
-                   ((POSTaxAmountLine.Quantity <> 0) and
-                    (POSTaxAmountLine."Tax Type" = POSTaxAmountLine."Tax Type"::"Excise Tax"))
-                then begin
-                    TempGenJnlLine.Init();
-                    TempGenJnlLine."Posting Date" := POSEntry."Posting Date";
-                    TempGenJnlLine."Document Date" := POSEntry."Document Date";
-                    TempGenJnlLine.Description := CopyStr(POSEntry.Description, 1, MaxStrLen(TempGenJnlLine.Description));
-                    TempGenJnlLine."Reason Code" := POSEntry."Reason Code";
-                    TempGenJnlLine."Document No." := POSEntry."Document No.";
-                    TempGenJnlLine."System-Created Entry" := true;
-                    TempGenJnlLine.Amount := 0;
-                    TempGenJnlLine."Source Currency Code" := POSEntry."Currency Code";
-                    TempGenJnlLine."Source Currency Amount" := 0;
-                    TempGenJnlLine."Gen. Posting Type" := TempGenJnlLine."Gen. Posting Type"::Sale;
-                    TempGenJnlLine."Tax Area Code" := POSTaxAmountLine."Tax Area Code";
-                    //TempGenJnlLine."Tax Type" := POSTaxAmountLine."Tax Type"; //Only in NA Version
-                    TempGenJnlLine."Tax Group Code" := POSTaxAmountLine."Tax Group Code";
-                    TempGenJnlLine."Tax Liable" := POSTaxAmountLine."Tax Liable";
-                    TempGenJnlLine.Quantity := POSTaxAmountLine.Quantity;
-                    TempGenJnlLine."VAT Calculation Type" := TempGenJnlLine."VAT Calculation Type"::"Sales Tax";
-                    TempGenJnlLine."VAT Posting" := TempGenJnlLine."VAT Posting"::"Manual VAT Entry";
-                    TempGenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
-                    TempGenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
-                    TempGenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
-                    TempGenJnlLine."Source Code" := POSPostingProfile."Source Code";
-                    TempGenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
-                    TempGenJnlLine."Source Type" := TempGenJnlLine."Source Type"::Customer;
-                    TempGenJnlLine."Source No." := POSEntry."Customer No.";
-                    //TempGenJnlLine."STE Transaction ID"  //Only in NA Version
-                    TempGenJnlLine."Source Curr. VAT Base Amount" :=
-                      CurrExchRate.ExchangeAmtLCYToFCY(
-                        POSEntry."Posting Date", POSEntry."Currency Code", POSTaxAmountLine."Tax Base Amount", POSEntry."Currency Factor");
-                    TempGenJnlLine."VAT Base Amount (LCY)" :=
-                      Round(POSTaxAmountLine."Tax Base Amount");
-                    TempGenJnlLine."VAT Base Amount" := TempGenJnlLine."VAT Base Amount (LCY)";
-                    if TaxJurisdiction.Code <> POSTaxAmountLine."Tax Jurisdiction Code" then begin
-                        TaxJurisdiction.Get(POSTaxAmountLine."Tax Jurisdiction Code");
-                        RemSalesTaxAmt := 0;
-                        RemSalesTaxSrcAmt := 0;
-                    end;
-                    if TaxJurisdiction."Unrealized VAT Type" > 0 then begin
-                        TaxJurisdiction.TestField("Unreal. Tax Acc. (Sales)");
-                        TempGenJnlLine."Account No." := TaxJurisdiction."Unreal. Tax Acc. (Sales)";
-                    end else begin
-                        TaxJurisdiction.TestField("Tax Account (Sales)");
-                        TempGenJnlLine."Account No." := TaxJurisdiction."Tax Account (Sales)";
-                    end;
-                    //TempGenJnlLine."Tax Jurisdiction Code" := TempSalesTaxAmtLine."Tax Jurisdiction Code"; //Only in NA Version
-                    if POSTaxAmountLine."Tax Amount" <> 0 then begin
-                        RemSalesTaxSrcAmt := RemSalesTaxSrcAmt +
-                          POSTaxAmountLine."Tax Base Amount FCY" * POSTaxAmountLine."Tax %" / 100;
-                        TempGenJnlLine."Source Curr. VAT Amount" := Round(RemSalesTaxSrcAmt, Currency."Amount Rounding Precision");
-                        RemSalesTaxSrcAmt := RemSalesTaxSrcAmt - TempGenJnlLine."Source Curr. VAT Amount";
-                        RemSalesTaxAmt := RemSalesTaxAmt + POSTaxAmountLine."Tax Amount";
-                        TempGenJnlLine."VAT Amount (LCY)" := Round(RemSalesTaxAmt, GLSetup."Amount Rounding Precision");
-                        RemSalesTaxAmt := RemSalesTaxAmt - TempGenJnlLine."VAT Amount (LCY)";
-                        TempGenJnlLine."VAT Amount" := TempGenJnlLine."VAT Amount (LCY)";
-                    end;
-                    TempGenJnlLine."VAT Difference" := POSTaxAmountLine."Tax Difference";
-                    TempGenJnlLine."Source Curr. VAT Base Amount" := -TempGenJnlLine."Source Curr. VAT Base Amount";
-                    TempGenJnlLine."VAT Base Amount (LCY)" := -TempGenJnlLine."VAT Base Amount (LCY)";
-                    TempGenJnlLine."VAT Base Amount" := -TempGenJnlLine."VAT Base Amount";
-                    TempGenJnlLine."Source Curr. VAT Amount" := -TempGenJnlLine."Source Curr. VAT Amount";
-                    TempGenJnlLine."VAT Amount (LCY)" := -TempGenJnlLine."VAT Amount (LCY)";
-                    TempGenJnlLine."VAT Amount" := -TempGenJnlLine."VAT Amount";
-                    TempGenJnlLine.Quantity := -TempGenJnlLine.Quantity;
-                    TempGenJnlLine."VAT Difference" := -TempGenJnlLine."VAT Difference";
-                    GenJnlPostLine.RunWithCheck(TempGenJnlLine);
-                end;
-            until POSTaxAmountLine.Next() = 0;
-        end;
+        GenJnlLine."Copy VAT Setup to Jnl. Lines" := false;
+        TaxSetup.TestField("Tax Account (Sales)");
+        GenJnlLine.validate("Account No.", TaxSetup."Tax Account (Sales)");
+        GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::" ";
+        GenJnlLine."Tax Group Code" := TempPOSEntryTaxLine."Tax Group Code";
+        GenJnlLine."Tax Liable" := TempPOSEntryTaxLine."Tax Liable";
+        GenJnlLine."Tax Area Code" := TempPOSEntryTaxLine."Tax Area Code";
+        GenJnlLine."VAT Calculation Type" := GenJnlLine."VAT Calculation Type"::"Sales Tax";
+        GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
+        GenJnlLine."Source Curr. VAT Base Amount" := -GenJnlLine."Source Curr. VAT Base Amount";
+        GenJnlLine."VAT Base Amount (LCY)" := -GenJnlLine."VAT Base Amount (LCY)";
+        GenJnlLine."VAT Base Amount" := -GenJnlLine."VAT Base Amount";
+        GenJnlLine.Amount := -GenJnlLine.Amount;
+        GenJnlLine."Amount (LCY)" := -GenJnlLine."Amount (LCY)";
+        GenJnlLine."Source Currency Amount" := -GenJnlLine."Source Currency Amount";
+        GenJnlLine."Source Curr. VAT Amount" := -GenJnlLine."Source Curr. VAT Amount";
+        GenJnlLine."VAT Amount (LCY)" := 0;
+        GenJnlLine."VAT Amount" := 0;
+        GenJnlLine.Quantity := -GenJnlLine.Quantity;
+        GenJnlLine."VAT Difference" := 0;
+        GenJnlLine.UpdateLineBalance();
+        GenJnlLine.Insert();
     end;
 
     //[Obsolete('This function has been discontinued.', '16.0')]
