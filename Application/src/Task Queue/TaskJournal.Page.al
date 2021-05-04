@@ -74,6 +74,7 @@ page 6059902 "NPR Task Journal"
                 field(NextExecutionTime; NextExecutionTime)
                 {
                     ApplicationArea = All;
+                    Caption = 'Next Execution Time';
                     ToolTip = 'Specifies the value of the NextExecutionTime field';
 
                     trigger OnValidate()

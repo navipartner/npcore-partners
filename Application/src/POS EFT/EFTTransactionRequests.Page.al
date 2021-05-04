@@ -311,15 +311,17 @@ page 6184498 "NPR EFT Transaction Requests"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Initiated from Entry No. field';
                 }
-                field("Receipt 1"; "Receipt 1".HasValue)
+                field("Receipt 1"; Rec."Receipt 1".HasValue)
                 {
                     ApplicationArea = All;
+                    Caption = 'Receipt 1';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Receipt 1.HasValue() field';
                 }
-                field("Receipt 2"; "Receipt 2".HasValue)
+                field("Receipt 2"; Rec."Receipt 2".HasValue)
                 {
                     ApplicationArea = All;
+                    Caption = 'Receipt 2';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Receipt 2.HasValue() field';
                 }

@@ -100,6 +100,7 @@ page 6059923 "NPR BTF EndPoints Error Log"
                 field("Initiatied From Rec. ID"; Format(Rec."Initiatied From Rec. ID"))
                 {
                     ApplicationArea = Advanced;
+                    Caption = 'Initiatied From Rec. ID';
                     ToolTip = 'Specifies record id of the entry which initiated sending web request. If entry is still available, then, to view the details of that entry, run an action Initiate from Record.';
                 }
             }

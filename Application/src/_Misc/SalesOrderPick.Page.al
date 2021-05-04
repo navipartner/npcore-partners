@@ -15,6 +15,7 @@ page 6014518 "NPR Sales Order Pick"
             field("Sales Order No."; SalesOrderNoSearch)
             {
                 ApplicationArea = All;
+                Caption = 'Sales Order No.';
                 ToolTip = 'Specifies the value of the SalesOrderNoSearch field';
 
                 trigger OnValidate()
@@ -36,12 +37,14 @@ page 6014518 "NPR Sales Order Pick"
             field("Item No."; ItemBarcode."No.")
             {
                 ApplicationArea = All;
+                Caption = 'Item No.';
                 Editable = false;
                 ToolTip = 'Specifies the value of the ItemBarcode.No. field';
             }
             field("Item Found on SalesLines"; ItemFoundonLines)
             {
                 ApplicationArea = All;
+                Caption = 'Item Found on SalesLines';
                 Editable = false;
                 ToolTip = 'Specifies the value of the ItemFoundonLines field';
             }

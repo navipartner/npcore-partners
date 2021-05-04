@@ -12,6 +12,7 @@ page 6059813 "NPR Retail Sales Chart"
             field("Date Range"; StatusText)
             {
                 ApplicationArea = All;
+                Caption = 'Date Range';
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;
