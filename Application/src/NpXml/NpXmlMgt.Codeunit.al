@@ -281,7 +281,7 @@
         BufferDecimal: Decimal;
         BufferInteger: Integer;
         Handled: Boolean;
-        i: Integer;
+        CurrentFilterGroupNo: Integer;
     begin
         Clear(RecRef2);
         if NpXmlElement."Generic Child Codeunit ID" <> 0 then
@@ -289,16 +289,21 @@
         if (not Handled) or (NpXmlElement."Generic Child Codeunit ID" = 0) then begin
             RecRef2.Open(NpXmlElement."Table No.");
             if RecRef.Number = NpXmlElement."Table No." then
-                RecRef2.Get(RecRef.RecordId);
+                RecRef2 := RecRef.Duplicate;
         end;
+        if RecRef.Number = NpXmlElement."Table No." then
+            RecRef2.SetRecFilter();
 
-        i := 40;
+        if not NpXmlElement."Replace Inherited Filters" then
+            CurrentFilterGroupNo := 40;
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
-        if NpXmlFilter.FindSet() then begin
+        if NpXmlFilter.FindSet() then
             repeat
-                i += 1;
-                RecRef2.FilterGroup(i);
+                if not NpXmlElement."Replace Inherited Filters" then begin
+                    CurrentFilterGroupNo += 1;
+                    RecRef2.FilterGroup(CurrentFilterGroupNo);
+                end;
                 FieldRef2 := RecRef2.Field(NpXmlFilter."Field No.");
                 case NpXmlFilter."Filter Type" of
                     NpXmlFilter."Filter Type"::TableLink:
@@ -336,11 +341,8 @@
                 end;
             until NpXmlFilter.Next() = 0;
 
+        if not NpXmlElement."Replace Inherited Filters" then
             RecRef2.FilterGroup(0);
-        end else
-            if RecRef.Number = NpXmlElement."Table No." then
-                RecRef2.SetRecFilter();
-
 
         case NpXmlElement."Iteration Type" of
             NpXmlElement."Iteration Type"::First:
