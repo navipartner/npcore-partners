@@ -12,6 +12,7 @@ resources:
   - repository: scriptsRepo
     type: git
     name: 'NpCore/NpDevOps'
+    ref: 'refs/heads/releases/1.0'
 
 pool:
   name: NP Core Pipelines
@@ -29,20 +30,22 @@ variables:
   containerAdminPassword: P@ssword1
 
 jobs:
-- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
+- template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
   parameters:
-    jobName: First_build
-    jobDisplayName: Build AL app - Localised base apps
-    timeoutInMinutes: 180
-    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactUrl: https://bcartifacts.blob.core.windows.net/onprem/17.0.16993.0/w1
-    containerName: $(containerName)
-    serverInstanceName: $(serverInstanceName)
-    containerAdminUsername: $(containerAdminUsername) 
-    containerAdminPassword: $(containerAdminPassword)
-    licenseSecureFileName: 'DEV_BC OP 17.flf'
-    scriptsRepo: ScriptsRepo
+    scriptsRepo: scriptsRepo
     stepList:
+    - checkout: self
+
+    - task: PowerShell@2
+      inputs:
+        filePath: $(psScriptsFolder)/BuildDeploy/CalculateNewVersion.ps1
+        arguments: >
+          -MajorVersion $(majorVersion)
+          -Prerelease
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      displayName: 'Calculate new version'
+
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         containerName: $(containerName)
@@ -50,7 +53,7 @@ jobs:
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
-        analyzers: 'AppSourceCop,UICop,CodeCop'
+        appVersion: $(NewAppVersion)
         dependancies:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
@@ -137,31 +140,3 @@ jobs:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
             id: Microsoft.BC.170.Base_Application.us
           ISOcountryCode: US
-
-- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
-  parameters:
-    jobName: Second_build
-    jobDisplayName: Build AL app - Insider Build  
-    timeoutInMinutes: 180
-    jobCondition: False
-    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactUrl: https://bcartifacts.blob.core.windows.net/onprem/17.0.16993.0/w1
-    containerName: Build-$(Build.BuildId)-2
-    serverInstanceName: $(serverInstanceName)
-    containerAdminUsername: $(containerAdminUsername) 
-    containerAdminPassword: $(containerAdminPassword)
-    licenseSecureFileName: 'DEV_BC OP 17.flf'
-    scriptsRepo: ScriptsRepo
-    stepList:
-    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
-      parameters:
-        containerName: $(containerName)
-        containerAdminUsername: $(containerAdminUsername)
-        containerAdminPassword: $(containerAdminPassword)
-        serverInstanceName: $(serverInstanceName)
-        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)
-        dependancies:
-        - package:
-            source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
-            id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-            destinationPath: '$(ServiceTierFolder)/Add-Ins'
