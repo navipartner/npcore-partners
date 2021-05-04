@@ -8,6 +8,11 @@
             "justification": "There must be exactly one space character on each side of a binary operator such as := + - AND OR =."
         },
         {
+            "id": "AA0005",
+            "action":"Hidden",
+            "justification": "Only use BEGIN..END to enclose compound statements."
+        },
+        {
             "id": "AA0021",
             "action":"Hidden",
             "justification": "Variable declarations should be ordered by type."
@@ -21,6 +26,11 @@
             "id": "AA0072",
             "action":"Hidden",
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
+        },
+        {
+            "id": "AA0074",
+            "action":"Hidden",
+            "justification": "TextConst and Label variable names should have an approved suffix."
         },
         {
             "id": "AA0087",
