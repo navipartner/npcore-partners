@@ -38,6 +38,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
         RESCHEDULE_NOT_ALLOWED: Label 'The ticket reschedule policy for %1 and %2, prevents changes at this time.';
+        NO_DEFAULT_ADMISSION_SELECTED: Label 'When ticket is scanned and no admission code is specified, system attempts to find a default admission. With current setup, a default admission could not be found for item %1.';
         INVALID_REFERENCE_NO: Label '-1001';
         RESERVATION_NOT_FOUND_NO: Label '-1002';
         NOT_VALID_NO: Label '-1003';
@@ -85,10 +86,10 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (not (GetReceiptRequestToken(POSEntry."Document No.", POSSalesLine."Line No.", Token))) then
             exit;
 
-        IssueTicketsFromToken(Token, POSEntry."Document No.", POSSalesLine."Line No.");
+        IssueTicketsFromToken(Token, POSEntry."Document No.", POSSalesLine."Line No.", POSEntry."POS Unit No.");
     end;
 
-    procedure IssueTicketsFromToken(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer)
+    procedure IssueTicketsFromToken(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10])
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketType: Record "NPR TM Ticket Type";
@@ -119,7 +120,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                         end;
 
                         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
-                            RegisterTicketBomAdmissionArrivalOnPosSales(Ticket);
+                            RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, 0);
 
                     end;
                 until (Ticket.Next() = 0);
@@ -748,7 +749,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
 
         AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
-        RegisterAdmissionArrivalOnPosSales(Ticket, AdmissionCode);
+        ValidateTicketForArrival(Ticket, AdmissionCode);
 
     end;
 
@@ -766,15 +767,16 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketBom.FindSet();
         repeat
             Admission.Get(TicketBom."Admission Code");
-            RegisterAdmissionArrivalOnPosSales(Ticket, Admission."Admission Code");
+            ValidateTicketForArrival(Ticket, Admission."Admission Code");
         until (TicketBom.Next() = 0);
     end;
 
-    local procedure RegisterTicketBomAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket")
+    procedure RegisterTicketBomAdmissionArrival(Ticket: Record "NPR TM Ticket"; PosUnitNo: Code[10]; ProcessFlow: Option SALES,SCAN)
     var
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketType: Record "NPR TM Ticket Type";
+        TicketAdmitted: Boolean;
     begin
 
         TicketType.Get(Ticket."Ticket Type Code");
@@ -784,52 +786,79 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (not TicketBom.FindSet()) then
             Error(NO_ADMISSION_CODE, Ticket."Item No.");
 
+        TicketAdmitted := false;
         repeat
             Admission.Get(TicketBom."Admission Code");
 
             case TicketBom."Activation Method" of
                 TicketBom."Activation Method"::SCAN:
-                    ; // Ignore
+                    if (ProcessFlow = ProcessFlow::SCAN) then
+                        TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
+
                 TicketBom."Activation Method"::POS:
-                    RegisterAdmissionArrivalOnPosSales(Ticket, Admission."Admission Code");
-                TicketBom."Activation Method"::NA:
+                    if (ProcessFlow = ProcessFlow::SALES) then
+                        TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
+
+                TicketBom."Activation Method"::ALWAYS:
+                    TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
+
+                TicketBom."Activation Method"::PER_UNIT:
                     begin
-                        if ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBom.Default) then
-                            RegisterAdmissionArrivalOnPosSales(Ticket, Admission."Admission Code");
-                        if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
-                            RegisterAdmissionArrivalOnPosSales(Ticket, Admission."Admission Code");
+                        if (ProcessFlow = ProcessFlow::SCAN) then
+                            if (IsSelectedAdmissionDefaultOnPosScan(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code", PosUnitNo)) then
+                                TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
+
+                        if (ProcessFlow = ProcessFlow::SALES) then
+                            if (IsSelectedAdmissionDefaultOnPosSale(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code", PosUnitNo)) then
+                                TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                    end;
+
+                TicketBom."Activation Method"::NA: // Fallback (default) to Ticket Type setup
+                    begin
+                        if (ProcessFlow = ProcessFlow::SALES) then begin
+                            if ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBom.Default) then
+                                TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
+
+                            if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
+                                TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                        end;
+
+                        if (ProcessFlow = ProcessFlow::SCAN) then
+                            if (TicketBom.Default) then
+                                TicketAdmitted := ValidateTicketForArrival(Ticket, Admission."Admission Code");
                     end;
             end;
         until (TicketBom.Next() = 0);
 
+        if ((ProcessFlow = ProcessFlow::SCAN) and (not TicketAdmitted)) then
+            Error(NO_DEFAULT_ADMISSION_SELECTED, Ticket."Item No.");
+
     end;
 
-    local procedure RegisterAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20])
+    local procedure IsSelectedAdmissionDefaultOnPosSale(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; PosUnitNo: Code[10]): Boolean
     var
-        Admission: Record "NPR TM Admission";
-        AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
-        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        PosDefaultAdmission: Record "NPR TM POS Default Admission";
     begin
+        if (PosDefaultAdmission.Get(ItemNo, VariantCode, AdmissionCode, PosDefaultAdmission."Station Type"::POS_UNIT, PosUnitNo)) then
+            exit((PosDefaultAdmission."Activation Method" = PosDefaultAdmission."Activation Method"::ON_SALES) or
+                 (PosDefaultAdmission."Activation Method" = PosDefaultAdmission."Activation Method"::ALWAYS));
+        exit(false);
+    end;
 
-        if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
-            DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
-            if (not DetTicketAccessEntry.FindFirst()) then
-                Error(SCHEDULE_REQUIRED, AdmissionCode);
+    local procedure IsSelectedAdmissionDefaultOnPosScan(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; PosUnitNo: Code[10]): Boolean
+    var
+        PosDefaultAdmission: Record "NPR TM POS Default Admission";
+    begin
+        if (PosDefaultAdmission.Get(ItemNo, VariantCode, AdmissionCode, PosDefaultAdmission."Station Type"::POS_UNIT, PosUnitNo)) then
+            exit((PosDefaultAdmission."Activation Method" = PosDefaultAdmission."Activation Method"::ON_SCAN) or
+                 (PosDefaultAdmission."Activation Method" = PosDefaultAdmission."Activation Method"::ALWAYS));
+        exit(false);
+    end;
 
-            AdmissionSchEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
-            AdmissionSchEntry.SetFilter(Cancelled, '=%1', false);
-            if (not (AdmissionSchEntry.FindFirst())) then
-                AdmissionSchEntry."Entry No." := -1;
-
-        end else begin
-
-            AdmissionSchEntry."Entry No." := -1;
-
-        end;
-
-        ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, AdmissionSchEntry."Entry No.");
-
+    local procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
+    begin
+        ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1); // Throws error on fail
+        exit(true);
     end;
 
     procedure GetReceiptRequestToken(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]): Boolean
@@ -2545,8 +2574,8 @@ codeunit 6059784 "NPR TM Ticket Management"
                 else
                     EntryValidationType := EntryValidationType::UNDEFINED;
             end;
-            MaxEntryCount := TicketBom."Max No. Of Entries";
-            TimespanFormula := TicketBom."Duration Formula";
+            MaxEntryCount := TicketType."Max No. Of Entries";
+            TimespanFormula := TicketType."Duration Formula";
         end;
     end;
 

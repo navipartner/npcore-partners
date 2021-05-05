@@ -177,30 +177,6 @@
 
         ConfigureWorkflow(Context, FunctionId, DefaultTicketNumber, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
 
-        // ShowTicketDialog := FALSE;
-        // ShowTicketQtyDialog := FALSE;
-        // ShowReferenceDialog := FALSE;
-        //
-        // CASE FunctionId OF
-        //  0 : ShowTicketDialog := FALSE; // Admission Count
-        //  1 : ShowTicketDialog := TRUE; // Register Arrival
-        //  2 : ShowTicketDialog := TRUE; // Revoke Reservation
-        //  3 : ShowTicketDialog := NOT (GetRequestToken (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)); // Edit Reservation
-        //  4 : ShowTicketDialog := FALSE; // Reconfirm Reservation
-        //  5 : ShowTicketDialog := NOT (GetRequestToken (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)); // Edit Ticketholder
-        //  6 :
-        //    BEGIN // Change Confirmed Ticket Quantity
-        //      ShowTicketDialog := TRUE;
-        //      ShowTicketQtyDialog := TRUE;
-        //    END;
-        //  7 : ShowReferenceDialog := TRUE; // Pick-up Ticket Reservation
-        //  8 : ShowTicketDialog := TRUE; // Convert To Membership
-        // END;
-        //
-        // Context.SetContext ('ShowTicketDialog', ShowTicketDialog AND (DefaultTicketNumber = ''));
-        // Context.SetContext ('ShowTicketQtyDialog', ShowTicketQtyDialog);
-        // Context.SetContext ('ShowReferenceDialog', ShowReferenceDialog);
-
         FrontEnd.SetActionContext(ActionCode(''), Context);
         Handled := true;
     end;
@@ -217,6 +193,8 @@
         DefaultTicketNumber: Text;
         TicketReference: Code[20];
         WithTicketPrint: Boolean;
+        PosUnitNo: Code[10];
+        PosSetup: Codeunit "NPR POS Setup";
     begin
 
         if (not Action.IsThisAction(ActionCode(''))) then
@@ -228,9 +206,12 @@
             FunctionId := 0;
 
         AdmissionCode := JSON.GetStringParameter('Admission Code');
+        POSSession.GetSetup(PosSetup);
+        PosUnitNo := PosSetup.GetPOSUnitNo();
+
         DefaultTicketNumber := JSON.GetStringParameter('DefaultTicketNumber');
         TicketReference := CopyStr(GetInput(JSON, 'ticketreference'), 1, MaxStrLen(TicketReference));
-        WithTicketPrint := JSON.GetBooleanParameter('PrintTicketOnArrival'); //-+TM1.47 [356582]
+        WithTicketPrint := JSON.GetBooleanParameter('PrintTicketOnArrival');
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
@@ -270,8 +251,7 @@
                 1:
                     begin
                         SetGroupTicketConfirmedQuantity(POSSession, JSON, ExternalTicketNumber, AdmissionCode);
-                        // RegisterArrival (ExternalTicketNumber, AdmissionCode);
-                        RegisterArrival(ExternalTicketNumber, AdmissionCode, WithTicketPrint);
+                        RegisterArrival(ExternalTicketNumber, AdmissionCode, POSUnitNo, WithTicketPrint);
 
                     end;
                 2:
@@ -281,7 +261,7 @@
                 4:
                     ReconfirmReservation(POSSession, ExternalTicketNumber);
                 5:
-                    EditTicketholder(POSSession, ExternalTicketNumber);
+                    EditTicketHolder(POSSession, ExternalTicketNumber);
                 6:
                     SetGroupTicketConfirmedQuantity(POSSession, JSON, ExternalTicketNumber, '');
                 7:
@@ -370,7 +350,7 @@
 
     end;
 
-    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text; WithTicketPrint: Boolean)
+    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text; PosUnitNo: Code[10]; WithTicketPrint: Boolean)
     begin
 
         case FunctionId of
@@ -380,7 +360,7 @@
                 begin
                     SetGroupTicketConfirmedQuantity(POSSession, Context, ExternalTicketNumber, AdmissionCode);
                     // RegisterArrival (ExternalTicketNumber, AdmissionCode);
-                    RegisterArrival(ExternalTicketNumber, AdmissionCode, WithTicketPrint);
+                    RegisterArrival(ExternalTicketNumber, AdmissionCode, PosUnitNo, WithTicketPrint);
                 end;
             2:
                 RevokeTicketReservation(POSSession, ExternalTicketNumber);
@@ -389,7 +369,7 @@
             4:
                 ReconfirmReservation(POSSession, ExternalTicketNumber);
             5:
-                EditTicketholder(POSSession, ExternalTicketNumber);
+                EditTicketHolder(POSSession, ExternalTicketNumber);
             6:
                 SetGroupTicketConfirmedQuantity(POSSession, Context, ExternalTicketNumber, '');
             7:
@@ -412,7 +392,9 @@
         ShowQtyDialog: Boolean;
         DefaultTicketNumber: Text;
         TicketReference: Code[20];
+        PosUnitNo: Code[10];
         WithTicketPrint: Boolean;
+        PosSetup: Codeunit "NPR POS Setup";
     begin
 
         FunctionId := Context.GetIntegerParameterOrFail('Function', ActionCode(''));
@@ -421,7 +403,9 @@
 
         AdmissionCode := Context.GetStringParameter('Admission Code');
         DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber');
-        WithTicketPrint := Context.GetBooleanParameter('PrintTicketOnArrival'); //-+TM1.47 [356582]
+        WithTicketPrint := Context.GetBooleanParameter('PrintTicketOnArrival');
+        POSSession.GetSetup(PosSetup);
+        PosUnitNo := PosSetup.GetPOSUnitNo();
 
         Context.SetScopeRoot();
         Context.SetScope('TicketReference');
@@ -452,9 +436,7 @@
                 end;
             'DoAction':
                 begin
-                    // MESSAGE ('Do %1 with %2', FunctionId, ExternalTicketNumber);
-                    //DoWorkflowFunction (FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference);
-                    DoWorkflowFunction(FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference, WithTicketPrint);
+                    DoWorkflowFunction(FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference, PosUnitNo, WithTicketPrint);
                 end;
         end;
     end;
@@ -766,21 +748,25 @@
         Error(ResponseMessage);
     end;
 
-    local procedure RegisterArrival(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; WithPrint: Boolean)
+    local procedure RegisterArrival(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; WithPrint: Boolean)
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Admission: Record "NPR TM Admission";
         Ticket: Record "NPR TM Ticket";
+        POSDefaultAdmission: Record "NPR TM POS Default Admission";
     begin
-
-        if (AdmissionCode <> '') then
-            if (not Admission.Get(AdmissionCode)) then
-                Error(StrSubstNo(INVALID_ADMISSION, 'Admission Code', AdmissionCode));
 
         TicketRequestManager.LockResources();
 
-        TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1);
+        if ((AdmissionCode = '') and (PosUnitNo <> '')) then begin
+            Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
+            if (Ticket.FindFirst()) then
+                TicketManagement.RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, 1);
+
+        end else begin
+            TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1);
+        end;
 
         if (WithPrint) then begin
             Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
@@ -948,7 +934,7 @@
         end;
     end;
 
-    local procedure EditTicketholder(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50])
+    local procedure EditTicketHolder(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50])
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -1081,7 +1067,7 @@
 
         PickUpReservedTickets.LookupMode(true);
         PageAction := PickUpReservedTickets.RunModal();
-        if (PageAction <> ACTION::LookupOK) then
+        if (PageAction <> Action::LookupOK) then
             exit;
 
         PickUpReservedTickets.GetRecord(TicketReservationRequest);
@@ -1482,6 +1468,6 @@
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR TM POS Action: Ticket Mgt.");
+        exit(Codeunit::"NPR TM POS Action: Ticket Mgt.");
     end;
 }
