@@ -56,7 +56,6 @@ page 6060121 "NPR TM Ticket BOM"
                 field("Activation Method"; Rec."Activation Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Activation Method field';
                 }
                 field("Percentage of Adm. Capacity"; Rec."Percentage of Adm. Capacity")
@@ -173,7 +172,7 @@ page 6060121 "NPR TM Ticket BOM"
     {
         area(navigation)
         {
-            Action("Ticket Setup")
+            Action(NavigateTicketSetup)
             {
                 ToolTip = 'Navigate to ticket setup.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -184,7 +183,7 @@ page 6060121 "NPR TM Ticket BOM"
                 PromotedCategory = Category5;
                 RunObject = Page "NPR TM Ticket Setup";
             }
-            Action(IssuedTickets)
+            Action(NavigateIssuedTickets)
             {
                 ToolTip = 'Navigate to Issued Tickets';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -193,7 +192,19 @@ page 6060121 "NPR TM Ticket BOM"
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "Item No." = field("Item No.");
             }
-            Action(Admissions)
+            Action(NavigateDefaultAdmission)
+            {
+                ToolTip = 'Navigate to Default Admission per POS Unit';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Default Admission per POS Unit';
+                Image = Default;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
+                RunObject = Page "NPR TM POS Default Admission";
+                RunPageLink = "Item No." = field ("Item No."), "Variant Code" = field ("Variant Code");
+            }
+            Action(NavigateAdmissions)
             {
                 ToolTip = 'Navigate to Admission Setup';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -205,7 +216,7 @@ page 6060121 "NPR TM Ticket BOM"
                 RunObject = Page "NPR TM Ticket Admissions";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
-            Action(AdmissionsSchedules)
+            Action(NavigateAdmissionsSchedules)
             {
                 ToolTip = 'Navigate to Admission Schedules';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -217,7 +228,7 @@ page 6060121 "NPR TM Ticket BOM"
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
-            Action(AdmissionsSchedulesEntries)
+            Action(NavigateAdmissionsSchedulesEntries)
             {
                 ToolTip = 'Navigate to Admission Schedule Entries';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -229,7 +240,7 @@ page 6060121 "NPR TM Ticket BOM"
                 RunObject = Page "NPR TM Admis. Schedule Entry";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
-            Action(TicketType)
+            Action(NavigateTicketType)
             {
                 ToolTip = 'Navigate to Ticket Type';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -237,7 +248,7 @@ page 6060121 "NPR TM Ticket BOM"
                 Image = Category;
                 RunObject = Page "NPR TM Ticket Type";
             }
-            action(Items)
+            Action(NavigateItems)
             {
                 ToolTip = 'Navigate to Item Card.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

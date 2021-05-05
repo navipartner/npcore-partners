@@ -1,19 +1,5 @@
 table 6060118 "NPR TM Admis. Schedule"
 {
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM80.1.09/TSA/20160310  CASE 236689 Change field from percentage to absolute
-    // TM1.11/TSA/20160325  CASE 237486 End date and end time on entries for web / Captions
-    // TM1.11/BR/20160331  CASE 237850 Changed recurrance calculation, Addded check to OnDelete, Added Recurrence Pattern NONE
-    // TM1.11/TSA/20160404  CASE 232250 Added field 47 and 48
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
-    // TM1.28/TSA /20180131 CASE 303925 Added Admission Base Calendar Code to establish "non-working" days.
-    // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
-    // TM1.41/TSA /20190429 CASE 353352 Stop time and event duration is kept under better sync.
-    // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
-    // #378212/TSA /20191120 CASE 378212 Added Sales Cut-off dates
-    // #378212/TSA /20191120 CASE 378212 Removed default assignment of "Event Arrival From Time", "Event Arrival Until Time"
-    // TM1.45/TSA/20200122  CASE 374620 Transport TM1.45 - 22 January 2020
 
     Caption = 'Admission Schedule';
     DataClassification = CustomerContent;
@@ -51,10 +37,8 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                //-TM1.11
                 UpdateEndAfterDate;
                 SetDayOfTheWeek;
-                //+TM1.11
             end;
         }
         field(12; "Recurrence Until Pattern"; Option)
@@ -66,7 +50,7 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                //-TM1.11
+
                 case "Recurrence Until Pattern" of
                     "Recurrence Until Pattern"::NO_END_DATE:
                         begin
@@ -79,7 +63,7 @@ table 6060118 "NPR TM Admis. Schedule"
                         end;
                 end;
                 UpdateEndAfterDate;
-                //+TM1.11
+
             end;
         }
         field(13; "End After Occurrence Count"; Integer)
@@ -89,9 +73,9 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                //-TM1.11
+
                 UpdateEndAfterDate;
-                //+TM1.11
+
             end;
         }
         field(14; "End After Date"; Date)
@@ -101,9 +85,7 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                //-NPRx.xx
                 UpdateReccurencePattern;
-                //+TM1.11
             end;
         }
         field(20; "Recurrence Pattern"; Option)
@@ -115,10 +97,8 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                //-NPRx.xx
                 UpdateEndAfterDate;
                 SetDayOfTheWeek;
-                //+TM1.11
             end;
         }
         field(21; "Recur Every N On"; Integer)
@@ -133,16 +113,7 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                //-#378212 [378212]
-                // "Event Arrival From Time" := "Start Time";
-                //
-                // //-TM1.41 [353352]
-                // "Stop Time" := "Start Time" + "Event Duration";
-                // "Event Arrival Until Time" := "Stop Time";
-                // //+TM1.41 [353352]
-
                 "Stop Time" := "Start Time" + "Event Duration";
-                //+#378212 [378212]
             end;
         }
         field(23; "Stop Time"; Time)
@@ -155,10 +126,6 @@ table 6060118 "NPR TM Admis. Schedule"
                 if ("Stop Time" < "Start Time") then
                     Error(STOP_TIME);
                 "Event Duration" := "Stop Time" - "Start Time";
-
-                //-#378212 [378212]
-                //"Event Arrival Until Time" := "Stop Time";
-                //+#378212 [378212]
             end;
         }
         field(24; "Recur Duration"; Duration)
@@ -175,9 +142,6 @@ table 6060118 "NPR TM Admis. Schedule"
             begin
                 "Stop Time" := "Start Time" + "Event Duration";
 
-                //-#378212 [378212]
-                // "Event Arrival Until Time" := "Stop Time";
-                //+#378212 [378212]
             end;
         }
         field(30; Monday; Boolean)
@@ -333,11 +297,9 @@ table 6060118 "NPR TM Admis. Schedule"
     var
         TMAdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
-        //-TM1.11
         TMAdmissionScheduleLines.Reset();
         TMAdmissionScheduleLines.SetRange("Schedule Code", "Schedule Code");
         TMAdmissionScheduleLines.DeleteAll(true);
-        //+TM1.11
     end;
 
     trigger OnModify()
@@ -365,18 +327,15 @@ table 6060118 "NPR TM Admis. Schedule"
     var
         TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
     begin
-        //-TM1.11
         if "Recurrence Until Pattern" = "Recurrence Until Pattern"::AFTER_X_OCCURENCES then begin
             "End After Date" := TMAdmissionSchManagement.GetRecurrenceEndDate("Start From", "End After Occurrence Count", "Recurrence Pattern");
         end;
-        //+TM1.11
     end;
 
     local procedure UpdateReccurencePattern()
     var
         TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
     begin
-        //-TM1.11
         if "Recurrence Until Pattern" = "Recurrence Until Pattern"::AFTER_X_OCCURENCES then begin
             if "End After Date" = 0D then begin
                 Validate("Recurrence Until Pattern", "Recurrence Until Pattern"::NO_END_DATE);
@@ -386,12 +345,11 @@ table 6060118 "NPR TM Admis. Schedule"
                 end;
             end;
         end;
-        //+TM1.11
     end;
 
     local procedure SetDayOfTheWeek()
     begin
-        //-TM1.11
+
         if "Recurrence Pattern" = "Recurrence Pattern"::ONCE then begin
             Monday := Date2DWY("Start From", 1) = 1;
             Tuesday := Date2DWY("Start From", 1) = 2;
@@ -401,7 +359,7 @@ table 6060118 "NPR TM Admis. Schedule"
             Saturday := Date2DWY("Start From", 1) = 6;
             Sunday := Date2DWY("Start From", 1) = 7;
         end;
-        //+TM1.11
+
     end;
 }
 
