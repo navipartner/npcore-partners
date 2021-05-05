@@ -1,26 +1,8 @@
 table 6060121 "NPR TM Ticket Admission BOM"
 {
-    // NPR4.16/TSA/20150803 CASE219658 Ticket Initial Version
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.07/TSA/20160125  CASE 232495 Added field Default for auto selection for admission code
-    // TM80.1.09/TSA/20160310  CASE 236742 Ticket BOM defaults on registration
-    // TM1.11/TSA/20160404  CASE 232250 Added new field Prefered Sales Display Method
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.16/TSA/20160701  CASE 245455 Added fields 45, 46, 60 from ticket type that must configurable on a lower level.
-    // TM1.18/TSA/20170103  CASE 262095 Added option field Revoke Policy
-    // TM1.20/TSA/20170323  CASE 269171 Added field Refund Price %
-    // TM1.28/TSA /20180219 CASE 305707 Ticket Base Calendar functionality
-    // TM1.36/TSA /20180801 CASE 316463 Added field "Allow Rescan Within (Sec.)"
-    // TM1.38/TSA /20181012 CASE 332109 New field "publish as eTicket"
-    // TM1.42/TSA /20190411 CASE 351050 Added field "Revisit Condition (Statistics)"
-    // TM1.45/TSA /20191120 CASE 378212 Added Sales cut-off dates
-    // TM1.45/TSA /20191216 CASE 382535 Added "Admission Inclusion", "Admission Unit Price"
-    // TM1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
-    // TM1.48/TSA /20200629 CASE 411704 Added "Percentage of Adm. Capacity"
 
     Caption = 'Ticket Admission BOM';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Item No."; Code[20])
@@ -38,7 +20,7 @@ table 6060121 "NPR TM Ticket Admission BOM"
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Admission Code"; Code[20])
         {
@@ -69,7 +51,7 @@ table 6060121 "NPR TM Ticket Admission BOM"
         }
         field(15; "Prefered Sales Display Method"; Option)
         {
-            Caption = 'Prefered Sales Display Method';
+            Caption = 'Preferred Sales Display Method';
             DataClassification = CustomerContent;
             OptionCaption = ' ,Schedule,Calendar';
             OptionMembers = DEFAULT,SCHEDULE,CALENDAR;
@@ -133,8 +115,8 @@ table 6060121 "NPR TM Ticket Admission BOM"
         {
             Caption = 'Activation Method';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Scan,POS';
-            OptionMembers = NA,SCAN,POS;
+            OptionCaption = ' ,On Scan,On Sale,Always,Per Unit';
+            OptionMembers = NA,SCAN,POS,ALWAYS,PER_UNIT;
         }
         field(62; "Admission Entry Validation"; Option)
         {
@@ -219,13 +201,11 @@ table 6060121 "NPR TM Ticket Admission BOM"
                 TicketType: Record "NPR TM Ticket Type";
             begin
 
-                //-TM90.1.46 [387138]
                 if ("Publish Ticket URL" >= "Publish Ticket URL"::PUBLISH) then begin
                     Item.Get("Item No.");
                     TicketType.Get(Item."NPR Ticket Type");
                     TicketType.TestField(TicketType."DIY Print Layout Code");
                 end;
-                //+TM90.1.46 [387138]
             end;
         }
         field(100; "Admission Description"; Text[50])
@@ -261,10 +241,6 @@ table 6060121 "NPR TM Ticket Admission BOM"
         key(Key1; "Item No.", "Variant Code", "Admission Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     local procedure UpdateItemDescription()
