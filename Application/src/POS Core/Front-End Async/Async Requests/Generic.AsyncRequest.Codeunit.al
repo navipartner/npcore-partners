@@ -19,4 +19,9 @@ codeunit 6150752 "NPR Front-End: Generic" implements "NPR Front-End Async Reques
     begin
         exit(_content);
     end;
+
+    procedure SetContent(Json: Interface "NPR IJsonSerializable")
+    begin
+        _content := Json.GetJson();
+    end;
 }
