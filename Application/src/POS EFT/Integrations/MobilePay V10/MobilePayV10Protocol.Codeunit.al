@@ -9,6 +9,8 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         MobilePayResponseExpectedButEmptyErr: Label 'This is a programming bug!!!\MobilePay response content expected but empty.\Can''t read any JSON response content.';
         IsRunningOutOfPosSession: Boolean;
+        MobilePayJobQueueCategoryCode_Lbl: Label 'MOBILEPAY', Locked = true;
+        MobilePayJobQueueCategoryDescription_Lbl: Label 'MOBILEPAY Tasks';
 
     internal procedure SendTrxRequest(EftTrxRequest: record "NPR EFT Transaction Request")
     var
@@ -523,11 +525,17 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     var
         JobQueueEntry: Record "Job Queue Entry";
         RecId: RecordId;
+        JobQueueCategory: Record "Job Queue Category";
     begin
         if (WithPrompt) then begin
             if not Confirm(CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_Qst, true) then
                 Error(CANCELED_BY_USER_Err);
         end;
+
+        JobQueueCategory.Init();
+        JobQueueCategory.Code := MobilePayJobQueueCategoryCode_Lbl;
+        JobQueueCategory.Description := MobilePayJobQueueCategoryDescription_Lbl;
+        if not JobQueueCategory.Insert() then;
 
         JobQueueEntry.Init();
         JobQueueEntry.Description := CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION_Lbl;
@@ -536,6 +544,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         JobQueueEntry.validate("Starting Time", 020000T);
         JobQueueEntry.validate("Ending Time", 030000T);
         JobQueueEntry."No. of Minutes between Runs" := 15;
+        JobQueueEntry."Job Queue Category Code" := JobQueueCategory.Code;
         JobQueueEntry.Modify(True);
     end;
 
