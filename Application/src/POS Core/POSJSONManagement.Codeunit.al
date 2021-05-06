@@ -482,6 +482,50 @@ codeunit 6150703 "NPR POS JSON Management"
     end;
 
     /// <summary>
+    /// Retrieves an big integer property from the current object. If the property does not exist, it
+    /// returns 0. If the property being accessed is an object, this method returns
+    /// the entire object serialized as JSON text.
+    /// </summary>
+    /// <param name="Property">Property to retrieve as big integer</param>
+    /// <returns>Value of the retrieved property as big integer, or 0 if not found.</returns>
+    procedure GetBigInteger(Property: Text) Int: BigInteger
+    var
+        JToken: JsonToken;
+        JValue: JsonValue;
+    begin
+        if not GetJToken(JToken, Property) then
+            exit;
+
+        if not (JToken.IsValue) then
+            exit;
+
+        JValue := JToken.AsValue();
+        Int := JValue.AsBigInteger();
+    end;
+
+    /// <summary>
+    /// Attempts to read an big integer property from the current object. If the property does not exist, it
+    /// throws a runtime error indicating the operation during which it happened.
+    /// </summary>
+    /// <param name="Property">Property to retrieve as big integer</param>
+    /// <param name="OperationDescription">Describes the operation that is being performed. In case of
+    /// failure, this is shown in the error message.</param>
+    /// <returns>Value of the retrieved property as big integer.</returns>
+    procedure GetBigIntegerOrFail(Property: Text; OperationDescription: Text) Int: BigInteger
+    var
+        JToken: JsonToken;
+        JValue: JsonValue;
+    begin
+        JToken := GetJTokenOrFail(Property, OperationDescription);
+
+        if not (JToken.IsValue) then
+            exit;
+
+        JValue := JToken.AsValue();
+        Int := JValue.AsBigInteger();
+    end;
+
+    /// <summary>
     /// Retrieves a date property from the current object. If the property does not exist, it
     /// returns 0D. If the property being accessed is an object, this method returns
     /// the entire object serialized as JSON text.
