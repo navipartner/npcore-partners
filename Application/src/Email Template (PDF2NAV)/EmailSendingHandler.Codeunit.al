@@ -46,8 +46,98 @@ codeunit 6014553 "NPR Email Sending Handler"
     end;
 
     procedure AddAttachmentFromStream(var EmailItem: Record "Email Item"; InStr: InStream; FileName: Text[1024])
+    var
+        Attachment: Record Attachment temporary;
+        TempBLOB: Codeunit "Temp Blob";
+        Outstr: OutStream;
+        FileMgt: Codeunit "File Management";
     begin
-        EmailItem.AddAttachment(InStr, FileName);
+        TempBLOB.CreateOutStream(Outstr);
+        CopyStream(Outstr, InStr);
+        Attachment.SetAttachmentFileFromBlob(TempBLOB);
+        Attachment."Attachment File".Export(FileName);
+        case true of
+            EmailItem."Attachment File Path" = '':
+                begin
+                    EmailItem."Attachment File Path" := FileName;
+                    EmailItem."Attachment Name" := FileName;
+                end;
+            EmailItem."Attachment File Path 2" = '':
+                begin
+                    EmailItem."Attachment File Path 2" := FileName;
+                    EmailItem."Attachment Name 2" := FileName;
+                end;
+            EmailItem."Attachment File Path 3" = '':
+                begin
+                    EmailItem."Attachment File Path 3" := FileName;
+                    EmailItem."Attachment Name 3" := FileName;
+                end;
+            EmailItem."Attachment File Path 4" = '':
+                begin
+                    EmailItem."Attachment File Path 4" := FileName;
+                    EmailItem."Attachment Name 4" := FileName;
+                end;
+            EmailItem."Attachment File Path 5" = '':
+                begin
+                    EmailItem."Attachment File Path 5" := FileName;
+                    EmailItem."Attachment Name 5" := FileName;
+                end;
+            EmailItem."Attachment File Path 6" = '':
+                begin
+                    EmailItem."Attachment File Path 6" := FileName;
+                    EmailItem."Attachment Name 6" := FileName;
+                end;
+            EmailItem."Attachment File Path 7" = '':
+                begin
+                    EmailItem."Attachment File Path 7" := FileName;
+                    EmailItem."Attachment Name 7" := FileName;
+                end;
+        end;
+        EmailItem.Modify();
+    end;
+
+    procedure AddAttachment(var EmailItem: Record "Email Item"; NewAttachment: Text[1024])
+    var
+        FileMgt: Codeunit "File Management";
+    begin
+        case true of
+            EmailItem."Attachment File Path" = '':
+                begin
+                    EmailItem."Attachment File Path" := NewAttachment;
+                    EmailItem."Attachment Name" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 2" = '':
+                begin
+                    EmailItem."Attachment File Path 2" := NewAttachment;
+                    EmailItem."Attachment Name 2" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 3" = '':
+                begin
+                    EmailItem."Attachment File Path 3" := NewAttachment;
+                    EmailItem."Attachment Name 3" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 4" = '':
+                begin
+                    EmailItem."Attachment File Path 4" := NewAttachment;
+                    EmailItem."Attachment Name 4" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 5" = '':
+                begin
+                    EmailItem."Attachment File Path 5" := NewAttachment;
+                    EmailItem."Attachment Name 5" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 6" = '':
+                begin
+                    EmailItem."Attachment File Path 6" := NewAttachment;
+                    EmailItem."Attachment Name 6" := FileMgt.GetFileName(NewAttachment);
+                end;
+            EmailItem."Attachment File Path 7" = '':
+                begin
+                    EmailItem."Attachment File Path 7" := NewAttachment;
+                    EmailItem."Attachment Name 7" := FileMgt.GetFileName(NewAttachment);
+                end;
+        end;
+        EmailItem.Modify();
     end;
 
     procedure AddRecipients(var EmailItem: Record "Email Item"; Recipients: List of [Text])
