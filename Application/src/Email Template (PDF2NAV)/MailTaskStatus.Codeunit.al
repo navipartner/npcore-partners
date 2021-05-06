@@ -392,6 +392,11 @@ codeunit 6059905 "NPR Mail Task Status"
         EmailSenderHandler.AppendBodyLine(EmailItem, TextLine + '<br/>');
     end;
 
+    procedure AddAttachment(NewAttachment: Text[1024])
+    begin
+        EmailSenderHandler.AddAttachment(EmailItem, NewAttachment);
+    end;
+
     procedure AddAttachmentFromStream(InStrAttachment: InStream; NewAttachment: Text[1024])
     begin
         EmailSenderHandler.AddAttachmentFromStream(EmailItem, InStrAttachment, NewAttachment);
