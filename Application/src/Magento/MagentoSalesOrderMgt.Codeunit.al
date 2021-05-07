@@ -184,7 +184,7 @@
         end;
     end;
 
-    local procedure InsertCustomer(XmlElement: XmlElement; IsContactCustomer: Boolean; var Customer: Record Customer): Boolean
+    local procedure InsertCustomer(XmlElement: XmlElement; IsContactCustomer: Boolean; var Customer: Record Customer; MagentoWebsite: Record "NPR Magento Website"): Boolean
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         CustTemplate: Record "Customer Templ.";
@@ -223,7 +223,7 @@
                 Error(Text002, MagentoSetup."Customer Update Mode");
             VATBusPostingGroup := MagentoMgt.GetVATBusPostingGroup(TaxClass);
 
-            InitCustomer(XmlElement, Customer);
+            InitCustomer(XmlElement, Customer, MagentoWebsite);
             Customer."NPR External Customer No." := ExternalCustomerNo;
             Customer.Insert(true);
             Customer."Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'post_code', MaxStrLen(Customer."Post Code"), true));
@@ -472,7 +472,7 @@
         if not XmlElement.SelectSingleNode('sell_to_customer', XNode) then
             Error(Error001);
         XmlElement2 := XNode.AsXmlElement();
-        InsertCustomer(XmlElement2, MagentoSetup."Customers Enabled", Customer);
+        InsertCustomer(XmlElement2, MagentoSetup."Customers Enabled", Customer, MagentoWebsite);
         SalesHeader.Init();
         SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
         SalesHeader."No." := '';
@@ -1455,9 +1455,10 @@
         exit(false);
     end;
 
-    local procedure InitCustomer(XmlElement: XmlElement; var Cust: Record Customer)
+    local procedure InitCustomer(XmlElement: XmlElement; var Cust: Record Customer; MagentoWebsite: Record "NPR Magento Website")
+    var
+        NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-
         Initialize();
 
         Cust.Init();
@@ -1470,6 +1471,10 @@
             MagentoSetup."Customer Mapping"::"Phone No. to Customer No.":
                 begin
                     Cust."No." := NpXmlDomMgt.GetXmlText(XmlElement, 'phone', MaxStrLen(Cust."No."), false);
+                end;
+            else begin
+                    if MagentoWebsite."Customer No. Series" <> '' then
+                        NoSeriesMgt.InitSeries(MagentoWebsite."Customer No. Series", Cust."No. Series", Today(), Cust."No.", Cust."No. Series");
                 end;
         end;
     end;
