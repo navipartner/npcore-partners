@@ -73,12 +73,14 @@ page 6150633 "NPR NPRE Select Flow Status"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Color field';
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Icon Class field';
                 }
             }
         }

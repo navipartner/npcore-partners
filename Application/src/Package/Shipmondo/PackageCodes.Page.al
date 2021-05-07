@@ -22,6 +22,7 @@ page 6014570 "NPR Package Codes"
                 field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Description; Rec.Description)
                 {
