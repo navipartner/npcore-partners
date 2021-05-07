@@ -17,6 +17,11 @@ page 6014445 "NPR Payment Method Denom"
                     ApplicationArea = All;
                     Editable = false;
                 }
+                field("Denomination Type"; Rec."Denomination Type")
+                {
+                    ToolTip = 'Specifies the value of the Denomination Type field.';
+                    ApplicationArea = All;
+                }
                 field(Denomination; Rec.Denomination)
                 {
                     ToolTip = 'Specifies the value of the Denomination field.';
