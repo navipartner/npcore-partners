@@ -49,6 +49,12 @@ table 6151402 "NPR Magento Website"
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
+        field(45; "Customer No. Series"; Code[20])
+        {
+            Caption = 'Customer No. Series';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+        }
     }
 
     keys
