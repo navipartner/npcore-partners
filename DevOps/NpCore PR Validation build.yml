@@ -85,6 +85,7 @@ jobs:
           id: NaviPartner.NPCore.BC$(majorVersion)
           download:
             enabled: true
+            deployApp: true
 
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
