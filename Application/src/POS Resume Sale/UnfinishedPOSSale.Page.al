@@ -4,8 +4,7 @@ page 6150746 "NPR Unfinished POS Sale"
     Editable = false;
     InstructionalText = 'There is an unfinished sale, do you want to resume it?';
     PageType = ConfirmationDialog;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR POS Sale";
 
     layout
@@ -18,7 +17,6 @@ page 6150746 "NPR Unfinished POS Sale"
                 CaptionClass = GenerateInstructions();
                 MultiLine = true;
                 ShowCaption = false;
-                ToolTip = 'Specifies the value of the '''' field';
             }
             group(Details)
             {
