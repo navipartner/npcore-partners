@@ -16,8 +16,10 @@ tableextension 6014427 "NPR Item" extends Item
                 ItemCategory: Record "Item Category";
                 ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
             begin
-                if ItemCategory.Get(Rec."Item Category Code") then
-                    ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
+                if not Rec.IsTemporary() then
+                    if Rec."Item Category Code" <> xRec."Item Category Code" then
+                        if ItemCategory.Get(Rec."Item Category Code") then
+                            ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
             end;
         }
 

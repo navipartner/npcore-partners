@@ -45,67 +45,6 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             Caption = 'Item Template Code';
             TableRelation = "Config. Template Header" where("Table ID" = const(27));
         }
-        field(6014401; "NPR Gen. Bus. Posting Group"; Code[20])
-        {
-            Caption = 'Gen. Bus. Posting Group';
-            DataClassification = CustomerContent;
-            TableRelation = "Gen. Business Posting Group";
-
-            trigger OnValidate()
-            var
-                GenBusinessPostingGroup: Record "Gen. Business Posting Group";
-                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
-            begin
-                if "NPR Gen. Bus. Posting Group" <> '' then begin
-                    GenBusinessPostingGroup.Get("NPR Gen. Bus. Posting Group");
-                    Validate("NPR VAT Bus. Posting Group", GenBusinessPostingGroup."Def. VAT Bus. Posting Group");
-                end else
-                    "NPR VAT Bus. Posting Group" := '';
-
-                ItemCategoryMgt.CheckItemCategory(Rec, FieldNo("NPR Gen. Bus. Posting Group"));
-            end;
-        }
-        field(6014402; "NPR Gen. Prod. Posting Group"; Code[20])
-        {
-            Caption = 'Gen. Prod. Posting Group';
-            DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                GenProductPostingGroup: Record "Gen. Product Posting Group";
-                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
-            begin
-                if "NPR Gen. Prod. Posting Group" <> '' then begin
-                    GenProductPostingGroup.Get("NPR Gen. Prod. Posting Group");
-                    Validate("NPR VAT Prod. Posting Group", GenProductPostingGroup."Def. VAT Prod. Posting Group");
-                end else
-                    "NPR VAT Prod. Posting Group" := '';
-
-                ItemCategoryMgt.CheckItemCategory(Rec, FieldNo("NPR Gen. Prod. Posting Group"));
-            end;
-        }
-        field(6014403; "NPR VAT Prod. Posting Group"; Code[20])
-        {
-            Caption = 'VAT Prod. Posting Group';
-            DataClassification = CustomerContent;
-        }
-        field(6014404; "NPR VAT Bus. Posting Group"; Code[20])
-        {
-            Caption = 'VAT Bus. Posting Group';
-            DataClassification = CustomerContent;
-        }
-        field(6014405; "NPR Inventory Posting Group"; Code[20])
-        {
-            Caption = 'Inventory Posting Group';
-            DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
-            begin
-                ItemCategoryMgt.CheckItemCategory(Rec, FieldNo("NPR Inventory Posting Group"));
-            end;
-        }
         field(6014406; "NPR Main Category"; Boolean)
         {
             Caption = 'Main Category';
@@ -126,8 +65,6 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             var
                 ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
             begin
-                ItemCategoryMgt.CheckItemCategory(Rec, FieldNo("NPR Blocked"));
-
                 ItemCategoryMgt.SetBlockedOnChildren(Code, "NPR Blocked", false);
             end;
         }
@@ -136,6 +73,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
             trigger OnValidate()
             begin
@@ -147,10 +85,11 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
             trigger OnValidate()
             begin
-                NPRValidateShortcutDimCode(2, "NPR Global Dimension 1 Code");
+                NPRValidateShortcutDimCode(2, "NPR Global Dimension 2 Code");
             end;
         }
         field(6014411; "NPR Date Filter"; Date)
@@ -290,36 +229,6 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
                                 "Location Code" = field("NPR Location Filter")));
         }
     }
-
-    trigger OnAfterInsert()
-    var
-        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
-    begin
-        if Rec.IsTemporary() then
-            exit;
-
-        if Rec."Parent Category" = '' then
-            exit;
-
-        ItemCategoryMgt.CopyParentItemCategoryDimensions(Rec, false);
-    end;
-
-
-    trigger OnAfterModify()
-    var
-        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
-    begin
-        if Rec.IsTemporary() then
-            exit;
-
-        if Format(Rec) <> Format(xRec) then
-            ItemCategoryMgt.CopySetupToChildren(Rec, true);
-
-        if (Rec."Parent Category" = '') or (Rec."Parent Category" = xRec."Parent Category") then
-            exit;
-
-        ItemCategoryMgt.CopyParentItemCategoryDimensions(Rec, xRec."Parent Category" <> '');
-    end;
 
     procedure NPRValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
