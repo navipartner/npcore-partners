@@ -1,15 +1,5 @@
 codeunit 6150786 "NPR POS Action - Play Sound"
 {
-    // NPR5.55/ALPO/20200514 CASE 401942 POS Action to play a sound (to be used as Ean Box event)
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        ActionDescription: Label 'An action to play an audio file from Url';
-
     local procedure ActionCode(): Text
     begin
         exit('PLAY_SOUND');
@@ -20,16 +10,19 @@ codeunit 6150786 "NPR POS Action - Play Sound"
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        ActionDescriptionLbl: Label 'This built in function allows to play back an audio file from provided Url.', MaxLength = 250;
+        DefaultMessageHdrLbl: Label 'You might want to know...', MaxLength = 250;
     begin
         if Sender.DiscoverAction(
-    ActionCode(),
-    ActionDescription,
-    ActionVersion(),
-    Sender.Type::Generic,
-    Sender."Subscriber Instances Allowed"::Multiple)
-then begin
+            ActionCode(),
+            ActionDescriptionLbl,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep('PlaySoundAndDisplayMessage',
               'if (param.AudioFileUrl) {' +
               '  var audio = new Audio(param.AudioFileUrl);' +
@@ -45,11 +38,11 @@ then begin
             Sender.RegisterTextParameter('AudioFileUrl', '');
             Sender.RegisterBooleanParameter('ShowMessage', false);
             Sender.RegisterTextParameter('MessageText', '');
-            Sender.RegisterTextParameter('MessageHeader', 'You might want to know...');
+            Sender.RegisterTextParameter('MessageHeader', DefaultMessageHdrLbl);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -57,7 +50,7 @@ then begin
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         CaptionAudioFileUrl: Label 'Audio File Url';
@@ -80,10 +73,10 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
-        DescAudioFileUrl: Label 'An Url to an audio file to be played back';
+        DescAudioFileUrl: Label 'Url of the audio file to be played back';
         DescMessageHeader: Label 'Define message heading text';
         DescMessageText: Label 'Define message detailed text';
         DescShowMessage: Label 'Set if you want to show a message to user';
@@ -103,14 +96,11 @@ then begin
         end;
     end;
 
-    local procedure "--- Ean Box Event Handling"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    #region Ean Box Event Handling
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
-        EanBoxEventDesc: Label 'Plays an audio file from an Url';
+        EanBoxEventDesc: Label 'Plays back an audio file from provided Url';
         EanBoxEventModuleName: Label 'Global';
     begin
         if not EanBoxEvent.Get(ActionCode()) then begin
@@ -125,12 +115,12 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, false)]
     local procedure SetEanBoxEventInScope(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     begin
         if EanBoxSetupEvent."Event Code" <> ActionCode() then
@@ -141,7 +131,7 @@ then begin
 
     local procedure CurrCodeunitID(): Integer
     begin
-        exit(CODEUNIT::"NPR POS Action - Play Sound");
+        exit(Codeunit::"NPR POS Action - Play Sound");
     end;
+    #endregion Ean Box Event Handling
 }
-
