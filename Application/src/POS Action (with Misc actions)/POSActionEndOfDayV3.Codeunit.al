@@ -68,6 +68,7 @@ then begin
         OpenUnit: Boolean;
         BalanceEntryToPrint: Integer;
         CurrentView: Codeunit "NPR POS View";
+        BalanceViewParameters: JsonObject;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;

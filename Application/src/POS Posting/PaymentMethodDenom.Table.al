@@ -12,6 +12,16 @@ table 6014546 "NPR Payment Method Denom"
             TableRelation = "NPR POS Payment Method".Code;
             DataClassification = CustomerContent;
         }
+
+        field(2; "Denomination Type"; Option)
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+            OptionMembers = COIN,BILL;
+            OptionCaption = 'Coin,Bill';
+            InitValue = COIN;
+        }
+
         field(10; Denomination; Decimal)
         {
             Caption = 'Denomination';
@@ -21,7 +31,7 @@ table 6014546 "NPR Payment Method Denom"
 
     keys
     {
-        key(Key1; "POS Payment Method Code", Denomination)
+        key(Key1; "POS Payment Method Code", "Denomination Type", Denomination)
         {
         }
     }

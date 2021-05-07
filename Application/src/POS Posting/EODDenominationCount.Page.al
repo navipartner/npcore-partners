@@ -24,6 +24,12 @@ page 6014443 "NPR EOD Denomination Count"
                     ApplicationArea = All;
                     Editable = false;
                 }
+                field("Denomination Type"; Rec."Denomination Type")
+                {
+                    ToolTip = 'Specifies the value of the Denomination Type field.';
+                    ApplicationArea = All;
+                    Editable = false;
+                }
                 field(Denomination; Rec.Denomination)
                 {
                     ToolTip = 'Specifies the value of the Denomination field.';

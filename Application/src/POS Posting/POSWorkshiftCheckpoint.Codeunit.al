@@ -772,6 +772,7 @@
                         POSPaymentBinDenomination."POS Unit No." := UnitNo;
                         POSPaymentBinDenomination."Workshift Checkpoint Entry No." := WorkshiftEntryNo;
                         POSPaymentBinDenomination."Bin Checkpoint Entry No." := POSPaymentBinCheckpoint."Entry No.";
+                        POSPaymentBinDenomination."Denomination Type" := EODDenomination."Denomination Type";
                         POSPaymentBinDenomination.Denomination := EODDenomination.Denomination;
                         POSPaymentBinDenomination.Quantity := EODDenomination.Quantity;
                         POSPaymentBinDenomination.Amount := EODDenomination.Amount;
