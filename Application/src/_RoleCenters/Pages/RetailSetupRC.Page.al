@@ -653,6 +653,7 @@ page 6151245 "NPR Retail Setup RC"
                 ApplicationArea = All;
                 Caption = 'Open POS';
                 RunObject = Codeunit "NPR Open POS Page";
+                ToolTip = 'Executes the Open POS action';
             }
         }
     }

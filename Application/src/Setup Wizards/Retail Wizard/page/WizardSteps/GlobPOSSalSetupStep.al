@@ -16,6 +16,7 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnValidate()
                     begin
@@ -25,6 +26,7 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
                 field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Company Name field';
 
                     trigger OnValidate()
                     var
@@ -45,6 +47,7 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
                 field("Service Url"; Rec."Service Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Service Url field';
                 }
             }
         }

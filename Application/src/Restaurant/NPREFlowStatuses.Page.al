@@ -41,6 +41,7 @@ page 6150679 "NPR NPRE Flow Statuses"
                 {
                     ApplicationArea = All;
                     Visible = IsServingSteps;
+                    ToolTip = 'Specifies the value of the Waiter Pad Status Code field';
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
@@ -57,14 +58,17 @@ page 6150679 "NPR NPRE Flow Statuses"
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Available in Front-End field';
                 }
                 field(Color; Rec.Color)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Color field';
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Icon Class field';
                 }
             }
         }

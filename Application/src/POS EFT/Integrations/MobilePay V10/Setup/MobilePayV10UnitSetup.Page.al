@@ -15,6 +15,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                 {
                     ApplicationArea = All;
                     Lookup = true;
+                    ToolTip = 'Specifies the value of the Store ID field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
@@ -30,11 +31,13 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                 field("Merchant PoS ID"; Rec."Merchant PoS ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Merchant PoS ID field';
                 }
                 field("MobilePay POS ID"; Rec."MobilePay POS ID")
                 {
                     ApplicationArea = All;
                     Lookup = true;
+                    ToolTip = 'Specifies the value of the MobilePay POS ID field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
@@ -50,10 +53,12 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                 field("Beacon ID"; Rec."Beacon ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Beacon ID field';
                 }
                 field("Only QR"; Rec."Only QR")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Only QR field';
                 }
             }
         }
@@ -68,6 +73,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                 ApplicationArea = All;
                 Caption = 'Create In Mobilepay';
                 Image = CopyCostBudget;
+                ToolTip = 'Executes the Create In Mobilepay action';
 
                 trigger OnAction()
                 var
@@ -81,6 +87,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                 ApplicationArea = All;
                 Caption = 'Delete In Mobilepay';
                 Image = CloseDocument;
+                ToolTip = 'Executes the Delete In Mobilepay action';
 
                 trigger OnAction()
                 var

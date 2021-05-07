@@ -19,6 +19,7 @@ page 6014409 "NPR POS Turnover"
                 {
                     Caption = 'Calculation Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Calculation Date field';
                 }
                 field(POSStoreCodeFilter; POSStoreCodeFilter)
                 {
@@ -26,12 +27,14 @@ page 6014409 "NPR POS Turnover"
                     ApplicationArea = All;
                     TableRelation = "NPR POS Store";
                     Editable = POSStoreCodeEditable;
+                    ToolTip = 'Specifies the value of the POS Store Code field';
                 }
                 field(POSUnitNoFilter; POSUnitNoFilter)
                 {
                     Caption = 'POS Unit No.';
                     ApplicationArea = All;
                     Editable = POSUnitNoFilterEditable;
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -57,30 +60,35 @@ page 6014409 "NPR POS Turnover"
                         ApplicationArea = All;
                         StyleExpr = RowStyle1;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field("This Year"; Rec."This Year")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the This Year field';
                     }
                     field("Last Year"; Rec."Last Year")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Last Year field';
                     }
                     field(Difference; Rec.Difference)
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Difference field';
                     }
                     field("Difference %"; Rec."Difference %")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Difference % field';
                     }
                 }
             }
@@ -99,6 +107,7 @@ page 6014409 "NPR POS Turnover"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+                ToolTip = 'Executes the Recalculate action';
 
                 trigger OnAction()
                 begin

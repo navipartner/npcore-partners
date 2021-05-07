@@ -60,6 +60,7 @@ page 6014575 "NPR Package Printers"
             {
                 Caption = 'Get printers';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Get printers action';
             }
         }
     }

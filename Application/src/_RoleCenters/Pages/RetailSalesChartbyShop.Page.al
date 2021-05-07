@@ -16,6 +16,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;
+                ToolTip = 'Specifies the value of the Date Range field';
             }
             field(ChartType; ChartType)
             {
@@ -25,6 +26,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;
+                ToolTip = 'Specifies the value of the Chart type field';
 
                 trigger OnValidate()
                 begin
@@ -58,6 +60,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                     ApplicationArea = Basic;
                     Caption = 'Day';
                     Image = ChangeDate;
+                    ToolTip = 'Executes the Day action';
 
                     trigger OnAction()
                     begin
@@ -71,6 +74,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                     ApplicationArea = Basic;
                     Caption = 'Week';
                     Image = ChangeDate;
+                    ToolTip = 'Executes the Week action';
 
                     trigger OnAction()
                     begin
@@ -84,6 +88,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                     ApplicationArea = Basic;
                     Caption = 'Month';
                     Image = ChangeDate;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -97,6 +102,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                     ApplicationArea = Basic;
                     Caption = 'Quarter';
                     Image = ChangeDate;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -110,6 +116,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                     ApplicationArea = Basic;
                     Caption = 'Year';
                     Image = ChangeDate;
+                    ToolTip = 'Executes the Year action';
 
                     trigger OnAction()
                     begin
@@ -124,6 +131,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 ApplicationArea = Basic;
                 Caption = 'Previous';
                 Image = PreviousRecord;
+                ToolTip = 'Executes the Previous action';
 
                 trigger OnAction()
                 begin
@@ -136,6 +144,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 ApplicationArea = Basic;
                 Caption = 'Next';
                 Image = NextRecord;
+                ToolTip = 'Executes the Next action';
 
                 trigger OnAction()
                 begin
