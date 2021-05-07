@@ -31,6 +31,8 @@ report 6014420 "NPR Item Group Top"
                     AuxItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
                     AuxItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
 
+                    AuxItemLedgerEntry.CalcSums(Quantity);
+
                     IleSalesQty := -AuxItemLedgerEntry.Quantity;
 
                     AuxValueEntry.Reset();
@@ -41,6 +43,8 @@ report 6014420 "NPR Item Group Top"
                     AuxValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
                     AuxValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
                     AuxValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
+
+                    AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
 
                     IleSalesLCY := AuxValueEntry."Sales Amount (Actual)";
                     IleCostAmtActual := -AuxValueEntry."Cost Amount (Actual)";
@@ -173,6 +177,8 @@ report 6014420 "NPR Item Group Top"
                         AuxItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
                         AuxItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
 
+                        AuxItemLedgerEntry.CalcSums(Quantity);
+
                         IleSalesQty += -AuxItemLedgerEntry.Quantity;
 
                         AuxValueEntry.Reset();
@@ -183,6 +189,8 @@ report 6014420 "NPR Item Group Top"
                         AuxValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
                         AuxValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
                         AuxValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
+
+                        AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
 
                         IleSalesLCY := AuxValueEntry."Sales Amount (Actual)";
                         IleCostAmtActual := -AuxValueEntry."Cost Amount (Actual)";

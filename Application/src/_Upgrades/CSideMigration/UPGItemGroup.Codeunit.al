@@ -10,7 +10,7 @@ codeunit 6014468 "NPR UPG Item Group"
     local procedure Upgrade()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRPUGItemGroup_Upgrade-20210303', Locked = true;
+        UpgradeTagLbl: Label 'NPRPUGItemGroup_Upgrade-20210430', Locked = true;
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
             exit;
@@ -41,11 +41,6 @@ codeunit 6014468 "NPR UPG Item Group"
 
             ItemCategory."Parent Category" := ItemGroup."Parent Item Group No.";
             ItemCategory.Description := ItemGroup.Description;
-            ItemCategory."NPR Gen. Bus. Posting Group" := ItemGroup."Gen. Bus. Posting Group";
-            ItemCategory."NPR Gen. Prod. Posting Group" := ItemGroup."Gen. Prod. Posting Group";
-            ItemCategory."NPR VAT Bus. Posting Group" := ItemGroup."VAT Bus. Posting Group";
-            ItemCategory."NPR VAT Prod. Posting Group" := ItemGroup."VAT Prod. Posting Group";
-            ItemCategory."NPR Inventory Posting Group" := ItemGroup."Inventory Posting Group";
             ItemCategory."NPR Main Category" := ItemGroup."Main Item Group";
             ItemCategory."NPR Main Category Code" := ItemGroup."Belongs In Main Item Group";
             ItemCategory."NPR Blocked" := ItemGroup.Blocked;
@@ -65,7 +60,11 @@ codeunit 6014468 "NPR UPG Item Group"
             TempItem."Tariff No." := ItemGroup."Tarif No.";
             TempItem."Reordering Policy" := "Reordering Policy".FromInteger(ItemGroup."Reordering Policy");
             TempItem."NPR Variety Group" := ItemGroup."Variety Group";
-            TempItem."Item Category Code" := ItemGroup."No.";
+            TempItem."Gen. Prod. Posting Group" := ItemGroup."Gen. Prod. Posting Group";
+            TempItem."VAT Prod. Posting Group" := ItemGroup."VAT Prod. Posting Group";
+            TempItem."VAT Bus. Posting Gr. (Price)" := ItemGroup."VAT Bus. Posting Group";
+            TempItem."Inventory Posting Group" := ItemGroup."Inventory Posting Group";
+            TempItem."Item Category Code" := ItemCategory.Code;
 
             ItemCategory."NPR Item Template Code" := ItemCategoryMgt.CreateItemTemplate(ItemCategory, TempItem);
 

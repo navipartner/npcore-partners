@@ -30,19 +30,16 @@ report 6014408 "NPR Item Group Overview"
             column(Item_Group_Belongs_in_Main_Item_Group_; "Item Category"."NPR Main Category Code")
             {
             }
-            column(Item_Group_VAT_Prod_Posting_Group_; "Item Category"."NPR VAT Prod. Posting Group")
+            column(Item_Group_VAT_Prod_Posting_Group_; VATProdPostingGroupCode)
             {
             }
-            column(Item_Group_VAT_Bus_Posting_Group_; "Item Category"."NPR VAT Bus. Posting Group")
+            column(Item_Group_VAT_Bus_Posting_Group_; VATBusPostingGroupCode)
             {
             }
-            column(Item_Group_Gen_Bus_Posting_Group_; "Item Category"."NPR Gen. Bus. Posting Group")
+            column(Item_Group_Gen_Prod_Posting_Group_; GenProdPostingGroupCode)
             {
             }
-            column(Item_Group_Gen_Prod_Posting_Group_; "Item Category"."NPR Gen. Prod. Posting Group")
-            {
-            }
-            column(Item_Group_Inventory_Posting_Group_; "Item Category"."NPR Inventory Posting Group")
+            column(Item_Group_Inventory_Posting_Group_; InventoryPostingGroupCode)
             {
             }
             column(ItemGroupCaption; ItemGroupCaptionLbl)
@@ -54,6 +51,21 @@ report 6014408 "NPR Item Group Overview"
             column(Picture_CompanyInformation; CompanyInformation.Picture)
             {
             }
+
+            trigger OnAfterGetRecord()
+            var
+                TempItem: Record Item temporary;
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+            begin
+                GenProdPostingGroupCode := '';
+
+                if ItemCategoryMgt.ApplyTemplateToTempItem(TempItem, "Item Category") then begin
+                    GenProdPostingGroupCode := TempItem."Gen. Prod. Posting Group";
+                    VATProdPostingGroupCode := TempItem."VAT Prod. Posting Group";
+                    VATBusPostingGroupCode := TempItem."VAT Bus. Posting Gr. (Price)";
+                    InventoryPostingGroupCode := TempItem."Inventory Posting Group";
+                end;
+            end;
         }
     }
 
@@ -75,6 +87,10 @@ report 6014408 "NPR Item Group Overview"
 
     var
         CompanyInformation: Record "Company Information";
+        GenProdPostingGroupCode: Code[20];
+        VATProdPostingGroupCode: Code[20];
+        VATBusPostingGroupCode: Code[20];
+        InventoryPostingGroupCode: Code[20];
         DescriptionCaptionLbl: Label 'Description';
         ItemGroupCaptionLbl: Label 'Item Group';
         Report_Caption_Lbl: Label 'Item Group Overview';

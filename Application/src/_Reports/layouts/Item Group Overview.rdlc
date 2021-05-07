@@ -1038,9 +1038,6 @@ End Function
         <Field Name="Item_Group_VAT_Bus_Posting_Group_">
           <DataField>Item_Group_VAT_Bus_Posting_Group_</DataField>
         </Field>
-        <Field Name="Item_Group_Gen_Bus_Posting_Group_">
-          <DataField>Item_Group_Gen_Bus_Posting_Group_</DataField>
-        </Field>
         <Field Name="Item_Group_Gen_Prod_Posting_Group_">
           <DataField>Item_Group_Gen_Prod_Posting_Group_</DataField>
         </Field>
