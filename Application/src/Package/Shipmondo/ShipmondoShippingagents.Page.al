@@ -15,26 +15,32 @@ page 6014569 "NPR Package Shipping Agents"
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Ship to Contact Mandatory"; Rec."Ship to Contact Mandatory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ship to Contact Mandatory field';
                 }
                 field("Automatic Drop Point Service"; Rec."Automatic Drop Point Service")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Automatic Drop Point Service field';
                 }
                 field("Use own Agreement"; Rec."Use own Agreement")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Use own Agreement field';
                 }
                 field("Package Type Required"; Rec."Package Type Required")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Package Type Required field';
                 }
             }
         }

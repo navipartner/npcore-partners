@@ -17,10 +17,12 @@ page 6014429 "NPR SMS Recipient Groups"
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

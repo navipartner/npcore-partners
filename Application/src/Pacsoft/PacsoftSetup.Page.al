@@ -205,6 +205,7 @@ page 6014574 "NPR Pacsoft Setup"
                 Caption = 'Mapping(Foreign Countries)';
                 RunObject = Page "NPR Pakke Foreign Shipm. Map.";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Mapping(Foreign Countries) action';
             }
             action("Pakkelabels Printers")
             {
@@ -212,6 +213,7 @@ page 6014574 "NPR Pacsoft Setup"
                 Caption = 'Printer';
                 RunObject = Page "NPR Package Printers";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Printer action';
             }
             action("Pakkelabels Shipping Agent")
             {
@@ -219,6 +221,7 @@ page 6014574 "NPR Pacsoft Setup"
                 Caption = 'Shipping Agents';
                 RunObject = Page "NPR Package Shipping agents";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Shipping Agents action';
             }
         }
     }

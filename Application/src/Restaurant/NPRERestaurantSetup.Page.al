@@ -108,6 +108,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("Save Layout Action"; Rec."Save Layout Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Save Layout Action field';
 
                     trigger OnAssistEdit()
                     begin
@@ -117,6 +118,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("Select Restaurant Action"; Rec."Select Restaurant Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Select Restaurant Action field';
 
                     trigger OnAssistEdit()
                     begin
@@ -126,6 +128,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("Select Table Action"; Rec."Select Table Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Select Table Action field';
 
                     trigger OnAssistEdit()
                     begin
@@ -135,6 +138,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("New Waiter Pad Action"; Rec."New Waiter Pad Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the New Waiter Pad Action field';
 
                     trigger OnAssistEdit()
                     begin
@@ -144,6 +148,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("Select Waiter Pad Action"; Rec."Select Waiter Pad Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Select Waiter Pad Action field';
 
                     trigger OnAssistEdit()
                     begin
@@ -153,6 +158,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("Set Waiter Pad Status Action"; Rec."Set Waiter Pad Status Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Set Waiter Pad Status Action field';
 
                     trigger OnAssistEdit()
                     begin
@@ -162,6 +168,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("Set Table Status Action"; Rec."Set Table Status Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Set Table Status Action field';
 
                     trigger OnAssistEdit()
                     begin
@@ -171,6 +178,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 field("Set Number of Guests Action"; Rec."Set Number of Guests Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Set Number of Guests Action field';
 
                     trigger OnAssistEdit()
                     begin

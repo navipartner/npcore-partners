@@ -16,18 +16,22 @@ page 6014434 "NPR VAT Prod Post Group Mapper"
                 field("VAT Prod. Pos. Group"; Rec."VAT Prod. Pos. Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Prod. Pos. Group field';
                 }
                 field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                 }
                 field("VAT Identifier"; Rec."VAT Identifier")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Identifier field';
                 }
                 field("Fiscal Name"; Rec."Fiscal Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fiscal Name field';
                 }
             }
         }

@@ -16,14 +16,17 @@ page 6060080 "NPR Admis. Scanner Stat. Card"
                 field("Scanner Station Id"; Rec."Scanner Station Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Scanner Station Id field';
                 }
                 field(Activated; Rec.Activated)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Activated field';
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
             }
         }

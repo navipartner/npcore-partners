@@ -16,10 +16,12 @@ page 6014433 "NPR Payment Method Mapper"
                 field("POS Payment Method"; Rec."POS Payment Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Payment Method field';
                 }
                 field("Fiscal Name"; Rec."Fiscal Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fiscal Name field';
                 }
             }
         }
