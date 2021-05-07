@@ -81,7 +81,7 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         username: $(containerAdminUsername)
         password: $(containerAdminPassword)
-        testRunName: 'NPCore Tests'
+        testRunName: '$(AppName)'
         testApps:
-          - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/NP_Retail_Tests.app
+          - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/$(AppName).app
         failOnFailedTests: TRUE
