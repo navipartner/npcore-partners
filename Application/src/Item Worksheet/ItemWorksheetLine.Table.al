@@ -1281,22 +1281,21 @@ table 6060042 "NPR Item Worksheet Line"
                 TempItem: Record Item temporary;
                 ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
             begin
-                ItemWorksheetManagement.CheckItemGroupSetup("Item Category Code");
-
                 if not ItemCategory.Get("Item Category Code") then
-                    ItemCategory.Init();
+                    exit;
 
-                "VAT Prod. Posting Group" := ItemCategory."NPR VAT Prod. Posting Group";
-                "VAT Bus. Posting Gr. (Price)" := ItemCategory."NPR VAT Bus. Posting Group";
-                "Gen. Prod. Posting Group" := ItemCategory."NPR Gen. Prod. Posting Group";
-                "Inventory Posting Group" := ItemCategory."NPR Inventory Posting Group";
                 "Global Dimension 1 Code" := ItemCategory."NPR Global Dimension 1 Code";
                 "Global Dimension 2 Code" := ItemCategory."NPR Global Dimension 2 Code";
                 if Description = '' then
                     Description := ItemCategory.Description;
 
-
                 ItemCategoryMgt.ApplyTemplateToTempItem(TempItem, ItemCategory);
+                // ItemCategoryMgt.ValidateItemForCreation(TempItem, ItemCategory.Code);
+
+                "Gen. Prod. Posting Group" := TempItem."Gen. Prod. Posting Group";
+                "VAT Prod. Posting Group" := TempItem."VAT Prod. Posting Group";
+                "VAT Bus. Posting Gr. (Price)" := TempItem."VAT Bus. Posting Gr. (Price)";
+                "Inventory Posting Group" := TempItem."Inventory Posting Group";
 
                 "Base Unit of Measure" := TempItem."Base Unit of Measure";
                 "Sales Unit of Measure" := TempItem."Sales Unit of Measure";

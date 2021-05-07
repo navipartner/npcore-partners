@@ -10,31 +10,6 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Item Template Code field';
             }
-            field("NPR Gen. Bus. Posting Group"; Rec."NPR Gen. Bus. Posting Group")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Gen. Bus. Posting Group field';
-            }
-            field("NPR Gen. Prod. Posting Group"; Rec."NPR Gen. Prod. Posting Group")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Gen. Prod. Posting Group field';
-            }
-            field("NPR VAT Bus. Posting Group"; Rec."NPR VAT Bus. Posting Group")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR VAT Bus. Posting Group field';
-            }
-            field("NPR VAT Prod. Posting Group"; Rec."NPR VAT Prod. Posting Group")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR VAT Prod. Posting Group field';
-            }
-            field("NPR Inventory Posting Group"; Rec."NPR Inventory Posting Group")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Inventory Posting Group field';
-            }
             field("NPR Global Dimension 1 Code"; Rec."NPR Global Dimension 1 Code")
             {
                 ApplicationArea = All;
@@ -97,10 +72,15 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     var
                         TempItem: Record Item temporary;
                         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+                        ContinueQst: Label 'You are creating item template for current item category. Do you want to continue?';
                     begin
-                        Rec."NPR Item Template Code" := ItemCategoryMgt.CreateItemTemplate(Rec, TempItem);
-                        Rec.Modify(true);
-                        CurrPage.Update();
+                        Rec.Testfield("NPR Item Template Code", '');
+                        if Confirm(ContinueQst) then begin
+                            TempItem."Item Category Code" := Rec.Code;
+                            Rec."NPR Item Template Code" := ItemCategoryMgt.CreateItemTemplate(Rec, TempItem);
+                            Rec.Modify(true);
+                            CurrPage.Update();
+                        end;
                     end;
                 }
                 action("NPR Create Item From Item Category")
@@ -111,8 +91,29 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     ToolTip = 'Executes the Create Item(s) From Item Category action';
 
                     trigger OnAction()
+                    var
+                        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+                        NewItemNo: Code[20];
+                        ItemCreatedMsg: Label 'Created Item No. %1.';
                     begin
-                        REPORT.Run(Report::"NPR Create Item From ItemGr.", true, false, Rec);
+                        NewItemNo := ItemCategoryMgt.CreateItemFromItemCategory(Rec);
+                        if NewItemNo <> '' then
+                            Message(ItemCreatedMsg, NewItemNo);
+                    end;
+                }
+                action("NPR Copy Item Category Setup to SubCategories")
+                {
+                    Caption = 'Copy Item Category Setup to SubCategories';
+                    Image = ProdBOMMatrixPerVersion;
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Copy Item Category Setup to SubCategories';
+
+                    trigger OnAction()
+                    var
+                        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+                    begin
+                        ItemCategoryMgt.CopySetupToChildren(Rec, false);
+                        CurrPage.Update();
                     end;
                 }
             }
@@ -142,9 +143,10 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     trigger OnAction()
                     var
                         VATPostingSetup: Record "VAT Posting Setup";
+                        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
                         MissingSettingsErr: Label 'Enter VAT posting settings on item category card!';
                     begin
-                        if VATPostingSetup.Get(Rec."NPR VAT Bus. Posting Group", Rec."NPR VAT Prod. Posting Group") then
+                        if ItemCategoryMgt.GetVATPostingSetupFromItemCategory(Rec, VATPostingSetup) then
                             PAGE.RunModal(PAGE::"VAT Posting Setup Card", VATPostingSetup)
                         else
                             Error(MissingSettingsErr);

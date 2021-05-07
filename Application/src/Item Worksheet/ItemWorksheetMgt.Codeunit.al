@@ -178,20 +178,6 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
             exit;
     end;
 
-    procedure CheckItemGroupSetup(ItemGroupCode: Code[20])
-    var
-        ItemCategory: Record "Item Category";
-    begin
-        if not ItemCategory.Get(ItemGroupCode) then
-            exit;
-        ItemCategory.TestField("NPR VAT Bus. Posting Group");
-        ItemCategory.TestField("NPR Gen. Prod. Posting Group");
-        ItemCategory.TestField("NPR VAT Prod. Posting Group");
-        ItemCategory.TestField("NPR Inventory Posting Group");
-        ItemCategory.TestField("NPR Blocked", false);
-        ItemCategory.TestField("NPR Main Category", false);
-    end;
-
     procedure CombineLines(ItemWorksheet: Record "NPR Item Worksheet")
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";

@@ -28,13 +28,9 @@ codeunit 85001 "NPR Library - Inventory"
         if not InventoryPostingGroup.FindFirst() then
             LibraryInventory.CreateInventoryPostingGroup(InventoryPostingGroup);
 
-        ItemCategory.Validate("NPR VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-        ItemCategory.Validate("NPR VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
-
-        ItemCategory."NPR Gen. Prod. Posting Group" := GeneralPostingSetup."Gen. Prod. Posting Group";
-        ItemCategory."NPR Gen. Bus. Posting Group" := GeneralPostingSetup."Gen. Bus. Posting Group";
-
-        ItemCategory."NPR Inventory Posting Group" := InventoryPostingGroup.Code;
+        TempItem."Gen. Prod. Posting Group" := GeneralPostingSetup."Gen. Prod. Posting Group";
+        TempItem."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
+        TempItem."Inventory Posting Group" := InventoryPostingGroup.Code;
 
         ItemCategory."NPR Item Template Code" := ItemCategoryMgt.CreateItemTemplate(ItemCategory, TempItem);
 

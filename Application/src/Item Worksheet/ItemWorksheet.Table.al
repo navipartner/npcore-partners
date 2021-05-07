@@ -119,11 +119,6 @@ table 6060041 "NPR Item Worksheet"
             Caption = 'Item Category';
             DataClassification = CustomerContent;
             TableRelation = "Item Category" WHERE("NPR Blocked" = CONST(false));
-
-            trigger OnValidate()
-            begin
-                ItemWorksheetManagement.CheckItemGroupSetup("Item Group");
-            end;
         }
     }
 

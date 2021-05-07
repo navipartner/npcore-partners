@@ -2,46 +2,6 @@ codeunit 6014456 "NPR Item Category Mgt."
 {
     #region Item Category creation and modification management
 
-    procedure CreateNoSeries(ItemCategory: Record "Item Category"): Code[20]
-    var
-        NoSeries: Record "No. Series";
-        NoSeriesLine: Record "No. Series Line";
-        NoSeriesCode: Code[20];
-        NoSeriesDescTok: Label 'Item Category %1 number series.';
-        ItemCategoryCodeTooLongErr: Label 'Item Category Code is too long. Please keep it up to 10 characters long.';
-        NoSeriesPrefTok: Label 'ITEMCAT_', Locked = true;
-    begin
-        if StrLen(NoSeriesPrefTok + ItemCategory.Code) > 10 then
-            error(ItemCategoryCodeTooLongErr);
-
-        evaluate(NoSeriesCode, NoSeriesPrefTok + ItemCategory.Code);
-
-
-        if not NoSeries.Get(NoSeriesCode) then begin
-            NoSeries.Init();
-            NoSeries.Code := NoSeriesCode;
-            NoSeries.Description := StrSubstNo(NoSeriesDescTok, ItemCategory.Code);
-            NoSeries."Default Nos." := true;
-            NoSeries."Manual Nos." := true;
-            NoSeries."Date Order" := false;
-            NoSeries.Insert(true);
-
-            NoSeriesLine.Init();
-            NoSeriesLine."Series Code" := NoSeries.Code;
-            NoSeriesLine."Line No." := 10000;
-            NoSeriesLine."Starting Date" := CalcDate('<-1D>', Today());
-            evaluate(NoSeriesLine."Starting No.", ItemCategory.Code + '000000');
-            evaluate(NoSeriesLine."Ending No.", ItemCategory.Code + '999999');
-            evaluate(NoSeriesLine."Warning No.", ItemCategory.Code + '999000');
-            NoSeriesLine."Increment-by No." := 1;
-            NoSeriesLine."Last No. Used" := NoSeriesLine."Starting No.";
-            NoSeriesLine.Open := true;
-            NoSeriesLine.Insert(true);
-        end;
-
-        exit(NoSeriesCode);
-    end;
-
     procedure UpdateItemDiscGroupOnItems(ItemCategory: Record "Item Category"; ItemDiscGroupCode: Code[20]; xItemDiscGroupCode: Code[20])
     var
         Item: Record Item;
@@ -79,10 +39,12 @@ codeunit 6014456 "NPR Item Category Mgt."
 
         ParentItemCategory.Get(ItemCategory."Parent Category");
 
-        if (not Silent) and (not ConfirmedOrGuiNotAlloved(ConfirmQst, false)) then
-            exit;
+        if (not Silent) then
+            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+                exit;
 
         CopyItemCategory(ParentItemCategory, ItemCategory);
+        CopyParentItemCategoryDimensions(ItemCategory, true);
     end;
 
     procedure CopySetupToChildren(ParentItemCategory: Record "Item Category"; Silent: Boolean)
@@ -94,12 +56,14 @@ codeunit 6014456 "NPR Item Category Mgt."
         if ChildItemCategory.IsEmpty() then
             exit;
 
-        if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
-            exit;
+        if not Silent then
+            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+                    exit;
 
         ChildItemCategory.FindSet();
         repeat
-            CopyItemCategory(ParentItemCategory, ChildItemCategory);
+            CopySetupFromParent(ChildItemCategory, Silent);
+            CopySetupToChildren(ChildItemCategory, true);
         until ChildItemCategory.Next() = 0;
     end;
 
@@ -110,13 +74,8 @@ codeunit 6014456 "NPR Item Category Mgt."
         if (FromItemCategory.Code = '') or (ToItemCategory.Code = '') then
             exit;
 
-        ToItemCategory."NPR VAT Prod. Posting Group" := FromItemCategory."NPR VAT Prod. Posting Group";
-        ToItemCategory."NPR VAT Bus. Posting Group" := FromItemCategory."NPR VAT Bus. Posting Group";
-        ToItemCategory."NPR Gen. Prod. Posting Group" := FromItemCategory."NPR Gen. Prod. Posting Group";
-        ToItemCategory."NPR Gen. Bus. Posting Group" := FromItemCategory."NPR Gen. Bus. Posting Group";
-        ToItemCategory."NPR Inventory Posting Group" := FromItemCategory."NPR Inventory Posting Group";
-        ToItemCategory."NPR Global Dimension 1 Code" := FromItemCategory."NPR Global Dimension 1 Code";
-        ToItemCategory."NPR Global Dimension 2 Code" := FromItemCategory."NPR Global Dimension 2 Code";
+        ToItemCategory.Validate("NPR Global Dimension 1 Code", FromItemCategory."NPR Global Dimension 1 Code");
+        ToItemCategory.Validate("NPR Global Dimension 2 Code", FromItemCategory."NPR Global Dimension 2 Code");
 
         TemplateCode := CopyItemTemplate(FromItemCategory, ToItemCategory);
         if ToItemCategory."NPR Item Template Code" = '' then
@@ -134,8 +93,9 @@ codeunit 6014456 "NPR Item Category Mgt."
         if ItemCategory.IsEmpty() then
             exit;
 
-        if (not Silent) or (not ConfirmedOrGuiNotAlloved(ConfirmQst, false)) then
-            exit;
+        if not Silent then
+            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+                exit;
 
         if ItemCategory.FindSet(true) then
             repeat
@@ -144,88 +104,157 @@ codeunit 6014456 "NPR Item Category Mgt."
             until ItemCategory.Next() = 0;
     end;
 
-    procedure CheckItemCategory(var ItemCategory: Record "Item Category"; CalledFromFieldNo: Integer)
-    var
-        ItemCategory2: Record "Item Category";
-    begin
-        if CalledFromFieldNo = ItemCategory.FieldNo("NPR Blocked") then begin
-            if not ItemCategory."NPR Blocked" then begin
-                ItemCategory.TestField("NPR Gen. Prod. Posting Group");
-                ItemCategory.TestField("NPR Gen. Bus. Posting Group");
-                ItemCategory2.Get(ItemCategory."Parent Category");
-            end;
-        end else
-            if (ItemCategory."NPR Gen. Prod. Posting Group" = '') or
-               (ItemCategory."NPR Gen. Bus. Posting Group" = '') or
-               (not ItemCategory2.Get(ItemCategory."Parent Category"))
-            then
-                ItemCategory."NPR Blocked" := true;
-    end;
-
     #endregion
 
     #region Item creation and modification management
+
+    procedure CreateItemFromItemCategory(var ItemCategory: Record "Item Category"): Code[20]
+    var
+        Item: Record Item;
+        ConfigTemplateHeader: Record "Config. Template Header";
+    begin
+        if ItemCategory.IsTemporary() then
+            exit('');
+
+        ItemCategory.TestField("NPR Item Template Code");
+
+        ConfigTemplateHeader.Get(ItemCategory."NPR Item Template Code");
+        ConfigTemplateHeader.TestField("Instance No. Series");
+        ConfigTemplateHeader.TestField("Table ID", Database::Item);
+
+        Item.Reset();
+        InsertItemFromTemplate(ConfigTemplateHeader, Item);
+
+        exit(Item."No.");
+    end;
+
+    procedure InsertItemFromTemplate(ConfigTemplateHeader: Record "Config. Template Header"; var Item: Record Item)
+    var
+        DimensionsTemplate: Record "Dimensions Template";
+        UnitOfMeasure: Record "Unit of Measure";
+        ConfigTemplateMgt: Codeunit "Config. Template Management";
+        RecRef: RecordRef;
+        FoundUoM: Boolean;
+    begin
+        InitItemNo(Item, ConfigTemplateHeader);
+        Item.Insert(true);
+        RecRef.GetTable(Item);
+        ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
+        RecRef.SetTable(Item);
+
+        if Item."Base Unit of Measure" = '' then begin
+            UnitOfMeasure.SetRange("International Standard Code", 'EA'); // 'Each' ~= 'PCS'
+            FoundUoM := UnitOfMeasure.FindFirst;
+            if not FoundUoM then begin
+                UnitOfMeasure.SetRange("International Standard Code");
+                FoundUoM := UnitOfMeasure.FindFirst;
+            end;
+            if FoundUoM then begin
+                Item.Validate("Base Unit of Measure", UnitOfMeasure.Code);
+                Item.Modify(true);
+            end;
+        end;
+
+        DimensionsTemplate.InsertDimensionsFromTemplates(ConfigTemplateHeader, Item."No.", DATABASE::Item);
+        Item.Find();
+
+        OnAfterInsertItemFromTemplate(Item, ConfigTemplateHeader);
+    end;
+
+    local procedure InitItemNo(var Item: Record Item; ConfigTemplateHeader: Record "Config. Template Header")
+    var
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeInitItemNo(Item, ConfigTemplateHeader, IsHandled);
+        if IsHandled then
+            exit;
+
+        if ConfigTemplateHeader."Instance No. Series" = '' then
+            exit;
+        NoSeriesMgt.InitSeries(ConfigTemplateHeader."Instance No. Series", '', 0D, Item."No.", Item."No. Series");
+    end;
 
     procedure SetupItemFromCategory(var Item: Record Item; var ItemCategory: Record "Item Category")
     var
         DefaultDimension: Record "Default Dimension";
         DefaultDimension2: Record "Default Dimension";
-        TempItem: Record Item temporary;
-        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+        // TempItem: Record Item temporary;
+        ConfigTemplateHeader: Record "Config. Template Header";
+        ConfigTemplateMgt: Codeunit "Config. Template Management";
+        RecRef: RecordRef;
     begin
         ItemCategory.TestField("NPR Blocked", false);
         ItemCategory.TestField("NPR Main Category", false);
         ItemCategory.TestField("NPR Item Template Code");
-        ItemCategory.TestField("NPR VAT Bus. Posting Group");
-        ItemCategory.TestField("NPR Gen. Prod. Posting Group");
-        ItemCategory.TestField("NPR VAT Prod. Posting Group");
 
-        ItemCategoryMgt.ApplyTemplateToTempItem(TempItem, ItemCategory);
+        ConfigTemplateHeader.Get(ItemCategory."NPR Item Template Code");
 
-        if TempItem.Type <> TempItem.Type::Service then
-            ItemCategory.TestField("NPR Inventory Posting Group");
+        RecRef.GetTable(Item);
+        ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
+        RecRef.SetTable(Item);
 
-        if Item.Type <> TempItem.Type then
-            Item.Validate(Item.Type, TempItem.Type);
+        // ApplyTemplateToTempItem(TempItem, ItemCategory);
 
-        Item.Validate(Item."Gen. Prod. Posting Group", ItemCategory."NPR Gen. Prod. Posting Group");
-        Item."VAT Prod. Posting Group" := ItemCategory."NPR VAT Prod. Posting Group";
-        Item."VAT Bus. Posting Gr. (Price)" := ItemCategory."NPR VAT Bus. Posting Group";
-        Item."Tax Group Code" := TempItem."Tax Group Code";
-        Item.Validate(Item."Inventory Posting Group", ItemCategory."NPR Inventory Posting Group");
+        // if Item.Type <> TempItem.Type then
+        //     Item.Validate(Item.Type, TempItem.Type);
 
-        Item.Validate(Item."Item Disc. Group", TempItem."Item Disc. Group");
-        Item.Validate(Item."NPR Guarantee voucher", TempItem."NPR Guarantee voucher");
-        Item."Costing Method" := TempItem."Costing Method";
+        // Item.Validate(Item."Gen. Prod. Posting Group", TempItem."Gen. Prod. Posting Group");
+        // Item."VAT Prod. Posting Group" := TempItem."VAT Prod. Posting Group";
+        // Item."VAT Bus. Posting Gr. (Price)" := TempItem."VAT Bus. Posting Gr. (Price)";
+        // Item."Tax Group Code" := TempItem."Tax Group Code";
+        // Item.Validate(Item."Inventory Posting Group", TempItem."Inventory Posting Group");
 
-        DefaultDimension2.SetRange("Table ID", DATABASE::Item);
-        DefaultDimension2.SetRange("No.", Item."No.");
-        DefaultDimension2.DeleteAll();
-        DefaultDimension.SetRange("Table ID", DATABASE::"Item Category");
-        DefaultDimension.SetRange("No.", Item."Item Category Code");
-        if DefaultDimension.FindSet() then
-            repeat
-                DefaultDimension2 := DefaultDimension;
-                DefaultDimension2."Table ID" := DATABASE::Item;
-                DefaultDimension2."No." := Item."No.";
-                DefaultDimension2.Insert();
-            until DefaultDimension.Next() = 0;
+        // Item.Validate(Item."Item Disc. Group", TempItem."Item Disc. Group");
+        // Item.Validate(Item."NPR Guarantee voucher", TempItem."NPR Guarantee voucher");
+        // Item."Costing Method" := TempItem."Costing Method";
 
-        Item."Global Dimension 1 Code" := ItemCategory."NPR Global Dimension 1 Code";
-        Item."Global Dimension 2 Code" := ItemCategory."NPR Global Dimension 2 Code";
+        // DefaultDimension2.SetRange("Table ID", DATABASE::Item);
+        // DefaultDimension2.SetRange("No.", Item."No.");
+        // DefaultDimension2.DeleteAll();
+        // DefaultDimension.SetRange("Table ID", DATABASE::"Item Category");
+        // DefaultDimension.SetRange("No.", Item."Item Category Code");
+        // if DefaultDimension.FindSet() then
+        //     repeat
+        //         DefaultDimension2 := DefaultDimension;
+        //         DefaultDimension2."Table ID" := DATABASE::Item;
+        //         DefaultDimension2."No." := Item."No.";
+        //         DefaultDimension2.Insert();
+        //     until DefaultDimension.Next() = 0;
 
-        AddItemUOMIfMissing(item."No.", TempItem."Base Unit of Measure");
-        AddItemUOMIfMissing(item."No.", TempItem."Sales Unit of Measure");
-        AddItemUOMIfMissing(item."No.", TempItem."Purch. Unit of Measure");
+        // Item."Global Dimension 1 Code" := ItemCategory."NPR Global Dimension 1 Code";
+        // Item."Global Dimension 2 Code" := ItemCategory."NPR Global Dimension 2 Code";
 
-        if Item."Base Unit of Measure" <> TempItem."Base Unit of Measure" then begin
-            Item.Validate(Item."Base Unit of Measure", TempItem."Base Unit of Measure");
-            Item.Validate(Item."Sales Unit of Measure", TempItem."Sales Unit of Measure");
-            Item.Validate(Item."Sales Unit of Measure", TempItem."Purch. Unit of Measure");
-        end;
+        // AddItemUOMIfMissing(item."No.", TempItem."Base Unit of Measure");
+        // AddItemUOMIfMissing(item."No.", TempItem."Sales Unit of Measure");
+        // AddItemUOMIfMissing(item."No.", TempItem."Purch. Unit of Measure");
 
-        if TempItem."NPR Variety Group" <> '' then
-            Item.Validate(Item."NPR Variety Group", TempItem."NPR Variety Group");
+        // if Item."Base Unit of Measure" <> TempItem."Base Unit of Measure" then begin
+        //     Item.Validate(Item."Base Unit of Measure", TempItem."Base Unit of Measure");
+        //     Item.Validate(Item."Sales Unit of Measure", TempItem."Sales Unit of Measure");
+        //     Item.Validate(Item."Sales Unit of Measure", TempItem."Purch. Unit of Measure");
+        // end;
+
+        // if TempItem."NPR Variety Group" <> '' then
+            // Item.Validate(Item."NPR Variety Group", TempItem."NPR Variety Group");
+
+        // Item.Validate("Item Category Code", ItemCategory.Code);
+
+        ApplyItemCategoryDimensionsToItem(ItemCategory, Item, true);
+    end;
+
+    procedure GetVATPostingSetupFromItemCategory(ItemCategory: Record "Item Category"; var VATPostingSetup: Record "VAT Posting Setup"): Boolean
+    var
+        TempItem: Record Item temporary;
+    begin
+        if ItemCategory.IsTemporary() then
+            exit(false);
+
+        if not ApplyTemplateToTempItem(TempItem, ItemCategory) then
+            exit(false);
+
+        exit(VATPostingSetup.Get(TempItem."VAT Bus. Posting Gr. (Price)", TempItem."VAT Prod. Posting Group"));
     end;
 
     local procedure AddItemUOMIfMissing(ItemNo: Code[20]; ItemUomCode: Code[10])
@@ -276,13 +305,14 @@ codeunit 6014456 "NPR Item Category Mgt."
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
-        TemplateFields: Array[13] of FieldRef;
+        TemplateFields: Array[20] of FieldRef;
         ConfigTemplateCode: Code[10];
     begin
         if ItemCategory.IsTemporary() then
             exit;
 
-        ItemCategory.Testfield("NPR Item Template Code", '');
+        if ItemCategory."NPR Item Template Code" <> '' then
+            exit;
 
         ConfigTemplateCode := GetNextItemTemplateCode();
 
@@ -298,7 +328,14 @@ codeunit 6014456 "NPR Item Category Mgt."
         SetFieldRef(TemplateFields[10], TempItem, TempItem.FieldNo("Tariff No."));
         SetFieldRef(TemplateFields[11], TempItem, TempItem.FieldNo("Reordering Policy"));
         SetFieldRef(TemplateFields[12], TempItem, TempItem.FieldNo("NPR Variety Group"));
-        SetFieldRef(TemplateFields[13], TempItem, TempItem.FieldNo("Item Category Code"));
+        SetFieldRef(TemplateFields[13], TempItem, TempItem.FieldNo("Gen. Prod. Posting Group"));
+        SetFieldRef(TemplateFields[14], TempItem, TempItem.FieldNo("VAT Prod. Posting Group"));
+        SetFieldRef(TemplateFields[15], TempItem, TempItem.FieldNo("VAT Bus. Posting Gr. (Price)"));
+        SetFieldRef(TemplateFields[16], TempItem, TempItem.FieldNo("Inventory Posting Group"));
+        SetFieldRef(TemplateFields[17], TempItem, TempItem.FieldNo("NPR Group sale"));
+        SetFieldRef(TemplateFields[18], TempItem, TempItem.FieldNo("Price Includes VAT"));
+        SetFieldRef(TemplateFields[19], TempItem, TempItem.FieldNo("Price/Profit Calculation"));
+        SetFieldRef(TemplateFields[20], TempItem, TempItem.FieldNo("Item Category Code"));
 
         ConfigTemplateMgt.CreateConfigTemplateAndLines(
             ConfigTemplateCode, ItemCategory.Description, Database::Item, TemplateFields);
@@ -321,10 +358,10 @@ codeunit 6014456 "NPR Item Category Mgt."
         ConfigTemplateCode: Code[10];
     begin
         if FromItemCategory.IsTemporary() or ToItemCategory.IsTemporary() then
-            exit;
+            exit('');
 
-        if (FromItemCategory.Code = '') or (ToItemCategory.Code = '') then
-            exit;
+        if (FromItemCategory.Code = '') or (ToItemCategory.Code = '') or (FromItemCategory."NPR Item Template Code" = '') then
+            exit('');
 
         FromConfigTemplateHeader.Get(FromItemCategory."NPR Item Template Code");
 
@@ -383,7 +420,7 @@ codeunit 6014456 "NPR Item Category Mgt."
 
     #region Dimension management
 
-    procedure ApplyDimensionsToChildren(DefaultDimension: Record "Default Dimension"; DeleteDimension: Boolean; "Query": Boolean)
+    procedure ApplyDimensionsToChildren(DefaultDimension: Record "Default Dimension"; DeleteDimension: Boolean; Silent: Boolean)
     var
         DefaultDimension2: Record "Default Dimension";
         ChildItemCategory: Record "Item Category";
@@ -398,8 +435,9 @@ codeunit 6014456 "NPR Item Category Mgt."
         if ChildItemCategory.IsEmpty() then
             exit;
 
-        if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
-            exit;
+        if not Silent then
+            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+                exit;
 
         ChildItemCategory.FindSet();
         repeat
@@ -417,11 +455,11 @@ codeunit 6014456 "NPR Item Category Mgt."
                     DefaultDimension2.Modify(true);
                 end;
 
-            ApplyDimensionsToChildren(DefaultDimension2, DeleteDimension, false);
+            ApplyDimensionsToChildren(DefaultDimension2, DeleteDimension, true);
         until ChildItemCategory.Next() = 0;
     end;
 
-    procedure CopyParentItemCategoryDimensions(ItemCategory: Record "Item Category"; "Query": Boolean)
+    procedure CopyParentItemCategoryDimensions(ItemCategory: Record "Item Category"; Silent: Boolean)
     var
         DefaultDimension: Record "Default Dimension";
         DefaultDimension2: Record "Default Dimension";
@@ -435,8 +473,9 @@ codeunit 6014456 "NPR Item Category Mgt."
         if DefaultDimension.IsEmpty() then
             exit;
 
-        if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
-            exit;
+        if not Silent then
+            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+                exit;
 
         DefaultDimension.FindSet();
         repeat
@@ -449,7 +488,40 @@ codeunit 6014456 "NPR Item Category Mgt."
                 DefaultDimension2.TransferFields(DefaultDimension, false);
                 DefaultDimension2.Modify(true);
             end;
-            ApplyDimensionsToChildren(DefaultDimension2, false, false);
+            ApplyDimensionsToChildren(DefaultDimension2, false, true);
+        until DefaultDimension.Next() = 0;
+    end;
+
+    procedure ApplyItemCategoryDimensionsToItem(ItemCategory: Record "Item Category"; Item: Record Item; Silent: Boolean)
+    var
+        DefaultDimension: Record "Default Dimension";
+        DefaultDimension2: Record "Default Dimension";
+        ConfirmQst: Label 'Apply Dimensions from Item Category to Item?';
+    begin
+        if ItemCategory.IsTemporary() or Item.IsTemporary() then
+            exit;
+
+        if (ItemCategory.Code = '') or (Item."No." = '') then
+            exit;
+
+        DefaultDimension.SetRange("Table ID", Database::"Item Category");
+        DefaultDimension.SetRange("No.", ItemCategory.Code);
+        if DefaultDimension.IsEmpty() then
+            exit;
+
+        if not Silent then
+            if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
+                exit;
+
+        repeat
+            if DefaultDimension2.Get(Database::Item, Item."No.", DefaultDimension."Dimension Code") then
+                DefaultDimension2.Delete(true);
+
+            DefaultDimension2.Init();
+            DefaultDimension2 := DefaultDimension;
+            DefaultDimension2."Table ID" := Database::Item;
+            DefaultDimension2."No." := Item."No.";
+            DefaultDimension2.Insert(true);
         until DefaultDimension.Next() = 0;
     end;
 
@@ -466,4 +538,14 @@ codeunit 6014456 "NPR Item Category Mgt."
     end;
 
     #endregion
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertItemFromTemplate(var Item: Record Item; ConfigTemplateHeader: Record "Config. Template Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInitItemNo(var Item: Record Item; ConfigTemplateHeader: Record "Config. Template Header"; var IsHandled: Boolean)
+    begin
+    end;
 }

@@ -134,6 +134,7 @@ table 6014414 "NPR Period Discount Line"
             trigger OnValidate()
             var
                 ItemCategory: Record "Item Category";
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
                 POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
                 Handled: Boolean;
                 UnitCost: Decimal;
@@ -142,7 +143,7 @@ table 6014414 "NPR Period Discount Line"
                 if Item.Get("Item No.") then begin
                     ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
-                        if VATPostingSetup.Get(ItemCategory."NPR VAT Bus. Posting Group", ItemCategory."NPR VAT Prod. Posting Group") then begin
+                        if ItemCategoryMgt.GetVATPostingSetupFromItemCategory(ItemCategory, VATPostingSetup) then begin
                             POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;
@@ -310,6 +311,7 @@ table 6014414 "NPR Period Discount Line"
             var
                 GLSetup: Record "General Ledger Setup";
                 ItemCategory: Record "Item Category";
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
                 POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
                 Handled: Boolean;
                 UnitCost: Decimal;
@@ -318,7 +320,7 @@ table 6014414 "NPR Period Discount Line"
                     GLSetup.Get();
                     ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
-                        if VATPostingSetup.Get(ItemCategory."NPR VAT Bus. Posting Group", ItemCategory."NPR VAT Prod. Posting Group") then begin
+                        if ItemCategoryMgt.GetVATPostingSetupFromItemCategory(ItemCategory, VATPostingSetup) then begin
                             POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;
