@@ -52,6 +52,11 @@ page 6151403 "NPR Magento Websites"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sales Order No. Series field';
                     }
+                    field("Customer No. Series"; Rec."Customer No. Series")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specify a different number series to be used when creating customer during order import';
+                    }
                 }
                 group(Control6150620)
                 {
