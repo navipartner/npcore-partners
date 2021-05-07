@@ -1,7 +1,5 @@
 table 6150638 "NPR POS Paym. Bin Denomin."
 {
-    // NPR5.48/TSA /20190111 CASE 339571 Persistant storage for counted denominations
-
     Caption = 'POS Payment Bin Denomination';
     DataClassification = CustomerContent;
 
@@ -18,6 +16,14 @@ table 6150638 "NPR POS Paym. Bin Denomin."
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit";
+        }
+        field(5; "Denomination Type"; Option)
+        {
+            Caption = 'Denomination Type';
+            DataClassification = CustomerContent;
+            OptionMembers = COIN,BILL;
+            OptionCaption = 'Coin,Bill';
+            InitValue = COIN;
         }
         field(10; Denomination; Decimal)
         {

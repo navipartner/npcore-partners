@@ -7093,6 +7093,9 @@ End Function
         <Field Name="BinEntryNo_">
           <DataField>BinEntryNo_</DataField>
         </Field>
+        <Field Name="Denomination_Type">
+          <DataField>Denomination_Type</DataField>
+        </Field>
         <Field Name="Denomination">
           <DataField>Denomination</DataField>
         </Field>

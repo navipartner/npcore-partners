@@ -17,6 +17,15 @@ table 6014547 "NPR EOD Denomination"
             TableRelation = "NPR POS Unit"."No.";
             DataClassification = CustomerContent;
         }
+        field(5; "Denomination Type"; Option)
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+            OptionMembers = COIN,BILL;
+            OptionCaption = 'Coin,Bill';
+            InitValue = COIN;
+
+        }
         field(10; Denomination; Decimal)
         {
             Caption = 'Denomination';
@@ -44,7 +53,7 @@ table 6014547 "NPR EOD Denomination"
 
     keys
     {
-        key(Key1; "POS Payment Method Code", "POS Unit No.", Denomination)
+        key(Key1; "POS Payment Method Code", "POS Unit No.", "Denomination Type", Denomination)
         {
         }
     }

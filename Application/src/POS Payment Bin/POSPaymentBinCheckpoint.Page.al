@@ -559,6 +559,7 @@
                     EODDenomination.Init();
                     EODDenomination."POS Payment Method Code" := Rec."Payment Type No.";
                     EODDenomination."POS Unit No." := GetRegisterNo();
+                    EODDenomination."Denomination Type" := PaymentMethodDenom."Denomination Type";
                     EODDenomination.Denomination := PaymentMethodDenom.Denomination;
                     EODDenomination.Insert();
 

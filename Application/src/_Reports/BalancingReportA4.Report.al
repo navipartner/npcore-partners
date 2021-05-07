@@ -687,6 +687,9 @@ report 6014460 "NPR Balancing Report A4"
                 {
                     DataItemLink = "Bin Checkpoint Entry No." = FIELD("Entry No.");
                     DataItemTableView = SORTING("Bin Checkpoint Entry No.");
+                    column(Denomination_Type; BinDenomination."Denomination Type")
+                    {
+                    }
                     column(Denomination; BinDenomination.Denomination)
                     {
                     }
