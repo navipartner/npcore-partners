@@ -23,6 +23,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         Text005: Label 'Unit Price may not be changed when Line Type is %1';
         NegativeAmtErr: Label 'Negative amount is not allowed. Please specify a positive figure.';
         WrongDimensionValueErr: Label 'The dimension value %1 has not been set up for dimension %2.';
+        InputIncludesTax: Option Always,IfPricesInclTax,Never;
         MultiLineDiscTarget: Option " ","Positive Only","Negative Only","Non-Zero";
         SelectDiscountTargetLbl: Label 'Please select discount target lines:';
         DiscTargetAllOptionLbl: Label 'All non-zero quantity lines';
@@ -42,7 +43,7 @@ codeunit 6150792 "NPR POS Action - Discount"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.6');
+        exit('1.7');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -103,6 +104,7 @@ codeunit 6150792 "NPR POS Action - Discount"
             Sender.RegisterTextParameter('DimensionValue', '');
             Sender.RegisterTextParameter('DiscountGroupFilter', '');
             Sender.RegisterOptionParameter('TotalDiscTargetLines', 'Auto,Positive,Negative,All,Ask', 'Positive');
+            Sender.RegisterOptionParameter('AmtIncludesTax', 'Always,IfPricesInclTax,Never', 'Always');
             Sender.RegisterDataBinding();
             Sender.RegisterWorkflow(true);
         end;
@@ -142,7 +144,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     var
         JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        Quantity: Decimal;
+        InputValue: Decimal;
         POSSale: Codeunit "NPR POS Sale";
         DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
         SalePOS: Record "NPR POS Sale";
@@ -193,11 +195,12 @@ codeunit 6150792 "NPR POS Action - Discount"
                     exit;
                 end;
         end;
-        Quantity := JSON.GetDecimalOrFail('quantity', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        InputValue := JSON.GetDecimalOrFail('quantity', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
         JSON.SetScopeParameters(ActionCode());
         DiscountType := JSON.GetIntegerOrFail('DiscountType', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
         PresetMultiLineDiscTarget := JSON.GetIntegerParameter('TotalDiscTargetLines');
         DiscountGroupFilter := JSON.GetStringParameterOrFail('DiscountGroupFilter', ActionCode);
+        InputIncludesTax := JSON.GetIntegerParameter('AmtIncludesTax');
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -206,7 +209,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         POSSaleLine.RefreshxRec();
         POSSession.GetCurrentView(View);
 
-        if (Quantity < 0) and
+        if (InputValue < 0) and
            (DiscountType in
             [DiscountType::TotalAmount,
              DiscountType::TotalDiscountAmount,
@@ -238,7 +241,7 @@ codeunit 6150792 "NPR POS Action - Discount"
                         TotalPrice := GetLinesTotalDiscountableValue(SalePOS)
                     else
                         TotalPrice := GetSingleLineTotalDiscountableValue(SaleLinePOS, false);
-                    if (TotalPrice < Quantity) then
+                    if (TotalPrice < InputValue) then
                         Error(DiscountAmountErr);
                 end;
 
@@ -249,7 +252,7 @@ codeunit 6150792 "NPR POS Action - Discount"
             DiscountType::DiscountPercentExtra,
             DiscountType::LineDiscountPercentExtra:
                 begin
-                    if (Quantity < 0) or (Quantity > 100) then
+                    if (InputValue < 0) or (InputValue > 100) then
                         Error(DiscountPercentError);
                 end;
         end;
@@ -257,32 +260,32 @@ codeunit 6150792 "NPR POS Action - Discount"
         GetAdditionalParams(JSON);
 
         case DiscountType of
-            0:
-                SetTotalAmount(SalePOS, Quantity);
-            1:
-                SetTotalDiscountAmount(SalePOS, Quantity);
-            2:
-                SetDiscountPctABS(SalePOS, Quantity);
-            3:
-                SetDiscountPctREL(SalePOS, Quantity);
-            4:
-                SetLineAmount(SaleLinePOS, Quantity);
-            5:
-                SetLineDiscountAmount(SaleLinePOS, Quantity);
-            6:
-                SetLineDiscountPctABS(SaleLinePOS, Quantity);
-            7:
-                SetLineDiscountPctREL(SaleLinePOS, Quantity);
-            8:
-                SetLineUnitPrice(SaleLinePOS, Quantity);
-            9:
+            DiscountType::TotalAmount:
+                SetTotalAmount(SalePOS, InputValue);
+            DiscountType::TotalDiscountAmount:
+                SetTotalDiscountAmount(SalePOS, InputValue);
+            DiscountType::DiscountPercentABS:
+                SetDiscountPctABS(SalePOS, InputValue);
+            DiscountType::DiscountPercentREL:
+                SetDiscountPctREL(SalePOS, InputValue);
+            DiscountType::LineAmount:
+                SetLineAmount(SaleLinePOS, InputValue);
+            DiscountType::LineDiscountAmount:
+                SetLineDiscountAmount(SaleLinePOS, InputValue);
+            DiscountType::LineDiscountPercentABS:
+                SetLineDiscountPctABS(SaleLinePOS, InputValue);
+            DiscountType::LineDiscountPercentREL:
+                SetLineDiscountPctREL(SaleLinePOS, InputValue);
+            DiscountType::LineUnitPrice:
+                SetLineUnitPrice(SaleLinePOS, InputValue);
+            DiscountType::ClearLineDiscount:
                 SetLineDiscountAmount(SaleLinePOS, 0);
-            10:
+            DiscountType::ClearTotalDiscount:
                 SetTotalDiscountAmount(SalePOS, 0);
-            11:
-                SetDiscountPctExtra(SalePOS, Quantity);
-            12:
-                SetLineDiscountPctExtra(SaleLinePOS, Quantity);
+            DiscountType::DiscountPercentExtra:
+                SetDiscountPctExtra(SalePOS, InputValue);
+            DiscountType::LineDiscountPercentExtra:
+                SetLineDiscountPctExtra(SaleLinePOS, InputValue);
         end;
 
         POSSaleLine.RefreshCurrent();
@@ -397,6 +400,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
+        CaptionAmtIncludesTax: Label 'Amount Incl. VAT/Tax';
         CaptionFixedReasonCode: Label 'Reason: Fixed Code';
         CaptionLookupReasonCode: Label 'Reason: Lookup';
         CaptionReasonCodeMandatory: Label 'Reason: Mandatory';
@@ -414,12 +418,15 @@ codeunit 6150792 "NPR POS Action - Discount"
                 Caption := CaptionLookupReasonCode;
             'ReasonCodeMandatory':
                 Caption := CaptionReasonCodeMandatory;
+            'AmtIncludesTax':
+                Caption := CaptionAmtIncludesTax;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
+        DescAmtIncludesTax: Label 'Specifies whether amount entered is VAT/tax inclusive. The parameter is ignored if DiscountType is set to "LineUnitPrice"';
         DescFixedReasonCode: Label 'Select a reason code, which will be assigned automatically to sale lines';
         DescLookupReasonCode: Label 'Ask user to select a reason code, when the action is run';
         DescReasonCodeMandatory: Label 'Defines whether a reason code must be selected in order for the discount to be successfully applied to sale lines';
@@ -437,12 +444,15 @@ codeunit 6150792 "NPR POS Action - Discount"
                 Caption := DescLookupReasonCode;
             'ReasonCodeMandatory':
                 Caption := DescReasonCodeMandatory;
+            'AmtIncludesTax':
+                Caption := DescAmtIncludesTax;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
     local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
+        OptionAmtIncludesTax: Label 'Always,If prices incl. VAT/tax,Never';
         OptionTotalDiscTargetLines: Label 'Auto,Positive quantity lines only,Negative quantity lines only,All non-zero quantity lines,Ask';
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -451,6 +461,8 @@ codeunit 6150792 "NPR POS Action - Discount"
         case POSParameterValue.Name of
             'TotalDiscTargetLines':
                 Caption := OptionTotalDiscTargetLines;
+            'AmtIncludesTax':
+                Caption := OptionAmtIncludesTax;
         end;
     end;
 
@@ -505,46 +517,43 @@ codeunit 6150792 "NPR POS Action - Discount"
         until SaleLinePOS.Next() = 0;
     end;
 
-    local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
+    local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; InputValue: Decimal)
     var
         PrevRec: Text;
     begin
         if SaleLinePOS."Custom Disc Blocked" then
             exit;
-        if DiscountType in [DiscountType::DiscountAmt, DiscountType::LineAmt] then
-            Discount := Discount * GetSignFactor(SaleLinePOS);
-        if not SaleLinePOS."Price Includes VAT" and
-           (SaleLinePOS."VAT %" > 0) and
-           (DiscountType in [DiscountType::DiscountAmt, DiscountType::LineAmt])
-        then
-            Discount := Round(Discount / (1 + SaleLinePOS."VAT %" / 100));
+        if DiscountType in [DiscountType::DiscountAmt, DiscountType::LineAmt] then begin
+            InputValue := InputValue * GetSignFactor(SaleLinePOS);
+            AdjustAmountForVat(SaleLinePOS, InputValue);
+        end;
 
         PrevRec := Format(SaleLinePOS);
 
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::" ";
         SaleLinePOS."Discount Code" := '';
-        if Discount <> 0 then
+        if InputValue <> 0 then
             SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
 
         case DiscountType of
             DiscountType::DiscountAmt:
                 begin
                     SaleLinePOS."Discount %" := 0;
-                    SaleLinePOS."Discount Amount" := Discount;
+                    SaleLinePOS."Discount Amount" := InputValue;
                 end;
             DiscountType::DiscountPct:
                 begin
-                    if Discount < 0 then
-                        Discount := 0;
-                    if Discount > 100 then
-                        Discount := 100;
-                    SaleLinePOS."Discount %" := Discount;
+                    if InputValue < 0 then
+                        InputValue := 0;
+                    if InputValue > 100 then
+                        InputValue := 100;
+                    SaleLinePOS."Discount %" := InputValue;
                     SaleLinePOS."Discount Amount" := 0;
                 end;
             DiscountType::LineAmt:
                 begin
                     SaleLinePOS."Discount %" := 0;
-                    SaleLinePOS."Discount Amount" := SaleLinePOS."Unit Price" * SaleLinePOS.Quantity - Discount;
+                    SaleLinePOS."Discount Amount" := SaleLinePOS."Unit Price" * SaleLinePOS.Quantity - InputValue;
                 end;
         end;
 
@@ -599,17 +608,20 @@ codeunit 6150792 "NPR POS Action - Discount"
         if not IncludeDiscount then
             SaleLinePOS."Discount Amount" := 0;
 
-        if not SaleLinePOS."Custom Disc Blocked" then begin
-            if SaleLinePOS."Price Includes VAT" then
-                LineValue := SaleLinePOS.Quantity * SaleLinePOS."Unit Price" - SaleLinePOS."Discount Amount"
-            else
-                LineValue := SaleLinePOS.Quantity * SaleLinePOS."Unit Price" * (1 + SaleLinePOS."VAT %" / 100) - SaleLinePOS."Discount Amount" * (1 + SaleLinePOS."VAT %" / 100);
-        end else begin
+        if not SaleLinePOS."Custom Disc Blocked" then
+            LineValue := SaleLinePOS.Quantity * SaleLinePOS."Unit Price" - SaleLinePOS."Discount Amount"
+        else begin
             if SaleLinePOS."Price Includes VAT" then
                 LineValue := SaleLinePOS."Amount Including VAT"
             else
-                LineValue := SaleLinePOS.Amount * (1 + SaleLinePOS."VAT %" / 100);
+                LineValue := SaleLinePOS.Amount;
         end;
+
+        if SaleLinePOS."Price Includes VAT" and (InputIncludesTax = InputIncludesTax::Never) then
+            LineValue := Round(LineValue / (1 + SaleLinePOS."VAT %" / 100))
+        else
+            if not SaleLinePOS."Price Includes VAT" and (InputIncludesTax = InputIncludesTax::Always) then
+                LineValue := Round(LineValue * (1 + SaleLinePOS."VAT %" / 100));
 
         if SaleLinePOS.Quantity < 0 then
             LineValue := -LineValue;
@@ -732,6 +744,20 @@ codeunit 6150792 "NPR POS Action - Discount"
 
         // Recalculate VAT Difference rounding error distribution on all lines
         UpdateSalesVAT(SaleLinePOS."Orig. POS Sale ID");
+    end;
+
+    local procedure AdjustAmountForVat(SaleLinePOS: Record "NPR POS Sale Line"; var UserInputAmount: Decimal)
+    begin
+        if (InputIncludesTax = InputIncludesTax::IfPricesInclTax) or
+           (SaleLinePOS."VAT %" = 0)
+        then
+            exit;
+
+        if SaleLinePOS."Price Includes VAT" and (InputIncludesTax = InputIncludesTax::Never) then
+            UserInputAmount := Round(UserInputAmount * (1 + SaleLinePOS."VAT %" / 100))
+        else
+            if not SaleLinePOS."Price Includes VAT" and (InputIncludesTax = InputIncludesTax::Always) then
+                UserInputAmount := Round(UserInputAmount / (1 + SaleLinePOS."VAT %" / 100));
     end;
 
     local procedure AdjustRoundingForTotalAmountDiscount(var SalePOS: Record "NPR POS Sale"; Amount: Decimal)
