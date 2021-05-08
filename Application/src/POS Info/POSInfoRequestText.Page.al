@@ -40,12 +40,12 @@ page 6014456 "NPR POS Info: Request Text"
         MustBeSpecifiedLbl: Label 'You cannot leave this field blank.';
         ConfirmRetryQst: Label 'Do you want to try again?';
     begin
-        Confirmed := (UserInputString <> '') and (CloseAction = CloseAction::Yes);
+        Confirmed := (UserInputString <> '') and (CloseAction = CloseAction::OK);
         if not Confirmed then begin
             if Rec."Input Mandatory" then
                 Confirmed := not Confirm('%1\%2', false, MustBeSpecifiedLbl, ConfirmRetryQst)
             else
-                Confirmed := CloseAction <> CloseAction::Yes;
+                Confirmed := CloseAction <> CloseAction::OK;
         end;
         exit(Confirmed);
     end;
