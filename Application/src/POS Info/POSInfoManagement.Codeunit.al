@@ -227,7 +227,7 @@
                             if Info = '' then begin
                                 Clear(POSInfoRequestText);
                                 POSInfoRequestText.SetRecord(POSInfo);
-                                if POSInfoRequestText.RunModal() = Action::Yes then
+                                if POSInfoRequestText.RunModal() = Action::OK then
                                     Info := POSInfoRequestText.GetUserInput();
                             end;
                             if (Info = '') and POSInfo."Input Mandatory" then
