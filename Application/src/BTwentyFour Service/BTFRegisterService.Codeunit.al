@@ -1,18 +1,28 @@
 codeunit 6014640 "NPR BTF Register Service"
 {
     var
-        ServiceCodeLbl: Label 'B24 V1', Locked = true;
+        ServiceCodeLbl: Label 'V1', Locked = true;
         ServiceNameLbl: Label 'BTwentyFour Omni Channel V1.0';
         ServiceURLLbl: Label 'https://api-connect.btwentyfour.com', Locked = true;
         AboutAPIURLLbl: Label 'https://api-developer.btwentyfour.com/apis', Locked = true;
         GetTokenEndPointIDLbl: Label 'GetToken', Locked = true;
         AuthorizePathLbl: Label '/authorizations/token', Locked = true;
         GetTokenDescriptionLbl: Label 'Get authorization token to use as Authorization header for all subsequent calls';
-        GetInvoicesEndPointIDLbl: Label 'GetInvoices', Locked = true;
-        GetInvoicesDescriptionIDLbl: Label 'List Invoices';
+        GetInvoicesEndPointIDLbl: Label 'GetInvoice', Locked = true;
+        GetInvoicesDescriptionIDLbl: Label 'Get Invoice';
+        GetInvoicesPathLbl: Label '/messages/queue/next', Locked = true;
         GetOrdersEndPointIDLbl: Label 'GetOrders', Locked = true;
         GetOrdersDescriptionIDLbl: Label 'List Orders';
-        MessagesPathLbl: Label '/messages', Locked = true;
+        GetOrdersPathLbl: Label '/messages/queue/next', Locked = true;
+        ProcessMessageEndPointIDLbl: Label 'ProcessMessage', Locked = true;
+        ProcessMessageDescriptionIDLbl: Label 'Set message status, e.g to mark message as delivered (status 40) after processing';
+        ProcessMessagePathLbl: Label '/messages/%1/status/%2', Locked = true, Comment = '%1={message_id};%2={status_id}';
+        GetOrderRespEndPointIDLbl: Label 'GetOrderResp', Locked = true;
+        GetOrderRespDescriptionIDLbl: Label 'Get Order Response';
+        GetOrderRespPathLbl: Label '/messages/queue/next', Locked = true;
+        GetPriCatEndPointIDLbl: Label 'GetPriCat', Locked = true;
+        GetPriCatDescriptionIDLbl: Label 'Get Price Catalogue';
+        GetPriCatPathLbl: Label '/messages/queue/next', Locked = true;
 
     #region Register Service with EndPoints
     [EventSubscriber(ObjectType::Table, Database::"NPR BTF Service Setup", 'OnRegisterService', '', true, true)]
@@ -31,7 +41,6 @@ codeunit 6014640 "NPR BTF Register Service"
                     '853878c0abd34e6f8aec6d91df03ec');
 
 
-
         RegisterServiceEndPointAuthorization(ServiceEndPoint);
         sender."Authroization EndPoint ID" := ServiceEndPoint."EndPoint ID";
         sender.Modify();
@@ -42,8 +51,10 @@ codeunit 6014640 "NPR BTF Register Service"
     end;
 
     local procedure GetServiceCode(): Text
+    var
+        ServiceAPI: Codeunit "NPR BTF Service API";
     begin
-        exit(ServiceCodeLbl);
+        exit(ServiceAPI.GetIntegrationPrefix() + ' ' + ServiceCodeLbl);
     end;
 
     [IntegrationEvent(false, false)]
@@ -58,8 +69,6 @@ codeunit 6014640 "NPR BTF Register Service"
     begin
         RegisterServiceEndPointAuthorization(sender);
         RegisterServiceEndPointMessages(sender);
-
-        OnAfterRegisterServiceEndPoint(sender);
     end;
 
     [IntegrationEvent(false, false)]
@@ -80,7 +89,7 @@ codeunit 6014640 "NPR BTF Register Service"
                     GetServiceCode(), GetTokenEndPointIDLbl, AuthorizePathLbl, "NPR BTF Service Method"::POST,
                     GetTokenDescriptionLbl, true, 0, "NPR BTF EndPoint Method"::"Get Token",
                     "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
-                    '');
+                    '', '');
     end;
     #endregion
 
@@ -88,24 +97,48 @@ codeunit 6014640 "NPR BTF Register Service"
     local procedure RegisterServiceEndPointMessages(sender: Record "NPR BTF Service EndPoint")
     var
         ServiceSetup: Record "NPR BTF Service Setup";
+        ServiceAPI: Codeunit "NPR BTF Service API";
+        ProcessMessageEndPointId: Text;
     begin
         ServiceSetup.SetRange(Code, GetServiceCode());
         if ServiceSetup.IsEmpty() then
             exit;
 
         sender.RegisterServiceEndPoint(
-                    GetServiceCode(), GetOrdersEndPointIDLbl, MessagesPathLbl, "NPR BTF Service Method"::GET,
-                    GetOrdersDescriptionIDLbl, true, 100, "NPR BTF EndPoint Method"::"Get Orders",
+                    GetServiceCode(), ProcessMessageEndPointIDLbl, ProcessMessagePathLbl, "NPR BTF Service Method"::PUT,
+                    ProcessMessageDescriptionIDLbl, true, 0, "NPR BTF EndPoint Method"::"Process Message",
                     "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
-                    'BF0DBE87-5369-405F-AA67-4D2640B4678C');
+                    'BF0DBE87-5369-405F-AA67-4D2640B4678C', '');
+        ProcessMessageEndPointId := sender."EndPoint ID";
 
         sender.RegisterServiceEndPoint(
-                    GetServiceCode(), GetInvoicesEndPointIDLbl, MessagesPathLbl, "NPR BTF Service Method"::GET,
+                    GetServiceCode(), GetInvoicesEndPointIDLbl, GetInvoicesPathLbl, "NPR BTF Service Method"::GET,
                     GetInvoicesDescriptionIDLbl, true, 200, "NPR BTF EndPoint Method"::"Get Invoices",
                     "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
-                    'BF0DBE87-5369-405F-AA67-4D2640B4678C');
+                    'BF0DBE87-5369-405F-AA67-4D2640B4678C', ProcessMessageEndPointId);
 
+        ServiceAPI.RegisterNcImportType(sender."EndPoint ID", sender.Description, "NPR Nc IL Update Handler"::B24GetInvoice);
+        ServiceAPI.ScheduleJobQueueEntry(sender);
+        OnAfterRegisterServiceEndPoint(sender);
 
+        sender.RegisterServiceEndPoint(
+                    GetServiceCode(), GetOrderRespEndPointIDLbl, GetOrderRespPathLbl, "NPR BTF Service Method"::GET,
+                    GetOrderRespDescriptionIDLbl, true, 200, "NPR BTF EndPoint Method"::"Get Order Response",
+                    "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
+                    'BF0DBE87-5369-405F-AA67-4D2640B4678C', ProcessMessageEndPointId);
+
+        ServiceAPI.RegisterNcImportType(sender."EndPoint ID", sender.Description, "NPR Nc IL Update Handler"::B24GetOrderResp);
+        ServiceAPI.ScheduleJobQueueEntry(sender);
+        OnAfterRegisterServiceEndPoint(sender);
+
+        sender.RegisterServiceEndPoint(
+                    GetServiceCode(), GetPriCatEndPointIDLbl, GetPriCatPathLbl, "NPR BTF Service Method"::GET,
+                    GetPriCatDescriptionIDLbl, true, 100, "NPR BTF EndPoint Method"::"Get Price Catalogue",
+                    "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
+                    'BF0DBE87-5369-405F-AA67-4D2640B4678C', ProcessMessageEndPointId);
+
+        ServiceAPI.RegisterNcImportType(sender."EndPoint ID", sender.Description, "NPR Nc IL Update Handler"::B24GetPriCat);
+        ServiceAPI.ScheduleJobQueueEntry(sender);
         OnAfterRegisterServiceEndPoint(sender);
     end;
     #endregion
