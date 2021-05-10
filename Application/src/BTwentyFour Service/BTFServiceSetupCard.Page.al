@@ -86,10 +86,9 @@ page 6059922 "NPR BTF Service Setup Card"
 
                 trigger OnAction()
                 var
-                    ServiceEndPoint: Record "NPR BTF Service Endpoint";
+                    ServiceAPI: Codeunit "NPR BTF Service API";
                 begin
-                    ServiceEndPoint.SetRange("Service Code", Rec.Code);
-                    Page.Run(0, ServiceEndPoint);
+                    ServiceAPI.ShowEndPoints(Rec.Code);
                 end;
             }
             action(Errors)
@@ -103,7 +102,7 @@ page 6059922 "NPR BTF Service Setup Card"
                 var
                     ServiceAPI: Codeunit "NPR BTF Service API";
                 begin
-                    ServiceAPI.ShowErrorLogEntries(Rec.Code);
+                    ServiceAPI.ShowErrorLogEntries(Rec.Code, '');
                 end;
             }
             Action(JobQueueEntries)
@@ -112,6 +111,13 @@ page 6059922 "NPR BTF Service Setup Card"
                 ToolTip = 'View list of job queue entries, enabled by BTwentyFour service.';
                 Image = JobLines;
                 Caption = 'Show Jobs';
+                trigger OnAction()
+                var
+                    ServiceAPI: Codeunit "NPR BTF Service API";
+                begin
+                    Rec.TestField(Enabled);
+                    ServiceAPI.ShowJobQueueEntries();
+                end;
             }
         }
         area(Processing)
@@ -126,11 +132,12 @@ page 6059922 "NPR BTF Service Setup Card"
                 trigger OnAction()
                 var
                     ServiceAPI: Codeunit "NPR BTF Service API";
+                    Response: Codeunit "Temp Blob";
                     ServiceEndPoint: Record "NPR BTF Service EndPoint";
                 begin
                     Rec.TestField("Authroization EndPoint ID");
                     ServiceEndPoint.Get(Rec.Code, Rec."Authroization EndPoint ID");
-                    ServiceAPI.SendRequestAndDownloadResult(ServiceEndPoint);
+                    ServiceAPI.ImportContentOnline(ServiceEndPoint, Response);
                 end;
             }
         }
