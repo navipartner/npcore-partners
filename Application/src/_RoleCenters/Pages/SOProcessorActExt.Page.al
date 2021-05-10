@@ -120,14 +120,14 @@
     var
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
     begin
-        RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial;
+        RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial();
     end;
 
     trigger OnAfterGetRecord()
     var
         DocExchServiceSetup: Record "Doc. Exch. Service Setup";
     begin
-        CalculateCueFieldValues;
+        CalculateCueFieldValues();
         if DocExchServiceSetup.Get() then
             ShowDocumentsPendingDodExchService := DocExchServiceSetup.Enabled;
     end;
@@ -143,13 +143,13 @@
             Rec.Insert();
         end;
 
-        Rec.SetRespCenterFilter;
+        Rec.SetRespCenterFilter();
         Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
         Rec.SetFilter("Date Filter2", '>=%1', WorkDate());
         Rec.SetFilter("User ID Filter", UserId);
 
-        RoleCenterNotificationMgt.ShowNotifications;
-        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
+        RoleCenterNotificationMgt.ShowNotifications();
+        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
     end;
 
     var
@@ -158,7 +158,7 @@
     local procedure CalculateCueFieldValues()
     begin
         if Rec.FieldActive("Average Days Delayed") then
-            Rec."Average Days Delayed" := Rec.CalculateAverageDaysDelayed;
+            Rec."Average Days Delayed" := Rec.CalculateAverageDaysDelayed();
 
         if Rec.FieldActive("Ready to Ship") then
             Rec."Ready to Ship" := Rec.CountOrders(Rec.FieldNo("Ready to Ship"));

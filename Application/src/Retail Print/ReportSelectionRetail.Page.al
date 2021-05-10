@@ -45,8 +45,8 @@ page 6014423 "NPR Report Selection: Retail"
 
                     trigger OnValidate()
                     begin
-                        SetUsageFilter;
-                        ReportUsage2OnAfterValidate;
+                        SetUsageFilter();
+                        ReportUsage2OnAfterValidate();
                     end;
                 }
             }
@@ -171,12 +171,12 @@ page 6014423 "NPR Report Selection: Retail"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Rec.NewRecord;
+        Rec.NewRecord();
     end;
 
     trigger OnOpenPage()
     begin
-        SetUsageFilter;
+        SetUsageFilter();
     end;
 
     var

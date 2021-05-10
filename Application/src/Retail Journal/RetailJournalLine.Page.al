@@ -315,7 +315,7 @@
         //+NPR5.53 [374290]
         if not Item.Get(Rec."Item No.") then
             Item.Init();
-        Rec.calcProfit;
+        Rec.calcProfit();
 
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);

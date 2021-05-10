@@ -23,7 +23,7 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         itemTrackingCode: Text;
     begin
         if Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           Text000,
           ActionVersion(),
           Sender.Type::Generic,
@@ -79,7 +79,7 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         Value: Text;
         DoNotClearTextBox: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode) then
+        if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
@@ -112,7 +112,7 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         if RPTemplateHeader."Table ID" <> DATABASE::"NPR POS Saved Sale Entry" then
             exit;
 
-        POSQuoteEntry.SetRecFilter;
+        POSQuoteEntry.SetRecFilter();
         RPTemplateMgt.PrintTemplate(RPTemplateHeader.Code, POSQuoteEntry, 0);
 
     end;
@@ -125,17 +125,17 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find;
+        SalePOS.Find();
 
         CreatePOSQuote(SalePOS, POSQuoteEntry);
 
-        Commit;
+        Commit();
         Clear(POSActionCancelSale);
         POSActionCancelSale.SetAlternativeDescription(StrSubstNo(SaleWasParkedTxt, CurrentDateTime));
         if not POSActionCancelSale.CancelSale(POSSession) then
             Error(ErrorCancelling);
 
-        Commit;
+        Commit();
         POSSale.SelectViewForEndOfSale(POSSession);
     end;
 
@@ -150,16 +150,16 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindSet then
+        if SaleLinePOS.FindSet() then
             repeat
                 InsertPOSQuoteLine(SaleLinePOS, POSQuoteEntry, LineNo);
                 if SaleLinePOS."EFT Approved" or SaleLinePOS."From Selection" then begin
                     SaleLinePOS."EFT Approved" := false;
                     SaleLinePOS."From Selection" := false;
-                    SaleLinePOS.Modify;
+                    SaleLinePOS.Modify();
                 end;
                 SaleLinePOS.Delete(true);
-            until SaleLinePOS.Next = 0;
+            until SaleLinePOS.Next() = 0;
     end;
 
     local procedure InsertPOSQuoteEntry(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
@@ -169,7 +169,7 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         XmlDoc: XmlDocument;
         OutStr: OutStream;
     begin
-        POSQuoteEntry.Init;
+        POSQuoteEntry.Init();
         POSQuoteEntry."Entry No." := 0;
         POSQuoteEntry."Created at" := CurrentDateTime;
         POSQuoteEntry."Register No." := SalePOS."Register No.";
@@ -195,7 +195,7 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
     begin
         LineNo += 10000;
 
-        POSQuoteLine.Init;
+        POSQuoteLine.Init();
         POSQuoteLine."Quote Entry No." := POSQuoteEntry."Entry No.";
         POSQuoteLine."Line No." := LineNo;
         POSQuoteLine."Sale Line No." := SaleLinePOS."Line No.";

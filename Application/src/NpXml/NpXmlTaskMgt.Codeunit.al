@@ -23,14 +23,14 @@ codeunit 6151550 "NPR NpXml Task Mgt."
                 begin
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
                         NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, false, false, UniqueTaskBuffer);
-                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;
             Type::Modify:
                 begin
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
                         NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, false, true, false, UniqueTaskBuffer);
-                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;
             Type::Delete:
@@ -40,7 +40,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
                         RecRef2.Find();
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
-                    ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                    ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                 end;
             Type::Rename:
                 begin
@@ -49,10 +49,10 @@ codeunit 6151550 "NPR NpXml Task Mgt."
                         RecRef2.Find();
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
-                    ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                    ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
                         NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, true, false, UniqueTaskBuffer);
-                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;
         end;

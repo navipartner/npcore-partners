@@ -238,7 +238,7 @@
                 case Type of
                     Type::Item:
                         begin
-                            GetItem;
+                            GetItem();
                             "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
                         end;
                     else
@@ -565,7 +565,7 @@
     begin
         if OpenCheckSuspended then
             exit;
-        GetWaiterPad;
+        GetWaiterPad();
         WaiterPad.TestField(Closed, false);
     end;
 
@@ -576,7 +576,7 @@
 
     procedure IsClosed(): Boolean
     begin
-        GetWaiterPad;
+        GetWaiterPad();
         exit(WaiterPad.Closed);
     end;
 }

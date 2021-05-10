@@ -273,12 +273,12 @@
         if PeriodDiscountLine.FindSet() then
             repeat
                 PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(PeriodDiscountLine."Item No.", PeriodDiscountLine."Variant Code", PeriodDiscountLine."Cross-Reference No.");
                 RetailJnlLine.SetDiscountType(1, PeriodDiscountLine.Code, PeriodDiscountLine."Campaign Unit Price", 1, PeriodDiscountLine."Unit Price Incl. VAT");
                 RetailJnlLine.Insert();
             until PeriodDiscountLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure Mix2RetailJnl(MixCode: Code[20]; RetailJnlCode: Code[40])
@@ -308,12 +308,12 @@
         if MixedDiscountLine.FindSet() then
             repeat
                 MixedDiscountLine.CalcFields("Unit price incl. VAT");
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(MixedDiscountLine."No.", MixedDiscountLine."Variant Code", MixedDiscountLine."Cross-Reference No.");
                 RetailJnlLine.SetDiscountType(2, MixedDiscountLine.Code, MixedDiscountLine."Unit price", MixedDiscountLine.Quantity, MixedDiscountLine."Unit price incl. VAT");
                 RetailJnlLine.Insert();
             until MixedDiscountLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure Quantity2RetailJnl(ItemNo: Code[20]; MainItemNo: Code[20]; RetailJnlCode: Code[40])
@@ -344,12 +344,12 @@
         if QuantityDiscountLine.FindSet() then
             repeat
                 QuantityDiscountLine.CalcFields("Price Includes VAT");
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(QuantityDiscountLine."Item No.", '', '');
                 RetailJnlLine.SetDiscountType(3, QuantityDiscountLine."Main no.", QuantityDiscountLine."Unit Price", QuantityDiscountLine.Quantity, QuantityDiscountLine."Price Includes VAT");
                 RetailJnlLine.Insert();
             until QuantityDiscountLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure TransferShipment2RetailJnl(TransferShipmentNo: Code[20]; RetailJnlCode: Code[40])
@@ -378,13 +378,13 @@
         RetailJnlLine.UseGUI(TransferShipmentLine.Count());
         if TransferShipmentLine.FindSet() then
             repeat
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferShipmentLine."Item No.", TransferShipmentLine."Variant Code", '');
                 RetailJnlLine."Quantity to Print" := TransferShipmentLine.Quantity;
 
                 RetailJnlLine.Insert();
             until TransferShipmentLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure TransferReceipt2RetailJnl(TransferReceiptNo: Code[20]; RetailJnlCode: Code[40])
@@ -413,13 +413,13 @@
         RetailJnlLine.UseGUI(TransferReceiptLine.Count());
         if TransferReceiptLine.FindSet() then
             repeat
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferReceiptLine."Item No.", TransferReceiptLine."Variant Code", '');
                 RetailJnlLine."Quantity to Print" := TransferReceiptLine.Quantity;
 
                 RetailJnlLine.Insert();
             until TransferReceiptLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure TransferOrder2RetailJnl(TransferOrderNo: Code[20]; RetailJnlCode: Code[40])
@@ -449,13 +449,13 @@
         RetailJnlLine.UseGUI(TransferLine.Count());
         if TransferLine.FindSet() then
             repeat
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferLine."Item No.", TransferLine."Variant Code", '');
                 RetailJnlLine."Quantity to Print" := TransferLine.Quantity;
 
                 RetailJnlLine.Insert();
             until TransferLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure PurchaseOrder2RetailJnl(DocumentType: Enum "Purchase Document Type"; PurchaseOrderNo: Code[20]; RetailJnlCode: Code[40])
@@ -489,7 +489,7 @@
         RetailJnlLine.UseGUI(PurchaseLine.Count());
         if PurchaseLine.FindSet() then
             repeat
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
                 if PurchaseLine."Item Reference Type" = PurchaseLine."Item Reference Type"::"Bar Code" then
                     RetailJnlLine.SetItem(PurchaseLine."No.", PurchaseLine."Variant Code", PurchaseLine."Item Reference No.")
                 else
@@ -507,7 +507,7 @@
                 OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);
                 RetailJnlLine.Insert();
             until PurchaseLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure PostedPurchaseInvoice2RetailJnl(PurchaseInvoiceNo: Code[20]; RetailJnlCode: Code[40])
@@ -537,7 +537,7 @@
         RetailJnlLine.UseGUI(PurchInvLine.Count());
         if PurchInvLine.FindSet() then
             repeat
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
 
                 if PurchInvLine."Item Reference Type" = PurchInvLine."Item Reference Type"::"Bar Code" then
                     RetailJnlLine.SetItem(PurchInvLine."No.", PurchInvLine."Variant Code", PurchInvLine."Item Reference No.")
@@ -550,7 +550,7 @@
                 OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine, RetailJnlLine);
                 RetailJnlLine.Insert();
             until PurchInvLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure InventoryPutAway2RetailJnl(DocumentType: Integer; DocumentNo: Code[20]; RetailJnlCode: Code[40])
@@ -581,14 +581,14 @@
         RetailJnlLine.UseGUI(WarehouseActivityLine.Count());
         if WarehouseActivityLine.FindSet() then
             repeat
-                RetailJnlLine.InitLine;
+                RetailJnlLine.InitLine();
 
                 RetailJnlLine.SetItem(WarehouseActivityLine."Item No.", WarehouseActivityLine."Variant Code", '');
                 RetailJnlLine."Quantity to Print" := WarehouseActivityLine.Quantity;
 
                 RetailJnlLine.Insert();
             until WarehouseActivityLine.Next() = 0;
-        RetailJnlLine.CloseGUI;
+        RetailJnlLine.CloseGUI();
     end;
 
     procedure SetRetailJnl(var RetailJnlCode: Code[40]) Selected: Boolean
@@ -682,7 +682,7 @@
         RecRef.Open(6014407);
 
         if Filters = '' then
-            exit(RecRef.FindSet);
+            exit(RecRef.FindSet());
 
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
@@ -691,7 +691,7 @@
         if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
             exit(false);
 
-        exit(RecRef.FindSet);
+        exit(RecRef.FindSet());
     end;
 
     local procedure GetStoreLocationCode(): Code[10]

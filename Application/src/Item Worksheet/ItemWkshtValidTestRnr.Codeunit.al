@@ -18,7 +18,7 @@ codeunit 6060052 "NPR Item Wksht.Valid.Test Rnr."
     begin
         if FunctionName = '' then
             exit(true);
-        ClearLastError;
+        ClearLastError();
         exit(true)
     end;
 

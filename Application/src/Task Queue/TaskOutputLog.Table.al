@@ -138,7 +138,7 @@ table 6059905 "NPR Task Output Log"
         "Journal Batch Name" := TaskLine."Journal Batch Name";
         "Journal Line No." := TaskLine."Line No.";
         "Import DateTime" := CurrentDateTime;
-        "Task Log Entry No." := TaskQueueAdd2Log.GetCurrentLogEntryNo;
+        "Task Log Entry No." := TaskQueueAdd2Log.GetCurrentLogEntryNo();
         //+TQ1.29
     end;
 
@@ -162,7 +162,7 @@ table 6059905 "NPR Task Output Log"
         OutStream.WriteText(TMPText);
         Description := CopyStr(TMPText, 1, MaxStrLen(Description));
         //-TQ1.29
-        "Task Log Entry No." := TaskQueueAdd2Log.GetCurrentLogEntryNo;
+        "Task Log Entry No." := TaskQueueAdd2Log.GetCurrentLogEntryNo();
         //+TQ1.29
         Insert();
     end;

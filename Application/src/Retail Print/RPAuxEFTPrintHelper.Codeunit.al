@@ -68,7 +68,7 @@ codeunit 6014536 "NPR RP Aux: EFT Print Helper"
         if RecID.TableNo <> DATABASE::"NPR EFT Receipt" then
             exit;
 
-        RecRef := RecID.GetRecord;
+        RecRef := RecID.GetRecord();
         RecRef.SetTable(CreditCardTransaction);
 
         if not CreditCardTransaction.Find() then

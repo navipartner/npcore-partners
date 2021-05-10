@@ -30,10 +30,10 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Amount), POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::"Sales Tax");
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::VAT);
 
-        DataSource.Totals.Add('AmountExclVAT');
-        DataSource.Totals.Add('VATAmount');
-        DataSource.Totals.Add('TotalAmount');
-        DataSource.Totals.Add('ItemCount');
+        DataSource.Totals().Add('AmountExclVAT');
+        DataSource.Totals().Add('VATAmount');
+        DataSource.Totals().Add('TotalAmount');
+        DataSource.Totals().Add('ItemCount');
 
         Handled := true;
     end;
@@ -43,7 +43,7 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
     var
         SaleLine: Codeunit "NPR POS Sale Line";
     begin
-        if DataSource.Id <> GetSourceNameText() then
+        if DataSource.Id() <> GetSourceNameText() then
             exit;
 
         POSSession.GetSaleLine(SaleLine);

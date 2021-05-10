@@ -37,7 +37,7 @@
 
         LoginMaster(MinSleepTime); //has COMMIT
 
-        MasterThreadLoop2;
+        MasterThreadLoop2();
         //+TQ1.34 [326930]
     end;
 
@@ -113,9 +113,9 @@
         //-TQ1.34 [326930]
         MilisecondsBetweenPolls := MinSleepTime;
         while true do begin
-            CheckWorkers;
+            CheckWorkers();
 
-            TaskWorker2.Get(ServiceInstanceId, SessionId);
+            TaskWorker2.Get(ServiceInstanceId(), SessionId());
             if TaskWorker2.Active then begin
                 TaskWorkerGroup.SetFilter("Max. Concurrent Threads", '>%1', 0);
                 if TaskWorkerGroup.FindSet() then
@@ -212,7 +212,7 @@
                     ErrorMessage := StrSubstNo(TextUnknown, ErrorMessage);
             end;
             if ErrorMessage = '' then begin
-                ActiveSession.Get(ServiceInstanceId, SessionId);
+                ActiveSession.Get(ServiceInstanceId(), SessionId());
                 TaskLogMaster."Error Message" := CopyStr(StrSubstNo(TextErrorStartingSession + ' ' + TextNoLastError, StartAttempt, ActiveSession."Server Computer Name"), 1, MaxStrLen(TaskLogMaster."Error Message"));
             end else
                 TaskLogMaster."Error Message" := CopyStr(StrSubstNo(TextErrorStartingSession + ' ' + TextLastError, StartAttempt, ErrorMessage), 1, MaxStrLen(TaskLogMaster."Error Message"));
@@ -272,7 +272,7 @@
                 TempTaskQueue.Insert();
             until TaskQueue.Next() = 0;
 
-        exit(TempTaskQueue.FindSet);
+        exit(TempTaskQueue.FindSet());
     end;
 
     procedure LoginMaster(MilisecondsBetweenPolls: Integer)
@@ -281,11 +281,11 @@
         ActiveSession: Record "Active Session";
         TaskLogMaster: Record "NPR Session Log";
     begin
-        if not TaskWorker.Get(ServiceInstanceId, SessionId) then begin
+        if not TaskWorker.Get(ServiceInstanceId(), SessionId()) then begin
             TaskWorker.LockTable();
             if TaskWorker.FindLast() then; //force a read lock
 
-            ActiveSession.Get(ServiceInstanceId, SessionId);
+            ActiveSession.Get(ServiceInstanceId(), SessionId());
 
             TaskWorker.Init();
             TaskWorker."Server Instance ID" := ActiveSession."Server Instance ID";
@@ -324,8 +324,8 @@
             exit;
         //+TQ1.34 [326930]
 
-        CleanUpDeadWorkers;
-        CheckHeartBeatForWorkers;
+        CleanUpDeadWorkers();
+        CheckHeartBeatForWorkers();
         //+TQ1.29
     end;
 
@@ -372,7 +372,7 @@
                         TaskWorker."Last HeartBeat (When Idle)" := CurrentDateTime;
                         TaskWorker.Modify();
                     end;
-                    Commit
+                    Commit()
                     //+NPR5.45 [326707]
                     //-TQ1.29
                     //  Commit();
@@ -397,7 +397,7 @@
             repeat
                 if (not ActiveSession.Get(TaskWorker."Server Instance ID", TaskWorker."Session ID")) or (ActiveSession."User ID" <> TaskWorker."User ID") or
                   //-TQ1.31 [298741]
-                  (TaskWorker."Server Instance ID" <> ServiceInstanceId) then
+                  (TaskWorker."Server Instance ID" <> ServiceInstanceId()) then
                     //+TQ1.31 [298741]
                     //the session doesnt exists any more -> delete it
                     taskQueueMgt.Logout(TaskWorker."Server Instance ID", TaskWorker."Session ID");
@@ -430,7 +430,7 @@
             exit;
         //+TQ1.31 [300683]
 
-        if TaskWorker.Get(ServiceInstanceId, SessionId) then begin
+        if TaskWorker.Get(ServiceInstanceId(), SessionId()) then begin
             if TaskWorker."Task Worker Group" <> 'MASTER' then
                 exit;
 

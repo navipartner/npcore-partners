@@ -310,7 +310,7 @@
             exit;
 
         Skip := ((EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and (EFTTransactionRequest."Auxiliary Operation ID" in [1, 2, 3, 6]))
-        or ((EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::SETUP, EFTTransactionRequest."Processing Type"::VOID, EFTTransactionRequest."Processing Type"::LOOK_UP]) and (not POSFrontEnd.IsPaused));
+        or ((EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::SETUP, EFTTransactionRequest."Processing Type"::VOID, EFTTransactionRequest."Processing Type"::LOOK_UP]) and (not POSFrontEnd.IsPaused()));
 
         //POS is not robust against Pause & Resume without client ping-pong so we skip both for SETUP,VOID,LOOKUP operations as they are all server-side synchronous API requests in Adyen
     end;

@@ -24,7 +24,7 @@ codeunit 6014528 "NPR Barcode Image Library"
         BarCodeGenerator := BarCodeGenerator.BarCodeGenerator(BarCodeSettings);
         BarCodeSettings.ApplyKey('3YOZI-9N0S5-RD239-JN9R0-WCGL8');
         Image := BarCodeGenerator.GenerateImage();
-        MemoryStream := MemoryStream.MemoryStream;
+        MemoryStream := MemoryStream.MemoryStream();
         Image.Save(MemoryStream, ImageFormat.Png);
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);

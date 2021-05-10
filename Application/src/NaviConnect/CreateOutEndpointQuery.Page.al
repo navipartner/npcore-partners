@@ -59,7 +59,7 @@ page 6014686 "NPR Create Out. Endpoint Query"
     begin
         if (Rec.Name <> '') and (Rec."Table No." <> 0) then
             if Confirm(TextConfirmCreate) then
-                CreateEndpointQuery;
+                CreateEndpointQuery();
     end;
 
     trigger OnOpenPage()

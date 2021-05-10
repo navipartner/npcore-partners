@@ -64,7 +64,7 @@ page 6151526 "NPR Nc Endpoint File List"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks();
                 end;
             }
         }

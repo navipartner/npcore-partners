@@ -112,10 +112,10 @@ table 6059940 "NPR SMS Template Header"
         ReturnFilters: Text;
         UserClickedOK: Boolean;
     begin
-        CurrentFilters := GetTableFilters;
+        CurrentFilters := GetTableFilters();
         UserClickedOK := OpenRequestPage(ReturnFilters, CurrentFilters);
         if UserClickedOK and (ReturnFilters <> CurrentFilters) then begin
-            if ReturnFilters = CreateDefaultRequestPageFilters then
+            if ReturnFilters = CreateDefaultRequestPageFilters() then
                 Clear("Table Filters")
             else begin
                 "Table Filters".CreateOutStream(FiltersOutStream);
@@ -134,7 +134,7 @@ table 6059940 "NPR SMS Template Header"
             "Table Filters".CreateInStream(FiltersInStream);
             FiltersInStream.Read(Filters);
         end else
-            Filters := CreateDefaultRequestPageFilters;
+            Filters := CreateDefaultRequestPageFilters();
     end;
 
     local procedure CreateDefaultRequestPageFilters(): Text

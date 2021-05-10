@@ -19,7 +19,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           Text000,
           ActionVersion(),
           Sender.Type::Generic,

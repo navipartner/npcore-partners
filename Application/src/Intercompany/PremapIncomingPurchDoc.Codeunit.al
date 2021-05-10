@@ -126,18 +126,18 @@
         if IntermediateDataImport.FindEntry(EntryNo, DATABASE::"Company Information", CompanyInfo.FieldNo(Name), 0, RecordNo) then
             ImportedName := IntermediateDataImport.Value;
 
-        NameNearness := RecordMatchMgt.CalculateStringNearness(CompanyName, ImportedName, MatchThreshold, NormalizingFactor);
+        NameNearness := RecordMatchMgt.CalculateStringNearness(CompanyName, ImportedName, MatchThreshold(), NormalizingFactor());
 
         IntermediateDataImport.SetRange("Field ID", CompanyInfo.FieldNo(Address));
         if IntermediateDataImport.FindFirst() then
             ImportedAddress := IntermediateDataImport.Value;
 
-        AddressNearness := RecordMatchMgt.CalculateStringNearness(CompanyAddr, ImportedAddress, MatchThreshold, NormalizingFactor);
+        AddressNearness := RecordMatchMgt.CalculateStringNearness(CompanyAddr, ImportedAddress, MatchThreshold(), NormalizingFactor());
 
-        if (ImportedName <> '') and (NameNearness < RequiredNearness) then
+        if (ImportedName <> '') and (NameNearness < RequiredNearness()) then
             LogErrorMessage(EntryNo, CompanyInfo, CompanyInfo.FieldNo(Name), StrSubstNo(InvalidCompanyInfoNameErr, ImportedName));
 
-        if (ImportedAddress <> '') and (AddressNearness < RequiredNearness) then
+        if (ImportedAddress <> '') and (AddressNearness < RequiredNearness()) then
             LogErrorMessage(EntryNo, CompanyInfo, CompanyInfo.FieldNo(Address), StrSubstNo(InvalidCompanyInfoAddressErr, ImportedAddress));
     end;
 
@@ -537,12 +537,12 @@
     begin
         if Vendor.FindSet() then
             repeat
-                NameNearness := RecordMatchMgt.CalculateStringNearness(VendorName, Vendor.Name, MatchThreshold, NormalizingFactor);
+                NameNearness := RecordMatchMgt.CalculateStringNearness(VendorName, Vendor.Name, MatchThreshold(), NormalizingFactor());
                 if VendorAddress = '' then
-                    AddressNearness := RequiredNearness
+                    AddressNearness := RequiredNearness()
                 else
-                    AddressNearness := RecordMatchMgt.CalculateStringNearness(VendorAddress, Vendor.Address, MatchThreshold, NormalizingFactor);
-                if (NameNearness >= RequiredNearness) and (AddressNearness >= RequiredNearness) then begin
+                    AddressNearness := RecordMatchMgt.CalculateStringNearness(VendorAddress, Vendor.Address, MatchThreshold(), NormalizingFactor());
+                if (NameNearness >= RequiredNearness()) and (AddressNearness >= RequiredNearness()) then begin
                     IntermediateDataImport.InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Header", FieldID, 0, RecordNo, Vendor."No.");
                     exit(Vendor."No.");
                 end;
@@ -610,8 +610,8 @@
 
         if Vendor.FindSet() then
             repeat
-                PhoneNoNearness := RecordMatchMgt.CalculateStringNearness(PhoneNo, Vendor."Phone No.", MatchThreshold, NormalizingFactor);
-                if PhoneNoNearness >= RequiredNearness then begin
+                PhoneNoNearness := RecordMatchMgt.CalculateStringNearness(PhoneNo, Vendor."Phone No.", MatchThreshold(), NormalizingFactor());
+                if PhoneNoNearness >= RequiredNearness() then begin
                     IntermediateDataImport.InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Header", FieldID, 0, RecordNo, Vendor."No.");
                     exit(Vendor."No.");
                 end;
@@ -1119,7 +1119,7 @@ then
         DataExchDef.Get(DataExch."Data Exch. Def Code");
         if not IntermediateDataImport.FindEntry(EntryNo, DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Document Type"), ParentRecNo, CurrRecNo) then
             LogErrorMessage(EntryNo, DataExchDef, DataExchDef.FieldNo(Code),
-              ConstructDocumenttypeUnknownErr);
+              ConstructDocumenttypeUnknownErr());
 
         case UpperCase(IntermediateDataImport.Value) of
             GetDocumentTypeOptionString(PurchaseHeader."Document Type"::Invoice),
@@ -1130,7 +1130,7 @@ then
             'CREDIT NOTE':
                 DocumentType := Format(PurchaseHeader."Document Type"::"Credit Memo", 0, 9);
             else
-                LogErrorMessage(EntryNo, DataExchDef, DataExchDef.FieldNo(Code), ConstructDocumenttypeUnknownErr);
+                LogErrorMessage(EntryNo, DataExchDef, DataExchDef.FieldNo(Code), ConstructDocumenttypeUnknownErr());
         end;
 
         IntermediateDataImport.InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Header",

@@ -721,7 +721,7 @@
         SetReceiptCloseDuration(0);
         DisplayHandler();
         if (POSSession.IsActiveSession(FrontEnd)) then
-            FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'LOGIN');
+            FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'LOGIN');
 
         case DisplayHandlerAction of
             DisplayHandlerAction::OpenDisplay:
@@ -741,7 +741,7 @@
         SetAction(5);
         DisplayHandler();
 
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'CLOSED');
+        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'CLOSED');
     end;
 
     procedure EndSale(var FrontEnd: Codeunit "NPR POS Front End Management"; EndSaleDescription: Text; RegisterNo: Code[10])
@@ -751,12 +751,12 @@
         SetReceiptContent(EndSaleDescription);
         DisplayHandler();
 
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'ENDSALE');
+        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'ENDSALE');
 
         SetReceiptCloseDuration(DisplaySetup."Receipt Duration");
         DisplayHandler();
 
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'RECEIPTCLOSEDURATION');
+        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'RECEIPTCLOSEDURATION');
     end;
 
     procedure Payments(var FrontEnd: Codeunit "NPR POS Front End Management"; PaymentDescription: Text)
@@ -765,7 +765,7 @@
         SetReceiptContent(PaymentDescription);
         DisplayHandler();
 
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'PAYMENT');
+        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'PAYMENT');
     end;
 
     procedure CloseReceipt(var FrontEnd: Codeunit "NPR POS Front End Management")
@@ -773,7 +773,7 @@
         SetAction(5);
         DisplayHandler();
 
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'CLEAR');
+        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'CLEAR');
     end;
 
     local procedure SetAction(ActionIn: Option OpenDisplay,CloseDisplay,UpdateDisplay,ShowReceipt,UpdateReceipt,CloseReceipt,DownloadFiles,DownloadHtmlFile)
@@ -815,7 +815,7 @@
 
         case DisplayHandlerAction of
             DisplayHandlerAction::DownloadFiles:
-                SecondaryMonitorRequest.DisplayContentHtml := SetContentHtml;
+                SecondaryMonitorRequest.DisplayContentHtml := SetContentHtml();
         end;
 
         SecondaryMonitorRequest.MediaDictionary := MediaDictionary;
@@ -998,7 +998,7 @@
 
             Bytes := MemoryStream.ToArray();
 
-            Converter := Converter.ImageConverter;
+            Converter := Converter.ImageConverter();
             Image := Converter.ConvertFrom(Bytes);
 
             //Image.FromStream(MemoryStream);

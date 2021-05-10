@@ -24,7 +24,7 @@ page 6014402 "NPR Retail Item Journal"
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
-                    CurrPage.SaveRecord;
+                    CurrPage.SaveRecord();
                     ItemJnlMgt.LookupName(CurrentJnlBatchName, Rec);
                     CurrPage.Update(false);
                 end;
@@ -32,7 +32,7 @@ page 6014402 "NPR Retail Item Journal"
                 trigger OnValidate()
                 begin
                     ItemJnlMgt.CheckName(CurrentJnlBatchName, Rec);
-                    CurrentJnlBatchNameOnAfterVali;
+                    CurrentJnlBatchNameOnAfterVali();
                 end;
             }
             repeater(Control1)
@@ -372,8 +372,8 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnAction()
                     begin
-                        Rec.ShowDimensions;
-                        CurrPage.SaveRecord;
+                        Rec.ShowDimensions();
+                        CurrPage.SaveRecord();
                     end;
                 }
                 action(ItemTrackingLines)
@@ -417,8 +417,8 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnAction()
                     begin
-                        Rec.RecalculateUnitAmount;
-                        CurrPage.SaveRecord;
+                        Rec.RecalculateUnitAmount();
+                        CurrPage.SaveRecord();
                     end;
                 }
             }
@@ -461,7 +461,7 @@ page 6014402 "NPR Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByEvent)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByEvent())
                         end;
                     }
                     action(Period)
@@ -473,7 +473,7 @@ page 6014402 "NPR Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByPeriod)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByPeriod())
                         end;
                     }
                     action("Variant")
@@ -485,7 +485,7 @@ page 6014402 "NPR Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByVariant)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByVariant())
                         end;
                     }
                     action(Location)
@@ -498,7 +498,7 @@ page 6014402 "NPR Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByLocation)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByLocation())
                         end;
                     }
                     action("BOM Level")
@@ -510,7 +510,7 @@ page 6014402 "NPR Retail Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByBOM)
+                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByBOM())
                         end;
                     }
                 }
@@ -733,7 +733,7 @@ page 6014402 "NPR Retail Item Journal"
     var
         JnlSelected: Boolean;
     begin
-        if Rec.IsOpenedFromBatch then begin
+        if Rec.IsOpenedFromBatch() then begin
             CurrentJnlBatchName := Rec."Journal Batch Name";
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
@@ -761,7 +761,7 @@ page 6014402 "NPR Retail Item Journal"
 
     local procedure CurrentJnlBatchNameOnAfterVali()
     begin
-        CurrPage.SaveRecord;
+        CurrPage.SaveRecord();
         ItemJnlMgt.SetName(CurrentJnlBatchName, Rec);
         CurrPage.Update(false);
     end;

@@ -54,8 +54,8 @@
         TaskLine.Validate("Object No.", CODEUNIT::"NPR Nc Trigger Sync. Mgt.");
         TaskLine.SetNextRuntime(CurrentDateTime, false);
         TaskLine.Insert(true);
-        TaskLine.InsertParameter(GetParamName, 0);
-        TaskLine.SetParameterText(GetParamName, NcTrigger.Code);
+        TaskLine.InsertParameter(GetParamName(), 0);
+        TaskLine.SetParameterText(GetParamName(), NcTrigger.Code);
     end;
 
     local procedure DeleteTaskLine(NcTrigger: Record "NPR Nc Trigger")
@@ -106,7 +106,7 @@
             NcSetup.Get();
             if not NcSetup."Task Queue Enabled" then
                 exit;
-            NcSetupMgt.SetupTaskQueue;
+            NcSetupMgt.SetupTaskQueue();
             NcTriggerSetup.Validate("Task Template Name", NcSetup."Task Worker Group");
             NcTriggerSetup.Validate("Task Batch Name", NcSetup."Task Worker Group");
             NcTriggerSetup.Insert(true);
@@ -133,7 +133,7 @@
                 TaskLineParam.SetRange("Journal Template Name", TaskLine."Journal Template Name");
                 TaskLineParam.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
                 TaskLineParam.SetRange("Journal Line No.", TaskLine."Line No.");
-                TaskLineParam.SetRange("Field Code", GetParamName);
+                TaskLineParam.SetRange("Field Code", GetParamName());
                 TaskLineParam.SetRange(Value, NcTrigger.Code);
                 if TaskLineParam.FindFirst() then
                     exit(true);

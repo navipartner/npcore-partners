@@ -112,7 +112,7 @@ page 6059909 "NPR Task Line Parameters"
     trigger OnAfterGetRecord()
     begin
         //-TQ1.17
-        Rec.FormatValueField;
+        Rec.FormatValueField();
         //+TQ1.17
     end;
 }

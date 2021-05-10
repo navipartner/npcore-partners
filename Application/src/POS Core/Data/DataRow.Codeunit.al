@@ -134,18 +134,18 @@ codeunit 6150895 "NPR Data Row" implements "NPR IJsonSerializable"
         MakeSureIsConstructed();
         Row.Constructor(Obj);
 
-        if (Row.Position <> Position) then
+        if (Row.Position() <> Position()) then
             exit(false);
 
-        if (Row.Fields.Keys.Count() <> _fields.Keys.Count) then
+        if (Row.Fields().Keys.Count() <> _fields.Keys.Count) then
             exit(false);
 
         foreach FieldName in _fields.Keys do begin
-            if not Row.Fields.Keys.Contains(FieldName) then
+            if not Row.Fields().Keys.Contains(FieldName) then
                 exit(false);
 
             _fields.Get(FieldName, TokenLeft);
-            Row.Fields.Get(FieldName, TokenRight);
+            Row.Fields().Get(FieldName, TokenRight);
             TokenLeft.WriteTo(ValueLeft);
             TokenRight.WriteTo(ValueRight);
             if ValueLeft <> ValueRight then

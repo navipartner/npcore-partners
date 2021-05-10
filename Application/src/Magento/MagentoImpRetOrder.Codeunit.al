@@ -107,7 +107,7 @@
         PrevCust: Text;
         CustTemplateCode: Code[20];
     begin
-        Initialize;
+        Initialize();
         ExternalCustomerNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'customer_no', false);
         if IsContactCustomer then begin
             if GetContactCustomer(ExternalCustomerNo, Customer) then
@@ -244,7 +244,7 @@
         WebsiteCode: Code[20];
         i: Integer;
     begin
-        Initialize;
+        Initialize();
         Clear(SalesHeader);
         OrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'return_order_no', true);
 
@@ -366,7 +366,7 @@
         Position: Integer;
         TableId: Integer;
     begin
-        Initialize;
+        Initialize();
         case LowerCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'type', true)) of
             'comment':
                 begin
@@ -472,7 +472,7 @@
             exit;
         if PaymentFeeRefund = 0 then
             exit;
-        Initialize;
+        Initialize();
         MagentoSetup.TestField("Payment Fee Account No.");
 
         LineNo += 10000;
@@ -522,7 +522,7 @@
         Contact: Record Contact;
         ContBusRel: Record "Contact Business Relation";
     begin
-        Initialize;
+        Initialize();
         Clear(Contact);
         if not Contact.Get(ContactNo) then
             exit(false);
@@ -538,7 +538,7 @@
 
     local procedure GetCustomer(ExternalCustomerNo: Code[20]; XmlElement: XmlElement; var Customer: Record Customer): Boolean
     begin
-        Initialize;
+        Initialize();
         Clear(Customer);
         Customer.SetRange("E-Mail", NpXmlDomMgt.GetXmlText(XmlElement, 'email', MaxStrLen(Customer."E-Mail"), false));
         exit(Customer.FindFirst() and (Customer."E-Mail" <> ''));

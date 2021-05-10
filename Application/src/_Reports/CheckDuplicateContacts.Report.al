@@ -61,7 +61,7 @@
                     begin
                         if Number = 1 then begin
                             if not TMPCont.FindFirst() then
-                                CurrReport.Break
+                                CurrReport.Break()
                         end else
                             if TMPCont.Next() = 0 then
                                 CurrReport.Break();

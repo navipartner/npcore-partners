@@ -123,7 +123,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
         SeatingTemplate.SetCurrentKey("Parent Entry No.");
         SeatingTemplate.SetFilter("Parent Entry No.", '=%1', EntryNo);
-        if (SeatingTemplate.FindSet) then begin
+        if (SeatingTemplate.FindSet()) then begin
             repeat
                 DeleteNodeWorker(SeatingTemplate."Entry No.");
             until (SeatingTemplate.Next() = 0);

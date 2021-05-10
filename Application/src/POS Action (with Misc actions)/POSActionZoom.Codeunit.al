@@ -7,7 +7,7 @@ codeunit 6150803 "NPR POSAction: Zoom"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -38,7 +38,7 @@ then begin
     begin
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type <> CurrentView.Type::Sale) then
+        if (CurrentView.Type() <> CurrentView.Type()::Sale) then
             exit;
 
         POSSession.GetSaleLine(SaleLine);

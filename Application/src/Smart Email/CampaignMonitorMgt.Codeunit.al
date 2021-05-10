@@ -11,7 +11,7 @@
     begin
         InitializeClient(Client);
 
-        Client.Get(GetCheckConnectionURL, ResponseMessage);
+        Client.Get(GetCheckConnectionURL(), ResponseMessage);
         if not ResponseMessage.IsSuccessStatusCode then begin
             ResponseMessage.Content().ReadAs(Response);
             Error(Response);
@@ -520,7 +520,7 @@
                 else begin
                     FldRef := RecRef.Field(TransactionalEmailVariable."Field No.");
                     if Format(FldRef.Class) = 'FlowField' then
-                        FldRef.CalcField;
+                        FldRef.CalcField();
                     ValueString := Format(FldRef.Value);
                 end;
                 JObject.Add(TransactionalEmailVariable."Variable Name", ValueString);
@@ -556,7 +556,7 @@
     local procedure OnInsertTransactionalEmailSetup(var Rec: Record "NPR Trx Email Setup"; RunTrigger: Boolean)
     begin
         if Rec."API URL" = '' then
-            Rec."API URL" := DefaultAPIURL;
+            Rec."API URL" := DefaultAPIURL();
     end;
 
 }

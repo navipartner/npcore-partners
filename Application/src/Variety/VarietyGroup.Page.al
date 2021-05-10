@@ -154,7 +154,7 @@ page 6059977 "NPR Variety Group"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code Part 3 Length field';
                 }
-                field(GetVariantCodeExample; Rec.GetVariantCodeExample)
+                field(GetVariantCodeExample; Rec.GetVariantCodeExample())
                 {
                     ApplicationArea = All;
                     Caption = 'Example';

@@ -74,7 +74,7 @@ page 6151520 "NPR Nc Triggers"
 
                 trigger OnAction()
                 begin
-                    RunTaskQueuePage;
+                    RunTaskQueuePage();
                 end;
             }
             action("Endpoint Links")
@@ -108,7 +108,7 @@ page 6151520 "NPR Nc Triggers"
 
     trigger OnOpenPage()
     begin
-        NcTriggerTaskMgt.OnSetupNcTriggers;
+        NcTriggerTaskMgt.OnSetupNcTriggers();
     end;
 
     var

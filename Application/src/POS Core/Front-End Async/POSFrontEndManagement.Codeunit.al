@@ -125,7 +125,7 @@
 
     procedure ContinueAtStep(Step: Text)
     begin
-        if CurrentWorkflowID = 0 then
+        if CurrentWorkflowID() = 0 then
             ReportBugAndThrowError(StrSubstNo(Text011, Step));
 
         StepToContinueAt := Step;
@@ -304,7 +304,7 @@
 
         Request.GetView(RequestView);
 
-        if RequestView.Type = RequestView.Type::Uninitialized then
+        if RequestView.Type() = RequestView.Type()::Uninitialized then
             ReportBugAndThrowError(StrSubstNo(Text003, ViewType));
 
         POSSession.GetCurrentView(CurrView);
@@ -313,7 +313,7 @@
                 OnBeforeChangeToLoginView(POSSession);
             DefaultView.Type::Sale:
                 begin
-                    if CurrView.Type = CurrView.Type::Login then
+                    if CurrView.Type() = CurrView.Type()::Login then
                         POSViewChangeWorkflowMgt.InvokeOnAfterLoginWorkflow(POSSession);
 
                     OnBeforeChangeToSaleView(POSSession);
@@ -563,8 +563,8 @@
         Workflow: Codeunit "NPR Workflow";
     begin
         Action.GetWorkflow(Workflow);
-        if not RegisteredWorkflows.Contains(Workflow.Name) then
-            RegisteredWorkflows.Add(Workflow.Name);
+        if not RegisteredWorkflows.Contains(Workflow.Name()) then
+            RegisteredWorkflows.Add(Workflow.Name());
 
         MakeSureFrameworkIsAvailable(true);
         Request.Initialize(Action);
@@ -718,7 +718,7 @@
 
         Request.Initialize(CurrentWorkflowID(), POSAction.Code, '', CreateGuid());
         Request.SetExplicit(true);
-        if POSSession.IsInAction and (CurrentWorkflowID > 0) then
+        if POSSession.IsInAction() and (CurrentWorkflowID() > 0) then
             Request.SetNested(true);
 
         POSAction.GetWorkflowInvocationContext(WorkflowInvocationParameters, WorkflowInvocationContext);
@@ -733,17 +733,17 @@
         Request: Codeunit "NPR Front-End: PauseWorkflow";
         ErrorText: Text;
     begin
-        if CurrentWorkflowID = 0 then
+        if CurrentWorkflowID() = 0 then
             ReportBugAndThrowError(Text008);
 
         if PausedWorkflowID > 0 then begin
-            ErrorText := StrSubstNo(Text009, PausedWorkflowID, CurrentWorkflowID);
+            ErrorText := StrSubstNo(Text009, PausedWorkflowID, CurrentWorkflowID());
             AbortWorkflows();
             ReportBugAndThrowError(ErrorText);
         end;
 
         Pausing := true;
-        PausedWorkflowID := CurrentWorkflowID;
+        PausedWorkflowID := CurrentWorkflowID();
 
         MakeSureFrameworkIsInitialized();
         Request.Initialize(CurrentWorkflowID());
@@ -803,14 +803,14 @@
         if PausedWorkflowID = 0 then
             ReportBugAndThrowError(Text012);
 
-        if (CurrentWorkflowID <> PausedWorkflowID) and (CurrentWorkflowID <> 0) then begin
-            ErrorText := StrSubstNo(Text010, PausedWorkflowID, CurrentWorkflowID);
+        if (CurrentWorkflowID() <> PausedWorkflowID) and (CurrentWorkflowID() <> 0) then begin
+            ErrorText := StrSubstNo(Text010, PausedWorkflowID, CurrentWorkflowID());
             AbortWorkflows();
             ReportBugAndThrowError(ErrorText);
         end;
 
         MakeSureFrameworkIsInitialized();
-        Request.Initialize(PausedWorkflowID, CurrentActionID);
+        Request.Initialize(PausedWorkflowID, CurrentActionID());
 
         Pausing := false;
         PausedWorkflowID := 0;

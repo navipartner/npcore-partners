@@ -878,7 +878,7 @@ codeunit 6151131 "NPR TM Seating UI"
             Middle + 5,
             Round(10 + (ScreenIllustrationHeight / 2), 1)),
 
-          CRLF);
+          CRLF());
 
         SeatingTemplate.SetCurrentKey("Parent Entry No.", Ordinal);
         SeatingTemplate.FindSet();
@@ -947,7 +947,7 @@ codeunit 6151131 "NPR TM Seating UI"
           StrSubstNo('rx="%1" ry="%2"', rx, ry),
           StrSubstNo('width="%1" height="%2"', width, height),
           StrSubstNo('transform="rotate(%1 %2,%3)"', Format(Round(v / 2 / 3.14 * 360, 1) * -1, 0, 9), Format(Round(x + width / 2, 1), 0, 9), Format(Round(y + height / 2, 1), 0, 9)), // rad to deg
-          CRLF);
+          CRLF());
     end;
 
     local procedure CRLF() CRLF: Text[2]

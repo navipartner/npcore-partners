@@ -159,7 +159,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
     begin
-        NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode, NaviDocsHandlingProfileTxt, true, false, false, false);
+        NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode(), NaviDocsHandlingProfileTxt, true, false, false, false);
     end;
 
     local procedure NaviDocsHandlingProfileCode(): Text
@@ -174,7 +174,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
         RecRef: RecordRef;
     begin
         DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
-        NaviDocsManagement.AddDocumentEntryWithHandlingProfileExt(RecRef, NaviDocsHandlingProfileCode, ReportID, '', PrinterID, DelayUntil);
+        NaviDocsManagement.AddDocumentEntryWithHandlingProfileExt(RecRef, NaviDocsHandlingProfileCode(), ReportID, '', PrinterID, DelayUntil);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnManageDocument', '', true, true)]
@@ -186,7 +186,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
         PrinterId: Text;
         OStream: OutStream;
     begin
-        if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode) then
+        if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode()) then
             exit;
 
         PrinterId := NaviDocsEntry."Template Code";
@@ -204,7 +204,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
             TempBlob.CreateOutStream(OStream);
             if not Report.SaveAs(ReportID, '', REPORTFORMAT::Pdf, OStream, RecRef) then
                 ErrorMessage := StrSubstNo(NoOutputErr, ReportID);
-            ClearCustomReportLayout;
+            ClearCustomReportLayout();
         end;
 
         if ErrorMessage = '' then begin

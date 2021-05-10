@@ -21,7 +21,7 @@
                     if NcEndpointTriggerLink.FindSet() then
                         repeat
                             if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
-                                if NcEndpoint."Endpoint Type" = NcEndpointFile.GetEndpointTypeCode then begin
+                                if NcEndpoint."Endpoint Type" = NcEndpointFile.GetEndpointTypeCode() then begin
                                     if NcEndpointFile.Get(NcEndpointTriggerLink."Endpoint Code") then begin
                                         ProcessNcEndpointTrigger(NcTriggerCode, Output, Filename, NcTask, NcEndpointFile);
                                     end;
@@ -265,9 +265,9 @@
         NcEndpointFile: Record "NPR Nc Endpoint File";
         NcEndpointType: Record "NPR Nc Endpoint Type";
     begin
-        if not NcEndpointType.Get(NcEndpointFile.GetEndpointTypeCode) then begin
+        if not NcEndpointType.Get(NcEndpointFile.GetEndpointTypeCode()) then begin
             NcEndpointType.Init();
-            NcEndpointType.Code := NcEndpointFile.GetEndpointTypeCode;
+            NcEndpointType.Code := NcEndpointFile.GetEndpointTypeCode();
             NcEndpointType.Insert();
         end;
     end;
@@ -279,7 +279,7 @@
     begin
         if Handled then
             exit;
-        if Sender."Endpoint Type" <> NcEndpointFile.GetEndpointTypeCode then
+        if Sender."Endpoint Type" <> NcEndpointFile.GetEndpointTypeCode() then
             exit;
         if not NcEndpointFile.Get(Sender.Code) then begin
             NcEndpointFile.Init();

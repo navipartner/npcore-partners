@@ -52,7 +52,7 @@ table 6151533 "NPR Nc Endpoint"
 
     trigger OnInsert()
     begin
-        SetupEndpoint;
+        SetupEndpoint();
     end;
 
     trigger OnRename()
@@ -65,9 +65,9 @@ table 6151533 "NPR Nc Endpoint"
     procedure SetupEndpoint()
     begin
         if "Endpoint Type" = '' then
-            if not ChooseEndpoint then
+            if not ChooseEndpoint() then
                 exit;
-        OpenEndpointSetup;
+        OpenEndpointSetup();
     end;
 
     local procedure ChooseEndpoint(): Boolean

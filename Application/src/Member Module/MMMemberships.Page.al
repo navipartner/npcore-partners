@@ -310,7 +310,7 @@ page 6060127 "NPR MM Memberships"
                     begin
 
                         Rec.TestField("Customer No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Rec."Customer No.");
 
                     end;
@@ -334,7 +334,7 @@ page 6060127 "NPR MM Memberships"
                     begin
 
                         Rec.TestField("Customer No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Rec."Customer No.");
 
                     end;
@@ -497,7 +497,7 @@ page 6060127 "NPR MM Memberships"
     local procedure GetMasterDataAttributeValue()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, Rec."Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
 
     end;

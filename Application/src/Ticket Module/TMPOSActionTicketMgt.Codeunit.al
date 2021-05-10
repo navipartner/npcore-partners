@@ -1403,7 +1403,7 @@
     begin
         if (not EanBoxEvent.Get(EventCodeExternalTicketNo())) then begin
             EanBoxEvent.Init();
-            EanBoxEvent.Code := EventCodeExternalTicketNo;
+            EanBoxEvent.Code := EventCodeExternalTicketNo();
             EanBoxEvent."Module Name" := 'Ticket Management';
             //EanBoxEvent.Description := TMTicket.FIELDCAPTION ("External Ticket No.");
             EanBoxEvent.Description := CopyStr(TMTicket.FieldCaption("External Ticket No."), 1, MaxStrLen(EanBoxEvent.Description));

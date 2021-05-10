@@ -50,7 +50,7 @@ table 6151525 "NPR Nc Collector"
 
             trigger OnValidate()
             begin
-                CheckCriteriaActiveCollector;
+                CheckCriteriaActiveCollector();
             end;
         }
         field(50; "Max. Lines per Collection"; Integer)
@@ -60,7 +60,7 @@ table 6151525 "NPR Nc Collector"
 
             trigger OnValidate()
             begin
-                CheckCriteriaActiveCollector;
+                CheckCriteriaActiveCollector();
             end;
         }
         field(70; "Wait to Send"; Duration)
@@ -70,7 +70,7 @@ table 6151525 "NPR Nc Collector"
 
             trigger OnValidate()
             begin
-                CheckCriteriaActiveCollector;
+                CheckCriteriaActiveCollector();
             end;
         }
         field(80; "Delete Obsolete Lines"; Boolean)

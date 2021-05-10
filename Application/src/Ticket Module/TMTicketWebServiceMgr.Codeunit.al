@@ -661,7 +661,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         WaitingListOptInAddress: Text[200];
     begin
 
-        Initialize;
+        Initialize();
 
         Clear(TicketReservationRequest);
         TicketReservationRequest."Session Token ID" := Token;
@@ -695,7 +695,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         ExternalItemType: Integer;
     begin
 
-        Initialize;
+        Initialize();
 
         TmpTicketReservationRequest.Init();
         TmpTicketReservationRequest."Entry No." := TmpTicketReservationRequest.Count() + 1;

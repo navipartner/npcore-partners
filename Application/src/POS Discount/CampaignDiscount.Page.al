@@ -523,7 +523,7 @@
         if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
             exit(false);
 
-        FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView);
+        FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView());
         FilterPageBuilder.PageCaption := Caption;
         if not FilterPageBuilder.RunModal() then
             exit(false);

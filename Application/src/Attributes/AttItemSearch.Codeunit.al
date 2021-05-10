@@ -20,7 +20,7 @@
         if Items.FindFirst() then begin
             repeat
                 Items.Mark(false);
-            until (0 = Items.Next);
+            until (0 = Items.Next());
         end;
         Items.MarkedOnly(false);
 
@@ -35,7 +35,7 @@
                     Counter := Counter + 1;
                     if Items.Get(NPRAttributeKey."MDR Code PK") then Items.Mark(true);
                 end;
-            until ((0 = NPRAttributeValueSet.Next) or (Counter = 100));
+            until ((0 = NPRAttributeValueSet.Next()) or (Counter = 100));
         end else begin
             exit(false);
         end;

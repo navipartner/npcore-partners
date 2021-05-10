@@ -4,7 +4,7 @@
     var
         VendorCode: Code[20];
     begin
-        VendorCode := GetVendorCode;
+        VendorCode := GetVendorCode();
         Initialize();
         ReadFileAndSplit();
         ImportSplitFiles(VendorCode);
@@ -59,7 +59,7 @@
         FieldDelimiter := GetFieldDelimiter(DataExchDef);
         GetSplitParameters(DataExchDef, SplitMethod, SplitOnColumn, SplitOnValue);
         CSVSplitter.Initialize('', FieldDelimiter, '"', SplitMethod, SplitOnColumn, SplitOnValue, DataExchDef."Header Lines", DataExchDef."File Encoding", true);
-        ServerOutputDirectory := CSVSplitter.Process;
+        ServerOutputDirectory := CSVSplitter.Process();
     end;
 
     local procedure ImportSplitFiles(VendorCode: Code[20])

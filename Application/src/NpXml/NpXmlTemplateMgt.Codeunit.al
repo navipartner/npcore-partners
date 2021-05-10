@@ -601,7 +601,7 @@
         TempBlob.CreateOutStream(OutStr);
         Document.WriteTo(OutStr);
 
-        exit(TempBlob.HasValue);
+        exit(TempBlob.HasValue());
     end;
 
     local procedure InsertRecRefFromArchiveXml(var XmlElementTable: XmlElement)

@@ -669,7 +669,7 @@ page 6014518 "NPR Sales Order Pick"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        Rec.CheckCreditMaxBeforeInsert;
+        Rec.CheckCreditMaxBeforeInsert();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -679,9 +679,9 @@ page 6014518 "NPR Sales Order Pick"
 
     trigger OnOpenPage()
     begin
-        if UserMgt.GetSalesFilter <> '' then begin
+        if UserMgt.GetSalesFilter() <> '' then begin
             Rec.FilterGroup(2);
-            Rec.SetRange("Responsibility Center", UserMgt.GetSalesFilter);
+            Rec.SetRange("Responsibility Center", UserMgt.GetSalesFilter());
             Rec.FilterGroup(0);
         end;
 

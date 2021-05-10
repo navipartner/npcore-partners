@@ -49,7 +49,7 @@
         FRef := RecRef.Field(FieldNo);
 
         if Field.Class = Field.Class::FlowField then
-            FRef.CalcField;
+            FRef.CalcField();
 
         FieldValue := Format(FRef.Value);
     end;

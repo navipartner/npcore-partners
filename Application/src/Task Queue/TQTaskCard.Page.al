@@ -347,7 +347,7 @@ page 6059903 "NPR TQ Task Card"
 
                     trigger OnAction()
                     begin
-                        Rec.RunReportRequestPage;
+                        Rec.RunReportRequestPage();
                     end;
                 }
             }

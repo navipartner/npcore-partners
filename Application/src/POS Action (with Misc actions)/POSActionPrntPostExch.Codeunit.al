@@ -27,7 +27,7 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescriptionCaption,
   ActionVersion(),
   Sender.Type::Generic,

@@ -4,7 +4,7 @@ codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpda
     var
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
-        if TaskLine.GetParameterBool(NcSyncMgt."Parameter.DownloadFtp") then begin
+        if TaskLine.GetParameterBool(NcSyncMgt."Parameter.DownloadFtp"()) then begin
             NcSyncMgt.DownloadFtpType(ImportType);
             Commit();
         end;

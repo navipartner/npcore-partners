@@ -41,7 +41,7 @@ page 6059957 "NPR MCS Person Groups"
                 Promoted = true;
                 trigger OnAction()
                 begin
-                    MCSFaceServiceAPI.GetPersonGroups;
+                    MCSFaceServiceAPI.GetPersonGroups();
                     CurrPage.Update();
                 end;
             }

@@ -22,7 +22,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSalesThisMonth;
+                        DrillDownSalesThisMonth();
                     end;
                 }
 
@@ -39,7 +39,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSalesThisMonthLastYear;
+                        DrillDownSalesThisMonthLastYear();
                     end;
                 }
 
@@ -88,7 +88,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        SetActivityGroupVisibility;
+        SetActivityGroupVisibility();
     end;
 
     trigger OnOpenPage()
@@ -106,13 +106,13 @@
             Commit();
         end;
 
-        ShowAwaitingIncomingDoc := OCRServiceMgt.OcrServiceIsEnable;
-        ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType <> CLIENTTYPE::Phone;
+        ShowAwaitingIncomingDoc := OCRServiceMgt.OcrServiceIsEnable();
+        ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
         ShowIntelligentCloud := not EnvironmentInformation.IsSaaS();
         IntegrationSynchJobErrors.SetDataIntegrationUIElementsVisible(ShowDataIntegrationCues);
-        ShowD365SIntegrationCues := CRMConnectionSetup.IsEnabled;
-        RoleCenterNotificationMgt.ShowNotifications;
-        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
+        ShowD365SIntegrationCues := CRMConnectionSetup.IsEnabled();
+        RoleCenterNotificationMgt.ShowNotifications();
+        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
 
         CODEUNIT.Run(CODEUNIT::"NPR Activities Mgt.");
     end;
@@ -160,7 +160,7 @@
         O365UserTours: Record "User Tours";
         TourID: Integer;
     begin
-        TourID := O365GettingStartedMgt.GetWhatIsNewTourID;
+        TourID := O365GettingStartedMgt.GetWhatIsNewTourID();
 
         if O365UserTours.AlreadyCompleted(TourID) then
             exit;

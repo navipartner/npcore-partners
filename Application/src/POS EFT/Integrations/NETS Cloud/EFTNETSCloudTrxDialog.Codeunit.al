@@ -82,7 +82,7 @@
         EFTNETSCloudBgResp.SetRunMode(1);
         if not EFTNETSCloudBgResp.Run(EFTTransactionRequest) then begin
             Message(GetLastErrorText);
-            if FrontEnd.IsPaused then
+            if FrontEnd.IsPaused() then
                 FrontEnd.ResumeWorkflow();
         end;
 

@@ -185,9 +185,9 @@ table 6059904 "NPR Task Log (Task)"
         "Task Worker Group" := TaskQueue."Task Worker Group";
         "Object Type" := TaskLine."Object Type";
         "Object No." := TaskLine."Object No.";
-        "Expected Ending Time" := "Starting Time" + TaskLine.GetExpectedDuration;
-        "Server Instance ID" := ServiceInstanceId;
-        "Session ID" := SessionId;
+        "Expected Ending Time" := "Starting Time" + TaskLine.GetExpectedDuration();
+        "Server Instance ID" := ServiceInstanceId();
+        "Session ID" := SessionId();
 
         Insert();
         //-TQ1.29
@@ -222,7 +222,7 @@ table 6059904 "NPR Task Log (Task)"
             "Last Error Message BLOB".CreateOutStream(OutStream);
             OutStream.WriteText(TMPText);
             "Last Error Message" := CopyStr(TMPText, 1, MaxStrLen("Last Error Message"));
-            ClearLastError;
+            ClearLastError();
         end;
         Modify();
     end;
@@ -261,11 +261,11 @@ table 6059904 "NPR Task Log (Task)"
         "Last Error Message" := CopyStr(TMPText, 1, MaxStrLen("Last Error Message"));
         //+TQ1.17
 
-        "Server Instance ID" := ServiceInstanceId;
-        "Session ID" := SessionId;
+        "Server Instance ID" := ServiceInstanceId();
+        "Session ID" := SessionId();
 
         Insert();
-        ClearLastError;
+        ClearLastError();
         exit("Entry No.");
     end;
 
@@ -292,8 +292,8 @@ table 6059904 "NPR Task Log (Task)"
         "Object Type" := TaskLine."Object Type";
         "Object No." := TaskLine."Object No.";
         "Last Error Message" := Text001;
-        "Server Instance ID" := ServiceInstanceId;
-        "Session ID" := SessionId;
+        "Server Instance ID" := ServiceInstanceId();
+        "Session ID" := SessionId();
 
         Insert();
     end;

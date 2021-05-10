@@ -49,7 +49,7 @@ page 6060042 "NPR Item Worksheet Page"
                             ItemWorksheet."Show Variety Level" := ShowExpanded;
                             ItemWorksheet.Modify();
                             ItemWorksheet.Validate("Show Variety Level");
-                            CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage;
+                            CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage();
                             CurrPage.Update();
                         end;
                     end;
@@ -1055,7 +1055,7 @@ page 6060042 "NPR Item Worksheet Page"
 
                     trigger OnAction()
                     begin
-                        GetCurrentWorksheet;
+                        GetCurrentWorksheet();
                         ItemWshtImpExpMgt.ImportFromExcel(ItemWorksheet);
                     end;
                 }
@@ -1204,7 +1204,7 @@ page 6060042 "NPR Item Worksheet Page"
     procedure SetVisibleFields()
     begin
         CurrPage.ItemWorksheetVarSubpage.PAGE.SetRecFromIW(Rec);
-        CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage;
+        CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage();
         UpdateFactBoxes();
         RRPDiff := (Rec."Recommended Retail Price" <> 0) and (Rec."Sales Price" <> 0) and (Rec."Recommended Retail Price" <> Rec."Sales Price");
     end;

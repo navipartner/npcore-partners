@@ -170,7 +170,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
 
         POSSale.RefreshCurrent();
 
-        POSSale.SetModified;
+        POSSale.SetModified();
         POSSession.RequestRefreshData();
 
         if (ShowMessage) and (StrMessage <> '') then

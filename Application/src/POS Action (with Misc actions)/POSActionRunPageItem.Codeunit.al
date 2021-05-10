@@ -20,7 +20,7 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,

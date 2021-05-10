@@ -44,9 +44,9 @@ codeunit 6150853 "NPR POS Ext.: Line Format."
 
         OnGetLineStyle(Color, Weight, Style, SaleLine, POSSession, FrontEnd);
 
-        DataRow.Fields.Add('Color', Color);
-        DataRow.Fields.Add('Weight', Weight);
-        DataRow.Fields.Add('Style', Style);
+        DataRow.Fields().Add('Color', Color);
+        DataRow.Fields().Add('Weight', Weight);
+        DataRow.Fields().Add('Style', Style);
     end;
 
     [BusinessEvent(false)]

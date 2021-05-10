@@ -149,7 +149,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     procedure AddLine(Text: Text)
     begin
         UpdateField(1, 0, 0, '', CopyStr(Text, 1, 100));
-        NewLine;
+        NewLine();
     end;
 
     procedure NewLine()
@@ -225,7 +225,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     var
         TemplateHeader: Record "NPR RP Template Header";
     begin
-        ClearState;
+        ClearState();
 
         TemplateHeader.Get(Code);
         TemplateHeader.TestField("Printer Type", TemplateHeader."Printer Type"::Line);
@@ -233,7 +233,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         if TemplateHeader."Pre Processing Codeunit" > 0 then begin
             if not CODEUNIT.Run(TemplateHeader."Pre Processing Codeunit", Table) then
                 exit;
-            ClearState;
+            ClearState();
         end;
 
         if TemplateHeader."Print Processing Object ID" = 0 then
@@ -249,19 +249,19 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         if TemplateHeader."Post Processing Codeunit" > 0 then
             CODEUNIT.Run(TemplateHeader."Post Processing Codeunit", Table);
 
-        ClearState;
+        ClearState();
     end;
 
     procedure ProcessBufferForCodeunit(CodeunitID: Integer; TemplateCode: Code[20])
     begin
         PrintBuffer(TemplateCode, CodeunitID, 0);
-        ClearState;
+        ClearState();
     end;
 
     procedure ProcessBufferForReport(ReportID: Integer; TemplateCode: Code[20])
     begin
         PrintBuffer(TemplateCode, 0, ReportID);
-        ClearState;
+        ClearState();
     end;
 
     procedure ClearBuffer()
@@ -275,7 +275,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         // This function takes advantage of the fact that this codeunit is single instance, which will be removed eventually.
         // Use the AddX functions and end with ProcessBufferForCodeunit() instead for new functionality if you need to hardcode printing.
 
-        ClearState;
+        ClearState();
         SetDefaultDistributions();
 
         if Table.IsRecord or Table.IsRecordRef then
@@ -285,7 +285,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
 
         PrintBuffer('', CodeunitID, 0);
 
-        ClearState;
+        ClearState();
     end;
 
     local procedure "// Locals"()
@@ -339,7 +339,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         ParseColumnDistribution(TemplateHeader);
         DataJoinBuffer.SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
         DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code); //Pulls data from tables and joins on the linked fields.
-        if DataJoinBuffer.IsEmpty then
+        if DataJoinBuffer.IsEmpty() then
             exit;
         ProcessLayout(DataJoinBuffer, TemplateHeader.Code); //Merges layout with data join buffer
         PrintBuffer(TemplateHeader.Code, CODEUNIT::"NPR RP Line Print Mgt.", 0); //Converts generic print buffer to device specific data.
@@ -623,7 +623,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
             UpdateField(TemplateLine."Template Column No.", TemplateLine.Align, TemplateLine.Width, TemplateLine."Type Option", TemplateLine."Processing Value");
 
             if TemplateLine."Pad Char" <> '' then
-                NewLine;
+                NewLine();
         end;
     end;
 
@@ -738,7 +738,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     begin
         if AutoLineBreak and (LastColumnNo >= Column) then begin
             LastColumnNo := 0;
-            NewLine;
+            NewLine();
         end;
 
         Buffer."Line No." := CurrentLineNo;

@@ -830,8 +830,8 @@
                     POSPostingBuffer."Rounding Amount" -= POSSalesLineToBeCompressed."Amount Incl. VAT";
                     POSPostingBuffer."Rounding Amount (LCY)" -= POSSalesLineToBeCompressed."Amount Incl. VAT (LCY)";
                 end;
-                POSPostingBuffer.Modify;
-            until POSSalesLineToBeCompressed.Next = 0;
+                POSPostingBuffer.Modify();
+            until POSSalesLineToBeCompressed.Next() = 0;
     end;
 
     local procedure CreatePostingBufferLinesFromPOSSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
@@ -962,7 +962,7 @@
         POSPostingLog."Posting Timestamp" := CurrentDateTime;
         POSPostingLog."With Error" := true;
         POSPostingLog."Error Description" := TextUnknownError;
-        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView, 1, MaxStrLen(POSPostingLog."POS Entry View"));
+        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
         POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
         POSPostingLog."Parameter Posting Date" := PostingDate;
         POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
@@ -1322,15 +1322,15 @@
         if IsNALocalized then begin
             POSEntry2.CopyFilters(POSEntry);
             POSEntry2.SetFilter("Post Entry Status", '=%1|=%2', POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
-            if POSEntry2.FindSet then
+            if POSEntry2.FindSet() then
                 repeat
                     POSEntryTaxLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
                     POSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
-                    if POSEntryTaxLine.FindSet then begin
+                    if POSEntryTaxLine.FindSet() then begin
                         repeat
                             TempPOSEntryTaxLine := POSEntryTaxLine;
                             TempPOSEntryTaxLine.Insert();
-                        until POSEntryTaxLine.Next = 0;
+                        until POSEntryTaxLine.Next() = 0;
                     end;
                     TempPOSEntryTaxLine.Reset();
                 until POSEntry2.Next() = 0;
@@ -1365,11 +1365,11 @@
         end else begin
             POSEntry2.CopyFilters(POSEntry);
             POSEntry2.SetFilter("Post Entry Status", '=%1|=%2', POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
-            if POSEntry2.FindSet then
+            if POSEntry2.FindSet() then
                 repeat
                     POSEntryTaxLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
                     POSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
-                    if POSEntryTaxLine.FindSet then begin
+                    if POSEntryTaxLine.FindSet() then begin
                         repeat
                             TempPOSEntryTaxLine.Reset();
                             TempPOSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type");

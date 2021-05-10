@@ -55,7 +55,7 @@ page 6151040 "NPR Notification Dialog"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if CloseAction in [ACTION::OK, ACTION::LookupOK] then
-            OKOnPush;
+            OKOnPush();
     end;
 
     var

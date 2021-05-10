@@ -52,7 +52,7 @@
         ManagementStatus := NaviDocsManagement.Run(NaviDocsEntry);
         if (not ManagementStatus) and (GetLastErrorText <> '') then begin
             InsertComment(NaviDocsEntry, GetLastErrorText, true);
-            ClearLastError;
+            ClearLastError();
         end;
 
         if ManagementStatus then
@@ -70,7 +70,7 @@
     begin
         if not NaviDocsSetup.Get() then
             exit;
-        OnAddHandlingProfilesToLibrary;
+        OnAddHandlingProfilesToLibrary();
         GetMasterTableHandlingProfiles(RecRef, TempHandlingProfile);
         if TempHandlingProfile.FindSet() then
             repeat
@@ -408,11 +408,11 @@
         end;
 
         case NaviDocsEntry."Document Handling Profile" of
-            HandlingTypePrintCode:
+            HandlingTypePrintCode():
                 DocManageSuccess := DocManagePrint(NaviDocsEntry, RecRef, ReportID);
-            HandlingTypeMailCode:
+            HandlingTypeMailCode():
                 DocManageSuccess := DocManageMail(NaviDocsEntry, RecRef, ReportID);
-            HandlingTypeElecDocCode:
+            HandlingTypeElecDocCode():
                 DocManageSuccess := DocManageElectronicDoc(NaviDocsEntry, RecRef, ReportID);
         end;
 
@@ -430,7 +430,7 @@
         RecRef.SetRecFilter();
         SetCustomReportLayout(RecRef, ReportID);
         ErrorMessage := PrintDoc(ReportID, false, false, RecRef);
-        ClearCustomReportLayout;
+        ClearCustomReportLayout();
         if ErrorMessage <> '' then begin
             InsertComment(NaviDocsEntry, ErrorMessage, true);
             exit(false);
@@ -460,7 +460,7 @@
             SetReportReqParameters(NaviDocsEntry, ReportID);
             ErrorMessage := MailAndDocumentHandling.SendReportTemplate(ReportID, RecRef, EmailTemplateHeader, NaviDocsEntry."E-mail (Recipient)", true);
             ClearReportReqParameters(ReportID);
-            ClearCustomReportLayout;
+            ClearCustomReportLayout();
         end;
         if ErrorMessage <> '' then begin
             InsertComment(NaviDocsEntry, ErrorMessage, true);
@@ -489,7 +489,7 @@
         end;
         if not TrySendElectronicDoc(RecRef, CustomerDocumentSendingProfile) then begin
             InsertComment(NaviDocsEntry, GetLastErrorText, true);
-            ClearLastError;
+            ClearLastError();
             exit(false);
         end;
     end;
@@ -514,7 +514,7 @@
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
     begin
         ReportPrinterInterface.RunReport(ReportID, ReqWindow, SystemPrinter, Record);
-        exit(ReportPrinterInterface.GetLastError);
+        exit(ReportPrinterInterface.GetLastError());
     end;
 
     local procedure GetCustomReportLayout(var CustomReportLayout: Record "Custom Report Layout"; RecRef: RecordRef; ReportID: Integer): Boolean
@@ -538,10 +538,10 @@
         HandlingTypeMailTxt: Label 'Send Document in E-Mail';
         HandlingTypeElecDocTxt: Label 'Send Electronic Document';
     begin
-        AddHandlingProfileToLibrary(HandlingTypePrintCode, HandlingTypePrintTxt, true, true, false, false);
-        AddHandlingProfileToLibrary(HandlingTypeMailCode, HandlingTypeMailTxt, true, false, true, false);
-        AddHandlingProfileToLibrary(HandlingTypeElecDocCode, HandlingTypeElecDocTxt, true, false, false, true);
-        OnAddHandlingProfilesToLibrary;
+        AddHandlingProfileToLibrary(HandlingTypePrintCode(), HandlingTypePrintTxt, true, true, false, false);
+        AddHandlingProfileToLibrary(HandlingTypeMailCode(), HandlingTypeMailTxt, true, false, true, false);
+        AddHandlingProfileToLibrary(HandlingTypeElecDocCode(), HandlingTypeElecDocTxt, true, false, false, true);
+        OnAddHandlingProfilesToLibrary();
     end;
 
     procedure AddHandlingProfileToLibrary("Code": Code[20]; Description: Text[30]; ReportRequired: Boolean; DefaultForPrint: Boolean; DefaultForEmail: Boolean; DefaultForElectronicDoc: Boolean)
@@ -743,11 +743,11 @@
             NaviDocsEntry.Modify(true);
 
             case Status of
-                NaviDocsStatusUnhandled:
+                NaviDocsStatusUnhandled():
                     Comment := StrSubstNo(Txt001, Txt011);
-                NaviDocsStatusError:
+                NaviDocsStatusError():
                     Comment := StrSubstNo(Txt001, Txt021);
-                NaviDocsStatusHandled:
+                NaviDocsStatusHandled():
                     Comment := StrSubstNo(Txt001, Txt031);
             end;
             InsertCommentWithActivity(NaviDocsEntry, ActivityStatusChange, Comment, false);
@@ -1002,7 +1002,7 @@
             Clear(MailAndDocumentHeader);
             MailAndDocumentHeader.SetRange("Table No.", NaviDocsEntry."Table No.");
             MailAndDocumentHeader.SetRange("Report ID", NaviDocsEntry."Report No.");
-            MailAndDocumentHeader.SetFilter(Group, '%1', EmailManagement.GetDefaultGroupFilter);
+            MailAndDocumentHeader.SetFilter(Group, '%1', EmailManagement.GetDefaultGroupFilter());
             if not MailAndDocumentHeader.FindFirst() then
                 MailAndDocumentHeader.SetRange("Report ID");
         end;
@@ -1060,7 +1060,7 @@
             if not TestNumber.FindFirst() then
                 exit;
         end;
-        NaviDocsHandlingProfile.Get(HandlingTypeMailCode);
+        NaviDocsHandlingProfile.Get(HandlingTypeMailCode());
         if NaviDocsHandlingProfile."Report Required" then
             ReportID := EMailMgt.GetReportIDFromRecRef(RecRef);
         Recipient := EMailMgt.GetCustomReportEmailAddress();
@@ -1103,7 +1103,7 @@
                 begin
                     NaviDocsEntry."No. (Recipient)" := POSEntry."Customer No.";
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
-                    if (Recipient = '') and (HandlingProfile = HandlingTypeMailCode) then
+                    if (Recipient = '') and (HandlingProfile = HandlingTypeMailCode()) then
                         if Customer.Get(NaviDocsEntry."No. (Recipient)") then begin
                             RecipientRecRef.GetTable(Customer);
                             Recipient := EmailMgt.GetEmailAddressFromRecRef(RecipientRecRef);
@@ -1113,7 +1113,7 @@
                 begin
                     NaviDocsEntry."No. (Recipient)" := POSEntry."Contact No.";
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Contact;
-                    if (Recipient = '') and (HandlingProfile = HandlingTypeMailCode) then
+                    if (Recipient = '') and (HandlingProfile = HandlingTypeMailCode()) then
                         if Contact.Get(NaviDocsEntry."No. (Recipient)") then begin
                             RecipientRecRef.GetTable(Contact);
                             Recipient := EmailMgt.GetEmailAddressFromRecRef(RecipientRecRef);

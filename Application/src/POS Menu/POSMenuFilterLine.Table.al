@@ -56,7 +56,7 @@ table 6150716 "NPR POS Menu Filter Line"
 
             trigger OnValidate()
             begin
-                if "Filter Value" <> '' then CheckLineFilter;
+                if "Filter Value" <> '' then CheckLineFilter();
             end;
         }
         field(9; "Table Name"; Text[30])
@@ -84,7 +84,7 @@ table 6150716 "NPR POS Menu Filter Line"
                 FieldLookup: Page "NPR Field Lookup";
                 "Field": Record "Field";
             begin
-                Field.Reset;
+                Field.Reset();
                 Field.SetRange(TableNo, DATABASE::"NPR POS Sale");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
@@ -96,7 +96,7 @@ table 6150716 "NPR POS Menu Filter Line"
 
             trigger OnValidate()
             begin
-                if "Filter Sale POS Field Id" <> 0 then CheckLineFilter;
+                if "Filter Sale POS Field Id" <> 0 then CheckLineFilter();
             end;
         }
         field(12; "Filter Sale Line POS Field Id"; Integer)
@@ -110,7 +110,7 @@ table 6150716 "NPR POS Menu Filter Line"
                 FieldLookup: Page "NPR Field Lookup";
                 "Field": Record "Field";
             begin
-                Field.Reset;
+                Field.Reset();
                 Field.SetRange(TableNo, DATABASE::"NPR POS Sale Line");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
@@ -122,7 +122,7 @@ table 6150716 "NPR POS Menu Filter Line"
 
             trigger OnValidate()
             begin
-                if "Filter Sale Line POS Field Id" <> 0 then CheckLineFilter;
+                if "Filter Sale Line POS Field Id" <> 0 then CheckLineFilter();
             end;
         }
         field(13; "Filter Sale POS Field Name"; Text[30])

@@ -20,7 +20,7 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-            ActionCode,
+            ActionCode(),
             ActionDescription,
             ActionVersion(),
             Sender.Type::Generic,
@@ -83,7 +83,7 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
             'EFT_dowork':
                 begin
                     POSSession.ClearActionState();
-                    ContextId := POSSession.BeginAction(ActionCode);
+                    ContextId := POSSession.BeginAction(ActionCode());
                     POSSession.StoreActionState('ContextId', ContextId);
 
                     DoWork(POSSession, CommandType, AuxCommand, OtherCommand, SalePOS, POSUnit);
@@ -224,10 +224,10 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         Token := TmpVariant;
 
         if (not EFTTransactionRequest.Get(EntryNo)) then
-            Error(EftRequestNotFound, ActionCode, TmpVariant, EFTTransactionRequest.TableCaption);
+            Error(EftRequestNotFound, ActionCode(), TmpVariant, EFTTransactionRequest.TableCaption);
 
         if (EFTTransactionRequest.Token <> Token) then
-            Error(EftRequestMissMatch, ActionCode, EntryNo, Token, EFTTransactionRequest.Token);
+            Error(EftRequestMissMatch, ActionCode(), EntryNo, Token, EFTTransactionRequest.Token);
 
         // EFT Integration might have worked some magic to get the job done
         if (not EFTTransactionRequest.Successful) then begin

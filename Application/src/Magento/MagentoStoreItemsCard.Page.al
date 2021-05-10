@@ -42,7 +42,7 @@ page 6014425 "NPR Magento Store Items Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption)
+                field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption())
                 {
                     ApplicationArea = All;
                     Caption = 'Fields Enabled';

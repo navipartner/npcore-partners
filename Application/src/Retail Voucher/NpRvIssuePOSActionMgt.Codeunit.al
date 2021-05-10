@@ -93,12 +93,12 @@
 
     local procedure InitializeIssueVoucherCaptions(var Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(IssueVoucherActionCode, 'IssueVoucherPrompt', Text001);
-        Captions.AddActionCaption(IssueVoucherActionCode, 'IssueVoucherTitle', Text002);
-        Captions.AddActionCaption(IssueVoucherActionCode, 'Quantity', Text003);
-        Captions.AddActionCaption(IssueVoucherActionCode, 'Amount', Text004);
-        Captions.AddActionCaption(IssueVoucherActionCode, 'DiscountAmount', Text005);
-        Captions.AddActionCaption(IssueVoucherActionCode, 'DiscountPercent', Text006);
+        Captions.AddActionCaption(IssueVoucherActionCode(), 'IssueVoucherPrompt', Text001);
+        Captions.AddActionCaption(IssueVoucherActionCode(), 'IssueVoucherTitle', Text002);
+        Captions.AddActionCaption(IssueVoucherActionCode(), 'Quantity', Text003);
+        Captions.AddActionCaption(IssueVoucherActionCode(), 'Amount', Text004);
+        Captions.AddActionCaption(IssueVoucherActionCode(), 'DiscountAmount', Text005);
+        Captions.AddActionCaption(IssueVoucherActionCode(), 'DiscountPercent', Text006);
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]

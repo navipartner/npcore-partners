@@ -18,7 +18,7 @@ codeunit 6150802 "NPR POS Action: Run Page"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -76,7 +76,7 @@ then begin
         POSParameterTableIDValue: Record "NPR POS Parameter Value";
         TableID: Integer;
     begin
-        if (POSParameterValue."Action Code" <> ActionCode) or (POSParameterValue.Name <> 'TableView') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
+        if (POSParameterValue."Action Code" <> ActionCode()) or (POSParameterValue.Name <> 'TableView') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
             exit;
         POSParameterTableIDValue.SetRange("Table No.", POSParameterValue."Table No.");
         POSParameterTableIDValue.SetRange(Code, POSParameterValue.Code);
@@ -98,7 +98,7 @@ then begin
         RecRef: RecordRef;
         TableID: Integer;
     begin
-        if (POSParameterValue."Action Code" <> ActionCode) or (POSParameterValue.Name <> 'TableView') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
+        if (POSParameterValue."Action Code" <> ActionCode()) or (POSParameterValue.Name <> 'TableView') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
             exit;
         if POSParameterValue.Value <> '' then begin
             POSParameterTableIDValue.SetRange("Table No.", POSParameterValue."Table No.");

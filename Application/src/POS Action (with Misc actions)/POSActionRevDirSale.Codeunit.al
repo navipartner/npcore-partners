@@ -32,7 +32,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -396,7 +396,7 @@ then begin
                 CurrentSalePOS."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
                 CurrentSalePOS.Modify();
 
-                if CurrentSalePOS.SalesLinesExist then
+                if CurrentSalePOS.SalesLinesExist() then
                     CurrentSalePOS.UpdateAllLineDim(CurrentSalePOS."Dimension Set ID", OldDimSetID);
 
                 exit(true);

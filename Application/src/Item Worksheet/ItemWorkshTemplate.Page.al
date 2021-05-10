@@ -152,7 +152,7 @@ page 6060058 "NPR Item Worksh. Template"
 
     trigger OnAfterGetRecord()
     begin
-        SetFieldsEditable;
+        SetFieldsEditable();
     end;
 
     var

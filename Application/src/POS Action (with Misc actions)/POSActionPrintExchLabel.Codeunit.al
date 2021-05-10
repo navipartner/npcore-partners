@@ -22,7 +22,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Button,
@@ -51,7 +51,7 @@ then begin
             exit;
 
         POSSession.GetSetup(POSSetup);
-        if not (Evaluate(DefaultDate, POSSetup.ExchangeLabelDefaultDate) and (StrLen(POSSetup.ExchangeLabelDefaultDate) > 0)) then
+        if not (Evaluate(DefaultDate, POSSetup.ExchangeLabelDefaultDate()) and (StrLen(POSSetup.ExchangeLabelDefaultDate()) > 0)) then
             DefaultDate := Today();
 
         Context.SetContext('defaultdate', Format(DefaultDate, 0, 9));

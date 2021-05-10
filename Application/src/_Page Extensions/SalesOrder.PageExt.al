@@ -182,7 +182,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                         SalesLine.Validate(Quantity, InputQuantity);
                         SalesLine.Modify(true);
                         Commit();
-                        ViewText := RetailItemList.NPR_GetViewText;
+                        ViewText := RetailItemList.NPR_GetViewText();
                         Clear(RetailItemList);
                         RetailItemList.NPR_SetLocationCode(Rec."Location Code");
                         RetailItemList.NPR_SetVendorNo(Rec."NPR Buy-From Vendor No.");

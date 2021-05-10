@@ -242,8 +242,8 @@
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeIssueCouponCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(IssueCouponActionCode, 'IssueCouponTitle', Text004);
-        Captions.AddActionCaption(IssueCouponActionCode, 'Quantity', Text005);
+        Captions.AddActionCaption(IssueCouponActionCode(), 'IssueCouponTitle', Text004);
+        Captions.AddActionCaption(IssueCouponActionCode(), 'Quantity', Text005);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
@@ -341,7 +341,7 @@
         CheckDT: DateTime;
     begin
         Clear(CouponType);
-        CouponType.SetRange("Issue Coupon Module", ModuleCode);
+        CouponType.SetRange("Issue Coupon Module", ModuleCode());
         CouponType.SetRange(Enabled, true);
         CheckDT := CurrentDateTime;
         CouponType.SetFilter("Starting Date", '<=%1', CheckDT);

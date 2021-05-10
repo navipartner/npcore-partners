@@ -205,7 +205,7 @@ page 6059975 "NPR Variety Fields Setup"
 
                 trigger OnAction()
                 begin
-                    Rec.InitVarietyFields;
+                    Rec.InitVarietyFields();
                 end;
             }
         }

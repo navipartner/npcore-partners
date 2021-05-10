@@ -52,7 +52,7 @@ page 6150679 "NPR NPRE Flow Statuses"
 
                     trigger OnDrillDown()
                     begin
-                        AssignPrintCategories;
+                        AssignPrintCategories();
                     end;
                 }
                 field("Available in Front-End"; Rec."Available in Front-End")
@@ -95,7 +95,7 @@ page 6150679 "NPR NPRE Flow Statuses"
 
                     trigger OnAction()
                     begin
-                        AssignPrintCategories;
+                        AssignPrintCategories();
                     end;
                 }
             }

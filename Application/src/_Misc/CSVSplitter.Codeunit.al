@@ -47,7 +47,7 @@ codeunit 6060073 "NPR CSV Splitter"
         if (NumberOfFiles > 0) and (ExportToServer) then begin
             if Exists(InputFileName) then
                 Erase(InputFileName);
-            exit(GetDirectoryName)
+            exit(GetDirectoryName())
         end else
             exit('');
     end;
@@ -163,7 +163,7 @@ codeunit 6060073 "NPR CSV Splitter"
         ExcelBuffer.Init();
         ExcelBuffer.Validate("Row No.", LineEnumarator);
         ExcelBuffer.Validate("Column No.", FieldEnumerator + 1);
-        ExcelBuffer.Validate("Cell Value as Text", GetEndofLineText);
+        ExcelBuffer.Validate("Cell Value as Text", GetEndofLineText());
         ExcelBuffer.Insert();
         exit(FieldEnumerator);
     end;
@@ -301,8 +301,8 @@ codeunit 6060073 "NPR CSV Splitter"
         BuildingFileLbl: Label 'Building file %1.', Comment = '%1 = Number of building file';
     begin
         if ExportToServer then
-            if FileMgt.ServerDirectoryExists(GetDirectoryName) then
-                FileMgt.ServerRemoveDirectory(GetDirectoryName, true);
+            if FileMgt.ServerDirectoryExists(GetDirectoryName()) then
+                FileMgt.ServerRemoveDirectory(GetDirectoryName(), true);
 
         I := 0;
         repeat
@@ -353,8 +353,8 @@ codeunit 6060073 "NPR CSV Splitter"
         else
             FileName := FileMgt.GetFileNameWithoutExtension(InputFileName) + '-' + Format(FileNo) + '.' + FileMgt.GetExtension(InputFileName);
         if ExportToServer then begin
-            FileMgt.ServerCreateDirectory(GetDirectoryName);
-            FileName := GetDirectoryName + '\' + FileName;
+            FileMgt.ServerCreateDirectory(GetDirectoryName());
+            FileName := GetDirectoryName() + '\' + FileName;
             if FileMgt.ServerFileExists(FileName) then
                 FileMgt.DeleteServerFile(FileName);
             case FileTextEncoding of
@@ -397,11 +397,11 @@ codeunit 6060073 "NPR CSV Splitter"
                 FieldValue := ExcelBuffer."Cell Value as Text"
             else
                 FieldValue := '';
-            if FieldValue <> GetEndofLineText then begin
+            if FieldValue <> GetEndofLineText() then begin
                 FieldValue := DelChr(FieldValue, '=', Format(FieldSeparator)); //Field separators are not allowed within a field
                 LineText := LineText + FieldValue + Format(FieldSeparator);
             end;
-        until (ColumnNo = MaxNoOfColumns) or (FieldValue = GetEndofLineText);
+        until (ColumnNo = MaxNoOfColumns) or (FieldValue = GetEndofLineText());
     end;
 
     local procedure GetEndofLineText(): Text

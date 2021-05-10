@@ -2046,7 +2046,7 @@
 
                 FieldRef := RecRef.Field(FieldNo);
                 if FieldRef.Class = FieldClass::FlowField then
-                    FieldRef.CalcField;
+                    FieldRef.CalcField();
                 NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
 
                 case FieldRef.Type of

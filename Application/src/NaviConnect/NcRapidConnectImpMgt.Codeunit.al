@@ -90,7 +90,7 @@
 
             Node.SelectNodes('//field', NodeList2);
             foreach Node2 in NodeList2 do begin
-                ConfigPackageData.Init;
+                ConfigPackageData.Init();
                 ConfigPackageData."Package Code" := ConfigPackageRecord."Package Code";
                 ConfigPackageData."Table ID" := ConfigPackageRecord."Table ID";
                 ConfigPackageData."No." := ConfigPackageRecord."No.";

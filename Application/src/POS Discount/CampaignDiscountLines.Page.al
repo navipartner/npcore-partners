@@ -159,7 +159,7 @@ page 6014454 "NPR Campaign Discount Lines"
         //+NPR5.40 [294655]
         //-NPR5.38 [300893]
         //OnAfterGetCurrRecord;
-        AfterGetCurrRecord;
+        AfterGetCurrRecord();
         //+NPR5.38 [300893]
     end;
 
@@ -167,7 +167,7 @@ page 6014454 "NPR Campaign Discount Lines"
     begin
         //-NPR5.38 [300893]
         //OnAfterGetCurrRecord;
-        AfterGetCurrRecord;
+        AfterGetCurrRecord();
         //+NPR5.38 [300893]
     end;
 

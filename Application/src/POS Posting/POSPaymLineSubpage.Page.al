@@ -80,7 +80,7 @@ page 6150654 "NPR POS Paym. Line Subpage"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowDimensions;
+                    Rec.ShowDimensions();
                 end;
             }
         }

@@ -1024,7 +1024,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketType: Record "NPR TM Ticket Type";
         TicketTypeForm: Page "NPR TM Ticket Type";
     begin
-        TicketTypeForm.HideTickets;
+        TicketTypeForm.HideTickets();
         TicketTypeForm.LookupMode(true);
         if (TicketTypeForm.RunModal() = ACTION::LookupOK) then begin
             TicketTypeForm.GetRecord(TicketType);

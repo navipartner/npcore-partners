@@ -74,14 +74,14 @@
                         ItemList.SetRecord(Item);
                         ItemList.LookupMode(true);
                         if ItemList.RunModal() = ACTION::LookupOK then begin
-                            Text := ItemList.GetSelectionFilter;
+                            Text := ItemList.GetSelectionFilter();
                             exit(true);
                         end;
                     end;
 
                     trigger OnValidate()
                     begin
-                        FilterOnAfterValidate;
+                        FilterOnAfterValidate();
                     end;
                 }
                 field(VariantFilter; VariantFilter)
@@ -92,7 +92,7 @@
 
                     trigger OnValidate()
                     begin
-                        FilterOnAfterValidate;
+                        FilterOnAfterValidate();
                     end;
                 }
                 field("VarietyValueFilter[1]"; VarietyValueFilter[1])
@@ -103,7 +103,7 @@
 
                     trigger OnValidate()
                     begin
-                        FilterOnAfterValidate;
+                        FilterOnAfterValidate();
                     end;
                 }
                 field("VarietyValueFilter[2]"; VarietyValueFilter[2])
@@ -114,7 +114,7 @@
 
                     trigger OnValidate()
                     begin
-                        FilterOnAfterValidate;
+                        FilterOnAfterValidate();
                     end;
                 }
                 field("VarietyValueFilter[3]"; VarietyValueFilter[3])
@@ -125,7 +125,7 @@
 
                     trigger OnValidate()
                     begin
-                        FilterOnAfterValidate;
+                        FilterOnAfterValidate();
                     end;
                 }
                 field("VarietyValueFilter[4]"; VarietyValueFilter[4])
@@ -136,7 +136,7 @@
 
                     trigger OnValidate()
                     begin
-                        FilterOnAfterValidate;
+                        FilterOnAfterValidate();
                     end;
                 }
             }
@@ -218,7 +218,7 @@
     begin
         ShowItems := ShowItems::All;
         SetColumns(MATRIX_SetWanted::Initial);
-        UpdateMatrixSubPage;
+        UpdateMatrixSubPage();
     end;
 
     var
@@ -259,8 +259,8 @@
                 until MatrixRecord.Next() = 0;
             if (LocationFilter = '') and not ShowInTransit then begin
                 MatrixRecordTmp.Init();
-                MatrixRecordTmp.Code := MatrixSubPage.EmptyCodeValue;
-                MatrixRecordTmp.Name := MatrixSubPage.EmptyCodeValue;
+                MatrixRecordTmp.Code := MatrixSubPage.EmptyCodeValue();
+                MatrixRecordTmp.Name := MatrixSubPage.EmptyCodeValue();
                 MatrixRecordTmp.Insert();
             end;
         end;
@@ -301,7 +301,7 @@
     local procedure RefreshMatrix(Wanted: Option)
     begin
         SetColumns(Wanted);
-        UpdateMatrixSubPage;
+        UpdateMatrixSubPage();
     end;
 
     local procedure FilterOnAfterValidate()

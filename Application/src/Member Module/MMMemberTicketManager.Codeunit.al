@@ -57,7 +57,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         end;
 
         MembershipEntryNo := MemberManagement.GetMembershipFromExtMemberNo(TmpTicketReservationRequest."External Member No.");
-        if (not (MemberManagement.IsMembershipActive(MembershipEntryNo, WorkDate, true))) then begin
+        if (not (MemberManagement.IsMembershipActive(MembershipEntryNo, WorkDate(), true))) then begin
             if (not (FailWithError)) then
                 exit(false);
             Error(MEMBERSHIP_NOT_ACTIVE, TmpTicketReservationRequest."External Member No.");

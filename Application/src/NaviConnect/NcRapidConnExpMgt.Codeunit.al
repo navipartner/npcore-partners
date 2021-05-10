@@ -237,7 +237,7 @@
             end;
         until ExportTrigger.Next() = 0;
 
-        exit(TempExportTrigger.FindSet);
+        exit(TempExportTrigger.FindSet());
     end;
 
     local procedure IsPartialModifyTrigger(var PrevRecRef: RecordRef; var RecRef: RecordRef; var TempExportTrigger: Record "NPR Nc RapidConnect Trig.Table" temporary): Boolean

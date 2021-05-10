@@ -92,7 +92,7 @@ report 6014550 "NPR Statement E-Mail"
                 Counter := 0;
                 RecRef.Open(18);
                 RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob);
-                Customer.SetView(RecRef.GetView);
+                Customer.SetView(RecRef.GetView());
                 Evaluate(Pdf2NavOutputMethod, RequestPageParametersHelper.GetRequestPageOptionValue('Pdf2NavOutputMethod', RequestPageParameters));
                 Evaluate(NaviDocsDelayUntil, RequestPageParametersHelper.GetRequestPageOptionValue('NaviDocsDelayUntil', RequestPageParameters), 9);
             end;
@@ -206,7 +206,7 @@ report 6014550 "NPR Statement E-Mail"
                         trigger OnValidate()
                         begin
                             if Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send through NaviDocs" then
-                                if not IsNaviDocsEnabled then begin
+                                if not IsNaviDocsEnabled() then begin
                                     Pdf2NavOutputMethod := Pdf2NavOutputMethod::"Send now";
                                     Message(NaviDocsDisabled);
                                     RequestOptionsPage.Update();
@@ -238,7 +238,7 @@ report 6014550 "NPR Statement E-Mail"
         trigger OnOpenPage()
         begin
             InitRequestPageDataInternal();
-            if not IsNaviDocsEnabled then
+            if not IsNaviDocsEnabled() then
                 Pdf2NavOutputMethod := Pdf2NavOutputMethod::"Send now";
             ShowNaviDocsOption := Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send through NaviDocs";
         end;
@@ -258,7 +258,7 @@ report 6014550 "NPR Statement E-Mail"
         CurrReport.UseRequestPage(false);
         RequestPageParameters := StatementEMail.RunRequestPage();
         if RequestPageParameters = '' then
-            CurrReport.Quit;
+            CurrReport.Quit();
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStr);
         OutStr.WriteText(RequestPageParameters);
@@ -324,7 +324,7 @@ report 6014550 "NPR Statement E-Mail"
         TempNaviDocsEntryAttachment."File Extension" := 'xml';
         TempNaviDocsEntryAttachment."Internal Type" := TempNaviDocsEntryAttachment."Internal Type"::"Report Parameters";
         TempNaviDocsEntryAttachment.Insert();
-        NaviDocsManagement.AddDocumentEntryWithAttachments(RecRef, NaviDocsManagement.HandlingTypeMailCode, ReportId, SendToEmail, '', DelayUntil, TempNaviDocsEntryAttachment);
+        NaviDocsManagement.AddDocumentEntryWithAttachments(RecRef, NaviDocsManagement.HandlingTypeMailCode(), ReportId, SendToEmail, '', DelayUntil, TempNaviDocsEntryAttachment);
     end;
 
     local procedure GetCustomReportSelectionEmail(CustomerNo: Code[20]; ReportID: Integer): Text

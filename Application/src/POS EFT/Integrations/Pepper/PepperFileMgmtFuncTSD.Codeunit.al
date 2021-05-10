@@ -117,7 +117,7 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
             MemoryStream := InStr;
             BinaryReader := BinaryReader.BinaryReader(InStr);
             PepperB64File := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-            MemoryStream.Dispose;
+            MemoryStream.Dispose();
             Clear(MemoryStream);
         end;
     end;

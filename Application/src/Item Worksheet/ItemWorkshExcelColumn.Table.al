@@ -116,7 +116,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
 
             trigger OnLookup()
             begin
-                LookupItemWorksheetField;
+                LookupItemWorksheetField();
             end;
 
             trigger OnValidate()
@@ -200,7 +200,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
 
             trigger OnLookup()
             begin
-                LookupItemWorksheetField;
+                LookupItemWorksheetField();
             end;
 
             trigger OnValidate()
@@ -221,7 +221,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
 
             trigger OnLookup()
             begin
-                LookupItemWorksheetField;
+                LookupItemWorksheetField();
             end;
 
             trigger OnValidate()

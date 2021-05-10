@@ -37,7 +37,7 @@
         XNodeList: XmlNodeList;
         XNode: XmlNode;
     begin
-        Initialize;
+        Initialize();
         if not XmlDoc.GetRoot(XmlElement) then
             exit;
 
@@ -200,7 +200,7 @@
         CustTemplateCode: Code[20];
         CustNo: Code[20];
     begin
-        Initialize;
+        Initialize();
         ExternalCustomerNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'customer_no', false);
         if IsContactCustomer then begin
             if GetContactCustomer(ExternalCustomerNo, Customer) then
@@ -464,7 +464,7 @@
         OrderNo: Code[20];
         CurrencyFactor: Decimal;
     begin
-        Initialize;
+        Initialize();
         Clear(SalesHeader);
         OrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'order_no', true);
         if MagentoWebsite.Get(NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'website_code', MaxStrLen(MagentoWebsite.Code), true)) then;
@@ -656,7 +656,7 @@
     var
         SalesLine: Record "Sales Line";
     begin
-        Initialize;
+        Initialize();
         case LowerCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'type', true)) of
             'comment':
                 begin
@@ -945,7 +945,7 @@
         if PaymentFee = 0 then
             exit;
 
-        Initialize;
+        Initialize();
         MagentoSetup.TestField("Payment Fee Account No.");
 
         LineNo += 10000;
@@ -1345,7 +1345,7 @@
         Contact: Record Contact;
         ContBusRel: Record "Contact Business Relation";
     begin
-        Initialize;
+        Initialize();
         Clear(Contact);
 
         if not Contact.Get(ContactNo) then
@@ -1367,8 +1367,8 @@
         Clear(Customer);
         OnBeforeGetCustomer(CurrImportType, CurrImportEntry, ExternalCustomerNo, XmlElement, Customer, Found);
         if Found then
-            exit(Customer.Find);
-        Initialize;
+            exit(Customer.Find());
+        Initialize();
         Clear(Customer);
         case MagentoSetup."Customer Mapping" of
             MagentoSetup."Customer Mapping"::"E-mail":

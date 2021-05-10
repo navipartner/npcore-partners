@@ -689,7 +689,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
                  '"SaleData":{' +
                     '"SaleToAcquirerData":"' + GetSaleToAcquirerData(EftTransactionRequest, EFTSetup) + '",' +
                     '"SaleTransactionID":{' +
-                       '"TimeStamp":"' + GetDateTime + '",' +
+                       '"TimeStamp":"' + GetDateTime() + '",' +
                        '"TransactionID":' + JsonConvert.ToString(EftTransactionRequest."Sales Ticket No.") + '' +
                     '},' +
                     '"SaleReferenceID":' + JsonConvert.ToString(EftTransactionRequest.Token) +
@@ -807,7 +807,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
               '"CardAcquisitionRequest":{' +
                  '"SaleData":{' +
                     '"SaleTransactionID":{' +
-                       '"TimeStamp":"' + GetDateTime + '",' +
+                       '"TimeStamp":"' + GetDateTime() + '",' +
                        '"TransactionID":' + JsonConvert.ToString(EftTransactionRequest."Sales Ticket No.") +
                     '}' +
                  '},' +
@@ -971,10 +971,10 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         HttpWebRequest.KeepAlive(false);
         //+NPR5.54 [387990]
 
-        ReqStream := HttpWebRequest.GetRequestStream;
+        ReqStream := HttpWebRequest.GetRequestStream();
         ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
         ReqStreamWriter.Write(Body);
-        ReqStreamWriter.Flush;
+        ReqStreamWriter.Flush();
         ReqStreamWriter.Close();
 
         //-NPR5.54 [387990]

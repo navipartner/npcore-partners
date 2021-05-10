@@ -61,7 +61,7 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
     begin
         if (Rec.Name <> '') and (Rec."Table No." <> 0) then
             if Confirm(TextConfirmCreate) then
-                CreateCollectorRequest;
+                CreateCollectorRequest();
     end;
 
     trigger OnOpenPage()

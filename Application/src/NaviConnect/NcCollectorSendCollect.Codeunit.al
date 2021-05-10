@@ -2,9 +2,9 @@
 {
     trigger OnRun()
     begin
-        CheckMaxLines;
-        CheckWaitingLines;
-        DeleteOldCollections;
+        CheckMaxLines();
+        CheckWaitingLines();
+        DeleteOldCollections();
     end;
 
     local procedure CheckMaxLines()

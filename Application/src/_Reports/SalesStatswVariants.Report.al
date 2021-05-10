@@ -250,9 +250,9 @@ report 6014611 "NPR Sales Stats w/ Variants"
 
     procedure Calculate()
     begin
-        SalesQty := -CalcInvoicedQty;
-        SalesAmount := CalcSalesAmount;
-        COGSAmount := CalcCostAmount + CalcCostAmountNonInvnt;
+        SalesQty := -CalcInvoicedQty();
+        SalesAmount := CalcSalesAmount();
+        COGSAmount := CalcCostAmount() + CalcCostAmountNonInvnt();
         ItemProfit := SalesAmount + COGSAmount;
 
         Item.CalcFields(Inventory);

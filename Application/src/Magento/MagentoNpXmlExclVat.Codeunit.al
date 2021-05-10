@@ -42,7 +42,7 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
     begin
         FieldRef := RecRef.Field(FieldNo);
         if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-            FieldRef.CalcField;
+            FieldRef.CalcField();
         if LowerCase(Format(FieldRef.Type)) <> 'decimal' then
             exit('');
 

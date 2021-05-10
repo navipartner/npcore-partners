@@ -68,7 +68,7 @@ page 6060114 "NPR TM Ticket Access Facts"
                     if Fact.Next() = 0 then begin
                         More := false;
                     end else begin
-                        if not Fact.Mark then begin
+                        if not Fact.Mark() then begin
                             More := false;
                         end else begin
                             LastFact := Fact."Fact Code";

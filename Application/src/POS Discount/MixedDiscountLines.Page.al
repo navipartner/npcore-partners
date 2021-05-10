@@ -185,7 +185,7 @@ page 6014451 "NPR Mixed Discount Lines"
 
     trigger OnAfterGetRecord()
     begin
-        TotalAmount := GetTotalAmount;
+        TotalAmount := GetTotalAmount();
     end;
 
     var

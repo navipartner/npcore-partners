@@ -30,7 +30,7 @@ codeunit 6014531 "NPR Retail Logo Mgt."
         RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
         RetailLogo.SetFilter("End Date", '>=%1|=%2', Today, 0D);
 
-        exit(RetailLogo.FindSet);
+        exit(RetailLogo.FindSet());
     end;
 
     procedure UploadLogo()

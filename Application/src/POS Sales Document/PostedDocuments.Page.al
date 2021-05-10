@@ -3,7 +3,7 @@ page 6014438 "NPR Posted Documents"
     // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
 
     Caption = 'Posted Documents';
-    DataCaptionExpression = GetCaptionText;
+    DataCaptionExpression = GetCaptionText();
     Editable = false;
     LinksAllowed = false;
     PageType = List;
@@ -108,7 +108,7 @@ page 6014438 "NPR Posted Documents"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowDocumentCard;
+                    Rec.ShowDocumentCard();
                 end;
             }
             action("&Navigate")
@@ -124,7 +124,7 @@ page 6014438 "NPR Posted Documents"
 
                 trigger OnAction()
                 begin
-                    Rec.Navigate;
+                    Rec.Navigate();
                 end;
             }
         }

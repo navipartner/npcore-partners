@@ -153,11 +153,11 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         end;
 
         if (RequiredLegAirPortCode <> '') and (RequiredLegAirPortCodeInTrip) and (RequiredTravelToday) and (RequiredLegAirPortFlightDate <> WorkDate()) then begin
-            Error(ERRTRAVELDATE, WorkDate, TravelDescription);
+            Error(ERRTRAVELDATE, WorkDate(), TravelDescription);
         end;
 
         if RequiredTravelToday and ((WorkDate() < TravelStartDate) or (WorkDate() > TravelEndDate)) then begin
-            Error(ERRTRAVELDATE, WorkDate, TravelDescription);
+            Error(ERRTRAVELDATE, WorkDate(), TravelDescription);
         end;
 
 

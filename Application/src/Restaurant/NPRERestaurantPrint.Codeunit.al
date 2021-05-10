@@ -28,7 +28,7 @@
         Confirmed: Boolean;
     begin
         SetupProxy.InitializeUsingWaiterPad(WaiterPad);
-        case SetupProxy.AutoSendKitchenOrder of
+        case SetupProxy.AutoSendKitchenOrder() of
             SeatingLocation."Auto Send Kitchen Order"::No:
                 Confirmed := false;
             SeatingLocation."Auto Send Kitchen Order"::Yes:
@@ -134,7 +134,7 @@
         OutputTypeIsActive: Boolean;
     begin
         SetupProxy.InitializeUsingWaiterPad(WaiterPad);
-        if not (SetupProxy.KitchenPrintingActivated or SetupProxy.KDSActivated) then
+        if not (SetupProxy.KitchenPrintingActivated() or SetupProxy.KDSActivated()) then
             Error(NowhereToSend);
 
         WaiterPadLine.Copy(WaiterPadLineIn);
@@ -145,9 +145,9 @@
             exit(false);
 
         if not ForceResend then begin
-            AskResendConfirmation := SetupProxy.ResendAllOnNewLines = SeatingLocation."Resend All On New Lines"::Ask;
+            AskResendConfirmation := SetupProxy.ResendAllOnNewLines() = SeatingLocation."Resend All On New Lines"::Ask;
             if not AskResendConfirmation then
-                ForceResend := SetupProxy.ResendAllOnNewLines = SeatingLocation."Resend All On New Lines"::Yes;
+                ForceResend := SetupProxy.ResendAllOnNewLines() = SeatingLocation."Resend All On New Lines"::Yes;
         end;
 
         WPadLineBuffer.Reset();
@@ -157,8 +157,8 @@
 
         for OutputType := WaiterPadLine."Output Type Filter"::Print to WaiterPadLine."Output Type Filter"::KDS do begin
             OutputTypeIsActive :=
-              ((OutputType = WaiterPadLine."Output Type Filter"::Print) and SetupProxy.KitchenPrintingActivated) or
-              ((OutputType = WaiterPadLine."Output Type Filter"::KDS) and SetupProxy.KDSActivated);
+              ((OutputType = WaiterPadLine."Output Type Filter"::Print) and SetupProxy.KitchenPrintingActivated()) or
+              ((OutputType = WaiterPadLine."Output Type Filter"::KDS) and SetupProxy.KDSActivated());
             if OutputTypeIsActive then
                 BufferEligibleForSendingWPadLines(
                   WaiterPadLine, OutputType, PrintType, FlowStatus, PrintCategoryTmp, ForceResend, AskResendConfirmation, WPadLineBuffer);
@@ -475,7 +475,7 @@
             FlowStatus.SetCurrentKey("Status Object", "Flow Order");
             FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);
             if WaiterPad."Serving Step Code" = '' then
-                FlowStatus.FindFirst
+                FlowStatus.FindFirst()
             else begin
                 FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow);
                 if FlowStatus.Next() = 0 then

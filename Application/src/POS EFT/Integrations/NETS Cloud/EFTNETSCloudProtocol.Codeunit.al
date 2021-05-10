@@ -727,10 +727,10 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         if Method <> 'GET' then begin
             HttpWebRequest.ContentType('application/json');
 
-            ReqStream := HttpWebRequest.GetRequestStream;
+            ReqStream := HttpWebRequest.GetRequestStream();
             ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
             ReqStreamWriter.Write(Body);
-            ReqStreamWriter.Flush;
+            ReqStreamWriter.Flush();
             ReqStreamWriter.Close();
         end;
 
@@ -749,7 +749,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
             if WebException.Status.Equals(WebExceptionStatus.ProtocolError) then begin
                 HttpWebResponse := WebException.Response;
                 ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
-                HttpWebResponse.GetResponseStream.CopyTo(ResponseNavStream);
+                HttpWebResponse.GetResponseStream().CopyTo(ResponseNavStream);
                 while (not ResponseNavStream.EOS) do begin
                     ResponseNavStream.Read(ResponseText);
                     Response += ResponseText;

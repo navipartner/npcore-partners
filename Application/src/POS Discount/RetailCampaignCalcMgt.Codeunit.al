@@ -21,7 +21,7 @@ codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
         RetailCampaignItemTotals.SetRange(Code, CampaignCode);
         if LineNo <> 0 then
             RetailCampaignItemTotals.SetRange(Line_No, LineNo);
-        if RetailCampaignItemTotals.Open then begin
+        if RetailCampaignItemTotals.Open() then begin
             if RetailCampaignItemTotals.Read() then
                 CostAmount := RetailCampaignItemTotals.Sum_Cost_Amount_Actual;
 
@@ -41,7 +41,7 @@ codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
         RetailCampaignItemTotals.SetRange(Code, CampaignCode);
         if LineNo <> 0 then
             RetailCampaignItemTotals.SetRange(Line_No, LineNo);
-        if RetailCampaignItemTotals.Open then begin
+        if RetailCampaignItemTotals.Open() then begin
             if RetailCampaignItemTotals.Read() then
                 Profit := RetailCampaignItemTotals.Sum_Sales_Amount_Actual + RetailCampaignItemTotals.Sum_Cost_Amount_Actual;
 
@@ -62,7 +62,7 @@ codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
         RetailCampaignItemTotals.SetRange(Code, CampaignCode);
         if LineNo <> 0 then
             RetailCampaignItemTotals.SetRange(Line_No, LineNo);
-        if RetailCampaignItemTotals.Open then begin
+        if RetailCampaignItemTotals.Open() then begin
             if RetailCampaignItemTotals.Read() and (RetailCampaignItemTotals.Sum_Sales_Amount_Actual <> 0) then begin
                 Profit := RetailCampaignItemTotals.Sum_Sales_Amount_Actual + RetailCampaignItemTotals.Sum_Cost_Amount_Actual;
                 ProfitPct := (Profit / RetailCampaignItemTotals.Sum_Sales_Amount_Actual) * 100;
@@ -84,7 +84,7 @@ codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
         RetailCampaignItemTotals.SetRange(Code, CampaignCode);
         if LineNo <> 0 then
             RetailCampaignItemTotals.SetRange(Line_No, LineNo);
-        if RetailCampaignItemTotals.Open then begin
+        if RetailCampaignItemTotals.Open() then begin
             if RetailCampaignItemTotals.Read() then
                 SalesAmount := RetailCampaignItemTotals.Sum_Sales_Amount_Actual;
 
@@ -110,7 +110,7 @@ codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
         RetailCampaignItemEntries.SetRange(Code, CampaignCode);
         if LineNo <> 0 then
             RetailCampaignItemEntries.SetRange(Line_No, LineNo);
-        if RetailCampaignItemEntries.Open then begin
+        if RetailCampaignItemEntries.Open() then begin
             while RetailCampaignItemEntries.Read() do begin
                 ItemLedgEntry.Get(RetailCampaignItemEntries.Entry_No);
                 TempItemLedgEntry.Init();

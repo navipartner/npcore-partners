@@ -29,7 +29,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
             Sender.RegisterWorkflowStep('do_lookup', 'respond();');
             Sender.RegisterWorkflowStep('complete_lookup', 'respond();');
             Sender.RegisterWorkflow(false);
-            Sender.RegisterOptionParameter('LookupType', CreateOptionString, '');
+            Sender.RegisterOptionParameter('LookupType', CreateOptionString(), '');
             Sender.RegisterTextParameter('View', '');
             Sender.RegisterOptionParameter('LocationFilter', 'POS Store,POS Unit,Use View', '');
         end;

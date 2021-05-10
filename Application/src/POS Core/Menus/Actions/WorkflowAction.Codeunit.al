@@ -21,12 +21,12 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
 
     procedure Content(): JsonObject;
     begin
-        exit(_base.Content);
+        exit(_base.Content());
     end;
 
     procedure Parameters(): JsonObject;
     begin
-        exit(_base.Parameters);
+        exit(_base.Parameters());
     end;
 
     procedure GetJson() Json: JsonObject;
@@ -55,20 +55,20 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
 
         // Specifies an undefined parameter
         foreach Param in _base.Parameters().Keys() do begin
-            if not Parameter.Get(_workflow.Name, Param) and not (CopyStr(Param, 1, 8) = '_option_') then begin
+            if not Parameter.Get(_workflow.Name(), Param) and not (CopyStr(Param, 1, 8) = '_option_') then begin
                 Severity := 10;
-                ErrorText := StrSubstNo(TextUndefinedParameter, _workflow.Name, Source, Param);
+                ErrorText := StrSubstNo(TextUndefinedParameter, _workflow.Name(), Source, Param);
                 exit(false);
             end;
         end;
 
-        Parameter.SetRange("POS Action Code", _workflow.Name);
+        Parameter.SetRange("POS Action Code", _workflow.Name());
         if Parameter.FindSet() then
             repeat
                 // Parameter not specified
                 if not _base.Parameters().Contains(Parameter.Name) then begin
                     Severity := 5;
-                    ErrorText := StrSubstNo(TextParameterNotDefined, _workflow.Name, Source, Parameter.Name);
+                    ErrorText := StrSubstNo(TextParameterNotDefined, _workflow.Name(), Source, Parameter.Name);
                     exit(false);
                 end;
 
@@ -82,7 +82,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
                         Value := Token.AsValue().AsText();
                         Severity := 1;
                     end;
-                    ErrorText := StrSubstNo(TextParameterValueInvalid, _workflow.Name, Source, Parameter.Name, Parameter."Data Type", Value);
+                    ErrorText := StrSubstNo(TextParameterValueInvalid, _workflow.Name(), Source, Parameter.Name, Parameter."Data Type", Value);
                     exit(false);
                 end;
             until Parameter.Next() = 0;
@@ -120,12 +120,12 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
                 POSAction.Workflow.CreateInStream(InStr);
                 Workflow.DeserializeFromJsonStream(InStr);
                 if POSAction."Bound to DataSource" then
-                    Instance.Content.Add('DataBinding', true);
+                    Instance.Content().Add('DataBinding', true);
                 if POSAction."Custom JavaScript Logic".HasValue() then begin
-                    Instance.Content.Add('CustomJavaScript', POSAction.GetCustomJavaScriptLogic());
+                    Instance.Content().Add('CustomJavaScript', POSAction.GetCustomJavaScriptLogic());
                 end;
                 if POSAction.Description <> '' then
-                    Instance.Content.Add('Description', POSAction.Description);
+                    Instance.Content().Add('Description', POSAction.Description);
                 Calculated := true;
             end;
         end;

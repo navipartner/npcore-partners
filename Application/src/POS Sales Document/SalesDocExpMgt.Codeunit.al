@@ -633,7 +633,7 @@
                     if WithError then
                         Error(RESERVE_FAIL_ERROR, Item.TableCaption, SalesLine."No.", SalesLine.FieldCaption(Quantity), SalesLine.Quantity);
                 end;
-            until (0 = SalesLine.Next);
+            until (0 = SalesLine.Next());
         end;
 
         if not AllLinesReserved then begin
@@ -713,7 +713,7 @@
         if not POSEntry.FindFirst() then
             exit;
 
-        ClearLastError;
+        ClearLastError();
         clear(POSEntryManagement);
         POSEntryManagement.SetFunctionToRun(1);
         POSEntryManagement.SetLargePrint(false);

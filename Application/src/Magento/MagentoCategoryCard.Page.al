@@ -202,7 +202,7 @@ page 6151414 "NPR Magento Category Card"
     begin
         HasSetupCategories := MagentoSetupMgt.HasSetupCategories();
         CurrPage.Editable(not HasSetupCategories);
-        SetDisplayConfigVisible;
+        SetDisplayConfigVisible();
     end;
 
     var

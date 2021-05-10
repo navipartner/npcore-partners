@@ -12,7 +12,7 @@
         RecRef2 := RecRef.Duplicate();
         RecRef2.SetRecFilter();
         NpXmlMgt.Initialize(NpXmlTemplate, RecRef2, NpXmlValueMgt.GetPrimaryKeyValue(RecRef2), true);
-        ClearLastError;
+        ClearLastError();
         ProcessComplete := NpXmlMgt.Run() and ProcessComplete;
 
         Commit();
@@ -104,7 +104,7 @@
             repeat
                 FieldRef := RecRef.Field(NpXmlTemplateTriggerLink."Field No.");
                 if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-                    FieldRef.CalcField;
+                    FieldRef.CalcField();
                 case LowerCase(Format(FieldRef.Type)) of
                     'boolean':
                         begin
@@ -129,7 +129,7 @@
             repeat
                 PrevFieldRef := PrevRecRef.Field(NpXmlTemplateTriggerLink."Field No.");
                 if LowerCase(Format(PrevFieldRef.Class)) = 'flowfield' then
-                    PrevFieldRef.CalcField;
+                    PrevFieldRef.CalcField();
                 case LowerCase(Format(PrevFieldRef.Type)) of
                     'boolean':
                         begin
@@ -183,7 +183,7 @@
         if Delete and (RecRef.Number = RecRef2.Number) then
             exit(true);
 
-        exit(RecRef2.FindSet);
+        exit(RecRef2.FindSet());
     end;
 
     procedure SetParentFilter(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; PrevRecRef: RecordRef; RecRef: RecordRef; var RecRef2: RecordRef)
@@ -218,7 +218,7 @@
                         begin
                             FieldRef := RecRef.Field(NpXmlTemplateTriggerLink."Field No.");
                             if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-                                FieldRef.CalcField;
+                                FieldRef.CalcField();
                             FieldRef2.SetFilter('=%1', FieldRef.Value);
                         end;
                     NpXmlTemplateTriggerLink."Link Type"::ParentConstant:
@@ -250,7 +250,7 @@
                         begin
                             FieldRef := PrevRecRef.Field(NpXmlTemplateTriggerLink."Field No.");
                             if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-                                FieldRef.CalcField;
+                                FieldRef.CalcField();
                             FieldRef2.SetFilter('=%1', FieldRef.Value);
                         end;
                 end;

@@ -8,7 +8,7 @@ codeunit 6060159 "NPR Event Vers. Specific Mgt."
     procedure WordXMLMergerConstructor()
     begin
         Clear(WordXMLMerger);
-        WordXMLMerger := WordXMLMerger.WordReportManager;
+        WordXMLMerger := WordXMLMerger.WordReportManager();
     end;
 
     procedure WordXMLMergerValidateWordDocumentTemplate(DocumentStream: InStream; NewXMLPart: Text) ValidationErrors: Text

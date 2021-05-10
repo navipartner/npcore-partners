@@ -151,7 +151,7 @@
                     trigger OnAction()
                     begin
                         Clear(NaviDocsEntry2);
-                        HandleNaviDocs;
+                        HandleNaviDocs();
                     end;
                 }
                 action("Handle marked")
@@ -170,7 +170,7 @@
                     begin
                         Clear(NaviDocsEntry2);
                         CurrPage.SetSelectionFilter(NaviDocsEntry2);
-                        HandleNaviDocs;
+                        HandleNaviDocs();
                     end;
                 }
                 separator(Separator6150634)
@@ -211,7 +211,7 @@
 
                     trigger OnAction()
                     begin
-                        CheckAndUpdateStatus;
+                        CheckAndUpdateStatus();
                     end;
                 }
                 separator(Separator6150645)
@@ -283,7 +283,7 @@
                     begin
                         Clear(NaviDocsEntry2);
                         CurrPage.SetSelectionFilter(NaviDocsEntry2);
-                        ChangeHandlingProfile;
+                        ChangeHandlingProfile();
                     end;
                 }
             }

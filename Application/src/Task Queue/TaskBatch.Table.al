@@ -124,7 +124,7 @@ table 6059901 "NPR Task Batch"
 
     trigger OnInsert()
     begin
-        LockTable;
+        LockTable();
         TaskTemplate.Get("Journal Template Name");
     end;
 

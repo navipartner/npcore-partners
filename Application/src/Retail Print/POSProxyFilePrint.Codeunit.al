@@ -39,7 +39,7 @@ codeunit 6151001 "NPR POS Proxy: File Print"
         end else
             PrintRequest.SelectedPrintMethod := PrintMethod.OSFileHandler;
 
-        FrontEnd.InvokeDevice(PrintRequest, ProtocolName, 'PRINT');
+        FrontEnd.InvokeDevice(PrintRequest, ProtocolName(), 'PRINT');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
@@ -49,7 +49,7 @@ codeunit 6151001 "NPR POS Proxy: File Print"
         PrintResponse: DotNet NPRNetFilePrintResponse0;
         ErrorMessage: Text;
     begin
-        if ActionName <> ProtocolName then
+        if ActionName <> ProtocolName() then
             exit;
 
         Stargate.DeserializeEnvelope(Envelope, PrintResponse, FrontEnd);

@@ -123,7 +123,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         Handled := true;
 
         RecRef.SetTable(SaleLinePOS);
-        DataRow.Fields.Add('ItemAddOn', FindItemAddOn(SaleLinePOS, ItemAddOn));
+        DataRow.Fields().Add('ItemAddOn', FindItemAddOn(SaleLinePOS, ItemAddOn));
     end;
 
     [BusinessEvent(false)]
@@ -576,7 +576,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
             if SaleLinePOS."Line No." <> AppliesToLineNo then begin
                 if not SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo) then
                     exit;
-                POSSaleLine.SetPosition(SaleLinePOS.GetPosition);
+                POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
             end;
             POSSaleLine.DeleteLine();
             POSSession.GetSale(POSSale);
@@ -660,8 +660,8 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
 
         Comment := Comment.Replace('"', '\"');
         Comment := Comment.Replace('/', '\/');
-        Comment := Comment.Replace(CR, '');
-        Comment := Comment.Replace(LF, '\n');
+        Comment := Comment.Replace(CR(), '');
+        Comment := Comment.Replace(LF(), '\n');
 
         exit(Comment);
     end;

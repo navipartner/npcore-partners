@@ -98,7 +98,7 @@ report 6014535 "NPR Sales Statistics By Dept."
 
                 if not isGroupedByLocation then
                     if not firstDimValue then
-                        CurrReport.Skip
+                        CurrReport.Skip()
                     else
                         firstDimValue := false;
 

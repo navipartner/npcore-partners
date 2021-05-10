@@ -42,12 +42,12 @@ page 6014676 "NPR Endpoint Filters"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        SetTableNo;
+        SetTableNo();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetTableNo;
+        SetTableNo();
     end;
 
     local procedure SetTableNo()

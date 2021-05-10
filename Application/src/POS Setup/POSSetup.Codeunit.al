@@ -29,7 +29,7 @@ codeunit 6150708 "NPR POS Setup"
             exit;
 
         if not UserSetup.Get(UserId) then begin
-            UserSetup.Init;
+            UserSetup.Init();
             UserSetup."User ID" := UserId;
             UserSetup.Insert();
         end;
@@ -97,7 +97,7 @@ codeunit 6150708 "NPR POS Setup"
 
     procedure AmountRoundingDirection(): Text[1]
     begin
-        exit(POSPostingProfile.RoundingDirection);
+        exit(POSPostingProfile.RoundingDirection());
     end;
 
     procedure RoundingAccount(Mandatory: Boolean): Code[20]
@@ -284,28 +284,28 @@ codeunit 6150708 "NPR POS Setup"
     begin
         Clear(ActionOut);
         InitializeSetup();
-        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_UnlockPOS, ActionOut);
+        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_UnlockPOS(), ActionOut);
     end;
 
     procedure Action_LockPOS(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
     begin
         Clear(ActionOut);
         InitializeSetup();
-        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_LockPOS, ActionOut);
+        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_LockPOS(), ActionOut);
     end;
 
     procedure Action_IdleTimeout(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
     begin
         Clear(ActionOut);
         InitializeSetup();
-        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_IdleTimeout, ActionOut);
+        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_IdleTimeout(), ActionOut);
     end;
 
     procedure Action_AdminMenu(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
     begin
         Clear(ActionOut);
         InitializeSetup();
-        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_AdminMenu, ActionOut);
+        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_AdminMenu(), ActionOut);
     end;
 
     procedure ActionCode_Login(): Code[20]

@@ -56,7 +56,7 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnInitJob', '', false, false)]
@@ -111,7 +111,7 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
     procedure Init()
     begin
         Clear(PrintBuffer);
-        InitializePrinter;
+        InitializePrinter();
     end;
 
     procedure PrintText(Text: Text)
@@ -199,7 +199,7 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
     local procedure PrintToDisplay()
     begin
         AddTextToBuffer('12345678901234567890');
-        CarriageReturn;
+        CarriageReturn();
         AddTextToBuffer('01234567890123456789');
     end;
 }

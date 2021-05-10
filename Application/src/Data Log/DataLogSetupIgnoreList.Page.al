@@ -41,7 +41,7 @@ page 6059895 "NPR Data Log Setup Ignore List"
 
                     trigger OnValidate()
                     begin
-                        UpdateRec;
+                        UpdateRec();
                     end;
                 }
             }
@@ -64,14 +64,14 @@ page 6059895 "NPR Data Log Setup Ignore List"
     trigger OnAfterGetCurrRecord()
     begin
         PageIsEditable := CurrPage.Editable();
-        GetRec;
-        TransFromRec;
+        GetRec();
+        TransFromRec();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        GetRec;
-        TransFromRec;
+        GetRec();
+        TransFromRec();
     end;
 
     trigger OnOpenPage()
@@ -90,12 +90,12 @@ page 6059895 "NPR Data Log Setup Ignore List"
 
     local procedure UpdateRec()
     begin
-        GetRec;
-        TransToRec;
+        GetRec();
+        TransToRec();
         if not DataLogSetupField."Ignore Modification" then begin
-            if DataLogSetupField.Delete then;
+            if DataLogSetupField.Delete() then;
         end else
-            if not DataLogSetupField.Modify then
+            if not DataLogSetupField.Modify() then
                 DataLogSetupField.Insert();
     end;
 

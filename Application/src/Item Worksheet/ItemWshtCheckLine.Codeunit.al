@@ -162,7 +162,7 @@
            ((CalledFromRegister = true) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check and On Register")) then begin
             ItemWkshtValidateTestRnr.SetItemWorksheetLine(ItemWkshtLine);
             ItemWkshtValidateTestRnr.Run();
-            ErrorText := ItemWkshtValidateTestRnr.GetErrormessage;
+            ErrorText := ItemWkshtValidateTestRnr.GetErrormessage();
             if ErrorText <> '' then begin
                 ProcessError(ItemWkshtLine, ErrorText, StopOnError);
             end;

@@ -278,7 +278,7 @@
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then
             exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;
@@ -396,7 +396,7 @@
         PictureDataUri := '';
         RegEx.Regex('data\:image/(.*?);base64,(.*)');
         RegEx.Match(DataUri, Match);
-        if Match.Success then begin
+        if Match.Success() then begin
             Match.Groups(Groups);
             Groups.Item(1, Group1);
             Groups.Item(2, Group2);
@@ -404,9 +404,9 @@
             TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
             TempMagentoPicture.Name := PictureName;
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
-            TempMagentoPicture."Mime Type" := Group1.Value;
+            TempMagentoPicture."Mime Type" := Group1.Value();
             TempMagentoPicture.Picture.CreateOutStream(OutStr);
-            Convert.FromBase64(Group2.Value, OutStr);
+            Convert.FromBase64(Group2.Value(), OutStr);
             TempMagentoPicture.Insert();
         end;
         PictureName := '';

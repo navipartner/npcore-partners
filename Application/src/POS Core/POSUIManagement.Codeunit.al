@@ -87,7 +87,7 @@ codeunit 6150702 "NPR POS UI Management"
             repeat
                 Clear(MenuObj);
                 InitializeMenu(Menu, MenuObj, POSSession, tmpPOSParameterValue);
-                Menus.Add(MenuObj.GetJson);
+                Menus.Add(MenuObj.GetJson());
             until Menu.Next() = 0;
         FrontEnd.ConfigureMenu(Menus);
     end;
@@ -154,8 +154,8 @@ codeunit 6150702 "NPR POS UI Management"
         MenuButtonObj.SetColumn(MenuButton."Position X");
         MenuButtonObj.SetFontSize(MenuButton."Font Size");
         MenuButtonObj.SetEnabledState(MenuButton.Enabled);
-        MenuButtonObj.Content.Add('keyMenu', MenuButton."Menu Code");
-        MenuButtonObj.Content.Add('keyId', MenuButton.ID);
+        MenuButtonObj.Content().Add('keyMenu', MenuButton."Menu Code");
+        MenuButtonObj.Content().Add('keyId', MenuButton.ID);
 
         InitializeMenuButtonObjectFilters(MenuButton, MenuButtonObj);
 
@@ -168,9 +168,9 @@ codeunit 6150702 "NPR POS UI Management"
     local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "NPR POS Menu Button"; MenuButtonObj: Codeunit "NPR POS Menu Button")
     begin
         if MenuButton."Salesperson Code" <> '' then
-            MenuButtonObj.Content.Add('filterSalesPerson', MenuButton."Salesperson Code");
+            MenuButtonObj.Content().Add('filterSalesPerson', MenuButton."Salesperson Code");
         if MenuButton."Register No." <> '' then
-            MenuButtonObj.Content.Add('filterRegister', MenuButton."Register No.");
+            MenuButtonObj.Content().Add('filterRegister', MenuButton."Register No.");
     end;
 
     procedure InitializeTheme(POSUnit: Record "NPR POS Unit")
@@ -475,10 +475,10 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('Sale_RegisterNo', CaptionLabelRegisterNo);
         Captions.Add('Sale_SalesPersonCode', CaptionLabelSalesPersonCode);
         Captions.Add('Login_Clear', CaptionLabelClear);
-        Captions.Add('Sale_SubTotal', StrSubstNo(CaptionLabelSubtotal, GetLCYCode));
-        Captions.Add('Sale_Total', StrSubstNo(CaptionLabelTotal, GetLCYCode));
-        Captions.Add('Sale_VATAmt', StrSubstNo(CaptionLabelVATAmt, GetLCYCode));
-        Captions.Add('Sale_TaxAmt', StrSubstNo(CaptionLabelTaxAmt, GetLCYCode));
+        Captions.Add('Sale_SubTotal', StrSubstNo(CaptionLabelSubtotal, GetLCYCode()));
+        Captions.Add('Sale_Total', StrSubstNo(CaptionLabelTotal, GetLCYCode()));
+        Captions.Add('Sale_VATAmt', StrSubstNo(CaptionLabelVATAmt, GetLCYCode()));
+        Captions.Add('Sale_TaxAmt', StrSubstNo(CaptionLabelTaxAmt, GetLCYCode()));
         Captions.Add('Item_Count', CaptionItemCount);
         Captions.Add('Payment_PaymentInfo', CaptionPaymentInfo);
         Captions.Add('Global_Cancel', CaptionGlobalCancel);
@@ -667,14 +667,14 @@ codeunit 6150702 "NPR POS UI Management"
         LicenseInformation: Codeunit "NPR License Information";
         Options: JsonObject;
     begin
-        Options.Add('itemWorkflow', Setup.ActionCode_Item);
-        Options.Add('paymentWorkflow', Setup.ActionCode_Payment);
-        Options.Add('customerWorkflow', Setup.ActionCode_Customer);
-        Options.Add('lockWorkflow', Setup.ActionCode_LockPOS);
-        Options.Add('unlockWorkflow', Setup.ActionCode_UnlockPOS);
+        Options.Add('itemWorkflow', Setup.ActionCode_Item());
+        Options.Add('paymentWorkflow', Setup.ActionCode_Payment());
+        Options.Add('customerWorkflow', Setup.ActionCode_Customer());
+        Options.Add('lockWorkflow', Setup.ActionCode_LockPOS());
+        Options.Add('unlockWorkflow', Setup.ActionCode_UnlockPOS());
         Options.Add('autoLockTimeout', Setup.GetLockTimeout());
-        Options.Add('loginWorkflow', Setup.ActionCode_Login);
-        Options.Add('textEnterWorkflow', Setup.ActionCode_TextEnter);
+        Options.Add('loginWorkflow', Setup.ActionCode_Login());
+        Options.Add('textEnterWorkflow', Setup.ActionCode_TextEnter());
         Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
         Options.Add('idleTimeoutWorkflow', Setup.ActionCode_IdleTimeout());
         Options.Add('posUnitType', Format(GetPOSUnitType(Setup), 0, 9));

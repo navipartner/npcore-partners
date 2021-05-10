@@ -251,7 +251,7 @@ table 6150623 "NPR POS Entry Payment Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions;
+                ShowDimensions();
             end;
         }
         field(500; EFT; Boolean)

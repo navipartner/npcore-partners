@@ -101,7 +101,7 @@ page 6014586 "NPR Salesperson Stats Retail"
 
     trigger OnAfterGetRecord()
     begin
-        Calc;
+        Calc();
     end;
 
     trigger OnOpenPage()
@@ -280,7 +280,7 @@ page 6014586 "NPR Salesperson Stats Retail"
     begin
         HideEmpty := not HideEmpty;
 
-        Rec.ClearMarks;
+        Rec.ClearMarks();
         if HideEmpty then begin
             Current := Rec;
             Dlg.Open(txtDlg);

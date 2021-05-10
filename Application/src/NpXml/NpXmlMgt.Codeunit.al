@@ -53,7 +53,7 @@
         RecordSetExists := RecRef.FindSet();
         repeat
             Counter += 1;
-            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition);
+            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());
 
             if ParseDataToXmlDocNode(RecRef, RecordSetExists, Node) then
                 XmlEntityCount += 1;
@@ -70,7 +70,7 @@
             FinalizeDoc(Document, NpXmlTemplate2, GetFilename(NpXmlTemplate2."Xml Root Name", PrimaryKeyValue, Counter));
 
         Clear(Document);
-        CloseDialog;
+        CloseDialog();
     end;
 
     procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var Node: XmlNode) Success: Boolean
@@ -289,7 +289,7 @@
         if (not Handled) or (NpXmlElement."Generic Child Codeunit ID" = 0) then begin
             RecRef2.Open(NpXmlElement."Table No.");
             if RecRef.Number = NpXmlElement."Table No." then
-                RecRef2 := RecRef.Duplicate;
+                RecRef2 := RecRef.Duplicate();
         end;
         if RecRef.Number = NpXmlElement."Table No." then
             RecRef2.SetRecFilter();
@@ -310,7 +310,7 @@
                         begin
                             FieldRef := RecRef.Field(NpXmlFilter."Parent Field No.");
                             if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-                                FieldRef.CalcField;
+                                FieldRef.CalcField();
                             FieldRef2.SetFilter('=%1', FieldRef.Value);
                         end;
                     NpXmlFilter."Filter Type"::Constant:
@@ -701,7 +701,7 @@
         FTPResponse := FTPClient.UploadFile(InStr, NPXmlTemplate."FTP Directory" + '/' + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
-        StatusCode := JToken.AsValue.AsText();
+        StatusCode := JToken.AsValue().AsText();
 
         case StatusCode of
             '200':
@@ -714,7 +714,7 @@
                 ErrorDescription := Error004;
             else begin
                     FTPResponse.Get('Error', JToken);
-                    ErrorDescription := JToken.AsValue.AsText();
+                    ErrorDescription := JToken.AsValue().AsText();
                 end;
         end;
 
@@ -804,7 +804,7 @@
             exit(false);
         end;
         TempBlob := OutputTempBlob;
-        exit(TempBlob.HasValue);
+        exit(TempBlob.HasValue());
     end;
 
     procedure GetResponse(var TempBlob: Codeunit "Temp Blob") HasOutput: Boolean
@@ -814,7 +814,7 @@
             exit(false);
         end;
         TempBlob := ResponseTempBlob;
-        exit(TempBlob.HasValue);
+        exit(TempBlob.HasValue());
     end;
 
     procedure InitializeOutput()
@@ -832,7 +832,7 @@
 
     local procedure CloseDialog()
     begin
-        if not UseDialog then
+        if not UseDialog() then
             exit;
 
         Window.Close();
@@ -840,7 +840,7 @@
 
     local procedure OpenDialog(Title: Text)
     begin
-        if not UseDialog then
+        if not UseDialog() then
             exit;
 
         Window.Open(Title);
@@ -850,7 +850,7 @@
     var
         Runtime: Decimal;
     begin
-        if not UseDialog then
+        if not UseDialog() then
             exit;
 
         if Total = 0 then
@@ -872,7 +872,7 @@
     var
         ActiveSession: Record "Active Session";
     begin
-        ActiveSession.Get(ServiceInstanceId, SessionId);
+        ActiveSession.Get(ServiceInstanceId(), SessionId());
         exit(LowerCase(ReplaceSpecialChar(ActiveSession."Database Name" + '_' + CompanyName)));
     end;
 
@@ -1050,7 +1050,7 @@
         OpenDialog(StrSubstNo(Text200, RecRef.Caption));
         while not Success do begin
             Counter += 1;
-            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition);
+            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());
             NpXmlElement.Reset();
             NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);
             NpXmlElement.SetFilter("Parent Line No.", '=%1', 0);

@@ -583,7 +583,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         case SearchMethod of
             'EXT-CARD-NO':
-                exit(GetMembershipFromExtCardNo(CopyStr(Key1, 1, MaxStrLen(MemberCard."External Card No.")), WorkDate, NotFoundReasonText));
+                exit(GetMembershipFromExtCardNo(CopyStr(Key1, 1, MaxStrLen(MemberCard."External Card No.")), WorkDate(), NotFoundReasonText));
             'EXT-MEMBER-NO':
                 exit(GetMembershipFromExtMemberNo(CopyStr(Key1, 1, MaxStrLen(Member."External Member No."))));
             'EXT-MEMBERSHIP-NO':

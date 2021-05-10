@@ -234,16 +234,16 @@ page 6151222 "NPR PrintNode Printer Settings"
             exit;
         TempRetailList.Number := 1;
         TempRetailList.Choice := SelectStr(1, DuplexOptionTxt);
-        TempRetailList.Value := SelectStr(1, DuplexValueText);
+        TempRetailList.Value := SelectStr(1, DuplexValueText());
         TempRetailList.Insert();
         if GetBoolean(JObject, Attribute) then begin
             TempRetailList.Number := 2;
             TempRetailList.Choice := SelectStr(2, DuplexOptionTxt);
-            TempRetailList.Value := SelectStr(2, DuplexValueText);
+            TempRetailList.Value := SelectStr(2, DuplexValueText());
             TempRetailList.Insert();
             TempRetailList.Number := 3;
             TempRetailList.Choice := SelectStr(3, DuplexOptionTxt);
-            TempRetailList.Value := SelectStr(3, DuplexValueText);
+            TempRetailList.Value := SelectStr(3, DuplexValueText());
             TempRetailList.Insert();
         end;
 
@@ -253,15 +253,15 @@ page 6151222 "NPR PrintNode Printer Settings"
     begin
         TempRetailList.Number := 1;
         TempRetailList.Choice := SelectStr(1, RotateOptionTxt);
-        TempRetailList.Value := SelectStr(1, RotateValueText);
+        TempRetailList.Value := SelectStr(1, RotateValueText());
         TempRetailList.Insert();
         TempRetailList.Number := 2;
         TempRetailList.Choice := SelectStr(2, RotateOptionTxt);
-        TempRetailList.Value := SelectStr(2, RotateValueText);
+        TempRetailList.Value := SelectStr(2, RotateValueText());
         TempRetailList.Insert();
         TempRetailList.Number := 3;
         TempRetailList.Choice := SelectStr(3, RotateOptionTxt);
-        TempRetailList.Value := SelectStr(3, RotateValueText);
+        TempRetailList.Value := SelectStr(3, RotateValueText());
         TempRetailList.Insert();
 
     end;

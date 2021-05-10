@@ -61,7 +61,7 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
         if EpsonBound then
             UnbindSubscription(EpsonLabelCommandLibrary);
 
-        ClearAll;
+        ClearAll();
     end;
 
     procedure GetDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)

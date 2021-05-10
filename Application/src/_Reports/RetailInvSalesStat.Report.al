@@ -181,9 +181,9 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
 
     local procedure Calculate()
     begin
-        SalesQty := -CalcInvoicedQty;
-        SalesAmount := CalcSalesAmount;
-        COGSAmount := CalcCostAmount + CalcCostAmountNonInvnt;
+        SalesQty := -CalcInvoicedQty();
+        SalesAmount := CalcSalesAmount();
+        COGSAmount := CalcCostAmount() + CalcCostAmountNonInvnt();
         ItemProfit := SalesAmount + COGSAmount;
 
         if SalesAmount <> 0 then

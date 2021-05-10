@@ -65,7 +65,7 @@ page 6150633 "NPR NPRE Select Flow Status"
 
                     trigger OnDrillDown()
                     begin
-                        AssignPrintCategories;
+                        AssignPrintCategories();
                     end;
                 }
                 field(Color; Rec.Color)
@@ -107,7 +107,7 @@ page 6150633 "NPR NPRE Select Flow Status"
 
                     trigger OnAction()
                     begin
-                        AssignPrintCategories;
+                        AssignPrintCategories();
                     end;
                 }
             }
@@ -123,7 +123,7 @@ page 6150633 "NPR NPRE Select Flow Status"
 
     trigger OnAfterGetRecord()
     begin
-        Selected := Rec.Mark;
+        Selected := Rec.Mark();
     end;
 
     trigger OnOpenPage()

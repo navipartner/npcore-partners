@@ -66,12 +66,12 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
     var
         DataRow: Codeunit "NPR Data Row";
     begin
-        if DataSource.Id <> GetSourceNameText() then
+        if DataSource.Id() <> GetSourceNameText() then
             exit;
 
-        CurrDataSet.Constructor(DataSource.Id);
+        CurrDataSet.Constructor(DataSource.Id());
         CurrDataSet.SetCurrentPosition('_');
-        CurrDataSet.NewRow(CurrDataSet.CurrentPosition, DataRow);
+        CurrDataSet.NewRow(CurrDataSet.CurrentPosition(), DataRow);
 
         DataRow.Add('RegisterFilter', 'Register 1');
         DataRow.Add('ReceiptFilter', 'Receipts 1..3');

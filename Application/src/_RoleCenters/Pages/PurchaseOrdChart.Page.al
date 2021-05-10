@@ -261,7 +261,7 @@ page 6151261 "NPR Purchase Ord Chart"
 
                 trigger OnAction()
                 begin
-                    RunSetup;
+                    RunSetup();
                 end;
             }
         }
@@ -269,15 +269,15 @@ page 6151261 "NPR Purchase Ord Chart"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        UpdateChart;
+        UpdateChart();
 
         if not IsChartAddInReady then
-            SetActionsEnabled;
+            SetActionsEnabled();
     end;
 
     trigger OnOpenPage()
     begin
-        SetActionsEnabled;
+        SetActionsEnabled();
     end;
 
     var
@@ -340,9 +340,9 @@ page 6151261 "NPR Purchase Ord Chart"
         OldTrailingSalesOrdersSetup := TrailingSalesOrdersSetup;
 
         if NeedsUpdate then
-            StatusText := TrailingSalesOrdersSetup.GetCurrentSelectionText;
+            StatusText := TrailingSalesOrdersSetup.GetCurrentSelectionText();
 
-        SetActionsEnabled;
+        SetActionsEnabled();
     end;
 
     local procedure RunSetup()

@@ -163,7 +163,7 @@ table 6060041 "NPR Item Worksheet"
 
     trigger OnInsert()
     begin
-        LockTable;
+        LockTable();
         ItemWorksheetTemplate.Get("Item Template Name");
     end;
 
@@ -241,7 +241,7 @@ table 6060041 "NPR Item Worksheet"
         ItemWorksheetLine.SetRange("Worksheet Name", Name);
         if ItemWorksheetLine.FindSet() then
             repeat
-                ItemWorksheetLine.UpdateSalesPriceWithRRP;
+                ItemWorksheetLine.UpdateSalesPriceWithRRP();
                 ItemWorksheetLine.Modify();
             until ItemWorksheetLine.Next() = 0;
     end;

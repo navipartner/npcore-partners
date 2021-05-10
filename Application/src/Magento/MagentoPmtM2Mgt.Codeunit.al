@@ -42,7 +42,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
     [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Capture Codeunit Id', true, true)]
     local procedure OnValidateCaptureCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
-        if Rec."Capture Codeunit Id" <> CurrCodeunitId then
+        if Rec."Capture Codeunit Id" <> CurrCodeunitId() then
             exit;
 
         SetApiInfo(Rec);
@@ -51,7 +51,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
     [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Refund Codeunit Id', true, true)]
     local procedure OnValidateRefundCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
-        if Rec."Refund Codeunit Id" <> CurrCodeunitId then
+        if Rec."Refund Codeunit Id" <> CurrCodeunitId() then
             exit;
 
         SetApiInfo(Rec);
@@ -60,7 +60,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
     [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Cancel Codeunit Id', true, true)]
     local procedure OnValidateCancelCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
-        if Rec."Cancel Codeunit Id" <> CurrCodeunitId then
+        if Rec."Cancel Codeunit Id" <> CurrCodeunitId() then
             exit;
 
         SetApiInfo(Rec);

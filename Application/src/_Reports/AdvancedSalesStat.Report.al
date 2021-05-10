@@ -144,7 +144,7 @@ report 6014490 "NPR Advanced Sales Stat."
                 fillTable();
 
                 // Rewind
-                UpdateSortKey;
+                UpdateSortKey();
                 if not Buffer.Find('-') then begin
                     if CurrReport.Language = 1030 then
                         Error(EmptyLinesDeErr)

@@ -25,10 +25,10 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     begin
 
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
 
-        Extensions.Add(ThisExtension);
+        Extensions.Add(ThisExtension());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
@@ -37,7 +37,7 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -79,7 +79,7 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

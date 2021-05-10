@@ -126,7 +126,7 @@
     procedure SetPosition(Position: Text): Boolean
     begin
         Rec.SetPosition(Position);
-        exit(Rec.Find);
+        exit(Rec.Find());
     end;
 
     procedure GetCurrentSale(var SalePOS: Record "NPR POS Sale")
@@ -250,7 +250,7 @@
         DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
         Rec.Modify();
 
-        if (OldDimSetID <> Rec."Dimension Set ID") and Rec.SalesLinesExist then
+        if (OldDimSetID <> Rec."Dimension Set ID") and Rec.SalesLinesExist() then
             Rec.UpdateAllLineDim(Rec."Dimension Set ID", OldDimSetID);
 
         RefreshCurrent();
@@ -515,7 +515,7 @@
                                                                 (SaleLinePOS.Quantity > 0) then begin
                         if not ((Sale."Customer Type" = Sale."Customer Type"::Ord) and (Sale."Customer No." <> '')) then
                             Error(ErrServiceNoCust);
-                        SaleLinePOS.TransferToService;
+                        SaleLinePOS.TransferToService();
                     end;
                 end;
                 if Item."Item Tracking Code" <> '' then begin
@@ -663,7 +663,7 @@
         Success: Boolean;
     begin
         //Any error at this time would leave the POS with inconsistent front-end state.
-        ClearLastError;
+        ClearLastError();
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
             Message(ERROR_AFTER_END_SALE, GetLastErrorText);

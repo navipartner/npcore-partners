@@ -157,7 +157,7 @@
             TotalVAT := TotalVAT + (SaleLinePOS."Amount Including VAT" - SaleLinePOS."VAT Base Amount");
 
 
-        until (0 = SaleLinePOS.Next);
+        until (0 = SaleLinePOS.Next());
 
         exit(TotalVAT);
     end;

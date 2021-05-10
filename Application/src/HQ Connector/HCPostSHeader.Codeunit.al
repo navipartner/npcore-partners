@@ -5,7 +5,7 @@ codeunit 6150916 "NPR HC Post S.Header"
     trigger OnRun()
     begin
         SalesHeader.Copy(Rec);
-        Code;
+        Code();
         Rec := SalesHeader;
     end;
 
