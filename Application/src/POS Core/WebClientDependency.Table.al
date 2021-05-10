@@ -45,12 +45,11 @@ table 6014624 "NPR Web Client Dependency"
     {
     }
 
-    local procedure GetBLOB(DependencyType: Integer; DependencyCode: Code[10]): Text
+    local procedure GetBLOB(DependencyType: Integer; DependencyCode: Code[10]) Result: Text
     var
         WebDependency: Record "NPR Web Client Dependency";
-        MemStr: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
         InStr: InStream;
+
     begin
         if not WebDependency.Get(DependencyType, DependencyCode) then
             exit;
@@ -59,11 +58,8 @@ table 6014624 "NPR Web Client Dependency"
             exit;
 
         WebDependency.CalcFields(BLOB);
-        WebDependency.BLOB.CreateInStream(InStr);
-        MemStr := MemStr.MemoryStream();
-        CopyStream(MemStr, InStr);
-
-        exit(Encoding.UTF8.GetString(MemStr.ToArray()));
+        WebDependency.BLOB.CreateInStream(InStr, TextEncoding::UTF8);
+        InStr.ReadText(Result);
     end;
 
     procedure GetJavaScript(DependencyCode: Code[10]): Text
