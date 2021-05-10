@@ -88,7 +88,8 @@ table 6150617 "NPR POS Payment Bin"
         {
             Caption = 'Timestamp';
             DataClassification = SystemMetadata;
-            SqlTimestamp = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Front-end caching strategy is abandoned, NST should do the heavy lifting here.';
         }
     }
 

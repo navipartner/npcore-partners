@@ -15,7 +15,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ReadingWorkflowIdErr: Label 'reading workflow ID';
         ReadingActionNameErr: Label 'reading action name';
 
-        OnRunType: Option InvokeAction,BeforeWorkflow;
+        OnRunType: Option InvokeAction,BeforeWorkflow,MethodInvocation;
         OnRunInitialized: Boolean;
         OnRunPOSAction: Record "NPR POS Action";
         OnRunWorkflowStep: Text;
@@ -24,6 +24,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         OnRunPOSSession: Codeunit "NPR POS Session";
         OnRunFrontEnd: Codeunit "NPR POS Front End Management";
         OnRunHandled: Boolean;
+        OnRunMethod: Text;
 
     trigger OnRun()
     begin
@@ -35,6 +36,8 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                 OnAction(OnRunPOSAction, OnRunWorkflowStep, OnRunContext, OnRunPOSSession, OnRunFrontEnd, OnRunHandled);
             OnRunType::BeforeWorkflow:
                 OnBeforeWorkflow(OnRunPOSAction, OnRunParameters, OnRunPOSSession, OnRunFrontEnd, OnRunHandled);
+            OnRunType::MethodInvocation:
+                OnCustomMethod(OnRunMethod, OnRunContext, OnRunPOSSession, OnRunFrontEnd, OnRunHandled);
         end;
     end;
 
@@ -66,6 +69,23 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         OnRunPOSSession := POSSessionIn;
         OnRunFrontEnd := FrontEndIn;
         OnRunType := OnRunType::BeforeWorkflow;
+
+        Success := Self.Run();
+        Handled := OnRunHandled;
+
+        OnRunInitialized := false;
+    end;
+
+    local procedure InvokeCustomMethodThroughOnRun(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface"; var Handled: Boolean) Success: Boolean
+    begin
+        OnRunHandled := false;
+        OnRunInitialized := true;
+
+        OnRunMethod := Method;
+        OnRunContext := Context;
+        OnRunPOSSession := POSSession;
+        OnRunFrontEnd := FrontEnd;
+        OnRunType := OnRunType::MethodInvocation;
 
         Success := Self.Run();
         Handled := OnRunHandled;
@@ -165,16 +185,18 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             'ProtocolUIResponse':
                 Method_ProtocolUIResponse(POSSession, FrontEnd, Context);
             else
-                InvokeCustomMethod(Method, Context, POSSession, FrontEnd);
+                InvokeCustomMethod(Method, Context, POSSession, FrontEnd, Self);
         end;
 
         OnAfterInvokeMethod(Method, Context, POSSession, FrontEnd);
     end;
 
-    local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
     var
+        FailedInvocationResponse: JsonObject;
         Handled: Boolean;
         ExpectsResponse: Boolean;
+        Success: Boolean;
         ContextString: Text;
         CustomMethodWithoutResponseErr: Label 'Custom awaitable method %1 was invoked, but it did not provide a response. This is a bug in the custom method handler codeunit.';
     begin
@@ -182,11 +204,16 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             ExpectsResponse := true;
         end;
 
-        OnCustomMethod(Method, Context, POSSession, FrontEnd, Handled);
+        Success := InvokeCustomMethodThroughOnRun(Method, Context, POSSession, FrontEnd, Self, Handled);
 
         if ExpectsResponse then begin
-            if not FrontEnd.IsDragonglassInvocationResponded(Context) then
-                FrontEnd.ReportBugAndThrowError(StrSubstNo(CustomMethodWithoutResponseErr, Method));
+            if not FrontEnd.IsDragonglassInvocationResponded(Context) then begin
+                if not Success then begin
+                    FailedInvocationResponse.Add('_dragonglassInvocationError', true);
+                    FrontEnd.RespondToFrontEndMethod(Context, FailedInvocationResponse, FrontEnd);
+                end else
+                    FrontEnd.ReportBugAndThrowError(StrSubstNo(CustomMethodWithoutResponseErr, Method));
+            end;
         end;
 
         if not Handled then begin
