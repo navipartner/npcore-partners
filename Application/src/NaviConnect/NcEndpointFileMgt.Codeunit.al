@@ -1,11 +1,11 @@
 ﻿codeunit 6151526 "NPR Nc Endpoint File Mgt."
 {
     var
-        TextFileDownloaded: Label 'The file was downloaded to %1.';
+        TextFileDownloaded: Label 'The file was downloaded.';
         TextFileExistsSkipped: Label 'The file was not exported because the file %1 already exists.';
         TextFileExistsOverwitten: Label 'The file was exported, overwriting the file %1 that already existed.';
         TextFileExistsAppendedSuffix: Label 'The file was exported to %1 with an appended Timestamp in the filename because the file already existed.';
-        TextFileExported: Label 'The file was exported to %1.';
+        TextFileExported: Label 'The file was exported.';
 
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text)
     var
@@ -102,155 +102,50 @@
     var
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
         FileMgt: Codeunit "File Management";
-        Encoding: TextEncoding;
-        UseDefaultEncoding: Boolean;
-        OutStr: OutStream;
-        Tempfile: File;
-        ExportFile: File;
-        DirectoryPathfromFile: Text;
-        FullName: Text;
-        ToFile: Text;
+        InStm: InStream;
+        OutStm: OutStream;
+        TempBlob: Codeunit "Temp Blob";
     begin
         NcEndpointFile.TestField(Path);
-        if NcEndpointFile."Client Path" then begin
-            Tempfile.CreateTempFile();
-            FullName := Tempfile.Name;
-            Tempfile.Close();
-        end else begin
-            FullName := StrSubstNo('%1\%2', DelChr(NcEndpointFile.Path, '>', '\'), Filename);
-            if StrLen(Filename) = (StrLen(DelChr(Filename, '=', '\')) + 1) then begin
-                DirectoryPathfromFile := NcEndpointFile.Path + '\' + CopyStr(Filename, 1, StrPos(Filename, '\') - 1);
-                if not FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) then
-                    FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
-            end;
-        end;
 
-        if Exists(FullName) then begin
-            case NcEndpointFile."Handle Exiting File" of
-                NcEndpointFile."Handle Exiting File"::KeepExisting:
-                    begin
-                        NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExistsSkipped, FullName), '\', '/'));
-                        exit;
-                    end;
-                NcEndpointFile."Handle Exiting File"::AddSuffix:
-                    begin
-                        FullName := AddSuffixToFileName(FullName);
-                        NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExistsAppendedSuffix, FullName), '\', '/'));
-                    end;
-                NcEndpointFile."Handle Exiting File"::Replace:
-                    begin
-                        Erase(FullName);
-                        NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExistsOverwitten, FullName), '\', '/'));
-                    end;
-            end;
-        end else begin
-            NcTriggerSyncMgt.AddResponse(NcTask, ConvertStr(StrSubstNo(TextFileExported, FullName), '\', '/'));
-        end;
+        NcTriggerSyncMgt.AddResponse(NcTask, TextFileExported);
 
-        UseDefaultEncoding := false;
+        TempBlob.CreateOutStream(OutStm);
+        OutStm.WriteText(OutputText);
+
         case NcEndpointFile."File Encoding" of
             NcEndpointFile."File Encoding"::ANSI:
-                Encoding := TextEncoding::Windows;
+                TempBlob.CreateInStream(InStm, TextEncoding::Windows);
             NcEndpointFile."File Encoding"::UTF8:
-                Encoding := TextEncoding::UTF8;
+                TempBlob.CreateInStream(InStm, TextEncoding::UTF8);
             else
-                UseDefaultEncoding := true;
+                TempBlob.CreateInStream(InStm);
         end;
-        if UseDefaultEncoding then
-            ExportFile.Create(FullName)
-        else
-            ExportFile.Create(FullName, Encoding);
-
-        ExportFile.Write(OutputText);
 
         if NcEndpointFile."Client Path" then begin
-            ToFile := NcEndpointFile.Path + Filename;
-            FileMgt.CopyServerFile(FullName, FullName + '.file', true);
-            ExportFile.Open(FullName);
-            FileMgt.DownloadToFile(ExportFile.Name + '.file', ToFile);
-            ExportFile.Close();
-            Erase(FullName);
-            NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + StrSubstNo(TextFileDownloaded, ConvertStr(ToFile, '\', '/')));
+            DownloadFromStream(InStm, 'Save file as...', NcEndpointFile.Path, 'All Files|*.*', Filename);
+            NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + TextFileDownloaded);
         end;
     end;
 
     local procedure FileProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFile: Record "NPR Nc Endpoint File")
     var
         FileMgt: Codeunit "File Management";
-        Encoding: TextEncoding;
-        UseDefaultEncoding: Boolean;
-        Tempfile: File;
-        ExportFile: File;
         InStr: InStream;
-        OutStr: OutStream;
-        DirectoryPathfromFile: Text;
-        FullName: Text;
-        ToFile: Text;
     begin
         NcEndpointFile.TestField(Path);
 
-        if NcEndpointFile."Client Path" then begin
-            Tempfile.CreateTempFile();
-            FullName := Tempfile.Name;
-            Tempfile.Close();
-        end else begin
-            FullName := StrSubstNo('%1\%2', DelChr(NcEndpointFile.Path, '>', '\'), NcTaskOutput.Name);
-            if StrLen(NcTaskOutput.Name) = (StrLen(DelChr(NcTaskOutput.Name, '=', '\')) + 1) then begin
-                DirectoryPathfromFile := NcEndpointFile.Path + '\' + CopyStr(NcTaskOutput.Name, 1, StrPos(NcTaskOutput.Name, '\') - 1);
-                if not FileMgt.ServerDirectoryExists(NcEndpointFile.Path + '\' + DirectoryPathfromFile) then
-                    FileMgt.ServerCreateDirectory(DirectoryPathfromFile);
-            end;
-        end;
-
-        if Exists(FullName) then begin
-            case NcEndpointFile."Handle Exiting File" of
-                NcEndpointFile."Handle Exiting File"::KeepExisting:
-                    exit;
-                NcEndpointFile."Handle Exiting File"::AddSuffix:
-                    FullName := AddSuffixToFileName(FullName);
-                NcEndpointFile."Handle Exiting File"::Replace:
-                    Erase(FullName);
-            end;
-        end;
-
-        NcTaskOutput.Data.CreateInStream(InStr);
-        UseDefaultEncoding := false;
         case NcEndpointFile."File Encoding" of
             NcEndpointFile."File Encoding"::ANSI:
-                Encoding := TextEncoding::Windows;
+                NcTaskOutput.Data.CreateInStream(InStr, TextEncoding::Windows);
             NcEndpointFile."File Encoding"::UTF8:
-                Encoding := TextEncoding::UTF8;
+                NcTaskOutput.Data.CreateInStream(InStr, TextEncoding::UTF8);
             else
-                UseDefaultEncoding := true;
+                NcTaskOutput.Data.CreateInStream(InStr);
         end;
 
-        if UseDefaultEncoding then
-            ExportFile.Create(FullName)
-        else
-            ExportFile.Create(FullName, Encoding);
-
-        ExportFile.CreateOutStream(OutStr);
-        CopyStream(OutStr, InStr);
-
-        if NcEndpointFile."Client Path" then begin
-            ToFile := NcEndpointFile.Path + NcTaskOutput.Name;
-            FileMgt.CopyServerFile(FullName, FullName + '.file', true);
-            ExportFile.Open(FullName);
-            FileMgt.DownloadToFile(ExportFile.Name + '.file', ToFile);
-            ExportFile.Close();
-            Erase(FullName);
-        end;
-    end;
-
-    local procedure AddSuffixToFileName(FilePath: Text): Text
-    var
-        Suffix: Text;
-        FileMgt: Codeunit "File Management";
-    begin
-        Suffix := Format(CurrentDateTime, 0, '<Year4><Month,2><Day,2>-<Hours24,2><Minutes,2><Seconds,2>');
-        exit(FileMgt.GetDirectoryName(FilePath) +
-              '\' + FileMgt.GetFileNameWithoutExtension(FilePath) +
-             Suffix + '.' + FileMgt.GetExtension(FilePath));
+        if NcEndpointFile."Client Path" then
+            DownloadFromStream(InStr, 'Save file as...', NcEndpointFile.Path, 'All Files|*.*', NcTaskOutput.Name);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
