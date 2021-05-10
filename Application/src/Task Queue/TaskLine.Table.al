@@ -75,7 +75,7 @@ table 6059902 "NPR Task Line"
                     RunTask.CalculateNextRunTime(Rec, true, DummyEnabled);
                     //+TQ1.28
                 end;
-                UpdateTaskQueue;
+                UpdateTaskQueue();
             end;
         }
         field(10; "Object Type"; Option)
@@ -87,7 +87,7 @@ table 6059902 "NPR Task Line"
 
             trigger OnValidate()
             begin
-                UpdateTaskQueue;
+                UpdateTaskQueue();
             end;
         }
         field(11; "Object No."; Integer)
@@ -132,7 +132,7 @@ table 6059902 "NPR Task Line"
                 if Description = '' then
                     Description := Object.Name;
                 //+TQ1.33 [322752]
-                UpdateTaskQueue;
+                UpdateTaskQueue();
             end;
         }
         field(12; "Call Object With Task Record"; Boolean)
@@ -156,7 +156,7 @@ table 6059902 "NPR Task Line"
 
             trigger OnValidate()
             begin
-                UpdateTaskQueue;
+                UpdateTaskQueue();
             end;
         }
         field(16; "Estimated Duration"; Duration)
@@ -172,7 +172,7 @@ table 6059902 "NPR Task Line"
 
             trigger OnValidate()
             begin
-                UpdateTaskQueue;
+                UpdateTaskQueue();
             end;
         }
         field(20; Recurrence; Option)
@@ -306,7 +306,7 @@ table 6059902 "NPR Task Line"
 
             trigger OnLookup()
             begin
-                PrinterLookup;
+                PrinterLookup();
             end;
         }
         field(52; "File Path"; Text[100])
@@ -747,7 +747,7 @@ table 6059902 "NPR Task Line"
         TaskQueueAdd2Log: Codeunit "NPR Task Queue: SingleInstance";
     begin
         //-TQ1.29
-        exit(TaskQueueAdd2Log.GetCurrentLogEntryNo);
+        exit(TaskQueueAdd2Log.GetCurrentLogEntryNo());
         //+TQ1.29
     end;
 
@@ -763,7 +763,7 @@ table 6059902 "NPR Task Line"
     procedure IncreaseIndentation()
     begin
         if Indentation = 0 then
-            CheckIndentation;
+            CheckIndentation();
 
         Indentation += 1;
         Modify();
@@ -1237,7 +1237,7 @@ table 6059902 "NPR Task Line"
         if "Object No." = 0 then
             exit;
 
-        Params := REPORT.RunRequestPage("Object No.", GetReportParameters);
+        Params := REPORT.RunRequestPage("Object No.", GetReportParameters());
 
         if Params <> '' then
             SetReportParameters(Params);

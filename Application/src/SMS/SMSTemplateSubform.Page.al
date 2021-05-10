@@ -44,7 +44,7 @@ page 6059942 "NPR SMS Template Subform"
 
                 trigger OnAction()
                 begin
-                    AddReportLink;
+                    AddReportLink();
                 end;
             }
         }

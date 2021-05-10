@@ -28,7 +28,7 @@
     begin
 
         if Sender.DiscoverAction20(
-          ActionCode,
+          ActionCode(),
           ActionDescription,
           ActionVersion())
         then begin

@@ -419,7 +419,7 @@ page 6059988 "NPR Sale Stats Activities"
     var
         Itt: Integer;
     begin
-        Rec.Initialize;
+        Rec.Initialize();
 
         Rec.SetXAxis(SelectStr(FigureToDisplay + 1, Text0001), Rec."Data Type"::String);
 

@@ -52,7 +52,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
                 ;
         end;
 
-        Message('%1:\%2', WorkflowStep, Context.ToString);
+        Message('%1:\%2', WorkflowStep, Context.ToString());
 
         /*
         if ReturnToDefaultView then begin

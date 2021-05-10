@@ -58,7 +58,7 @@ then begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type = CurrentView.Type::Sale) then begin
+        if (CurrentView.Type() = CurrentView.Type()::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);
             if LinePOS.Type = LinePOS.Type::Item then begin

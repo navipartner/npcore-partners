@@ -24,7 +24,7 @@ codeunit 6151404 "NPR Magento Functions"
         HtmlText: Text;
     begin
         Clear(TempBlob);
-        FieldRef.CalcField;
+        FieldRef.CalcField();
         TempBlob.FromFieldRef(FieldRef);
 
         TempBlob.CreateInStream(InStr);

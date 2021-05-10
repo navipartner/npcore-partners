@@ -70,7 +70,7 @@
             end;
         end;
 
-        exit(TempSalesHeader.FindSet() or TempSalesCrMemoHeader.FindSet);
+        exit(TempSalesHeader.FindSet() or TempSalesCrMemoHeader.FindSet());
     end;
 
     procedure RunPageReturnOrder(var TempSalesHeader: Record "Sales Header" temporary): Boolean

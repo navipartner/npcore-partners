@@ -95,7 +95,7 @@ table 6059973 "NPR Variety Value"
         //+NPR5.38 [268786]
         //+VRT1.10
 
-        AssignSortOrder;
+        AssignSortOrder();
     end;
 
     trigger OnRename()
@@ -122,7 +122,7 @@ table 6059973 "NPR Variety Value"
         if Evaluate(Dec, Value) then begin
             //its a number. take the sort order from here (if possible)
             //convert '.' with ',' so we can use the number correct
-            DecSep := GetDecimalSeperator;
+            DecSep := GetDecimalSeperator();
             if DecSep = '.' then
                 Value2 := ConvertStr(Value, ',', DecSep)
             else

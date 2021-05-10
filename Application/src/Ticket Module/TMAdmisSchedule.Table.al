@@ -37,8 +37,8 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                UpdateEndAfterDate;
-                SetDayOfTheWeek;
+                UpdateEndAfterDate();
+                SetDayOfTheWeek();
             end;
         }
         field(12; "Recurrence Until Pattern"; Option)
@@ -62,7 +62,7 @@ table 6060118 "NPR TM Admis. Schedule"
                             "End After Occurrence Count" := 0;
                         end;
                 end;
-                UpdateEndAfterDate;
+                UpdateEndAfterDate();
 
             end;
         }
@@ -74,7 +74,7 @@ table 6060118 "NPR TM Admis. Schedule"
             trigger OnValidate()
             begin
 
-                UpdateEndAfterDate;
+                UpdateEndAfterDate();
 
             end;
         }
@@ -85,7 +85,7 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                UpdateReccurencePattern;
+                UpdateReccurencePattern();
             end;
         }
         field(20; "Recurrence Pattern"; Option)
@@ -97,8 +97,8 @@ table 6060118 "NPR TM Admis. Schedule"
 
             trigger OnValidate()
             begin
-                UpdateEndAfterDate;
-                SetDayOfTheWeek;
+                UpdateEndAfterDate();
+                SetDayOfTheWeek();
             end;
         }
         field(21; "Recur Every N On"; Integer)

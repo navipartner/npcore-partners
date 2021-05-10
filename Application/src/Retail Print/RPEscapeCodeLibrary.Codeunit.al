@@ -422,7 +422,7 @@ codeunit 6014540 "NPR RP Escape Code Library"
     local procedure TestInitialize()
     begin
         if not Initialized then
-            Initialize;
+            Initialize();
     end;
 
     procedure "-- ESC Shorthands"()

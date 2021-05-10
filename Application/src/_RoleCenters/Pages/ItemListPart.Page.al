@@ -275,12 +275,12 @@ page 6014463 "NPR Item ListPart"
 
         WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
 
-        SetWorkflowManagementEnabledState;
+        SetWorkflowManagementEnabledState();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        EnableControls;
+        EnableControls();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -316,10 +316,10 @@ page 6014463 "NPR Item ListPart"
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
         ClientTypeManagement: Codeunit "Client Type Management";
     begin
-        CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
-        IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled;
-        SetWorkflowManagementEnabledState;
-        IsOnPhone := ClientTypeManagement.GetCurrentClientType = CLIENTTYPE::Phone;
+        CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
+        IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled();
+        SetWorkflowManagementEnabledState();
+        IsOnPhone := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
     end;
 
     var
@@ -350,13 +350,13 @@ page 6014463 "NPR Item ListPart"
         ItemListPage.SetTableView(Item);
         ItemListPage.LookupMode(true);
         if ItemListPage.RunModal() = ACTION::LookupOK then
-            exit(ItemListPage.GetSelectionFilter);
+            exit(ItemListPage.GetSelectionFilter());
     end;
 
     local procedure EnableControls()
     begin
-        IsNonInventoriable := Rec.IsNonInventoriableType;
-        IsInventoriable := Rec.IsInventoriableType;
+        IsNonInventoriable := Rec.IsNonInventoriableType();
+        IsInventoriable := Rec.IsInventoriableType();
     end;
 
     local procedure SetWorkflowManagementEnabledState()
@@ -364,8 +364,8 @@ page 6014463 "NPR Item ListPart"
         WorkflowManagement: Codeunit "Workflow Management";
         WorkflowEventHandling: Codeunit "Workflow Event Handling";
     begin
-        EventFilter := WorkflowEventHandling.RunWorkflowOnSendItemForApprovalCode + '|' +
-          WorkflowEventHandling.RunWorkflowOnItemChangedCode;
+        EventFilter := WorkflowEventHandling.RunWorkflowOnSendItemForApprovalCode() + '|' +
+          WorkflowEventHandling.RunWorkflowOnItemChangedCode();
 
         EnabledApprovalWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::Item, EventFilter);
     end;

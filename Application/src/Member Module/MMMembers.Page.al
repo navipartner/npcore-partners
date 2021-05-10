@@ -402,7 +402,7 @@ page 6060126 "NPR MM Members"
 
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
                     end;
@@ -427,7 +427,7 @@ page 6060126 "NPR MM Members"
 
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
                     end;
@@ -508,7 +508,7 @@ page 6060126 "NPR MM Members"
     local procedure GetMasterDataAttributeValue()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, Rec."Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
 
     end;

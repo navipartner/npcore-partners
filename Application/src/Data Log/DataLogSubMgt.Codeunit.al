@@ -164,7 +164,7 @@
         if MaxRecords > 0 then begin
             if TempDataLogRecord.Count() > MaxRecords then begin
                 if MaxRecords = 1 then
-                    TempDataLogRecord.FindFirst
+                    TempDataLogRecord.FindFirst()
                 else begin
                     TempDataLogRecord.FindSet();
                     TempDataLogRecord.Next(MaxRecords - 1);
@@ -186,7 +186,7 @@
         end;
 
         if not ModifySubscriber then
-            exit(TempDataLogRecord.FindSet);
+            exit(TempDataLogRecord.FindSet());
 
         DataLogSubscriber.FindSet();
         repeat
@@ -207,7 +207,7 @@
         until DataLogSubscriber.Next() = 0;
 
         Clear(TempDataLogRecord);
-        exit(TempDataLogRecord.FindSet);
+        exit(TempDataLogRecord.FindSet());
     end;
 
     procedure GetNewRecordsCompany(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
@@ -244,7 +244,7 @@
         if MaxRecords > 0 then begin
             if TempDataLogRecord.Count() > MaxRecords then begin
                 if MaxRecords = 1 then
-                    TempDataLogRecord.FindFirst
+                    TempDataLogRecord.FindFirst()
                 else begin
                     TempDataLogRecord.FindSet();
                     TempDataLogRecord.Next(MaxRecords - 1);
@@ -264,7 +264,7 @@
         end;
 
         if not ModifySubscriber then
-            exit(TempDataLogRecord.FindSet);
+            exit(TempDataLogRecord.FindSet());
 
         DataLogSubscriber.FindSet();
         repeat
@@ -278,7 +278,7 @@
         until DataLogSubscriber.Next() = 0;
 
         Clear(TempDataLogRecord);
-        exit(TempDataLogRecord.FindSet);
+        exit(TempDataLogRecord.FindSet());
         //+DL1.10
     end;
 
@@ -354,8 +354,8 @@
             if Previous then
                 exit(false);
             RecordID := DataLogRecord."Record ID";
-            RecRef := RecordID.GetRecord;
-            exit(RecRef.Find);
+            RecRef := RecordID.GetRecord();
+            exit(RecRef.Find());
         end;
 
         Clear(RecRef);

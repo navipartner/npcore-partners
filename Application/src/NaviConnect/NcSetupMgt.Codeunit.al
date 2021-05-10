@@ -34,14 +34,14 @@
 
         FindLineNo(TaskCode, TaskCode, TaskDescription + ' Process Tasks', TaskLineNo);
         SetupTaskLineMinute(TaskCode, TaskCode, TaskLineNo, TaskDescription + ' Process Tasks', TaskCode);
-        SetupTaskLineParameterBool(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.ProcessTasks", true);
-        SetupTaskLineParameterInt(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.TaskRetryCount", 3);
-        SetupTaskLineParameterBool(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.ImportNewTasks", true);
+        SetupTaskLineParameterBool(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.ProcessTasks"(), true);
+        SetupTaskLineParameterInt(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.TaskRetryCount"(), 3);
+        SetupTaskLineParameterBool(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.ImportNewTasks"(), true);
         SetTaskLineEnabled(TaskCode, TaskCode, TaskLineNo, NaviConnectSetup."Task Queue Enabled");
 
         FindLineNo(TaskCode, TaskCode, TaskDescription + ' Reset Task Count', TaskLineNo);
         SetupTaskLineDay(TaskCode, TaskCode, TaskLineNo, TaskDescription + ' Reset Task Count', TaskCode);
-        SetupTaskLineParameterBool(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.ResetTaskCount", true);
+        SetupTaskLineParameterBool(TaskCode, TaskCode, TaskLineNo, SyncMgt."Parameter.ResetTaskCount"(), true);
         SetTaskLineEnabled(TaskCode, TaskCode, TaskLineNo, NaviConnectSetup."Task Queue Enabled");
 
         FindLineNo(TaskCode, TaskCode, TaskDescription + ' Delete Old Entries', TaskLineNo);

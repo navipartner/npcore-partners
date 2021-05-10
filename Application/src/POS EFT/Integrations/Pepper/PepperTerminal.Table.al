@@ -50,7 +50,7 @@ table 6184492 "NPR Pepper Terminal"
             begin
                 if ("Register No." <> '') and GuiAllowed then
                     if xRec."Register No." <> "Register No." then
-                        CheckDuplicateRegister;
+                        CheckDuplicateRegister();
             end;
         }
         field(60; "Open Automatically"; Boolean)
@@ -217,7 +217,7 @@ table 6184492 "NPR Pepper Terminal"
                 TxtOfflineDisabled: Label 'Offline mode is disabled in the Pepper Configuration.';
             begin
                 if Rec.Status = Rec.Status::ActiveOffline then
-                    if not GetOfflineAllowed then
+                    if not GetOfflineAllowed() then
                         Error(TxtOfflineDisabled);
             end;
         }
@@ -258,7 +258,7 @@ table 6184492 "NPR Pepper Terminal"
 
     trigger OnInsert()
     begin
-        FillDefaultPrintFileNames;
+        FillDefaultPrintFileNames();
     end;
 
     procedure UploadFile(FileType: Option License,AdditionalParameters)

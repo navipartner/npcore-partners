@@ -204,7 +204,7 @@
             JArray.Get(i, JToken);
             JObject := JToken.AsObject();
             JObject.Get('Record', JToken);
-            TableNo := JToken.AsValue.AsInteger();
+            TableNo := JToken.AsValue().AsInteger();
 
             case TableNo of
                 DATABASE::"NPR RP Template Header":
@@ -242,7 +242,7 @@
             RecRef.Close();
         end;
 
-        exit(tmpTemplateHeader.FindSet);
+        exit(tmpTemplateHeader.FindSet());
     end;
 
     local procedure ImportPackage(var tmpImportWorksheet: Record "NPR RP Imp. Worksh."; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary)

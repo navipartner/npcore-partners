@@ -109,7 +109,7 @@ page 6059791 "NPR E-mail Template"
                                 Clear(Rec."HTML Template");
                                 Rec."HTML Template".CreateOutStream(Outstream, TEXTENCODING::UTF8);
                                 Outstream.WriteText(HtmlText);
-                                Rec.Modify;
+                                Rec.Modify();
                             end;
                         end;
                     }

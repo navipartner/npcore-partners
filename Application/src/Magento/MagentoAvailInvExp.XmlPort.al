@@ -43,7 +43,7 @@
     trigger OnPreXmlPort()
     begin
         if ItemFilter = '' then
-            currXMLport.Quit;
+            currXMLport.Quit();
 
         SetupTempItemVariants();
     end;

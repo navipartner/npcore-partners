@@ -21,7 +21,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -165,7 +165,7 @@ then begin
             'EndOfWorkflow':
                 begin
                     POSSession.GetCurrentView(CurrentView);
-                    if (CurrentView.Type <> CurrentView.Type::Login) then
+                    if (CurrentView.Type() <> CurrentView.Type()::Login) then
                         POSSession.ChangeViewLogin();
                 end;
         end;

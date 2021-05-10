@@ -47,7 +47,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnInitJob', '', false, false)]
@@ -116,9 +116,9 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
         //+NPR5.51 [360975]
 
         if HashTable.IsEmpty then
-            ConstructHashTable;
+            ConstructHashTable();
 
-        STX := ESC."02";
+        STX := ESC."02"();
         AddToBuffer(STX + 'm');     // Set units to mm.
         AddToBuffer(STX + 'M1200'); // Set Max Length
         AddToBuffer(STX + 'L');     // Set to Label mode.
@@ -313,7 +313,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
 
     local procedure AddTextToBuffer(Text: Text[1024])
     begin
-        PrintBuffer += Text + ESC.CR + ESC.LF;
+        PrintBuffer += Text + ESC.CR() + ESC.LF();
     end;
 
     procedure PadStrLeft(Input: Text[30]; Length: Integer; PadChr: Text[1]) Output: Text[30]

@@ -25,7 +25,7 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         XmlValue := '';
         FieldRef := RecRef.Field(FieldNo);
         if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-            FieldRef.CalcField;
+            FieldRef.CalcField();
 
         if NpXmlElement."Field Type" <> NpXmlElement."Field Type"::" " then
             XmlValue := GetSpecialFieldValue(RecRef, NpXmlElement, FieldNo)
@@ -63,7 +63,7 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                     if LowerCase(Format(FieldRef.Type)) = 'blob' then begin
                         XmlValue := '';
 
-                        FieldRef.CalcField;
+                        FieldRef.CalcField();
                         TempBlob.FromFieldRef(FieldRef);
                         TempBlob.CreateInStream(InStr);
                         while not InStr.EOS do begin

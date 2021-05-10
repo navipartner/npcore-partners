@@ -386,7 +386,7 @@ page 6151504 "NPR Nc Import List"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then
             exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;

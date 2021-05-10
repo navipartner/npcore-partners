@@ -159,9 +159,9 @@ table 6151248 "NPR NP Retail Admin Cue"
 
     begin
         GeneralLegerSetup.Get();
-        CurrencySymbol := GeneralLegerSetup.GetCurrencySymbol;
+        CurrencySymbol := GeneralLegerSetup.GetCurrencySymbol();
 
-        IF UserPersonalization.GET(USERSECURITYID) AND (CurrencySymbol <> '') THEN
+        IF UserPersonalization.GET(USERSECURITYID()) AND (CurrencySymbol <> '') THEN
             CASE UserPersonalization."Locale ID" OF
                 1030, // da-DK
                 1053, // sv-Se
@@ -183,7 +183,7 @@ table 6151248 "NPR NP Retail Admin Cue"
                     EXIT(CurrencySymbol + '<Precision,0:0><Standard Format,0>');
             END;
 
-        EXIT(GetDefaultAmountFormat);
+        EXIT(GetDefaultAmountFormat());
 
     end;
 

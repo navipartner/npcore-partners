@@ -27,7 +27,7 @@ table 6150701 "NPR POS Menu Button"
 
             trigger OnValidate()
             begin
-                CalculateLevel;
+                CalculateLevel();
             end;
         }
         field(4; Ordinal; Integer)
@@ -515,7 +515,7 @@ table 6150701 "NPR POS Menu Button"
         ActionInterface := "Action Type";
         ActionInterface.ConfigureFromMenuButton(Rec, POSSession, ActionOut);
         if Rec."Show Plus/Minus Buttons" then
-            ActionOut.Content.Add('ShowPlusMinus', true);
+            ActionOut.Content().Add('ShowPlusMinus', true);
 
         StoreButtonParameters(ActionOut, POSParameterValue);
         StoreDataSource(ActionOut);
@@ -556,18 +556,18 @@ table 6150701 "NPR POS Menu Button"
         POSAction: Record "NPR POS Action";
     begin
         if "Blocking UI" then
-            ActionIn.Content.Add('Blocking', true);
+            ActionIn.Content().Add('Blocking', true);
 
         if (not POSSession.RetrieveSessionAction("Action Code", POSAction)) then
             exit;
 
-        ActionIn.Content.Add('requirePosUnitType', Format(POSAction."Requires POS Type", 0, 9));
+        ActionIn.Content().Add('requirePosUnitType', Format(POSAction."Requires POS Type", 0, 9));
     end;
 
     local procedure StoreDataSource(ActionIn: Interface "NPR IAction")
     begin
         if "Data Source Name" <> '' then
-            ActionIn.Content.Add('dataSource', "Data Source Name");
+            ActionIn.Content().Add('dataSource', "Data Source Name");
     end;
 
     procedure StoreButtonConfiguration(MenuButtonObj: Codeunit "NPR POS Menu Button")
@@ -575,11 +575,11 @@ table 6150701 "NPR POS Menu Button"
         if Tooltip <> '' then
             MenuButtonObj.SetTooltip(GetLocalizedCaption(FieldNo(Tooltip)));
         if "Background Image Url" <> '' then begin
-            MenuButtonObj.Content.Add('BackgroundImageUrl', "Background Image Url");
-            MenuButtonObj.Content.Add('CaptionPosition', "Caption Position");
+            MenuButtonObj.Content().Add('BackgroundImageUrl', "Background Image Url");
+            MenuButtonObj.Content().Add('CaptionPosition', "Caption Position");
         end;
         if "Secure Method Code" <> '' then
-            MenuButtonObj.Content.Add('SecureMethod', "Secure Method Code");
+            MenuButtonObj.Content().Add('SecureMethod', "Secure Method Code");
     end;
 
     procedure SetSortOrderAndBaseMenuFilter(MenuCode: Code[20])

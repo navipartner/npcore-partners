@@ -5,13 +5,13 @@
 
     trigger OnRun()
     begin
-        if not Step1_ChooseBusinessType then
+        if not Step1_ChooseBusinessType() then
             exit;
 
-        if not Step2_ChooseProducts then
+        if not Step2_ChooseProducts() then
             exit;
 
-        Step3_SelectWhichToCreate;
+        Step3_SelectWhichToCreate();
     end;
 
     var
@@ -62,35 +62,35 @@
                 case TMPProductChoiceSelectionBuffer.Code of
                     //Shoes
                     'FR_MEN':
-                        InsertShoe_FRMen;
+                        InsertShoe_FRMen();
                     'US_MEN':
-                        InsertShoe_USMen;
+                        InsertShoe_USMen();
                     'UK_MEN':
-                        InsertShoe_UKMen;
+                        InsertShoe_UKMen();
                     'IT_MEN':
-                        InsertShoe_ITMen;
+                        InsertShoe_ITMen();
                     'FR_WOMEN':
-                        InsertShoe_FRWomen;
+                        InsertShoe_FRWomen();
                     'US_WOMEN':
-                        InsertShoe_USWomen;
+                        InsertShoe_USWomen();
                     'UK_WOMEN':
-                        InsertShoe_UKWomen;
+                        InsertShoe_UKWomen();
                     'IT_WOMEN':
-                        InsertShoe_ITWomen;
+                        InsertShoe_ITWomen();
 
                     //Clothes
                     'SHIRT':
-                        InsertShirts;
+                        InsertShirts();
                     'PANTS2':
-                        InsertPants2;
+                        InsertPants2();
                     'PANTS3':
-                        InsertPants3;
+                        InsertPants3();
                     'T-SHIRT':
-                        InsertTShirts;
+                        InsertTShirts();
 
                     //Jewelry
                     'RINGS':
-                        InsertRings;
+                        InsertRings();
                 end;
             until TMPProductChoiceSelectionBuffer.Next() = 0;
         //EXIT(PAGE.RUNMODAL(PAGE::"Dimension Selection-Multiple", TMPProductChoiceSelectionBuffer) = ACTION::LookupOK);
@@ -166,7 +166,7 @@
             exit;
         VarietyTable.Init();
         VarietyTable.SetRange(Type, VrtType);
-        VarietyTable.SetupNewLine;
+        VarietyTable.SetupNewLine();
         VarietyTable.Type := VrtType;
         VarietyTable.Code := VrtTable;
         VarietyTable.Description := Desc;
@@ -185,7 +185,7 @@
         VarietyValue.Table := VrtTable;
         VarietyValue.Value := VrtValue;
         VarietyValue.Description := Desc;
-        VarietyValue.AssignSortOrder;
+        VarietyValue.AssignSortOrder();
         VarietyValue.Insert(false);
     end;
 

@@ -14,7 +14,7 @@ codeunit 6150818 "NPR POSAction: Set TaxAreaCode"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,

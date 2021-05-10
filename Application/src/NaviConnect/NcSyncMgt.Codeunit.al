@@ -77,7 +77,7 @@
         FTPResponse := FTPClient.DownloadFile(SourceUri + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -86,7 +86,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
 
@@ -146,7 +146,7 @@
         FTPResponse := SFTPClient.DownloadFile(RemotePath + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -155,7 +155,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
 
@@ -221,7 +221,7 @@
         if TaskSetup.FindSet() then
             repeat
                 if Task.Get(Task."Entry No.") then;
-                ClearLastError;
+                ClearLastError();
                 if not CODEUNIT.Run(TaskSetup."Codeunit ID", Task) then begin
                     TaskError(Task);
                     exit(false);
@@ -281,7 +281,7 @@
         if ErrorText <> '' then begin
             NaviConnectTask.Response.CreateOutStream(OutStream);
             OutStream.Write(ErrorText);
-            ClearLastError;
+            ClearLastError();
         end;
 
         NaviConnectTask.Modify(true);
@@ -360,7 +360,7 @@
         FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         FTPClient.Destruct();
 
@@ -375,7 +375,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('IsDirectory', JToken);
-                        if Jtoken.AsValue.AsBoolean() then begin
+                        if Jtoken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
                             DirectoryList.Add(JToken.AsValue().AsText());
                         end;
@@ -385,7 +385,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
     end;
@@ -414,7 +414,7 @@
         FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         FTPClient.Destruct();
 
@@ -429,7 +429,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('IsDirectory', JToken);
-                        if not Jtoken.AsValue.AsBoolean() then begin
+                        if not Jtoken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
                             ListDirectoryDetails.Add(JToken.AsValue().AsText());
                         end;
@@ -439,7 +439,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
     end;
@@ -466,7 +466,7 @@
         FTPResponse := SFTPClient.ListDirectory(RemotePath);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         SFTPClient.Destruct();
 
@@ -481,7 +481,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('IsDirectory', JToken);
-                        if not Jtoken.AsValue.AsBoolean() then begin
+                        if not Jtoken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
                             ListDirectory.Add(JToken.AsValue().AsText());
                         end;
@@ -491,7 +491,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
     end;
@@ -557,7 +557,7 @@
         FTPResponse := FTPClient.ListDirectory(FtpUrl);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         SFTPClient.Destruct();
 
@@ -572,7 +572,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('IsDirectory', JToken);
-                        if Jtoken.AsValue.AsBoolean() then begin
+                        if Jtoken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
                             if JToken.AsValue().AsText() = FolderName then
                                 FolderExist := true;
@@ -583,7 +583,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
 
@@ -600,7 +600,7 @@
         FTPResponse := FTPClient.DeleteFile(FtpUrl);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         exit(ResponseCodeText = '200');
     end;
@@ -635,7 +635,7 @@
         FTPClient.CreateDirectory(FtpUrl);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         exit(ResponseCodeText = '200');
     end;
@@ -650,7 +650,7 @@
         FTPResponse := FTPClient.RenameFile(FtpUrl, RenameTo);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         exit(ResponseCodeText = '200');
     end;

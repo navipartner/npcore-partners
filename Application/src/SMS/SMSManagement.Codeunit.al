@@ -80,7 +80,7 @@
         if Sender = '' then
             Sender := Template."Alt. Sender";
         if Sender = '' then
-            Sender := GetDefaultSender;
+            Sender := GetDefaultSender();
         if Template."Table No." <> 0 then
             if IsRecRefEmpty(RecRef) then
                 if not Confirm(NoRecordSelectedTxt) then
@@ -129,7 +129,7 @@
 
         Sender := SMSTemplateHeader."Alt. Sender";
         if Sender = '' then
-            Sender := GetDefaultSender;
+            Sender := GetDefaultSender();
 
         SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
         SMSSendMessage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", '', DummyRecRef, Sender, 2, StrSubstNo(BatchSendStatusText, SMSTemplateHeader."Table Caption", Total), false);
@@ -177,7 +177,7 @@
         if SelectTemplate(RecRef, SMSTemplateHeader) then begin
             Sender := SMSTemplateHeader."Alt. Sender";
             if Sender = '' then
-                Sender := GetDefaultSender;
+                Sender := GetDefaultSender();
             SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
 
             DialogPage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo, RecRef, Sender, 1, '', true);
@@ -256,7 +256,7 @@
         RecRef.Open(SMSTemplateHeader."Table No.");
 
         if Filters = '' then
-            exit(RecRef.FindSet);
+            exit(RecRef.FindSet());
 
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
@@ -581,7 +581,7 @@
         TextLine := ResultText;
         ResultText := '';
         repeat
-            DotNetRegEx.Regex(StrSubstNo(AFReportLinkTag, '.*?'));
+            DotNetRegEx.Regex(StrSubstNo(AFReportLinkTag(), '.*?'));
             DotNetRegEx.Match(TextLine, DotNetMatch);
             if DotNetMatch.Success() then begin
                 ResultText += CopyStr(TextLine, 1, DotNetMatch.Index());
@@ -607,7 +607,7 @@
             exit(FieldNoText);
         FldRef := RecRef.Field(FieldNumber);
         if UpperCase(Format(FldRef.Class)) = 'FLOWFIELD' then
-            FldRef.CalcField;
+            FldRef.CalcField();
 
         if UpperCase(Format(Format(FldRef.Type))) = 'OPTION' then begin
             OptionString := Format(FldRef.OptionCaption);
@@ -709,7 +709,7 @@
 
         Sender := SMSTemplateHeader."Alt. Sender";
         if Sender = '' then
-            Sender := GetDefaultSender;
+            Sender := GetDefaultSender();
 
         SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
 
@@ -792,7 +792,7 @@
     begin
         if ReportId = 0 then
             exit('');
-        exit(AFReportLinkTag);
+        exit(AFReportLinkTag());
     end;
 
     local procedure AFReportLinkTag(): Text

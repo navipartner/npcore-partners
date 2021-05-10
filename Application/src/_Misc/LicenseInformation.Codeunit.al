@@ -43,12 +43,12 @@ codeunit 6014402 "NPR License Information"
 
     procedure PaymentManagementLicensed(): Boolean
     begin
-        exit(InLicenseFile(Object.Type::Table, GranulePaymentManagement))
+        exit(InLicenseFile(Object.Type::Table, GranulePaymentManagement()))
     end;
 
     procedure DocumentCaptureLicensed(): Boolean
     begin
-        exit(InLicenseFile(Object.Type::Table, GranuleDocumentCapture))
+        exit(InLicenseFile(Object.Type::Table, GranuleDocumentCapture()))
     end;
 
     procedure GranulePaymentManagement(): Integer

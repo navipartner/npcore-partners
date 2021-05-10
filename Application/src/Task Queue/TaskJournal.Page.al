@@ -30,7 +30,7 @@ page 6059902 "NPR Task Journal"
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
-                    CurrPage.SaveRecord;
+                    CurrPage.SaveRecord();
                     JobJnlManagement.LookupName(CurrentJnlBatchName, Rec);
                     CurrPage.Update(false);
                 end;
@@ -38,7 +38,7 @@ page 6059902 "NPR Task Journal"
                 trigger OnValidate()
                 begin
                     JobJnlManagement.CheckName(CurrentJnlBatchName, Rec);
-                    CurrentJnlBatchNameOnAfterVali;
+                    CurrentJnlBatchNameOnAfterVali();
                 end;
             }
             repeater(Control1)
@@ -226,8 +226,8 @@ page 6059902 "NPR Task Journal"
 
                     trigger OnAction()
                     begin
-                        CurrPage.SaveRecord;
-                        Rec.DecreaseIndentation;
+                        CurrPage.SaveRecord();
+                        Rec.DecreaseIndentation();
                         CurrPage.Update(true);
                     end;
                 }
@@ -244,8 +244,8 @@ page 6059902 "NPR Task Journal"
 
                     trigger OnAction()
                     begin
-                        CurrPage.SaveRecord;
-                        Rec.IncreaseIndentation;
+                        CurrPage.SaveRecord();
+                        Rec.IncreaseIndentation();
                         CurrPage.Update(true);
                     end;
                 }
@@ -282,11 +282,11 @@ page 6059902 "NPR Task Journal"
 
     trigger OnAfterGetRecord()
     begin
-        NextExecutionTime := Rec.LookupNextRunTime;
+        NextExecutionTime := Rec.LookupNextRunTime();
         NameIndent := Rec.Indentation;
 
         //-TQ1.31 [302644]
-        GetLastLogInfo;
+        GetLastLogInfo();
         //+TQ1.31 [302644]
     end;
 

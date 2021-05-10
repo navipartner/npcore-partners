@@ -63,7 +63,7 @@ page 6060157 "NPR Event Word Layouts"
 
                 trigger OnAction()
                 begin
-                    Rec.CopyRecord;
+                    Rec.CopyRecord();
                 end;
             }
         }
@@ -129,7 +129,7 @@ page 6060157 "NPR Event Word Layouts"
 
                 trigger OnAction()
                 begin
-                    Rec.PreviewReport;
+                    Rec.PreviewReport();
                 end;
             }
             action(RequestPage)

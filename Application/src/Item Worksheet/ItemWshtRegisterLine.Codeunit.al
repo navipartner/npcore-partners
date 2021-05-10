@@ -31,13 +31,13 @@
     procedure RunWithCheck(var ItemWkshLine2: Record "NPR Item Worksheet Line")
     begin
         ItemWkshLine.Copy(ItemWkshLine2);
-        Code;
+        Code();
         ItemWkshLine2 := ItemWkshLine;
     end;
 
     local procedure "Code"()
     begin
-        if ItemWkshLine.EmptyLine then
+        if ItemWkshLine.EmptyLine() then
             exit;
 
         if ItemWkshLine.Status = ItemWkshLine.Status::Validated then begin
@@ -63,7 +63,7 @@
                             Item.Insert(true);
                         end else begin
                             Item.Init();
-                            NewItemNo := ItemWkshLine.GetNewItemNo;
+                            NewItemNo := ItemWkshLine.GetNewItemNo();
                             if NewItemNo = '' then
                                 NoSeriesMgt.InitSeries(ItemWkshLine."No. Series", '', 0D, NewItemNo, ItemWkshLine."No. Series");
                             Item."No." := NewItemNo;
@@ -72,17 +72,17 @@
                             Item.Insert(true);
                             ItemWkshLine."Item No." := NewItemNo;
                         end;
-                        CreateItem;
+                        CreateItem();
                     end;
                 ItemWkshLine.Action::UpdateOnly:
                     begin
                         ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
-                        UpdateItem;
+                        UpdateItem();
                     end;
                 ItemWkshLine.Action::UpdateAndCreateVariants:
                     begin
                         ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
-                        UpdateItem;
+                        UpdateItem();
                     end;
             end;
 
@@ -237,14 +237,14 @@
         Item.Modify(true);
         ValidateFields(Item, ItemWkshLine, true, false);
 
-        ItemWkshLine.UpdateBarcode;
-        ProcessLineSalesPrices;
-        ProcessLinePurchasePrices;
+        ItemWkshLine.UpdateBarcode();
+        ProcessLineSalesPrices();
+        ProcessLinePurchasePrices();
         UpdateAndCopyVarieties(ItemWkshLine, 1, ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshLine."Create Copy of Variety 1 Table", false);
         UpdateAndCopyVarieties(ItemWkshLine, 2, ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshLine."Create Copy of Variety 2 Table", false);
         UpdateAndCopyVarieties(ItemWkshLine, 3, ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshLine."Create Copy of Variety 3 Table", false);
         UpdateAndCopyVarieties(ItemWkshLine, 4, ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshLine."Create Copy of Variety 4 Table", false);
-        UpdateItemAttributes;
+        UpdateItemAttributes();
     end;
 
     local procedure UpdateAndCopyVarieties(var ItemworkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[10]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; CreateCopy: Boolean; CopyValues: Boolean)
@@ -271,19 +271,19 @@
                     1:
                         if (VarietyGroup."Copy Naming Variety 1" = VarietyGroup."Copy Naming Variety 1"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                     2:
                         if (VarietyGroup."Copy Naming Variety 2" = VarietyGroup."Copy Naming Variety 2"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                     3:
                         if (VarietyGroup."Copy Naming Variety 3" = VarietyGroup."Copy Naming Variety 3"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                     4:
                         if (VarietyGroup."Copy Naming Variety 4" = VarietyGroup."Copy Naming Variety 4"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                 end;
                 if StrPos(VarietyTableFrom, '-') > 0 then
                     PrefixCode := CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1)
@@ -366,19 +366,19 @@
                     1:
                         if (VarietyGroup."Copy Naming Variety 1" = VarietyGroup."Copy Naming Variety 1"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                     2:
                         if (VarietyGroup."Copy Naming Variety 2" = VarietyGroup."Copy Naming Variety 2"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                     3:
                         if (VarietyGroup."Copy Naming Variety 3" = VarietyGroup."Copy Naming Variety 3"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                     4:
                         if (VarietyGroup."Copy Naming Variety 4" = VarietyGroup."Copy Naming Variety 4"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
-                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate, SuffixCode, VarietyGroup."No. Series");
+                            NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                 end;
                 if StrPos(VarietyTableFrom, '-') > 0 then
                     PrefixCode := CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1)
@@ -542,7 +542,7 @@
 
     local procedure CopyToRegisteredWorksheetLine()
     begin
-        RegisteredWorksheetLine."Registered Worksheet No." := LastRegisteredWorksheetNo;
+        RegisteredWorksheetLine."Registered Worksheet No." := LastRegisteredWorksheetNo();
         RegisteredWorksheetLine."Line No." := ItemWkshLine."Line No.";
         RegisteredWorksheetLine.Action := ItemWkshLine.Action;
         RegisteredWorksheetLine."Existing Item No." := ItemWkshLine."Existing Item No.";
@@ -719,7 +719,7 @@
 
     local procedure CopyToRegisteredWorksheetVariantLine()
     begin
-        RegisteredWorksheetVariantLine."Registered Worksheet No." := LastRegisteredWorksheetNo;
+        RegisteredWorksheetVariantLine."Registered Worksheet No." := LastRegisteredWorksheetNo();
         RegisteredWorksheetVariantLine."Registered Worksheet Line No." := ItemWkshLine."Line No.";
         RegisteredWorksheetVariantLine."Line No." := ItemWkshVariantLine."Line No.";
         RegisteredWorksheetVariantLine.Level := ItemWkshVariantLine.Level;
@@ -744,7 +744,7 @@
 
     local procedure CopyToRegisteredWorksheetVarietyValueLine()
     begin
-        RegisteredWorksheetVarietyValue."Registered Worksheet No." := LastRegisteredWorksheetNo;
+        RegisteredWorksheetVarietyValue."Registered Worksheet No." := LastRegisteredWorksheetNo();
         RegisteredWorksheetVarietyValue."Registered Worksheet Line No." := ItemWorksheetVarietyValue."Worksheet Line No.";
         RegisteredWorksheetVarietyValue.Type := ItemWorksheetVarietyValue.Type;
         RegisteredWorksheetVarietyValue.Table := ItemWorksheetVarietyValue.Table;
@@ -1333,7 +1333,7 @@
         ItemWorksheetFieldMapping.SetRange("Field Number", ItemWorksheetFieldSetup."Field Number");
         if ItemWorksheetFieldMapping.FindSet() then
             repeat
-                RecRef := SourceFldRef.Record;
+                RecRef := SourceFldRef.Record();
                 RecRef.SetRecFilter();
                 //Exact
                 case ItemWorksheetFieldMapping.Matching of

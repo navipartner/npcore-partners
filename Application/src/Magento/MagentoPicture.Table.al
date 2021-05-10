@@ -222,7 +222,7 @@ table 6151411 "NPR Magento Picture"
         if "Size (kb)" <= 0 then
             exit;
 
-        if (not MagentoSetup.Get) or (MagentoSetup."Max. Picture Size" <= 0) then
+        if (not MagentoSetup.Get()) or (MagentoSetup."Max. Picture Size" <= 0) then
             MagentoSetup."Max. Picture Size" := 512;
 
         if "Size (kb)" > MagentoSetup."Max. Picture Size" then

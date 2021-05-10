@@ -46,13 +46,13 @@ codeunit 6014487 "NPR Report Usage Mgt."
         EntryNo := 1;
         if ReportUsageLogEntry.FindLast() then
             EntryNo := ReportUsageLogEntry."Entry No." + 1;
-        ActiveSession.SetRange("Server Instance ID", ServiceInstanceId);
-        ActiveSession.SetRange("Session ID", SessionId);
+        ActiveSession.SetRange("Server Instance ID", ServiceInstanceId());
+        ActiveSession.SetRange("Session ID", SessionId());
         ActiveSession.FindFirst();
         ReportUsageLogEntry.Init();
         ReportUsageLogEntry."Entry No." := EntryNo;
         ReportUsageLogEntry."Database Name" := ActiveSession."Database Name";
-        ReportUsageLogEntry."Tenant Id" := TenantId;
+        ReportUsageLogEntry."Tenant Id" := TenantId();
         ReportUsageLogEntry."Company Name" := CompanyName;
         ReportUsageLogEntry."Report Id" := ReportID;
         case true of

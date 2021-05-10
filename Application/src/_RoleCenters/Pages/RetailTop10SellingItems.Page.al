@@ -25,7 +25,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
                 field(Enddate; Enddate)
@@ -36,7 +36,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
             }
@@ -168,8 +168,8 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
     local procedure UpdateList()
     begin
-        Setdate;
-        ExecuteQuery;
+        Setdate();
+        ExecuteQuery();
     end;
 
     local procedure ExecuteQuery()

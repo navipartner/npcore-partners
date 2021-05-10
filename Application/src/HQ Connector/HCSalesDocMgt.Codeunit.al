@@ -506,7 +506,7 @@
             CurrentEntryStatus := CurrentEntryStatus::Prospect;
 
         ReservationEntry := TempReservationEntry;
-        ReservationEntry.SetPointerFilter;
+        ReservationEntry.SetPointerFilter();
         ReservationEntry.SetTrackingFilterFromReservEntry(ReservationEntry);
         if not ReservationEntry.FindFirst() then
             CreateReservationEntry(TempReservationEntry, CurrentEntryStatus)

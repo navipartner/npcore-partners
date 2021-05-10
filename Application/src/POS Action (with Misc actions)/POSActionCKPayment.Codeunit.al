@@ -65,7 +65,7 @@
             exit;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type = CurrentView.Type::Sale) then
+        if (CurrentView.Type() = CurrentView.Type()::Sale) then
             POSSession.ChangeViewPayment();
 
         POSSession.GetSetup(Setup);
@@ -353,7 +353,7 @@
         EntryNo := TmpVariant;
 
         if (not CashKeeperTransaction.Get(EntryNo)) then
-            Error(RequestNotFound, ActionCode, TmpVariant, CashKeeperTransaction.TableCaption);
+            Error(RequestNotFound, ActionCode(), TmpVariant, CashKeeperTransaction.TableCaption);
     end;
     #endregion
 

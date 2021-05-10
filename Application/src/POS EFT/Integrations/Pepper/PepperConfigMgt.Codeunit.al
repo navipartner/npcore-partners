@@ -12,7 +12,7 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
         TextWhole := '';
         TempFile.TextMode(true);
         TempFile.WriteMode(false);
-        TempFile.CreateTempFile;
+        TempFile.CreateTempFile();
         TempFile.CreateOutStream(StreamOut);
         case TextType of
             TextType::License:

@@ -827,7 +827,7 @@
     begin
         if not Confirm(Text009, false, ItemRef.TableCaption) then
             exit;
-        GetVRTSetup;
+        GetVRTSetup();
 
         NoOfRecords := ItemRef.Count();
 

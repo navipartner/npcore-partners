@@ -30,7 +30,7 @@ codeunit 6059811 "NPR Retail Chart Mgt."
         Setdate(StartDate, Enddate, Period, PeriodType, BusChartBuf);
         BusChartBuf.InitializePeriodFilter(StartDate, Enddate);
 
-        BusChartBuf.Initialize;
+        BusChartBuf.Initialize();
         //-NC1.17
         //AddMeasure('Revenue',2 ,"Data Type"::Decimal,"Chart Type"::Column);
         //AddMeasure('Turnover',1 ,"Data Type"::Decimal,"Chart Type"::Column);
@@ -39,7 +39,7 @@ codeunit 6059811 "NPR Retail Chart Mgt."
         //+NC1.17
 
         BusChartBuf."Period Length" := PeriodType;
-        BusChartBuf.SetPeriodXAxis;
+        BusChartBuf.SetPeriodXAxis();
         BusChartBuf.AddPeriods(StartDate, Enddate);
         TotNoOfPeriod := BusChartBuf.CalcNumberOfPeriods(StartDate, Enddate);
 
@@ -47,7 +47,7 @@ codeunit 6059811 "NPR Retail Chart Mgt."
             BusChartBuf.GetPeriodFromMapColumn(I - 1, StartDate, Enddate);
             Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
             Query1.Open();
-            Query1.Read;
+            Query1.Read();
             //+NC1.17
             //BusChartBuf.SetValue('Revenue',I-1,Query1.Sum_Profit_LCY);
             //BusChartBuf.SetValue('Turnover',I-1,Query1.Sum_Sales_LCY);

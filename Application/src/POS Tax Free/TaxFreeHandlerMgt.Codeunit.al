@@ -498,7 +498,7 @@
         if POSSession.IsActiveSession(POSFrontEndManagement) then begin //If the request is being created while logged into POS
             POSFrontEndManagement.GetSession(POSSession);
             POSSession.GetSetup(POSSetup);
-            Request."Salesperson Code" := POSSetup.Salesperson;
+            Request."Salesperson Code" := POSSetup.Salesperson();
         end;
     end;
 

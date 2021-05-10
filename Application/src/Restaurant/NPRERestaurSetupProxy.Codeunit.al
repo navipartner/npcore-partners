@@ -57,7 +57,7 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
 
     procedure InitializeDefault()
     begin
-        ClearAll;
+        ClearAll();
     end;
 
     local procedure InitializeSetup()
@@ -98,7 +98,7 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
     local procedure MakeSureIsInitialized()
     begin
         if not Initialized then
-            InitializeSetup;
+            InitializeSetup();
     end;
 
     local procedure GetNPRESetup()
@@ -112,37 +112,37 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
 
     procedure AutoSendKitchenOrder(): Integer
     begin
-        MakeSureIsInitialized;
+        MakeSureIsInitialized();
         exit(SeatingLocation."Auto Send Kitchen Order");
     end;
 
     procedure ResendAllOnNewLines(): Integer
     begin
-        MakeSureIsInitialized;
+        MakeSureIsInitialized();
         exit(SeatingLocation."Resend All On New Lines");
     end;
 
     procedure KitchenPrintingActivated(): Boolean
     begin
-        MakeSureIsInitialized;
+        MakeSureIsInitialized();
         exit(Restaurant."Kitchen Printing Active" = Restaurant."Kitchen Printing Active"::Yes);
     end;
 
     procedure KDSActivated(): Boolean
     begin
-        MakeSureIsInitialized;
+        MakeSureIsInitialized();
         exit(Restaurant."KDS Active" = Restaurant."KDS Active"::Yes);
     end;
 
     procedure OrderIDAssignmentMethod(): Integer
     begin
-        MakeSureIsInitialized;
+        MakeSureIsInitialized();
         exit(Restaurant."Order ID Assign. Method");
     end;
 
     procedure GetServiceFlowProfile(var ServiceFlowProfileOut: Record "NPR NPRE Serv.Flow Profile")
     begin
-        MakeSureIsInitialized;
+        MakeSureIsInitialized();
         if not ServiceFlowProfileOut.Get(Restaurant."Service Flow Profile") then
             Clear(ServiceFlowProfileOut);
     end;

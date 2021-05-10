@@ -52,7 +52,7 @@ page 6059949 "NPR NaviDocs Entry Attachments"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowOutput;
+                    Rec.ShowOutput();
                 end;
             }
         }

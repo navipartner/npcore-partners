@@ -33,12 +33,12 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
         WorkflowResponseHandling: Codeunit "Workflow Response Handling";
     begin
         case ResponseFunctionName of
-            SetItemStatusCode:
+            SetItemStatusCode():
                 WorkflowResponseHandling.AddResponsePredecessor(
-                    SetItemStatusCode, WorkflowEventHandling.RunWorkflowOnItemChangedCode);
-            SetItemFieldCode:
+                    SetItemStatusCode(), WorkflowEventHandling.RunWorkflowOnItemChangedCode());
+            SetItemFieldCode():
                 WorkflowResponseHandling.AddResponsePredecessor(
-                    SetItemStatusCode, WorkflowEventHandling.RunWorkflowOnItemChangedCode);
+                    SetItemStatusCode(), WorkflowEventHandling.RunWorkflowOnItemChangedCode());
         end;
     end;
 
@@ -47,8 +47,8 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
     var
         WorkflowResponseHandling: Codeunit "Workflow Response Handling";
     begin
-        WorkflowResponseHandling.AddResponseToLibrary(SetItemStatusCode, DATABASE::Item, 'TEST2 Set the status of an item.', 'GROUP 7');
-        WorkflowResponseHandling.AddResponseToLibrary(SetItemFieldCode, DATABASE::Item, 'TEST2 Set a field on the item.', 'GROUP 7');
+        WorkflowResponseHandling.AddResponseToLibrary(SetItemStatusCode(), DATABASE::Item, 'TEST2 Set the status of an item.', 'GROUP 7');
+        WorkflowResponseHandling.AddResponseToLibrary(SetItemFieldCode(), DATABASE::Item, 'TEST2 Set a field on the item.', 'GROUP 7');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Workflow Response Handling", 'OnExecuteWorkflowResponse', '', true, true)]
@@ -58,7 +58,7 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
     begin
         if WorkflowResponse.Get(ResponseWorkflowStepInstance."Function Name") then
             case WorkflowResponse."Function Name" of
-                SetItemFieldCode:
+                SetItemFieldCode():
                     begin
                         SetItemField(Variant, ResponseWorkflowStepInstance);
                         ResponseExecuted := true;
@@ -73,7 +73,7 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
     begin
         if WorkflowResponse.Get(ResponseWorkflowStepInstance."Function Name") then
             case WorkflowResponse."Function Name" of
-                SetItemStatusCode:
+                SetItemStatusCode():
                     begin
                         SetItemStatus(Variant, ResponseWorkflowStepInstance);
                         ResponseExecuted := true;

@@ -4,7 +4,7 @@ page 6151492 "NPR Raptor Data Buffer Entries"
 
     UsageCategory = None;
     Caption = 'Raptor Data Entries';
-    DataCaptionExpression = GetDataCaptionExpr;
+    DataCaptionExpression = GetDataCaptionExpr();
     Editable = false;
     LinksAllowed = false;
     PageType = List;

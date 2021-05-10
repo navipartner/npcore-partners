@@ -37,7 +37,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
             begin
                 if "Default for Print" then
                     TestDefaultProfiles();
-                SetDefaults;
+                SetDefaults();
             end;
         }
         field(110; "Default for E-Mail"; Boolean)
@@ -49,7 +49,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
             begin
                 if "Default for E-Mail" then
                     TestDefaultProfiles();
-                SetDefaults;
+                SetDefaults();
             end;
         }
         field(120; "Default Electronic Document"; Boolean)
@@ -61,7 +61,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
             begin
                 if "Default Electronic Document" then
                     TestDefaultProfiles();
-                SetDefaults;
+                SetDefaults();
             end;
         }
     }
@@ -77,7 +77,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
 
     trigger OnInsert()
     begin
-        SetDefaults;
+        SetDefaults();
     end;
 
     var
@@ -114,11 +114,11 @@ table 6059770 "NPR NaviDocs Handling Profile"
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
     begin
-        if (Code = NaviDocsManagement.HandlingTypePrintCode) and ("Default for E-Mail" or "Default Electronic Document") then
+        if (Code = NaviDocsManagement.HandlingTypePrintCode()) and ("Default for E-Mail" or "Default Electronic Document") then
             Message(DefaultProfileWarning, Code, PrintTxt);
-        if (Code = NaviDocsManagement.HandlingTypeMailCode) and ("Default for Print" or "Default Electronic Document") then
+        if (Code = NaviDocsManagement.HandlingTypeMailCode()) and ("Default for Print" or "Default Electronic Document") then
             Message(DefaultProfileWarning, Code, EmailTxt);
-        if (Code = NaviDocsManagement.HandlingTypeElecDocCode) and ("Default for E-Mail" or "Default for Print") then
+        if (Code = NaviDocsManagement.HandlingTypeElecDocCode()) and ("Default for E-Mail" or "Default for Print") then
             Message(DefaultProfileWarning, Code, ElectronicDocumentTxt);
     end;
 }

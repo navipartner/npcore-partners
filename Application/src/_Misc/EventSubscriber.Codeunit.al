@@ -46,7 +46,7 @@ codeunit 6014404 "NPR Event Subscriber"
             if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
                 ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then
                 if SalesShptHeader.Get(SalesShptHdrNo) then begin
-                    if (PacsoftSetup.Get) and (PacsoftSetup."Create Pacsoft Document") then begin
+                    if (PacsoftSetup.Get()) and (PacsoftSetup."Create Pacsoft Document") then begin
                         RecRefShipment.GetTable(SalesShptHeader);
                         ShipmentDocument.AddEntry(RecRefShipment, false);
                     end;

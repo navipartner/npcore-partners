@@ -17,7 +17,7 @@ codeunit 6150727 "NPR POS Action - Hyperlink"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           ActionDescription,
           ActionVersion(),
           Sender.Type::Generic,
@@ -110,7 +110,7 @@ codeunit 6150727 "NPR POS Action - Hyperlink"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        if JSON.GetBooleanParameterOrFail('back-end', ActionCode) then
+        if JSON.GetBooleanParameterOrFail('back-end', ActionCode()) then
             HyperLink(JSON.GetStringParameterOrFail('url', ActionCode()));
     end;
 }

@@ -41,12 +41,12 @@ page 6151530 "NPR Nc Collec. Filters"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        SetTableNo;
+        SetTableNo();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetTableNo;
+        SetTableNo();
     end;
 
     local procedure SetTableNo()

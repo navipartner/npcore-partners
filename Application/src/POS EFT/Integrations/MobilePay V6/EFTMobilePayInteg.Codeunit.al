@@ -258,13 +258,13 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
-        ClearAll;
+        ClearAll();
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
         if InvokeRegisterPoS(PoSID) then begin
-            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS ID', PoSID);
-            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Registered', true);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS ID', PoSID);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Registered', true);
             PoSRegistered := true;
             Message(Text6014517, EFTSetup."POS Unit No.", PoSID);
         end else
@@ -273,7 +273,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure UpdateRegisteredPoSName(EFTSetupIn: Record "NPR EFT Setup")
     begin
-        ClearAll;
+        ClearAll();
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
@@ -290,7 +290,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
-        ClearAll;
+        ClearAll();
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
@@ -298,7 +298,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
 
         if InvokeUnRegisterPoS() then begin
-            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Registered', false);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Registered', false);
             PoSRegistered := false;
             Message(Text6014519, EFTSetup."POS Unit No.");
         end else
@@ -309,7 +309,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
-        ClearAll;
+        ClearAll();
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
@@ -321,8 +321,8 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
 
         if InvokeAssignPoSUnitIdToPoS(PoSUnitID) then begin
-            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Unit ID', PoSUnitID);
-            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType, EFTSetup."POS Unit No.", 'PoS Unit Assigned', true);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit ID', PoSUnitID);
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit Assigned', true);
             PoSUnitAssigned := true;
             Message(Text6014521, PoSUnitID, EFTSetup."POS Unit No.");
         end else
@@ -333,7 +333,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
-        ClearAll;
+        ClearAll();
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
@@ -357,7 +357,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         RegisteredPoSUnitId: Text;
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
-        ClearAll;
+        ClearAll();
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
@@ -383,7 +383,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
         Found: Boolean;
     begin
-        ClearAll;
+        ClearAll();
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
@@ -717,18 +717,18 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         HttpWebRequest.Headers.Add('Authorization', AuthHeader);
         HttpWebRequest.Method('POST');
 
-        ReqStream := HttpWebRequest.GetRequestStream;
+        ReqStream := HttpWebRequest.GetRequestStream();
         ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
         ReqStreamWriter.Write(JSONRequestBody);
-        ReqStreamWriter.Flush;
+        ReqStreamWriter.Flush();
         ReqStreamWriter.Close();
         Clear(ReqStreamWriter);
         Clear(ReqStream);
 
-        HttpWebResponse := HttpWebRequest.GetResponse;
-        ResponseStream := HttpWebResponse.GetResponseStream;
+        HttpWebResponse := HttpWebRequest.GetResponse();
+        ResponseStream := HttpWebResponse.GetResponseStream();
         ResponseStreamReader := ResponseStreamReader.StreamReader(ResponseStream);
-        JSONResponseText := ResponseStreamReader.ReadToEnd;
+        JSONResponseText := ResponseStreamReader.ReadToEnd();
     end;
 
     local procedure "// Aux"()

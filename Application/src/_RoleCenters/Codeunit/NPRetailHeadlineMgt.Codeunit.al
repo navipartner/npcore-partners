@@ -3,7 +3,7 @@
 
     trigger OnRun()
     begin
-        DrillDownSalesThisMonthLastYear;
+        DrillDownSalesThisMonthLastYear();
     end;
 
     var
@@ -55,11 +55,11 @@
         if Payload = '' then
             exit(false); // payload should not be empty
 
-        if StrLen(Qualifier) > GetMaxQualifierLength then
+        if StrLen(Qualifier) > GetMaxQualifierLength() then
             exit(false); // qualifier is too long to be a qualifier
 
         PayloadWithoutEmphasize := RegExMgt.Replace(Payload, '<emphasize>|</emphasize>', '');
-        if StrLen(PayloadWithoutEmphasize) > GetMaxPayloadLength then
+        if StrLen(PayloadWithoutEmphasize) > GetMaxPayloadLength() then
             exit(false); // payload is too long for being a headline
 
         ResultText := CopyStr(GetQualifierText(Qualifier) + GetPayloadText(Payload), 1, MaxStrLen(ResultText));
@@ -82,8 +82,8 @@
     var
         User: Record User;
     begin
-        if User.Get(UserSecurityId) then;
-        GetUserGreetingTextInternal(User."Full Name", GetTimeOfDay, GreetingText);
+        if User.Get(UserSecurityId()) then;
+        GetUserGreetingTextInternal(User."Full Name", GetTimeOfDay(), GreetingText);
     end;
 
     procedure GetUserGreetingTextInternal(UserName: Text[80]; CurrentTimeOfDay: Option; var GreetingText: Text[250])
@@ -135,7 +135,7 @@
         if not TypeHelper.GetUserTimezoneOffset(TimezoneOffset) then
             TimezoneOffset := 0;
 
-        Evaluate(Hour, TypeHelper.FormatUtcDateTime(TypeHelper.GetCurrUTCDateTime, 'HH', ''));
+        Evaluate(Hour, TypeHelper.FormatUtcDateTime(TypeHelper.GetCurrUTCDateTime(), 'HH', ''));
         Hour += TimezoneOffset div (60 * 60 * 1000);
 
         case Hour of
@@ -177,7 +177,7 @@
         DummyRecordId: RecordID;
     begin
         OnBeforeScheduleTask(CodeunitId);
-        if not TASKSCHEDULER.CanCreateTask then
+        if not TASKSCHEDULER.CanCreateTask() then
             exit;
         if not JobQueueEntry.WritePermission then
             exit;
@@ -199,13 +199,13 @@
     [EventSubscriber(ObjectType::Page, Page::"My Settings", 'OnBeforeLanguageChange', '', true, true)]
     local procedure OnBeforeUpdateLanguage(OldLanguageId: Integer; NewLanguageId: Integer)
     begin
-        OnInvalidateHeadlines;
+        OnInvalidateHeadlines();
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"My Settings", 'OnBeforeWorkdateChange', '', true, true)]
     local procedure OnBeforeUpdateWorkdate(OldWorkdate: Date; NewWorkdate: Date)
     begin
-        OnInvalidateHeadlines;
+        OnInvalidateHeadlines();
     end;
 
     [IntegrationEvent(false, false)]

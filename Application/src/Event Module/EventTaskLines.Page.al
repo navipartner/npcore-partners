@@ -172,13 +172,13 @@ page 6151589 "NPR Event Task Lines"
                         PAGE.Run(PAGE::"NPR Event Planning Lines", JobPlanningLine, JobPlanningLine."Remaining Line Amount (LCY)");
                     end;
                 }
-                field("EAC (Total Cost)"; Rec.CalcEACTotalCost)
+                field("EAC (Total Cost)"; Rec.CalcEACTotalCost())
                 {
                     ApplicationArea = All;
                     Caption = 'EAC (Total Cost)';
                     ToolTip = 'Specifies the value of the EAC (Total Cost) field';
                 }
-                field("EAC (Total Price)"; Rec.CalcEACTotalPrice)
+                field("EAC (Total Price)"; Rec.CalcEACTotalPrice())
                 {
                     ApplicationArea = All;
                     Caption = 'EAC (Total Price)';
@@ -432,7 +432,7 @@ page 6151589 "NPR Event Task Lines"
                         Rec.TestField("Job No.");
                         Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
-                            Job.TestBlocked;
+                            Job.TestBlocked();
 
                         JobTask.SetRange("Job No.", Job."No.");
                         if Rec."Job Task No." <> '' then
@@ -465,7 +465,7 @@ page 6151589 "NPR Event Task Lines"
                         Rec.TestField("Job No.");
                         Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
-                            Job.TestBlocked;
+                            Job.TestBlocked();
 
                         Rec.TestField("Job Task No.");
                         JobTask.SetRange("Job No.", Job."No.");
@@ -490,7 +490,7 @@ page 6151589 "NPR Event Task Lines"
                         Rec.TestField("Job No.");
                         Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
-                            Job.TestBlocked;
+                            Job.TestBlocked();
 
                         JobTask.SetRange("Job No.", Job."No.");
                         if Rec."Job Task No." <> '' then
@@ -606,7 +606,7 @@ page 6151589 "NPR Event Task Lines"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Rec.ClearTempDim;
+        Rec.ClearTempDim();
     end;
 
     var

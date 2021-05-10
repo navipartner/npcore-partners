@@ -361,13 +361,13 @@
         MemberCommunity: Record "NPR MM Member Community";
     begin
 
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
 
         // disable this extension unless member community is setup with loyalty
         MemberCommunity.SetFilter("Activate Loyalty Program", '=%1', true);
         if (not MemberCommunity.IsEmpty()) then
-            Extensions.Add(ThisExtension);
+            Extensions.Add(ThisExtension());
 
     end;
 
@@ -376,7 +376,7 @@
     var
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         DataSource.AddColumn('RemainingPoints', 'Remaining Points', DataType::String, false);
@@ -401,7 +401,7 @@
         RedeemablePoints: Text;
     begin
 
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         RemainingPoints := ' -- ';

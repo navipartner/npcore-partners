@@ -193,7 +193,7 @@ page 6151510 "NPR Nc Task Output List"
 
         Data.CreateInStream(InStr, TEXTENCODING::UTF8);
         Path := TemporaryPath + Rec.Name;
-        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.' + FileMgt.GetExtension(Rec.Name), Path);
+        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(Rec.Name), Path);
         HyperLink(Path);
     end;
 

@@ -115,6 +115,6 @@ page 6150664 "NPR NPRE Seating List"
 
     trigger OnAfterGetRecord()
     begin
-        Rec.UpdateCurrentWaiterPadDescription;
+        Rec.UpdateCurrentWaiterPadDescription();
     end;
 }

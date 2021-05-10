@@ -567,7 +567,7 @@ codeunit 6184541 "NPR EFT NETS BAXI Protocol"
         if ActionName <> ActionCode() then
             exit;
 
-        ClearLastError;
+        ClearLastError();
 
         EFTNETSBAXIRespParser.SetResponseEnvelope(Step, Envelope);
         if (EFTNETSBAXIRespParser.Run() and EFTNETSBAXIRespParser.TryGetEftTransactionEntryNo(EntryNo)) then begin
@@ -591,7 +591,7 @@ codeunit 6184541 "NPR EFT NETS BAXI Protocol"
 
         Handled := true;
 
-        ClearLastError;
+        ClearLastError();
 
         EFTNETSBAXIRespParser.SetResponseEvent(EventName, Data);
 

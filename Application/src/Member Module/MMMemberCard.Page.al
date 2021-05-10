@@ -792,7 +792,7 @@ page 6060136 "NPR MM Member Card"
 
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
                     end;
@@ -817,7 +817,7 @@ page 6060136 "NPR MM Member Card"
 
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
-                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
                     end;
@@ -901,7 +901,7 @@ page 6060136 "NPR MM Member Card"
     local procedure GetMasterDataAttributeValue()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, Rec."Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
 
     end;
@@ -931,7 +931,7 @@ page 6060136 "NPR MM Member Card"
     begin
 
         //NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, FORMAT (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
-        NPRAttrManagement.OnPageLookUp(GetAttributeTableId, AttributeNumber, Format(Rec."Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
+        NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(Rec."Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
 
     end;
 }

@@ -36,7 +36,7 @@
   Sender."Subscriber Instances Allowed"::Multiple) then begin
             Sender.RegisterWorkflowStep('ImportDocument', 'respond();');
             Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding(ThisDataSource);
+            Sender.RegisterDataSourceBinding(ThisDataSource());
 
             Sender.RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
             Sender.RegisterBooleanParameter('SelectCustomer', true);
@@ -292,10 +292,10 @@
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
     begin
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
 
-        Extensions.Add(ThisExtension);
+        Extensions.Add(ThisExtension());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', true, false)]
@@ -303,7 +303,7 @@
     var
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -317,7 +317,7 @@
         SalesHeader: Record "Sales Header";
         LocationFilter: Text;
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

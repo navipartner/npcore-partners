@@ -62,7 +62,7 @@ table 6014561 "NPR RP Data Items"
                     Name := "Data Source";
                     //Name := STRSUBSTNO('<%1>',"Data Source");
                 end;
-                FindParentItem;
+                FindParentItem();
             end;
 
             trigger OnValidate()
@@ -328,13 +328,13 @@ table 6014561 "NPR RP Data Items"
         //+NPR5.34 [284505]
 
         ModifiedRec();
-        FindParentItem;
+        FindParentItem();
     end;
 
     trigger OnModify()
     begin
         ModifiedRec();
-        FindParentItem;
+        FindParentItem();
     end;
 
     trigger OnRename()

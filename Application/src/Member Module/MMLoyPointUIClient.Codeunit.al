@@ -218,7 +218,7 @@ codeunit 6151163 "NPR MM Loy. Point UI (Client)"
         // EFTFrameworkMgt.SendRequest(AbortEFTTransactionRequest);
 
         if (POSSession.IsActiveSession(POSFrontEnd)) then
-            if (POSFrontEnd.IsPaused) then
+            if (POSFrontEnd.IsPaused()) then
                 POSFrontEnd.ResumeWorkflow();
     end;
 }

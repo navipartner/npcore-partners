@@ -139,7 +139,7 @@ page 6014652 "NPR Comp. Inf. Step"
 
                         trigger OnValidate()
                         begin
-                            CurrPage.SaveRecord;
+                            CurrPage.SaveRecord();
                         end;
                     }
                 }

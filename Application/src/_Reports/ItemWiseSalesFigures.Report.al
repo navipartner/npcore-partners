@@ -56,7 +56,7 @@ report 6060052 "NPR Item Wise Sales Figures"
                 SalesHeader.SetFilter(SalesHeader."Order Date", '%1..%2', FromDate, ToDate);
                 SalesHeader.SetRange(SalesHeader."No.", "Sales Line"."Document No.");
                 SalesHeader.SetRange(SalesHeader."Document Type", "Sales Line"."Document Type");
-                if (not SalesHeader.FindFirst) or (SalesHeader."NPR External Order No." = '') then begin
+                if (not SalesHeader.FindFirst()) or (SalesHeader."NPR External Order No." = '') then begin
                     PreviousItemNo := SalesLine."No.";
                     CurrReport.Skip();
                 end

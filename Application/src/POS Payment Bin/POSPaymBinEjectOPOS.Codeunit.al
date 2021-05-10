@@ -48,8 +48,8 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
     local procedure OnLookupBinInvokeMethods(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;
-        tmpRetailList.Choice := InvokeMethodCode;
-        tmpRetailList.Value := InvokeMethodCode;
+        tmpRetailList.Choice := InvokeMethodCode();
+        tmpRetailList.Value := InvokeMethodCode();
         tmpRetailList.Insert();
     end;
 
@@ -105,7 +105,7 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
         ErrorMessage: Text;
         Stargate: Codeunit "NPR POS Stargate Management";
     begin
-        if ActionName <> InvokeMethodCode then
+        if ActionName <> InvokeMethodCode() then
             exit;
 
         Stargate.DeserializeEnvelope(Envelope, OPOSEjectDrawerResponse, FrontEnd);

@@ -132,8 +132,8 @@
         Rec.SetRange(Date, Rec.Date);
         Rec.FilterGroup(0);
 
-        EnableMenu;
-        SaleLineStatistics;
+        EnableMenu();
+        SaleLineStatistics();
     end;
 
 }

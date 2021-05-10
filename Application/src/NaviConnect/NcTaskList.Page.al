@@ -297,7 +297,7 @@ page 6151502 "NPR Nc Task List"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then
             exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;
@@ -398,7 +398,7 @@ page 6151502 "NPR Nc Task List"
                 NcTaskOutput.CalcFields(Data);
                 NcTaskOutput.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
                 Path := TemporaryPath + NcTaskOutput.Name;
-                DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.' + FileMgt.GetExtension(NcTaskOutput.Name), Path);
+                DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(NcTaskOutput.Name), Path);
                 HyperLink(Path);
                 exit;
             end;

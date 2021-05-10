@@ -27,12 +27,12 @@ codeunit 6150891 "NPR Data Store"
         Original: Codeunit "NPR Data Set";
         Merged: JsonObject;
     begin
-        GetDataSet(Set.DataSource, Original);
+        GetDataSet(Set.DataSource(), Original);
         Merged := Original.GetDelta(Set.GetJson());
-        if _dataSets.Contains(Set.DataSource) then
-            _dataSets.Replace(Set.DataSource, Set.GetJson())
+        if _dataSets.Contains(Set.DataSource()) then
+            _dataSets.Replace(Set.DataSource(), Set.GetJson())
         else
-            _dataSets.Add(Set.DataSource, Set.GetJson());
+            _dataSets.Add(Set.DataSource(), Set.GetJson());
 
         exit(Merged);
     end;

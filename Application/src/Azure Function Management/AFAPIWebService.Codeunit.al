@@ -354,7 +354,7 @@ codeunit 6151572 "NPR AF API WebService"
         if not AllObjWithCaption.Get(OBJECTTYPE::Report, ReportID) then
             exit;
 
-        RecRef := RecID.GetRecord;
+        RecRef := RecID.GetRecord();
         RecRef.SetRecFilter();
         VarRecRef := RecRef;
 

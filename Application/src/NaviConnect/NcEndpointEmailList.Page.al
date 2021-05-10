@@ -54,7 +54,7 @@ page 6151524 "NPR Nc Endpoint E-mail List"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks();
                 end;
             }
         }

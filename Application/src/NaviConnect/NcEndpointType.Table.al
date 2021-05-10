@@ -24,7 +24,7 @@ table 6151531 "NPR Nc Endpoint Type"
 
     procedure SetupEndpointTypes()
     begin
-        OnSetupEndpointTypes;
+        OnSetupEndpointTypes();
     end;
 
     [IntegrationEvent(false, false)]

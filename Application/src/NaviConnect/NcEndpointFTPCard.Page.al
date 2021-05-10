@@ -94,7 +94,7 @@ page 6151523 "NPR Nc Endpoint FTP Card"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks();
                 end;
             }
         }

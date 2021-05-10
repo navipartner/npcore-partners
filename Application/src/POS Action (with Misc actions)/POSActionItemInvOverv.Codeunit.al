@@ -19,15 +19,15 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
   Sender."Subscriber Instances Allowed"::Multiple)
 then begin
             Sender.RegisterWorkflow(false);
-            Sender.RegisterBooleanParameter(AllItemsParTxt, false);
-            Sender.RegisterBooleanParameter(OnlyCurrentLocParTxt, false);
+            Sender.RegisterBooleanParameter(AllItemsParTxt(), false);
+            Sender.RegisterBooleanParameter(OnlyCurrentLocParTxt(), false);
         end;
     end;
 
@@ -65,8 +65,8 @@ then begin
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
-        AllItems := JSON.GetBooleanParameter(AllItemsParTxt);
-        OnlyCurrrentLocation := JSON.GetBooleanParameter(OnlyCurrentLocParTxt);
+        AllItems := JSON.GetBooleanParameter(AllItemsParTxt());
+        OnlyCurrrentLocation := JSON.GetBooleanParameter(OnlyCurrentLocParTxt());
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -80,7 +80,7 @@ then begin
         end;
 
         POSInventoryOverview.SetParameters('', '', SalePOS."Location Code", OnlyCurrrentLocation);
-        if (CurrentView.Type = CurrentView.Type::Sale) then begin
+        if (CurrentView.Type() = CurrentView.Type()::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);
             if LinePOS.Type = LinePOS.Type::Item then begin

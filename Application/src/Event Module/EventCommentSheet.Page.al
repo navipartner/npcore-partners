@@ -40,6 +40,6 @@ page 6059834 "NPR Event Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Rec.SetUpNewLine;
+        Rec.SetUpNewLine();
     end;
 }

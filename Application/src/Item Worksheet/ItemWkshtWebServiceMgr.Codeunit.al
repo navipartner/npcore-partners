@@ -820,7 +820,7 @@
         ItemWshtImpExpMgt.SetImportActionWorksheetVariantLine(ItemWorksheetLine, ActionIfVariantUnknown, ActionIfVarietyUnknown, ItemWorksheetVariantLine);
         ItemWorksheetVariantLine.Modify(true);
         ItemWshtImpExpMgt.RaiseOnAfterImportWorksheetVariantLine(ItemWorksheetVariantLine);
-        ItemWorksheetLine.CleanupObsoleteLines;
+        ItemWorksheetLine.CleanupObsoleteLines();
         TempText := UpperCase(GetXmlText(Element, 'ValidateLine', MaxStrLen(TempText), false));
         if TempText in ['YES', '1', 'TRUE'] then
             ItemWkshCheckLine.RunCheck(ItemWorksheetLine, false, false);

@@ -71,7 +71,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
               '}'
             );
             Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding(ThisDataSource);
+            Sender.RegisterDataSourceBinding(ThisDataSource());
 
             Sender.RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
             Sender.RegisterTextParameter('FixedSeatingCode', '');
@@ -240,10 +240,10 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
     begin
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
 
-        Extensions.Add(ThisExtension);
+        Extensions.Add(ThisExtension());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
@@ -251,7 +251,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
     var
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -272,7 +272,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         WaiterPad: Record "NPR NPRE Waiter Pad";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

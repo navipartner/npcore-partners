@@ -446,7 +446,7 @@ report 6014663 "NPR Retail Calc. Inv."
                 end;
 
             if ColumnDim = '' then
-                DimEntryNo2 := CreateDimFromItemDefault;
+                DimEntryNo2 := CreateDimFromItemDefault();
 
             if DimBufMgt.GetDimensions(DimEntryNo2, TempDimBufOut) then begin
                 TempDimSetEntry.Reset();
@@ -625,7 +625,7 @@ report 6014663 "NPR Retail Calc. Inv."
         if Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then begin
             if (Item.GetFilter("Global Dimension 1 Code") <> '') or
                (Item.GetFilter("Global Dimension 2 Code") <> '') or
-               TempDimBufIn.FindFirst
+               TempDimBufIn.FindFirst()
             then
                 Error(Text004, Location.FieldCaption("Bin Mandatory"), Location."Bin Mandatory");
         end;

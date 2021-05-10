@@ -170,7 +170,7 @@ codeunit 6150700 "NPR POS Session"
 
         OnInitializeDataSource(DataStore);
 
-        if DataStore.DataSources.Count() > 0 then begin
+        if DataStore.DataSources().Count() > 0 then begin
             RequestRefreshData();
             JS.RefreshData(This, FrontEnd);
         end;
@@ -211,7 +211,7 @@ codeunit 6150700 "NPR POS Session"
         if not Finalized then begin
             OnFinalize(FrontEnd);
             UnbindSubscription(FrontEndKeeper);
-            ClearAll;
+            ClearAll();
             SessionActions.DeleteAll();
             Finalized := true;
         end;

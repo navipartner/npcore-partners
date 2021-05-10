@@ -115,7 +115,7 @@ page 6014679 "NPR Endpoint Query List"
 
                 trigger OnAction()
                 begin
-                    Rec.ProcessQuery;
+                    Rec.ProcessQuery();
                 end;
             }
         }

@@ -10,7 +10,7 @@ codeunit 6059905 "NPR Mail Task Status"
             TaskBatch."Mail From Address" := 'Navipartner@NoReply.com';
         if TaskBatch."Mail From Name" = '' then
             TaskBatch."Mail From Name" := 'Navipartner (No Reply)';
-        TaskLog.Get(TaskLine.GetLogEntryNo);
+        TaskLog.Get(TaskLine.GetLogEntryNo());
 
         TaskLineParm.SetRange("Journal Template Name", TaskLine."Journal Template Name");
         TaskLineParm.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
@@ -18,13 +18,13 @@ codeunit 6059905 "NPR Mail Task Status"
 
         case TaskLog.Status of
             TaskLog.Status::Started:
-                SendMailOnStart;
+                SendMailOnStart();
             TaskLog.Status::Error:
-                SendMailOnError;
+                SendMailOnError();
             TaskLog.Status::Succes:
                 begin
-                    SendMailOnErrorRecovery;
-                    SendMailOnSucces;
+                    SendMailOnErrorRecovery();
+                    SendMailOnSucces();
                 end;
         end;
     end;
@@ -83,8 +83,8 @@ codeunit 6059905 "NPR Mail Task Status"
         AppendHTML(TaskLine.FieldCaption("Line No.") + ': ' + Format(TaskLine."Line No."));
         AppendHTML(TaskLine.FieldCaption(Description) + ': ' + TaskLine.Description);
 
-        if TaskLine.GetLogEntryNo <> 0 then begin
-            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
+        if TaskLine.GetLogEntryNo() <> 0 then begin
+            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo());
             if TaskOutputLog.FindSet() then
                 repeat
                     TaskOutputLog.CalcFields(File);
@@ -92,7 +92,7 @@ codeunit 6059905 "NPR Mail Task Status"
                         TaskOutputLog.File.CreateInStream(InStr);
                         AddAttachmentFromStream(InStr, TaskOutputLog."File Name");
                     end;
-                until TaskOutputLog.Next = 0;
+                until TaskOutputLog.Next() = 0;
         end;
 
         Send();
@@ -124,10 +124,10 @@ codeunit 6059905 "NPR Mail Task Status"
         CreateMessage(0, TaskBatch."Mail From Name", TaskBatch."Mail From Address",
                       '', StrSubstNo(Text001, TaskLine.Description, TaskLog.Status), '');
 
-        if TaskLineParm.FindFirst then
+        if TaskLineParm.FindFirst() then
             repeat
                 AddRecipient(TaskLineParm.Value);
-            until TaskLineParm.Next = 0;
+            until TaskLineParm.Next() = 0;
 
 
         AppendHTML(StrSubstNo(Text002, CurrentErrorNo));
@@ -138,10 +138,10 @@ codeunit 6059905 "NPR Mail Task Status"
             AppendHTML(Text003);
 
         TaskLineParm.SetRange("Field No.", 177);
-        if TaskLineParm.FindFirst then
+        if TaskLineParm.FindFirst() then
             repeat
                 AppendHTML(TaskLineParm.Value);
-            until TaskLineParm.Next = 0;
+            until TaskLineParm.Next() = 0;
 
         AppendHTML('');
         AppendHTML(Text005);
@@ -151,16 +151,16 @@ codeunit 6059905 "NPR Mail Task Status"
         AppendHTML(TaskLine.FieldCaption("Line No.") + ': ' + Format(TaskLine."Line No."));
         AppendHTML(TaskLine.FieldCaption(Description) + ': ' + TaskLine.Description);
 
-        if TaskLine.GetLogEntryNo <> 0 then begin
-            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
-            if TaskOutputLog.FindSet then
+        if TaskLine.GetLogEntryNo() <> 0 then begin
+            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo());
+            if TaskOutputLog.FindSet() then
                 repeat
                     TaskOutputLog.CalcFields(File);
                     if TaskOutputLog.File.HasValue then begin
                         TaskOutputLog.File.CreateInStream(InStr);
                         AddAttachmentFromStream(InStr, TaskOutputLog."File Name");
                     end;
-                until TaskOutputLog.Next = 0;
+                until TaskOutputLog.Next() = 0;
         end;
 
         Send();
@@ -179,8 +179,8 @@ codeunit 6059905 "NPR Mail Task Status"
         if TaskLineParm.IsEmpty then
             exit;
 
-        if (TaskLine."Send Only if File Exists") and (TaskLine.GetLogEntryNo <> 0) then begin
-            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
+        if (TaskLine."Send Only if File Exists") and (TaskLine.GetLogEntryNo() <> 0) then begin
+            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo());
             if TaskOutputLog.FindSet() then
                 repeat
                     TaskOutputLog.CalcFields(TaskOutputLog.File);
@@ -212,8 +212,8 @@ codeunit 6059905 "NPR Mail Task Status"
         AppendHTML(TaskLine.FieldCaption("Line No.") + ': ' + Format(TaskLine."Line No."));
         AppendHTML(TaskLine.FieldCaption(Description) + ': ' + TaskLine.Description);
 
-        if TaskLine.GetLogEntryNo <> 0 then begin
-            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
+        if TaskLine.GetLogEntryNo() <> 0 then begin
+            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo());
             if TaskOutputLog.FindSet() then
                 repeat
                     TaskOutputLog.CalcFields(File);
@@ -221,7 +221,7 @@ codeunit 6059905 "NPR Mail Task Status"
                         TaskOutputLog.File.CreateInStream(InStr);
                         AddAttachmentFromStream(InStr, TaskOutputLog."File Name");
                     end;
-                until TaskOutputLog.Next = 0;
+                until TaskOutputLog.Next() = 0;
         end;
 
         Send();
@@ -245,16 +245,16 @@ codeunit 6059905 "NPR Mail Task Status"
         CreateMessage(0, TaskBatch."Mail From Name", TaskBatch."Mail From Address",
                       '', StrSubstNo(Text008, TaskLine.Description, TaskLog.Status), '');
 
-        if TaskLineParm.FindFirst then
+        if TaskLineParm.FindFirst() then
             repeat
                 AddRecipient(TaskLineParm.Value);
-            until TaskLineParm.Next = 0;
+            until TaskLineParm.Next() = 0;
 
         TaskLineParm.SetRange("Field No.", 182);
-        if TaskLineParm.FindFirst then
+        if TaskLineParm.FindFirst() then
             repeat
                 AppendHTML(TaskLineParm.Value);
-            until TaskLineParm.Next = 0;
+            until TaskLineParm.Next() = 0;
 
         AppendHTML('');
         AppendHTML(Text005);
@@ -264,16 +264,16 @@ codeunit 6059905 "NPR Mail Task Status"
         AppendHTML(TaskLine.FieldCaption("Line No.") + ': ' + Format(TaskLine."Line No."));
         AppendHTML(TaskLine.FieldCaption(Description) + ': ' + TaskLine.Description);
 
-        if TaskLine.GetLogEntryNo <> 0 then begin
-            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo);
-            if TaskOutputLog.FindSet then
+        if TaskLine.GetLogEntryNo() <> 0 then begin
+            TaskOutputLog.SetRange("Task Log Entry No.", TaskLine.GetLogEntryNo());
+            if TaskOutputLog.FindSet() then
                 repeat
                     TaskOutputLog.CalcFields(File);
                     if TaskOutputLog.File.HasValue then begin
                         TaskOutputLog.File.CreateInStream(InStr);
                         AddAttachmentFromStream(InStr, TaskOutputLog."File Name");
                     end;
-                until TaskOutputLog.Next = 0;
+                until TaskOutputLog.Next() = 0;
         end;
 
         Send();

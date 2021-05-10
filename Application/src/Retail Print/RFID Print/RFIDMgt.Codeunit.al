@@ -30,7 +30,7 @@ codeunit 6059831 "NPR RFID Mgt."
         RFIDSetup.Get();
         RFIDSetup.TestField("RFID Value No. Series");
         RFIDSetup.TestField("RFID Hex Value Length");
-        Evaluate(BigInt, NoSeriesManagement.GetNextNo(RFIDSetup."RFID Value No. Series", WorkDate, true));
+        Evaluate(BigInt, NoSeriesManagement.GetNextNo(RFIDSetup."RFID Value No. Series", WorkDate(), true));
         HexValue := IntToHex(BigInt);
 
         if StrLen(HexValue) > RFIDSetup."RFID Hex Value Length" then

@@ -108,22 +108,22 @@ table 6014560 "NPR RP Device Settings"
 
     trigger OnDelete()
     begin
-        ModifiedRec;
+        ModifiedRec();
     end;
 
     trigger OnInsert()
     begin
-        ModifiedRec;
+        ModifiedRec();
     end;
 
     trigger OnModify()
     begin
-        ModifiedRec;
+        ModifiedRec();
     end;
 
     trigger OnRename()
     begin
-        ModifiedRec;
+        ModifiedRec();
     end;
 
     local procedure ModifiedRec()

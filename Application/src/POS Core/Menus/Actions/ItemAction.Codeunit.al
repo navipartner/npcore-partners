@@ -21,12 +21,12 @@ codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializa
 
     procedure Content(): JsonObject;
     begin
-        exit(_base.Content);
+        exit(_base.Content());
     end;
 
     procedure Parameters(): JsonObject;
     begin
-        exit(_base.Parameters);
+        exit(_base.Parameters());
     end;
 
     procedure GetJson() Json: JsonObject;
@@ -49,7 +49,7 @@ codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializa
         MenuButton.OnRetrieveItemMetadata(Metadata);
 
         Instance.SetCode(MenuButton."Action Code");
-        Instance.Content.Add('Metadata', Metadata);
+        Instance.Content().Add('Metadata', Metadata);
 
         ActionOut := Instance;
     end;

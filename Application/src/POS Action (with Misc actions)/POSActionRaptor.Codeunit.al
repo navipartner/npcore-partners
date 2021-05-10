@@ -27,9 +27,9 @@ codeunit 6150875 "NPR POS Action: Raptor"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction20(
-    ActionCode,
+    ActionCode(),
     ActionDescription,
-    ActionVersion)
+    ActionVersion())
 then begin
             //RegisterWorkflow20('await workflow.respond();');  //NPR5.54 [400510]-revoked
             //-NPR5.54 [400510]

@@ -9,7 +9,7 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         CollectorRequestWebImport.Import();
 
         InsertImportEntry('Createcollectorrequest', ImportEntry);

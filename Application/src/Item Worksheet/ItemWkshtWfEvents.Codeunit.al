@@ -18,10 +18,10 @@ codeunit 6060053 "NPR Item Wksht. Wf Events"
         DescrItemStatusChangedTxt: Label 'The status of an Item was changed.';
     begin
         WorkflowEventHandling.AddEventToLibrary(
-            NewItemWorksheetLineInserted, DATABASE::"NPR Item Worksheet Line",
+            NewItemWorksheetLineInserted(), DATABASE::"NPR Item Worksheet Line",
             DescrNewItemWorksheetLineInsertedTxt, 0, false);
         WorkflowEventHandling.AddEventToLibrary(
-            ItemStatusChanged, DATABASE::Item,
+            ItemStatusChanged(), DATABASE::Item,
             DescrItemStatusChangedTxt, 0, false);
     end;
 
@@ -30,7 +30,7 @@ codeunit 6060053 "NPR Item Wksht. Wf Events"
     var
         WorkflowManagement: Codeunit "Workflow Management";
     begin
-        WorkflowManagement.HandleEvent(NewItemWorksheetLineInserted, Rec);
+        WorkflowManagement.HandleEvent(NewItemWorksheetLineInserted(), Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
@@ -40,7 +40,7 @@ codeunit 6060053 "NPR Item Wksht. Wf Events"
     begin
         if Rec."NPR Item Status" = xRec."NPR Item Status" then
             exit;
-        WorkflowManagement.HandleEventWithxRec(ItemStatusChanged, Rec, xRec);
+        WorkflowManagement.HandleEventWithxRec(ItemStatusChanged(), Rec, xRec);
     end;
 }
 

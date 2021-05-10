@@ -24,7 +24,7 @@
         if not (RaptorSetup.Get() and RaptorSetup."Send Data to Raptor") then
             exit;
 
-        if not DataLogSubscriberMgt.GetNewRecords(RaptorMgt.RaptorDataLogSubscriber, true, 0, TempDataLog) then
+        if not DataLogSubscriberMgt.GetNewRecords(RaptorMgt.RaptorDataLogSubscriber(), true, 0, TempDataLog) then
             exit;
 
         SessionGUID := CreateGuid();

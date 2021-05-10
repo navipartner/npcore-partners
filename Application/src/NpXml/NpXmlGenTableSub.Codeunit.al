@@ -167,7 +167,7 @@
 
     local procedure IsLinkSubscriber(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; GenericTableFunction: Text): Boolean
     begin
-        if NpXmlTemplateTrigger."Generic Parent Codeunit ID" <> CurrCodeunitId then
+        if NpXmlTemplateTrigger."Generic Parent Codeunit ID" <> CurrCodeunitId() then
             exit(false);
         if NpXmlTemplateTrigger."Generic Parent Function" <> GenericTableFunction then
             exit(false);

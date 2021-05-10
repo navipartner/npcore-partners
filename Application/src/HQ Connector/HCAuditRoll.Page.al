@@ -331,7 +331,7 @@ page 6150900 "NPR HC Audit Roll"
 
                 trigger Pong()
                 begin
-                    CurrPage.PingPong.Stop;
+                    CurrPage.PingPong.Stop();
                     CurrPage.Update(false);
                 end;
             }
@@ -390,7 +390,7 @@ page 6150900 "NPR HC Audit Roll"
 
                     trigger OnAction()
                     begin
-                        PostReceipt;
+                        PostReceipt();
                     end;
                 }
                 action("Posting of Range")
@@ -576,7 +576,7 @@ page 6150900 "NPR HC Audit Roll"
 
     trigger OnAfterGetRecord()
     begin
-        SetStyleExpression;
+        SetStyleExpression();
     end;
 
     trigger OnOpenPage()
@@ -637,14 +637,14 @@ page 6150900 "NPR HC Audit Roll"
             PostDocNo := HCPostTempAuditRoll.getNewPostingNo(true);
             HCPostTempAuditRoll.setPostingNo(PostDocNo);
             HCPostTempAuditRoll.RunPost(HCAuditRollPosting);
-            HCAuditRollPosting.UpdateChangesSilent;
+            HCAuditRollPosting.UpdateChangesSilent();
 
             /* ITEM LEDGER ENTRIES */
             HCAuditRollPosting.DeleteAll();
             HCAuditRollPosting.TransferFromRevSilentItemLedg(HCAuditRoll4, HCAuditRollPosting);
             HCPostTempAuditRoll.setPostingNo(PostDocNo);
             HCPostTempAuditRoll.RunPostItemLedger(HCAuditRollPosting);
-            HCAuditRollPosting.UpdateChangesSilent;
+            HCAuditRollPosting.UpdateChangesSilent();
         end;
 
     end;

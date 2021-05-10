@@ -73,7 +73,7 @@ page 6184496 "NPR Pepper Version List"
                     trigger OnAction()
                     begin
                         Rec.UploadZipFile(0);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
             }
@@ -89,7 +89,7 @@ page 6184496 "NPR Pepper Version List"
                     trigger OnAction()
                     begin
                         Rec.ClearZipFile(0);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
             }
@@ -113,7 +113,7 @@ page 6184496 "NPR Pepper Version List"
 
     trigger OnAfterGetRecord()
     begin
-        UpdateBLOBCheck;
+        UpdateBLOBCheck();
     end;
 
     var

@@ -57,7 +57,7 @@ table 6059903 "NPR Task Queue"
             trigger OnValidate()
             begin
                 //-TQ1.11
-                UpdateTaskLine;
+                UpdateTaskLine();
                 //+TQ1.11
             end;
         }
@@ -76,7 +76,7 @@ table 6059903 "NPR Task Queue"
             trigger OnValidate()
             begin
                 //-TQ1.11
-                UpdateTaskLine;
+                UpdateTaskLine();
                 //+TQ1.11
             end;
         }
@@ -94,7 +94,7 @@ table 6059903 "NPR Task Queue"
             trigger OnValidate()
             begin
                 //-TQ1.11
-                UpdateTaskLine;
+                UpdateTaskLine();
                 //+TQ1.11
             end;
         }
@@ -128,15 +128,15 @@ table 6059903 "NPR Task Queue"
                         begin
                             "Assigned To User" := UserId;
                             "Assigned Time" := CurrentDateTime;
-                            "Assigned to Service Inst.ID" := ServiceInstanceId;
-                            "Assigned to Session ID" := SessionId;
+                            "Assigned to Service Inst.ID" := ServiceInstanceId();
+                            "Assigned to Session ID" := SessionId();
                         end;
                     Status::Started:
                         begin
                             "Assigned To User" := UserId;
                             "Assigned Time" := CurrentDateTime;
-                            "Assigned to Service Inst.ID" := ServiceInstanceId;
-                            "Assigned to Session ID" := SessionId;
+                            "Assigned to Service Inst.ID" := ServiceInstanceId();
+                            "Assigned to Session ID" := SessionId();
                             "Started Time" := CurrentDateTime;
                         end;
                 end;

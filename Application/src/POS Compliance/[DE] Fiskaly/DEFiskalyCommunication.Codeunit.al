@@ -210,7 +210,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         BodyTxt: Text;
     begin
         GetContext();
-        DEAuditSetup.GET;
+        DEAuditSetup.GET();
 
         RequestObject.Add('method', 'GET');
         RequestObject.Add('path', '/tss/' + TssId + '/tx/' + TxId);

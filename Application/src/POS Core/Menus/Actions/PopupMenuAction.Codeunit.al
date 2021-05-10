@@ -32,12 +32,12 @@ codeunit 6150887 "NPR Popup Menu Action" implements "NPR IAction", "NPR IJsonSer
 
     procedure Content(): JsonObject;
     begin
-        exit(_base.Content);
+        exit(_base.Content());
     end;
 
     procedure Parameters(): JsonObject;
     begin
-        exit(_base.Parameters);
+        exit(_base.Parameters());
     end;
 
     procedure GetJson() Json: JsonObject;

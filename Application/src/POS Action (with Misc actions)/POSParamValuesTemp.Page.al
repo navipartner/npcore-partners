@@ -63,12 +63,12 @@ page 6150727 "NPR POS Param. Values Temp."
 
     trigger OnAfterGetRecord()
     begin
-        ParameterIsNotDefault := not IsDefault;
+        ParameterIsNotDefault := not IsDefault();
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        ParameterIsNotDefault := not IsDefault;
+        ParameterIsNotDefault := not IsDefault();
         CurrPage.Update(false);
     end;
 

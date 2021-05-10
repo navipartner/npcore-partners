@@ -30,7 +30,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit;
+                        AssistEdit();
                     end;
                 }
                 field("Field Name"; Rec."Field Name")
@@ -48,7 +48,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
 
     trigger OnOpenPage()
     begin
-        LoadTable;
+        LoadTable();
         CurrPage.Update(true);
     end;
 

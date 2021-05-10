@@ -117,7 +117,7 @@ page 6151416 "NPR Magento Categories"
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
         HasSetupCategories := MagentoSetupMgt.HasSetupCategories();
-        SetDisplayConfigVisible;
+        SetDisplayConfigVisible();
     end;
 
     var

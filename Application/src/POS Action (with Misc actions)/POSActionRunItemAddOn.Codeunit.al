@@ -141,7 +141,7 @@ then begin
             AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
         if NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn, AddOnLines, POSSession, AppliesToLineNo, OnlyFixedQtyLines) then begin
             SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
-            POSSaleLine.SetPosition(SaleLinePOS.GetPosition);
+            POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
             if NpIaItemAddOnMgt.InsertedWithAutoSplitKey() then begin
                 POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
                 exit;

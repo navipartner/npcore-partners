@@ -47,8 +47,8 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 
     local procedure InitializeVoucherPaymentCaptions(var Captions: Codeunit "NPR POS Caption Management")
     begin
-        Captions.AddActionCaption(VoucherPaymentActionCode, 'VoucherPaymentTitle', Text001);
-        Captions.AddActionCaption(VoucherPaymentActionCode, 'ReferenceNo', Text002);
+        Captions.AddActionCaption(VoucherPaymentActionCode(), 'VoucherPaymentTitle', Text001);
+        Captions.AddActionCaption(VoucherPaymentActionCode(), 'ReferenceNo', Text002);
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
@@ -168,7 +168,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
 
         POSSession.GetSetup(POSSetup);
-        if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision) then
+        if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision()) then
             exit;
 
         VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherType', StrSubstNo(ReadingErr, ObjectIdentifier())));

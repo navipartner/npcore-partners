@@ -99,7 +99,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type = CurrentView.Type::Sale) then
+        if (CurrentView.Type() = CurrentView.Type()::Sale) then
             POSSession.ChangeViewPayment();
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
@@ -221,7 +221,7 @@ codeunit 6150725 "NPR POS Action: Payment"
             'capture_payment':
                 begin
                     POSSession.ClearActionState();
-                    POSSession.StoreActionState('ContextId', POSSession.BeginAction(ActionCode));
+                    POSSession.StoreActionState('ContextId', POSSession.BeginAction(ActionCode()));
 
                     OnBeforeAction(WorkflowStep, POSPaymentMethod, Context, POSSession, FrontEnd, PaymentHandled);
                     CapturePayment(POSPaymentMethod, POSSession, FrontEnd, GetAmount(Context, FrontEnd), GetVoucherNo(Context, FrontEnd), PaymentHandled);

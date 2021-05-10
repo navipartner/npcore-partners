@@ -12,17 +12,17 @@ codeunit 6014590 "NPR Service Tier User Mgt."
     var
         Itt: Integer;
     begin
-        if (activeSession."Server Instance ID" = ServiceInstanceId) and
-           (activeSession."Session ID" = SessionId) then
+        if (activeSession."Server Instance ID" = ServiceInstanceId()) and
+           (activeSession."Session ID" = SessionId()) then
             exit;
 
-        while (not activeSession.Get(ServiceInstanceId, SessionId)) do begin
+        while (not activeSession.Get(ServiceInstanceId(), SessionId())) do begin
             Sleep(10);
             Itt += 1;
             if Itt > 50 then begin
                 if not GuiAllowed then
                     exit;
-                activeSession.Get(ServiceInstanceId, SessionId);
+                activeSession.Get(ServiceInstanceId(), SessionId());
             end;
         end;
     end;
@@ -72,7 +72,7 @@ codeunit 6014590 "NPR Service Tier User Mgt."
                   '<' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser">' +
                       '<usernameIn>' + UserId + '</usernameIn>' +
                       '<databaseNameIn>' + GetDatabaseName() + '</databaseNameIn>' +
-                      '<tenantIDIn>' + TenantId + '</tenantIDIn>' +
+                      '<tenantIDIn>' + TenantId() + '</tenantIDIn>' +
                   '</' + serviceMethod + '>' +
               '</soapenv:Body>' +
           '</soapenv:Envelope>');

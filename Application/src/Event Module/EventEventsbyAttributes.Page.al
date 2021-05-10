@@ -120,7 +120,7 @@
 
     trigger OnOpenPage()
     begin
-        SetDefaultFilter;
+        SetDefaultFilter();
     end;
 
     var

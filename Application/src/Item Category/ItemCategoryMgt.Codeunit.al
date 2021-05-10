@@ -144,10 +144,10 @@ codeunit 6014456 "NPR Item Category Mgt."
 
         if Item."Base Unit of Measure" = '' then begin
             UnitOfMeasure.SetRange("International Standard Code", 'EA'); // 'Each' ~= 'PCS'
-            FoundUoM := UnitOfMeasure.FindFirst;
+            FoundUoM := UnitOfMeasure.FindFirst();
             if not FoundUoM then begin
                 UnitOfMeasure.SetRange("International Standard Code");
-                FoundUoM := UnitOfMeasure.FindFirst;
+                FoundUoM := UnitOfMeasure.FindFirst();
             end;
             if FoundUoM then begin
                 Item.Validate("Base Unit of Measure", UnitOfMeasure.Code);

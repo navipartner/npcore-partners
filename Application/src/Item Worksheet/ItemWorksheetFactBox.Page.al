@@ -106,14 +106,14 @@ page 6060051 "NPR Item Worksheet FactBox"
             if RecExItem.Get(Rec."Existing Item No.") then
                 RecTempItem := RecExItem;
         RecExItem.CalcFields(Inventory);
-        BuildCaptions;
+        BuildCaptions();
     end;
 
     trigger OnAfterGetRecord()
     begin
         Clear(RecExItem);
         Clear(RecTempItem);
-        BuildCaptions;
+        BuildCaptions();
     end;
 
     var

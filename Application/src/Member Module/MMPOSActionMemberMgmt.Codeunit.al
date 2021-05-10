@@ -1061,7 +1061,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         SalePOS.Find();
         POSSale.Refresh(SalePOS);
 
-        ClearLastError;
+        ClearLastError();
 
         repeat
 
@@ -1097,7 +1097,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
                 POSMemberCardEdit.SetRecord(Member);
                 POSMemberCardEdit.LookupMode(true);
-                ClearLastError;  //MM1.45 [407500]
+                ClearLastError();  //MM1.45 [407500]
                 if (POSMemberCardEdit.RunModal() = ACTION::LookupOK) then
                     MembershipSelected := AssignPOSMember(SalePOS, ExternalMemberNo);
 

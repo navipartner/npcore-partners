@@ -203,7 +203,7 @@
         end;
 
         if POSAuditLog."External Implementation" <> ImplementationCode() then //Can only validate the current version of the implementation as the rules & fields might have changed over time.
-            Error(ERROR_VALIDATE_VERSION, ImplementationCode);
+            Error(ERROR_VALIDATE_VERSION, ImplementationCode());
 
         if POSAuditLog."Certificate Thumbprint" <> FRCertificationSetup."Signing Certificate Thumbprint" then
             Error(ERROR_VALIDATE_CERT, FRCertificationSetup."Signing Certificate Thumbprint");
@@ -563,7 +563,7 @@
                         POSAuditLog."External ID" := GetNextEventNoSeries(2, POSWorkshiftCheckpoint."POS Unit No.");
                     end else
                         if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::PREPORT then begin
-                            if POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType then begin
+                            if POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType() then begin
                                 POSAuditLog."External Description" := 'Yearly Grand Total';
                                 POSAuditLog."External ID" := GetNextEventNoSeries(4, POSWorkshiftCheckpoint."POS Unit No.");
                             end else
@@ -880,7 +880,7 @@
 
     local procedure ImplementationCode(): Text
     begin
-        exit(HandlerCode + '_V3');
+        exit(HandlerCode() + '_V3');
     end;
 
     procedure GetJETInitRecord(var POSAuditLog: Record "NPR POS Audit Log"; POSUnitNo: Code[10]; WithError: Boolean): Boolean

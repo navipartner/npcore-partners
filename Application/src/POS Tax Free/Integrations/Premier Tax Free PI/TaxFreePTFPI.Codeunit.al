@@ -621,7 +621,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
             Printer.AddBarcode(Font, Value, 2);
 
         if CR then
-            Printer.NewLine;
+            Printer.NewLine();
     end;
 
     [Obsolete('PrintMethodMgt: Codeunit "NPR Print Method Mgt." needs to be refractored ')]
@@ -652,7 +652,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         CopyStream(MemoryStream, InStream);
         MemoryStream.Position := 0;
 
-        XMLDoc := XMLDoc.XmlDocument;
+        XMLDoc := XMLDoc.XmlDocument();
         XMLDoc.Load(MemoryStream);
 
         PrintLines := XMLDoc.GetElementsByTagName('FormData'); //Base64 pdf data
@@ -978,7 +978,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
             if not TaxFreeVoucher.Print.HasValue() then
                 Error(Error_MissingPrint);
 
-        ClearLastError;
+        ClearLastError();
         if not TryPrintVoucher(TaxFreeRequest) then
             Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
     end;

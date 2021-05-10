@@ -265,20 +265,20 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         if (not CleanCashTransactionCopy.FindSet()) then
             exit;
 
-        LinePrintMgt.NewLine;
+        LinePrintMgt.NewLine();
         repeat
             LinePrintMgt.AddTextField(1, 0, ReceiptNoLbl);
             LinePrintMgt.AddTextField(2, 2, CleanCashTransactionCopy."Receipt Id");
-            LinePrintMgt.NewLine;
+            LinePrintMgt.NewLine();
 
             LinePrintMgt.AddTextField(1, 0, SerialNoLbl);
             LinePrintMgt.AddTextField(2, 2, CleanCashTransactionCopy."CleanCash Unit Id");
-            LinePrintMgt.NewLine;
+            LinePrintMgt.NewLine();
 
             LinePrintMgt.AddLine(ControlCodeLbl);
             LinePrintMgt.AddLine(CopyStr(CleanCashTransactionCopy."CleanCash Code", 1, 30));
             LinePrintMgt.AddLine(CopyStr(CleanCashTransactionCopy."CleanCash Code", 31, 60));
-            LinePrintMgt.NewLine;
+            LinePrintMgt.NewLine();
         until (CleanCashTransactionCopy.Next() = 0);
 
     end;

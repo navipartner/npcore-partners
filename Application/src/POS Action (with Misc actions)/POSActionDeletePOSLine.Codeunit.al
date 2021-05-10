@@ -21,7 +21,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -68,14 +68,14 @@ then begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type = CurrentView.Type::Sale) then begin
+        if (CurrentView.Type() = CurrentView.Type()::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             OnBeforeDeleteSaleLinePOS(POSSaleLine);
             DeleteAccessories(POSSaleLine);
             POSSaleLine.DeleteLine();
         end;
 
-        if (CurrentView.Type = CurrentView.Type::Payment) then begin
+        if (CurrentView.Type() = CurrentView.Type()::Payment) then begin
             POSSession.GetPaymentLine(POSPaymentLine);
             POSPaymentLine.RefreshCurrent();
             POSPaymentLine.DeleteLine();

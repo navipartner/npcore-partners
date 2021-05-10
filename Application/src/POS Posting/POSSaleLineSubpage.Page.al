@@ -161,7 +161,7 @@ page 6150653 "NPR POS Sale Line Subpage"
                 trigger OnAction()
                 begin
                     //-NPR5.38 [294717]
-                    Rec.ShowDimensions;
+                    Rec.ShowDimensions();
                     //+NPR5.38 [294717]
                 end;
             }

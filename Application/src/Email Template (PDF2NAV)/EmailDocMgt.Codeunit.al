@@ -318,96 +318,96 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
     begin
         NewEmailTemplateCount := 0;
 
-        for i := "TemplateType.SalesQuote" to "TemplateType.GiftVoucher" do begin
+        for i := "TemplateType.SalesQuote"() to "TemplateType.GiftVoucher"() do begin
             TempField.Init();
             TempField."No." := i;
             case i of
-                "TemplateType.SalesQuote":
+                "TemplateType.SalesQuote"():
                     begin
                         TempField."Field Caption" := SalesQuoteLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.SalesOrder":
+                "TemplateType.SalesOrder"():
                     begin
                         TempField."Field Caption" := SalesOrderLbl;
                         TempField.Enabled := true;
                     end;
-                "TemplateType.SalesShpt":
+                "TemplateType.SalesShpt"():
                     begin
                         TempField."Field Caption" := SalesShipmentLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.SalesInv":
+                "TemplateType.SalesInv"():
                     begin
                         TempField."Field Caption" := SalesInvoiceLbl;
                         TempField.Enabled := true;
                     end;
-                "TemplateType.SalesCrMemo":
+                "TemplateType.SalesCrMemo"():
                     begin
                         TempField."Field Caption" := SalesCrMemoLbl;
                         TempField.Enabled := true;
                     end;
-                "TemplateType.PurchQuote":
+                "TemplateType.PurchQuote"():
                     begin
                         TempField."Field Caption" := PurchaseQuoteLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.PurchOrder":
+                "TemplateType.PurchOrder"():
                     begin
                         TempField."Field Caption" := PurchaseOrderLbl;
                         TempField.Enabled := true;
                     end;
-                "TemplateType.PurchRcpt":
+                "TemplateType.PurchRcpt"():
                     begin
                         TempField."Field Caption" := PurchaseReceiptLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.PurchInv":
+                "TemplateType.PurchInv"():
                     begin
                         TempField."Field Caption" := PurchaseInvoiceLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.PurchCrMemo":
+                "TemplateType.PurchCrMemo"():
                     begin
                         TempField."Field Caption" := PurchaseCrMemoLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.Reminder":
+                "TemplateType.Reminder"():
                     begin
                         TempField."Field Caption" := ReminderLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.ChargeMemo":
+                "TemplateType.ChargeMemo"():
                     begin
                         TempField."Field Caption" := ChargeMemolbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.Statement":
+                "TemplateType.Statement"():
                     begin
                         TempField."Field Caption" := StatementLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.ServQuote":
+                "TemplateType.ServQuote"():
                     begin
                         TempField."Field Caption" := ServiceQuoteLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.ServOrder":
+                "TemplateType.ServOrder"():
                     begin
                         TempField."Field Caption" := ServiceOrderLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.ServShpt":
+                "TemplateType.ServShpt"():
                     begin
                         TempField."Field Caption" := ServiceShipmentLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.ServInv":
+                "TemplateType.ServInv"():
                     begin
                         TempField."Field Caption" := ServiceInvoiceLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.POSEntry":
+                "TemplateType.POSEntry"():
                     begin
                         TempField."Field Caption" := POSEntryLbl;
                         TempField.Enabled := false;
@@ -443,7 +443,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
 
         EmailTemplate.Init();
         case TemplateType of
-            "TemplateType.SalesQuote":
+            "TemplateType.SalesQuote"():
                 begin
                     NewTemplateCode := UpperCase(SalesQuoteLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -453,7 +453,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Sales Header";
                     EmailTemplate.Filename := SalesQuoteLbl + '-{3}.pdf';
                 end;
-            "TemplateType.SalesOrder":
+            "TemplateType.SalesOrder"():
                 begin
                     NewTemplateCode := UpperCase(SalesOrderLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -463,7 +463,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Sales Header";
                     EmailTemplate.Filename := SalesOrderLbl + '-{3}.pdf';
                 end;
-            "TemplateType.SalesShpt":
+            "TemplateType.SalesShpt"():
                 begin
                     NewTemplateCode := UpperCase(SalesShipmentLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -473,7 +473,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Sales Shipment Header";
                     EmailTemplate.Filename := SalesShipmentLbl + '-{3}.pdf';
                 end;
-            "TemplateType.SalesInv":
+            "TemplateType.SalesInv"():
                 begin
                     NewTemplateCode := UpperCase(SalesInvoiceLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -483,7 +483,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Sales Invoice Header";
                     EmailTemplate.Filename := SalesInvoiceLbl + '-{3}.pdf';
                 end;
-            "TemplateType.SalesCrMemo":
+            "TemplateType.SalesCrMemo"():
                 begin
                     NewTemplateCode := UpperCase(SalesCrMemoLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -493,7 +493,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Sales Cr.Memo Header";
                     EmailTemplate.Filename := SalesCrMemoLbl + '-{3}.pdf';
                 end;
-            "TemplateType.PurchQuote":
+            "TemplateType.PurchQuote"():
                 begin
                     NewTemplateCode := UpperCase(PurchaseQuoteLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -503,7 +503,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Purchase Header";
                     EmailTemplate.Filename := PurchaseQuoteLbl + '-{3}.pdf';
                 end;
-            "TemplateType.PurchOrder":
+            "TemplateType.PurchOrder"():
                 begin
                     NewTemplateCode := UpperCase(PurchaseOrderLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -513,7 +513,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Purchase Header";
                     EmailTemplate.Filename := PurchaseOrderLbl + '-{3}.pdf';
                 end;
-            "TemplateType.PurchRcpt":
+            "TemplateType.PurchRcpt"():
                 begin
                     NewTemplateCode := UpperCase(PurchaseReceiptLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -523,7 +523,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Purch. Rcpt. Header";
                     EmailTemplate.Filename := PurchaseReceiptLbl + '-{3}.pdf';
                 end;
-            "TemplateType.PurchInv":
+            "TemplateType.PurchInv"():
                 begin
                     NewTemplateCode := UpperCase(PurchaseInvoiceLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -533,7 +533,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Purch. Inv. Header";
                     EmailTemplate.Filename := PurchaseInvoiceLbl + '-{3}.pdf';
                 end;
-            "TemplateType.PurchCrMemo":
+            "TemplateType.PurchCrMemo"():
                 begin
                     NewTemplateCode := UpperCase(PurchaseCrMemoLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -543,7 +543,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Purch. Cr. Memo Hdr.";
                     EmailTemplate.Filename := PurchaseCrMemoLbl + '-{3}.pdf';
                 end;
-            "TemplateType.Reminder":
+            "TemplateType.Reminder"():
                 begin
                     NewTemplateCode := UpperCase(ReminderLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -553,7 +553,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Issued Reminder Header";
                     EmailTemplate.Filename := ReminderLbl + '-{1}.pdf';
                 end;
-            "TemplateType.ChargeMemo":
+            "TemplateType.ChargeMemo"():
                 begin
                     NewTemplateCode := UpperCase(ChargeMemolbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -563,7 +563,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Issued Fin. Charge Memo Header";
                     EmailTemplate.Filename := ChargeMemolbl + '-{1}.pdf';
                 end;
-            "TemplateType.Statement":
+            "TemplateType.Statement"():
                 begin
                     NewTemplateCode := UpperCase(StatementLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -573,7 +573,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::Customer;
                     EmailTemplate.Filename := StatementLbl + '-{1}.pdf';
                 end;
-            "TemplateType.ServQuote":
+            "TemplateType.ServQuote"():
                 begin
                     NewTemplateCode := UpperCase(ServiceQuoteLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -583,7 +583,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Service Header";
                     EmailTemplate.Filename := ServiceQuoteLbl + '-{3}.pdf';
                 end;
-            "TemplateType.ServOrder":
+            "TemplateType.ServOrder"():
                 begin
                     NewTemplateCode := UpperCase(ServiceOrderLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -593,7 +593,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Service Header";
                     EmailTemplate.Filename := ServiceOrderLbl + '-{3}.pdf';
                 end;
-            "TemplateType.ServShpt":
+            "TemplateType.ServShpt"():
                 begin
                     NewTemplateCode := UpperCase(ServiceShipmentLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -603,7 +603,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Service Shipment Header";
                     EmailTemplate.Filename := ServiceShipmentLbl + '-{3}.pdf';
                 end;
-            "TemplateType.ServInv":
+            "TemplateType.ServInv"():
                 begin
                     NewTemplateCode := UpperCase(ServiceInvoiceLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -613,7 +613,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate."Table No." := DATABASE::"Service Invoice Header";
                     EmailTemplate.Filename := ServiceInvoiceLbl + '-{3}.pdf';
                 end;
-            "TemplateType.POSEntry":
+            "TemplateType.POSEntry"():
                 begin
                     NewTemplateCode := UpperCase(POSEntryLbl);
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
@@ -633,7 +633,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         EmailTemplate.Insert(true);
 
         case TemplateType of
-            "TemplateType.SalesQuote":
+            "TemplateType.SalesQuote"():
                 begin
                     EmailTemplateFilter.Init();
                     EmailTemplateFilter."E-mail Template Code" := EmailTemplate.Code;
@@ -643,7 +643,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter.Value := Format(SalesHeader."Document Type"::Quote.AsInteger());
                     EmailTemplateFilter.Insert();
                 end;
-            "TemplateType.SalesOrder":
+            "TemplateType.SalesOrder"():
                 begin
                     EmailTemplateFilter.Init();
                     EmailTemplateFilter."E-mail Template Code" := EmailTemplate.Code;
@@ -653,7 +653,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter.Value := Format(SalesHeader."Document Type"::Order.AsInteger());
                     EmailTemplateFilter.Insert();
                 end;
-            "TemplateType.PurchQuote":
+            "TemplateType.PurchQuote"():
                 begin
                     EmailTemplateFilter.Init();
                     EmailTemplateFilter."E-mail Template Code" := EmailTemplate.Code;
@@ -663,7 +663,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter.Value := Format(PurchHeader."Document Type"::Quote.AsInteger());
                     EmailTemplateFilter.Insert();
                 end;
-            "TemplateType.PurchOrder":
+            "TemplateType.PurchOrder"():
                 begin
                     EmailTemplateFilter.Init();
                     EmailTemplateFilter."E-mail Template Code" := EmailTemplate.Code;
@@ -673,7 +673,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter.Value := Format(PurchHeader."Document Type"::Order.AsInteger());
                     EmailTemplateFilter.Insert();
                 end;
-            "TemplateType.ServQuote":
+            "TemplateType.ServQuote"():
                 begin
                     EmailTemplateFilter.Init();
                     EmailTemplateFilter."E-mail Template Code" := EmailTemplate.Code;
@@ -683,7 +683,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplateFilter.Value := Format(ServHeader."Document Type"::Quote.AsInteger());
                     EmailTemplateFilter.Insert();
                 end;
-            "TemplateType.ServOrder":
+            "TemplateType.ServOrder"():
                 begin
                     EmailTemplateFilter.Init();
                     EmailTemplateFilter."E-mail Template Code" := EmailTemplate.Code;

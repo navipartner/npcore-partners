@@ -51,7 +51,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnInitJob', '', false, false)]
@@ -141,7 +141,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         CustomEncoding: Text;
     begin
         if HashTable.IsEmpty then
-            ConstructHashTable;
+            ConstructHashTable();
 
         AddToBuffer('^XA'); // Ref sheet 372
 
@@ -992,7 +992,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
                     end;
             //+NPR5.53 [381166]
             end;
-            exit(tmpDeviceSetting.Insert);
+            exit(tmpDeviceSetting.Insert());
         end;
     end;
 
@@ -1144,7 +1144,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
 
     local procedure AddTextToBuffer(Text: Text)
     begin
-        PrintBuffer += Text + ESC.CR + ESC.LF;
+        PrintBuffer += Text + ESC.CR() + ESC.LF();
     end;
 }
 

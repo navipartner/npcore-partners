@@ -39,10 +39,10 @@
         HttpWebRequest: HttpRequestMessage;
         RequestBodyText: Text;
     begin
-        JsonBody.Add("RequestParameter.Id", PaymentLine."No.");
-        JsonBody.Add("RequestParameter.Amount", ConvertToQuickPayAmount(PaymentLine.Amount));
+        JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
+        JsonBody.Add("RequestParameter.Amount"(), ConvertToQuickPayAmount(PaymentLine.Amount));
         JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post", PaymentLine, "ServiceName.Capture", RequestBodyText);
+        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post"(), PaymentLine, "ServiceName.Capture"(), RequestBodyText);
         SendWebRequest(HttpWebRequest);
     end;
 
@@ -52,9 +52,9 @@
         HttpWebRequest: HttpRequestMessage;
         RequestBodyText: Text;
     begin
-        JsonBody.Add("RequestParameter.Id", PaymentLine."No.");
+        JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
         JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post", PaymentLine, "ServiceName.Cancel", RequestBodyText);
+        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post"(), PaymentLine, "ServiceName.Cancel"(), RequestBodyText);
         SendWebRequest(HttpWebRequest);
     end;
 
@@ -64,10 +64,10 @@
         HttpWebRequest: HttpRequestMessage;
         RequestBodyText: Text;
     begin
-        JsonBody.Add("RequestParameter.Id", PaymentLine."No.");
-        JsonBody.Add("RequestParameter.Amount", ConvertToQuickPayAmount(PaymentLine.Amount));
+        JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
+        JsonBody.Add("RequestParameter.Amount"(), ConvertToQuickPayAmount(PaymentLine.Amount));
         JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post", PaymentLine, "ServiceName.Refund", RequestBodyText);
+        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post"(), PaymentLine, "ServiceName.Refund"(), RequestBodyText);
         SendWebRequest(HttpWebRequest);
     end;
 
