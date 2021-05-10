@@ -961,7 +961,7 @@
     /// Awaitable methods must invoke `RespondToFrontEndMethod` before completing their call stack.
     /// </summary>
     /// <param name="Context">Original method invocation context</param>
-    /// <param name="Response">Response objet to send to the front end. Awaitable method invocation will receive this object as response.</param>
+    /// <param name="Response">Response object to send to the front end. Awaitable method invocation will receive this object as response.</param>
     /// <param name="This">Current instance of Front-end Management.</param>
     procedure RespondToFrontEndMethod(Context: JsonObject; Response: JsonObject; This: Codeunit "NPR POS Front End Management")
     var
