@@ -340,20 +340,20 @@ page 6014622 "NPR POS Web Fonts"
                 not Rec.Find():
                     begin
                         Rec.Init();
-                        Rec.Code := Font.Code;
+                        Rec.Code := Font.Code();
                         Rec.Insert(true);
                     end;
-                (Rec.Code = '') and (Font.Code = ''):
+                (Rec.Code = '') and (Font.Code() = ''):
                     Rec.FieldError(Code);
-                (Rec.Code = '') and (Font.Code <> ''):
-                    Rec.Code := Font.Code;
-                (Rec.Code <> '') and (Font.Code <> '') and (Font.Code <> Rec.Code):
+                (Rec.Code = '') and (Font.Code() <> ''):
+                    Rec.Code := Font.Code();
+                (Rec.Code <> '') and (Font.Code() <> '') and (Font.Code() <> Rec.Code):
                     begin
-                        Choice := StrMenu(StrSubstNo(Text010, Font.Code, Font.Name, Rec.Code, Rec.Name), 1, Text009);
+                        Choice := StrMenu(StrSubstNo(Text010, Font.Code(), Font.Name(), Rec.Code, Rec.Name), 1, Text009);
                         if Choice <= 1 then
                             exit;
                         if Choice = 2 then begin
-                            WebFont.Code := Font.Code;
+                            WebFont.Code := Font.Code();
                             WebFont.Insert(true);
                             SaveFontConfiguration(WebFont, Font);
                             CurrPage.Update(false);
@@ -371,9 +371,9 @@ page 6014622 "NPR POS Web Fonts"
     var
         OutStr: OutStream;
     begin
-        WebFont.Name := Font.Name;
-        WebFont."Font Face" := Font.FontFace;
-        WebFont.Prefix := Font.Prefix;
+        WebFont.Name := Font.Name();
+        WebFont."Font Face" := Font.FontFace();
+        WebFont.Prefix := Font.Prefix();
 
         WebFont.Woff.CreateOutStream(OutStr);
         Font.GetWoffStream(OutStr);

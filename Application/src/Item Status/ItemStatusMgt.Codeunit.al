@@ -22,7 +22,7 @@
         if ItemStatus.FindFirst() then
             Rec.Validate("NPR Item Status", ItemStatus.Code)
         else
-            Rec.Validate("NPR Item Status", CreateInitialStatus);
+            Rec.Validate("NPR Item Status", CreateInitialStatus());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 21, 'OnAfterCheckItemJnlLine', '', true, true)]

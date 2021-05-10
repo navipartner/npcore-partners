@@ -47,7 +47,7 @@
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         MMAdmissionServiceLog.Init();
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
@@ -223,7 +223,7 @@
         MMMemberWebService: Codeunit "NPR MM Member WebService";
         MessageText: Text[250];
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         MMAdmissionServiceSetup.Get();
 
@@ -337,7 +337,7 @@
         MMMemberWebService: Codeunit "NPR MM Member WebService";
         MessageText: Text[250];
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         MMAdmissionServiceSetup.Get();
 
@@ -596,7 +596,7 @@
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         MMAdmissionServiceLog.Init();
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";

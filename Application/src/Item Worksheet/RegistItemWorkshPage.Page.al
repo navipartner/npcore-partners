@@ -433,7 +433,7 @@ page 6060047 "NPR Regist. Item Worksh. Page"
     begin
         if not RegItemWorksheet.Get(Rec."Registered Worksheet No.") then
             RegItemWorksheet.Init();
-        SetVisibleFields;
+        SetVisibleFields();
     end;
 
     var

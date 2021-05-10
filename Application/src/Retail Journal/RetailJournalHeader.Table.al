@@ -105,7 +105,7 @@ table 6014451 "NPR Retail Journal Header"
 
     trigger OnModify()
     begin
-        UpdateJournalLines;
+        UpdateJournalLines();
     end;
 
     var

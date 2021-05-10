@@ -54,7 +54,7 @@ page 6151439 "NPR Magento Store Item List"
                                     CurrPage.Update(true);
                                 end;
                             }
-                            field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption)
+                            field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption())
                             {
                                 ApplicationArea = All;
                                 Caption = 'Fields Enabled';

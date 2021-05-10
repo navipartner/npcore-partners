@@ -70,7 +70,7 @@ page 6060053 "NPR Item Works. Excel Column"
 
                 trigger OnAction()
                 begin
-                    GetCurrentWorksheet;
+                    GetCurrentWorksheet();
                     ItemWshtImpExpMgt.SelectExcelToMap(ItemWorksheet);
                 end;
             }
@@ -85,7 +85,7 @@ page 6060053 "NPR Item Works. Excel Column"
                 var
                     ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
                 begin
-                    GetCurrentWorksheet;
+                    GetCurrentWorksheet();
                     ItemWorksheetManagement.AddMappedFieldsToExcel(ItemWorksheet."Item Template Name", ItemWorksheet.Name);
                 end;
             }

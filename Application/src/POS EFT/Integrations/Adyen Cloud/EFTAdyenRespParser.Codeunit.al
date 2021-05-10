@@ -328,7 +328,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
     begin
         StatusResponse := JObject.Item('Response');
 
-        if (StatusResponse.Item('Result').ToString = 'Success') then begin
+        if (StatusResponse.Item('Result').ToString() = 'Success') then begin
             JObject := JObject.Item('RepeatedMessageResponse');
 
             OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
@@ -396,7 +396,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
     var
         JToken: DotNet NPRNetJObject;
     begin
-        EFTTransactionRequest.Successful := (JObject.Item('Result').ToString = 'Success');
+        EFTTransactionRequest.Successful := (JObject.Item('Result').ToString() = 'Success');
 
         if TrySelectToken(JObject, 'AdditionalResponse', JToken, false) then
             ParseAdditionalDataString(JToken, EFTTransactionRequest);

@@ -27,7 +27,7 @@ codeunit 6150857 "NPR POS Action: Item UnitPrice"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           Text000,
           ActionVersion(),
           Sender.Type::Generic,

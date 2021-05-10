@@ -34,7 +34,7 @@
         RecRef: RecordRef;
         ChangeLogMgt: Codeunit "Change Log Management";
     begin
-        GetGLSetup;
+        GetGLSetup();
         NPRLineDimension.SetRange("Table ID", TableID);
         NPRLineDimension.SetRange("Register No.", RegisterNo);
         NPRLineDimension.SetRange("Sales Ticket No.", SalesTicketNo);
@@ -80,7 +80,7 @@
         j: Integer;
         NoFilter: array[2] of Code[20];
     begin
-        GetGLSetup;
+        GetGLSetup();
         TempDimBuf2.Reset();
         TempDimBuf2.DeleteAll();
         if TempDimBuf1.FindSet() then begin
@@ -230,7 +230,7 @@
         DimVal: Record "Dimension Value";
         GLSetup: Record "General Ledger Setup";
     begin
-        GetGLSetup;
+        GetGLSetup();
         if GLSetupShortcutDimCode[FieldNumber] = '' then
             Error(Text002, GLSetup.TableCaption);
         DimVal.SetRange("Dimension Code", GLSetupShortcutDimCode[FieldNumber]);
@@ -263,7 +263,7 @@
         xRecRef: RecordRef;
         ChangeLogMgt: Codeunit "Change Log Management";
     begin
-        GetGLSetup;
+        GetGLSetup();
         if ShortcutDimCode <> '' then begin
             if NPRLineDim.Get(TableID, RegisterNo, SalesTicketNo, Date2, SaleType, LineNo, No, GLSetupShortcutDimCode[FieldNumber]) then begin
                 xRecRef.GetTable(NPRLineDim);
@@ -308,7 +308,7 @@
     #region SaveTempDim
     procedure SaveTempDim(FieldNumber: Integer; ShortcutDimCode: Code[20])
     begin
-        GetGLSetup;
+        GetGLSetup();
         TempDimBuf2.SetRange("Dimension Code", GLSetupShortcutDimCode[FieldNumber]);
         if ShortcutDimCode <> '' then begin
             if TempDimBuf2.FindFirst() then begin

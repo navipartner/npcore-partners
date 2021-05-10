@@ -194,7 +194,7 @@ table 6014678 "NPR Endpoint Query"
         "Creation Date" := CurrentDateTime;
 
         if "Database Name" = '' then begin
-            ActiveSession.SetRange("Session ID", SessionId);
+            ActiveSession.SetRange("Session ID", SessionId());
             if ActiveSession.FindFirst() then
                 "Database Name" := CopyStr("Database Name", 1, MaxStrLen("Database Name"));
         end;
@@ -219,7 +219,7 @@ table 6014678 "NPR Endpoint Query"
     procedure ProcessQuery()
     begin
         if Status in [Status::New, Status::Rejected] then begin
-            if CreateEndpointRequests then
+            if CreateEndpointRequests() then
                 Validate(Status, Status::Processed)
             else
                 Validate(Status, Status::Rejected);
@@ -259,8 +259,8 @@ table 6014678 "NPR Endpoint Query"
                     FldRef.SetFilter(EndpointQueryFilter."Filter Text");
                 end;
             until EndpointQueryFilter.Next() = 0;
-        if StrLen(RecRef.GetView) <= MaxStrLen("Table View") then begin
-            "Table View" := RecRef.GetView
+        if StrLen(RecRef.GetView()) <= MaxStrLen("Table View") then begin
+            "Table View" := RecRef.GetView()
         end else begin
             "Table No." := 0;
             "Table View" := '';

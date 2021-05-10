@@ -20,7 +20,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           Text000,
           ActionVersion(),
           Sender.Type::Generic,

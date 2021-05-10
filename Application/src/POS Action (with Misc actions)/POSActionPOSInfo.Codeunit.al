@@ -112,12 +112,12 @@ codeunit 6150829 "NPR POS Action: POS Info"
         POSSale.GetCurrentSale(SalePOS);
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type = CurrentView.Type::Sale) then begin
+        if (CurrentView.Type() = CurrentView.Type()::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         end;
 
-        if (CurrentView.Type = CurrentView.Type::Payment) then begin
+        if (CurrentView.Type() = CurrentView.Type()::Payment) then begin
             POSSession.GetPaymentLine(POSPaymentLine);
             POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
         end;

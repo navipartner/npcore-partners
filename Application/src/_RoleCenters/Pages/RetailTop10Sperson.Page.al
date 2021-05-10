@@ -25,7 +25,7 @@ page 6059817 "NPR Retail Top 10 S.person"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
                 field(Enddate; Enddate)
@@ -36,7 +36,7 @@ page 6059817 "NPR Retail Top 10 S.person"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
             }
@@ -173,8 +173,8 @@ page 6059817 "NPR Retail Top 10 S.person"
 
     local procedure UpdateList()
     begin
-        Setdate;
-        ExecuteQuery;
+        Setdate();
+        ExecuteQuery();
     end;
 
     local procedure ExecuteQuery()

@@ -12,7 +12,7 @@ report 6014543 "NPR Item - Loss - Top 10"
 
             trigger OnAfterGetRecord()
             begin
-                ItemShrinkage;
+                ItemShrinkage();
             end;
 
             trigger OnPreDataItem()

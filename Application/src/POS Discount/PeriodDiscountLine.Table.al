@@ -421,7 +421,7 @@ table 6014414 "NPR Period Discount Line"
         if QtyDiscLine.Find('-') then
             Message(Text1060005);
 
-        UpdatePeriodDiscount;
+        UpdatePeriodDiscount();
 
         UpdateLine();
     end;
@@ -430,7 +430,7 @@ table 6014414 "NPR Period Discount Line"
     begin
         "Last Date Modified" := Today();
 
-        UpdatePeriodDiscount;
+        UpdatePeriodDiscount();
 
         UpdateLine();
     end;
@@ -440,7 +440,7 @@ table 6014414 "NPR Period Discount Line"
         RetailComment: Record "NPR Retail Comment";
         RetailComment2: Record "NPR Retail Comment";
     begin
-        UpdatePeriodDiscount;
+        UpdatePeriodDiscount();
 
         RetailComment.SetRange("Table ID", 6014414);
         RetailComment.SetRange("No.", xRec.Code);

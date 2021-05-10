@@ -738,7 +738,7 @@
         POSPostingLog."Posting Timestamp" := CurrentDateTime;
         POSPostingLog."With Error" := true;
         POSPostingLog."Error Description" := CopyStr(ErrorReason, 1, MaxStrLen(POSPostingLog."Error Description"));
-        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView, 1, MaxStrLen(POSPostingLog."POS Entry View"));
+        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
         POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
         POSPostingLog.Insert(true);
         exit(POSPostingLog."Entry No.");
@@ -1205,7 +1205,7 @@
             exit('');
         POSFrontEnd.GetSession(POSSession);
         POSSession.GetSetup(POSSetup);
-        exit(POSSetup.Salesperson);
+        exit(POSSetup.Salesperson());
 
     end;
 

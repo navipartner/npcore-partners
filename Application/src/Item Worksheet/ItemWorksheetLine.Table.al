@@ -45,10 +45,10 @@ table 6060042 "NPR Item Worksheet Line"
                             if "Existing Item No." <> '' then begin
                                 "Internal Bar Code" := '';
                                 "Vendors Bar Code" := '';
-                                DeleteRelatedLines;
+                                DeleteRelatedLines();
                             end;
                             if "Item No." = '' then
-                                Validate("Item No.", GetNewItemNo);
+                                Validate("Item No.", GetNewItemNo());
                             if (CurrFieldNo <> 0) and (xRec.Action = xRec.Action::Skip) and GuiAllowed then begin
                                 ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                                 ItemWorksheetVariantLine.SetRange("Worksheet Name", "Worksheet Name");
@@ -63,7 +63,7 @@ table 6060042 "NPR Item Worksheet Line"
                                                     ItemWorksheetVariantLine.Modify(true);
                                                 end;
                                             until ItemWorksheetVariantLine.Next() = 0;
-                                        "Status Comment" := CopyStr(ItemWorksheetVariantLine.GetStatusCommentText, 1, MaxStrLen("Status Comment"));
+                                        "Status Comment" := CopyStr(ItemWorksheetVariantLine.GetStatusCommentText(), 1, MaxStrLen("Status Comment"));
                                     end;
                             end;
                         end;
@@ -173,7 +173,7 @@ table 6060042 "NPR Item Worksheet Line"
                 if Action = Action::CreateNew then
                     if "Existing Item No." <> '' then
                         if "Item No." = '' then
-                            Validate("Item No.", GetNewItemNo);
+                            Validate("Item No.", GetNewItemNo());
                 UpdateVarietyHeadingText();
                 FillMappedFields();
             end;
@@ -894,7 +894,7 @@ table 6060042 "NPR Item Worksheet Line"
                 if "Variety Group" <> xRec."Variety Group" then begin
                     //updateitem
                     if "Variety Group" = '' then
-                        VRTGroup.Init
+                        VRTGroup.Init()
                     else
                         VRTGroup.Get("Variety Group");
 
@@ -1880,13 +1880,13 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");
 
             if ItemWorksheet."Sales Price Currency Code" = '' then
-                SalesCurrency.InitRoundingPrecision
+                SalesCurrency.InitRoundingPrecision()
             else begin
                 SalesCurrency.Get(ItemWorksheet."Sales Price Currency Code");
                 SalesCurrency.TestField("Amount Rounding Precision");
             end;
             if ItemWorksheet."Purchase Price Currency Code" = '' then
-                PurchaseCurrency.InitRoundingPrecision
+                PurchaseCurrency.InitRoundingPrecision()
             else begin
                 PurchaseCurrency.Get(ItemWorksheet."Purchase Price Currency Code");
                 PurchaseCurrency.TestField("Amount Rounding Precision");
@@ -2061,7 +2061,7 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheetTemplate."Item No. Creation by"::NoSeriesInWorksheet:
                 begin
                     NoSeriesMgt.InitSeries("No. Series", "No. Series", 0D, "Item No.", "No. Series");
-                    Prefix := ItemNoPrefix;
+                    Prefix := ItemNoPrefix();
                     if StrLen(Prefix + "Item No.") < MaxStrLen("Item No.") then
                         exit(Prefix + "Item No.");
                     exit("Item No.");
@@ -2074,7 +2074,7 @@ table 6060042 "NPR Item Worksheet Line"
                     NoSeriesMgt.TestManual("No. Series");
                     if "Vendor Item No." = '' then
                         exit('');
-                    Prefix := ItemNoPrefix;
+                    Prefix := ItemNoPrefix();
                     if StrLen(Prefix + "Vendor Item No.") < MaxStrLen("Vendor Item No.") then
                         exit(Prefix + "Vendor Item No.");
                     exit("Vendor Item No.");
@@ -2312,7 +2312,7 @@ table 6060042 "NPR Item Worksheet Line"
                                                 ItemWorksheetVariantLine."Item No." := Rec."Item No.";
                                                 ItemWorksheetVariantLine."Existing Item No." := Rec."Existing Item No.";
 
-                                                ExistingVariantCode := ItemWorksheetVariantLine.GetExistingVariantCode;
+                                                ExistingVariantCode := ItemWorksheetVariantLine.GetExistingVariantCode();
                                                 if ExistingVariantCode <> '' then
                                                     ItemWorksheetVariantLine.Validate("Existing Variant Code", ExistingVariantCode);
 
@@ -3072,8 +3072,8 @@ table 6060042 "NPR Item Worksheet Line"
                         exit(false);
             end;
         end else begin
-            SourceRecRef := SourceFldRef.Record;
-            TargetRecRef := TargetFldRef.Record;
+            SourceRecRef := SourceFldRef.Record();
+            TargetRecRef := TargetFldRef.Record();
             if SourceFieldRec.Get(SourceRecRef.Number, SourceFldRef.Number) and TargetFieldRec.Get(TargetRecRef.Number, TargetFldRef.Number) then begin
                 if SourceFieldRec.Type = TargetFieldRec.Type then begin
                     TargetFldRef.Value(SourceFldRef.Value);

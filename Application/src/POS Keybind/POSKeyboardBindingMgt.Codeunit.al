@@ -278,7 +278,7 @@
     begin
         ErrMessage := '';
         AvailablePOSKeybind.SetFilter("Key Name", StrSubstNo('@%1', KeyBind));
-        if (not AvailablePOSKeybind.FindFirst) or (not AvailablePOSKeybind.Supported) then begin
+        if (not AvailablePOSKeybind.FindFirst()) or (not AvailablePOSKeybind.Supported) then begin
             ErrMessage := StrSubstNo(NoSuchKeyBindErr, KeyBind);
             exit(false);
         end;

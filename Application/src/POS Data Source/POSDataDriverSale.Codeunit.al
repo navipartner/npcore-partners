@@ -29,9 +29,9 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo(Sale.Date), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Contact No."), false);
 
-        DataSource.AddColumn(GetRegisterNameText, Caption_RegisterName, DataType::String, false);
-        DataSource.AddColumn(GetCustomerNameText, Caption_CustomerName, DataType::String, false);
-        DataSource.AddColumn(GetContactNameText, Caption_ContactName, DataType::String, false);
+        DataSource.AddColumn(GetRegisterNameText(), Caption_RegisterName, DataType::String, false);
+        DataSource.AddColumn(GetCustomerNameText(), Caption_CustomerName, DataType::String, false);
+        DataSource.AddColumn(GetContactNameText(), Caption_ContactName, DataType::String, false);
         DataSource.AddColumn(GetLastSaleNoText(), '', DataType::String, false);
         DataSource.AddColumn(GetLastSaleTotalText(), '', DataType::Decimal, false);
         DataSource.AddColumn(GetLastSalePaidText(), '', DataType::Decimal, false);
@@ -48,7 +48,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
     var
         Sale: Codeunit "NPR POS Sale";
     begin
-        if DataSource.Id <> GetSourceNameText() then
+        if DataSource.Id() <> GetSourceNameText() then
             exit;
 
         POSSession.GetSale(Sale);

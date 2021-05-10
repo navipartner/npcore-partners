@@ -331,7 +331,7 @@
 
                 trigger OnAction()
                 begin
-                    Rec.ShowDimensions;
+                    Rec.ShowDimensions();
                 end;
             }
             action("Sales Document")

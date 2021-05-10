@@ -76,13 +76,13 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnInitJob', '', false, false)]
     local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
-        InitJob;
+        InitJob();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnEndJob', '', false, false)]
@@ -268,7 +268,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         end;
 
         PrintBarCodeA(BarcodeId, Text);
-        LineFeed;
+        LineFeed();
 
         if Rotation > 0 then
             SelectPrintDirectInPageMode(0);
@@ -306,7 +306,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
     begin
         case Char of
             'G':
-                PrintDefaultLogo;
+                PrintDefaultLogo();
             'P':
                 SelectCutModeAndCutPaper(66, 3);//papercut
             'A':
@@ -330,7 +330,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
             'e':
                 GeneratePulse(1, 125, 125);
             'h':
-                PrintAltDefaultLogo;
+                PrintAltDefaultLogo();
         end;
     end;
 

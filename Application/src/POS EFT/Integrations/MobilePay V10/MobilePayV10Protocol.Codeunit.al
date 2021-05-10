@@ -452,7 +452,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         EFTTransactionRequest."Force Closed" := true;
-        EFTTransactionRequest.Modify;
+        EFTTransactionRequest.Modify();
 
         mobilePayIntegration.HandleProtocolResponse(EFTTransactionRequest);
     end;

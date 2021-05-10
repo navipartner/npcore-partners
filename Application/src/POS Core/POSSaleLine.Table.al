@@ -144,7 +144,7 @@ table 6014406 "NPR POS Sale Line"
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                GetItem;
+                GetItem();
                 "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
                 "Quantity (Base)" := CalcBaseQty(Quantity);
                 "Unit Price" := FindItemSalesPrice();
@@ -184,15 +184,15 @@ table 6014406 "NPR POS Sale Line"
                         end;
                     Type::Item:
                         begin
-                            GetItem;
+                            GetItem();
                             "Quantity (Base)" := CalcBaseQty(Quantity);
 
-                            UpdateDependingLinesQuantity;
+                            UpdateDependingLinesQuantity();
 
                             if ("Discount Type" = "Discount Type"::Manual) and ("Discount %" <> 0) then
                                 Validate("Discount %");
 
-                            CalculateCostPrice;
+                            CalculateCostPrice();
                             UpdateAmounts(Rec);
 
                             if not Item."NPR Group sale" then begin
@@ -226,7 +226,7 @@ table 6014406 "NPR POS Sale Line"
                             "Amount Including VAT" := 0;
                         end;
                 end;
-                UpdateCost;
+                UpdateCost();
             end;
         }
         field(13; "Invoice (Qty)"; Decimal)
@@ -274,7 +274,7 @@ table 6014406 "NPR POS Sale Line"
                         begin
                             if "Unit Price" < 0 then
                                 Error(ErrItemBelow);
-                            GetItem;
+                            GetItem();
 
                             "Eksp. Salgspris" := true;
                             GetAmount(Rec, Item, "Unit Price");
@@ -321,7 +321,7 @@ table 6014406 "NPR POS Sale Line"
             trigger OnValidate()
             begin
                 "Unit Cost" := "Unit Cost (LCY)";
-                UpdateCost;
+                UpdateCost();
             end;
         }
         field(17; "VAT %"; Decimal)
@@ -375,18 +375,18 @@ table 6014406 "NPR POS Sale Line"
                                 Error(Trans0003);
                             "Discount Type" := "Discount Type"::" ";
                             "Discount Code" := '';
-                            "Discount Amount" := Round("Unit Price" * "Discount %" / 100, POSSetup.AmountRoundingPrecision);
+                            "Discount Amount" := Round("Unit Price" * "Discount %" / 100, POSSetup.AmountRoundingPrecision());
                             "Amount Including VAT" := "Unit Price" - "Discount Amount";
                         end;
                     Type::Item:
                         begin
-                            RemoveBOMDiscount;
+                            RemoveBOMDiscount();
                             if "Discount %" > 0 then
                                 "Discount Type" := "Discount Type"::Manual;
                             "Discount Code" := xRec."Discount Code";
                             "Amount Including VAT" := 0;
                             "Discount Amount" := 0;
-                            if Modify then;
+                            if Modify() then;
                             GetItem();
                             GetAmount(Rec, Item, Rec."Unit Price");
                         end;
@@ -448,7 +448,7 @@ table 6014406 "NPR POS Sale Line"
                     case Type of
                         Type::Item:
                             begin
-                                GetItem;
+                                GetItem();
                                 if Amount * xRec.Amount <> Abs(Amount) * Abs(xRec.Amount) then
                                     Error(Trans0001);
 
@@ -462,7 +462,7 @@ table 6014406 "NPR POS Sale Line"
                                 "Discount Amount" := 0;
                                 "Amount Including VAT" := 0;
 
-                                if Modify then;
+                                if Modify() then;
                                 GetAmount(Rec, Item, Rec."Unit Price");
                             end;
                     end;
@@ -544,13 +544,13 @@ table 6014406 "NPR POS Sale Line"
 
             trigger OnLookup()
             begin
-                SerialNoLookup;
+                SerialNoLookup();
             end;
 
             trigger OnValidate()
             begin
                 SerialNoValidate();
-                Validate("Unit Cost (LCY)", GetUnitCostLCY);
+                Validate("Unit Cost (LCY)", GetUnitCostLCY());
             end;
         }
         field(44; "Customer/Item Discount %"; Decimal)
@@ -705,7 +705,7 @@ table 6014406 "NPR POS Sale Line"
             trigger OnValidate()
             begin
                 if "Special price" = 0 then begin
-                    GetItem;
+                    GetItem();
                     "Custom Price" := false;
                     "Eksp. Salgspris" := false;
                     GetAmount(Rec, Item, FindItemSalesPrice());
@@ -769,7 +769,7 @@ table 6014406 "NPR POS Sale Line"
                     if ReturnReason."Inventory Value Zero" then
                         Validate("Unit Cost (LCY)", 0);
                 end else begin
-                    GetPOSHeader;
+                    GetPOSHeader();
                     if "Location Code" <> SalePOS."Location Code" then
                         Validate("Location Code", SalePOS."Location Code");
                     CalculateCostPrice();
@@ -796,7 +796,7 @@ table 6014406 "NPR POS Sale Line"
                 if "Unit Cost" <> 0 then begin
                     "Custom Cost" := true;
                     "Unit Cost (LCY)" := "Unit Cost";
-                    UpdateCost;
+                    UpdateCost();
                 end else begin
                     "Custom Cost" := false;
                     Validate("No.");
@@ -833,7 +833,7 @@ table 6014406 "NPR POS Sale Line"
                 TestField(Type);
                 TestField(Quantity);
                 TestField("Unit Price");
-                GetPOSHeader;
+                GetPOSHeader();
                 "Line Amount" := Round("Line Amount", Currency."Amount Rounding Precision");
             end;
         }
@@ -1679,7 +1679,7 @@ table 6014406 "NPR POS Sale Line"
     trigger OnInsert()
     begin
         if "Orig. POS Sale ID" = 0 then begin
-            GetPOSHeader;
+            GetPOSHeader();
 
             "Orig. POS Sale ID" := SalePOS."POS Sale ID";
             "Orig. POS Line No." := "Line No.";
@@ -1723,20 +1723,20 @@ table 6014406 "NPR POS Sale Line"
     begin
         if SalePOS2.Get("Register No.", "Sales Ticket No.") then
             SalePOS := SalePOS2;
-        Currency.InitRoundingPrecision;
+        Currency.InitRoundingPrecision();
     end;
 
     procedure SetPOSHeader(NewSalePOS: Record "NPR POS Sale")
     begin
         SalePOS := NewSalePOS;
-        Currency.InitRoundingPrecision;
+        Currency.InitRoundingPrecision();
     end;
 
     procedure CalculateCostPrice()
     var
         VATPercent: Decimal;
     begin
-        GetItem;
+        GetItem();
 
         if "Price Includes VAT" then
             VATPercent := "VAT %"
@@ -1763,7 +1763,7 @@ table 6014406 "NPR POS Sale Line"
             if SaleLinePOS.FindSet(true, false) then
                 repeat
                     if SaleLinePOS.Type = Type::"BOM List" then
-                        SaleLinePOS.Delete
+                        SaleLinePOS.Delete()
                     else begin
                         SaleLinePOS."Discount Type" := "Discount Type"::" ";
                         SaleLinePOS."Discount Code" := '';
@@ -1784,7 +1784,7 @@ table 6014406 "NPR POS Sale Line"
     begin
         if "Manual Item Sales Price" then
             exit("Unit Price");
-        GetPOSHeader;
+        GetPOSHeader();
         TempSaleLinePOS := Rec;
         TempSaleLinePOS."Currency Code" := '';
         POSSalesPriceCalcMgt.FindItemPrice(SalePOS, TempSaleLinePOS);
@@ -1892,7 +1892,7 @@ table 6014406 "NPR POS Sale Line"
     var
         ServiceItem: Record "Service Item";
     begin
-        GetPOSHeader;
+        GetPOSHeader();
         ServiceItem.Init();
         ServiceItem.Insert(true);
         ServiceItem.Validate("Item No.", "No.");
@@ -1996,7 +1996,7 @@ table 6014406 "NPR POS Sale Line"
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
     begin
-        GetPOSHeader;
+        GetPOSHeader();
 
         TableID[1] := Type1;
         No[1] := No1;
@@ -2082,7 +2082,7 @@ table 6014406 "NPR POS Sale Line"
 
     local procedure InitFromSalePOS()
     begin
-        GetPOSHeader;
+        GetPOSHeader();
         "Allow Line Discount" := SalePOS."Allow Line Discount";
         "Location Code" := SalePOS."Location Code";
         "Price Includes VAT" := SalePOS."Prices Including VAT";
@@ -2121,7 +2121,7 @@ table 6014406 "NPR POS Sale Line"
             exit;
 
         GLAccount.Get("No.");
-        GLAccount.CheckGLAcc;
+        GLAccount.CheckGLAcc();
         Description := GLAccount.Name;
         "Gen. Posting Type" := GLAccount."Gen. Posting Type";
         "Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
@@ -2137,7 +2137,7 @@ table 6014406 "NPR POS Sale Line"
             exit;
 
         TestItem();
-        GetItem;
+        GetItem();
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         "Item Category Code" := Item."Item Category Code";
@@ -2160,7 +2160,7 @@ table 6014406 "NPR POS Sale Line"
             exit;
 
         ItemCategory.Get("No.");
-        GetItem;
+        GetItem();
         Item.TestField("NPR Group sale");
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
@@ -2240,7 +2240,7 @@ table 6014406 "NPR POS Sale Line"
             exit("Unit Cost");
 
         if ("Serial No." <> '') and (Quantity > 0) then begin
-            GetItem;
+            GetItem();
             Item.TestField("Item Tracking Code");
             ItemTrackingCode.Get(Item."Item Tracking Code");
             if ItemTrackingCode."SN Specific Tracking" then begin
@@ -2348,7 +2348,7 @@ table 6014406 "NPR POS Sale Line"
         TestField("Sale Type", "Sale Type"::Sale);
         TestField(Type, Type::Item);
 
-        GetItem;
+        GetItem();
         Item.TestField("Costing Method", Item."Costing Method"::Specific);
         ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
@@ -2408,7 +2408,7 @@ table 6014406 "NPR POS Sale Line"
         TestField("Sale Type", "Sale Type"::Sale);
         TestField(Quantity);
 
-        GetItem;
+        GetItem();
         Item.TestField("Item Tracking Code");
         ItemTrackingCode.Get(Item."Item Tracking Code");
 

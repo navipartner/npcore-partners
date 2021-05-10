@@ -22,9 +22,9 @@ table 6151061 "NPR Retail Repl. Demand Line"
                 if "Item No." <> xRec."Item No." then begin
                     "Variant Code" := '';
                 end;
-                GetItem;
+                GetItem();
                 Item.TestField(Blocked, false);
-                UpdateDescription;
+                UpdateDescription();
                 "Item Category Code" := Item."Item Category Code";
                 Item.TestField("Base Unit of Measure");
             end;
@@ -132,7 +132,7 @@ table 6151061 "NPR Retail Repl. Demand Line"
 
                 "Bin Code" := '';
 
-                CheckSKU;
+                CheckSKU();
             end;
         }
         field(18; "Recurring Method"; Option)
@@ -603,7 +603,7 @@ table 6151061 "NPR Retail Repl. Demand Line"
         Vend: Record Vendor;
     begin
         if "Variant Code" = '' then begin
-            GetItem;
+            GetItem();
             Description := Item.Description;
         end else begin
             ItemVariant.Get("Item No.", "Variant Code");

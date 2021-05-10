@@ -526,7 +526,7 @@ table 6059975 "NPR Variety Field Setup"
             exit;
 
 
-        InitVarietyFields;
+        InitVarietyFields();
         //+NPR5.32 [274170]
     end;
 

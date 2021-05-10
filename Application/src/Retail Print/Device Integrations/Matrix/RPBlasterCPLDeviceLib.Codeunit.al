@@ -39,7 +39,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnInitJob', '', false, false)]
@@ -561,7 +561,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 
     local procedure AddTextToBuffer(Text: Text[1024])
     begin
-        PrintBuffer += Text + ESC.CR + ESC.LF;
+        PrintBuffer += Text + ESC.CR() + ESC.LF();
     end;
 
     procedure LatinConvert(Input: Text[1024]) Output: Text[1024]
@@ -614,7 +614,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
                 'MEDIA_SIZE':
                     tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Text;
             end;
-            exit(tmpDeviceSetting.Insert);
+            exit(tmpDeviceSetting.Insert());
         end;
     end;
 

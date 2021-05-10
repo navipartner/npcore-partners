@@ -22,10 +22,10 @@ codeunit 6150742 "NPR POS Cancel Sale Key Bind"
         if not POSKeyboardBindingMgt.KeyboardBindingEnabled(GetActionCode(), KeyPress, GetKeyCode()) then
             exit;
         POSSession.GetCurrentView(POSView);
-        case POSView.Type of
-            POSView.Type::Sale:
+        case POSView.Type() of
+            POSView.Type()::Sale:
                 CancelSale(FrontEnd, POSSession);
-            POSView.Type::Payment:
+            POSView.Type()::Payment:
                 POSSession.ChangeViewSale();
         end;
     end;

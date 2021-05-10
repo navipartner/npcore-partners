@@ -17,19 +17,19 @@ codeunit 6059984 "NPR MPOS Helper Functions"
 
     procedure GetTenantID(): Text
     begin
-        exit(TenantId);
+        exit(TenantId());
     end;
 
     local procedure FindMySession()
     begin
-        if (ActiveSession."Server Instance ID" = ServiceInstanceId) and
-           (ActiveSession."Session ID" = SessionId) then
+        if (ActiveSession."Server Instance ID" = ServiceInstanceId()) and
+           (ActiveSession."Session ID" = SessionId()) then
             exit;
 
         SelectLatestVersion();
 
-        ActiveSession.SetRange("Server Instance ID", ServiceInstanceId);
-        ActiveSession.SetRange("Session ID", SessionId);
+        ActiveSession.SetRange("Server Instance ID", ServiceInstanceId());
+        ActiveSession.SetRange("Session ID", SessionId());
         if not ActiveSession.FindFirst() then begin
             Sleep(500);
             if not GuiAllowed then

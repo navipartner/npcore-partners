@@ -95,7 +95,7 @@
                     CustToAnonymize.Reset();
                     CustToAnonymize.DeleteAll();
 
-                    if (GDPRSetup.Get) then;
+                    if (GDPRSetup.Get()) then;
 
                     DateFormulaTxt := '-' + Format(GDPRSetup."Anonymize After");
                     Evaluate(VarPeriod, DateFormulaTxt);
@@ -204,7 +204,7 @@
     begin
 
         Rec.Reset();
-        if (not Rec.Get) then begin
+        if (not Rec.Get()) then begin
             Rec.Init();
             Rec.Insert();
         end;

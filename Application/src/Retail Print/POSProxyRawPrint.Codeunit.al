@@ -35,7 +35,7 @@ codeunit 6151000 "NPR POS Proxy: Raw Print"
             PrintRequest.TargetEncodingName := TargetEncoding;
         end;
 
-        FrontEnd.InvokeDevice(PrintRequest, ProtocolName, 'PRINT');
+        FrontEnd.InvokeDevice(PrintRequest, ProtocolName(), 'PRINT');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
@@ -45,7 +45,7 @@ codeunit 6151000 "NPR POS Proxy: Raw Print"
         PrintResponse: DotNet NPRNetPrintResponse0;
         ResponseMessage: Text;
     begin
-        if ActionName <> ProtocolName then
+        if ActionName <> ProtocolName() then
             exit;
 
         Stargate.DeserializeEnvelope(Envelope, PrintResponse, FrontEnd);

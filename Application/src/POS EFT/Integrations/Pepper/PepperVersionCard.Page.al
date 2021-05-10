@@ -199,7 +199,7 @@ page 6184497 "NPR Pepper Version Card"
                     trigger OnAction()
                     begin
                         Rec.UploadZipFile(0);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
             }
@@ -216,7 +216,7 @@ page 6184497 "NPR Pepper Version Card"
                     trigger OnAction()
                     begin
                         Rec.ClearZipFile(0);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
             }
@@ -241,7 +241,7 @@ page 6184497 "NPR Pepper Version Card"
 
     trigger OnAfterGetRecord()
     begin
-        UpdateBLOBCheck;
+        UpdateBLOBCheck();
     end;
 
     var

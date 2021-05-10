@@ -24,7 +24,7 @@ page 6059813 "NPR Retail Sales Chart"
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
-                    UpdateChart;
+                    UpdateChart();
                 end;
             }
         }
@@ -49,7 +49,7 @@ page 6059813 "NPR Retail Sales Chart"
                     begin
                         Period := Period::" ";
                         PeriodType := PeriodType::Day;
-                        UpdateChart;
+                        UpdateChart();
                     end;
                 }
                 action(Week)
@@ -63,7 +63,7 @@ page 6059813 "NPR Retail Sales Chart"
                     begin
                         Period := Period::" ";
                         PeriodType := PeriodType::Week;
-                        UpdateChart;
+                        UpdateChart();
                     end;
                 }
                 action(Month)
@@ -77,7 +77,7 @@ page 6059813 "NPR Retail Sales Chart"
                     begin
                         Period := Period::" ";
                         PeriodType := PeriodType::Month;
-                        UpdateChart;
+                        UpdateChart();
                     end;
                 }
                 action(Quarter)
@@ -91,7 +91,7 @@ page 6059813 "NPR Retail Sales Chart"
                     begin
                         Period := Period::" ";
                         PeriodType := PeriodType::Quarter;
-                        UpdateChart;
+                        UpdateChart();
                     end;
                 }
                 action(Year)
@@ -105,7 +105,7 @@ page 6059813 "NPR Retail Sales Chart"
                     begin
                         Period := Period::" ";
                         PeriodType := PeriodType::Year;
-                        UpdateChart;
+                        UpdateChart();
                     end;
                 }
             }
@@ -119,7 +119,7 @@ page 6059813 "NPR Retail Sales Chart"
                 trigger OnAction()
                 begin
                     Period := Period::Previous;
-                    UpdateChart;
+                    UpdateChart();
                 end;
             }
             action("Next")
@@ -132,7 +132,7 @@ page 6059813 "NPR Retail Sales Chart"
                 trigger OnAction()
                 begin
                     Period := Period::Next;
-                    UpdateChart;
+                    UpdateChart();
                 end;
             }
         }

@@ -24,7 +24,7 @@ codeunit 6150721 "NPR POS Action - Login"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           ActionDescription,
           ActionVersion(),
           Sender.Type::BackEnd,
@@ -185,7 +185,7 @@ codeunit 6150721 "NPR POS Action - Login"
         ResumeExistingSale := POSResumeSale.SelectUnfinishedSaleToResume(SalePOS, POSSession, ResumeFromPOSQuoteNo);
 
         POSSession.GetSetup(POSSetup);
-        POSCreateEntry.InsertUnitLoginEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson);
+        POSCreateEntry.InsertUnitLoginEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
 
         if ResumeExistingSale and (ResumeFromPOSQuoteNo = 0) then
             POSSession.ResumeTransaction(SalePOS)

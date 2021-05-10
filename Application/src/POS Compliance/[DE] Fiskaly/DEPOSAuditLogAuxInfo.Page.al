@@ -135,7 +135,7 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                     IF NOT DEAuditMgt.DeAuxInfoInsertResponse(Rec, ResponseJson) THEN
                         Message(GETLASTERRORTEXT);
 
-                    Rec.MODIFY;
+                    Rec.MODIFY();
                 end;
             }
             action(ShowError)

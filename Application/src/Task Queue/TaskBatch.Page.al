@@ -76,7 +76,7 @@ page 6059901 "NPR Task Batch"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         //-TQ1.29
-        Rec.SetupNewBatch;
+        Rec.SetupNewBatch();
         //+TQ1.29
     end;
 }

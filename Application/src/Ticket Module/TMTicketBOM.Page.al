@@ -144,7 +144,7 @@ page 6060121 "NPR TM Ticket BOM"
 
                     trigger OnDrillDown()
                     begin
-                        CurrPage.SaveRecord;
+                        CurrPage.SaveRecord();
                         Rec.TestField("Ticket Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;

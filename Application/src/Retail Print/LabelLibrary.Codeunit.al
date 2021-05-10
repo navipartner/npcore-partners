@@ -144,7 +144,7 @@
         end;
 
         if TmpSelectionBuffer.Get(RecRefIn.RecordId) then
-            TmpSelectionBuffer.Delete
+            TmpSelectionBuffer.Delete()
         else
             TransferSelectionFields(RecRefIn);
     end;

@@ -81,7 +81,7 @@ then begin
             POSSession.GetSetup(POSSetup);
             if (SalespersonPurchaser.Code <> POSSetup.Salesperson()) then begin
 
-                if (not Confirm(ChangeSalesperson, false, POSSetup.Salesperson)) then
+                if (not Confirm(ChangeSalesperson, false, POSSetup.Salesperson())) then
                     Error('');
 
                 POSSetup.SetSalesperson(SalespersonPurchaser);

@@ -1094,7 +1094,7 @@
         Currency: Record Currency;
     begin
         Clear(Currency);
-        Currency.InitRoundingPrecision;
+        Currency.InitRoundingPrecision();
         AmountRoundingPrecision := Currency."Amount Rounding Precision";
         UnitAmountRoundingPrecision := Currency."Unit-Amount Rounding Precision";
         if CurrencyCode <> '' then begin
@@ -1181,7 +1181,7 @@
                     if JobPlanningLineInvoice.FindFirst() then begin
                         JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
                         Job.Get(JobPlanningLine."Job No.");
-                        Job.TestBlocked;
+                        Job.TestBlocked();
                         Job.TestField(Status, Job.Status::Open);
                         JobTask.Get(SalesLine."Job No.", SalesLine."Job Task No.");
                         JobTask.TestField("Job Task Type", JobTask."Job Task Type"::Posting);
@@ -1257,7 +1257,7 @@
                 JobPlanningLineInvoice."Invoiced Cost Amount (LCY)" := JobPlanningLineInvoice."Quantity Transferred" * JobPlanningLine."Unit Cost (LCY)";
                 JobPlanningLineInvoice."Job Ledger Entry No." := NextEntryNo;
                 JobPlanningLineInvoice.Modify();
-                JobPlanningLine.UpdateQtyToInvoice;
+                JobPlanningLine.UpdateQtyToInvoice();
                 JobPlanningLine.Modify();
             until NonPostedJobPlanningLineInvoice.Next() = 0;
         PostedJobPlanningLineInvoice.SetRange("Document Type", PostedDocType);
@@ -1545,7 +1545,7 @@
                     JobJnlLine."Dimension Set ID" := DimSetID;
                 end;
             EntryType::Usage:
-                JobJnlLine.UpdateDimensions;
+                JobJnlLine.UpdateDimensions();
         end;
     end;
 
@@ -1643,7 +1643,7 @@
                                 if JobJnlLine."Currency Code" <> '' then
                                     Currency.Get(JobJnlLine."Currency Code")
                                 else
-                                    Currency.InitRoundingPrecision;
+                                    Currency.InitRoundingPrecision();
 
                                 UpdateJobJnlLineTotalAmounts(JobJnlLine, Currency."Amount Rounding Precision");
                                 UpdateJobJnlLineAmount(
@@ -1680,7 +1680,7 @@
         ValueEntry.SetRange("Document No.", JobPlanningLineInvoice."Document No.");
         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
         ValueEntry.SetRange("Job Ledger Entry No.", 0);
-        exit(ValueEntry.FindSet);
+        exit(ValueEntry.FindSet());
     end;
 
     local procedure CreateJobLedgEntry(JobJnlLine: Record "Job Journal Line"): Integer
@@ -1790,7 +1790,7 @@
     begin
         if JobJnlLine."Currency Code" = '' then begin
             Clear(Currency);
-            Currency.InitRoundingPrecision
+            Currency.InitRoundingPrecision()
         end else begin
             Currency.Get(JobJnlLine."Currency Code");
             Currency.TestField("Amount Rounding Precision");
@@ -1953,7 +1953,7 @@
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
     begin
-        ClearAll;
+        ClearAll();
         if JobPlanningLine."Line No." = 0 then
             exit;
         JobPlanningLine.TestField("Job No.");

@@ -11,7 +11,7 @@
         //CheckMaxRequests;
         //+NPR5.30 [267582]
 
-        CheckWaitingRequests;
+        CheckWaitingRequests();
     end;
 
     local procedure CheckMaxRequests()

@@ -135,7 +135,7 @@ page 6150718 "NPR POS Menu Filter"
 
                 trigger OnAction()
                 begin
-                    Rec.ActivateFilter;
+                    Rec.ActivateFilter();
                 end;
             }
             action(Deactivate)
@@ -151,7 +151,7 @@ page 6150718 "NPR POS Menu Filter"
 
                 trigger OnAction()
                 begin
-                    Rec.DeActivateFilter;
+                    Rec.DeActivateFilter();
                 end;
             }
             action("Table Filter")
@@ -168,7 +168,7 @@ page 6150718 "NPR POS Menu Filter"
 
                 trigger OnAction()
                 begin
-                    Rec.TableFilter;
+                    Rec.TableFilter();
                 end;
             }
             action(GenericFilter)

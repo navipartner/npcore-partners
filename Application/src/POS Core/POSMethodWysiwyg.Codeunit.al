@@ -402,7 +402,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         ScopeID: Guid;
     begin
         CopyParametersFromActionToTempParam(POSMenuButton."Action Code", TempParam);
-        ScopeID := JSON.StoreScope;
+        ScopeID := JSON.StoreScope();
         if not JSON.SetScope('parameters') then
             exit(false);
 

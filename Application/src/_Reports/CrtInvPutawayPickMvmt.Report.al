@@ -80,7 +80,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                                 MovementCounter += 1;
                     end;
                     if PrintDocument then
-                        InsertTempWhseActivHdr;
+                        InsertTempWhseActivHdr();
                     Commit();
                 end;
             end;
@@ -90,7 +90,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                 Msg: Text;
                 ExpiredItemMessageText: Text[100];
             begin
-                ExpiredItemMessageText := CreateInvtPickMovement.GetExpiredItemMessage;
+                ExpiredItemMessageText := CreateInvtPickMovement.GetExpiredItemMessage();
                 if TempWhseActivHdr.Find('-') then
                     PrintNewDocuments();
 

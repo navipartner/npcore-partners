@@ -23,7 +23,7 @@ codeunit 6059903 "NPR Task Queue Execute"
         OutStr: OutStream;
     begin
         //Cleanup
-        if TaskUsesPrinter then begin
+        if TaskUsesPrinter() then begin
             Printer.Get("Printer Name");//needs for testing if it exists
         end;
 
@@ -38,7 +38,7 @@ codeunit 6059903 "NPR Task Queue Execute"
         //TaskTemplate.GET("Journal Template Name");
         //+TQ1.29
 
-        SetRecFilter;
+        SetRecFilter();
 
         if ("Language ID" <> 0) and ("Language ID" <> GlobalLanguage) then begin
             CurrLangID := GlobalLanguage;
@@ -111,7 +111,7 @@ codeunit 6059903 "NPR Task Queue Execute"
                         RunOnRecRef := true;
                     end;
 
-                    if TaskGenerateOutput then begin
+                    if TaskGenerateOutput() then begin
                         TaskOutputLog.InitRecord(Rec);
                         TaskOutputLog.File.CreateOutStream(OutStr);
                         TaskOutputLog.Insert();
@@ -121,23 +121,23 @@ codeunit 6059903 "NPR Task Queue Execute"
                         "Type Of Output"::" ":
                             begin
                                 if RunOnRecRef then
-                                    REPORT.Execute("Object No.", GetReportParameters, RecRef)
+                                    REPORT.Execute("Object No.", GetReportParameters(), RecRef)
                                 else
-                                    REPORT.Execute("Object No.", GetReportParameters);
+                                    REPORT.Execute("Object No.", GetReportParameters());
                             end;
                         "Type Of Output"::Paper:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.Print("Object No.", GetReportParameters, "Printer Name", RecRef)
+                                    REPORT.Print("Object No.", GetReportParameters(), "Printer Name", RecRef)
                                 else
-                                    REPORT.Print("Object No.", GetReportParameters, "Printer Name");
+                                    REPORT.Print("Object No.", GetReportParameters(), "Printer Name");
                             end;
                         "Type Of Output"::XMLFile:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Xml, OutStr, RecRef)
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Xml, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Xml, OutStr);
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Xml, OutStr);
                             end;
                         "Type Of Output"::HTMLFile:
                             begin
@@ -152,23 +152,23 @@ codeunit 6059903 "NPR Task Queue Execute"
                         "Type Of Output"::PDFFile:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Pdf, OutStr, RecRef)
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Pdf, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Pdf, OutStr);
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Pdf, OutStr);
                             end;
                         "Type Of Output"::Excel:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Excel, OutStr, RecRef)
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Excel, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Excel, OutStr);
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Excel, OutStr);
                             end;
                         "Type Of Output"::Word:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Word, OutStr, RecRef)
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Word, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters, REPORTFORMAT::Word, OutStr);
+                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Word, OutStr);
                             end;
                     end;
                 end;
@@ -185,7 +185,7 @@ codeunit 6059903 "NPR Task Queue Execute"
             GlobalLanguage(CurrLangID);
 
         //-TQ1.29 [242044]
-        if TaskGenerateOutput then begin
+        if TaskGenerateOutput() then begin
             CalcFields("Report Name");
             TaskOutputLog."File Name" := DelChr("Report Name", '=', '\/:*?"<>|') + Suffix(Rec);
             TaskOutputLog.Modify();

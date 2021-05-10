@@ -215,7 +215,7 @@ page 6060118 "NPR TM Ticket Schedules"
 
                     trigger OnDrillDown()
                     begin
-                        CurrPage.SaveRecord;
+                        CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;

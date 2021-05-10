@@ -243,8 +243,8 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             Clear(DataSource);
             DataSource.Constructor(DataSourceToken.AsObject());
             RefreshSource := false;
-            if (View.InstanceId() = LastView.InstanceId()) and DataSource.PerSession then
-                DataMgt.OnIsDataSourceModified(POSSession, DataSource.Id, RefreshSource)
+            if (View.InstanceId() = LastView.InstanceId()) and DataSource.PerSession() then
+                DataMgt.OnIsDataSourceModified(POSSession, DataSource.Id(), RefreshSource)
             else
                 RefreshSource := true;
 
@@ -268,7 +268,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
         DataMgt.OnRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd, Handled);
         if not Handled then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnRefreshDataSet', DataSource.Id));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnRefreshDataSet', DataSource.Id()));
         DataMgt.OnAfterRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd);
     end;
 
@@ -297,7 +297,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                     Position := JValue.AsText();
                     POSSession.GetDataStore(DataStore);
                     DataStore.GetDataSet(JsonKey, DataSet);
-                    if DataSet.CurrentPosition <> Position then begin
+                    if DataSet.CurrentPosition() <> Position then begin
                         DataSet.SetCurrentPosition(Position);
                         SetPosition(POSSession, DataSet, Position, FrontEnd);
                     end;
@@ -311,9 +311,9 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         Data: Codeunit "NPR POS Data Management";
         Handled: Boolean;
     begin
-        Data.OnSetPosition(DataSet.DataSource, Position, POSSession, Handled);
+        Data.OnSetPosition(DataSet.DataSource(), Position, POSSession, Handled);
         if not Handled then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnSetPosition', DataSet.DataSource));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnSetPosition', DataSet.DataSource()));
     end;
 
     local procedure Method_AbortWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)

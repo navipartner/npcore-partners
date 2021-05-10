@@ -812,7 +812,7 @@
         EFTTransactionRequest.Finished := CurrentDateTime;
 
         if (not EFTTransactionRequest.Successful) then
-            AddToCommentBatch(StrSubstNo(Text003, PepperFileMgmtFunctions.GetExceptionText));
+            AddToCommentBatch(StrSubstNo(Text003, PepperFileMgmtFunctions.GetExceptionText()));
 
         AddToCommentBatch(StrSubstNo(Text001, PepperFileMgmtFunctions.GetInstalledVersion()));
         AddToCommentBatch(StrSubstNo(Text002, PepperFileMgmtFunctions.GetPreviousVersion()));

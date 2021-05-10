@@ -401,7 +401,7 @@ table 6014612 "NPR Retail Campaign Items"
         PurchPriceCalcMgt: Codeunit "Purch. Price Calc. Mgt.";
         RequisitionLine: Record "Requisition Line";
     begin
-        DeleteAll;
+        DeleteAll();
         LineNo := 0;
         RetailCampaignLine.SetRange("Campaign Code", RetailCampaignHeader.Code);
         if RetailCampaignLine.FindSet() then begin
@@ -462,9 +462,9 @@ table 6014612 "NPR Retail Campaign Items"
                                     RetailComment.SetRange("No. 2", PeriodDiscountLine."Item No.");
                                     if RetailComment.FindFirst() then
                                         "Comment 2" := CopyStr(RetailComment.Comment, 1, 50);
-                                    CalcProfit;
-                                    "Quantity Sold" := GetQuantitySold;
-                                    if Insert then;
+                                    CalcProfit();
+                                    "Quantity Sold" := GetQuantitySold();
+                                    if Insert() then;
                                 until PeriodDiscountLine.Next() = 0;
                             end;
                         end;
@@ -522,8 +522,8 @@ table 6014612 "NPR Retail Campaign Items"
                                     "Item Discount Qty." := MixedDiscount."Item Discount Qty.";
                                     "Item Discount %" := MixedDiscount."Item Discount %";
                                     "Mix Type" := MixedDiscount."Mix Type" + 1;
-                                    "Quantity Sold" := GetQuantitySold;
-                                    if Insert then;
+                                    "Quantity Sold" := GetQuantitySold();
+                                    if Insert() then;
                                 until MixedDiscountLine.Next() = 0;
                             end;
                         end;

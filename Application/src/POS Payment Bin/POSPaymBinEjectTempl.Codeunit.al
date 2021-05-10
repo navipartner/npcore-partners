@@ -40,8 +40,8 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
     local procedure OnLookupBinInvokeMethods(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;
-        tmpRetailList.Choice := InvokeMethodCode;
-        tmpRetailList.Value := InvokeMethodCode;
+        tmpRetailList.Choice := InvokeMethodCode();
+        tmpRetailList.Value := InvokeMethodCode();
         tmpRetailList.Insert();
     end;
 

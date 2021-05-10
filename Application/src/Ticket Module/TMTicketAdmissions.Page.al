@@ -109,7 +109,7 @@ page 6060120 "NPR TM Ticket Admissions"
 
                     trigger OnDrillDown()
                     begin
-                        CurrPage.SaveRecord;
+                        CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeAdmissionTemp);
                     end;
@@ -128,7 +128,7 @@ page 6060120 "NPR TM Ticket Admissions"
 
                     trigger OnDrillDown()
                     begin
-                        CurrPage.SaveRecord;
+                        CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTicketTemp);
                     end;

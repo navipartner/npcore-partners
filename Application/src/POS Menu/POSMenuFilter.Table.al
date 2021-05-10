@@ -284,7 +284,7 @@ table 6150717 "NPR POS Menu Filter"
         case TableNo of
             DATABASE::"NPR POS Entry":
                 begin
-                    POSEntry.SetView(FilterRecRef.GetView);
+                    POSEntry.SetView(FilterRecRef.GetView());
                     POSEntry.CopyFilters(FilterRecVariant);
                     POSEntry.SetFilter("POS Unit No.", '=%1', GetPosUnitNo());
                     FilterStringText := POSEntry.GetView();

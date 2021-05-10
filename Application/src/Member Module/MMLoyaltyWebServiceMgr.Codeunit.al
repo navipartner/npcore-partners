@@ -69,7 +69,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         if (MemberInfoCapture."External Card No." <> '') then begin
 
             if (MemberInfoCapture."Membership Entry No." = 0) then
-                MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", WorkDate, NotFoundReason);
+                MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", WorkDate(), NotFoundReason);
 
         end;
 
@@ -112,7 +112,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
 
         end;
 
-        MemberInfoCapture.Insert
+        MemberInfoCapture.Insert()
     end;
 
     local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text[100]

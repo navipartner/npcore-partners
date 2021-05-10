@@ -297,7 +297,7 @@
 
     trigger OnAfterGetCurrRecord()
     begin
-        Rec.UpdateCurrentSeatingDescription;
+        Rec.UpdateCurrentSeatingDescription();
     end;
 
     trigger OnOpenPage()

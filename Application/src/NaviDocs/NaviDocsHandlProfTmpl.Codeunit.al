@@ -17,9 +17,9 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
         RecRef: RecordRef;
     begin
-        if NaviDocsHandlingProfileCode <> '' then begin
+        if NaviDocsHandlingProfileCode() <> '' then begin
             DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
-            NaviDocsManagement.AddDocumentEntryWithHandlingProfile(RecRef, NaviDocsHandlingProfileCode, ReportID, Recepient, DelayUntil);
+            NaviDocsManagement.AddDocumentEntryWithHandlingProfile(RecRef, NaviDocsHandlingProfileCode(), ReportID, Recepient, DelayUntil);
         end;
     end;
 
@@ -33,8 +33,8 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
     begin
-        if NaviDocsHandlingProfileCode <> '' then
-            NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode, NaviDocsHandlingProfileTxt, false, false, false, false);
+        if NaviDocsHandlingProfileCode() <> '' then
+            NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode(), NaviDocsHandlingProfileTxt, false, false, false, false);
     end;
 
 
@@ -43,7 +43,7 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
     var
         RecRef: RecordRef;
     begin
-        if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode) then
+        if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode()) then
             exit;
 
         if RecRef.Get(NaviDocsEntry."Record ID") then;

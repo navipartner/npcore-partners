@@ -109,7 +109,7 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
-        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByEvent);
+        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByEvent());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
@@ -124,7 +124,7 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
-        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByVariant);
+        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByVariant());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
@@ -139,7 +139,7 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
-        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByLocation);
+        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByLocation());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
@@ -154,7 +154,7 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
-        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByPeriod);
+        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByPeriod());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]

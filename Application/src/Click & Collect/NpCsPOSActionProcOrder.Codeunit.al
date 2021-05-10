@@ -192,11 +192,11 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 
         LocationFilter := GetPOSMenuButtonLocationFilter(POSSession);
         UnprocessedOrdersExists := GetUnprocessedOrdersExists(LocationFilter);
-        DataRow.Fields.Add('UnprocessedOrdersExists', UnprocessedOrdersExists);
+        DataRow.Fields().Add('UnprocessedOrdersExists', UnprocessedOrdersExists);
         if UnprocessedOrdersExists then
-            DataRow.Fields.Add('UnprocessedOrdersQty', GetUnprocessedOrdersQty(LocationFilter))
+            DataRow.Fields().Add('UnprocessedOrdersQty', GetUnprocessedOrdersQty(LocationFilter))
         else
-            DataRow.Fields.Add('UnprocessedOrdersQty', 0);
+            DataRow.Fields().Add('UnprocessedOrdersQty', 0);
     end;
 
     local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"): Text

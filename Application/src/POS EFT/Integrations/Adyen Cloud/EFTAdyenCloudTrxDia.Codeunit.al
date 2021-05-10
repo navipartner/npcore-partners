@@ -96,7 +96,7 @@
         EFTAdyenCloudBackgndResp.SetRunMode(1);
         if not EFTAdyenCloudBackgndResp.Run(EFTTransactionRequest) then begin
             Message(GetLastErrorText);
-            if FrontEnd.IsPaused then
+            if FrontEnd.IsPaused() then
                 FrontEnd.ResumeWorkflow();
         end;
         //+NPR5.54 [364340]

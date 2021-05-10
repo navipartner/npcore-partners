@@ -150,7 +150,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
     local procedure UpdateList()
     begin
         Rec.DeleteAll();
-        Setdate;
+        Setdate();
         Clear(Query1);
         Query1.SetFilter(Query1.Date_Filter, '%1..%2', StartDate, Enddate);
         Query1.Open();

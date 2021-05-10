@@ -1125,7 +1125,7 @@ page 6060150 "NPR Event Card"
 
                     trigger OnValidate()
                     begin
-                        CurrencyCheck;
+                        CurrencyCheck();
                     end;
                 }
                 field("Invoice Currency Code"; Rec."Invoice Currency Code")
@@ -1136,7 +1136,7 @@ page 6060150 "NPR Event Card"
 
                     trigger OnValidate()
                     begin
-                        CurrencyCheck;
+                        CurrencyCheck();
                     end;
                 }
             }
@@ -1278,7 +1278,7 @@ page 6060150 "NPR Event Card"
 
                     trigger OnAction()
                     begin
-                        Rec.DisplayMap;
+                        Rec.DisplayMap();
                     end;
                 }
                 action(ActivityLog)
@@ -1764,7 +1764,7 @@ page 6060150 "NPR Event Card"
     var
         i: Integer;
     begin
-        CurrencyCheck;
+        CurrencyCheck();
         Clear(EventAttributeTemplateName);
         EventAttribute.SetRange("Job No.", Rec."No.");
         EventAttribute.SetRange(Promote, true);
@@ -1925,7 +1925,7 @@ page 6060150 "NPR Event Card"
             ColumnCaption[j] [AttributeSetNo] := '';
             ColumnLineNo[j] [AttributeSetNo] := 0;
             if j = 1 then
-                ColumnEditable[j] [AttributeSetNo] := EventAttrColValue.FindSet
+                ColumnEditable[j] [AttributeSetNo] := EventAttrColValue.FindSet()
             else
                 ColumnEditable[j] [AttributeSetNo] := EventAttrColValue.Next() <> 0;
             if ColumnEditable[j] [AttributeSetNo] then begin
@@ -1937,7 +1937,7 @@ page 6060150 "NPR Event Card"
             RowDescription[i] [AttributeSetNo] := '';
             RowLineNo[i] [AttributeSetNo] := 0;
             if i = 1 then
-                RowEditable[i] [AttributeSetNo] := EventAttrRowValue.FindSet
+                RowEditable[i] [AttributeSetNo] := EventAttrRowValue.FindSet()
             else
                 RowEditable[i] [AttributeSetNo] := EventAttrRowValue.Next() <> 0;
             if RowEditable[i] [AttributeSetNo] then begin

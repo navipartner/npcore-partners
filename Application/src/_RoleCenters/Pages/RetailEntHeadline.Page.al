@@ -63,7 +63,7 @@ page 6151332 "NPR Retail Ent Headline"
     }
     trigger OnAfterGetRecord()
     begin
-        ComputeDefaultFieldsVisibility;
+        ComputeDefaultFieldsVisibility();
     end;
 
     trigger OnOpenPage()
@@ -86,7 +86,7 @@ page 6151332 "NPR Retail Ent Headline"
 
 
 
-        DocumentationText := StrSubstNo(DocumentationTxt, PRODUCTNAME.Short);
+        DocumentationText := StrSubstNo(DocumentationTxt, PRODUCTNAME.Short());
 
         HeadlineManagement.GetTicketAdmissionToday(TicketAdmission);
         HeadlineManagement.GetMembersCreatedToday(MembersCreated);
@@ -94,7 +94,7 @@ page 6151332 "NPR Retail Ent Headline"
 
         if Uninitialized then
             // table is uninitialized because of permission issues. OnAfterGetRecord won't be called
-            ComputeDefaultFieldsVisibility;
+            ComputeDefaultFieldsVisibility();
 
         Commit(); // not to mess up the other page parts that may do IF CODEUNIT.RUN()
     end;
@@ -115,7 +115,7 @@ page 6151332 "NPR Retail Ent Headline"
         ExtensionHeadlinesVisible: Boolean;
     begin
         OnIsAnyExtensionHeadlineVisible(ExtensionHeadlinesVisible);
-        UserGreetingVisible := HeadlineManagement.ShouldUserGreetingBeVisible;
+        UserGreetingVisible := HeadlineManagement.ShouldUserGreetingBeVisible();
     end;
 
     [IntegrationEvent(false, false)]

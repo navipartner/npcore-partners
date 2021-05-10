@@ -25,7 +25,7 @@ page 6059814 "NPR Retail Top 10 Customers"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
                 field(Enddate; Enddate)
@@ -36,7 +36,7 @@ page 6059814 "NPR Retail Top 10 Customers"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
             }
@@ -177,8 +177,8 @@ page 6059814 "NPR Retail Top 10 Customers"
 
     local procedure UpdateList()
     begin
-        Setdate;
-        ExecuteQuery;
+        Setdate();
+        ExecuteQuery();
     end;
 
     local procedure ExecuteQuery()

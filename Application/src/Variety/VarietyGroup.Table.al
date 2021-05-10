@@ -213,7 +213,7 @@ table 6059976 "NPR Variety Group"
             trigger OnValidate()
             begin
                 //-NPR5.43 [317108]
-                CheckMaxLength;
+                CheckMaxLength();
                 //+NPR5.43 [317108]
             end;
         }
@@ -225,7 +225,7 @@ table 6059976 "NPR Variety Group"
             trigger OnValidate()
             begin
                 //-NPR5.43 [317108]
-                CheckMaxLength;
+                CheckMaxLength();
                 ChekIllegalCharacter("Variant Code Seperator 1");
                 //+NPR5.43 [317108]
             end;
@@ -254,7 +254,7 @@ table 6059976 "NPR Variety Group"
             trigger OnValidate()
             begin
                 //-NPR5.43 [317108]
-                CheckMaxLength;
+                CheckMaxLength();
                 //+NPR5.43 [317108]
             end;
         }
@@ -266,7 +266,7 @@ table 6059976 "NPR Variety Group"
             trigger OnValidate()
             begin
                 //-NPR5.43 [317108]
-                CheckMaxLength;
+                CheckMaxLength();
                 ChekIllegalCharacter("Variant Code Seperator 2");
                 //+NPR5.43 [317108]
             end;
@@ -295,7 +295,7 @@ table 6059976 "NPR Variety Group"
             trigger OnValidate()
             begin
                 //-NPR5.43 [317108]
-                CheckMaxLength;
+                CheckMaxLength();
                 //+NPR5.43 [317108]
             end;
         }
@@ -328,7 +328,7 @@ table 6059976 "NPR Variety Group"
 
         TestField("No. Series");
 
-        exit("Variety 1 Table" + '-' + GetNextNo);
+        exit("Variety 1 Table" + '-' + GetNextNo());
     end;
 
     procedure GetVariety2Table(Item: Record Item): Code[40]
@@ -342,7 +342,7 @@ table 6059976 "NPR Variety Group"
 
         TestField("No. Series");
 
-        exit("Variety 2 Table" + '-' + GetNextNo);
+        exit("Variety 2 Table" + '-' + GetNextNo());
     end;
 
     procedure GetVariety3Table(Item: Record Item): Code[40]
@@ -356,7 +356,7 @@ table 6059976 "NPR Variety Group"
 
         TestField("No. Series");
 
-        exit("Variety 3 Table" + '-' + GetNextNo);
+        exit("Variety 3 Table" + '-' + GetNextNo());
     end;
 
     procedure GetVariety4Table(Item: Record Item): Code[40]
@@ -370,7 +370,7 @@ table 6059976 "NPR Variety Group"
 
         TestField("No. Series");
 
-        exit("Variety 4 Table" + '-' + GetNextNo);
+        exit("Variety 4 Table" + '-' + GetNextNo());
     end;
 
     procedure GetNextNo(): Code[20]

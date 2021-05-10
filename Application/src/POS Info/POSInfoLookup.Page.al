@@ -61,9 +61,9 @@
     trigger OnOpenPage()
     begin
         if POSInfo."Input Type" = POSInfo."Input Type"::Table then
-            LoadTable;
+            LoadTable();
         if POSInfo."Input Type" = POSInfo."Input Type"::SubCode then
-            LoadSubcodes;
+            LoadSubcodes();
 
         CurrPage.Update();
     end;

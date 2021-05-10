@@ -115,8 +115,8 @@ page 6151174 "NPR NpGp User Sale Return"
         RetailCrossReference: Record "NPR Retail Cross Reference";
     begin
         if GetLastErrorCode > '' then begin
-            Rec.ClearMarks;
-            ClearLastError;
+            Rec.ClearMarks();
+            ClearLastError();
         end;
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -128,13 +128,13 @@ page 6151174 "NPR NpGp User Sale Return"
             repeat
                 SaleLinePOS.SetRange("Retail ID", RetailCrossReference."Retail ID");
                 SaleLinePOS.SetFilter(Quantity, '<0');
-                if SaleLinePOS.FindFirst() and not SaleLinePOS.Mark then begin
+                if SaleLinePOS.FindFirst() and not SaleLinePOS.Mark() then begin
                     Rec.Quantity += SaleLinePOS.Quantity;
                     SaleLinePOS.Mark(true);
                 end;
             until RetailCrossReference.Next() = 0;
 
-        if not Rec.Mark then begin
+        if not Rec.Mark() then begin
             OriginalQuantity := Rec."Quantity (Base)" / Rec."Qty. per Unit of Measure";
             QuantityReturned := OriginalQuantity - Rec.Quantity;
             Rec.Mark(true);
@@ -147,7 +147,7 @@ page 6151174 "NPR NpGp User Sale Return"
 
     trigger OnOpenPage()
     begin
-        ClearLastError;
+        ClearLastError();
     end;
 
     var

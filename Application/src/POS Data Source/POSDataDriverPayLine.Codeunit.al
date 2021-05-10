@@ -28,10 +28,10 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Currency Amount"), true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), true);
 
-        DataSource.Totals.Add('SaleAmount');
-        DataSource.Totals.Add('PaidAmount');
-        DataSource.Totals.Add('ReturnAmount');
-        DataSource.Totals.Add('Subtotal');
+        DataSource.Totals().Add('SaleAmount');
+        DataSource.Totals().Add('PaidAmount');
+        DataSource.Totals().Add('ReturnAmount');
+        DataSource.Totals().Add('Subtotal');
 
         Handled := true;
     end;
@@ -43,7 +43,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
     begin
         //-NPR5.36 [287688]
         //IF DataSource.Id <> SourceName THEN
-        if DataSource.Id <> GetSourceNameText() then
+        if DataSource.Id() <> GetSourceNameText() then
             //+NPR5.36 [287688]
             exit;
 

@@ -24,7 +24,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -120,13 +120,13 @@ then begin
     var
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
     begin
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
 
         if TaxFreeUnit.IsEmpty then //Only activate data extension in companies using tax free.
             exit;
 
-        Extensions.Add(ThisExtension);
+        Extensions.Add(ThisExtension());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
@@ -134,7 +134,7 @@ then begin
     var
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         DataSource.AddColumn('Status', 'Tax Free Enabled', DataType::String, false);
@@ -149,7 +149,7 @@ then begin
         SalePOS: Record "NPR POS Sale";
     begin
 
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         POSSession.GetSale(POSSale);

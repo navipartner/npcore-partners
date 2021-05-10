@@ -79,7 +79,7 @@ table 6150710 "NPR POS View"
         DefaultView.SetRange(Type, ViewType);
         DefaultView.SetFilter("Starting Date", '%1|<=%2', 0D, WorkDate());
         DefaultView.SetFilter("Ending Date", '%1|>=%2', 0D, WorkDate());
-        case Date2DWY(WorkDate, 1) of
+        case Date2DWY(WorkDate(), 1) of
             1:
                 DefaultView.SetRange(Monday, true);
             2:

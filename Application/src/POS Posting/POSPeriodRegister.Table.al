@@ -129,13 +129,13 @@ table 6150620 "NPR POS Period Register"
 
     trigger OnInsert()
     begin
-        GenerateDocumentNo;
+        GenerateDocumentNo();
     end;
 
     trigger OnModify()
     begin
         if Status <> xRec.Status then
-            UpdateTimeStamps;
+            UpdateTimeStamps();
     end;
 
     local procedure GenerateDocumentNo()

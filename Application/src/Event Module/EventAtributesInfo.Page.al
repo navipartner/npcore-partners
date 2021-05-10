@@ -57,7 +57,7 @@
                 begin
                     EventAttributeMatrix.SetJob(Rec."Job No.");
                     EventAttributeMatrix.SetAttrTemplate(Rec."Template Name");
-                    EventAttributeMatrix.Run
+                    EventAttributeMatrix.Run()
                 end;
             }
         }

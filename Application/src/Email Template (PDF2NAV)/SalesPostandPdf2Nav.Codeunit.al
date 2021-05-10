@@ -5,7 +5,7 @@
     trigger OnRun()
     begin
         SalesHeader.Copy(Rec);
-        Code;
+        Code();
         Rec := SalesHeader;
     end;
 
@@ -50,7 +50,7 @@
                     SalesHeader.Invoice := Selection in [2, 3];
                 end
             else
-                if not Confirm(ConfirmationMessage, false, SalesHeader."Document Type") then
+                if not Confirm(ConfirmationMessage(), false, SalesHeader."Document Type") then
                     exit;
         end;
 

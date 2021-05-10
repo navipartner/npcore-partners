@@ -127,7 +127,7 @@
                 var
                     RaptorMgt: Codeunit "NPR Raptor Management";
                 begin
-                    RaptorMgt.ShowJobQueueEntry;
+                    RaptorMgt.ShowJobQueueEntry();
                 end;
             }
         }

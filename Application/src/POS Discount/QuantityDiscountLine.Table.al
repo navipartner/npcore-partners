@@ -32,7 +32,7 @@ table 6014415 "NPR Quantity Discount Line"
 
             trigger OnValidate()
             begin
-                ValidateValues;
+                ValidateValues();
                 Total := "Unit Price" * Quantity;
             end;
         }
@@ -47,7 +47,7 @@ table 6014415 "NPR Quantity Discount Line"
             trigger OnValidate()
             begin
                 "Unit Price" := Total / Quantity;
-                ValidateValues;
+                ValidateValues();
             end;
         }
         field(5; "Created Date"; Date)

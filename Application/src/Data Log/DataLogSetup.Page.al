@@ -271,7 +271,7 @@ page 6059897 "NPR Data Log Setup"
         RecRef.Open(Rec."Table ID");
 
         if Filters = '' then
-            exit(RecRef.FindSet);
+            exit(RecRef.FindSet());
 
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
@@ -280,7 +280,7 @@ page 6059897 "NPR Data Log Setup"
         if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
             exit(false);
 
-        exit(RecRef.FindSet);
+        exit(RecRef.FindSet());
     end;
 
     local procedure AssistEditIgnoreList()

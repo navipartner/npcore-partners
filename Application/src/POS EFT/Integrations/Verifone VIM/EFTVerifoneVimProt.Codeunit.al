@@ -433,7 +433,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         if ActionName <> ActionCode() then
             exit;
 
-        ClearLastError;
+        ClearLastError();
 
         EFTVerifoneVimResponseParser.SetResponseEnvelope(Step, Envelope);
         if (EFTVerifoneVimResponseParser.Run() and EFTVerifoneVimResponseParser.TryGetEftTransactionEntryNo(EntryNo)) then begin
@@ -456,7 +456,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
 
         Handled := true;
 
-        ClearLastError;
+        ClearLastError();
 
         EFTVerifoneVimResponseParser.SetResponseEvent(EventName, Data);
 

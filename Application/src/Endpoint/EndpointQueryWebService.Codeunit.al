@@ -16,7 +16,7 @@ codeunit 6014680 "NPR Endpoint Query WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         EndpointQueryWebImport.Import();
 
         InsertImportEntry('Createendpointquery', ImportEntry);

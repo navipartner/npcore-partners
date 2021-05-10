@@ -26,7 +26,7 @@ table 6014642 "NPR Tax Free Handler Param."
             trigger OnLookup()
             begin
                 if "Data Type" = "Data Type"::Option then
-                    LookupOption;
+                    LookupOption();
             end;
 
             trigger OnValidate()

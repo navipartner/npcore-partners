@@ -190,7 +190,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
             SaleLine.GetCurrentSaleLine(SaleLinePOS);
             SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
             SaleLinePOS.Modify();
-            SaleLine.RefreshCurrent;
+            SaleLine.RefreshCurrent();
         END;
 
         POSSession.RequestRefreshData();

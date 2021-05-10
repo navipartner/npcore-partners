@@ -1497,7 +1497,7 @@ page 6060134 "NPR MM Member Info Capture"
     local procedure GetMasterDataAttributeValue()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, Rec."Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
 
     end;
@@ -1526,7 +1526,7 @@ page 6060134 "NPR MM Member Info Capture"
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
 
-        NPRAttrManagement.OnPageLookUp(GetAttributeTableId, AttributeNumber, Format(AttributeNumber, 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
+        NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(AttributeNumber, 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
 
     end;
 }

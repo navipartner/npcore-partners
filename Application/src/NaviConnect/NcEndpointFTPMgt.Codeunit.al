@@ -19,7 +19,7 @@
                     if NcEndpointTriggerLink.FindSet() then
                         repeat
                             if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
-                                if NcEndpoint."Endpoint Type" = NcEndpointFTP.GetEndpointTypeCode then begin
+                                if NcEndpoint."Endpoint Type" = NcEndpointFTP.GetEndpointTypeCode() then begin
                                     if NcEndpointFTP.Get(NcEndpointTriggerLink."Endpoint Code") then begin
                                         ProcessNcEndpointTrigger(NcTriggerCode, Output, Filename, NcTask, NcEndpointFTP);
                                     end;
@@ -188,20 +188,20 @@
         FTPResponse := FTPClient.UploadFile(InStr, ConnectionString);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
                 begin
                     FTPResponse.Get('Decription', JToken);
-                    ResponseDescriptionText := JToken.AsValue.AsText();
+                    ResponseDescriptionText := JToken.AsValue().AsText();
                     exit(true);
                 end;
             '401':
                 ResponseDescriptionText := AuthorizationFailedErrorText;
             else begin
                     FTPResponse.Get('Error', JToken);
-                    ResponseDescriptionText := JToken.AsValue.AsText();
+                    ResponseDescriptionText := JToken.AsValue().AsText();
                 end;
         end;
 
@@ -255,7 +255,7 @@
         FTPResponse := SFTPClient.UploadFile(InStr, RemotePath + Filename);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -267,7 +267,7 @@
                 ResponseDescriptionText := AuthorizationFailedErrorText;
             else begin
                     FTPResponse.Get('Error', JToken);
-                    ResponseDescriptionText := JToken.AsValue.AsText();
+                    ResponseDescriptionText := JToken.AsValue().AsText();
                 end;
         end;
 
@@ -397,7 +397,7 @@
         FTPResponse := FTPClient.CreateDirectory(FtpPath);
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -406,7 +406,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
     end;
@@ -424,7 +424,7 @@
         FTPResponse := FTPClient.ListDirectory('/');
 
         FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue.AsText();
+        ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -437,7 +437,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('Directory', JToken);
-                        if Jtoken.AsValue.AsBoolean() then begin
+                        if Jtoken.AsValue().AsBoolean() then begin
                             FileObject.Get('File', JToken);
                             DirectoryList.Add(JToken.AsValue().AsText());
                         end;
@@ -447,7 +447,7 @@
                 Error(AuthorizationFailedErrorText);
             else begin
                     FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue.AsText());
+                    Error(JToken.AsValue().AsText());
                 end;
         end;
     end;
@@ -510,9 +510,9 @@
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
         NcEndpointType: Record "NPR Nc Endpoint Type";
     begin
-        if not NcEndpointType.Get(NcEndpointFTP.GetEndpointTypeCode) then begin
+        if not NcEndpointType.Get(NcEndpointFTP.GetEndpointTypeCode()) then begin
             NcEndpointType.Init();
-            NcEndpointType.Code := NcEndpointFTP.GetEndpointTypeCode;
+            NcEndpointType.Code := NcEndpointFTP.GetEndpointTypeCode();
             NcEndpointType.Insert();
         end;
     end;
@@ -524,7 +524,7 @@
     begin
         if Handled then
             exit;
-        if Sender."Endpoint Type" <> NcEndpointFTP.GetEndpointTypeCode then
+        if Sender."Endpoint Type" <> NcEndpointFTP.GetEndpointTypeCode() then
             exit;
         if not NcEndpointFTP.Get(Sender.Code) then begin
             NcEndpointFTP.Init();

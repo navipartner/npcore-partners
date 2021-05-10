@@ -166,7 +166,7 @@
         repeat
             TempSaleLinePOS."MR Anvendt antal" := CalcInventory(TempSaleLinePOS);
             if TempSaleLinePOS."MR Anvendt antal" >= TempSaleLinePOS."Quantity (Base)" then
-                TempSaleLinePOS.Delete
+                TempSaleLinePOS.Delete()
             else
                 TempSaleLinePOS.Modify();
         until TempSaleLinePOS.Next() = 0;

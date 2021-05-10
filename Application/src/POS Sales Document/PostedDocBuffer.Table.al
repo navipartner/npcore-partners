@@ -130,9 +130,9 @@ table 6014433 "NPR Posted Doc. Buffer"
                 begin
                     RecRef.SetTable(SalesHeader);
 
-                    Reset;
+                    Reset();
                     SetRange("Source Record ID", RecRef.RecordId);
-                    DeleteAll;
+                    DeleteAll();
 
                     if PrepaymentOnly and (SalesHeader."Document Type" <> SalesHeader."Document Type"::Order) then
                         exit;

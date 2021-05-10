@@ -37,7 +37,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             exit;
 
         // Run upgrade code
-        UpgradeAuditRollStep1;
+        UpgradeAuditRollStep1();
         OnActivatePosEntryPosting();
 
 
@@ -62,15 +62,15 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         AuditRoll.SetCurrentKey("Clustered Key");
-        AuditRolltoPOSEntryLink.LockTable;
-        if AuditRolltoPOSEntryLink.FindLast then
+        AuditRolltoPOSEntryLink.LockTable();
+        if AuditRolltoPOSEntryLink.FindLast() then
             AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Link Entry No.")
         else
-            InitDatamodel;
+            InitDatamodel();
 
         StartDateTime := CurrentDateTime;
 
-        if AuditRoll.FindSet then begin
+        if AuditRoll.FindSet() then begin
             repeat
                 if AuditRoll."Sales Ticket No." = '' then
                     AuditRoll."Sales Ticket No." := AuditRoll."Offline receipt no.";
@@ -87,7 +87,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                     if POSUnit."No." <> AuditRoll."Register No." then
                         if POSUnit.Get(AuditRoll."Register No.") then;
 
-                    POSEntry.Init;
+                    POSEntry.Init();
                     POSEntry."Entry No." := 0; //Auto Incr.
                     POSEntry."POS Store Code" := POSUnit."POS Store Code";
                     POSEntry."POS Unit No." := AuditRoll."Register No.";
@@ -97,34 +97,34 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                     POSEntry."Posting Date" := POSEntry."Entry Date";
                     POSEntry."Document Date" := POSEntry."Entry Date";
                     POSEntry."POS Sale ID" := AuditRoll."POS Sale ID";
-                    POSEntry.Insert;
+                    POSEntry.Insert();
 
                     if (POSEntry."POS Unit No." <> POSLedgerRegister."POS Unit No.") or
                        (POSLedgerRegister.Status <> POSLedgerRegister.Status::OPEN) then begin
                         POSLedgerRegister.SetCurrentKey("POS Unit No.");
                         POSLedgerRegister.SetRange("POS Unit No.", POSEntry."POS Unit No.");
-                        if POSLedgerRegister.FindLast then
+                        if POSLedgerRegister.FindLast() then
                             HasOpenPOSLedgerRegister := (POSLedgerRegister.Status = POSLedgerRegister.Status::OPEN)
                         else
                             HasOpenPOSLedgerRegister := false;
                         if not HasOpenPOSLedgerRegister then begin
-                            POSLedgerRegister.Init;
+                            POSLedgerRegister.Init();
                             POSLedgerRegister."No." := 0; //Auto Increment;
                             POSLedgerRegister."POS Store Code" := POSEntry."POS Store Code";
                             POSLedgerRegister."POS Unit No." := POSEntry."POS Unit No.";
                             POSLedgerRegister."Opening Entry No." := POSEntry."Entry No.";
                             POSLedgerRegister.Status := POSLedgerRegister.Status::OPEN;
-                            POSLedgerRegister.Insert;
+                            POSLedgerRegister.Insert();
                         end;
                     end;
                     POSEntry."POS Period Register No." := POSLedgerRegister."No.";
 
-                    AuditRolltoPOSEntryLink.Init;
+                    AuditRolltoPOSEntryLink.Init();
                     AuditRolltoPOSEntryLink."Link Entry No." := 0; //Auto Increment
                     AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
                     AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
                     AuditRolltoPOSEntryLink."Upgrade Step" := 1;
-                    AuditRolltoPOSEntryLink.Insert;
+                    AuditRolltoPOSEntryLink.Insert();
                     NoOfPOSEntriesCreated += 1;
                 end;
 
@@ -146,7 +146,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                 end;
                 UpdatePOSEntry(POSEntry, AuditRoll);
                 xAuditRoll := AuditRoll;
-            until AuditRoll.Next = 0;
+            until AuditRoll.Next() = 0;
 
             if NoOfPOSEntriesCreated > 0 then begin
                 FinalizePOSEntry(POSEntry, AuditRoll);
@@ -186,7 +186,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                 end;
                 PreviousEntryNo := AuditRolltoPOSEntryLink."POS Entry No.";
                 AuditRolltoPOSEntryLink."Upgrade Step" := Step;
-                AuditRolltoPOSEntryLink.Modify;
+                AuditRolltoPOSEntryLink.Modify();
             until AuditRolltoPOSEntryLink.Next() = 0;
     end;
 
@@ -200,7 +200,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         AuditRollComment: Record "NPR Audit Roll";
     begin
         with POSSalesLine do begin
-            Init;
+            Init();
             "POS Entry No." := POSEntry."Entry No.";
             "Line No." := AuditRoll."Line No.";
             "POS Store Code" := POSEntry."POS Store Code";
@@ -312,27 +312,27 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             "Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
             "Dimension Set ID" := AuditRoll."Dimension Set ID";
 
-            if not Insert then begin
+            if not Insert() then begin
                 "Line No." := "Line No." + 1000000; //Fix error with duplicate Line No.'s in migration
-                Insert;
+                Insert();
             end;
-            AuditRolltoPOSEntryLink.Init;
+            AuditRolltoPOSEntryLink.Init();
             AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
             AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
             AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
             AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Sale;
             AuditRolltoPOSEntryLink."Line No." := "Line No.";
-            AuditRolltoPOSEntryLink.Insert;
+            AuditRolltoPOSEntryLink.Insert();
 
             //Update POS Entry
             case AuditRoll."Sale Type" of
                 AuditRoll."Sale Type"::"Debit Sale":
                     begin
                         POSEntry."Entry Type" := POSEntry."Entry Type"::"Credit Sale";
-                        AuditRollComment.Reset;
+                        AuditRollComment.Reset();
                         AuditRollComment.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
                         AuditRollComment.SetRange(Type, AuditRollComment.Type::Comment);
-                        if AuditRollComment.FindFirst then
+                        if AuditRollComment.FindFirst() then
                             POSEntry.Description := AuditRollComment.Description;
                     end;
                 AuditRoll."Sale Type"::Sale:
@@ -375,7 +375,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
     begin
         with POSPaymentLine do begin
-            Init;
+            Init();
             "POS Entry No." := POSEntry."Entry No.";
             "Line No." := AuditRoll."Line No.";
             "POS Store Code" := POSEntry."POS Store Code";
@@ -405,14 +405,14 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             "Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
             "Dimension Set ID" := AuditRoll."Dimension Set ID";
 
-            Insert;
-            AuditRolltoPOSEntryLink.Init;
+            Insert();
+            AuditRolltoPOSEntryLink.Init();
             AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
             AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
             AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
             AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Payment;
             AuditRolltoPOSEntryLink."Line No." := "Line No.";
-            AuditRolltoPOSEntryLink.Insert;
+            AuditRolltoPOSEntryLink.Insert();
 
             //Update POS Entry
             POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale"; //If any payment line its a Sale
@@ -433,7 +433,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         POSPostingControl: Codeunit "NPR POS Posting Control";
     begin
         with POSBalancingLine do begin
-            Init;
+            Init();
             "POS Entry No." := POSEntry."Entry No.";
             "Line No." := AuditRoll."Line No.";
             "POS Store Code" := POSEntry."POS Store Code";
@@ -449,7 +449,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
 
             CashRegPeriod.SetRange("Register No.", AuditRoll."Register No.");
             CashRegPeriod.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-            if CashRegPeriod.FindLast then begin
+            if CashRegPeriod.FindLast() then begin
                 "Calculated Amount" := CashRegPeriod."Balanced Cash Amount" + CashRegPeriod.Difference;
                 "Balanced Amount" := CashRegPeriod."Balanced Cash Amount";
                 "Balanced Diff. Amount" := CashRegPeriod.Difference;
@@ -470,14 +470,14 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             "Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
             "Dimension Set ID" := AuditRoll."Dimension Set ID";
 
-            Insert;
-            AuditRolltoPOSEntryLink.Init;
+            Insert();
+            AuditRolltoPOSEntryLink.Init();
             AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
             AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
             AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
             AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Balancing;
             AuditRolltoPOSEntryLink."Line No." := "Line No.";
-            AuditRolltoPOSEntryLink.Insert;
+            AuditRolltoPOSEntryLink.Insert();
             POSEntry."Entry Type" := POSEntry."Entry Type"::Balancing;
             POSEntry.Description := AuditRoll.Description;
             if POSEntry."Dimension Set ID" = 0 then begin
@@ -490,7 +490,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             POSLedgerRegister."Document No." := AuditRoll."Posted Doc. No.";
             POSLedgerRegister."Closing Entry No." := "POS Entry No.";
             POSLedgerRegister.Status := POSLedgerRegister.Status::CLOSED;
-            POSLedgerRegister.Modify;
+            POSLedgerRegister.Modify();
         end;
     end;
 
@@ -543,9 +543,9 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
 
     procedure BufferAuditRollLink(var AuditRoll: Record "NPR Audit Roll")
     begin
-        TmpAuditRollBuffer.Init;
+        TmpAuditRollBuffer.Init();
         TmpAuditRollBuffer := AuditRoll;
-        TmpAuditRollBuffer.Insert;
+        TmpAuditRollBuffer.Insert();
     end;
 
     local procedure UpdatePOSEntry(var POSEntry: Record "NPR POS Entry"; var AuditRoll: Record "NPR Audit Roll")
@@ -584,7 +584,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         if POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Unposted then
             POSEntry."Post Item Entry Status" := POSEntry."Post Entry Status";
         POSEntry."Amount Incl. Tax & Round" := POSEntry."Amount Incl. Tax" + POSEntry."Rounding Amount (LCY)";
-        POSEntry.Modify;
+        POSEntry.Modify();
     end;
 
     local procedure RecalulatePOSEntry(var POSEntry: Record "NPR POS Entry")
@@ -614,7 +614,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
     begin
         if VATAmountLine.FindSet() then
             repeat
-                PersistentPOSTaxAmountLine.Init;
+                PersistentPOSTaxAmountLine.Init();
                 PersistentPOSTaxAmountLine."VAT Identifier" := VATAmountLine."VAT Identifier";
                 PersistentPOSTaxAmountLine."Tax Calculation Type" := VATAmountLine."VAT Calculation Type";
                 PersistentPOSTaxAmountLine."Tax Group Code" := VATAmountLine."Tax Group Code";
@@ -632,7 +632,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                 PersistentPOSTaxAmountLine."Calculated Tax Amount" := VATAmountLine."Calculated VAT Amount";
                 PersistentPOSTaxAmountLine."Tax Difference" := VATAmountLine."VAT Difference";
                 PersistentPOSTaxAmountLine."POS Entry No." := POSEntryIn."Entry No.";
-                PersistentPOSTaxAmountLine.Insert;
+                PersistentPOSTaxAmountLine.Insert();
             until VATAmountLine.Next() = 0;
     end;
 
@@ -647,7 +647,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         RoundingLineInserted: Boolean;
     begin
         POSEntry := POSEntryIn;
-        VATAmountLine.DeleteAll;
+        VATAmountLine.DeleteAll();
 
         with POSSalesLine do begin
             SetRange("POS Entry No.", POSEntryIn."Entry No.");
@@ -663,14 +663,14 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                         if not VATAmountLine.Get(
                              "VAT Identifier", "VAT Calculation Type", "Tax Group Code", false, "Amount Excl. VAT" >= 0)
                         then begin
-                            VATAmountLine.Init;
+                            VATAmountLine.Init();
                             VATAmountLine."VAT Identifier" := "VAT Identifier";
                             VATAmountLine."VAT Calculation Type" := "VAT Calculation Type";
                             VATAmountLine."Tax Group Code" := "Tax Group Code";
                             VATAmountLine."VAT %" := "VAT %";
                             VATAmountLine.Modified := true;
                             VATAmountLine.Positive := "Amount Excl. VAT" >= 0;
-                            VATAmountLine.Insert;
+                            VATAmountLine.Insert();
                         end;
                         VATAmountLine.Quantity := VATAmountLine.Quantity + "Quantity (Base)";
                         VATAmountLine."Line Amount" := VATAmountLine."Line Amount" + "Amount Excl. VAT";
@@ -678,7 +678,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                         VATAmountLine."VAT Base" := VATAmountLine."VAT Base" + "Amount Excl. VAT";
                         VATAmountLine."Amount Including VAT" := VATAmountLine."Amount Including VAT" + "Amount Incl. VAT";
                         VATAmountLine."VAT Amount" := VATAmountLine."VAT Amount" + ("Amount Incl. VAT" - "Amount Excl. VAT");
-                        VATAmountLine.Modify;
+                        VATAmountLine.Modify();
                     end;
                 until Next() = 0;
         end;
@@ -706,7 +706,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         if (not CacheRegister.IsEmpty()) then
             Error('POS Entry posting is not activated. Cash register must be empty.');
 
-        CacheRegister.Reset;
+        CacheRegister.Reset();
         if (CacheRegister.FindSet()) then begin
             repeat
                 if (not POSUnit.Get(CacheRegister."Register No.")) then
@@ -745,7 +745,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
     begin
-        POSEntry.Init;
+        POSEntry.Init();
         POSEntry."Entry No." := 0;
         POSEntry."Entry Type" := POSEntry."Entry Type"::Other;
         POSEntry."System Entry" := true;
@@ -814,7 +814,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                 BinEntry."Payment Method Code" := POSPaymentMethod.Code;
                 BinEntry.Insert();
 
-                PaymentBinCheckpoint.Init;
+                PaymentBinCheckpoint.Init();
                 PaymentBinCheckpoint."Entry No." := 0;
                 PaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
                 PaymentBinCheckpoint."Workshift Checkpoint Entry No." := POSWorkshiftCheckpoint."Entry No.";

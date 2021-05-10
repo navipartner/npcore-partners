@@ -40,7 +40,7 @@
                         "Sales Unit of measure" := Item."Sales Unit of Measure";
                     "Unit List Price" := Item."Unit List Price";
 
-                    UpdateBarcode;
+                    UpdateBarcode();
                 end else begin
                     Validate(Barcode, "Item No.");
                     exit;
@@ -90,7 +90,7 @@
 
             trigger OnValidate()
             begin
-                Currency.InitRoundingPrecision;
+                Currency.InitRoundingPrecision();
                 "Discount Price Excl. VAT" :=
                   Round(
                     "Discount Price Incl. Vat" /
@@ -98,7 +98,7 @@
                     Currency."Amount Rounding Precision");
 
                 CalcDiscountPrice(FieldNo("Discount Price Incl. Vat"));
-                calcProfit;
+                calcProfit();
             end;
         }
         field(8; "Last Direct Cost"; Decimal)
@@ -108,7 +108,7 @@
 
             trigger OnValidate()
             begin
-                calcProfit;
+                calcProfit();
             end;
         }
         field(9; "Line No."; Integer)
@@ -165,9 +165,9 @@
                 if ItemVariant.Get("Item No.", "Variant Code") then
                     "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
 
-                UpdateBarcode;
+                UpdateBarcode();
 
-                FindItemSalesPrice;
+                FindItemSalesPrice();
             end;
         }
         field(18; "Description 2"; Text[50])
@@ -356,7 +356,7 @@
 
             trigger OnValidate()
             begin
-                FindItemSalesPrice;
+                FindItemSalesPrice();
             end;
         }
         field(65; "Calculation Date"; Date)
@@ -422,7 +422,7 @@
 
             trigger OnValidate()
             begin
-                Currency.InitRoundingPrecision;
+                Currency.InitRoundingPrecision();
                 Validate("Discount Price Incl. Vat",
                   Round(
                     "Discount Price Excl. VAT" *
@@ -476,7 +476,7 @@
                         RetailJournalLine := Rec
                     else begin
                         RetailJournalLine.SelectRetailJournal("No.");
-                        RetailJournalLine.InitLine;
+                        RetailJournalLine.InitLine();
                     end;
 
                     RetailJournalLine."Exchange Label" := ExchangeLabel.Barcode;
@@ -731,7 +731,7 @@
 
     local procedure CalcDiscountPrice(CalledFromFieldNo: Integer)
     begin
-        Currency.InitRoundingPrecision;
+        Currency.InitRoundingPrecision();
         case CalledFromFieldNo of
             FieldNo("Discount Pct."):
                 begin

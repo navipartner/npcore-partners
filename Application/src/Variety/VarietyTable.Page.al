@@ -81,7 +81,7 @@ page 6059972 "NPR Variety Table"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         //-VRT1.11
-        Rec.SetupNewLine;
+        Rec.SetupNewLine();
         //+VRT1.11
     end;
 }

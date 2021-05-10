@@ -56,7 +56,7 @@ table 6184510 "NPR EFT BIN Range"
         SetCurrentKey("BIN Group Priority");
         SetFilter("BIN from", '<=%1', BigInt);
         SetFilter("BIN to", '>=%1', BigInt);
-        exit(FindFirst);
+        exit(FindFirst());
     end;
 
     [TryFunction]

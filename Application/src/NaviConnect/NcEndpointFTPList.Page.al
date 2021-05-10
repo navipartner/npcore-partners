@@ -54,7 +54,7 @@ page 6151522 "NPR Nc Endpoint FTP List"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks();
                 end;
             }
         }

@@ -21,7 +21,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSalesThisMonth;
+                        DrillDownSalesThisMonth();
                     end;
                 }
                 field("NPRC Sales This Month Lst Year"; Rec."NPR Sales This Month Lst Year")
@@ -32,7 +32,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSalesThisMonthLastYear;
+                        DrillDownSalesThisMonthLastYear();
                     end;
                 }
             }
@@ -65,7 +65,7 @@
     var
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
     begin
-        RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial;
+        RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial();
     end;
 
     trigger OnOpenPage()
@@ -79,14 +79,14 @@
             Rec.Insert();
         end;
 
-        Rec.SetRespCenterFilter;
+        Rec.SetRespCenterFilter();
         Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
         Rec.SetFilter("Date Filter2", '>=%1', WorkDate());
         Rec.SetFilter("User ID Filter", UserId);
         Rec.SetFilter("NPR Date Filter Lst Year", '%1..%2', CalcDate('<-CM-1Y>', Today), CalcDate('<CM-1Y>', Today));
         Rec.SetFilter("NPR Date Filter", '%1..%2', CalcDate('<-CM>', Today), Today);
-        RoleCenterNotificationMgt.ShowNotifications;
-        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
+        RoleCenterNotificationMgt.ShowNotifications();
+        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
 
     end;
 

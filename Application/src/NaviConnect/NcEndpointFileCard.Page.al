@@ -74,7 +74,7 @@ page 6151527 "NPR Nc Endpoint File Card"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks();
                 end;
             }
         }

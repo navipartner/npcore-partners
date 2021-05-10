@@ -23,7 +23,7 @@ page 6014465 "NPR NP Attributes FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    ShowDetails;
+                    ShowDetails();
                 end;
             }
             field(NPRAttrTextArray_01; NPRAttrTextArray[1])

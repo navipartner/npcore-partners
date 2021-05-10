@@ -103,7 +103,7 @@
 
     local procedure ReadCollectorRequest(Element: XmlElement; Token: Text[100]; var NcCollectorRequest: Record "NPR Nc Collector Request")
     begin
-        Initialize;
+        Initialize();
 
         Clear(NcCollectorRequest);
         NcCollectorRequest.Init();
@@ -128,7 +128,7 @@
 
     local procedure ReadCollectorRequestFilter(Element: XmlElement; Token: Text[100]; var NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter"; var NcCollectorRequest: Record "NPR Nc Collector Request")
     begin
-        Initialize;
+        Initialize();
 
         Clear(NcCollectorRequestFilter);
         NcCollectorRequestFilter.Init();

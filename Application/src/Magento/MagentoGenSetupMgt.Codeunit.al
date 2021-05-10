@@ -129,9 +129,9 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         TempGenericSetupBuffer."Node Path" := TempGenericSetupBuffer.Name;
         if ParentNodePath <> '' then
             TempGenericSetupBuffer."Node Path" := ParentNodePath + '/' + TempGenericSetupBuffer."Node Path";
-        TempGenericSetupBuffer.Container := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.ElementType", false) = "ElementType.Container";
+        TempGenericSetupBuffer.Container := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.ElementType"(), false) = "ElementType.Container"();
         if not TempGenericSetupBuffer.Container then begin
-            TempGenericSetupBuffer."Data Type" := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.FieldType", false);
+            TempGenericSetupBuffer."Data Type" := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.FieldType"(), false);
             TempGenericSetupBuffer.Value := XmlElement.InnerText;
         end;
 
@@ -332,7 +332,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
             exit('');
 
         if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-            FieldRef.CalcField;
+            FieldRef.CalcField();
 
         exit(Format(FieldRef.Value));
     end;
@@ -413,7 +413,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
         TempBlob.CreateOutStream(OutStream);
         XmlDoc.WriteTo(OutStream);
-        exit(LookupGenericSetup(TempBlob, "ElementName.VariantDimension"));
+        exit(LookupGenericSetup(TempBlob, "ElementName.VariantDimension"()));
     end;
 
     local procedure SetupDimensionBuffer(var XmlDoc: XmlDocument): Boolean
@@ -422,7 +422,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     begin
         InitGenericSetup(TempBlob);
         LoadGenericSetup(TempBlob, XmlDoc);
-        AddContainer(XmlDoc, '', "ElementName.VariantDimension");
+        AddContainer(XmlDoc, '', "ElementName.VariantDimension"());
     end;
 
     local procedure SetupDimensionBufferVariety(var XmlDoc: XmlDocument): Boolean
@@ -446,7 +446,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         repeat
             if OpenFieldRef(RecRef, VarietyDescriptionFieldNo, FieldRef) and OpenFieldRef(RecRef, VarietyCodeFieldNo, FieldRef2) then
                 if (Format(FieldRef.Value) <> '') and (Format(FieldRef2.Value) <> '') then
-                    AddFieldText(XmlDoc, "ElementName.VariantDimension", Format(FieldRef.Value), Format(FieldRef2.Value));
+                    AddFieldText(XmlDoc, "ElementName.VariantDimension"(), Format(FieldRef.Value), Format(FieldRef2.Value));
         until RecRef.Next() = 0;
 
         exit(true);

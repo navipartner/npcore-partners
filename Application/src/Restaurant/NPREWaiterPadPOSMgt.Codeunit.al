@@ -47,7 +47,7 @@
         repeat
             ChoosenWaiterPadLine.Get(TMPWaiterPadLine."Waiter Pad No.", TMPWaiterPadLine."Line No.");
             SplitWaiterPadLine(WaiterPad, ChoosenWaiterPadLine, TMPWaiterPadLine."Marked Qty", NewWaiterPad);
-        until (0 = TMPWaiterPadLine.Next);
+        until (0 = TMPWaiterPadLine.Next());
 
         WaiterPadMgt.CloseWaiterPad(WaiterPad, false);
 
@@ -278,7 +278,7 @@
             repeat
                 POSSaleLine.GetNewSaleLine(SaleLinePOS);
                 GetSaleLineFromWaiterPadToPOS(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, POSSaleLine);
-            until (0 = WaiterPadLine.Next);
+            until (0 = WaiterPadLine.Next());
 
         CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", false);
     end;
@@ -419,7 +419,7 @@
                     TMPWaiterPadLine."Marked Qty" := 0;
                     TMPWaiterPadLine.Insert();
                 end;
-            until (0 = WaiterPadLine.Next);
+            until (0 = WaiterPadLine.Next());
 
         Clear(POSWaiterPadLines);
 

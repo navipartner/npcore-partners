@@ -15,7 +15,7 @@ table 6059785 "NPR TM Ticket"
             trigger OnValidate()
             begin
                 if "No." <> xRec."No." then begin
-                    GetTicketType;
+                    GetTicketType();
                     NoSeriesMgt.TestManual(TicketType."No. Series");
                     "No. Series" := '';
                 end;
@@ -190,14 +190,14 @@ table 6059785 "NPR TM Ticket"
     trigger OnInsert()
     begin
         if "No." = '' then begin
-            GetTicketType;
+            GetTicketType();
             NoSeriesMgt.InitSeries(TicketType."No. Series", xRec."No. Series", Today, "No.", "No. Series");
         end;
 
         "Last Date Modified" := Today();
 
         if "Ticket Type Code" <> '' then begin
-            GetTicketType;
+            GetTicketType();
             "External Ticket No." := TicketMgt.GenerateCertificateNumber(TicketType."External Ticket Pattern", "No.");
         end;
     end;

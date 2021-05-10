@@ -89,7 +89,7 @@ table 6151081 "NPR ExRv Voucher"
 
             trigger OnLookup()
             begin
-                ShowDocDim;
+                ShowDocDim();
             end;
         }
         field(485; "Shortcut Dimension 1 Code"; Code[20])

@@ -175,12 +175,12 @@ table 6150660 "NPR NPRE Waiter Pad"
 
     trigger OnInsert()
     begin
-        UpdateCurrentSeatingDescription;
+        UpdateCurrentSeatingDescription();
     end;
 
     trigger OnModify()
     begin
-        UpdateCurrentSeatingDescription;
+        UpdateCurrentSeatingDescription();
     end;
 
     procedure UpdateCurrentSeatingDescription()

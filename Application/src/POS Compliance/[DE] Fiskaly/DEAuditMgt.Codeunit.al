@@ -39,7 +39,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := HandlerCode();
-        tmpRetailList.Insert;
+        tmpRetailList.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogBeforeInsert', '', true, true)]
@@ -151,7 +151,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
         TaxAmountLine.SetRange("POS Entry No.", EntryNo);
         if TaxAmountLine.FindSet() then
             repeat
-                TaxMapper.RESET;
+                TaxMapper.RESET();
                 TaxMapper.SETRANGE("VAT Identifier", TaxAmountLine."VAT Identifier");
                 TaxMapper.FINDFIRST();
                 TaxJsonObject.Add('vat_rate', TaxMapper."Fiscal Name");

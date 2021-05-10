@@ -72,7 +72,7 @@ table 6059944 "NPR NaviDocs Entry Attachment"
             exit;
         end;
         TempBlob.FromRecord(Rec, FieldNo(Data));
-        FileMgt.BLOBExport(TempBlob, StrSubstNo(FilenamePattern, "NaviDocs Entry No.", "File Extension"), true);
+        FileMgt.BLOBExport(TempBlob, StrSubstNo(FilenamePattern(), "NaviDocs Entry No.", "File Extension"), true);
         exit;
     end;
 
@@ -85,7 +85,7 @@ table 6059944 "NPR NaviDocs Entry Attachment"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then
             exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;

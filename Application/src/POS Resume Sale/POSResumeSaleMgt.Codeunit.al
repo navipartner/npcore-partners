@@ -57,7 +57,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
             exit(false);
 
         SalePOS.FindFirst();
-        if not SalePOS.SalesLinesExist then
+        if not SalePOS.SalesLinesExist() then
             ActionOption := ActionOption::CancelAndNew;  //Silently cancel any unfinished sale with no lines
         ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
 
@@ -121,7 +121,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl";
     begin
         //Do not save as POS Saved Sales unfinished sales with no lines
-        if not SalePOS.SalesLinesExist then
+        if not SalePOS.SalesLinesExist() then
             SkipDialog := true
         else
             POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
@@ -193,7 +193,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         Clear(POSTryCancelSale);
         POSTryCancelSale.Initialize(POSSession);
         POSTryCancelSale.SetAlternativeDescription(AltSaleCancelDescription);
-        ClearLastError;
+        ClearLastError();
         Success := POSTryCancelSale.Run(SalePOS);
         if not Success then begin
             CancelErrorText := GetLastErrorText;

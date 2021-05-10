@@ -27,7 +27,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnInitJob', '', false, false)]
@@ -39,7 +39,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLineFeed', '', false, false)]
     local procedure OnLineFeed()
     begin
-        LineFeed;
+        LineFeed();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrintData', '', false, false)]
@@ -101,7 +101,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     begin
         Clear(PrintBuffer);
         Clear(MediaWidth);
-        InitializePrinter;
+        InitializePrinter();
         SelectCharacterCodeTable(16);
     end;
 
@@ -166,7 +166,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         end;
 
         AddTextToBuffer(Text);
-        LineFeed;
+        LineFeed();
         SelectJustification(0);
     end;
 

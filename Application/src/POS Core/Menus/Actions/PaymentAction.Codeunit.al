@@ -21,12 +21,12 @@ codeunit 6150885 "NPR Payment Action" implements "NPR IAction", "NPR IJsonSerial
 
     procedure Content(): JsonObject;
     begin
-        exit(_base.Content);
+        exit(_base.Content());
     end;
 
     procedure Parameters(): JsonObject;
     begin
-        exit(_base.Parameters);
+        exit(_base.Parameters());
     end;
 
     procedure GetJson() Json: JsonObject;
@@ -49,7 +49,7 @@ codeunit 6150885 "NPR Payment Action" implements "NPR IAction", "NPR IJsonSerial
         MenuButton.OnRetrievePaymentMetadata(Metadata);
 
         Instance.SetCode(MenuButton."Action Code");
-        Instance.Content.Add('Metadata', Metadata);
+        Instance.Content().Add('Metadata', Metadata);
 
         ActionOut := Instance;
     end;

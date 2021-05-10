@@ -288,7 +288,7 @@
 
                     trigger OnAction()
                     begin
-                        CurrPage.SubLine.PAGE.InvertSelection;
+                        CurrPage.SubLine.PAGE.InvertSelection();
                     end;
                 }
                 action("Set Print Qty to Inventory")
@@ -301,7 +301,7 @@
                     trigger OnAction()
                     begin
                         //-NPR5.46 [294354]
-                        Rec.SetPrintQuantityByInventory;
+                        Rec.SetPrintQuantityByInventory();
                         //+NPR5.46 [294354]
                     end;
                 }

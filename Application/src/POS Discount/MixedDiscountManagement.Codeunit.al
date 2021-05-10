@@ -598,7 +598,7 @@
 
         TempPriorityBufferHigh.Quantity -= DiscQty;
         if TempPriorityBufferHigh.Quantity > 0 then
-            TempPriorityBufferHigh.Modify
+            TempPriorityBufferHigh.Modify()
         else
             TempPriorityBufferHigh.Delete();
 

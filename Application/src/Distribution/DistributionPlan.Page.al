@@ -152,7 +152,7 @@ page 6151060 "NPR Distribution Plan"
                         LastColumn: Integer;
                     begin
                         //Previous Set
-                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown;
+                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown();
                         if LastColumn - 12 < 0 then
                             LastColumn := 0
                         else
@@ -177,7 +177,7 @@ page 6151060 "NPR Distribution Plan"
                         LastColumn: Integer;
                     begin
                         //Previous Column
-                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown;
+                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown();
                         if LastColumn - 1 < 0 then
                             LastColumn := 0
                         else
@@ -202,7 +202,7 @@ page 6151060 "NPR Distribution Plan"
                         LastColumn: Integer;
                     begin
                         //Next Column
-                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown;
+                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown();
                         if LastColumn < 0 then
                             LastColumn := 0
                         else
@@ -229,7 +229,7 @@ page 6151060 "NPR Distribution Plan"
                         LastColumn: Integer;
                     begin
                         //Next Set
-                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown;
+                        LastColumn := CurrPage.DistMatrix.PAGE.GetLastColumnShown();
                         //IF LastColumn < 12 THEN
                         //  LastColumn := 0
                         //ELSE

@@ -49,12 +49,12 @@
         Clear(TempTask);
         TempDataLogRecord.DeleteAll();
         TempTask.DeleteAll();
-        if UseDialog then
+        if UseDialog() then
             Window.Open(Text001);
 
         if DataLogSubScriberMgt.GetNewRecords(TaskProcessor.Code, true,
                                               NaviConnectSetup."Max Task Count per Batch", TempDataLogRecord) then begin
-            if UseDialog then
+            if UseDialog() then
                 Window.Update(1, 10000);
             InsertTempTasks(TaskProcessor, '', TempDataLogRecord, TempTask);
             TempDataLogRecord.DeleteAll();
@@ -63,7 +63,7 @@
             Commit();
         end;
 
-        if UseDialog then
+        if UseDialog() then
             Window.Close();
 
         Clear(TempDataLogRecord);
@@ -76,14 +76,14 @@
         TaskProcesLine.SetRange(Code, TaskProcesLine.DataLogCode());
         TaskProcesLine.SetFilter(Value, '<>%1&<>%2', '', CompanyName);
         if TaskProcesLine.FindSet() then begin
-            if UseDialog then
+            if UseDialog() then
                 Window.Open(Text002);
             repeat
-                if UseDialog then
+                if UseDialog() then
                     Window.Update(7, TaskProcesLine.Value);
                 if DataLogSubScriberMgt.GetNewRecordsCompany(TaskProcessor.Code, TaskProcesLine.Value, true,
                                                       NaviConnectSetup."Max Task Count per Batch", TempDataLogRecord) then begin
-                    if UseDialog then
+                    if UseDialog() then
                         Window.Update(1, 10000);
                     InsertTempTasks(TaskProcessor, TaskProcesLine.Value, TempDataLogRecord, TempTask);
                     TempDataLogRecord.DeleteAll();
@@ -97,7 +97,7 @@
                 TempTask.DeleteAll();
             until TaskProcesLine.Next() = 0;
 
-            if UseDialog then
+            if UseDialog() then
                 Window.Close();
         end;
     end;
@@ -153,7 +153,7 @@
 
         Clear(TempTask);
 
-        if UseDialog then begin
+        if UseDialog() then begin
             Counter := 0;
             Total := TempTask.Count();
         end;
@@ -162,7 +162,7 @@
 
         if TempTask.FindSet() then
             repeat
-                if UseDialog then begin
+                if UseDialog() then begin
                     Counter += 1;
                     Window.Update(4, Round((Counter / Total) * 10000, 1));
                 end;
@@ -208,7 +208,7 @@
         i := 0;
         if (DataLogCompanyName <> '') and (DataLogCompanyName <> CompanyName) then
             DataLogField.ChangeCompany(DataLogCompanyName);
-        if UseDialog then begin
+        if UseDialog() then begin
             Counter := 0;
             Total := TempDataLogRecord.Count();
         end;
@@ -222,7 +222,7 @@
                     TempTaskSetup.Insert();
                 until TaskSetup.Next() = 0;
             repeat
-                if UseDialog then begin
+                if UseDialog() then begin
                     Counter += 1;
                     Window.Update(2, Round((Counter / Total) * 10000, 1));
                 end;
@@ -231,7 +231,7 @@
                 if TempTaskSetup.FindSet() then
                     repeat
                         i += 1;
-                        if UseDialog then begin
+                        if UseDialog() then begin
                             if i mod 10 = 0 then
                                 Window.Update(5, i);
                         end;
@@ -253,7 +253,7 @@
                             TempTask."Company Name" := DataLogCompanyName;
                             TempTask."Table No." := TempDataLogRecord."Table ID";
                             RecordID := TempDataLogRecord."Record ID";
-                            RecRef := RecordID.GetRecord;
+                            RecRef := RecordID.GetRecord();
                             TempTask."Record Position" := RecRef.GetPosition(false);
                             TempTask."Record ID" := RecordID;
                             TempTask."Log Date" := TempDataLogRecord."Log Date";
@@ -280,7 +280,7 @@
         if not TempTask.IsTemporary then
             exit;
 
-        if UseDialog then begin
+        if UseDialog() then begin
             Counter := 0;
             Total := TempTask.Count();
         end;
@@ -288,7 +288,7 @@
         Counter2 := 0;
         if TempTask.FindSet() then
             repeat
-                if UseDialog then begin
+                if UseDialog() then begin
                     Counter += 1;
                     Window.Update(3, Round((Counter / Total) * 10000, 1));
                 end;
@@ -306,7 +306,7 @@
                 end;
                 DeleteTempTask := not UniqueTask;
                 if DeleteTempTask then begin
-                    if UseDialog then begin
+                    if UseDialog() then begin
                         Counter2 += 1;
                         if Counter2 mod 10 = 0 then
                             Window.Update(6, Counter2);
@@ -421,7 +421,7 @@
 
         Position := NcTaskMgt.GetRecordPosition(NcTask);
         RecRef.SetPosition(Position);
-        exit(RecRef.Find);
+        exit(RecRef.Find());
     end;
 
     procedure RestoreRecord(TaskEntryNo: BigInteger; var RecRef: RecordRef): Boolean
@@ -498,7 +498,7 @@
             RecRefExisting.Open(DataLogRecord."Table ID");
 
         RecordID := DataLogRecord."Record ID";
-        RecRef := RecordID.GetRecord;
+        RecRef := RecordID.GetRecord();
 
         RecordPosition := RecRef.GetPosition(false);
         RecRefExisting.SetPosition(RecordPosition);
@@ -586,7 +586,7 @@
         else
             RecRefExists.Open(RecRef.Number, false, RecCompanyName);
         RecRefExists.SetPosition(RecRef.GetPosition(false));
-        exit(RecRefExists.Find);
+        exit(RecRefExists.Find());
     end;
 
     local procedure UseDialog(): Boolean
@@ -602,7 +602,7 @@
         RecordPosition := NcTask."Record Position";
         if Format(NcTask."Record ID") <> '' then begin
             RecordID := NcTask."Record ID";
-            RecRef := RecordID.GetRecord;
+            RecRef := RecordID.GetRecord();
             RecordPosition := RecRef.GetPosition(false);
         end;
 

@@ -386,7 +386,7 @@ report 6014617 "NPR Purchase Order"
                         column(TotalInclVATText; TotalInclVATText)
                         {
                         }
-                        column(VATAmountText; VATAmountLine.VATAmountText)
+                        column(VATAmountText; VATAmountLine.VATAmountText())
                         {
                         }
                         column(VATAmount; VATAmount)
@@ -600,7 +600,7 @@ report 6014617 "NPR Purchase Order"
                         column(TotalPaymentDiscountOnVAT_Totals; TotalPaymentDiscOnVAT)
                         {
                         }
-                        column(TotalVATAmountText_Totals; VATAmountLine.VATAmountText)
+                        column(TotalVATAmountText_Totals; VATAmountLine.VATAmountText())
                         {
                         }
                         column(TotalExcludingVATText_Totals; TotalExclVATText)
@@ -702,7 +702,7 @@ report 6014617 "NPR Purchase Order"
                         begin
                             if (not GLSetup."Print VAT specification in LCY") or
                                ("Purchase Header"."Currency Code" = '') or
-                               (VATAmountLine.GetTotalVATAmount = 0)
+                               (VATAmountLine.GetTotalVATAmount() = 0)
                             then
                                 CurrReport.Break();
 
@@ -828,7 +828,7 @@ report 6014617 "NPR Purchase Order"
                             AutoFormatExpression = "Purchase Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(PrepmtVATAmountText; PrepmtVATAmountLine.VATAmountText)
+                        column(PrepmtVATAmountText; PrepmtVATAmountLine.VATAmountText())
                         {
                         }
                         column(PrepmtVATAmount; PrepmtVATAmount)
@@ -963,7 +963,7 @@ report 6014617 "NPR Purchase Order"
                     VATBaseAmount := VATAmountLine.GetTotalVATBase();
                     VATDiscountAmount :=
                       VATAmountLine.GetTotalVATDiscount("Purchase Header"."Currency Code", "Purchase Header"."Prices Including VAT");
-                    TotalAmountInclVAT := VATAmountLine.GetTotalAmountInclVAT;
+                    TotalAmountInclVAT := VATAmountLine.GetTotalAmountInclVAT();
 
                     PrepmtInvBuf.DeleteAll();
                     PurchPostPrepmt.GetPurchLines("Purchase Header", 0, PrepmtPurchLine);
@@ -976,9 +976,9 @@ report 6014617 "NPR Purchase Order"
                     PrepmtVATAmountLine.DeductVATAmountLine(PrePmtVATAmountLineDeduct);
                     PurchPostPrepmt.UpdateVATOnLines("Purchase Header", PrepmtPurchLine, PrepmtVATAmountLine, 0);
                     PurchPostPrepmt.BuildInvLineBuffer("Purchase Header", PrepmtPurchLine, 0, PrepmtInvBuf);
-                    PrepmtVATAmount := PrepmtVATAmountLine.GetTotalVATAmount;
-                    PrepmtVATBaseAmount := PrepmtVATAmountLine.GetTotalVATBase;
-                    PrepmtTotalAmountInclVAT := PrepmtVATAmountLine.GetTotalAmountInclVAT;
+                    PrepmtVATAmount := PrepmtVATAmountLine.GetTotalVATAmount();
+                    PrepmtVATBaseAmount := PrepmtVATAmountLine.GetTotalVATBase();
+                    PrepmtTotalAmountInclVAT := PrepmtVATAmountLine.GetTotalAmountInclVAT();
 
                     if Number > 1 then
                         CopyText := Text003;

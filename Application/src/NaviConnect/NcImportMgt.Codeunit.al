@@ -21,7 +21,7 @@
         NewRecIsTemp := RecRef.IsTemporary();
 
         if NewRecIsTemp then
-            NewImportEntry.DeleteAll
+            NewImportEntry.DeleteAll()
         else
             Clear(NewImportEntry);
 
@@ -56,7 +56,7 @@
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-        ClearLastError;
+        ClearLastError();
         ImportType.Get(ImportEntry."Import Type");
         CleanupImportType(ImportType);
         Commit();
@@ -136,7 +136,7 @@
                 '    <dd>' + NcImportEntry."Document Name" + '</dd><br />' +
                 '    <dt><b>- Import Type:</b></dt>' +
                 '    <dd>' + NcImportEntry."Import Type" + '</dd><br />';
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then begin
+        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then begin
             Body += '    <dt><b>- Server Instance Name:</b></dt>' +
                     '    <dd>' + ActiveSession."Server Instance Name" + '</dd><br />' +
                     '    <dt><b>- Database Name:</b></dt>' +

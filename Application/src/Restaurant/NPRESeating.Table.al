@@ -118,7 +118,7 @@ table 6150665 "NPR NPRE Seating"
 
     trigger OnInsert()
     begin
-        UpdateCurrentWaiterPadDescription;
+        UpdateCurrentWaiterPadDescription();
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR NPRE Seating", Code,
           "Global Dimension 1 Code", "Global Dimension 2 Code");
@@ -126,7 +126,7 @@ table 6150665 "NPR NPRE Seating"
 
     trigger OnModify()
     begin
-        UpdateCurrentWaiterPadDescription;
+        UpdateCurrentWaiterPadDescription();
     end;
 
     trigger OnRename()

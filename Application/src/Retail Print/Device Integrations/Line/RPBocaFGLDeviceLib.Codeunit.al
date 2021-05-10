@@ -129,7 +129,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnInitJob', '', false, false)]
@@ -141,7 +141,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLineFeed', '', false, false)]
     local procedure OnLineFeed()
     begin
-        LineFeed;
+        LineFeed();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrintData', '', false, false)]
@@ -690,7 +690,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
                         tmpDeviceSetting.Options := '200,300,600';
                     end;
             end;
-            exit(tmpDeviceSetting.Insert);
+            exit(tmpDeviceSetting.Insert());
         end;
     end;
 

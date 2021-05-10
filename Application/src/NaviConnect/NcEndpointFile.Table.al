@@ -20,7 +20,7 @@ table 6151524 "NPR Nc Endpoint File"
 
             trigger OnValidate()
             begin
-                UpdateNcEndpoint;
+                UpdateNcEndpoint();
             end;
         }
         field(40; Enabled; Boolean)
@@ -30,7 +30,7 @@ table 6151524 "NPR Nc Endpoint File"
 
             trigger OnValidate()
             begin
-                UpdateNcEndpoint;
+                UpdateNcEndpoint();
             end;
         }
         field(50; "Output Nc Task Entry No."; BigInteger)
@@ -45,7 +45,7 @@ table 6151524 "NPR Nc Endpoint File"
 
             trigger OnValidate()
             begin
-                UpdateNcEndpoint;
+                UpdateNcEndpoint();
             end;
         }
         field(105; "Client Path"; Boolean)
@@ -61,7 +61,7 @@ table 6151524 "NPR Nc Endpoint File"
 
             trigger OnValidate()
             begin
-                UpdateNcEndpoint;
+                UpdateNcEndpoint();
             end;
         }
         field(120; "Handle Exiting File"; Option)
@@ -90,12 +90,12 @@ table 6151524 "NPR Nc Endpoint File"
 
     trigger OnDelete()
     begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
+        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode(), Code);
     end;
 
     trigger OnRename()
     begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode, Code);
+        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode(), Code);
     end;
 
     var
@@ -128,14 +128,14 @@ table 6151524 "NPR Nc Endpoint File"
         if not NcEndpoint.Get(Code) then begin
             NcEndpoint.Init();
             NcEndpoint.Validate(Code, Code);
-            NcEndpoint.Validate("Endpoint Type", GetEndpointTypeCode);
+            NcEndpoint.Validate("Endpoint Type", GetEndpointTypeCode());
             NcEndpoint.Insert();
         end;
         if Description <> NcEndpoint.Description then begin
             NcEndpoint.Description := Description;
             ToBeUpdated := true;
         end;
-        SetupSummary := BuildSetupSummary;
+        SetupSummary := BuildSetupSummary();
         if SetupSummary <> NcEndpoint."Setup Summary" then begin
             NcEndpoint."Setup Summary" := CopyStr(SetupSummary, 1, MaxStrLen(NcEndpoint."Setup Summary"));
             ToBeUpdated := true;

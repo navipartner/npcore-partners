@@ -92,7 +92,7 @@ page 6151577 "NPR Event Copy"
 
                     trigger OnValidate()
                     begin
-                        ValidateSource;
+                        ValidateSource();
                     end;
                 }
                 field("Planning Line Type"; PlanningLineType)
@@ -159,7 +159,7 @@ page 6151577 "NPR Event Copy"
 
                     trigger OnValidate()
                     begin
-                        CheckDate;
+                        CheckDate();
                     end;
                 }
                 field(NewEndingDate; NewEndingDate)
@@ -170,7 +170,7 @@ page 6151577 "NPR Event Copy"
 
                     trigger OnValidate()
                     begin
-                        CheckDate;
+                        CheckDate();
                     end;
                 }
                 field(Recurring; Recurring)
@@ -225,7 +225,7 @@ page 6151577 "NPR Event Copy"
     begin
         PlanningLineType := PlanningLineType::"Schedule+Contract";
         LedgerEntryType := LedgerEntryType::"Usage+Sale";
-        ValidateSource;
+        ValidateSource();
         CopyDimensions := true;
     end;
 
@@ -358,7 +358,7 @@ page 6151577 "NPR Event Copy"
     local procedure CopyEvent()
     begin
         repeat
-            ValidateUserInput;
+            ValidateUserInput();
             CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
             CopyJob.SetJobTaskRange(FromJobTaskNo, ToJobTaskNo);
             CopyJob.SetJobTaskDateRange(FromDate, ToDate);

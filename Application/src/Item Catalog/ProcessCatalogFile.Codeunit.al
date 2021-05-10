@@ -44,8 +44,8 @@ codeunit 6060062 "NPR Process Catalog File"
         InStr: InStream;
         OutStr: OutStream;
     begin
-        if Exists(TemporaryPath + GetZipFilename) then
-            Erase(TemporaryPath + GetZipFilename);
+        if Exists(TemporaryPath + GetZipFilename()) then
+            Erase(TemporaryPath + GetZipFilename());
 
         //Store blob as zipfile
         NcImportEntry.CalcFields("Document Source");
@@ -76,7 +76,7 @@ codeunit 6060062 "NPR Process Catalog File"
 
         //Delete files
         FileManagement.ServerRemoveDirectory(ServerTempPath, true);
-        FileManagement.DeleteServerFile(TemporaryPath + GetZipFilename);
+        FileManagement.DeleteServerFile(TemporaryPath + GetZipFilename());
     end;
 
     local procedure GetZipFilename(): Text

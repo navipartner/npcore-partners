@@ -110,7 +110,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        Calc;
+        Calc();
     end;
 
     trigger OnOpenPage()
@@ -150,7 +150,7 @@
         //SetFilter()
         if (Dim1Filter <> GlobalDim1) or (Dim2Filter <> GlobalDim2) or (Periodestart <> DatoStart) or
            (Periodeslut <> DatoEnd) or (ItemCategoryFilter <> ItemGroup) then
-            ReleaseLock;
+            ReleaseLock();
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
         Periodestart := DatoStart;
@@ -160,7 +160,7 @@
         if (ItemGroup = '') and (ItemCategoryFilter <> '') and HideEmpty then begin
             ItemCategoryFilter := ItemGroup;
             HideEmpty := false;
-            ChangeEmptyFilter;
+            ChangeEmptyFilter();
         end else begin
             ItemCategoryFilter := ItemGroup;
         end;
@@ -273,7 +273,7 @@
     begin
         //ChangeEmptyFilter()
         HideEmpty := true;
-        Rec.ClearMarks;
+        Rec.ClearMarks();
         if HideEmpty then begin
             Current := Rec;
 
@@ -322,7 +322,7 @@
         //UpdateHidden()
         if HideEmpty then begin
             HideEmpty := false;
-            ChangeEmptyFilter;
+            ChangeEmptyFilter();
             CurrPage.Update();
         end;
     end;
@@ -332,7 +332,7 @@
         //ReleaseLock()
         if Rec.Count() = 0 then begin
             Rec.MarkedOnly(false);
-            Rec.ClearMarks;
+            Rec.ClearMarks();
         end;
     end;
 

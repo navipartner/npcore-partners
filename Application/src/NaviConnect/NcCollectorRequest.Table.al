@@ -171,7 +171,7 @@ table 6151529 "NPR Nc Collector Request"
         "Creation Date" := CurrentDateTime;
 
         if "Database Name" = '' then begin
-            ActiveSession.SetRange("Session ID", SessionId);
+            ActiveSession.SetRange("Session ID", SessionId());
             if ActiveSession.FindFirst() then
                 "Database Name" := CopyStr("Database Name", 1, MaxStrLen("Database Name"));
         end;

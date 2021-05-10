@@ -95,7 +95,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
 
         HttpClientVar.Timeout := 5000;
-        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Cancel"), HttpWebResponse) then
+        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Cancel"()), HttpWebResponse) then
             Error(CopyStr('NetAxept: ' + GetLastErrorText, 1, 1024));
 
         RequestProcessing(HttpWebResponse);
@@ -111,7 +111,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
 
         HttpClientVar.Timeout := 5000;
-        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Capture"), HttpWebResponse) then
+        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Capture"()), HttpWebResponse) then
             Error(CopyStr('NetAxept: ' + GetLastErrorText, 1, 1024));
 
         RequestProcessing(HttpWebResponse);
@@ -127,7 +127,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
 
         HttpClientVar.Timeout := 5000;
-        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Refund"), HttpWebResponse) then
+        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Refund"()), HttpWebResponse) then
             Error(CopyStr('NetAxept: ' + GetLastErrorText, 1, 1024));
 
         RequestProcessing(HttpWebResponse);

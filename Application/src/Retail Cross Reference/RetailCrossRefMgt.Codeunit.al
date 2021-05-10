@@ -156,7 +156,7 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
                    '(?<RandomEnd>\])';
         RegEx.Regex(Pattern);
         RegEx.Match(Input, Match);
-        while Match.Success do begin
+        while Match.Success() do begin
             ReplaceString := '';
             RandomQty := 1;
             Match.Groups(GroupCollection);
@@ -188,7 +188,7 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
                    '(?<RandomEnd>\])';
         RegEx.Regex(Pattern);
         RegEx.Match(Input, Match);
-        while Match.Success do begin
+        while Match.Success() do begin
             ReplaceString := '';
             RandomQty := 1;
             Match.Groups(GroupCollection);

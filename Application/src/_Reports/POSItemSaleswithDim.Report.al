@@ -302,7 +302,7 @@ report 6014441 "NPR POS Item Sales with Dim."
                     DimSetEntry."Dimension Set ID" := TempDimSetEntryBuffer."Dimension Set ID";
                     if not DimSetEntry.Find() then begin
                         DimSetEntry2 := DimSetEntry;
-                        if not FilterForBlankIncluded or (FilterForBlankIncluded and DimSetEntry2.Find) then
+                        if not FilterForBlankIncluded or (FilterForBlankIncluded and DimSetEntry2.Find()) then
                             TempDimSetEntryBuffer.Delete();
                     end;
                 until TempDimSetEntryBuffer.Next() = 0;

@@ -27,7 +27,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     MembershipBurndownMgt.OnPageOpen(MembershipBurndownSetup);
                     UpdateStatus();
                     if IsChartDataReady then
-                        UpdateChart;
+                        UpdateChart();
                 end;
             }
         }
@@ -279,7 +279,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
 
                 trigger OnAction()
                 begin
-                    RunSetup;
+                    RunSetup();
                 end;
             }
         }
@@ -287,16 +287,16 @@ page 6060148 "NPR RC Members. Burndown Chart"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        UpdateChart;
+        UpdateChart();
         IsChartDataReady := true;
 
         if not IsChartAddInReady then
-            SetActionsEnabled;
+            SetActionsEnabled();
     end;
 
     trigger OnOpenPage()
     begin
-        SetActionsEnabled;
+        SetActionsEnabled();
     end;
 
     var
@@ -358,9 +358,9 @@ page 6060148 "NPR RC Members. Burndown Chart"
         OldMembershipBurndownSetup := MembershipBurndownSetup;
 
         if NeedsUpdate then
-            StatusText := MembershipBurndownSetup.GetCurrentSelectionText;
+            StatusText := MembershipBurndownSetup.GetCurrentSelectionText();
 
-        SetActionsEnabled;
+        SetActionsEnabled();
     end;
 
     procedure RunSetup()

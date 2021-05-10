@@ -20,7 +20,7 @@ table 6059767 "NPR NaviDocs Setup"
                 NaviDocsManagement: Codeunit "NPR NaviDocs Management";
             begin
                 if "Enable NaviDocs" then
-                    NaviDocsManagement.CreateHandlingProfileLibrary;
+                    NaviDocsManagement.CreateHandlingProfileLibrary();
             end;
         }
         field(20; "Auto Capture Payment"; Boolean)
@@ -39,7 +39,7 @@ table 6059767 "NPR NaviDocs Setup"
                 NaviDocsManagement: Codeunit "NPR NaviDocs Management";
             begin
                 if (not xRec."Log to Activity Log") and "Log to Activity Log" then
-                    NaviDocsManagement.ConvertLog;
+                    NaviDocsManagement.ConvertLog();
                 if xRec."Log to Activity Log" then
                     "Log to Activity Log" := true;
             end;

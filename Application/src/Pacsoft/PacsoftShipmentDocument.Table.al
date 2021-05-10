@@ -859,7 +859,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
             CreateShipmentDocument.LookupMode(false);
             CreateShipmentDocument.SetRecord(ShipmentDocument);
             CreateShipmentDocument.RunModal();
-            if CreateShipmentDocument.OKButtonWasPressed then begin
+            if CreateShipmentDocument.OKButtonWasPressed() then begin
                 CreateShipmentDocument.GetRecord(ShipmentDocument);
                 ShipmentDocument.Modify(true);
                 if PacsoftSetup."Send Doc. Immediately(Pacsoft)" then

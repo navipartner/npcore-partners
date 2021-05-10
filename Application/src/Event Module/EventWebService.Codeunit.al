@@ -76,7 +76,7 @@
             exit(false);
         end;
 
-        if not AdditionalItems.Import then begin
+        if not AdditionalItems.Import() then begin
             ReturnMessage := StrSubstNo(ProcessingError, XmlPortProblem);
             exit(false);
         end;

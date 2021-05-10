@@ -20,12 +20,12 @@ codeunit 6151480 "NPR Magento Chart Mgt."
         Setdate(StartDate, Enddate, Period, PeriodType, BusChartBuf);
         BusChartBuf.InitializePeriodFilter(StartDate, Enddate);
 
-        BusChartBuf.Initialize;
+        BusChartBuf.Initialize();
         BusChartBuf.AddMeasure(Text000, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
         BusChartBuf.AddMeasure(Text001, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
 
         BusChartBuf."Period Length" := PeriodType;
-        BusChartBuf.SetPeriodXAxis;
+        BusChartBuf.SetPeriodXAxis();
         BusChartBuf.AddPeriods(StartDate, Enddate);
         TotNoOfPeriod := BusChartBuf.CalcNumberOfPeriods(StartDate, Enddate);
 
@@ -33,7 +33,7 @@ codeunit 6151480 "NPR Magento Chart Mgt."
             BusChartBuf.GetPeriodFromMapColumn(I - 1, StartDate, Enddate);
             Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
             Query1.Open();
-            Query1.Read;
+            Query1.Read();
             BusChartBuf.SetValue(Text000, I - 1, Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual);
             BusChartBuf.SetValue(Text001, I - 1, Query1.Sum_Sales_Amount_Actual);
             Query1.Close();

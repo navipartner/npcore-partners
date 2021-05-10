@@ -462,7 +462,7 @@ table 6150622 "NPR POS Entry Sales Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions;
+                ShowDimensions();
             end;
         }
         field(500; "Exclude from Posting"; Boolean)

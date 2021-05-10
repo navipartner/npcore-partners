@@ -136,7 +136,7 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
             exit;
 
         POSFrontEnd.GetSession(POSSession);
-        POSSession.RetrieveSessionAction(ActionCode, POSAction);
+        POSSession.RetrieveSessionAction(ActionCode(), POSAction);
         POSFrontEnd.InvokeWorkflow(POSAction);
     end;
 }

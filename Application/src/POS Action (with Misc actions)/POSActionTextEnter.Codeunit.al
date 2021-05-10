@@ -19,7 +19,7 @@ codeunit 6150722 "NPR POS Action: Text Enter"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           ActionDescription,
           ActionVersion(),
           Sender.Type::BackEnd,
@@ -47,7 +47,7 @@ codeunit 6150722 "NPR POS Action: Text Enter"
             'EanBox':
                 EanBoxEventHandler.InvokeEanBox(Value, Context, POSSession, FrontEnd);
             else
-                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, ControlId, ActionCode));
+                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, ControlId, ActionCode()));
         end;
 
         Handled := true;

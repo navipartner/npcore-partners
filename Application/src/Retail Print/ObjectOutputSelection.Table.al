@@ -38,7 +38,7 @@ table 6014580 "NPR Object Output Selection"
 
             trigger OnValidate()
             begin
-                GetObjectName;
+                GetObjectName();
             end;
         }
         field(5; "Object Name"; Text[80])
@@ -101,12 +101,12 @@ table 6014580 "NPR Object Output Selection"
 
     trigger OnInsert()
     begin
-        GetObjectName;
+        GetObjectName();
     end;
 
     trigger OnModify()
     begin
-        GetObjectName;
+        GetObjectName();
     end;
 
     procedure GetObjectName()

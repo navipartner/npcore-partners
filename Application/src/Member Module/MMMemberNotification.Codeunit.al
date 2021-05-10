@@ -642,7 +642,7 @@ codeunit 6060136 "NPR MM Member Notification"
         n: Integer;
     begin
 
-        Randomize;
+        Randomize();
         Token := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         for n := StrLen(Token) to MaxStrLen(Token) do begin
@@ -823,7 +823,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
                 FieldRef := RecRef.Field(FieldNumber);
                 if (UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD') then
-                    FieldRef.CalcField;
+                    FieldRef.CalcField();
 
                 NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
 

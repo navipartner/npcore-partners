@@ -14,7 +14,7 @@
                     if NcEndpointTriggerLink.FindSet() then
                         repeat
                             if NcEndpoint.Get(NcEndpointTriggerLink."Endpoint Code") then begin
-                                if NcEndpoint."Endpoint Type" = NcEndpointEmail.GetEndpointTypeCode then begin
+                                if NcEndpoint."Endpoint Type" = NcEndpointEmail.GetEndpointTypeCode() then begin
                                     if NcEndpointEmail.Get(NcEndpointTriggerLink."Endpoint Code") then begin
                                         ProcessNcEndpointTrigger(NcTriggerCode, Output, Filename, Subject, Body, NcTask, NcEndpointEmail);
                                     end;
@@ -196,9 +196,9 @@
         NcEndpointEmail: Record "NPR Nc Endpoint E-mail";
         NcEndpointType: Record "NPR Nc Endpoint Type";
     begin
-        if not NcEndpointType.Get(NcEndpointEmail.GetEndpointTypeCode) then begin
+        if not NcEndpointType.Get(NcEndpointEmail.GetEndpointTypeCode()) then begin
             NcEndpointType.Init();
-            NcEndpointType.Code := NcEndpointEmail.GetEndpointTypeCode;
+            NcEndpointType.Code := NcEndpointEmail.GetEndpointTypeCode();
             NcEndpointType.Insert();
         end;
     end;
@@ -210,7 +210,7 @@
     begin
         if Handled then
             exit;
-        if Sender."Endpoint Type" <> NcEndpointEmail.GetEndpointTypeCode then
+        if Sender."Endpoint Type" <> NcEndpointEmail.GetEndpointTypeCode() then
             exit;
         if not NcEndpointEmail.Get(Sender.Code) then begin
             NcEndpointEmail.Init();

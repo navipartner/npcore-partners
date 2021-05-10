@@ -50,7 +50,7 @@ page 6059768 "NPR NaviDocs Handling Profiles"
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
     begin
-        NaviDocsManagement.CreateHandlingProfileLibrary;
+        NaviDocsManagement.CreateHandlingProfileLibrary();
     end;
 }
 

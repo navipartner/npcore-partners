@@ -25,7 +25,7 @@ codeunit 6151140 "NPR POS Action: Change UOM"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           ActionDescriptionCaption,
           ActionVersion(),
           Sender.Type::Generic,
@@ -79,7 +79,7 @@ codeunit 6151140 "NPR POS Action: Change UOM"
         SaleLinePOS.Validate("Unit of Measure Code", UnitofMeasure.Code);
         SaleLinePOS.Modify(true);
 
-        POSSaleLine.RefreshCurrent;
+        POSSaleLine.RefreshCurrent();
     end;
 
     local procedure GetItemCodes(ItemNo: Code[20]) Codes: Text

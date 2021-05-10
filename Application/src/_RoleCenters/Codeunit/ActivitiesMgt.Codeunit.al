@@ -3,7 +3,7 @@
 
     trigger OnRun()
     begin
-        RefreshActivitiesCueData;
+        RefreshActivitiesCueData();
     end;
 
     var
@@ -25,7 +25,7 @@
         if CalledFromWebService then
             DetailedCustLedgEntry.SetFilter("Initial Entry Due Date", '<%1', Today)
         else
-            DetailedCustLedgEntry.SetFilter("Initial Entry Due Date", '<%1', GetDefaultWorkDate);
+            DetailedCustLedgEntry.SetFilter("Initial Entry Due Date", '<%1', GetDefaultWorkDate());
     end;
 
     procedure DrillDownCalcOverdueSalesInvoiceAmount()
@@ -34,7 +34,7 @@
     begin
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
         CustLedgerEntry.SetRange(Open, true);
-        CustLedgerEntry.SetFilter("Due Date", '<%1', GetDefaultWorkDate);
+        CustLedgerEntry.SetFilter("Due Date", '<%1', GetDefaultWorkDate());
         CustLedgerEntry.SetFilter("Remaining Amt. (LCY)", '<>0');
         CustLedgerEntry.SetCurrentKey("Remaining Amt. (LCY)");
         CustLedgerEntry.Ascending := false;
@@ -57,7 +57,7 @@
         if CalledFromWebService then
             DetailedVendorLedgEntry.SetFilter("Initial Entry Due Date", '<%1', Today)
         else
-            DetailedVendorLedgEntry.SetFilter("Initial Entry Due Date", '<%1', GetDefaultWorkDate);
+            DetailedVendorLedgEntry.SetFilter("Initial Entry Due Date", '<%1', GetDefaultWorkDate());
     end;
 
     procedure DrillDownOverduePurchaseInvoiceAmount()
@@ -89,7 +89,7 @@
         if CalledFromWebService then
             CustLedgerEntry.SetRange("Posting Date", CalcDate('<-CM>', Today), Today)
         else
-            CustLedgerEntry.SetRange("Posting Date", CalcDate('<-CM>', GetDefaultWorkDate), GetDefaultWorkDate);
+            CustLedgerEntry.SetRange("Posting Date", CalcDate('<-CM>', GetDefaultWorkDate()), GetDefaultWorkDate());
     end;
 
 
@@ -129,7 +129,7 @@
     begin
         ItemLedgerEntry.SetFilter("Document Type", '%1|%2',
           ItemLedgerEntry."Document Type"::"Sales Invoice", ItemLedgerEntry."Document Type"::"Sales Credit Memo");
-        ItemLedgerEntry.SetRange("Posting Date", CalcDate('<-CM>', GetDefaultWorkDate), GetDefaultWorkDate);
+        ItemLedgerEntry.SetRange("Posting Date", CalcDate('<-CM>', GetDefaultWorkDate()), GetDefaultWorkDate());
         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
     end;
 
@@ -139,7 +139,7 @@
     begin
         ItemLedgerEntry.SetFilter("Document Type", '%1|%2',
           ItemLedgerEntry."Document Type"::"Sales Invoice", ItemLedgerEntry."Document Type"::"Sales Credit Memo");
-        ItemLedgerEntry.SetRange("Posting Date", CalcDate('<-CM-12M>', GetDefaultWorkDate), GetDefaultWorkDate);
+        ItemLedgerEntry.SetRange("Posting Date", CalcDate('<-CM-12M>', GetDefaultWorkDate()), GetDefaultWorkDate());
         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
     end;
 
@@ -152,8 +152,8 @@
     begin
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
         CustLedgerEntry.SetRange(Open, false);
-        CustLedgerEntry.SetRange("Posting Date", CalcDate('<CM-3M>', GetDefaultWorkDate), GetDefaultWorkDate);
-        CustLedgerEntry.SetRange("Closed at Date", CalcDate('<CM-3M>', GetDefaultWorkDate), GetDefaultWorkDate);
+        CustLedgerEntry.SetRange("Posting Date", CalcDate('<CM-3M>', GetDefaultWorkDate()), GetDefaultWorkDate());
+        CustLedgerEntry.SetRange("Closed at Date", CalcDate('<CM-3M>', GetDefaultWorkDate()), GetDefaultWorkDate());
     end;
 
     procedure CalcCashAccountsBalances() CashAccountBalance: Decimal
@@ -211,7 +211,7 @@
         if ActivitiesCue."Last Date/Time Modified" = 0DT then
             exit(true);
 
-        exit(CurrentDateTime - ActivitiesCue."Last Date/Time Modified" >= GetActivitiesCueRefreshInterval)
+        exit(CurrentDateTime - ActivitiesCue."Last Date/Time Modified" >= GetActivitiesCueRefreshInterval())
     end;
 
     local procedure GetDefaultWorkDate(): Date
@@ -219,7 +219,7 @@
         LogInManagement: Codeunit LogInManagement;
     begin
         if DefaultWorkDate = 0D then
-            DefaultWorkDate := LogInManagement.GetDefaultWorkDate;
+            DefaultWorkDate := LogInManagement.GetDefaultWorkDate();
         exit(DefaultWorkDate);
     end;
 

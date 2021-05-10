@@ -287,7 +287,7 @@ page 6059784 "NPR TM Ticket Type"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then
             exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;

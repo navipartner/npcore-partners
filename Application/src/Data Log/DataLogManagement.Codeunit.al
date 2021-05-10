@@ -37,7 +37,7 @@
 
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
-            LoadMonTables;
+            LoadMonTables();
         end;
 
         if TempDataLogSetup.Get(TableId) then begin
@@ -67,7 +67,7 @@
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
-            LoadMonTables;
+            LoadMonTables();
         end;
         if (not TempDataLogSetup.Get(RecRef.Number)) or (TempDataLogSetup."Log Insertion" = TempDataLogSetup."Log Insertion"::" ") then
             exit;
@@ -98,7 +98,7 @@
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
-            LoadMonTables;
+            LoadMonTables();
         end;
         if (not TempDataLogSetup.Get(RecRef.Number)) or (TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::" ") then
             exit;
@@ -132,7 +132,7 @@
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
-            LoadMonTables;
+            LoadMonTables();
         end;
         if (not TempDataLogSetup.Get(RecRef.Number)) or (TempDataLogSetup."Log Deletion" = TempDataLogSetup."Log Deletion"::" ") then
             exit;
@@ -164,7 +164,7 @@
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
-            LoadMonTables;
+            LoadMonTables();
         end;
         if not TempDataLogSetup.Get(RecRef.Number) then
             exit;
@@ -208,7 +208,7 @@
     var
         RecRef: RecordRef;
     begin
-        LoadMonTables;
+        LoadMonTables();
         RecRef.Open(TableID, false);
         if RecRef.FindSet(false) then
             repeat
@@ -291,7 +291,7 @@
                     end;
                     if (Format(FieldRef.Value, 0, 9) <> Format(FieldRefInit.Value, 0, 9)) or (FieldValueChanged) then begin
                         if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
-                            FieldRef.CalcField;
+                            FieldRef.CalcField();
                         DataLogField.Init();
                         DataLogField."Entry No." := 0;
                         DataLogField."Table ID" := RecRef.Number;

@@ -263,8 +263,8 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         NPREWaiterPadLine.SetRange("Waiter Pad No.", CurrNPREWaiterPad."No.");
         if NPREWaiterPadLine.FindSet() then
             repeat
-                if NPREWaiterPadLine.RemainingQtyToBill > 0 then
-                    for i := 1 to NPREWaiterPadLine.RemainingQtyToBill do begin
+                if NPREWaiterPadLine.RemainingQtyToBill() > 0 then
+                    for i := 1 to NPREWaiterPadLine.RemainingQtyToBill() do begin
                         BillLine := '{ bill_id: 1';
                         BillLine += ', array_index: ' + Format(ArrayIndex);
                         BillLine += ', line_no: ' + Format(NPREWaiterPadLine."Line No.");

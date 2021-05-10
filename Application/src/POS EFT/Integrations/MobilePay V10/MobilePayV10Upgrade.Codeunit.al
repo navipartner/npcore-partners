@@ -25,7 +25,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         if (not FindAndSetDefaultMobilePayV10IntegrationType()) then
             exit;
 
-        TempOldEftSetupTemp.reset;
+        TempOldEftSetupTemp.reset();
         TempOldEftSetupTemp.DeleteAll(false);
 
         TempOldEFTTypePOSUnitGenParam.Reset();
@@ -105,7 +105,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
             until EFTTypePOSUnitGenParam.next() = 0;
         end;
 
-        EFTTypePOSUnitGenParam.DeleteAll;
+        EFTTypePOSUnitGenParam.DeleteAll();
     end;
 
     local procedure CreateOldEftTypePosUnitBlobParamsTempRecords(var OldEftSetup: Record "NPR EFT Setup")

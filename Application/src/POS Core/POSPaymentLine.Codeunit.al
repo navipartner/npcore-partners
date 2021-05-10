@@ -63,7 +63,7 @@ codeunit 6150707 "NPR POS Payment Line"
     procedure SetPosition(Position: Text): Boolean
     begin
         Rec.SetPosition(Position);
-        exit(Rec.Find);
+        exit(Rec.Find());
     end;
 
     procedure RefreshCurrent(): Boolean
@@ -132,8 +132,8 @@ codeunit 6150707 "NPR POS Payment Line"
         Subtotal := SaleAmount - PaidAmount - RoundingAmount;
         ReturnAmount := SaleAmount - PaidAmount - RoundingAmount - ReturnRounding;
 
-        if (ReturnAmount < 0) and (Setup.RoundingAccount(false) <> '') and (Setup.AmountRoundingPrecision > 0) then
-            ReturnAmount := Round(ReturnAmount, Setup.AmountRoundingPrecision, Setup.AmountRoundingDirection);
+        if (ReturnAmount < 0) and (Setup.RoundingAccount(false) <> '') and (Setup.AmountRoundingPrecision() > 0) then
+            ReturnAmount := Round(ReturnAmount, Setup.AmountRoundingPrecision(), Setup.AmountRoundingDirection());
     end;
 
     local procedure InitLine()

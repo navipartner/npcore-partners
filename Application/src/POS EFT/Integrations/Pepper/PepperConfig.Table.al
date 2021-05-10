@@ -26,7 +26,7 @@ table 6184490 "NPR Pepper Config."
 
             trigger OnValidate()
             begin
-                QueryFillDefaultPaths;
+                QueryFillDefaultPaths();
             end;
         }
         field(100; "Recovery Retry Attempts"; Integer)
@@ -254,7 +254,7 @@ table 6184490 "NPR Pepper Config."
 
             trigger OnValidate()
             begin
-                CheckMinMaxLengthAuthorisationNo;
+                CheckMinMaxLengthAuthorisationNo();
             end;
         }
         field(667; "Max. Length Authorisation No."; Integer)
@@ -268,7 +268,7 @@ table 6184490 "NPR Pepper Config."
 
             trigger OnValidate()
             begin
-                CheckMinMaxLengthAuthorisationNo;
+                CheckMinMaxLengthAuthorisationNo();
             end;
         }
         field(700; "Customer ID"; Text[8])
@@ -454,7 +454,7 @@ table 6184490 "NPR Pepper Config."
                     PepperVersion.TestField(PepperVersion."XMLport Configuration");
                     TempFile.TextMode(true);
                     TempFile.WriteMode(false);
-                    TempFile.CreateTempFile;
+                    TempFile.CreateTempFile();
                     TempFile.CreateOutStream(StreamOut);
                     XMLPORT.Export(PepperVersion."XMLport Configuration", StreamOut);
                     TempFile.CreateInStream(StreamIn);

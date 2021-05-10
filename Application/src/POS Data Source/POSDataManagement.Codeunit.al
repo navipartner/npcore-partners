@@ -9,29 +9,29 @@ codeunit 6150710 "NPR POS Data Management"
     var
         DataSource: Codeunit "NPR Data Source";
     begin
-        case View.Type of
-            View.Type::Login:
+        case View.Type() of
+            View.Type()::Login:
                 begin
-                    GetDataSource(BuiltInSale, DataSource, Setup);
+                    GetDataSource(BuiltInSale(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
-            View.Type::Sale:
+            View.Type()::Sale:
                 begin
-                    GetDataSource(BuiltInSaleLine, DataSource, Setup);
+                    GetDataSource(BuiltInSaleLine(), DataSource, Setup);
                     View.AddDataSource(DataSource);
-                    GetDataSource(BuiltInSale, DataSource, Setup);
+                    GetDataSource(BuiltInSale(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
-            View.Type::Payment:
+            View.Type()::Payment:
                 begin
-                    GetDataSource(BuiltInPaymentLine, DataSource, Setup);
+                    GetDataSource(BuiltInPaymentLine(), DataSource, Setup);
                     View.AddDataSource(DataSource);
-                    GetDataSource(BuiltInSale, DataSource, Setup);
+                    GetDataSource(BuiltInSale(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
-            View.Type::BalanceRegister:
+            View.Type()::BalanceRegister:
                 begin
-                    GetDataSource(BuiltInBalancing, DataSource, Setup);
+                    GetDataSource(BuiltInBalancing(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
         end;
@@ -64,13 +64,13 @@ codeunit 6150710 "NPR POS Data Management"
                 if not Handled then
                     Error(Text003, ExtensionName, Name, 'OnGetDataSourceExtension');
 
-                foreach Column in ExtensionDataSource.Columns do begin
+                foreach Column in ExtensionDataSource.Columns() do begin
                     DataColumn.Constructor(Column);
                     DataSource.AddColumn(
-                      ExtensionName + '.' + DataColumn.FieldId,
-                      DataColumn.Caption,
-                      DataColumn.DataType,
-                      DataColumn.Visible);
+                      ExtensionName + '.' + DataColumn.FieldId(),
+                      DataColumn.Caption(),
+                      DataColumn.DataType(),
+                      DataColumn.Visible());
                 end;
             end;
         end;
@@ -84,7 +84,7 @@ codeunit 6150710 "NPR POS Data Management"
         DataRow: Codeunit "NPR Data Row";
         CurrentPosition: Text;
     begin
-        CurrDataSet.Constructor(DataSource.Id);
+        CurrDataSet.Constructor(DataSource.Id());
 
         RecRef.GetTable(Record);
         CurrentPosition := RecRef.GetPosition();
@@ -116,7 +116,7 @@ codeunit 6150710 "NPR POS Data Management"
         HasVariables: Boolean;
         IsExtensionField: Boolean;
     begin
-        foreach DataColumnToken in DataSource.Columns do begin
+        foreach DataColumnToken in DataSource.Columns() do begin
             DataColumnObject := DataColumnToken.AsObject();
             FieldIdText := DataColumnProxy.FieldId(DataColumnObject);
             if Evaluate(FieldId, FieldIdText) then begin
@@ -138,22 +138,22 @@ codeunit 6150710 "NPR POS Data Management"
         end;
 
         if HasVariables then begin
-            OnReadDataSourceVariables(POSSession, RecRef, DataSource.Id, DataRow, Handled);
+            OnReadDataSourceVariables(POSSession, RecRef, DataSource.Id(), DataRow, Handled);
             if not Handled then
-                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text002, DataSource.Id));
+                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text002, DataSource.Id()));
 
-            OnAfterReadDataSourceVariables(POSSession, RecRef, DataSource.Id, DataRow);
+            OnAfterReadDataSourceVariables(POSSession, RecRef, DataSource.Id(), DataRow);
         end;
 
         if DataSource.HasExtensions() then begin
             DataSource.GetExtensions(Extensions);
             foreach Extension in Extensions do begin
                 Clear(ExtensionDataRow);
-                ExtensionDataRow.Constructor(DataRow.Position);
+                ExtensionDataRow.Constructor(DataRow.Position());
                 Handled := false;
-                OnDataSourceExtensionReadData(DataSource.Id, Extension, RecRef, ExtensionDataRow, POSSession, FrontEnd, Handled);
+                OnDataSourceExtensionReadData(DataSource.Id(), Extension, RecRef, ExtensionDataRow, POSSession, FrontEnd, Handled);
                 if not Handled then
-                    FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Extension, DataSource.Id, 'OnDataSourceExtensionReadData'));
+                    FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Extension, DataSource.Id(), 'OnDataSourceExtensionReadData'));
                 ExtensionKeys := ExtensionDataRow.Fields().Keys();
                 foreach ExtensionKey in ExtensionKeys do
                     DataRow.Add(StrSubstNo('%1.%2', Extension, ExtensionKey), ExtensionDataRow.Field(ExtensionKey));

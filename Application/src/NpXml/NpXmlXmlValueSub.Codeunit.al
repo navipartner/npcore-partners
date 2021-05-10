@@ -23,7 +23,7 @@ codeunit 6151562 "NPR NpXml Xml Value Sub."
             exit;
         end;
 
-        FieldRef.CalcField;
+        FieldRef.CalcField();
         Clear(TempBlob);
         TempBlob.FromFieldRef(FieldRef);
         TempBlob.CreateInStream(InStr);

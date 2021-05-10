@@ -473,7 +473,7 @@
 
                         trigger OnAction()
                         begin
-                            CollapseToItemDiscGroup;
+                            CollapseToItemDiscGroup();
                         end;
                     }
                 }
@@ -595,7 +595,7 @@
         if ItemDiscGrpRec.Insert(true) then;
 
         Clear(MixedDiscountLine);
-        MixedDiscountLine.ClearMarks;
+        MixedDiscountLine.ClearMarks();
         MixedDiscountLine.SetRange(Code, Rec.Code);
         if MixedDiscountLine.Find('-') then
             repeat
@@ -613,7 +613,7 @@
         MixedDiscountLine.MarkedOnly(true);
         MixedDiscountLine.DeleteAll(true);
 
-        MixedDiscountLine.ClearMarks;
+        MixedDiscountLine.ClearMarks();
         Clear(MixedDiscountLine);
         MixedDiscountLine.Init();
         MixedDiscountLine.Validate(Code, Rec.Code);
@@ -671,7 +671,7 @@
         EntityID := CopyStr(Caption, 1, 20);
         if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
             exit(false);
-        FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView);
+        FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView());
         FilterPageBuilder.PageCaption := Caption;
         if not FilterPageBuilder.RunModal() then
             exit(false);

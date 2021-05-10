@@ -236,7 +236,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         if DueLaterThan <> 0D then
             CustLedgerEntry.SetFilter("Due Date", '>%1', DueLaterThan);
         if WithError then
-            CustLedgerEntry.FindFirst
+            CustLedgerEntry.FindFirst()
         else begin
             if not CustLedgerEntry.FindFirst() then
                 exit(false);

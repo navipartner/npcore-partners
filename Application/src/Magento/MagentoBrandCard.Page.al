@@ -174,7 +174,7 @@ page 6151419 "NPR Magento Brand Card"
         HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
         CurrPage.Editable(not HasSetupBrands);
 
-        SetDisplayConfigVisible;
+        SetDisplayConfigVisible();
     end;
 
     var

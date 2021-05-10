@@ -213,7 +213,7 @@ page 6184493 "NPR Pepper Terminal Card"
                     trigger OnAction()
                     begin
                         Rec.UploadFile(0);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
                 action(ImportAdditionalParameters)
@@ -226,7 +226,7 @@ page 6184493 "NPR Pepper Terminal Card"
                     trigger OnAction()
                     begin
                         Rec.UploadFile(1);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
             }
@@ -241,7 +241,7 @@ page 6184493 "NPR Pepper Terminal Card"
 
                     trigger OnAction()
                     begin
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                         Rec.ShowFile(0);
                     end;
                 }
@@ -270,7 +270,7 @@ page 6184493 "NPR Pepper Terminal Card"
                     trigger OnAction()
                     begin
                         Rec.ClearFile(0);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
                 action("DeleteAdditional Parameters")
@@ -283,7 +283,7 @@ page 6184493 "NPR Pepper Terminal Card"
                     trigger OnAction()
                     begin
                         Rec.ClearFile(1);
-                        UpdateBLOBCheck;
+                        UpdateBLOBCheck();
                     end;
                 }
             }
@@ -333,7 +333,7 @@ page 6184493 "NPR Pepper Terminal Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        UpdateBLOBCheck;
+        UpdateBLOBCheck();
     end;
 
     var

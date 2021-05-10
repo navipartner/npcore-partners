@@ -74,7 +74,7 @@
             if not TaskJnlBatch.Find('-') then begin
                 TaskJnlBatch.Init();
                 TaskJnlBatch."Journal Template Name" := CurrentJnlTemplateName;
-                TaskJnlBatch.SetupNewBatch;
+                TaskJnlBatch.SetupNewBatch();
                 TaskJnlBatch.Name := Text004;
                 TaskJnlBatch.Description := Text005;
                 TaskJnlBatch.Insert(true);

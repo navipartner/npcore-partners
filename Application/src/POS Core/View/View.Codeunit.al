@@ -39,10 +39,10 @@ codeunit 6150896 "NPR POS View" implements "NPR IJsonSerializable"
 
     procedure AddDataSource(DataSource: Codeunit "NPR Data Source");
     begin
-        if (_dataSources.Contains(DataSource.Id)) then
-            _dataSources.Replace(DataSource.Id, DataSource.GetJson())
+        if (_dataSources.Contains(DataSource.Id())) then
+            _dataSources.Replace(DataSource.Id(), DataSource.GetJson())
         else
-            _dataSources.Add(DataSource.Id, DataSource.GetJson());
+            _dataSources.Add(DataSource.Id(), DataSource.GetJson());
     end;
 
     procedure GetDataSources() DataSources: JsonArray;

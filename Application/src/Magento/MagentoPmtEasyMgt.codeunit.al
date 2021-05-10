@@ -245,7 +245,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         if not JToken.SelectToken(Path, Token2) then
             exit('');
 
-        Value := token2.AsValue.AsText;
+        Value := token2.AsValue().AsText();
 
         if MaxLen > 0 then
             Value := CopyStr(Value, 1, MaxLen);

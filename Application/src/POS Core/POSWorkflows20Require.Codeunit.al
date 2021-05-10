@@ -83,13 +83,13 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         WorkflowAction.GetWorkflow(Workflow);
         Workflow.DeserializeFromJsonStream(InStr);
         if POSAction."Bound to DataSource" then
-            WorkflowAction.Content.Add('DataBinding', true);
+            WorkflowAction.Content().Add('DataBinding', true);
         if POSAction."Custom JavaScript Logic".HasValue() then begin
             JavaScriptJson := POSAction.GetCustomJavaScriptLogic();
-            WorkflowAction.Content.Add('CustomJavaScript', JavaScriptJson);
+            WorkflowAction.Content().Add('CustomJavaScript', JavaScriptJson);
         end;
         if POSAction.Description <> '' then
-            WorkflowAction.Content.Add('Description', POSAction.Description);
+            WorkflowAction.Content().Add('Description', POSAction.Description);
 
         POSActionParam.SetRange("POS Action Code", POSAction.Code);
         if POSActionParam.FindSet() then

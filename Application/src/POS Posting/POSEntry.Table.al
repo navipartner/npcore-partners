@@ -327,7 +327,7 @@ table 6150621 "NPR POS Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions;
+                ShowDimensions();
             end;
         }
         field(500; "Sales Document Type"; Enum "Sales Document Type")
@@ -452,7 +452,7 @@ table 6150621 "NPR POS Entry"
         POSBalancingLine.SetRange("POS Entry No.", "Entry No.");
         POSBalancingLine.DeleteAll();
         POSEntryCommentLine.SetRange("POS Entry No.", "Entry No.");
-        POSEntryCommentLine.DeleteAll;
+        POSEntryCommentLine.DeleteAll();
         POSEntryTaxCalc.DeleteAllLines(Rec."Entry No.");
     end;
 

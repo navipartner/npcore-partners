@@ -58,7 +58,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 
                 trigger OnPreDataItem()
                 begin
-                    Get;
+                    Get();
                 end;
             }
             dataitem(POS_Store; "NPR POS Store")

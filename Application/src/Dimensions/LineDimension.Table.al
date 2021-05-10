@@ -57,7 +57,7 @@ table 6014430 "NPR Line Dimension"
             trigger OnValidate()
             begin
                 if not DimMgt.CheckDim("Dimension Code") then
-                    Error(DimMgt.GetDimErr);
+                    Error(DimMgt.GetDimErr());
             end;
         }
         field(11; "Dimension Value Code"; Code[20])
@@ -70,7 +70,7 @@ table 6014430 "NPR Line Dimension"
             trigger OnValidate()
             begin
                 if not DimMgt.CheckDimValue("Dimension Code", "Dimension Value Code") then
-                    Error(DimMgt.GetDimErr);
+                    Error(DimMgt.GetDimErr());
             end;
         }
     }
@@ -321,7 +321,7 @@ table 6014430 "NPR Line Dimension"
         if not NPRLineDimLine.FindFirst() then
             exit;
 
-        // Genneml¢b alle dimensionerne på "Ekspedition" EFTER dim er blevet opdateret.
+        // Gennemlï¿½b alle dimensionerne pï¿½ "Ekspedition" EFTER dim er blevet opdateret.
         if NPRLineDimHeader.FindSet() then
             repeat
                 if (not OldNPRLineDimHeader.Get(NPRLineDimHeader."Table ID", NPRLineDimHeader."Register No.", NPRLineDimHeader."Sales Ticket No.", NPRLineDimHeader.Date, NPRLineDimHeader."Sale Type", NPRLineDimHeader."Line No.", '', NPRLineDimHeader."Dimension Code"
@@ -344,8 +344,8 @@ table 6014430 "NPR Line Dimension"
                 end;
             until NPRLineDimHeader.Next() = 0;
 
-        // Genneml¢b alle dimensionerne på "Ekspedition" F¥R dim er blevet opdateret.
-        // hvis Dimensionskoden vare der f¢r men ikke mere, så slettes Dimensionslinjerne med denne Dimensionskode
+        // Gennemlï¿½b alle dimensionerne pï¿½ "Ekspedition" Fï¿½R dim er blevet opdateret.
+        // hvis Dimensionskoden vare der fï¿½r men ikke mere, sï¿½ slettes Dimensionslinjerne med denne Dimensionskode
         if OldNPRLineDimHeader.FindSet() then
             repeat
                 if not NPRLineDimHeader.Get(OldNPRLineDimHeader."Table ID", Kassenr, Bonnr, Dato2, EkspArt, OldNPRLineDimHeader."Line No.", '', OldNPRLineDimHeader."Dimension Code") then begin

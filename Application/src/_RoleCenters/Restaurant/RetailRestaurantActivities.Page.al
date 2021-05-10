@@ -76,7 +76,7 @@
             cuegroup("My User Tasks")
             {
                 Caption = 'My User Tasks';
-                field("UserTaskManagement.GetMyPendingUserTasksCount"; UserTaskManagement.GetMyPendingUserTasksCount)
+                field("UserTaskManagement.GetMyPendingUserTasksCount"; UserTaskManagement.GetMyPendingUserTasksCount())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Pending User Tasks';
@@ -87,7 +87,7 @@
                     var
                         UserTaskList: Page "User Task List";
                     begin
-                        UserTaskList.SetPageToShowMyPendingUserTasks;
+                        UserTaskList.SetPageToShowMyPendingUserTasks();
                         UserTaskList.Run();
                     end;
                 }
@@ -199,7 +199,7 @@
     var
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
     begin
-        RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial;
+        RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial();
         RecalculateCues();
     end;
 
@@ -232,8 +232,8 @@
         Rec.SetRange("Cleaning R. Seat.Status Filter", RestaurantSetup."Seat.Status: Cleaning Required");
         Rec.SetRange("Reserved Seating Status Filter", RestaurantSetup."Seat.Status: Reserved");
 
-        RoleCenterNotificationMgt.ShowNotifications;
-        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
+        RoleCenterNotificationMgt.ShowNotifications();
+        ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
     end;
 
     local procedure SetRestaurantFilter(var Restaurant: Record "NPR NPRE Restaurant")
@@ -320,7 +320,7 @@
             if POSSalesLine.Get(POSEntryQry.POS_Entry_No, POSEntryQry.Line_No) then begin
                 Rec."Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
                 if POSEntry.Get(POSSalesLine."POS Entry No.") then
-                    if not POSEntry.Mark then begin
+                    if not POSEntry.Mark() then begin
                         POSEntry.Mark(true);
                         Rec."No. of Sales" += 1;
                         Rec."Total No. of Guests" += POSEntry."NPRE Number of Guests";

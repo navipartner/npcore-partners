@@ -104,7 +104,7 @@
     begin
         if GlobalKitchenOrder."Order ID" = 0 then begin
             SetupProxy.SetRestaurant(KitchenRequest."Restaurant Code");
-            if SetupProxy.OrderIDAssignmentMethod = Restaurant."Order ID Assign. Method"::"Same for Source Document" then begin
+            if SetupProxy.OrderIDAssignmentMethod() = Restaurant."Order ID Assign. Method"::"Same for Source Document" then begin
                 KitchenReqWSourceQry.SetRange(Source_Document_Type, KitchenReqSourceLink."Source Document Type");
                 KitchenReqWSourceQry.SetRange(Source_Document_Subtype, KitchenReqSourceLink."Source Document Subtype");
                 KitchenReqWSourceQry.SetRange(Source_Document_No, KitchenReqSourceLink."Source Document No.");
@@ -296,7 +296,7 @@
                 until KitchenStationSelection.Next() = 0;
         end;
 
-        exit(KitchenStationBuffer.FindSet);
+        exit(KitchenStationBuffer.FindSet());
     end;
 
     local procedure GetKitchenStationSelection(var KitchenStationSelection: Record "NPR NPRE Kitchen Station Slct."): Boolean
@@ -334,7 +334,7 @@
                 end;
             end;
         end;
-        exit(KitchenStationSelection.FindSet);
+        exit(KitchenStationSelection.FindSet());
     end;
 
     procedure DefaultPriority(KitchenRequest: Record "NPR NPRE Kitchen Request"): Integer

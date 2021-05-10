@@ -163,7 +163,7 @@ table 6014498 "NPR Exchange Label"
         ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
     begin
         if "No." = '' then
-            NoSeriesMgt.InitSeries(GetNoSeriesCode, xRec."No. Series", 0D, "No.", "No. Series");
+            NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", 0D, "No.", "No. Series");
 
         TestField("Store ID");
 

@@ -4,7 +4,7 @@ codeunit 6060051 "NPR Item Wksht.Valid. Process"
 
     trigger OnRun()
     begin
-        ValidateItemWorksheetLineProcessing;
+        ValidateItemWorksheetLineProcessing();
     end;
 
     var
@@ -13,7 +13,7 @@ codeunit 6060051 "NPR Item Wksht.Valid. Process"
     [Test]
     procedure ValidateItemWorksheetLineProcessing()
     begin
-        ValidateRegisterLine;
+        ValidateRegisterLine();
     end;
 
     [Normal]

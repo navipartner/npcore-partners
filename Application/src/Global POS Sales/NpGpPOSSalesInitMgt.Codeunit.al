@@ -174,13 +174,13 @@
     local procedure OnDiscoverRetailCrossReferenceSetup(var RetailCrossReferenceSetup: Record "NPR Retail Cross Ref. Setup")
     begin
         if not RetailCrossReferenceSetup.Get(DATABASE::"NPR POS Sale") then begin
-            RetailCrossReferenceSetup.Init;
+            RetailCrossReferenceSetup.Init();
             RetailCrossReferenceSetup.Validate("Table ID", DATABASE::"NPR POS Sale");
             RetailCrossReferenceSetup.Insert(true);
         end;
 
         if not RetailCrossReferenceSetup.Get(DATABASE::"NPR POS Sale Line") then begin
-            RetailCrossReferenceSetup.Init;
+            RetailCrossReferenceSetup.Init();
             RetailCrossReferenceSetup.Validate("Table ID", DATABASE::"NPR POS Sale Line");
             RetailCrossReferenceSetup.Insert(true);
         end;

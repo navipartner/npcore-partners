@@ -121,9 +121,9 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
             exit(false);
 
         if JToken.IsArray then
-            KeysCount := JToken.AsArray.Count()
+            KeysCount := JToken.AsArray().Count()
         else
-            KeysCount := JToken.AsObject.Keys.Count();
+            KeysCount := JToken.AsObject().Keys.Count();
 
         if KeysCount = 0 then
             exit(true);
@@ -218,7 +218,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         foreach FieldID in FieldIDList do
             if FieldRefByName(RecRef, FieldID, FieldReference) then begin
                 JObject.Get(FieldID, JToken);
-                if not JValueToFieldRef(JToken.AsValue, FieldReference) then
+                if not JValueToFieldRef(JToken.AsValue(), FieldReference) then
                     exit(false);
             end;
 
@@ -250,8 +250,8 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         JObject.ReadFrom(JSON);
         JObject.Get('value', JToken);
 
-        if Specific and (JToken.AsArray.Count() = 1) then
-            JToken.AsArray.Get(0, JToken);
+        if Specific and (JToken.AsArray().Count() = 1) then
+            JToken.AsArray().Get(0, JToken);
     end;
 
     [TryFunction]
@@ -273,7 +273,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
           GetJObjectValueAsText(Dependency, 'Type'),
           GetJObjectValueAsText(Dependency, 'Name'),
           GetJObjectValueAsText(Dependency, 'Version'));
-        JObject.Add('Service_Tier', GetServerID);
+        JObject.Add('Service_Tier', GetServerID());
 
         JObject.WriteTo(JSON);
 
@@ -297,7 +297,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         Jtoken: JsonToken;
     begin
         if JObject.Get(TokenKey, JToken) then
-            JTokenValueText := Jtoken.AsValue.AsText();
+            JTokenValueText := Jtoken.AsValue().AsText();
     end;
 
     procedure GetServerID() ID: Text
@@ -307,7 +307,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
         ID := GetUrl(CLIENTTYPE::Windows);
         String := CopyStr(ID, StrPos(ID, '//'));
-        ID := String.Replace('//', '') + '/' + TenantId;
+        ID := String.Replace('//', '') + '/' + TenantId();
 
         if ID = '' then
             Error('Invalid address returned by GETURL: %1', GetLastErrorText);

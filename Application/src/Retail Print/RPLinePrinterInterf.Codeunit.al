@@ -61,7 +61,7 @@ codeunit 6014548 "NPR RP Line Printer Interf."
         if BocaBound then
             UnbindSubscription(BocaCommandLibrary);
 
-        ClearAll;
+        ClearAll();
     end;
 
     procedure GetDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)

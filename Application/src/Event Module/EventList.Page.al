@@ -86,7 +86,7 @@ page 6060152 "NPR Event List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the number of the person responsible for the event.';
                 }
-                field("% of Overdue Planning Lines"; Rec.PercentOverdue)
+                field("% of Overdue Planning Lines"; Rec.PercentOverdue())
                 {
                     ApplicationArea = All;
                     Caption = '% of Overdue Planning Lines';
@@ -94,7 +94,7 @@ page 6060152 "NPR Event List"
                     ToolTip = 'Specifies the percent of planning lines that are overdue for this event.';
                     Visible = false;
                 }
-                field("% Completed"; Rec.PercentCompleted)
+                field("% Completed"; Rec.PercentCompleted())
                 {
                     ApplicationArea = All;
                     Caption = '% Completed';
@@ -102,7 +102,7 @@ page 6060152 "NPR Event List"
                     ToolTip = 'Specifies the completion percentage for this event.';
                     Visible = false;
                 }
-                field("% Invoiced"; Rec.PercentInvoiced)
+                field("% Invoiced"; Rec.PercentInvoiced())
                 {
                     ApplicationArea = All;
                     Caption = '% Invoiced';
@@ -501,7 +501,7 @@ page 6060152 "NPR Event List"
                     begin
                         EventCopy.SetFromJob(Rec);
                         EventCopy.RunModal();
-                        if EventCopy.GetConfirmAnswer then begin
+                        if EventCopy.GetConfirmAnswer() then begin
                             EventCopy.GetTargetJob(NewJob);
                             EventCard.SetTableView(NewJob);
                             EventCard.Run();

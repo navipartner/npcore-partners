@@ -63,7 +63,7 @@ table 6059900 "NPR Task Template"
                             case NASGroup.Count() of
                                 0:
                                     begin
-                                        NASGroup.InsertDefault;
+                                        NASGroup.InsertDefault();
                                         NASGroup.FindFirst();
                                         "Task Worker Group" := NASGroup.Code;
                                     end;
@@ -81,7 +81,7 @@ table 6059900 "NPR Task Template"
                             case NASGroup.Count() of
                                 0:
                                     begin
-                                        NASGroup.InsertDefault;
+                                        NASGroup.InsertDefault();
                                         NASGroup.FindFirst();
                                         "Task Worker Group" := NASGroup.Code;
                                     end;

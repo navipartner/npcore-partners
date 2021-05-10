@@ -72,8 +72,8 @@ table 6150678 "NPR NPRE Kitchen Request"
             trigger OnValidate()
             begin
                 if Type <> xRec.Type then begin
-                    TestChangesAllowed;
-                    RevertToNewLineState;
+                    TestChangesAllowed();
+                    RevertToNewLineState();
                 end;
             end;
         }
@@ -86,8 +86,8 @@ table 6150678 "NPR NPRE Kitchen Request"
             trigger OnValidate()
             begin
                 if "No." <> xRec."No." then begin
-                    TestChangesAllowed;
-                    RevertToNewLineState;
+                    TestChangesAllowed();
+                    RevertToNewLineState();
                     "No." := KitchenOrderLine."No.";
                     if "No." = '' then
                         exit;
@@ -96,7 +96,7 @@ table 6150678 "NPR NPRE Kitchen Request"
                 case Type of
                     Type::Item:
                         begin
-                            GetItem;
+                            GetItem();
                             Item.TestField(Blocked, false);
                             Validate("Unit of Measure Code", Item."Sales Unit of Measure");
                         end;
@@ -138,7 +138,7 @@ table 6150678 "NPR NPRE Kitchen Request"
                 case Type of
                     Type::Item:
                         begin
-                            GetItem;
+                            GetItem();
                             "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
                         end;
                     else
@@ -290,7 +290,7 @@ table 6150678 "NPR NPRE Kitchen Request"
     begin
         KitchenReqSourceLink.SetCurrentKey("Request No.");
         KitchenReqSourceLink.SetRange("Request No.", Rec."Request No.");
-        if FindLast then
+        if FindLast() then
             case KitchenReqSourceLink."Source Document Type" of
                 KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
                     begin

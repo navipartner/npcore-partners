@@ -14,7 +14,7 @@ codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,

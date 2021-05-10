@@ -51,7 +51,7 @@ page 6014511 "NPR generic retail Headline"
     }
     trigger OnOpenPage()
     begin
-        ComputeDefaultFieldsVisibility;
+        ComputeDefaultFieldsVisibility();
         HeadlineManagement.GetUserGreetingText(GreetingText);
         NPRVersion := StrSubstNo(NPRVersionTxt, LicenseInformation.GetRetailVersion());
     end;
@@ -67,6 +67,6 @@ page 6014511 "NPR generic retail Headline"
 
     local procedure ComputeDefaultFieldsVisibility()
     begin
-        UserGreetingVisible := HeadlineManagement.ShouldUserGreetingBeVisible;
+        UserGreetingVisible := HeadlineManagement.ShouldUserGreetingBeVisible();
     end;
 }

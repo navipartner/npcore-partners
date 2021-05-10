@@ -223,7 +223,7 @@
         if not Response.IsSuccessStatusCode then begin
             ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
             if XmlDocument.ReadFrom(ErrorMessage, Document) then
-                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode().AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
 
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
@@ -338,7 +338,7 @@
 
         ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
         if XmlDocument.ReadFrom(ErrorMessage, Document) then
-            ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+            ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode().AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
 
         Error(CopyStr(ErrorMessage, 1, 1000));
     end;
@@ -410,7 +410,7 @@
         if not Response.IsSuccessStatusCode then begin
             ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
             if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
-                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode().AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
 
                 Error(CopyStr(ErrorMessage, 1, 1000));
             end;
@@ -531,7 +531,7 @@
         if not Response.IsSuccessStatusCode then begin
             ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
             if XmlDocument.ReadFrom(ErrorMessage, Document) then
-                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode().AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
 
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
@@ -608,7 +608,7 @@
         if not Response.IsSuccessStatusCode then begin
             ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
             if XmlDocument.ReadFrom(ErrorMessage, Document) then
-                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode().AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
 
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;

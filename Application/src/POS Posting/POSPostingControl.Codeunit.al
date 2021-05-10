@@ -13,7 +13,7 @@ codeunit 6150637 "NPR POS Posting Control"
     begin
         if DimUsageIsConsistent(GlobalDim1, GlobalDim2, DimSetID) then
             exit;
-        GetGLSetup;
+        GetGLSetup();
         LastErrorStack := GetLastErrorCallstack;
         case RespType of
             RespType::"Show Error":
@@ -42,7 +42,7 @@ codeunit 6150637 "NPR POS Posting Control"
     begin
         if (DimSetID = 0) and (GlobalDim1 = '') and (GlobalDim2 = '') then
             exit(true);
-        GetGLSetup;
+        GetGLSetup();
         Ok := CheckDimInDimSet(GLSetup."Global Dimension 1 Code", GlobalDim1, DimSetID);
         if Ok then
             Ok := CheckDimInDimSet(GLSetup."Global Dimension 2 Code", GlobalDim2, DimSetID);

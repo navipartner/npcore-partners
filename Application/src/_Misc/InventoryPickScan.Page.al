@@ -53,7 +53,7 @@
                     begin
                         CreateInvtPick.Run(Rec);
                         CurrPage.Update();
-                        CurrPage.WhseActivityLines.PAGE.UpdateForm;
+                        CurrPage.WhseActivityLines.PAGE.UpdateForm();
                     end;
 
                     trigger OnValidate()
@@ -397,7 +397,7 @@
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Rec."Location Code" := Rec.GetUserLocation;
+        Rec."Location Code" := Rec.GetUserLocation();
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
@@ -429,28 +429,28 @@
 
     local procedure AutofillQtyToHandle()
     begin
-        CurrPage.WhseActivityLines.PAGE.AutofillQtyToHandle;
+        CurrPage.WhseActivityLines.PAGE.AutofillQtyToHandle();
     end;
 
     local procedure DeleteQtyToHandle()
     begin
-        CurrPage.WhseActivityLines.PAGE.DeleteQtyToHandle;
+        CurrPage.WhseActivityLines.PAGE.DeleteQtyToHandle();
     end;
 
     local procedure PostPickYesNo()
     begin
-        CurrPage.WhseActivityLines.PAGE.PostPickYesNo;
+        CurrPage.WhseActivityLines.PAGE.PostPickYesNo();
     end;
 
     local procedure PostAndPrint()
     begin
-        CurrPage.WhseActivityLines.PAGE.PostAndPrint;
+        CurrPage.WhseActivityLines.PAGE.PostAndPrint();
     end;
 
     local procedure SourceNoOnAfterValidate()
     begin
         CurrPage.Update();
-        CurrPage.WhseActivityLines.PAGE.UpdateForm;
+        CurrPage.WhseActivityLines.PAGE.UpdateForm();
     end;
 
     local procedure GetItemReference(var ItemReference: Record "Item Reference"): Boolean
@@ -591,7 +591,7 @@
         if WhseActivityLine.FindSet() then begin
             repeat
                 TempWhseActivLine := WhseActivityLine;
-                TempWhseActivLine.Insert;
+                TempWhseActivLine.Insert();
             until WhseActivityLine.Next() = 0;
         end;
         if WhseActivityLine.FindSet() then

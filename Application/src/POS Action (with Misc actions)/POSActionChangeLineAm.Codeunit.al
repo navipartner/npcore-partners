@@ -18,7 +18,7 @@ codeunit 6151175 "NPR POS Action: Change LineAm."
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescriptionCaption,
   ActionVersion(),
   Sender.Type::Generic,
@@ -58,9 +58,9 @@ then begin
         SaleLinePOS.Validate("Amount Including VAT", LineAmount);
         SaleLinePOS.Modify();
 
-        POSSaleLine.ResendAllOnAfterInsertPOSSaleLine;
-        POSSale.RefreshCurrent;
-        POSSession.RequestRefreshData;
+        POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
+        POSSale.RefreshCurrent();
+        POSSession.RequestRefreshData();
 
         Handled := true;
     end;
@@ -74,12 +74,12 @@ then begin
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        if not EanBoxEvent.Get(EanEventCode) then begin
+        if not EanBoxEvent.Get(EanEventCode()) then begin
             EanBoxEvent.Init();
-            EanBoxEvent.Code := EanEventCode;
+            EanBoxEvent.Code := EanEventCode();
             EanBoxEvent."Module Name" := SaleLinePOS.TableCaption;
             EanBoxEvent.Description := CopyStr(SaleLinePOS.FieldCaption(Amount), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode;
+            EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: Change LineAm.";
             EanBoxEvent.Insert();
@@ -89,7 +89,7 @@ then begin
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
-        if EanBoxEvent.Code = EanEventCode then
+        if EanBoxEvent.Code = EanEventCode() then
             Sender.SetNonEditableParameterValues(EanBoxEvent, 'NewLineAmount', true, '0');
     end;
 

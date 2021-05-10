@@ -5,7 +5,7 @@ codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
     trigger OnRun()
     begin
         ItemWkshLine.Copy(Rec);
-        Code;
+        Code();
         Copy(ItemWkshLine);
     end;
 

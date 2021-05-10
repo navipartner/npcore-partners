@@ -20,10 +20,10 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     begin
 
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
 
-        Extensions.Add(ThisExtension);
+        Extensions.Add(ThisExtension());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
@@ -32,7 +32,7 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
         POSPaymentMethod: Record "NPR POS Payment Method";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
         POSPaymentMethod.SetFilter("Currency Code", '<>%1', '');
         POSPaymentMethod.SetRange("Block POS Payment", false);
@@ -57,7 +57,7 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
         SubTotal: Decimal;
     begin
 
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
         Handled := true;
 

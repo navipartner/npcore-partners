@@ -94,7 +94,7 @@ page 6150705 "NPR POS Parameter Values"
     trigger OnAfterGetRecord()
     begin
         //-NPR5.34 [282915]
-        ParameterIsNotDefault := not IsDefault;
+        ParameterIsNotDefault := not IsDefault();
         //+NPR5.34 [282915]
 
         //-NPR5.40 [308050]
@@ -107,7 +107,7 @@ page 6150705 "NPR POS Parameter Values"
     trigger OnModifyRecord(): Boolean
     begin
         //-NPR5.34 [282915]
-        ParameterIsNotDefault := not IsDefault;
+        ParameterIsNotDefault := not IsDefault();
         CurrPage.Update(false);
         //+NPR5.34 [282915]
     end;

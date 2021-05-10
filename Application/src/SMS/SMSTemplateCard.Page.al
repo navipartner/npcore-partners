@@ -171,7 +171,7 @@ page 6059941 "NPR SMS Template Card"
 
                     trigger OnAction()
                     begin
-                        Rec.OpenFilterPage;
+                        Rec.OpenFilterPage();
                     end;
                 }
             }

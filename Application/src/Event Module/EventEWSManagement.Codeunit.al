@@ -120,7 +120,7 @@
             if RecRef.FieldExist(FieldNo) then begin
                 FieldRef := RecRef.Field(FieldNo);
                 if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
-                    FieldRef.CalcField;
+                    FieldRef.CalcField();
                 NewLine := InsStr(DelStr(NewLine, StartPos, EndPos - StartPos + 1), Format(FieldRef), StartPos);
             end;
             Line := NewLine;
@@ -334,7 +334,7 @@
         CryptographyManagement: Codeunit "Cryptography Management";
         OutStream: OutStream;
     begin
-        if CryptographyManagement.IsEncryptionPossible then
+        if CryptographyManagement.IsEncryptionPossible() then
             PasswordText := CryptographyManagement.Encrypt(PasswordText);
         EventExchIntEmail.Password.CreateOutStream(OutStream);
         OutStream.Write(PasswordText);
@@ -351,7 +351,7 @@
         EventExchIntEmail.CalcFields(Password);
         EventExchIntEmail.Password.CreateInStream(InStream);
         InStream.Read(PasswordText);
-        if CryptographyManagement.IsEncryptionPossible then
+        if CryptographyManagement.IsEncryptionPossible() then
             exit(CryptographyManagement.Decrypt(PasswordText));
         exit(PasswordText);
     end;

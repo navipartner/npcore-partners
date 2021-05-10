@@ -7,7 +7,7 @@
 
     trigger OnRun()
     begin
-        UpgradeAuditRollStep1;
+        UpgradeAuditRollStep1();
         OnActivatePosEntryPosting();
     end;
 
@@ -50,7 +50,7 @@
         if AuditRolltoPOSEntryLink.FindLast() then
             AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Link Entry No.")
         else
-            InitDatamodel;
+            InitDatamodel();
 
         StartDateTime := CurrentDateTime;
         if AuditRoll.FindSet() then begin

@@ -66,7 +66,7 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
 
     trigger OnAfterGetRecord()
     begin
-        Selected := Rec.Mark;
+        Selected := Rec.Mark();
     end;
 
     trigger OnOpenPage()

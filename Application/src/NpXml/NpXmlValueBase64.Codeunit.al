@@ -40,7 +40,7 @@ codeunit 6151560 "NPR NpXml Value Base64"
 
         FieldRef := RecRef.Field(FieldNo);
         if LowerCase(Format(FieldRef.Type)) in ['blob'] then begin
-            FieldRef.CalcField;
+            FieldRef.CalcField();
             Clear(TempBlob);
             TempBlob.FromFieldRef(FieldRef);
             TempBlob.CreateInStream(InStr);

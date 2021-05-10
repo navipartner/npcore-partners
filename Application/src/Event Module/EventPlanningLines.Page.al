@@ -2,7 +2,7 @@ page 6014549 "NPR Event Planning Lines"
 {
     AutoSplitKey = true;
     Caption = 'Event Planning Lines';
-    DataCaptionExpression = Rec.Caption;
+    DataCaptionExpression = Rec.Caption();
     PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
@@ -50,7 +50,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        UsageLinkOnAfterValidate;
+                        UsageLinkOnAfterValidate();
                     end;
                 }
                 field("Planning Date"; Rec."Planning Date")
@@ -61,7 +61,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        PlanningDateOnAfterValidate;
+                        PlanningDateOnAfterValidate();
                     end;
                 }
                 field("Starting Time"; Rec."NPR Starting Time")
@@ -130,7 +130,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        NoOnAfterValidate;
+                        NoOnAfterValidate();
                     end;
                 }
                 field("No."; Rec."No.")
@@ -141,7 +141,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        NoOnAfterValidate;
+                        NoOnAfterValidate();
                     end;
                 }
                 field(Description; Rec.Description)
@@ -187,7 +187,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        VariantCodeOnAfterValidate;
+                        VariantCodeOnAfterValidate();
                     end;
                 }
                 field("Location Code"; Rec."Location Code")
@@ -198,7 +198,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        LocationCodeOnAfterValidate;
+                        LocationCodeOnAfterValidate();
                     end;
                 }
                 field("Work Type Code"; Rec."Work Type Code")
@@ -216,7 +216,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        UnitofMeasureCodeOnAfterValida;
+                        UnitofMeasureCodeOnAfterValida();
                     end;
                 }
                 field(Control5; Rec.Reserve)
@@ -228,7 +228,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        ReserveOnAfterValidate;
+                        ReserveOnAfterValidate();
                     end;
                 }
                 field(Quantity; Rec.Quantity)
@@ -238,7 +238,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnValidate()
                     begin
-                        QuantityOnAfterValidate;
+                        QuantityOnAfterValidate();
                     end;
                 }
                 field("Reserved Quantity"; Rec."Reserved Quantity")
@@ -400,7 +400,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        Rec.DrillDownJobInvoices;
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("Qty. to Transfer to Invoice"; Rec."Qty. to Transfer to Invoice")
@@ -415,7 +415,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        Rec.DrillDownJobInvoices;
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("Qty. to Invoice"; Rec."Qty. to Invoice")
@@ -431,7 +431,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        Rec.DrillDownJobInvoices;
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("Invoiced Cost Amount (LCY)"; Rec."Invoiced Cost Amount (LCY)")
@@ -442,7 +442,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        Rec.DrillDownJobInvoices;
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("User ID"; Rec."User ID")
@@ -487,7 +487,7 @@ page 6014549 "NPR Event Planning Lines"
                     Visible = false;
                     ToolTip = 'Specifies the value of the System-Created Entry field';
                 }
-                field(Overdue; Rec.Overdue)
+                field(Overdue; Rec.Overdue())
                 {
                     ApplicationArea = All;
                     Caption = 'Overdue';
@@ -589,7 +589,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnAction()
                     begin
-                        Rec.ShowOrderPromisingLine;
+                        Rec.ShowOrderPromisingLine();
                     end;
                 }
                 group(Calendar)
@@ -814,8 +814,8 @@ page 6014549 "NPR Event Planning Lines"
                             if JobPlanningLine.FindSet() then
                                 repeat
                                     JobTransferLine.FromPlanningLineToJnlLine(
-                                      JobPlanningLine, JobTransferJobPlanningLine.GetPostingDate, JobTransferJobPlanningLine.GetJobJournalTemplateName,
-                                      JobTransferJobPlanningLine.GetJobJournalBatchName, JobJnlLine);
+                                      JobPlanningLine, JobTransferJobPlanningLine.GetPostingDate(), JobTransferJobPlanningLine.GetJobJournalTemplateName(),
+                                      JobTransferJobPlanningLine.GetJobJournalBatchName(), JobJnlLine);
                                 until JobPlanningLine.Next() = 0;
 
                             CurrPage.Update(false);
@@ -901,7 +901,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnAction()
                     begin
-                        Rec.ShowReservation;
+                        Rec.ShowReservation();
                     end;
                 }
                 action("Order &Tracking")
@@ -913,7 +913,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnAction()
                     begin
-                        Rec.ShowTracking;
+                        Rec.ShowTracking();
                     end;
                 }
                 separator(Separator130)
@@ -1132,55 +1132,55 @@ page 6014549 "NPR Event Planning Lines"
         if (Rec.Reserve = Rec.Reserve::Always) and
            (Rec."Remaining Qty. (Base)" <> 0)
         then begin
-            CurrPage.SaveRecord;
-            Rec.AutoReserve;
+            CurrPage.SaveRecord();
+            Rec.AutoReserve();
             CurrPage.Update(false);
         end;
     end;
 
     local procedure UsageLinkOnAfterValidate()
     begin
-        PerformAutoReserve;
+        PerformAutoReserve();
     end;
 
     local procedure PlanningDateOnAfterValidate()
     begin
         if Rec."Planning Date" <> xRec."Planning Date" then
-            PerformAutoReserve;
+            PerformAutoReserve();
     end;
 
     local procedure NoOnAfterValidate()
     begin
         InsertExtendedText(false);
         if Rec."No." <> xRec."No." then
-            PerformAutoReserve;
+            PerformAutoReserve();
     end;
 
     local procedure VariantCodeOnAfterValidate()
     begin
         if Rec."Variant Code" <> xRec."Variant Code" then
-            PerformAutoReserve;
+            PerformAutoReserve();
     end;
 
     local procedure LocationCodeOnAfterValidate()
     begin
         if Rec."Location Code" <> xRec."Location Code" then
-            PerformAutoReserve;
+            PerformAutoReserve();
     end;
 
     local procedure UnitofMeasureCodeOnAfterValida()
     begin
-        PerformAutoReserve;
+        PerformAutoReserve();
     end;
 
     local procedure ReserveOnAfterValidate()
     begin
-        PerformAutoReserve;
+        PerformAutoReserve();
     end;
 
     local procedure QuantityOnAfterValidate()
     begin
-        PerformAutoReserve;
+        PerformAutoReserve();
         if (Rec.Type = Rec.Type::Item) and (Rec.Quantity <> xRec.Quantity) then
             CurrPage.Update(true);
     end;
@@ -1190,11 +1190,11 @@ page 6014549 "NPR Event Planning Lines"
         EventTransferExtText: Codeunit "NPR Event Transf.Ext.Text Mgt.";
     begin
         if EventTransferExtText.EventCheckIfAnyExtText(Rec, Unconditionally) then begin
-            CurrPage.SaveRecord;
+            CurrPage.SaveRecord();
             Commit();
             EventTransferExtText.InsertEventExtText(Rec);
         end;
-        if EventTransferExtText.MakeUpdate then
+        if EventTransferExtText.MakeUpdate() then
             CurrPage.Update(true);
     end;
 }

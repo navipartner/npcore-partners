@@ -93,7 +93,7 @@ table 6060149 "NPR RC Members. Burndown Setup"
         StartDate: Date;
     begin
         if "Use Work Date as Base" then
-            StartDate := WorkDate
+            StartDate := WorkDate()
         else
             StartDate := Today();
 

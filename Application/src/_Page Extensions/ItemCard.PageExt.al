@@ -299,7 +299,7 @@
                             CLEAR(PrintTagsPage);
                             PrintTagsPage.SetTagText(Rec."NPR Print Tags");
                             IF PrintTagsPage.RunModal() = ACTION::OK THEN
-                                Rec."NPR Print Tags" := PrintTagsPage.ToText;
+                                Rec."NPR Print Tags" := PrintTagsPage.ToText();
 
                         end;
                     }

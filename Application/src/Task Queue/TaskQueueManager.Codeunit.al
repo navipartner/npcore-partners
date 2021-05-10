@@ -35,7 +35,7 @@ codeunit 6059901 "NPR Task Queue Manager"
     begin
         LoginTaskWorker("Task Worker Group");
         ExecuteTasks(Rec);
-        LogoutAuto;
+        LogoutAuto();
     end;
 
     var
@@ -47,7 +47,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskWorker: Record "NPR Task Worker";
         NextTaskQueue: Record "NPR Task Queue";
     begin
-        GetMySession;
+        GetMySession();
         //-TQ1.29
         //TaskWorker.GET(ActiveSession."Server Instance ID", ActiveSession."Session ID");
         //+TQ1.29
@@ -72,13 +72,13 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskWorker: Record "NPR Task Worker";
         TaskWorkerGroup: Record "NPR Task Worker Group";
     begin
-        if not TaskWorker.Get(ServiceInstanceId, SessionId) then begin
+        if not TaskWorker.Get(ServiceInstanceId(), SessionId()) then begin
             //-NPR5.45 [326707]
             // LOCKTABLE;
             // IF FINDLAST THEN; //force a read lock
             //+NPR5.45 [326707]
 
-            GetMySession;
+            GetMySession();
 
             TaskWorkerGroup.Get(TaskWorkerGroupCode);
 
@@ -119,7 +119,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         //  EXIT;
         //+TQ1.29
 
-        GetMySession;
+        GetMySession();
         Logout(ActiveSession."Server Instance ID", ActiveSession."Session ID");
     end;
 
@@ -170,7 +170,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         if ActiveSession."Server Instance ID" <> 0 then
             exit;
 
-        ActiveSession.Get(ServiceInstanceId, SessionId);
+        ActiveSession.Get(ServiceInstanceId(), SessionId());
     end;
 
     procedure HeartBeat(CurrentCheckInterval: Integer)
@@ -183,7 +183,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         //IF TaskWorker.FindLast() THEN;
         //+TQ1.31 [301695]
         //+TQ1.28
-        GetMySession;
+        GetMySession();
 
         TaskWorker.Get(ActiveSession."Server Instance ID", ActiveSession."Session ID");
         TaskWorker."Last HeartBeat (When Idle)" := CurrentDateTime;
@@ -212,8 +212,8 @@ codeunit 6059901 "NPR Task Queue Manager"
         //+NPR5.45 [313269]
 
         TaskQueue2.SetRange(Company, TaskWorker."Current Company");
-        TaskQueue2.SetRange("Assigned to Service Inst.ID", ServiceInstanceId);
-        TaskQueue2.SetRange("Assigned to Session ID", SessionId);
+        TaskQueue2.SetRange("Assigned to Service Inst.ID", ServiceInstanceId());
+        TaskQueue2.SetRange("Assigned to Session ID", SessionId());
         if TaskQueue2.FindFirst() then begin
             TaskQueue := TaskQueue2;
             exit(true);

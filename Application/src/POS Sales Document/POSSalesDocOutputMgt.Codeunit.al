@@ -185,7 +185,7 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
     var
         SalesPostandPdf2Nav: Codeunit "NPR Sales-Post and Pdf2Nav";
     begin
-        SalesPostandPdf2Nav.DontHandlePrint;
+        SalesPostandPdf2Nav.DontHandlePrint();
         SalesPostandPdf2Nav.SetMode(Type);
         SalesPostandPdf2Nav.GetReport(SalesHeader);
     end;

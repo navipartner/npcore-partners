@@ -95,7 +95,7 @@
                     end;
 
                     POSEntry2.Get(POSSalesLine2."POS Entry No.");
-                    if not POSEntry2.Mark then begin
+                    if not POSEntry2.Mark() then begin
                         POSEntry2.Mark := true;
                         POSSalesLineCons."POS Period Register No." := POSSalesLineCons."POS Period Register No." + POSEntry2."NPRE Number of Guests";
                     end;
@@ -306,7 +306,7 @@
                     DimSetEntry."Dimension Set ID" := TempDimSetEntryBuffer."Dimension Set ID";
                     if not DimSetEntry.Find() then begin
                         DimSetEntry2 := DimSetEntry;
-                        if not FilterForBlankIncluded or (FilterForBlankIncluded and DimSetEntry2.Find) then
+                        if not FilterForBlankIncluded or (FilterForBlankIncluded and DimSetEntry2.Find()) then
                             TempDimSetEntryBuffer.Delete();
                     end;
                 until TempDimSetEntryBuffer.Next() = 0;

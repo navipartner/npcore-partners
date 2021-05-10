@@ -215,7 +215,7 @@
         Kasse.Get(CashRegisterNo);
         Clear(FinKldLinie);
         if Finkllbr = 0 then
-            Finkllbr := GetLastGenJournalLine;
+            Finkllbr := GetLastGenJournalLine();
         Finkllbr += 10000;
         FinKldLinie."Line No." := Finkllbr;
 
@@ -399,7 +399,7 @@
                 if Difference > 0 then begin
 
                     if Finkllbr = 0 then
-                        Finkllbr := GetLastGenJournalLine;
+                        Finkllbr := GetLastGenJournalLine();
                     Finkllbr += 10000;
                     FinKldLinie.Init();
                     FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
@@ -470,7 +470,7 @@
         Kasse.Get(RevRulle."Register No.");
         VarekldLinie.Init();
         if Varekllbr = 0 then
-            Varekllbr := GetLastItemJournalLine;
+            Varekllbr := GetLastItemJournalLine();
         Varekllbr += 10000;
         VarekldLinie."Journal Template Name" := HCRetailSetup."Item Journal Template";
         VarekldLinie."Journal Batch Name" := HCRetailSetup."Item Journal Batch";
@@ -601,7 +601,7 @@
 
         HCRetailSetup.Get();
         if Finkllbr = 0 then
-            Finkllbr := GetLastGenJournalLine;
+            Finkllbr := GetLastGenJournalLine();
         Finkllbr += 10000;
         FinKldLinie."Line No." := Finkllbr;
         FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
@@ -723,7 +723,7 @@
 
         if Rec.Difference <> 0 then begin
             if Finkllbr = 0 then
-                Finkllbr := GetLastGenJournalLine;
+                Finkllbr := GetLastGenJournalLine();
             Finkllbr += 10000;
             FinKldLinie.Init();
             FinKldLinie."Line No." := Finkllbr;
@@ -770,7 +770,7 @@
 
         if Rec."Transferred to Balance Account" <> 0 then begin
             if Finkllbr = 0 then
-                Finkllbr := GetLastGenJournalLine;
+                Finkllbr := GetLastGenJournalLine();
             Finkllbr += 10000;
             FinKldLinie.Init();
             FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
@@ -818,7 +818,7 @@
 
         if Rec."Change Register" <> 0 then begin
             if Finkllbr = 0 then
-                Finkllbr := GetLastGenJournalLine;
+                Finkllbr := GetLastGenJournalLine();
             Finkllbr += 10000;
             FinKldLinie.Init();
             FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";

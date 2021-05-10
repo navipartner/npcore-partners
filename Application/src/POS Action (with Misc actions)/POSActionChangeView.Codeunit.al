@@ -18,7 +18,7 @@ codeunit 6150724 "NPR POS Action - Change View"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -67,7 +67,7 @@ then begin
                 begin
                     POSCreateEntry.InsertUnitLogoutEntry(POSUnit."No.", POSSetup.Salesperson());
 
-                    if (CurrentView.Type = CurrentView.Type::Sale) or (CurrentView.Type = CurrentView.Type::Payment) then begin
+                    if (CurrentView.Type() = CurrentView.Type()::Sale) or (CurrentView.Type() = CurrentView.Type()::Payment) then begin
                         POSSession.GetSaleLine(POSSaleLine);
 
                         // if there are lines to delete

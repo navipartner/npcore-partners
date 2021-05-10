@@ -144,7 +144,7 @@
         if not UploadIntoStream(UploadFileMsg, '', '', Filename, InStream) then
             exit;
 
-        EmailAttachmentTemp.Init;
+        EmailAttachmentTemp.Init();
         EmailAttachmentTemp."Attached File".CreateOutStream(OutStream);
         CopyStream(OutStream, InStream);
         Pos := StrPos(Filename, '\');
@@ -241,7 +241,7 @@
                     repeat
                         HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateLine."Mail Body Line", EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
                         EmailSendingHandler.AppendBodyLine(EmailItem, HtmlLine);
-                    until EmailTemplateLine.Next = 0;
+                    until EmailTemplateLine.Next() = 0;
             end else begin
                 EmailSendingHandler.HtmlMessage(EmailItem, true);
                 EmailTemplateHeader.CalcFields("HTML Template");
@@ -385,7 +385,7 @@
         OStream: OutStream;
         Parameters: Text;
     begin
-        SetGlobalCustomReport;
+        SetGlobalCustomReport();
         EmailAttachmentTemp.Description := Filename;
         EmailAttachmentTemp."Attached File".CreateOutStream(OStream);
         Parameters := GetReqParametersFromStore(ReportID);
@@ -400,7 +400,7 @@
             Result := AddAttachmentToBuffer(EmailAttachmentTemp);
         end;
 
-        ClearGlobalCustomReport;
+        ClearGlobalCustomReport();
         exit(Result);
     end;
     #endregion
@@ -446,7 +446,7 @@
         Stop: Boolean;
     begin
         if EmailTemplateHeader.GetFilters = '' then
-            EmailTemplateHeader.SetFilter(Group, '%1', GetDefaultGroupFilter);
+            EmailTemplateHeader.SetFilter(Group, '%1', GetDefaultGroupFilter());
         EmailTemplateHeader.SetRange("Table No.", RecRef.Number);
         if EmailTemplateHeader.Find('-') then
             repeat

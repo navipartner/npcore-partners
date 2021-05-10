@@ -6,7 +6,7 @@
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         auditrolllineimport.Import();
         InsertImportEntry('InsertAuditRoll', 6150904, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := CopyStr('NCConnectorAuditRoll' + auditrolllineimport.GetSalesTicketNo(), 1, MaxStrLen(NaviConnectImportEntry."Document Name") - 4) + '.xml';
@@ -25,7 +25,7 @@
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         posentryimport.Import();
         InsertImportEntry('InsertPOSEntry', 6150915, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'BCConnectorPOSEntry.xml';
@@ -44,7 +44,7 @@
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         salesdocumentimport.Import();
         InsertImportEntry('InsertSalesDocument', 6150906, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConenctorSalesDocument.xml';
@@ -63,7 +63,7 @@
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         customerimport.Import();
         InsertImportEntry('InsertCustomer', 6150907, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConnectorCustomer.xml';
@@ -84,7 +84,7 @@
         TmpSalesHeader: Record "Sales Header" temporary;
         TmpSalesLine: Record "Sales Line" temporary;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         customerPriceRequest.Import();
         InsertImportEntry('GetCustomerPrice', 6150908, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConnectorGetCustomerPrice.xml';
@@ -97,7 +97,7 @@
         Commit();
 
         customerPriceRequest.GetRequest(TmpSalesHeader, TmpSalesLine);
-        ClearLastError;
+        ClearLastError();
         if (not CustomerPriceManagement.TryProcessRequest(TmpSalesHeader, TmpSalesLine)) then begin
             customerPriceRequest.SetErrorResponse(StrSubstNo('<h3>HQ Connect Server:</h3><br>%1', GetLastErrorText));
             NaviConnectImportEntry.Imported := false;
@@ -124,7 +124,7 @@
         HCGenericWebReqManagement: Codeunit "NPR HC Generic Web Req. Mgt.";
         TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         genericrequest.Import();
         InsertImportEntry('GenericWebRequest', 6150911, NaviConnectImportEntry);
         NaviConnectImportEntry."Document Name" := 'HQConnectorGenericRequest.xml';
@@ -137,7 +137,7 @@
         Commit();
 
         genericrequest.GetRequest(TmpHCGenericWebRequest);
-        ClearLastError;
+        ClearLastError();
         if (not HCGenericWebReqManagement.TryProcessRequest(TmpHCGenericWebRequest)) then begin
             genericrequest.SetErrorResponse(StrSubstNo('<h3>HQ Connect Server:</h3><br>%1', GetLastErrorText));
             NaviConnectImportEntry.Imported := false;

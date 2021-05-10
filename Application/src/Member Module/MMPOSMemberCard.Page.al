@@ -406,7 +406,7 @@ page 6060140 "NPR MM POS Member Card"
 
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
-                        if (RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction)) then
+                        if (RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory(), true, RaptorAction)) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
                     end;
@@ -431,7 +431,7 @@ page 6060140 "NPR MM POS Member Card"
 
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
-                        if (RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction)) then
+                        if (RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations(), true, RaptorAction)) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
                     end;

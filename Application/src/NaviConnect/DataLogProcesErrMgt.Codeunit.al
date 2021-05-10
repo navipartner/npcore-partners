@@ -14,7 +14,7 @@ codeunit 6059897 "NPR Data Log Proces. Err. Mgt."
         OutStr: OutStream;
     begin
         LastErrorText := GetLastErrorText;
-        ClearLastError;
+        ClearLastError();
 
         if LastErrorText = '' then
             exit;

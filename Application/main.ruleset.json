@@ -13,6 +13,11 @@
             "justification": "Only use BEGIN..END to enclose compound statements."
         },
         {
+            "id": "AA0008",
+            "action":"Error",
+            "justification": "Function calls should have parenthesis even if they do not have any parameters."
+        },
+        {
             "id": "AA0021",
             "action":"Hidden",
             "justification": "Variable declarations should be ordered by type."

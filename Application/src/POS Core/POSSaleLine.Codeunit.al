@@ -130,7 +130,7 @@
     procedure SetPosition(Position: Text): Boolean
     begin
         Rec.SetPosition(Position);
-        exit(Rec.Find);
+        exit(Rec.Find());
     end;
 
     procedure GetCurrentSaleLine(var SaleLinePOS: Record "NPR POS Sale Line")
@@ -369,10 +369,10 @@
     begin
         DataMgt.RecordToDataSet(Rec, CurrDataSet, DataSource, POSSession, FrontEnd);
         CalculateBalance(AmountExclVAT, VATAmount, TotalAmount);
-        CurrDataSet.Totals.Add('AmountExclVAT', AmountExclVAT);
-        CurrDataSet.Totals.Add('VATAmount', VATAmount);
-        CurrDataSet.Totals.Add('TotalAmount', TotalAmount);
-        CurrDataSet.Totals.Add('ItemCount', ItemCountWhenCalculatedBalance);
+        CurrDataSet.Totals().Add('AmountExclVAT', AmountExclVAT);
+        CurrDataSet.Totals().Add('VATAmount', VATAmount);
+        CurrDataSet.Totals().Add('TotalAmount', TotalAmount);
+        CurrDataSet.Totals().Add('ItemCount', ItemCountWhenCalculatedBalance);
     end;
 
     procedure GetDepositLine(var LinePOS: Record "NPR POS Sale Line")
@@ -652,7 +652,7 @@
             if SaleLinePOS."Currency Code" <> '' then
                 Currency.Get(SaleLinePOS."Currency Code")
             else
-                Currency.InitRoundingPrecision;
+                Currency.InitRoundingPrecision();
             UnitPrice := Round(UnitPrice, Currency."Unit-Amount Rounding Precision");
         end;
     end;

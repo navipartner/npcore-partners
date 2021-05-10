@@ -857,7 +857,7 @@
             '<TransmissionDate>' + FormattedDateTime() + '</TransmissionDate>' +
             '<Sender>' +
               '<SenderID>' + SenderID() + '</SenderID>' +
-              '<Version>' + POSVersion + '</Version>' +
+              '<Version>' + POSVersion() + '</Version>' +
               '<SenderSpecificData>' +
                 '<parameter name="UserName" value="' + GlobalBlueParameters.Username + '"/>' +
                 '<parameter name="Password" value="' + GlobalBlueParameters.Password + '"/>' +
@@ -894,7 +894,7 @@
             '<TransmissionDate>' + FormattedDateTime() + '</TransmissionDate>' +
             '<Sender>' +
               '<SenderID>' + SenderID() + '</SenderID>' +
-              '<Version>' + POSVersion + '</Version>' +
+              '<Version>' + POSVersion() + '</Version>' +
               '<SenderSpecificData>' +
                 '<parameter name="UserName" value="' + GlobalBlueParameters.Username + '"/>' +
                 '<parameter name="Password" value="' + GlobalBlueParameters.Password + '"/>' +
@@ -1873,7 +1873,7 @@
         if not IsRecentVoucher then //I2 only allows for reprint of recent voucher which is stored for the session. This can either be a just-issued voucher or a print-last attempt.
             Error(Error_NotSupported, TaxFreeRequest."Handler ID Enum");
 
-        ClearLastError;
+        ClearLastError();
         if not TryPrintVoucher(TaxFreeRequest) then
             Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
     end;

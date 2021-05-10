@@ -25,7 +25,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2ResetAccountPassword.Import();
         M2ResetAccountPassword.GetRequest(TmpOneTimePassword);
@@ -65,7 +65,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpShipToAddress: Record "Ship-to Address" temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2GetAccount.Import();
         ContactNo := M2GetAccount.GetRequest();
@@ -86,7 +86,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpAccount: Record Contact temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2UpdateAccount.Import();
         M2UpdateAccount.GetRequest(TmpContact, TmpCustomer);
@@ -107,7 +107,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpAccount: Record Contact temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2CreateCorporateAccount.Import();
         M2CreateCorporateAccount.GetRequest(TmpContact, TmpCustomer);
@@ -127,7 +127,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpAccount: Record Contact temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2AddAccount.Import();
         M2AddAccount.GetRequest(TmpContact);
@@ -146,7 +146,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         ContactNo: Code[20];
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2DeleteAccount.Import();
         ContactNo := M2DeleteAccount.GetRequest();
@@ -167,7 +167,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpShiptoAddressResponse: Record "Ship-to Address" temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2AddShiptoAddress.Import();
         M2AddShiptoAddress.GetRequest(TmpAccount, TmpShiptoAddressRequest);
@@ -188,7 +188,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpShiptoAddressResponse: Record "Ship-to Address" temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2UpdateShiptoAddress.Import();
         M2UpdateShiptoAddress.GetRequest(TmpAccount, TmpShiptoAddressRequest);
@@ -208,7 +208,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpShiptoAddressRequest: Record "Ship-to Address" temporary;
     begin
 
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         M2DeleteShiptoAddress.Import();
         M2DeleteShiptoAddress.GetRequest(TmpAccount, TmpShiptoAddressRequest);
@@ -230,7 +230,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpBillToCustomer: Record Customer temporary;
         TmpShipToAddress: Record "Ship-to Address" temporary;
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         GetExtendedAccount.Import();
         ContactNo := GetExtendedAccount.GetRequest();
@@ -246,7 +246,7 @@ codeunit 6151150 "NPR M2 Account WebService"
 
     procedure ListMailGroupsForAccount(ContactNo: Code[20]; var ListMailingGroups: XMLport "NPR M2 List Mailing Groups")
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         ListMailingGroups.CreateListForContact(ContactNo);
     end;
 
@@ -254,7 +254,7 @@ codeunit 6151150 "NPR M2 Account WebService"
     var
         ContactMailingGroup: Record "Contact Mailing Group";
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         if (not ContactMailingGroup.Get(ContactNo, MailGroupCode)) then begin
             ContactMailingGroup.Validate("Contact No.", ContactNo);
@@ -269,7 +269,7 @@ codeunit 6151150 "NPR M2 Account WebService"
     var
         ContactMailingGroup: Record "Contact Mailing Group";
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
 
         if (ContactMailingGroup.Get(ContactNo, MailGroupCode)) then begin
             ContactMailingGroup.Delete(true);
@@ -283,7 +283,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpEFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary;
         EFTShopperRecognition: Codeunit "NPR EFT Shopper Recognition";
     begin
-        SelectLatestVersion;
+        SelectLatestVersion();
         ShopperRecognition.Import();
         ShopperRecognition.GetRequest(TmpEFTShopperRecognition);
 

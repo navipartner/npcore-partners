@@ -176,16 +176,16 @@ codeunit 6150893 "NPR Data Set" implements "NPR IJsonSerializable"
         MakeSureIsConstructed();
 
         Modified.Constructor(ModifiedJson);
-        Set.Constructor(Modified.DataSource);
+        Set.Constructor(Modified.DataSource());
         Set.SetIsDelta(true);
-        Set.SetCurrentPosition(Modified.CurrentPosition);
+        Set.SetCurrentPosition(Modified.CurrentPosition());
 
-        foreach RowToken in Modified.Rows do begin
+        foreach RowToken in Modified.Rows() do begin
             if not FindRow(RowStatic.Position(RowToken.AsObject()), Existing) then begin
-                Set.Rows.Add(RowToken);
+                Set.Rows().Add(RowToken);
             end else begin
                 if not Existing.Equals(RowToken.AsObject()) then
-                    Set.Rows.Add(RowToken);
+                    Set.Rows().Add(RowToken);
             end;
         end;
 
@@ -195,13 +195,13 @@ codeunit 6150893 "NPR Data Set" implements "NPR IJsonSerializable"
                 Clear(Existing);
                 Existing.Constructor(RowPosition);
                 Existing.SetDeleted(true);
-                Set.Rows.Add(Existing.GetJson());
+                Set.Rows().Add(Existing.GetJson());
             end;
         end;
 
-        foreach Total in Modified.Totals.Keys do begin
-            Modified.Totals.Get(Total, TotalToken);
-            Set.Totals.Add(Total, TotalToken.Clone());
+        foreach Total in Modified.Totals().Keys do begin
+            Modified.Totals().Get(Total, TotalToken);
+            Set.Totals().Add(Total, TotalToken.Clone());
         end;
 
         exit(Set.GetJson());

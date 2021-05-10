@@ -34,7 +34,7 @@ codeunit 6150618 "NPR POS Entry Output Log Mgt."
         if POSSession.IsActiveSession(POSFrontEnd) then begin
             POSFrontEnd.GetSession(POSSession);
             POSSession.GetSetup(POSSetup);
-            POSEntryOutputLog."Salesperson Code" := POSSetup.Salesperson;
+            POSEntryOutputLog."Salesperson Code" := POSSetup.Salesperson();
         end;
         POSEntryOutputLog."User ID" := UserId;
         POSEntryOutputLog."Output Method" := POSEntryOutputLog."Output Method"::Print;

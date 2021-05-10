@@ -16,7 +16,7 @@ codeunit 6059812 "NPR Retail Chart Mgt by Shop"
         end;
         if not ChangedChartType then
             Setdate(StartDate, Enddate, Period, PeriodType, BusChartBuf);
-        BusChartBuf.Initialize;
+        BusChartBuf.Initialize();
         BusChartBuf.AddMeasure(Text000, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
         BusChartBuf.AddMeasure(Text001, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
         BusChartBuf.SetXAxis(Text002, BusChartBuf."Data Type"::String);
@@ -43,7 +43,7 @@ codeunit 6059812 "NPR Retail Chart Mgt by Shop"
         end;
         if not ChangedChartType then
             Setdate(StartDate, Enddate, Period, PeriodType, BusChartBuf);
-        BusChartBuf.Initialize;
+        BusChartBuf.Initialize();
         BusChartBuf.AddMeasure(Text000, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
         BusChartBuf.AddMeasure(Text001, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
         BusChartBuf.SetXAxis(Text002, BusChartBuf."Data Type"::String);

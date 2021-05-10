@@ -70,7 +70,7 @@ page 6059979 "NPR Variety Fields Lookup"
     trigger OnOpenPage()
     begin
         //-NPR5.32 [274170]
-        Rec.UpdateToLatestVersion;
+        Rec.UpdateToLatestVersion();
         //+NPR5.32 [274170]
     end;
 }

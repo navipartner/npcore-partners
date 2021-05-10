@@ -722,7 +722,7 @@
         NPRAttributeKeys.SetFilter(Datetime_Value, NPRAttributeValueSet.GetFilter("Datetime Value"));
         NPRAttributeKeys.SetFilter(Numeric_Value, NPRAttributeValueSet.GetFilter("Numeric Value"));
         NPRAttributeKeys.SetFilter(Boolean_Value, NPRAttributeValueSet.GetFilter("Boolean Value"));
-        if not NPRAttributeKeys.Open then
+        if not NPRAttributeKeys.Open() then
             exit('');
 
         KeyLayout := GetRecordKeyLayout(Record);
@@ -760,7 +760,7 @@
         end;
 
         FieldRefCode.SetFilter(KeyFilterCode);
-        exit(RecRef.GetView);
+        exit(RecRef.GetView());
     end;
 
     local procedure GetAttributeFilterViewDocument(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
@@ -787,7 +787,7 @@
 
         FieldRefOption.SetFilter(KeyFilterOption);
         FieldRefCode.SetFilter(KeyFilterCode);
-        exit(RecRef.GetView);
+        exit(RecRef.GetView());
     end;
 
     local procedure GetAttributeFilterViewDocumentLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
@@ -822,7 +822,7 @@
         FieldRefOption.SetFilter(KeyFilterOption);
         FieldRefCode.SetFilter(KeyFilterCode);
         FieldRefLine.SetFilter(KeyFilterLine);
-        exit(RecRef.GetView);
+        exit(RecRef.GetView());
     end;
 
     local procedure GetAttributeFilterViewWorksheetLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
@@ -857,7 +857,7 @@
         FieldRefCode.SetFilter(KeyFilterCode);
         FieldRefCode2.SetFilter(KeyFilterCode2);
         FieldRefLine.SetFilter(KeyFilterLine);
-        exit(RecRef.GetView);
+        exit(RecRef.GetView());
     end;
 
     local procedure GetAttributeFilterViewWorksheetSubLine(var NPRAttributeKeys: Query "NPR Attribute Keys"; var RecRef: RecordRef): Text
@@ -900,7 +900,7 @@
         FieldRefCode2.SetFilter(KeyFilterCode2);
         FieldRefLine.SetFilter(KeyFilterLine);
         FieldRefLine2.SetFilter(KeyFilterLine2);
-        exit(RecRef.GetView);
+        exit(RecRef.GetView());
     end;
 
     local procedure GetRecordKeyLayout("Record": Variant): Integer
@@ -974,7 +974,7 @@
     begin
         Clear(NPRAttributeFilter);
 
-        Parameters := NPRAttributeFilter.RunRequestPage;
+        Parameters := NPRAttributeFilter.RunRequestPage();
         if Parameters = '' then
             exit(false);
 
@@ -1334,7 +1334,7 @@
                     TEMPNPRAttributeLookupValue."Attribute Value Code" := FieldRefValue.Value;
                     TEMPNPRAttributeLookupValue."Attribute Value Description" := FieldRefDescription.Value;
                     TEMPNPRAttributeLookupValue.Insert();
-                until (0 = RecRef.Next);
+                until (0 = RecRef.Next());
             end;
             if PAGE.RunModal(PAGE::"NPR Attribute Value Lookup", TEMPNPRAttributeLookupValue) = ACTION::LookupOK then begin
                 Value := TEMPNPRAttributeLookupValue."Attribute Value Code";

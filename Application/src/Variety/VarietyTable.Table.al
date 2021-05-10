@@ -29,7 +29,7 @@ table 6059972 "NPR Variety Table"
             trigger OnValidate()
             begin
                 //-NPR5.47 [327541]
-                TestLength;
+                TestLength();
                 //+NPR5.47 [327541]
             end;
         }
@@ -93,14 +93,14 @@ table 6059972 "NPR Variety Table"
     trigger OnInsert()
     begin
         //-NPR5.47 [327541]
-        TestLength;
+        TestLength();
         //+NPR5.47 [327541]
     end;
 
     trigger OnRename()
     begin
         //-NPR5.47 [327541]
-        TestLength;
+        TestLength();
         //+NPR5.47 [327541]
     end;
 

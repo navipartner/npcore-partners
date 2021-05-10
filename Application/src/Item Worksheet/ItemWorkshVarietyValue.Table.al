@@ -94,7 +94,7 @@ table 6060044 "NPR Item Worksh. Variety Value"
 
     trigger OnInsert()
     begin
-        AssignSortOrder;
+        AssignSortOrder();
     end;
 
     procedure AssignSortOrder()
@@ -108,7 +108,7 @@ table 6060044 "NPR Item Worksh. Variety Value"
         if Evaluate(Dec, Value) then begin
             //its a number. take the sort order from here (if possible)
             //convert '.' with ',' so we can use the number correct
-            DecSep := GetDecimalSeperator;
+            DecSep := GetDecimalSeperator();
             if DecSep = '.' then
                 Value2 := ConvertStr(Value, ',', DecSep)
             else

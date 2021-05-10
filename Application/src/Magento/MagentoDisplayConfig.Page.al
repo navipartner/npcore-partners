@@ -22,9 +22,9 @@ page 6151443 "NPR Magento Display Config"
 
                     trigger OnValidate()
                     begin
-                        CurrPage.SaveRecord;
+                        CurrPage.SaveRecord();
                         NumberFilter := '';
-                        SetRecFilters;
+                        SetRecFilters();
                     end;
                 }
                 field(NumberFilterCtrl; NumberFilter)
@@ -46,7 +46,7 @@ page 6151443 "NPR Magento Display Config"
                                 begin
                                     ItemList.LookupMode := true;
                                     if ItemList.RunModal() = ACTION::LookupOK then
-                                        Text := ItemList.GetSelectionFilter
+                                        Text := ItemList.GetSelectionFilter()
                                     else
                                         exit(false);
                                 end;
@@ -54,7 +54,7 @@ page 6151443 "NPR Magento Display Config"
                                 begin
                                     ItemGroups.LookupMode := true;
                                     if ItemGroups.RunModal() = ACTION::LookupOK then
-                                        Text := ItemGroups.GetSelectionFilter
+                                        Text := ItemGroups.GetSelectionFilter()
                                     else
                                         exit(false);
                                 end;
@@ -62,7 +62,7 @@ page 6151443 "NPR Magento Display Config"
                                 begin
                                     Brands.LookupMode := true;
                                     if Brands.RunModal() = ACTION::LookupOK then
-                                        Text := Brands.GetSelectionFilter
+                                        Text := Brands.GetSelectionFilter()
                                     else
                                         exit(false);
                                 end;
@@ -73,8 +73,8 @@ page 6151443 "NPR Magento Display Config"
 
                     trigger OnValidate()
                     begin
-                        CurrPage.SaveRecord;
-                        SetRecFilters;
+                        CurrPage.SaveRecord();
+                        SetRecFilters();
                     end;
                 }
             }
@@ -132,8 +132,8 @@ page 6151443 "NPR Magento Display Config"
 
     trigger OnOpenPage()
     begin
-        GetRecFilters;
-        SetRecFilters;
+        GetRecFilters();
+        SetRecFilters();
     end;
 
     var
@@ -187,7 +187,7 @@ page 6151443 "NPR Magento Display Config"
         SalesSrcTableName: Text[100];
         Description: Text[250];
     begin
-        GetRecFilters;
+        GetRecFilters();
 
 
 

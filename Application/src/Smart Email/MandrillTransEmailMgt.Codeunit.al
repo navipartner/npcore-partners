@@ -13,7 +13,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     begin
         Initialize(GetFullURL('/users/ping2.json'), 'POST');
 
-        if not ExecuteWebServiceRequest then
+        if not ExecuteWebServiceRequest() then
             Error(GetLastErrorText);
 
         Message(ConnectionSuccessMsg);
@@ -27,11 +27,11 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         i: Integer;
     begin
         Initialize(GetFullURL('/templates/list.json'), 'POST');
-        if not ExecuteWebServiceRequest then
+        if not ExecuteWebServiceRequest() then
             Error(GetLastErrorText);
 
         i := 0;
-        JToken.ReadFrom(GetWebResonseText);
+        JToken.ReadFrom(GetWebResonseText());
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
@@ -59,10 +59,10 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         Initialize(GetFullURL('/templates/info.json'), 'POST');
         BodyJObject.Add('name', SmartEmail."Smart Email ID");
 
-        if not ExecuteWebServiceRequest then
+        if not ExecuteWebServiceRequest() then
             Error(GetLastErrorText);
 
-        JObject.ReadFrom(GetWebResonseText);
+        JObject.ReadFrom(GetWebResonseText());
 
         SmartEmail."Smart Email Name" := CopyStr(GetString(JObject, 'name'), 1, MaxStrLen(SmartEmail."Smart Email Name"));
         SmartEmail.From := CopyStr(GetString(JObject, 'from_name'), 1, MaxStrLen(SmartEmail.From));
@@ -119,7 +119,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         if not ExecuteWebServiceRequest() then
             Error(GetLastErrorText);
 
-        JObject.ReadFrom(GetWebResonseText);
+        JObject.ReadFrom(GetWebResonseText());
     end;
 
     local procedure SaveMessageDetails(EmailLog: Record "NPR Trx Email Log"; var JObject: JsonObject)
@@ -173,10 +173,10 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
 
         BodyJObject.Add('message', MessageJObject);
 
-        if not ExecuteWebServiceRequest then
+        if not ExecuteWebServiceRequest() then
             Error(GetLastErrorText);
 
-        JToken.ReadFrom(GetWebResonseText);
+        JToken.ReadFrom(GetWebResonseText());
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
@@ -228,10 +228,10 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         MessageJObject.Add('attachments', JArray);
 
         BodyJObject.Add('message', MessageJObject);
-        if not ExecuteWebServiceRequest then
+        if not ExecuteWebServiceRequest() then
             Error(GetLastErrorText);
 
-        JToken.ReadFrom(GetWebResonseText);
+        JToken.ReadFrom(GetWebResonseText());
         JArray := JToken.AsArray();
         foreach JToken in JArray do begin
             JObject := JToken.AsObject();
@@ -275,7 +275,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         AddVariablesToJArray(JArray, SmartEmail, RecRef);
         BodyJObject.Add('merge_vars', JArray);
 
-        if not ExecuteWebServiceRequest then
+        if not ExecuteWebServiceRequest() then
             Error(GetLastErrorText);
 
         JObject.ReadFrom(GetWebResonseText());
@@ -406,7 +406,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
                     if (RecRef.Number <> 0) and (SmartEmailVariable."Field No." <> 0) then begin
                         FldRef := RecRef.Field(SmartEmailVariable."Field No.");
                         if Format(FldRef.Class) = 'FlowField' then
-                            FldRef.CalcField;
+                            FldRef.CalcField();
                         JObject.Add('content', Format(FldRef.Value));
                     end else
                         JObject.Add('content', '');
@@ -499,7 +499,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
             exit;
         RegEx.Regex('(\*\|)(.*?)(\|\*)');
         RegEx.Match(CodeString, Match);
-        while Match.Success do begin
+        while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i;
             TempVariable."Variable Name" := Match.Value();
@@ -514,7 +514,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         RegEx.Regex('({{)(.*?)(}})');
         RegEx.Match(CodeString, Match);
         i := 0;
-        while Match.Success do begin
+        while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i + OffSet;
             TempVariable."Variable Name" := Match.Value();

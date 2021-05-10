@@ -38,7 +38,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
                 else
                     services += ',' + ServicesCombination."Service Code";
                 Counter += 1;
-            until ServicesCombination.NEXT = 0;
+            until ServicesCombination.NEXT() = 0;
     end;
 
     local procedure CreateShipment(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"; Silent: Boolean);
@@ -96,15 +96,15 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
                 PrinterName := GetJsonText(JToken, 'name', 0);
 
                 PakkelabelsPrinter.SETRANGE(Name, PrinterName);
-                if not PakkelabelsPrinter.FINDFIRST then begin
-                    PakkelabelsPrinter.INIT;
+                if not PakkelabelsPrinter.FINDFIRST() then begin
+                    PakkelabelsPrinter.INIT();
                     PakkelabelsPrinter.Name := PrinterName;
                     PakkelabelsPrinter.INSERT(true);
                 end;
                 PakkelabelsPrinter."Host Name" := GetJsonText(JToken, 'hostname', 0);
                 PakkelabelsPrinter.Printer := GetJsonText(JToken, 'printer', 0);
                 PakkelabelsPrinter."Label Format" := GetJsonText(JToken, 'label_format', 0);
-                PakkelabelsPrinter.MODIFY;
+                PakkelabelsPrinter.MODIFY();
             end;
         end;
     end;
@@ -115,7 +115,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         ShippingAgent: Record "NPR Package Shipping Agent";
         test_mode: Text[10];
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
 
         ShippingAgent.GET(PakkelabelsShipment."Shipping Agent Code");
@@ -146,7 +146,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
             Output += STRSUBSTNO('"automatic_select_service_point": true,');
 
 
-        Output += STRSUBSTNO('"sender": %1,', BuildSender);
+        Output += STRSUBSTNO('"sender": %1,', BuildSender());
         Output += STRSUBSTNO('"receiver": %1,', BuildReceiver(PakkelabelsShipment));
 
         if PakkelabelsShipment."Delivery Location" <> '' then
@@ -167,7 +167,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
     var
         CompanyInformation: Record "Company Information";
     begin
-        CompanyInformation.GET;
+        CompanyInformation.GET();
         Output := '{';
         Output += STRSUBSTNO('"name": "%1",', CompanyInformation.Name);
         Output += '"attention": null,';
@@ -235,7 +235,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
             exit(false);
 
         PakkelabelsPrinter.SETRANGE("Location Code", PakkelabelsShipment."Location Code");
-        if PakkelabelsPrinter.FINDFIRST then
+        if PakkelabelsPrinter.FINDFIRST() then
             exit(true)
         else
             exit(false);
@@ -246,7 +246,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         PakkelabelsPrinter: Record "NPR Package Printers";
     begin
         PakkelabelsPrinter.SETRANGE("Location Code", PakkelabelsShipment."Location Code");
-        if PakkelabelsPrinter.FINDFIRST then begin
+        if PakkelabelsPrinter.FINDFIRST() then begin
             Output := '{';
             Output += STRSUBSTNO('"host_name": "%1",', PakkelabelsPrinter."Host Name");
             Output += STRSUBSTNO('"printer_name": "%1",', PakkelabelsPrinter.Printer);
@@ -326,7 +326,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         output += STRSUBSTNO('"document_id":%1', ShipmentDocument."Response Shipment ID");
         output += '"document_type":"shipment"';
         PakkelabelsPrinter.SETRANGE("Location Code", ShipmentDocument."Location Code");
-        if PakkelabelsPrinter.FINDFIRST then;
+        if PakkelabelsPrinter.FINDFIRST() then;
         output += STRSUBSTNO('"host_name": "%1",', PakkelabelsPrinter."Host Name");
         output += STRSUBSTNO('"printer_name": "%1",', PakkelabelsPrinter.Printer);
         output += STRSUBSTNO('"label_format": "%1"', PakkelabelsPrinter."Label Format");
@@ -364,7 +364,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         RequestMessage.GetHeaders(Headers);
 
         Headers.Remove('Authorization');
-        Headers.Add('Authorization', 'Basic ' + HttpBasicAuthorization);
+        Headers.Add('Authorization', 'Basic ' + HttpBasicAuthorization());
         if not SendHttpRequest(RequestMessage, ResponseText) then begin
             if silent then
                 Message(GetLastErrorText())
@@ -382,7 +382,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
     var
         Base64Convert: Codeunit "Base64 Convert";
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
 
         ApiUser := PackageProviderSetup."Api User";
@@ -397,7 +397,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         SalesLine: Record "Sales Line";
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
         if Rec."Shipment Method Code" = '' then exit;
 
@@ -437,14 +437,14 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
             exit;
         if SalesHeader."Shipment Method Code" = '' then
             exit;
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
 
         if PackageProviderSetup."Default Weight" <= 0 then exit;
 
         if Rec."Net Weight" = 0 then begin
             Rec."Net Weight" := PackageProviderSetup."Default Weight";
-            Rec.MODIFY;
+            Rec.MODIFY();
         end;
     end;
 
@@ -456,12 +456,12 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
     begin
         if tmpAllObjWithCaption.ISTEMPORARY then begin
             AllObjWithCaption.GET(OBJECTTYPE::Codeunit, 6014578);
-            tmpAllObjWithCaption.INIT;
+            tmpAllObjWithCaption.INIT();
             tmpAllObjWithCaption."Object Type" := AllObjWithCaption."Object Type";
             tmpAllObjWithCaption."Object ID" := AllObjWithCaption."Object ID";
             tmpAllObjWithCaption."Object Name" := AllObjWithCaption."Object Name";
             tmpAllObjWithCaption."Object Caption" := AllObjWithCaption."Object Caption";
-            tmpAllObjWithCaption.INSERT;
+            tmpAllObjWithCaption.INSERT();
         end;
     end;
 
@@ -471,7 +471,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         RecRefSalesHeader: RecordRef;
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
         RecRefSalesHeader.GETTABLE(SalesHeader);
         TestFieldPakkelabels(RecRefSalesHeader);
@@ -488,7 +488,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         RecRefShipment: RecordRef;
         LastErrorText: Text;
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
 
         begin
@@ -501,7 +501,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
                         if ErrorTextFound <> '' then
                             MESSAGE(Err0001, ErrorTextFound);
                     end;
-            COMMIT;
+            COMMIT();
             ERROR('');
         end;
         LastErrorText := GETLASTERRORTEXT;
@@ -511,7 +511,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
 
     local procedure InitPackageProvider(): Boolean;
     begin
-        if not PackageProviderSetup.GET then
+        if not PackageProviderSetup.GET() then
             exit(false);
 
         if PackageProviderSetup."Package Service Codeunit ID" = 0 then
@@ -662,11 +662,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
 
         ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
         ShipmentDocument.SETRANGE(RecordID, RecRef.RECORDID);
-        if ShipmentDocument.FINDLAST then
+        if ShipmentDocument.FINDLAST() then
             DocFound := true
         else begin
             CLEAR(ShipmentDocument);
-            ShipmentDocument.INIT;
+            ShipmentDocument.INIT();
             ShipmentDocument.VALIDATE("Entry No.", 0);
             ShipmentDocument.VALIDATE("Table No.", RecRef.NUMBER);
             ShipmentDocument.VALIDATE(RecordID, RecRef.RECORDID);
@@ -733,7 +733,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
                         if SalesShipmentLine.FINDSET() then
                             repeat
                                 ShipmentDocument."Total Weight" += SalesShipmentLine."Net Weight" * SalesShipmentLine.Quantity;
-                            until SalesShipmentLine.NEXT = 0;
+                            until SalesShipmentLine.NEXT() = 0;
                         ShipmentDocument."Total Weight" := ROUND(ShipmentDocument."Total Weight", 1, '>') * 1000;
                         if SalesShipmentHeader."NPR Delivery Location" <> '' then begin
                             ShipmentDocument.Name := SalesShipmentHeader."Bill-to Name";
@@ -774,7 +774,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
                 end;
         end;
 
-        CompanyInfo.GET;
+        CompanyInfo.GET();
         ShipmentDocument."Sender VAT Reg. No" := CompanyInfo."VAT Registration No.";
         if ShipmentDocument."Country/Region Code" = '' then
             ShipmentDocument."Country/Region Code" := CompanyInfo."Country/Region Code";
@@ -783,7 +783,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
 
         ShipmentDocument.MODIFY(true);
 
-        COMMIT;
+        COMMIT();
 
         if PackageProviderSetup."Send Package Doc. Immediately" then
             CreateShipment(ShipmentDocument, Silent)
@@ -792,7 +792,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
     [EventSubscriber(ObjectType::Page, 6014440, 'OnAfterActionEvent', 'SendDocument', true, true)]
     local procedure P6014440OnAfterActionEventSendDoc(var Rec: Record "NPR Pacsoft Shipment Document");
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
         CreateShipment(Rec, false)
     end;
@@ -813,13 +813,13 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         Jtoken: JsonToken;
 
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
 
         RecRef.GETTABLE(Rec);
         ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
         ShipmentDocument.SETRANGE(RecordID, RecRef.RECORDID);
-        if ShipmentDocument.FINDLAST then begin
+        if ShipmentDocument.FINDLAST() then begin
             if CONFIRM(Text001, true) then
                 if ShipmentDocument."Response Shipment ID" <> '' then begin
                     RequestURL := 'https://app.shipmondo.com/api/public/v3/print_jobs/';
@@ -847,7 +847,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         JToken: JsonToken;
     begin
 
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
 
         if Rec."Response Shipment ID" <> '' then begin
@@ -868,7 +868,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
         if ShipmentDocument.FINDSET(true) then
             repeat
                 CreateShipment(ShipmentDocument, true)
-            until ShipmentDocument.NEXT = 0;
+            until ShipmentDocument.NEXT() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 36, 'OnAfterModifyEvent', '', true, true)]
@@ -878,14 +878,14 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
     begin
         if not RunTrigger then
             exit;
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
         if (Rec."Shipment Method Code" = '') or (Rec."Shipping Agent Code" = '') then
             exit;
         ForeignShipmentMapping.SETRANGE("Shipment Method Code", Rec."Shipment Method Code");
         ForeignShipmentMapping.SETRANGE("Base Shipping Agent Code", Rec."Shipping Agent Code");
         ForeignShipmentMapping.SETRANGE("Country/Region Code", Rec."Ship-to Country/Region Code");
-        if ForeignShipmentMapping.FINDFIRST then begin
+        if ForeignShipmentMapping.FINDFIRST() then begin
             Rec."Shipping Agent Code" := ForeignShipmentMapping."Shipping Agent Code";
             Rec."Shipping Agent Service Code" := ForeignShipmentMapping."Shipping Agent Service Code";
             Rec.MODIFY(true);
@@ -897,7 +897,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
     var
         Jtoken: JsonToken;
     begin
-        if not InitPackageProvider then
+        if not InitPackageProvider() then
             exit;
         RequestURL := 'https://app.shipmondo.com/api/public/v3/account/balance';
         if not ExecuteCall('GET', Jtoken, False) then
@@ -935,7 +935,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
 
         if not JToken.SelectToken(Path, Token2) then
             exit('');
-        Jvalue := token2.asValue;
+        Jvalue := token2.asValue();
         if Jvalue.IsNull then
             exit('');
 

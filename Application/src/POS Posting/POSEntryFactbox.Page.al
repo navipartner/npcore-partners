@@ -58,7 +58,7 @@
 
                 trigger OnDrillDown()
                 begin
-                    TaxDetail;
+                    TaxDetail();
                 end;
             }
             field("Rounding Amount (LCY)"; Rec."Rounding Amount (LCY)")
@@ -113,7 +113,7 @@
     trigger OnAfterGetRecord()
     begin
         if Rec."Discount Amount" = 0 then
-            UpdateDiscountAmt;
+            UpdateDiscountAmt();
     end;
 
     local procedure TaxDetail()

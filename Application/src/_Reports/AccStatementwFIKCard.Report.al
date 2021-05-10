@@ -766,17 +766,17 @@
 
                             case SupportedOutputMethod of
                                 SupportedOutputMethod::Print:
-                                    ChosenOutputMethod := CustomLayoutReporting.GetPrintOption;
+                                    ChosenOutputMethod := CustomLayoutReporting.GetPrintOption();
                                 SupportedOutputMethod::Preview:
-                                    ChosenOutputMethod := CustomLayoutReporting.GetPreviewOption;
+                                    ChosenOutputMethod := CustomLayoutReporting.GetPreviewOption();
                                 SupportedOutputMethod::PDF:
-                                    ChosenOutputMethod := CustomLayoutReporting.GetPDFOption;
+                                    ChosenOutputMethod := CustomLayoutReporting.GetPDFOption();
                                 SupportedOutputMethod::Email:
-                                    ChosenOutputMethod := CustomLayoutReporting.GetEmailOption;
+                                    ChosenOutputMethod := CustomLayoutReporting.GetEmailOption();
                                 SupportedOutputMethod::Excel:
-                                    ChosenOutputMethod := CustomLayoutReporting.GetExcelOption;
+                                    ChosenOutputMethod := CustomLayoutReporting.GetExcelOption();
                                 SupportedOutputMethod::XML:
-                                    ChosenOutputMethod := CustomLayoutReporting.GetXMLOption;
+                                    ChosenOutputMethod := CustomLayoutReporting.GetXMLOption();
                             end;
                         end;
                     }

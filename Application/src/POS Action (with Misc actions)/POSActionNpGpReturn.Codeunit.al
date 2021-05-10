@@ -33,7 +33,7 @@
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-            ActionCode,
+            ActionCode(),
             ActionDescriptionCaption,
             ActionVersion(),
             Sender.Type::Generic,
@@ -102,8 +102,8 @@
                     end else
                         CreateGlobalReverseSale(Context, POSSession, FrontEnd, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
 
-                    POSSession.ChangeViewSale;
-                    POSSession.RequestRefreshData;
+                    POSSession.ChangeViewSale();
+                    POSSession.RequestRefreshData();
                 end;
         end;
 
@@ -362,7 +362,7 @@
 
         with TempNpGpPOSSalesLine do
             repeat
-                SaleLinePOS.Init;
+                SaleLinePOS.Init();
                 SaleLinePOS.Validate("Register No.", SalePOS."Register No.");
                 SaleLinePOS.Validate("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
@@ -399,16 +399,16 @@
                 SaleLinePOS.Modify(true);
 
                 RetailCrossReference."Retail ID" := SaleLinePOS.SystemId;
-                RetailCrossReference.Insert;
+                RetailCrossReference.Insert();
 
                 RetailCrossReference."Reference No." := TempNpGpPOSSalesLine."Global Reference";
                 RetailCrossReference."Table ID" := DATABASE::"NPR POS Sale Line";
                 RetailCrossReference."Record Value" := SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No.");
-                RetailCrossReference.Modify;
+                RetailCrossReference.Modify();
             until not FullSale or (TempNpGpPOSSalesLine.Next() = 0);
 
-        POSSaleLine.ResendAllOnAfterInsertPOSSaleLine;
-        POSSale.RefreshCurrent;
+        POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
+        POSSale.RefreshCurrent();
     end;
 
     local procedure UpdateLineNos(SalePOS: Record "NPR POS Sale"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)

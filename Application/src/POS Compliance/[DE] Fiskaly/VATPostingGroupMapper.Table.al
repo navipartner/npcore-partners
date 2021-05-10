@@ -17,7 +17,7 @@ table 6014545 "NPR VAT Posting Group Mapper"
             begin
                 VATPostingSetupPage.LOOKUPMODE(TRUE);
                 VATPostingSetupPage.SETRECORD(VATPostingSetupRec);
-                IF VATPostingSetupPage.RUNMODAL = ACTION::LookupOK THEN BEGIN
+                IF VATPostingSetupPage.RUNMODAL() = ACTION::LookupOK THEN BEGIN
                     VATPostingSetupPage.GETRECORD(VATPostingSetupRec);
                     Rec."VAT Prod. Pos. Group" := VATPostingSetupRec."VAT Prod. Posting Group";
                     Rec."VAT Bus. Posting Group" := VATPostingSetupRec."VAT Bus. Posting Group";

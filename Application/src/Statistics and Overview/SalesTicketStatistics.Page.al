@@ -37,7 +37,7 @@
                     Caption = 'Number of Exp.';
                     ToolTip = 'Specifies the value of the Number of Exp. field';
                 }
-                field(CalculatedAverage; CalcAverage)
+                field(CalculatedAverage; CalcAverage())
                 {
                     ApplicationArea = All;
                     Caption = 'Stay Expedition';
@@ -121,8 +121,8 @@
     trigger OnAfterGetRecord()
     begin
 
-        SetDateFilter;
-        SetDimensionFilters;
+        SetDateFilter();
+        SetDimensionFilters();
         CalcAverage();
     end;
 

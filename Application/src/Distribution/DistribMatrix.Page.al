@@ -354,7 +354,7 @@ page 6151061 "NPR Distrib. Matrix"
     var
         DistributionGroupMembers: Record "NPR Distrib. Group Members";
     begin
-        NewLastColumnShown := GetLastColumnShown;
+        NewLastColumnShown := GetLastColumnShown();
         LastColumnShown := NewLastColumnShown;
         i := 0;
         //IF DistributionHeaders.GET(DistributionID) THEN;

@@ -45,7 +45,7 @@ codeunit 6060128 "NPR MM Member WebService"
         NotFoundReasonText: Text;
     begin
 
-        MembershipEntryNo := MembershipMgr.GetMembershipFromExtCardNo(ExternalMemberCardNo, WorkDate, NotFoundReasonText);
+        MembershipEntryNo := MembershipMgr.GetMembershipFromExtCardNo(ExternalMemberCardNo, WorkDate(), NotFoundReasonText);
         exit(IsMembershipValid(MembershipEntryNo));
     end;
 
@@ -174,7 +174,7 @@ codeunit 6060128 "NPR MM Member WebService"
     begin
 
         MembershipEntryNo := MembershipMgr.GetMembershipFromExtMembershipNo(ExternalMembershipNo);
-        exit(MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate, true));
+        exit(MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate(), true));
     end;
 
     local procedure "--"()
@@ -1100,7 +1100,7 @@ codeunit 6060128 "NPR MM Member WebService"
         if (MembershipEntryNo = 0) then
             exit(false);
 
-        IsValid := MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate, false);
+        IsValid := MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate(), false);
         if (not IsValid) then
             IsValid := MembershipMgr.MembershipNeedsActivation(MembershipEntryNo);
 
@@ -1141,8 +1141,8 @@ codeunit 6060128 "NPR MM Member WebService"
             MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1);
             exit(-1);
         end;
-        if (not MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate, true)) then begin
-            ResponseMessage := StrSubstNo('Membership is not active for today (%1).', Format(WorkDate, 0, 9));
+        if (not MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate(), true)) then begin
+            ResponseMessage := StrSubstNo('Membership is not active for today (%1).', Format(WorkDate(), 0, 9));
             MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1);
             exit(-1);
         end;

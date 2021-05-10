@@ -17,7 +17,7 @@
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescription,
   ActionVersion(),
   Sender.Type::Generic,
@@ -63,7 +63,7 @@ then begin
 
         POSSale.Refresh(SalePOS);
         POSSale.Modify(false, false);
-        POSSession.RequestRefreshData;
+        POSSession.RequestRefreshData();
     end;
 
     local procedure OnActionCreateContact(CardPageId: Integer; var SalePOS: Record "NPR POS Sale")

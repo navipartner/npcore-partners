@@ -28,7 +28,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         TypeOnAfterValidate();
                         NoOnAfterValidate();
                         TypeChosen := Rec.Type <> Rec.Type::" ";
-                        SetLocationCodeMandatory;
+                        SetLocationCodeMandatory();
 
                         if xRec."No." <> '' then
                             RedistributeTotalsOnAfterValidate();
@@ -832,7 +832,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByEvent)
+                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByEvent())
                         end;
                     }
                     action(Period)
@@ -844,7 +844,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByPeriod)
+                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByPeriod())
                         end;
                     }
                     action("Variant")
@@ -856,7 +856,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByVariant)
+                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByVariant())
                         end;
                     }
                     action(Location)
@@ -869,7 +869,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByLocation)
+                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByLocation())
                         end;
                     }
                     action("BOM Level")
@@ -881,7 +881,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByBOM)
+                            ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByBOM())
                         end;
                     }
                 }
@@ -908,7 +908,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
                     trigger OnAction()
                     begin
-                        Rec.OpenItemTrackingLines;
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action("Select Item Substitution")
@@ -1348,7 +1348,7 @@ page 6014519 "NPR Sales Order Pick Subform"
         if (Rec.Type = Rec.Type::"Charge (Item)") and (Rec."No." <> xRec."No.") and
            (xRec."No." <> '')
         then
-            CurrPage.SaveRecord;
+            CurrPage.SaveRecord();
 
         SaveAndAutoAsmToOrder();
 
@@ -1454,7 +1454,7 @@ page 6014519 "NPR Sales Order Pick Subform"
 
     local procedure SaveAndAutoAsmToOrder()
     begin
-        if (Rec.Type = Rec.Type::Item) and Rec.IsAsmToOrderRequired then begin
+        if (Rec.Type = Rec.Type::Item) and Rec.IsAsmToOrderRequired() then begin
             CurrPage.SaveRecord();
             Rec.AutoAsmToOrder();
             CurrPage.Update(false);

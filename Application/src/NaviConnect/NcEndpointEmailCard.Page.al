@@ -89,7 +89,7 @@ page 6151525 "NPR Nc Endpoint E-mail Card"
 
                 trigger OnAction()
                 begin
-                    Rec.ShowEndpointTriggerLinks;
+                    Rec.ShowEndpointTriggerLinks();
                 end;
             }
         }

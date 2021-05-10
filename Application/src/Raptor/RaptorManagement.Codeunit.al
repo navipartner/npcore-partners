@@ -41,7 +41,7 @@
         Path :=
             StrSubstNo('/v1/%1/%2/%3/%4?%5=%6&json=True',
                 RaptorSetup."Customer ID",
-                RaptorAction.RaptorActionAPIReqString,
+                RaptorAction.RaptorActionAPIReqString(),
                 RaptorAction."Number of Entries to Return",
                 RaptorSetup."API Key",
                 RaptorAction."User Identifier Param. Name",
@@ -93,7 +93,7 @@
             if not Handled then begin
                 JObject := JToken.AsObject();
                 case RaptorAction."Raptor Module Code" of
-                    RaptorModule_GetUserIdHistory:
+                    RaptorModule_GetUserIdHistory():
                         begin
                             RaptorDataBuffer.Init();
                             RaptorDataBuffer."Entry No." += 1;
@@ -103,7 +103,7 @@
                             RaptorDataBuffer.Insert();
                         end;
 
-                    RaptorModule_GetUserRecommendations:
+                    RaptorModule_GetUserRecommendations():
                         begin
                             RaptorDataBuffer.Init();
                             RaptorDataBuffer."Entry No." += 1;
@@ -132,12 +132,12 @@
         OnBeforeShowRaptorBuffer(RaptorAction, RaptorDataBuffer, Handled);
         if not Handled then
             case RaptorAction."Raptor Module Code" of
-                RaptorModule_GetUserIdHistory:
+                RaptorModule_GetUserIdHistory():
                     begin
                         RaptorDataBuffer.SetCurrentKey(Priority, "Date-Time Created");
                         RaptorDataBuffer.FindFirst();
                     end;
-                RaptorModule_GetUserRecommendations:
+                RaptorModule_GetUserRecommendations():
                     begin
                         RaptorDataBuffer.SetCurrentKey(Priority);
                         RaptorDataBuffer.FindFirst();
@@ -238,7 +238,7 @@
 
         RaptorAction.Init();
         RaptorAction.Code := 'USER_BROWS_HIST';
-        RaptorAction."Raptor Module Code" := RaptorModule_GetUserIdHistory;
+        RaptorAction."Raptor Module Code" := RaptorModule_GetUserIdHistory();
         RaptorAction."Data Type Description" := ActionDescrLbl_GetUserIDHistory;
         RaptorAction.Comment := ActionCommentLbl_GetUserIDHistory;
         RaptorAction."Number of Entries to Return" := 10;
@@ -248,7 +248,7 @@
 
         RaptorAction.Init();
         RaptorAction.Code := 'USER_RECOMM';
-        RaptorAction."Raptor Module Code" := RaptorModule_GetUserRecommendations;
+        RaptorAction."Raptor Module Code" := RaptorModule_GetUserRecommendations();
         RaptorAction."Data Type Description" := ActionDescrLbl_GetUserRecomm;
         RaptorAction.Comment := ActionCommentLbl_GetUserRecomm;
         RaptorAction."Number of Entries to Return" := 10;
@@ -280,7 +280,7 @@
         DummyRecId: RecordID;
     begin
         if Enabled then begin
-            AddDataLogSubscribers;
+            AddDataLogSubscribers();
 
             JobQueueEntry.ScheduleRecurrentJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Raptor Send Data", DummyRecId);
@@ -295,7 +295,7 @@
                 PAGE.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
         end else
             if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Raptor Send Data") then
-                JobQueueEntry.Cancel;
+                JobQueueEntry.Cancel();
     end;
 
     procedure ShowJobQueueEntry()
@@ -327,7 +327,7 @@
         if Updated then
             DataLogSetup.Modify(true);
 
-        DataLogSubscriber.AddAsSubscriber(RaptorDataLogSubscriber, DATABASE::"Item Ledger Entry");
+        DataLogSubscriber.AddAsSubscriber(RaptorDataLogSubscriber(), DATABASE::"Item Ledger Entry");
     end;
 
     local procedure DaysToDuration(NoOfDays: Integer): BigInteger
@@ -370,7 +370,7 @@
     begin
         OnGetDefaultTrackingServiceType(TrackingServiceType, Handled);
         if not Handled then
-            TrackingServiceType := RaptorTrackService_rsa;
+            TrackingServiceType := RaptorTrackService_rsa();
     end;
 
     local procedure GetListOfTrackingServiceTypes(var ListOfTrackingServiceTypes: Record "Name/Value Buffer")
@@ -384,7 +384,7 @@
         ListOfTrackingServiceTypes.Init();
         ListOfTrackingServiceTypes.ID += 1;
         ListOfTrackingServiceTypes.Name := CopyStr(TrackServDescr_rsa, 1, MaxStrLen(ListOfTrackingServiceTypes.Name));
-        ListOfTrackingServiceTypes.Value := RaptorTrackService_rsa;
+        ListOfTrackingServiceTypes.Value := RaptorTrackService_rsa();
         ListOfTrackingServiceTypes.Insert();
 
         OnGetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);

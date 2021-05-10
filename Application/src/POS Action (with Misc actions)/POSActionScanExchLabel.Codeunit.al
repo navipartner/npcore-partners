@@ -122,7 +122,7 @@ then begin
     begin
         if not EanBoxEvent.Get(EventCodeExchLabel()) then begin
             EanBoxEvent.Init();
-            EanBoxEvent.Code := EventCodeExchLabel;
+            EanBoxEvent.Code := EventCodeExchLabel();
             EanBoxEvent."Module Name" := InpTitle;
             //EanBoxEvent.Description := ExchangeLabel.FIELDCAPTION(Barcode);
             EanBoxEvent.Description := CopyStr(ExchangeLabel.FieldCaption(Barcode), 1, MaxStrLen(EanBoxEvent.Description));

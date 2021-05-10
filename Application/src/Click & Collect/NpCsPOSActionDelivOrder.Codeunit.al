@@ -584,11 +584,11 @@
 
         LocationFilter := GetPOSMenuButtonLocationFilter(POSSession);
         ProcessedOrdersExists := GetProcessedOrdersExists(LocationFilter);
-        DataRow.Fields.Add('ProcessedOrdersExists', ProcessedOrdersExists);
+        DataRow.Fields().Add('ProcessedOrdersExists', ProcessedOrdersExists);
         if ProcessedOrdersExists then
-            DataRow.Fields.Add('ProcessedOrdersQty', GetProcessedOrdersQty(LocationFilter))
+            DataRow.Fields().Add('ProcessedOrdersQty', GetProcessedOrdersQty(LocationFilter))
         else
-            DataRow.Fields.Add('ProcessedOrdersQty', 0);
+            DataRow.Fields().Add('ProcessedOrdersQty', 0);
     end;
 
     local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"): Text

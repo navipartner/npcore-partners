@@ -24,7 +24,7 @@ codeunit 6014569 "NPR RegEx"
         Regex.Regex(Pattern);
 
         Regex.Match(Input, Match);
-        while Match.Success do begin
+        while Match.Success() do begin
             ReplaceString := '';
             RandomQty := 1;
             Match.Groups(GroupCollection);

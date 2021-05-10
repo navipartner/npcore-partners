@@ -99,7 +99,7 @@ table 6059964 "NPR MPOS QR Code"
         if MPOSQRCode.Url = '' then
             MPOSQRCode.Url := StringReplace(GetUrl(CLIENTTYPE::Windows));
         if MPOSQRCode.Tenant = '' then
-            MPOSQRCode.Tenant := TenantId;
+            MPOSQRCode.Tenant := TenantId();
         if MPOSQRCode.Company = '' then
             MPOSQRCode.Company := CompanyName;
         if MPOSQRCode."Webservice Url" = '' then

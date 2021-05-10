@@ -250,6 +250,6 @@ codeunit 6150894 "NPR Data Column" implements "NPR IJsonSerializable"
     procedure CompareTo(Other: Codeunit "NPR Data Column"): Integer;
     begin
         MakeSureIsConstructed();
-        exit(Ordinal - Other.Ordinal);
+        exit(Ordinal() - Other.Ordinal());
     end;
 }

@@ -24,7 +24,7 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
     begin
         if Handled then
             exit;
-        if TriggerCode <> GetTriggerCode then
+        if TriggerCode <> GetTriggerCode() then
             exit;
         CreateOutput(Output);
         Handled := true;
@@ -35,11 +35,11 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
     var
         NcTrigger: Record "NPR Nc Trigger";
     begin
-        if NcTrigger.Get(GetTriggerCode) then
+        if NcTrigger.Get(GetTriggerCode()) then
             exit;
         NcTrigger.Init();
-        NcTrigger.Validate(Code, GetTriggerCode);
-        NcTrigger.Validate(Description, GetTriggerDescription);
+        NcTrigger.Validate(Code, GetTriggerCode());
+        NcTrigger.Validate(Description, GetTriggerDescription());
         NcTrigger.Validate("Subscriber Codeunit ID", CODEUNIT::"NPR Nc Trigger Sample Sub.");
         NcTrigger.Insert(true);
     end;

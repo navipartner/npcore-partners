@@ -39,7 +39,7 @@
 
                 if not ProcessDataItem(ParentDataItem, RecRef) then begin
                     DeleteSet();
-                    ClearAll;
+                    ClearAll();
                     exit; //Skip
                 end;
 
@@ -291,13 +291,13 @@
 
             ParentDataItem."Iteration Type"::First:
                 if ParentRecRef.FindFirst() then
-                    ParentRecRef.SetRecFilter
+                    ParentRecRef.SetRecFilter()
                 else
                     exit(ShouldProcessingContinue(ParentDataItem, false));
 
             ParentDataItem."Iteration Type"::Last:
                 if ParentRecRef.FindLast() then
-                    ParentRecRef.SetRecFilter
+                    ParentRecRef.SetRecFilter()
                 else
                     exit(ShouldProcessingContinue(ParentDataItem, false));
 
@@ -317,7 +317,7 @@
             ParentDataItem."Iteration Type"::"Field Value":
                 begin
                     if ParentRecRef.FindFirst() then
-                        ParentRecRef.SetRecFilter
+                        ParentRecRef.SetRecFilter()
                     else
                         exit(ShouldProcessingContinue(ParentDataItem, false));
 
@@ -376,7 +376,7 @@
                 if FieldMap."Data Item Field No." > 0 then begin
                     FieldRef := RecRef.Field(FieldMap."Data Item Field No.");
                     if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
-                        FieldRef.CalcField;
+                        FieldRef.CalcField();
 
                     if UpperCase(Format(FieldRef.Type)) = 'DECIMAL' then
                         case DecimalRounding of

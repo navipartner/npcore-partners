@@ -263,12 +263,12 @@
     var
         Found: Boolean;
     begin
-        ApplyFilters;
+        ApplyFilters();
         ItemVariantTmp."Item No." := Rec."Item No.";
         ItemVariantTmp.Code := Rec."Variant Code";
         Found := ItemVariantTmp.Find(Which);
         if Found then
-            CopyItemVariantToBuf;
+            CopyItemVariantToBuf();
         exit(Found);
     end;
 
@@ -296,18 +296,18 @@
     var
         ResultSteps: Integer;
     begin
-        ApplyFilters;
+        ApplyFilters();
         ItemVariantTmp."Item No." := Rec."Item No.";
         ItemVariantTmp.Code := Rec."Variant Code";
         ResultSteps := ItemVariantTmp.Next(Steps);
         if ResultSteps <> 0 then
-            CopyItemVariantToBuf;
+            CopyItemVariantToBuf();
         exit(ResultSteps);
     end;
 
     trigger OnOpenPage()
     begin
-        GenerateItemVariantList;
+        GenerateItemVariantList();
     end;
 
     var
@@ -456,7 +456,7 @@
 
     local procedure AdjustMatrixRecordCode("Code": Code[10]): Code[10]
     begin
-        if Code = EmptyCodeValue then
+        if Code = EmptyCodeValue() then
             exit('')
         else
             exit(Code);

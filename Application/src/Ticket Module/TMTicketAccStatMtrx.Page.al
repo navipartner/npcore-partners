@@ -30,7 +30,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         trigger OnValidate()
                         begin
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                         end;
                     }
                     field("fld_ColumnFactOption"; ColumnFactOption)
@@ -48,7 +48,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         trigger OnValidate()
                         begin
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                         end;
                     }
                 }
@@ -65,7 +65,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         trigger OnValidate()
                         begin
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Same);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                         end;
                     }
                     field("fld_HideAdmission"; HideLinesWithZeroAdmissionCount)
@@ -79,7 +79,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         begin
                             //-#341289 [341289]
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Same);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                             //+#341289 [341289]
                         end;
                     }
@@ -106,7 +106,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         trigger OnValidate()
                         begin
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Same);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                         end;
                     }
                     field("fld_DisplayOption"; DisplayOption)
@@ -120,7 +120,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         trigger OnValidate()
                         begin
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Same);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                         end;
                     }
                     field("fld_PeriodType"; PeriodType)
@@ -136,7 +136,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                             DateFactFilter := '';
                             FindPeriod('');
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                         end;
                     }
                     field("fld_TrendPeriodType"; TrendPeriodType)
@@ -150,7 +150,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         trigger OnValidate()
                         begin
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Same);
-                            UpdateMatrixSubForm;
+                            UpdateMatrixSubForm();
                         end;
                     }
                 }
@@ -178,7 +178,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnValidate()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 field(TicketTypeFactFilter; TicketTypeFactFilter)
@@ -196,7 +196,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnValidate()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 field(DateFactFilter; DateFactFilter)
@@ -233,7 +233,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         // DateFilterOnAfterValidate;
 
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 field(HourFactFilter; HourFactFilter)
@@ -251,7 +251,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnValidate()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 field(AdmissionCodeFilter; AdmissionCodeFilter)
@@ -269,7 +269,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnValidate()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 field(VariantCodeFilter; VariantCodeFilter)
@@ -287,7 +287,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnValidate()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
             }
@@ -350,7 +350,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 trigger OnAction()
                 begin
                     TicketAccessStatisticsMgr.BuildCompressedStatistics(Today);
-                    UpdateMatrixSubForm;
+                    UpdateMatrixSubForm();
                 end;
             }
             group(Periods)
@@ -373,7 +373,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
 
                         CurrPage.Update();
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 action("Next Period")
@@ -393,7 +393,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
 
                         CurrPage.Update();
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 action("Previous Set")
@@ -409,7 +409,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnAction()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Previous);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 action("Previous Column")
@@ -425,7 +425,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnAction()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::PreviousColumn);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 action("Next Column")
@@ -441,7 +441,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnAction()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::NextColumn);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
                 action("Next Set")
@@ -457,7 +457,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     trigger OnAction()
                     begin
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Next);
-                        UpdateMatrixSubForm;
+                        UpdateMatrixSubForm();
                     end;
                 }
             }
@@ -491,7 +491,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 
         FindPeriod('');
         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-        UpdateMatrixSubForm;
+        UpdateMatrixSubForm();
     end;
 
     var
@@ -730,7 +730,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         FactList.SetSelection(TicketFact);
 
         if FactList.RunModal() = ACTION::LookupOK then begin
-            FactFilter := FactList.GetSelectionFilter;
+            FactFilter := FactList.GetSelectionFilter();
             UpdateMatrixSubForm();
             exit(true);
         end;

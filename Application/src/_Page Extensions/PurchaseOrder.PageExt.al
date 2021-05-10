@@ -64,7 +64,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                         PurchaseLine.Validate(Quantity, InputQuantity);
                         PurchaseLine.Modify(true);
                         Commit();
-                        ViewText := RetailItemList.NPR_GetViewText;
+                        ViewText := RetailItemList.NPR_GetViewText();
                         Clear(RetailItemList);
                         RetailItemList.NPR_SetLocationCode(Rec."Location Code");
                         RetailItemList.NPR_SetVendorNo(Rec."Buy-from Vendor No.");

@@ -75,7 +75,7 @@ table 6151249 "NPR Trail. Purch. Orders Setup"
         StartDate: Date;
     begin
         if "Use Work Date as Base" then
-            StartDate := WorkDate
+            StartDate := WorkDate()
         else
             StartDate := Today();
         if "Show Orders" = "Show Orders"::"All Orders" then begin

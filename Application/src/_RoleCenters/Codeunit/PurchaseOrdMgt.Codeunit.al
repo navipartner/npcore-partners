@@ -29,7 +29,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         TrailingPurchOrdersSetup.Get(UserId);
         PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
         if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
-            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate);
+            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate());
         if Evaluate(PurchHeader.Status, BusChartBuf.GetMeasureValueString(Measure), 9) then
             PurchHeader.SetRange(Status, PurchHeader.Status);
 
@@ -49,14 +49,14 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         PurchHeaderStatus: Integer;
     begin
         TrailingPurchOrdersSetup.Get(UserId);
-        BusChartBuf.Initialize;
+        BusChartBuf.Initialize();
         BusChartBuf."Period Length" := TrailingPurchOrdersSetup."Period Length";
-        BusChartBuf.SetPeriodXAxis;
+        BusChartBuf.SetPeriodXAxis();
 
         CreateMap(ChartToStatusMap);
         for PurchHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
             PurchHeader.Status := ChartToStatusMap[PurchHeaderStatus];
-            BusChartBuf.AddMeasure(Format(PurchHeader.Status), PurchHeader.Status, BusChartBuf."Data Type"::Decimal, TrailingPurchOrdersSetup.GetChartType);
+            BusChartBuf.AddMeasure(Format(PurchHeader.Status), PurchHeader.Status, BusChartBuf."Data Type"::Decimal, TrailingPurchOrdersSetup.GetChartType());
         end;
 
         if CalcPeriods(FromDate, ToDate, BusChartBuf) then begin
@@ -82,7 +82,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         i: Integer;
     begin
         MaxPeriodNo := ArrayLen(ToDate);
-        ToDate[MaxPeriodNo] := TrailingPurchOrdersSetup.GetStartDate;
+        ToDate[MaxPeriodNo] := TrailingPurchOrdersSetup.GetStartDate();
         if ToDate[MaxPeriodNo] = 0D then
             exit(false);
         for i := MaxPeriodNo downto 1 do begin
@@ -110,7 +110,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         TotalAmount: Decimal;
     begin
         if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
-            TrailingSalesOrderQry.SetFilter(ShipmentDate, '<%1', TrailingPurchOrdersSetup.GetStartDate);
+            TrailingSalesOrderQry.SetFilter(ShipmentDate, '<%1', TrailingPurchOrdersSetup.GetStartDate());
 
         TrailingSalesOrderQry.SetRange(Status, Status);
         TrailingSalesOrderQry.SetRange(DocumentDate, FromDate, ToDate);
@@ -129,7 +129,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
     begin
         PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
         if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
-            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate)
+            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate())
         else
             PurchHeader.SetRange("Posting Date");
         PurchHeader.SetRange(Status, Status);

@@ -124,7 +124,7 @@ page 6150663 "NPR NPRE Waiter Pad List"
 
     trigger OnAfterGetRecord()
     begin
-        Rec.UpdateCurrentSeatingDescription;
+        Rec.UpdateCurrentSeatingDescription();
     end;
 
     var

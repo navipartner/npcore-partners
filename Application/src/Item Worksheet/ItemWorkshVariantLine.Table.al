@@ -48,7 +48,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
             begin
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
-                    SetPropagationFilter;
+                    SetPropagationFilter();
                     if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate(Action, Action);
@@ -66,7 +66,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                         Action::Update:
                             begin
                                 if "Existing Item No." <> '' then
-                                    Validate("Existing Variant Code", GetExistingVariantCode);
+                                    Validate("Existing Variant Code", GetExistingVariantCode());
                                 TestField("Existing Variant Code");
                             end;
                     end;
@@ -92,7 +92,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
             trigger OnValidate()
             begin
-                Validate("Existing Variant Code", GetExistingVariantCode);
+                Validate("Existing Variant Code", GetExistingVariantCode());
             end;
         }
         field(16; "Existing Variant Code"; Code[10])
@@ -108,11 +108,11 @@ table 6060043 "NPR Item Worksh. Variant Line"
                         CalcFields("Existing Variant Blocked");
                         Blocked := "Existing Variant Blocked";
                         Description := ItemVariant.Description;
-                        GetLine;
-                        "Sales Price" := GetExistingVariantPrice;
+                        GetLine();
+                        "Sales Price" := GetExistingVariantPrice();
                         if "Sales Price" = ItemWorksheetLine."Sales Price" then
                             "Sales Price" := 0;
-                        "Direct Unit Cost" := GetExistingVariantCost;
+                        "Direct Unit Cost" := GetExistingVariantCost();
                         if "Direct Unit Cost" = ItemWorksheetLine."Direct Unit Cost" then
                             "Direct Unit Cost" := 0;
                     end;
@@ -126,7 +126,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
             trigger OnValidate()
             begin
-                UpdateExistingItemAndVaraint;
+                UpdateExistingItemAndVaraint();
             end;
         }
         field(22; "Internal Bar Code"; Text[30])
@@ -138,7 +138,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
             begin
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
-                    SetPropagationFilter;
+                    SetPropagationFilter();
                     if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate("Internal Bar Code", "Internal Bar Code");
@@ -159,15 +159,15 @@ table 6060043 "NPR Item Worksh. Variant Line"
             begin
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
-                    SetPropagationFilter;
+                    SetPropagationFilter();
                     if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate("Sales Price", "Sales Price");
                             ItemWorksheetVariantLine2.Modify();
                         until ItemWorksheetVariantLine2.Next() = 0;
-                    UpdateAllRemarks;
+                    UpdateAllRemarks();
                 end else begin
-                    UpdateExistingItemAndVaraint;
+                    UpdateExistingItemAndVaraint();
                 end;
             end;
         }
@@ -180,7 +180,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
             begin
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
-                    SetPropagationFilter;
+                    SetPropagationFilter();
                     if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Validate("Direct Unit Cost", "Direct Unit Cost");
@@ -225,7 +225,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
             begin
                 if "Heading Text" <> '' then begin
                     //Propagate to lower lines
-                    SetPropagationFilter;
+                    SetPropagationFilter();
                     if ItemWorksheetVariantLine2.FindSet() then
                         repeat
                             ItemWorksheetVariantLine2.Blocked := Blocked;
@@ -490,7 +490,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
             ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");
 
             if ItemWorksheet."Currency Code" = '' then
-                Currency.InitRoundingPrecision
+                Currency.InitRoundingPrecision()
             else begin
                 Currency.Get(ItemWorksheet."Currency Code");
                 Currency.TestField("Amount Rounding Precision");
@@ -549,7 +549,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         if "Direct Unit Cost" <> 0 then
             exit("Direct Unit Cost");
 
-        GetLine;
+        GetLine();
         exit(ItemWorksheetLine."Direct Unit Cost");
     end;
 
@@ -558,7 +558,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         if "Sales Price" <> 0 then
             exit("Sales Price");
 
-        GetLine;
+        GetLine();
         exit(ItemWorksheetLine."Sales Price");
     end;
 
@@ -603,7 +603,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         AddCommentText: Text;
     begin
         GetLine();
-        ApplyVarietyMapping;
+        ApplyVarietyMapping();
         if Action <> Action::Skip then begin
             if (VrtTable <> '') and (VrtValue <> '') then begin
                 NewVarExists := ItemWorksheetVarValue.Get("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", VrtType, VrtTable, VrtValue);
@@ -658,7 +658,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                                     until ItemWorksheetVariantLine.Next() = 0;
                             until I = 4;
                             if NewVarExists then
-                                ItemWorksheetVarValue.Delete
+                                ItemWorksheetVarValue.Delete()
                             else
                                 ItemWorksheetVarValue.Rename("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", VrtType, VrtTable, VrtValue);
                         end;
@@ -674,7 +674,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                             ItemWorksheetVariantLine.SetFilter("Worksheet Line No.", '<>%1', ItemWorksheetVarValue."Worksheet Line No.");
                             if ItemWorksheetVariantLine.FindSet() then
                                 repeat
-                                    if ItemWorksheetVariantLine.ApplyVarietyMapping then
+                                    if ItemWorksheetVariantLine.ApplyVarietyMapping() then
                                         ItemWorksheetVariantLine.Modify(true);
                                 until ItemWorksheetVariantLine.Next() = 0;
                         end;
@@ -710,15 +710,15 @@ table 6060043 "NPR Item Worksh. Variant Line"
                         end;
                     end;
                 end;
-                if GetExistingVariantCode <> "Variant Code" then
-                    Validate("Existing Variant Code", GetExistingVariantCode);
+                if GetExistingVariantCode() <> "Variant Code" then
+                    Validate("Existing Variant Code", GetExistingVariantCode());
             end;
         end;
     end;
 
     local procedure UpdateLevel()
     begin
-        Level := CalcLevel;
+        Level := CalcLevel();
     end;
 
     procedure CalcLevel(): Integer
@@ -756,8 +756,8 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
     local procedure UpdateAllRemarks()
     begin
-        GetLine;
-        ItemWorksheetLine.UpdateVarietyHeadingText;
+        GetLine();
+        ItemWorksheetLine.UpdateVarietyHeadingText();
     end;
 
     procedure GetExistingVariantCode(): Code[20]
@@ -885,7 +885,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         ItemWorksheetVarietyMapping: Record "NPR Item Worksh. Vrty Mapping";
         I: Integer;
     begin
-        GetLine;
+        GetLine();
         ItemWorksheetVarietyMapping.Reset();
         ItemWorksheetVarietyMapping.SetFilter("Worksheet Template Name", '%1|%2', ItemWorksheetLine."Worksheet Template Name", '');
         ItemWorksheetVarietyMapping.SetFilter("Worksheet Name", '%1|%2', ItemWorksheetLine."Worksheet Name", '');

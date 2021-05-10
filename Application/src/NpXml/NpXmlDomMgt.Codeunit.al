@@ -225,7 +225,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
 
         if not Element.SelectSingleNode(Path, Node) then begin
             if not Required then begin
-                ClearLastError;
+                ClearLastError();
                 exit(false);
             end;
             Error(Text000, Element.Name + '/' + Path);
@@ -498,7 +498,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         if TryGetWebResponse(XmlDoc, HttpWebRequest, HttpWebResponse) then
             exit(true);
 
-        WebException := GetLastErrorObject;
+        WebException := GetLastErrorObject();
         exit(false);
     end;
 
@@ -507,7 +507,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     var
         NpWebRequest: DotNet NPRNetNpWebRequest;
     begin
-        NpWebRequest := NpWebRequest.NpWebRequest;
+        NpWebRequest := NpWebRequest.NpWebRequest();
         NpWebRequest.SetTrustedCertificateValidation(HttpWebRequest);
     end;
 
@@ -517,13 +517,13 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     var
         MemoryStream: DotNet NPRNetMemoryStream;
     begin
-        MemoryStream := HttpWebRequest.GetRequestStream;
+        MemoryStream := HttpWebRequest.GetRequestStream();
         XmlDoc.Save(MemoryStream);
-        MemoryStream.Flush;
+        MemoryStream.Flush();
         MemoryStream.Close();
         Clear(MemoryStream);
 
-        HttpWebResponse := HttpWebRequest.GetResponse;
+        HttpWebResponse := HttpWebRequest.GetResponse();
     end;
 
     procedure GetAttributeFromElement(Element: XmlElement; AttributeName: Text; var Attribute: XmlAttribute; Required: Boolean);

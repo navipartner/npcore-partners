@@ -11,7 +11,7 @@
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-          ActionCode,
+          ActionCode(),
           ActionDescription,
           ActionVersion(),
           Sender.Type::Generic,
@@ -25,7 +25,7 @@
             Sender.RegisterBooleanParameter('ClearEvent', false);
             Sender.RegisterBooleanParameter('OnlyCurrentSale', false);
             Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding(ThisDataSource);
+            Sender.RegisterDataSourceBinding(ThisDataSource());
         end;
     end;
 
@@ -104,10 +104,10 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     begin
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
 
-        Extensions.Add(ThisExtension);
+        Extensions.Add(ThisExtension());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
@@ -115,7 +115,7 @@
     var
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -131,7 +131,7 @@
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

@@ -40,7 +40,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     begin
                         if Rec."Variety 1 Value" <> xRec."Variety 1 Value" then
                             Rec.Modify(true);
-                        ItemWorksheetLine.UpdateVarietyHeadingText;
+                        ItemWorksheetLine.UpdateVarietyHeadingText();
                         Commit();
                         CurrPage.Update(false);
                     end;
@@ -57,7 +57,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     begin
                         if Rec."Variety 2 Value" <> xRec."Variety 2 Value" then
                             Rec.Modify(true);
-                        ItemWorksheetLine.UpdateVarietyHeadingText;
+                        ItemWorksheetLine.UpdateVarietyHeadingText();
                         Commit();
                         CurrPage.Update(false);
                     end;
@@ -74,7 +74,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     begin
                         if Rec."Variety 3 Value" <> xRec."Variety 3 Value" then
                             Rec.Modify(true);
-                        ItemWorksheetLine.UpdateVarietyHeadingText;
+                        ItemWorksheetLine.UpdateVarietyHeadingText();
                         Commit();
                         CurrPage.Update(false);
                     end;
@@ -91,7 +91,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     begin
                         if Rec."Variety 4 Value" <> xRec."Variety 4 Value" then
                             Rec.Modify(true);
-                        ItemWorksheetLine.UpdateVarietyHeadingText;
+                        ItemWorksheetLine.UpdateVarietyHeadingText();
                         Commit();
                         CurrPage.Update(false);
                     end;

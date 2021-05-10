@@ -32,7 +32,7 @@ codeunit 6151511 "NPR Nc Import Processor"
 
     local procedure MarkAsStarted(var NcImportEntry: Record "NPR Nc Import Entry")
     begin
-        ClearLastError;
+        ClearLastError();
         NcImportEntry.LockTable();
         NcImportEntry.Get(NcImportEntry."Entry No.");
         Clear(NcImportEntry."Last Error Message");
@@ -44,8 +44,8 @@ codeunit 6151511 "NPR Nc Import Processor"
         NcImportEntry."Import Completed at" := 0DT;
         NcImportEntry."Import Count" += 1;
         NcImportEntry."Import Started by" := UserId;
-        NcImportEntry."Server Instance Id" := ServiceInstanceId;
-        NcImportEntry."Session Id" := SessionId;
+        NcImportEntry."Server Instance Id" := ServiceInstanceId();
+        NcImportEntry."Session Id" := SessionId();
         NcImportEntry.Modify(true);
         Commit();
     end;
@@ -78,7 +78,7 @@ codeunit 6151511 "NPR Nc Import Processor"
         if Success then
             exit;
 
-        ClearLastError;
+        ClearLastError();
         if not NcImportType.Get(NcImportEntry."Import Type") then
             exit;
         if NcImportType."Send e-mail on Error" then begin
@@ -119,7 +119,7 @@ codeunit 6151511 "NPR Nc Import Processor"
     var
         SessionId: Integer;
     begin
-        SESSION.StartSession(SessionId, CurrCodeunitId, CompanyName, NcImportEntry);
+        SESSION.StartSession(SessionId, CurrCodeunitId(), CompanyName, NcImportEntry);
     end;
 
     local procedure CurrCodeunitId(): Integer

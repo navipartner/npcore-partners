@@ -151,39 +151,39 @@ table 6150705 "NPR POS Parameter Value"
             "Data Type"::Boolean:
                 begin
                     Evaluate(Boolean, Value, 9);
-                    Target.Parameters.Add(Name, Boolean);
+                    Target.Parameters().Add(Name, Boolean);
                 end;
             "Data Type"::Date:
                 begin
                     Evaluate(Date, Value, 9);
-                    Target.Parameters.Add(Name, Date);
+                    Target.Parameters().Add(Name, Date);
                 end;
             "Data Type"::Decimal:
                 begin
                     Evaluate(Decimal, Value, 9);
-                    Target.Parameters.Add(Name, Decimal);
+                    Target.Parameters().Add(Name, Decimal);
                 end;
             "Data Type"::Integer:
                 begin
                     Evaluate(Integer, Value, 9);
-                    Target.Parameters.Add(Name, Integer);
+                    Target.Parameters().Add(Name, Integer);
                 end;
             "Data Type"::Text:
-                Target.Parameters.Add(Name, Value);
+                Target.Parameters().Add(Name, Value);
             "Data Type"::Option:
                 begin
                     Param.Options := GetOptions();
                     CacheKey := StrSubstNo('Action_%1-Param_%2', "Action Code", Name);
                     if OptionStringCache.Contains(CacheKey) then begin
                         OptionStringCache.Get(CacheKey, OptionToken);
-                        JsonMgt.AddVariantValueToJsonObject(Target.Parameters, '_option_' + Name, OptionToken.AsObject());
+                        JsonMgt.AddVariantValueToJsonObject(Target.Parameters(), '_option_' + Name, OptionToken.AsObject());
                     end else begin
                         Param.GetOptionsDictionary(OptionsJson);
-                        JsonMgt.AddVariantValueToJsonObject(Target.Parameters, '_option_' + Name, OptionsJson);
+                        JsonMgt.AddVariantValueToJsonObject(Target.Parameters(), '_option_' + Name, OptionsJson);
                         OptionStringCache.Add(CacheKey, OptionsJson);
                     end;
-                    Target.Parameters.Add(Name, Param.GetOptionInt(Value));
-                    Target.Content.Add('param_option_' + Name + 'originalValue', Value);
+                    Target.Parameters().Add(Name, Param.GetOptionInt(Value));
+                    Target.Content().Add('param_option_' + Name + 'originalValue', Value);
                 end;
         end;
     end;
@@ -408,7 +408,7 @@ table 6150705 "NPR POS Parameter Value"
         TypeHelper: Codeunit "Type Helper";
         OptionCaption: Text;
     begin
-        if TrySelectStr(TypeHelper.GetOptionNo(Value, BoolOptionNames), BoolOptionMLCaptions, OptionCaption) then
+        if TrySelectStr(TypeHelper.GetOptionNo(Value, BoolOptionNames()), BoolOptionMLCaptions(), OptionCaption) then
             exit(OptionCaption)
         else
             exit(Value);

@@ -204,7 +204,7 @@ table 6150703 "NPR POS Action"
         if ActionUpdateRequired then
             OnActionDiscovered(Rec);
 
-        if not Insert then;
+        if not Insert() then;
 
         if (ActionInRefresh = Code) then
             Modify();
@@ -248,7 +248,7 @@ table 6150703 "NPR POS Action"
         if ActionUpdateRequired then
             OnActionDiscovered(Rec);
 
-        if not Insert then;
+        if not Insert() then;
 
         if (ActionInRefresh = Code) then
             Modify();
@@ -257,7 +257,7 @@ table 6150703 "NPR POS Action"
             Clear(WorkflowObj);
             WorkflowObj.SetName(Code);
             ActionInDiscovery := Code;
-            WorkflowObj.Content.Add('engineVersion', '2.0');
+            WorkflowObj.Content().Add('engineVersion', '2.0');
         end else
             InitializeWorkflowDiscovery();
 
@@ -301,7 +301,7 @@ table 6150703 "NPR POS Action"
         RequireVersion10();
         WorkflowStep.Add('Label', Label);
         WorkflowStep.Add('Code', Code);
-        WorkflowObj.Steps.Add(WorkflowStep);
+        WorkflowObj.Steps().Add(WorkflowStep);
     end;
 
     procedure RegisterWorkflow(WithOnBeforeWorkflowEvent: Boolean)
@@ -332,7 +332,7 @@ table 6150703 "NPR POS Action"
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Code, Type));
 
         WorkflowStep.Add('Code', Code);
-        WorkflowObj.Steps.Add(WorkflowStep);
+        WorkflowObj.Steps().Add(WorkflowStep);
 
         StreamWorkflowToBlob();
         Modify();

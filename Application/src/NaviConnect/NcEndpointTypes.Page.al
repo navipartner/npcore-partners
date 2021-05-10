@@ -49,7 +49,7 @@ page 6151537 "NPR Nc Endpoint Types"
 
     trigger OnOpenPage()
     begin
-        Rec.SetupEndpointTypes;
+        Rec.SetupEndpointTypes();
     end;
 }
 

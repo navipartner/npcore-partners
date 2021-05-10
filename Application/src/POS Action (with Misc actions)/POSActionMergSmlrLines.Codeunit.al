@@ -26,7 +26,7 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
+  ActionCode(),
   ActionDescriptionCaption,
   ActionVersion(),
   Sender.Type::Generic,
@@ -54,9 +54,9 @@ then begin
 
         ColapseSaleLines(SalePOS);
 
-        POSSale.RefreshCurrent;
-        POSSession.ChangeViewSale;
-        POSSession.RequestRefreshData;
+        POSSale.RefreshCurrent();
+        POSSession.ChangeViewSale();
+        POSSession.RequestRefreshData();
 
         Handled := true;
     end;

@@ -73,7 +73,7 @@ table 6150712 "NPR POS Default User View"
 
         DefaultView."POS View Code" := ViewCode;
         if ViewCode <> '' then
-            DefaultView.Modify
+            DefaultView.Modify()
         else
             DefaultView.Delete();
 

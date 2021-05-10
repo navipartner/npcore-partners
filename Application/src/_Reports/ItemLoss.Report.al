@@ -67,7 +67,7 @@ report 6014542 "NPR Item - Loss"
 
             trigger OnAfterGetRecord()
             begin
-                SvindCalculation;
+                SvindCalculation();
 
                 if SvindQty = 0 then
                     CurrReport.Skip();

@@ -299,7 +299,7 @@ table 6060151 "NPR Event Word Layout"
 
         Layout.CreateInStream(DocumentInStream);
         TempBlob.CreateOutStream(DocumentOutStream);
-        ErrorMessage := DocumentReportMgt.TryUpdateWordLayout(DocumentInStream, DocumentOutStream, GetCustomXmlPart, WordXmlPart);
+        ErrorMessage := DocumentReportMgt.TryUpdateWordLayout(DocumentInStream, DocumentOutStream, GetCustomXmlPart(), WordXmlPart);
 
         Clear("XML Part");
         "XML Part".CreateOutStream(PartStream, TEXTENCODING::UTF16);

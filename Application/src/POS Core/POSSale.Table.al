@@ -164,7 +164,7 @@ table 6014405 "NPR POS Sale"
                     "Prices Including VAT" := POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::VAT;
                 end;
 
-                if not Modify then;
+                if not Modify() then;
 
                 if ("Customer Type" = "Customer Type"::Ord) then begin
                     SaleLinePOS.Reset();
@@ -191,7 +191,7 @@ table 6014405 "NPR POS Sale"
                             SaleLinePOS."VAT Bus. Posting Group" := "VAT Bus. Posting Group";
                             SaleLinePOS."Tax Area Code" := "Tax Area Code";
                             SaleLinePOS."Tax Liable" := "Tax Liable";
-                            SaleLinePOS.UpdateVATSetup;
+                            SaleLinePOS.UpdateVATSetup();
 
                             //Recalc.existing price to reflect possible VAT Rate/Price Inc. VAT change
                             POSSaleLine.ConvertPriceToVAT(
@@ -688,7 +688,7 @@ table 6014405 "NPR POS Sale"
 
             trigger OnLookup()
             begin
-                ShowDocDim;
+                ShowDocDim();
             end;
         }
         field(485; "Customer Name"; Text[100])
@@ -808,11 +808,11 @@ table 6014405 "NPR POS Sale"
         "Shortcut Dimension 2 Code" := '';
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
-          DimMgt.GetDefaultDimID(TableID, No, GetPOSSourceCode, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
+          DimMgt.GetDefaultDimID(TableID, No, GetPOSSourceCode(), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
         if (OldDimSetID <> "Dimension Set ID") then begin
             Modify();
-            if SalesLinesExist then
+            if SalesLinesExist() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
     end;
@@ -844,7 +844,7 @@ table 6014405 "NPR POS Sale"
 
         if OldDimSetID <> "Dimension Set ID" then begin
             Modify();
-            if SalesLinesExist then
+            if SalesLinesExist() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
     end;
@@ -860,7 +860,7 @@ table 6014405 "NPR POS Sale"
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         if OldDimSetID <> "Dimension Set ID" then begin
             Modify();
-            if SalesLinesExist then
+            if SalesLinesExist() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
     end;

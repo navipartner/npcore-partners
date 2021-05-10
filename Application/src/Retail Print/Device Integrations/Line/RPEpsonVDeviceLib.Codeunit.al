@@ -98,7 +98,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
 
     procedure IsThisDevice(Text: Text): Boolean
     begin
-        exit(StrPos(UpperCase(Text), DeviceCode) > 0);
+        exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnInitJob', '', false, false)]
@@ -110,7 +110,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLineFeed', '', false, false)]
     local procedure OnLineFeed()
     begin
-        LineFeed;
+        LineFeed();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrintData', '', false, false)]
@@ -222,7 +222,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
                 end;
             until DeviceSettings.Next() = 0;
 
-        InitializePrinter;
+        InitializePrinter();
         case Encoding of
             Encoding::"Windows-1252":
                 SelectCharacterCodeTable(16);
@@ -333,7 +333,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         end;
 
         AddTextToBuffer(Text);
-        LineFeed;
+        LineFeed();
         SelectJustification(0);
     end;
 
@@ -365,7 +365,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     begin
         case Char of
             'G':
-                PrintDefaultLogo;
+                PrintDefaultLogo();
             'P':
                 SelectCutModeAndCutPaper(66, 3);//papercut
             'A':
@@ -389,7 +389,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
             'e':
                 GeneratePulse(1, 125, 125);
             'h':
-                PrintAltDefaultLogo;
+                PrintAltDefaultLogo();
             'm':
                 PrintBitmapFromKeyword('TAXFREE', '');
         end;
@@ -462,31 +462,31 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     procedure HorizontalTab()
     begin
         // Ref sheet 103, Horizontal Tab
-        AddTextToBuffer(ESC.HT);
+        AddTextToBuffer(ESC.HT());
     end;
 
     procedure LineFeed()
     begin
         // Ref sheet 103, Print And Line Feed
-        AddTextToBuffer(ESC.LF);
+        AddTextToBuffer(ESC.LF());
     end;
 
     procedure FormFeed()
     begin
         // Ref sheet 103, Print and return to standard mode (in page mode)
-        AddTextToBuffer(ESC.FF);
+        AddTextToBuffer(ESC.FF());
     end;
 
     procedure CarriageReturn()
     begin
         // Ref sheet 103, Print and carriage return
-        AddTextToBuffer(ESC.CR);
+        AddTextToBuffer(ESC.CR());
     end;
 
     procedure Cancel()
     begin
         // Ref sheet 104, Cancel print in data in page mode
-        AddTextToBuffer(ESC.CAN);
+        AddTextToBuffer(ESC.CAN());
     end;
 
     local procedure CancelUserDefinedCharacters(n: Char)
@@ -507,7 +507,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     begin
         // Ref sheet 135
         // TempPattern := 'GS ( A %1 %2 %3 %4';
-        AddTextToBuffer(ESC.GS + '(' + 'A' + Format(pL) + Format(pH) + Format(n) + Format(m));
+        AddTextToBuffer(ESC.GS() + '(' + 'A' + Format(pL) + Format(pH) + Format(n) + Format(m));
     end;
 
     local procedure InitializePrinter()
@@ -544,7 +544,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         // 0; UPC-A, 1: UPC-1, 2; EAN13, 3; JAN8, 4; CODE39
         // 5; ITF, 6; CODABAR(NW-7)
         // TempPattern := 'GS k %1 %2 NUL';
-        AddTextToBuffer(ESC.GS + 'k' + Format(m) + "d1..dk" + ESC.NUL);
+        AddTextToBuffer(ESC.GS() + 'k' + Format(m) + "d1..dk" + ESC.NUL());
     end;
 
     local procedure PrintBarCodeB(m: Char; n: Char; "d1..dn": Text)
@@ -552,7 +552,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         // Ref sheet 191 m in [A-N]
         // Command:
         // GS k m n d1..dn
-        AddTextToBuffer(ESC.GS + 'k' + Format(m) + Format(n) + "d1..dn");
+        AddTextToBuffer(ESC.GS() + 'k' + Format(m) + Format(n) + "d1..dn");
     end;
 
     local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
@@ -587,9 +587,9 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
 
         StoreGraphicsInBuffer(cmdL, cmdH, 48, 112, 48, 1, 1, 49, 0, 2, hL, hH, ESCPOS); // 0/2 is always the low/high width bytes since 512px is assumed constant.
 
-        LineFeed;
+        LineFeed();
         PrintGraphicsInBuffer();
-        LineFeed;
+        LineFeed();
     end;
 
     local procedure PrintGraphicsInBuffer()
@@ -606,27 +606,27 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         // TempPattern := 'GS ( L %1 %2 %3 %4';
         m := 48;
         fn := 50;
-        AddTextToBuffer(ESC.GS + '(' + 'L' + ESC."02" + ESC.NUL + Format(m) + Format(fn));
+        AddTextToBuffer(ESC.GS() + '(' + 'L' + ESC."02"() + ESC.NUL() + Format(m) + Format(fn));
     end;
 
     local procedure PrintDataInPageMode()
     begin
         // Ref sheet 110
-        AddTextToBuffer(ESC.ESC() + ESC.FF);
+        AddTextToBuffer(ESC.ESC() + ESC.FF());
     end;
 
     procedure PrintNVGraphicsData(n: Char; m: Char)
     begin
         // Ref sheet 198 n in [1-255], m in [0-3]
         // TempPattern := 'FS p %1 %2';
-        AddTextToBuffer(ESC.FS + 'p' + Format(n) + Format(m));
+        AddTextToBuffer(ESC.FS() + 'p' + Format(n) + Format(m));
     end;
 
     procedure PrintNVGraphicsDataNew(pL: Char; pH: Char; m: Char; fn: Char; kc1: Char; kc2: Char; x: Char; y: Char)
     begin
         // Ref sheet 191 m in [A-N]
         // TempPattern := 'GS ( L %1 %2 %3 %4 %5 %6 %7 %8';
-        AddTextToBuffer(ESC.GS + '(' + 'L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(kc1) + Format(kc2) + Format(x) + Format(y));
+        AddTextToBuffer(ESC.GS() + '(' + 'L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(kc1) + Format(kc2) + Format(x) + Format(y));
     end;
 
     local procedure SelectBitImageMode(m: Char; nL: Char; nH: Char; "d1..dk": Text)
@@ -661,7 +661,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     begin
         // Ref sheet 118 (n in [0,1])
         // TempPattern := 'GS f %1';
-        AddTextToBuffer(ESC.GS + 'f' + Format(n));
+        AddTextToBuffer(ESC.GS() + 'f' + Format(n));
     end;
 
     local procedure SelectCharacterSize(n: Char)
@@ -672,14 +672,14 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         // Bit 4-6 Width Magnification
         // Bit 7 reserved
         // TempPattern := 'GS ! %1';
-        AddTextToBuffer(ESC.GS + '!' + Format(n));
+        AddTextToBuffer(ESC.GS() + '!' + Format(n));
     end;
 
     local procedure SelectCutModeAndCutPaper(m: Char; n: Char)
     begin
         // Ref sheet 184
         // TempPattern := 'GS V %1 %2';
-        AddTextToBuffer(ESC.GS + 'V' + Format(m) + Format(n));
+        AddTextToBuffer(ESC.GS() + 'V' + Format(m) + Format(n));
     end;
 
     local procedure SelectDefaultLineSpacing()
@@ -727,7 +727,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     begin
         // Ref sheet 149, pL + pH x 256 = 2
         // TempPattern := 'GS ( %1 %2 %3 %4 %5';
-        AddTextToBuffer(ESC.GS + '(' + Format(K) + Format(pL) + Format(pH) + Format(fn) + Format(m));
+        AddTextToBuffer(ESC.GS() + '(' + Format(K) + Format(pL) + Format(pH) + Format(fn) + Format(m));
     end;
 
     local procedure SelectStandardMode()
@@ -755,42 +755,42 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     begin
         // Ref sheet 134 LSB of   0 <= nL, nH <= 255
         // TempPattern := 'GS $ %1 %2';
-        AddTextToBuffer(ESC.GS + '$' + Format(nL) + Format(nH));
+        AddTextToBuffer(ESC.GS() + '$' + Format(nL) + Format(nH));
     end;
 
     local procedure SetBarCodeHeight(n: Char)
     begin
         // Ref sheet 189
         // TempPattern := 'GS h %1';
-        AddTextToBuffer(ESC.GS + 'h' + Format(n));
+        AddTextToBuffer(ESC.GS() + 'h' + Format(n));
     end;
 
     local procedure SetBarCodeWidth(n: Char)
     begin
         // Ref sheet 193
         // TempPattern := 'GS w %1';
-        AddTextToBuffer(ESC.GS + 'w' + Format(n));
+        AddTextToBuffer(ESC.GS() + 'w' + Format(n));
     end;
 
     local procedure SetHorzAndVertMotionUnits(x: Char; y: Char)
     begin
         // Ref sheet 183
         // TempPattern := 'GS P %1 %2';
-        AddTextToBuffer(ESC.GS + 'P' + Format(x) + Format(y));
+        AddTextToBuffer(ESC.GS() + 'P' + Format(x) + Format(y));
     end;
 
     local procedure SetHorizontalTabPositions("n1..nk": Text[50])
     begin
         // Ref sheet 117
         // TempPattern := 'ESC D %1 NUL';
-        AddTextToBuffer(ESC.ESC() + 'D' + "n1..nk" + ESC.NUL);
+        AddTextToBuffer(ESC.ESC() + 'D' + "n1..nk" + ESC.NUL());
     end;
 
     local procedure SetLeftMargin(nL: Char; nH: Char)
     begin
         // Ref sheet 183
         // TempPattern := 'GS L %1 %2';
-        AddTextToBuffer(ESC.GS + 'L' + Format(nL) + Format(nH));
+        AddTextToBuffer(ESC.GS() + 'L' + Format(nL) + Format(nH));
     end;
 
     local procedure SetLineSpacing(n: Char)
@@ -811,7 +811,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     begin
         // Ref sheet 184
         // TempPattern := 'GS W %1 %2';
-        AddTextToBuffer(ESC.GS + 'W' + Format(nL) + Format(nH));
+        AddTextToBuffer(ESC.GS() + 'W' + Format(nL) + Format(nH));
     end;
 
     local procedure SetRelativePrintPosition(nL: Char; nH: Char)
@@ -825,20 +825,20 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     begin
         // Ref sheet 184
         // TempPattern := 'GS \ %1 %2';
-        AddTextToBuffer(ESC.GS + '\' + Format(nL) + Format(nH));
+        AddTextToBuffer(ESC.GS() + '\' + Format(nL) + Format(nH));
     end;
 
     local procedure SetRightSideCharacterSpacing(n: Char)
     begin
         // Ref sheet 110
         // TempPattern := 'ESC SP %1';
-        AddTextToBuffer(ESC.ESC() + ESC.SP + Format(n));
+        AddTextToBuffer(ESC.ESC() + ESC.SP() + Format(n));
     end;
 
     local procedure StoreGraphicsInBuffer(pL: Char; pH: Char; m: Char; fn: Char; a: Char; bx: Char; by: Char; c: Char; xL: Char; xH: Char; yL: Char; yH: Char; Image: Text)
     begin
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=99
-        AddTextToBuffer(ESC.GS + '(' + 'L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH) + Image);
+        AddTextToBuffer(ESC.GS() + '(' + 'L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH) + Image);
     end;
 
     local procedure TurnDoubleStrikeModeOnOff(n: Integer)
@@ -1143,7 +1143,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
                         tmpDeviceSetting.Options := '200,300';
                     end;
             end;
-            exit(tmpDeviceSetting.Insert);
+            exit(tmpDeviceSetting.Insert());
         end;
     end;
 

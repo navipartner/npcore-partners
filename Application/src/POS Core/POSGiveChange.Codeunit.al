@@ -84,7 +84,7 @@ codeunit 6150634 "NPR POS Give Change"
         SetPOSSetupPOSUnitContext(SalePOS."POS Store Code");
         if (POSSetup.AmountRoundingPrecision() = 0) or (POSSetup.RoundingAccount(false) = '') then
             exit(0);
-        exit(ChangeAmount - Round(ChangeAmount, POSSetup.AmountRoundingPrecision, POSSetup.AmountRoundingDirection));
+        exit(ChangeAmount - Round(ChangeAmount, POSSetup.AmountRoundingPrecision(), POSSetup.AmountRoundingDirection()));
     end;
 
     local procedure GetLastLineNo(SalePOS: Record "NPR POS Sale"): Integer

@@ -24,7 +24,7 @@
     begin
         if not EanBoxSetup.Get(DefaultSalesSetupCode()) then begin
             EanBoxSetup.Init();
-            EanBoxSetup.Code := DefaultSalesSetupCode;
+            EanBoxSetup.Code := DefaultSalesSetupCode();
             EanBoxSetup.Description := Text000;
             EanBoxSetup."POS View" := EanBoxSetup."POS View"::Sale;
             EanBoxSetup.Insert(true);

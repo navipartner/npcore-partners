@@ -100,7 +100,7 @@
             RecVariant.IsRecordId:
                 begin
                     RecID := RecVariant;
-                    RecRef := RecID.GetRecord;
+                    RecRef := RecID.GetRecord();
                 end;
             RecVariant.IsInteger:
                 RecRef.Open(RecVariant, true);

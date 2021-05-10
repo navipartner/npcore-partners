@@ -256,7 +256,7 @@
         if RetailPriceLogSetup."Period Discount" then
             FindNewPeriodDiscountLogEntries(TempRetailPriceLogEntry);
 
-        exit(TempRetailPriceLogEntry.FindSet);
+        exit(TempRetailPriceLogEntry.FindSet());
     end;
 
     local procedure SetChangeLogEntryFilter(LastChangeLogEntryNo: BigInteger; TableNoFilter: Text; FieldNoFilter: Text; var ChangeLogEntry: Record "Change Log Entry"): Boolean

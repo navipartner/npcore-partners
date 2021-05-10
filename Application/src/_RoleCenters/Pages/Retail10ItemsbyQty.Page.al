@@ -26,7 +26,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
                 field(Enddate; Enddate)
@@ -37,7 +37,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
             }
@@ -169,8 +169,8 @@ page 6059815 "NPR Retail 10 Items by Qty."
 
     local procedure UpdateList()
     begin
-        Setdate;
-        ExecuteQuery;
+        Setdate();
+        ExecuteQuery();
     end;
 
     local procedure ExecuteQuery()

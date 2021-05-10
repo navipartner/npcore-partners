@@ -482,7 +482,7 @@
         MemberNotificationSetup."PUT Passes Template".CREATEOUTSTREAM(outstr);
         outstr.WRITE(MemberNotification.GetDefaultWalletTemplate());
 
-        MemberNotificationSetup.Modify
+        MemberNotificationSetup.Modify()
     end;
 
     procedure SetupWelcomeNotification(NotificationCode: Code[10]; CommunityCode: Code[20]; MembershipCode: Code[20]);

@@ -41,8 +41,8 @@
         if POSUnit.Get(SalePOS."Register No.") then;
 
         POSSession.GetCurrentView(CurrView);
-        case CurrView.Type of
-            CurrView.Type::Sale:
+        case CurrView.Type() of
+            CurrView.Type()::Sale:
                 begin
                     if POSUnit."Ean Box Sales Setup" = '' then
                         POSUnit."Ean Box Sales Setup" := EanBoxSetupMgt.DefaultSalesSetupCode();

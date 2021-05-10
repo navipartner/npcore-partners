@@ -58,7 +58,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Quanity; Rec.RemainingQtyToBill)
+                field(Quanity; Rec.RemainingQtyToBill())
                 {
                     ApplicationArea = All;
                     Caption = 'Quantity';
@@ -103,7 +103,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 
                     trigger OnAction()
                     begin
-                        ActionOKLine;
+                        ActionOKLine();
                     end;
                 }
             }
@@ -138,7 +138,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 
         Rec.Modify();
 
-        StyleTxt := GetStyle;
+        StyleTxt := GetStyle();
     end;
 
     trigger OnOpenPage()
@@ -177,7 +177,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
             TMPWaiterPadLine.Init();
             TMPWaiterPadLine.TransferFields(Rec);
             TMPWaiterPadLine.Insert();
-        until (0 = Rec.Next);
+        until (0 = Rec.Next());
     end;
 
     procedure isOKLines(): Boolean

@@ -59,7 +59,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                     trigger OnValidate()
                     begin
-                        SerialNoOnAfterValidate;
+                        SerialNoOnAfterValidate();
                     end;
                 }
                 field("Serial No. Blocked"; Rec."Serial No. Blocked")
@@ -76,7 +76,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                     trigger OnValidate()
                     begin
-                        LotNoOnAfterValidate;
+                        LotNoOnAfterValidate();
                     end;
                 }
                 field("Lot No. Blocked"; Rec."Lot No. Blocked")

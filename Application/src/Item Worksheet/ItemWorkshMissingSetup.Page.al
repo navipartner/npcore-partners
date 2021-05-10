@@ -60,7 +60,7 @@ page 6060049 "NPR Item Worksh. Missing Setup"
 
                 trigger OnAction()
                 begin
-                    ItemWorksheetManagement.CreateMissingSetup;
+                    ItemWorksheetManagement.CreateMissingSetup();
                 end;
             }
         }

@@ -38,7 +38,7 @@
 
                     trigger OnValidate()
                     begin
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 }
                 field(VariantCode; VariantCode)
@@ -55,7 +55,7 @@
 
                     trigger OnValidate()
                     begin
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 }
                 field(Variety1ValueCode; Variety1ValueCode)
@@ -72,7 +72,7 @@
 
                     trigger OnValidate()
                     begin
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 }
                 field(Variety2ValueCode; Variety2ValueCode)
@@ -89,7 +89,7 @@
 
                     trigger OnValidate()
                     begin
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 }
                 field(Variety3ValueCode; Variety3ValueCode)
@@ -106,7 +106,7 @@
 
                     trigger OnValidate()
                     begin
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 }
                 field(Variety4ValueCode; Variety4ValueCode)
@@ -123,7 +123,7 @@
 
                     trigger OnValidate()
                     begin
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 }
             }
@@ -169,7 +169,7 @@
     trigger OnOpenPage()
     begin
         Clear(Item);
-        RefreshLines;
+        RefreshLines();
     end;
 
     var
@@ -308,7 +308,7 @@
                     if RetailItemList.RunModal() = ACTION::LookupOK then begin
                         RetailItemList.GetRecord(LookupItem);
                         ItemCode := LookupItem."No.";
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 end;
             FieldType::VariantCode:
@@ -323,7 +323,7 @@
                     if ItemVariants.RunModal() = ACTION::LookupOK then begin
                         ItemVariants.GetRecord(ItemVariant);
                         VariantCode := ItemVariant.Code;
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 end;
             FieldType::Variety1:
@@ -339,7 +339,7 @@
                     if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety1ValueCode := VarietyValue.Value;
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 end;
             FieldType::Variety2:
@@ -355,7 +355,7 @@
                     if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety2ValueCode := VarietyValue.Value;
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 end;
             FieldType::Variety3:
@@ -371,7 +371,7 @@
                     if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety3ValueCode := VarietyValue.Value;
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 end;
             FieldType::Variety4:
@@ -387,7 +387,7 @@
                     if VarietyValuePage.RunModal() = ACTION::LookupOK then begin
                         VarietyValuePage.GetRecord(VarietyValue);
                         Variety4ValueCode := VarietyValue.Value;
-                        RefreshLines;
+                        RefreshLines();
                     end;
                 end;
         end;

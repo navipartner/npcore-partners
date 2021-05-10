@@ -20,7 +20,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
 
                     trigger OnValidate()
                     begin
-                        Rec.Mark(not Rec.Mark);
+                        Rec.Mark(not Rec.Mark());
                     end;
                 }
                 field("Waiter Pad No."; Rec."Waiter Pad No.")
@@ -294,7 +294,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
 
     trigger OnAfterGetRecord()
     begin
-        LineIsMarked := Rec.Mark;
+        LineIsMarked := Rec.Mark();
     end;
 
     var
@@ -308,6 +308,6 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
 
     procedure ClearMarkedLines()
     begin
-        Rec.ClearMarks;
+        Rec.ClearMarks();
     end;
 }

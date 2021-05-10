@@ -341,7 +341,7 @@ report 6014510 "NPR Purch Return Order"
                             AutoFormatExpression = "Purchase Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText)
+                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText())
                         {
                         }
                         column(VATAmt; VATAmount)
@@ -586,7 +586,7 @@ report 6014510 "NPR Purch Return Order"
                         begin
                             if (not GLSetup."Print VAT specification in LCY") or
                                ("Purchase Header"."Currency Code" = '') or
-                               (VATAmountLine.GetTotalVATAmount = 0)
+                               (VATAmountLine.GetTotalVATAmount() = 0)
                             then
                                 CurrReport.Break();
 
@@ -665,11 +665,11 @@ report 6014510 "NPR Purch Return Order"
                     PurchPost.GetPurchLines("Purchase Header", PurchLine, 0);
                     PurchLine.CalcVATAmountLines(0, "Purchase Header", PurchLine, VATAmountLine);
                     PurchLine.UpdateVATOnLines(0, "Purchase Header", PurchLine, VATAmountLine);
-                    VATAmount := VATAmountLine.GetTotalVATAmount;
-                    VATBaseAmount := VATAmountLine.GetTotalVATBase;
+                    VATAmount := VATAmountLine.GetTotalVATAmount();
+                    VATBaseAmount := VATAmountLine.GetTotalVATBase();
                     VATDiscountAmount :=
                       VATAmountLine.GetTotalVATDiscount("Purchase Header"."Currency Code", "Purchase Header"."Prices Including VAT");
-                    TotalAmountInclVAT := VATAmountLine.GetTotalAmountInclVAT;
+                    TotalAmountInclVAT := VATAmountLine.GetTotalAmountInclVAT();
 
                     if Number > 1 then begin
                         CopyText := Text003;

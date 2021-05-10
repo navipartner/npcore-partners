@@ -7,7 +7,7 @@
         VendorNo: Code[20];
     begin
         Filename := FileManagement.OpenFileDialog(CatalogFile, '', 'CSV files (*.csv)|*.csv|All files (*.*)|*.*');
-        VendorNo := SelectVendor;
+        VendorNo := SelectVendor();
         ReadFile(VendorNo, Filename, true, true);
     end;
 

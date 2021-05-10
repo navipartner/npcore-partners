@@ -62,7 +62,7 @@ page 6150746 "NPR Unfinished POS Sale"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownDocument;
+                        DrillDownDocument();
                     end;
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
@@ -72,7 +72,7 @@ page 6150746 "NPR Unfinished POS Sale"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownDocument;
+                        DrillDownDocument();
                     end;
                 }
                 field("Payment Amount"; Rec."Payment Amount")
@@ -82,7 +82,7 @@ page 6150746 "NPR Unfinished POS Sale"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownDocument;
+                        DrillDownDocument();
                     end;
                 }
             }

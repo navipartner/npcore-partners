@@ -106,7 +106,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
 
                     trigger OnDrillDown()
                     begin
-                        CurrPage.SaveRecord;
+                        CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;

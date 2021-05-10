@@ -1975,7 +1975,7 @@ page 6059978 "NPR Variety Matrix Bool"
             VRTMatrixMgt.LoadMatrixData(Item."No.", HideInactive);
         //+NPR5.36 [285733]
 
-        SetVisible;
+        SetVisible();
 
         //Are the sorting order 100% correct with 3 or 4 Variety in use?
         case ShowAsCrossVRT of

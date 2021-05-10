@@ -169,7 +169,7 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
                 ParamValue.ID := FieldID;
                 ParamValue."Record ID" := RecordID;
                 ParamValue.Name := ActionParam.Name;
-                if (not ParamValue.Find) or (ParamValue."Data Type" <> ActionParam."Data Type") then
+                if (not ParamValue.Find()) or (ParamValue."Data Type" <> ActionParam."Data Type") then
                     exit(true);
             until ActionParam.Next() = 0;
 

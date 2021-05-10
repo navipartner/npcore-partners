@@ -65,7 +65,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         InStr.Read(JSON);
         JObject.ReadFrom(JSON);
         JObject.Get('Primary Package Table', JToken);
-        PrimaryPackageTable := JToken.AsValue.AsInteger();
+        PrimaryPackageTable := JToken.AsValue().AsInteger();
         JObject.Get('Data', JToken);
 
 
@@ -93,7 +93,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         InStr.Read(JSON);
         JObject.ReadFrom(JSON);
         JObject.Get('Primary Package Table', Jtoken);
-        PrimaryPackageTable := Jtoken.AsValue.AsInteger();
+        PrimaryPackageTable := Jtoken.AsValue().AsInteger();
         JObject.Get('Data', Jtoken);
 
         OnLoadPackage(Handled, PrimaryPackageTable, Jtoken, 1);
@@ -135,7 +135,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
 
         JObject.ReadFrom(JSON);
         JObject.Get('Primary Package Table', Jtoken);
-        PrimaryPackageTable := Jtoken.AsValue.AsInteger();
+        PrimaryPackageTable := Jtoken.AsValue().AsInteger();
         JObject.Get('Data', Jtoken);
 
         OnLoadPackage(Handled, PrimaryPackageTable, Jtoken, 0);
@@ -153,9 +153,9 @@ codeunit 6014628 "NPR Managed Package Mgt."
         Total: Integer;
     begin
         if JToken.IsArray then
-            Total := JToken.AsArray.Count
+            Total := JToken.AsArray().Count
         else
-            Total := JToken.AsObject.Keys.Count();
+            Total := JToken.AsObject().Keys.Count();
 
         if Total < 1 then
             exit;
@@ -216,7 +216,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         if Total < 1 then
             exit;
 
-        OpenDialog;
+        OpenDialog();
 
         for i := 0 to Total - 1 do begin
             Itt += 1;
@@ -224,7 +224,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
             JArray.Get(i, JToken);
             JObject := JToken.AsObject();
             JObject.Get('Record', JToken);
-            TableNo := JToken.AsValue.AsInteger();
+            TableNo := JToken.AsValue().AsInteger();
 
             UpdateDialog(1, TableNo);
             UpdateProgressDialog(2, Itt, Total);
@@ -254,14 +254,14 @@ codeunit 6014628 "NPR Managed Package Mgt."
                         ;
                 LoadMethod::InsertOrModify:
                     if not RecRef.Insert() then
-                        if not RecRef.Modify then
+                        if not RecRef.Modify() then
                             exit(false);
             end;
 
             RecRef.Close();
         end;
 
-        CloseDialog;
+        CloseDialog();
 
         exit(true);
     end;

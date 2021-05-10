@@ -102,7 +102,7 @@ page 6151420 "NPR Magento Brands"
     begin
         HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
 
-        SetDisplayConfigVisible;
+        SetDisplayConfigVisible();
     end;
 
     var

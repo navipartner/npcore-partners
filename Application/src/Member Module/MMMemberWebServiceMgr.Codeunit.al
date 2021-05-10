@@ -443,7 +443,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (not Membership.Get(MembershipEntryNo)) then
             Error(NOT_FOUND);
 
-        IsValid := MembershipManagement.IsMembershipActive(MembershipEntryNo, WorkDate, false);
+        IsValid := MembershipManagement.IsMembershipActive(MembershipEntryNo, WorkDate(), false);
         if (not IsValid) then
             IsValid := MembershipManagement.MembershipNeedsActivation(MembershipEntryNo);
 
@@ -456,7 +456,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         if (MemberInfoCapture."External Card No." <> '') then begin
             if (MemberInfoCapture."Member Entry No" = 0) then
-                MemberInfoCapture."Member Entry No" := MembershipManagement.GetMemberFromExtCardNo(MemberInfoCapture."External Card No.", WorkDate, NotFoundReason);
+                MemberInfoCapture."Member Entry No" := MembershipManagement.GetMemberFromExtCardNo(MemberInfoCapture."External Card No.", WorkDate(), NotFoundReason);
         end;
 
         MemberInfoCapture.Modify();

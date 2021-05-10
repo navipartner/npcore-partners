@@ -367,7 +367,7 @@ codeunit 6059970 "NPR Variety Wrapper"
 
         //updateitem
         if Rec."NPR Variety Group" = '' then
-            VrtGroup.Init
+            VrtGroup.Init()
         else
             VrtGroup.Get(Rec."NPR Variety Group");
 
@@ -463,7 +463,7 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VrtFieldSetup: Record "NPR Variety Field Setup";
     begin
-        VrtFieldSetup.UpdateToLatestVersion;
+        VrtFieldSetup.UpdateToLatestVersion();
     end;
 
     local procedure GetCalculationDate(DateIn: Date): Text

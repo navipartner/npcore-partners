@@ -35,8 +35,8 @@ codeunit 6150719 "NPR POS Action Management"
 
     local procedure ReportError(ActionObject: Interface "NPR IAction"; Source: Text; "Action": Text; ErrorText: Text; Severity: Integer; RaiseEvent: Boolean)
     begin
-        ActionObject.Content.Add('error', ErrorText);
-        ActionObject.Content.Add('errorSeverity', Severity);
+        ActionObject.Content().Add('error', ErrorText);
+        ActionObject.Content().Add('errorSeverity', Severity);
         if RaiseEvent then
             OnInvalidActionConfiguration(Source, Action, ErrorText);
     end;

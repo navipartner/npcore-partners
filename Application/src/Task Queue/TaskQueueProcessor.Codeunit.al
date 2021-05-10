@@ -55,7 +55,7 @@ codeunit 6059902 "NPR Task Queue Processor"
             //+TQ1.34 [326930]
             TaskQueue.Get(TaskQueue.Company, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
             TaskQueue."Next Run time" := NextRunTime;
-            TaskQueue."Estimated Duration" := TaskLine.GetExpectedDuration;
+            TaskQueue."Estimated Duration" := TaskLine.GetExpectedDuration();
             TaskQueue.Validate(Status, TaskQueue.Status::Awaiting);
             TaskQueue.Modify();
 
@@ -99,7 +99,7 @@ codeunit 6059902 "NPR Task Queue Processor"
         TaskQueue.Get(TaskQueue.Company, TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
         //+TQ1.34 [326930]
         TaskQueue."Next Run time" := NextRunTime;
-        TaskQueue."Estimated Duration" := TaskLine.GetExpectedDuration;
+        TaskQueue."Estimated Duration" := TaskLine.GetExpectedDuration();
         TaskQueue.Modify();
         //-TQ1.34 [326930]
         Commit();
@@ -196,7 +196,7 @@ codeunit 6059902 "NPR Task Queue Processor"
         else begin
             TaskQueue.Validate(Status, TaskQueue.Status::Awaiting);
             //-TQ1.29
-            TaskQueue."Last Task Log Entry No." := TaskQueueAdd2Log.GetCurrentLogEntryNo;
+            TaskQueue."Last Task Log Entry No." := TaskQueueAdd2Log.GetCurrentLogEntryNo();
             //+TQ1.29
 
             if Success then begin

@@ -126,7 +126,7 @@
         FrontEndUpdateIsNeeded := false;
         if TempPOSInfoTransaction.FindSet() then
             repeat
-                TempPOSInfoTransaction.ShowMessage;
+                TempPOSInfoTransaction.ShowMessage();
                 if SaleLineApplyPOSInfo(pSaleLinePos, TempPOSInfoTransaction, pApplicScope, false) then
                     FrontEndUpdateIsNeeded := true;
             until TempPOSInfoTransaction.Next() = 0;
@@ -148,7 +148,7 @@
         POSInfoTransParam.CopyFromPOSInfo(POSInfo);
         if not pClearInfo then begin
             POSInfoTransParam."POS Info" := CopyStr(GetPosInfoOutput(POSInfo, UserInputString), 1, MaxStrLen(POSInfoTransParam."POS Info"));
-            POSInfoTransParam.ShowMessage;
+            POSInfoTransParam.ShowMessage();
         end;
 
         FrontEndUpdateIsNeeded := SaleLineApplyPOSInfo(pSaleLinePos, POSInfoTransParam, pApplicScope, pClearInfo);
@@ -306,7 +306,7 @@
                 POSInfoTransaction.SetRange("Sales Line No.", SaleLinePosTmp."Line No.");
                 if POSInfoTransaction.FindFirst() then begin
                     if pClearInfo then
-                        POSInfoTransaction.Delete
+                        POSInfoTransaction.Delete()
                     else begin
                         POSInfoTransaction."POS Info" := POSInfoTransParam."POS Info";
                         POSInfoTransaction.Modify();
@@ -559,13 +559,13 @@
     var
         POSInfo: Record "NPR POS Info";
     begin
-        if ThisDataSource <> DataSourceName then
+        if ThisDataSource() <> DataSourceName then
             exit;
         POSInfo.SetRange("Available in Front-End", true);
         if POSInfo.IsEmpty then
             exit;
 
-        Extensions.Add(ThisExtension);
+        Extensions.Add(ThisExtension());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
@@ -574,7 +574,7 @@
         POSInfo: Record "NPR POS Info";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -597,7 +597,7 @@
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
-        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -636,7 +636,7 @@
         if POSSession.IsActiveSession(POSFrontEndManagement) then begin
             POSFrontEndManagement.GetSession(POSSession);
             POSSession.GetSale(POSSale);
-            POSSale.SetModified;
+            POSSale.SetModified();
             POSSession.RequestRefreshData();
         end;
     end;

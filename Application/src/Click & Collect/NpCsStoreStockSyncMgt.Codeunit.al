@@ -9,7 +9,7 @@ codeunit 6151223 "NPR NpCs Store Stock Sync Mgt."
 
     procedure ScheduleStockItemInitiation()
     begin
-        TaskScheduler.CreateTask(CurrCodeunitId, 0, true, CompanyName, CurrentDateTime);
+        TaskScheduler.CreateTask(CurrCodeunitId(), 0, true, CompanyName, CurrentDateTime);
     end;
 
     local procedure CurrCodeunitId(): Integer

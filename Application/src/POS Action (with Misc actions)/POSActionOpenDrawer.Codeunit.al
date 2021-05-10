@@ -18,7 +18,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-              ActionCode,
+              ActionCode(),
               ActionDescription,
               ActionVersion(),
               Sender.Type::Generic,

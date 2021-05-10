@@ -125,7 +125,7 @@ table 6150664 "NPR NPRE Flow Status"
             PrintCategory.MarkedOnly(true);
         if PrintCategory.FindSet() then
             repeat
-                if (Code <> '') or not PrintCategory.Mark then begin
+                if (Code <> '') or not PrintCategory.Mark() then begin
                     if PrintCategoryString <> '' then
                         PrintCategoryString := PrintCategoryString + '|';
                     PrintCategoryString := PrintCategoryString + StrSubstNo(InQuotes, PrintCategory.Code);

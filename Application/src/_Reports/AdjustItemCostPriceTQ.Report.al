@@ -225,7 +225,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
         ItemView: Text;
     begin
         DataLogMgt.DisableDataLog(true);
-        ItemView := Item.GetView;
+        ItemView := Item.GetView();
         if "Task Line".GetFilters <> '' then
             if "Task Line".Find('-') then
                 if not CurrReport.UseRequestPage() then begin
@@ -270,7 +270,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
 
     local procedure UpdateEnabled()
     begin
-        PageUpdateEnabled;
+        PageUpdateEnabled();
     end;
 
     local procedure GetGLSetup()

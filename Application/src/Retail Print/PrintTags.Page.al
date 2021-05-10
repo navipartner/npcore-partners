@@ -105,7 +105,7 @@ page 6014417 "NPR Print Tags"
         if (StrLen(PrintTag) > 100) or (PrintTag = '') then exit;
 
         if SelectedPrintTagsTmp.Get(PrintTag) then
-            SelectedPrintTagsTmp.Delete
+            SelectedPrintTagsTmp.Delete()
         else begin
             SelectedPrintTagsTmp.Init();
             SelectedPrintTagsTmp."Print Tag" := PrintTag;

@@ -138,7 +138,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
     local procedure UpdateList()
     begin
         Rec.DeleteAll();
-        Setdate;
+        Setdate();
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
         Query1.Open();
