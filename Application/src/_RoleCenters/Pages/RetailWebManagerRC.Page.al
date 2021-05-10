@@ -14,15 +14,6 @@ page 6151244 "NPR Retail Web Manager RC"
             {
                 ApplicationArea = All;
             }
-            part(Control6151403; "NPR Magento Top10 Items by Qty")
-            {
-                ApplicationArea = Basic, Suite;
-            }
-            part(Control1905989608; "My Items")
-            {
-                AccessByPermission = TableData "My Item" = R;
-                ApplicationArea = Basic, Suite;
-            }
             part(Control21; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = R;
