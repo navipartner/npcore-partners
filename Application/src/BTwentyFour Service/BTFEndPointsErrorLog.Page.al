@@ -3,6 +3,7 @@ page 6059923 "NPR BTF EndPoints Error Log"
     UsageCategory = None;
     PageType = List;
     SourceTable = "NPR BTF EndPoint Error Log";
+    SourceTableView = sorting("Entry No.") order(descending);
     Caption = 'BTwentyFour EndPoints Error Log';
     Editable = false;
 
@@ -16,6 +17,12 @@ page 6059923 "NPR BTF EndPoints Error Log"
                 {
                     ApplicationArea = Advanced;
                     ToolTip = 'Specifies entry number. Unique value for each endpoint error log entry.';
+                    Visible = false;
+                }
+                field("Sent on Date"; Rec."Sent on Date")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies date and time when web request is sent.';
                 }
                 field("Response Note"; Rec."Response Note")
                 {
@@ -86,11 +93,6 @@ page 6059923 "NPR BTF EndPoints Error Log"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies portal number, only required for production environment.';
-                }
-                field("Sent on Date"; Rec."Sent on Date")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies date and time when web request is sent.';
                 }
                 field("Sent by User ID"; Rec."Sent by User ID")
                 {

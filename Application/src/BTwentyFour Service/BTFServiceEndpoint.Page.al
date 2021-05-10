@@ -1,19 +1,19 @@
-page 6059921 "NPR BTF Service EndPoints"
+page 6059924 "NPR BTF Service Endpoint"
 {
     UsageCategory = None;
-    PageType = List;
+    PageType = Card;
     SourceTable = "NPR BTF Service EndPoint";
-    Caption = 'BTwentyFour Service EndPoints';
+    Caption = 'BTwentyFour Service EndPoint';
+    DelayedInsert = true;
     DataCaptionFields = "Service Code";
-    Editable = false;
-    CardPageId = "NPR BTF Service Endpoint";
 
     layout
     {
         area(Content)
         {
-            repeater(GroupName)
+            group(General)
             {
+                Caption = 'General';
                 field("EndPoint ID"; Rec."EndPoint ID")
                 {
                     ApplicationArea = All;
@@ -24,6 +24,11 @@ page 6059921 "NPR BTF Service EndPoints"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the service endpoint.';
                 }
+                field("EndPoint Method"; Rec."EndPoint Method")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the endpoint method.';
+                }
                 field("Next EndPoint ID"; Rec."Next EndPoint ID")
                 {
                     ApplicationArea = All;
@@ -32,22 +37,46 @@ page 6059921 "NPR BTF Service EndPoints"
                 field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies if the endpoint is enabled. To be able to consume resources, service endpoint has to be enabled.Additionally, automatic sending of web requests will be enabled. For details, refer to action Show Jobs.';
+                    ToolTip = 'Specifies if the endpoint is enabled. To be able to consume resources, service endpoint has to be enabled. Additionally, automatic sending of web requests will be enabled. For details, refer to action Show Jobs.';
+                }
+                field("Sequence Order"; Rec."Sequence Order")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if the sequence order.';
+                }
+            }
+            group(APIDetails)
+            {
+                Caption = 'API Details';
+
+                field("BTF Service Method"; Rec."Service Method Name")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the service method name.';
+                }
+                field(Path; Rec.Path)
+                {
+                    ApplicationArea = Advanced;
+                    ToolTip = 'Specifies the API resource path.';
                 }
                 field("EndPoint-Key"; Rec."EndPoint-Key")
                 {
                     ApplicationArea = Advanced;
-                    ToolTip = 'Specifies the service endpoint key obtained with API credentials. EndPoint-Key is not mandatory for all endpoints.';
+                    ToolTip = 'Specifies the endpoint key.';
                 }
                 field(Accept; Rec.Accept)
                 {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies response format (e.g. response could be in json or xml format). Change value and check response by running an action Send Request.';
+                    ApplicationArea = Advanced;
+                    ToolTip = 'Specifies the type of content returned by service endpoint.';
+                }
+                field("Content-Type"; Rec."Content-Type")
+                {
+                    ApplicationArea = Advanced;
+                    ToolTip = 'Specifies the type of content which will be sent to the service endpoint.';
                 }
             }
         }
     }
-
     actions
     {
         area(Navigation)
@@ -134,9 +163,4 @@ page 6059921 "NPR BTF Service EndPoints"
             }
         }
     }
-
-    trigger OnOpenPage()
-    begin
-        Rec.OnRegisterServiceEndPoint();
-    end;
 }

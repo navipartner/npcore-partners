@@ -70,8 +70,11 @@ table 6014522 "NPR BTF Service Setup"
                 ServiceEndPoint: Record "NPR BTF Service EndPoint";
             begin
                 ServiceEndPoint.SetRange("Service Code", Rec.Code);
-                if not ServiceEndPoint.IsEmpty() then
-                    ServiceEndPoint.ModifyAll(Enabled, Rec.Enabled, true);
+                if ServiceEndPoint.FindSet(true) then
+                    repeat
+                        ServiceEndPoint.Validate(Enabled, Rec.Enabled);
+                        ServiceEndPoint.Modify();
+                    until ServiceEndPoint.Next() = 0;
             end;
         }
         field(12; Password; Text[50])
@@ -95,10 +98,12 @@ table 6014522 "NPR BTF Service Setup"
     trigger OnDelete()
     var
         ServiceEndPoint: Record "NPR BTF Service EndPoint";
+        ServiceAPI: Codeunit "NPR BTF Service API";
     begin
+        ServiceAPI.DeleteJobQueueCategory(Rec.Code);
         ServiceEndPoint.Setrange("Service Code", Rec.Code);
         if not ServiceEndPoint.IsEmpty() then
-            ServiceEndPoint.DeleteAll();
+            ServiceEndPoint.DeleteAll(true);
     end;
 
     trigger OnRename()
@@ -113,6 +118,13 @@ table 6014522 "NPR BTF Service Setup"
             exit;
 
         Init();
+        InitService(NewServiceURL, NewName, NewAboutAPI, NewSubscriptionKey, NewEnvironment, NewUsername, NewPortal, NewPassword, NewEnabled);
+        OnAfterInit();
+        Insert();
+    end;
+
+    procedure InitService(NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewPassword: Text; NewEnabled: Boolean)
+    begin
         "Service URL" := NewServiceURL;
         Name := copystr(NewName, 1, MaxStrLen(Name));
         "About API" := NewAboutAPI;
@@ -120,12 +132,8 @@ table 6014522 "NPR BTF Service Setup"
         Environment := NewEnvironment;
         Username := NewUsername;
         Portal := NewPortal;
-        Enabled := NewEnabled;
         Password := NewPassword;
-
-        OnAfterInit();
-
-        Insert();
+        Enabled := NewEnabled;
     end;
 
     [IntegrationEvent(true, false)]

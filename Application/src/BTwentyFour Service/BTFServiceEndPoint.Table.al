@@ -16,6 +16,11 @@ table 6014523 "NPR BTF Service EndPoint"
         {
             DataClassification = CustomerContent;
             Caption = 'EndPoint ID';
+
+            trigger OnValidate()
+            begin
+                "EndPoint ID" := UpperCase("EndPoint ID");
+            end;
         }
         field(3; Description; Text[100])
         {
@@ -43,6 +48,19 @@ table 6014523 "NPR BTF Service EndPoint"
         {
             DataClassification = CustomerContent;
             Caption = 'Enabled';
+
+            trigger OnValidate()
+            var
+                ServiceAPI: Codeunit "NPR BTF Service API";
+            begin
+                if Rec.Enabled then begin
+                    ServiceAPI.RegisterNcImportType(Rec."EndPoint ID", Rec.Description, GetImportListUpdateHandler());
+                    ServiceAPI.ScheduleJobQueueEntry(Rec);
+                end else begin
+                    ServiceAPI.DeleteNcImportType(Rec."EndPoint ID");
+                    ServiceAPI.CancelJob(Rec);
+                end;
+            end;
         }
         field(7; "Sequence Order"; Integer)
         {
@@ -69,6 +87,13 @@ table 6014523 "NPR BTF Service EndPoint"
             DataClassification = CustomerContent;
             Caption = 'Endpoint Key';
         }
+
+        field(30; "Next EndPoint ID"; Text[250])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Next EndPoint ID';
+            TableRelation = "NPR BTF Service EndPoint"."EndPoint ID" where("Service Code" = field("Service Code"));
+        }
     }
 
     keys
@@ -82,19 +107,57 @@ table 6014523 "NPR BTF Service EndPoint"
     var
         RenameNotAllowedErr: Label 'Rename not allowed. Instead, delete and recreate record.';
 
+    trigger OnDelete()
+    var
+        ServiceAPI: Codeunit "NPR BTF Service API";
+    begin
+        ServiceAPI.DeleteNcImportType(Rec."EndPoint ID");
+        ServiceAPI.CancelJob(Rec);
+    end;
+
     trigger OnRename()
     begin
         Error(RenameNotAllowedErr);
     end;
 
-    procedure RegisterServiceEndPoint(NewServiceCode: Code[10]; NewEndPointID: Text; NewPath: Text; NewServiceMethodName: Enum "NPR BTF Service Method"; NewDescription: Text; NewEnabled: Boolean; NewSeqOrder: Integer; NewEndPointMethod: Enum "NPR BTF EndPoint Method"; NewContentType: Enum "NPR BTF Content Type"; NewAccept: Enum "NPR BTF Content Type"; NewEndPointKey: Text)
+    procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
+    var
+        ImportListUpdateHandler: Enum "NPR Nc IL Update Handler";
+        EndPoint: Interface "NPR BTF IEndPoint";
+    begin
+        EndPoint := Rec."EndPoint Method";
+        exit(EndPoint.GetImportListUpdateHandler());
+    end;
+
+    procedure RegisterServiceEndPoint(NewServiceCode: Code[10]; NewEndPointID: Text; NewPath: Text; NewServiceMethodName: Enum "NPR BTF Service Method"; NewDescription: Text;
+                                                                                                                              NewEnabled: Boolean;
+                                                                                                                              NewSeqOrder: Integer;
+                                                                                                                              NewEndPointMethod: Enum "NPR BTF EndPoint Method";
+                                                                                                                              NewContentType: Enum "NPR BTF Content Type";
+                                                                                                                              NewAccept: Enum "NPR BTF Content Type";
+                                                                                                                              NewEndPointKey: Text;
+                                                                                                                              NewNextEndPointKey: Text)
     begin
         "Service Code" := NewServiceCode;
-        "EndPoint ID" := NewEndPointID;
+        validate("EndPoint ID", NewEndPointID);
         if Find() then
             exit;
 
         Init();
+        InitServiceEndPoint(NewServiceCode, NewEndPointID, NewPath, NewServiceMethodName, NewDescription, NewEnabled, NewSeqOrder, NewEndPointMethod, NewContentType, NewAccept, NewEndPointKey, NewNextEndPointKey);
+        OnAfterInit();
+        Insert();
+    end;
+
+    procedure InitServiceEndPoint(NewServiceCode: Code[10]; NewEndPointID: Text; NewPath: Text; NewServiceMethodName: Enum "NPR BTF Service Method"; NewDescription: Text;
+                                                                                                                          NewEnabled: Boolean;
+                                                                                                                          NewSeqOrder: Integer;
+                                                                                                                          NewEndPointMethod: Enum "NPR BTF EndPoint Method";
+                                                                                                                          NewContentType: Enum "NPR BTF Content Type";
+                                                                                                                          NewAccept: Enum "NPR BTF Content Type";
+                                                                                                                          NewEndPointKey: Text;
+                                                                                                                          NewNextEndPointKey: Text)
+    begin
         Path := NewPath;
         Description := NewDescription;
         "Service Method Name" := NewServiceMethodName;
@@ -104,10 +167,7 @@ table 6014523 "NPR BTF Service EndPoint"
         "Content-Type" := NewContentType;
         Accept := NewAccept;
         "EndPoint-Key" := NewEndPointKey;
-
-        OnAfterInit();
-
-        Insert();
+        "Next EndPoint ID" := NewNextEndPointKey;
     end;
 
     [IntegrationEvent(true, false)]

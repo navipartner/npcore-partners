@@ -12,17 +12,26 @@ codeunit 6014649 "NPR BTF Nc Import Entry"
         RecIDToRecordLb: Label 'Content from field %1 (%2%3) can''t be fetched to Record.', Comment = '%1=ImportEntry.FieldName("Document ID");%2=ImportEntry.TableCaption();%3=ImportEntry."Entry No."';
         UnexpectedRecordLbl: Label 'Expected record %1 in the %2 (%3:%4).', Comment = '%1=ServiceEndPoint.TableName();%2=ImportEntry.FieldName("Document ID");%3=ImportEntry.TableCaption();%4=ImportEntry."Entry No."';
         EmptyContentLbl: Label 'Nothing to process. Empty content in a field %1 (%2%3)', Comment = '%1=ImportEntry.FieldName("Document Source");%2=ImportEntry.TableCaption();%3=ImportEntry."Entry No."';
+        ReferToServiceEndPointErrorLogLbl: Label 'Check out "%1" (%2 -> Service Endpoints -> %3 -> Error Log)', Comment = '%1="NPR BTF EndPoint Error Log".TableCaption();%2="NPR BTF Service Setup".Caption();%3=ServiceEndpoint."EndPoint ID"';
 
     local procedure ProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         ServiceEndPoint: Record "NPR BTF Service EndPoint";
         Content: Codeunit "Temp Blob";
+        ServiceSetup: page "NPR BTF Service Setup";
         EndPoint: Interface "NPR BTF IEndPoint";
+        ErrorMsg: Text;
     begin
+        ClearLastError();
         PreProcessingCheck(ImportEntry, ServiceEndPoint);
         Content.FromRecord(ImportEntry, ImportEntry.FieldNo("Document Source"));
         EndPoint := ServiceEndPoint."EndPoint Method";
-        EndPoint.ProcessImportedContent(Content, ServiceEndPoint);
+        if not EndPoint.ProcessImportedContent(Content, ServiceEndPoint) then begin
+            ErrorMsg := GetLastErrorText();
+            if ErrorMsg = '' then
+                ErrorMsg := StrSubstNo(ReferToServiceEndPointErrorLogLbl, ServiceEndPoint.TableCaption(), ServiceSetup.Caption(), ServiceEndPoint."EndPoint ID");
+            Error(ErrorMsg);
+        end;
     end;
 
     local procedure PreProcessingCheck(var ImportEntry: Record "NPR Nc Import Entry"; var ServiceEndPoint: Record "NPR BTF Service EndPoint")

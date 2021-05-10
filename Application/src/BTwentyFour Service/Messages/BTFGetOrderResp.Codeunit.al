@@ -1,16 +1,16 @@
-codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Import List IUpdate"
+codeunit 6014650 "NPR BTF GetOrderResp" implements "NPR BTF IEndPoint", "NPR Nc Import List IUpdate"
 {
     var
         EndPointKeyNotSetLbl: Label 'Endpoint-Key is not set for endpoint %1 (%2 -> %3)', Comment = '%1=Service EndPoint ID;%2=ServiceSetup.TableCaption();%3=ServiceEndPoint.TableCaption()';
         AuthMethodIDNotSetLbl: Label 'Authorization Method ID is not set in %1 or it''s not found in related table %2', Comment = '%1=Service Setup Table Caption;%2=Service EndPoint Table Caption';
         RequestNotSentLbl: Label 'Failed to send request to %1', Comment = '%1=Request URI';
-        DefaultFileNameLbl: Label 'GetOrders_%1', Comment = '%1=Current Date and Time';
-        OrderNotFoundInContentLbl: Label 'Order or it''s lines not found in the content';
+        DefaultFileNameLbl: Label 'GetOrderResp_%1', Comment = '%1=Current Date and Time';
+        OrderResponseNotFoundInContentLbl: Label 'Order Response or it''s lines not found in the content';
         ErrorLogInfoLbl: Label 'Error encountered. Check out error log for more details.';
-        OrderNotDeliveredLbl: Label 'Order has been imported successfully under the %1 %2. However, due to offline import, this order is still available in a B24 queue under %3 %4 and has to be set as a delivered in B24 with messageId = %4.', Comment = '%1="Sales Header".FieldName("External Document No.");%2="Sales Header"."External Document No.";%3="Sales Header".FieldName("Your Reference");%4="Sales Header"."Your Reference"';
+        OrderResponseNotDeliveredLbl: Label 'Order Response %1 has been imported successfully. However, due to offline import, this order response is still available in a B24 queue under the messageId %2 and has to be set as a delivered.', Comment = '%1=Order No;%2=Message ID';
         MessageIdNotFoundLbl: Label 'Message Id not found in Sales Order %1 under the %2.', Comment = '%1="Sales Header".No.;%2="Sales Header".FieldName("Your Reference")';
-        DocAlreadyCreatedLbl: Label 'Document you are trying to import has been already created.';
-        DocAlreadyPostedLbl: Label 'Document are trying to import has been already posted.';
+        DocAlreadyCreatedLbl: Label 'Document that you are trying to import has been already created.';
+        DocAlreadyPostedLbl: Label 'Document that you are trying to import has been already posted.';
         DocCreatedInLiveEnvLbl: Label 'Since this is live environment, this document has to be removed from B24 queue by sending message id of this document to B24 portal. Message ID could be found under the %1 or under the property messageId in the original content downloaded from B24.', Comment = '%1="Sales Header".FieldName("Your Reference")';
         OpenCardLbl: Label 'Open';
 
@@ -44,15 +44,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         ServiceAPI.ShowErrorLogEntries('', ImportType.Code);
     end;
 
-    procedure SendRequest(ServiceSetup: Record "NPR BTF Service Setup";
-        ServiceEndPoint: Record "NPR BTF Service EndPoint";
-        Request: Codeunit "Temp Blob";
-
-    var
-        Response: Codeunit "Temp Blob";
-
-    var
-        StatusCode: Integer)
+    procedure SendRequest(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; Request: Codeunit "Temp Blob"; var Response: Codeunit "Temp Blob"; var StatusCode: Integer)
     var
         ServiceEndPointForAuth: Record "NPR BTF Service EndPoint";
     begin
@@ -60,7 +52,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
             exit;
         if not CheckServiceEndPoint(ServiceSetup, ServiceEndPoint, Response) then
             exit;
-        GetOrders(ServiceSetup, ServiceEndPoint, ServiceEndPointForAuth, Request, Response, StatusCode);
+        GetOrderResponse(ServiceSetup, ServiceEndPoint, ServiceEndPointForAuth, Request, Response, StatusCode);
     end;
 
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR BTF Service EndPoint"): Text
@@ -68,7 +60,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
     end;
 
-    local procedure GetOrders(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; ServiceEndPointForAuth: Record "NPR BTF Service EndPoint"; DummyRequest: Codeunit "Temp Blob"; var Response: Codeunit "Temp Blob"; var StatusCode: Integer)
+    local procedure GetOrderResponse(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; ServiceEndPointForAuth: Record "NPR BTF Service EndPoint"; DummyRequest: Codeunit "Temp Blob"; var Response: Codeunit "Temp Blob"; var StatusCode: Integer)
     var
         ServiceAPI: Codeunit "NPR BTF Service API";
         EndPoint: Interface "NPR BTF IEndPoint";
@@ -92,7 +84,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
 
         ClearLastError();
         RequestMessage.Method := Format(ServiceEndPoint."Service Method Name");
-        URI := StrSubstNo(ServiceSetup."Service URL" + ServiceEndPoint.Path + '?classid=%1', "NPR BTF Messages Class"::order.AsInteger());
+        URI := StrSubstNo(ServiceSetup."Service URL" + ServiceEndPoint.Path + '?classid=%1', "NPR BTF Messages Class"::orderresponse.AsInteger());
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
         Headers.Add('User-Agent', 'Dynamics 365');
@@ -177,10 +169,10 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         MessageId: Text;
     begin
         FormatResponse := ServiceEndPoint.Accept;
-        FormatResponse.GetOrder(Content, TempSalesHeader, TempSalesLine);
+        FormatResponse.GetOrderResp(Content, TempSalesHeader, TempSalesLine);
 
         if (not TempSalesHeader.Find()) or TempSalesLine.IsEmpty() then begin
-            FormatResponse.FormatInternalError('internal_business_central_error', OrderNotFoundInContentLbl, Response);
+            FormatResponse.FormatInternalError('internal_business_central_error', OrderResponseNotFoundInContentLbl, Response);
             ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), SalesHeader.RecordId());
             exit;
         end;
@@ -209,7 +201,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         ServiceSetup.Find();
         ServiceSetup.TestField(Enabled);
         Request.CreateOutStream(OutStr);
-        OutStr.WriteText(MessageId);
+        OutStr.WriteText(TempSalesHeader."Your Reference"); //as messageId
 
         ServiceAPI.SendWebRequest(ServiceSetup, NextServiceEndPoint, Request, Response, StatusCode);
         FormatResponse := NextServiceEndPoint.Accept;
@@ -237,10 +229,10 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         ServiceSetup.TestField(Enabled);
 
         FormatResponse := ServiceEndPoint.Accept;
-        FormatResponse.GetOrder(Content, TempSalesHeader, TempSalesLine);
+        FormatResponse.GetOrderResp(Content, TempSalesHeader, TempSalesLine);
 
         if (not TempSalesHeader.Find()) or TempSalesLine.IsEmpty() then begin
-            FormatResponse.FormatInternalError('internal_business_central_error', OrderNotFoundInContentLbl, Response);
+            FormatResponse.FormatInternalError('internal_business_central_error', OrderResponseNotFoundInContentLbl, Response);
             ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), SalesHeader.RecordId());
             Message(ErrorLogInfoLbl);
             exit;
@@ -248,21 +240,20 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
 
         if DocumentCreated(SalesHeader, TempSalesHeader) then begin
             if ServiceSetup.Environment = ServiceSetup.Environment::production then begin
-                FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(OrderNotDeliveredLbl, SalesHeader.FieldName("External Document No."), SalesHeader."External Document No.", SalesHeader.FieldName("Your Reference"), SalesHeader."Your Reference"), Response);
-                ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), SalesHeader.RecordId());
+                FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(OrderResponseNotDeliveredLbl, TempSalesHeader."External Document No.", TempSalesHeader."Your Reference"), Content);
                 SalesHeader.SetRecFilter();
-                Page.RunModal(Page::"Sales Order", SalesHeader);
+                Page.Run(Page::"Sales Order", SalesHeader);
                 SendDocumentNotification(GetDocumentCreatedInLiveEnvNotificationId(), DocAlreadyCreatedLbl + ' ' + DocCreatedInLiveEnvLbl, SalesHeader."No.", 'OpenOrder');
             end else begin
                 SalesHeader.SetRecFilter();
-                Page.RunModal(Page::"Sales Order", SalesHeader);
+                Page.Run(Page::"Sales Order", SalesHeader);
                 SendDocumentNotification(GetDocumentAlreadyCreatedNotificationId(), DocAlreadyCreatedLbl, SalesHeader."No.", 'OpenOrder');
             end;
             exit;
         end else begin
             if InvoicePosted(SalesInvoiceHeader, TempSalesHeader) then begin
                 SalesInvoiceHeader.SetRecFilter();
-                Page.RunModal(Page::"Posted Sales Invoice", SalesInvoiceHeader);
+                Page.Run(Page::"Posted Sales Invoice", SalesInvoiceHeader);
                 SendDocumentNotification(GetDocumentAlreadyPostedNotificationId(), DocAlreadyPostedLbl, SalesInvoiceHeader."No.", 'OpenPostedInvoice');
                 exit;
             end;
@@ -310,6 +301,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
                 SalesLine.Validate("Line Discount %", TempSalesLine."Line Discount %");
                 SalesLine.Modify();
             until TempSalesLine.next() = 0;
+        CODEUNIT.Run(CODEUNIT::"Release Sales Document", SalesHeader);
     end;
 
     local procedure DocumentCreated(var SalesHeader: Record "Sales Header"; TempSalesHeader: Record "Sales Header"): Boolean
@@ -317,8 +309,8 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         NoSeriesMgt: codeunit NoSeriesManagement;
     begin
         Clear(SalesHeader);
+        SalesHeader."Document Type" := TempSalesHeader."Document Type";
         if NoSeriesMgt.ManualNoAllowed(SalesHeader.GetNoSeriesCode()) then begin
-            SalesHeader."Document Type" := TempSalesHeader."Document Type";
             SalesHeader."No." := TempSalesHeader."No.";
             exit(SalesHeader.Find());
         end else begin
@@ -358,30 +350,31 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         DocNotification: Notification;
     begin
         DocNotification.Id := DocNotificationId;
-        DocNotification.Recall();
+        DocNotification.Recall;
         DocNotification.Message(Msg);
         DocNotification.Scope(NOTIFICATIONSCOPE::LocalScope);
         DocNotification.SetData('DocNo', DocNo);
-        DocNotification.AddAction(OpenCardLbl, Codeunit::"NPR BTF GetOrders", ActionName);
-        DocNotification.Send();
+        DocNotification.AddAction(OpenCardLbl, Codeunit::"NPR BTF GetOrderResp", ActionName);
+        DocNotification.Send;
     end;
 
     local procedure GetDocumentAlreadyCreatedNotificationId(): Guid
     begin
-        exit('2af25b7f-29a1-4880-850a-f8f1166196ec');
+        exit('d8546594-8d51-4291-867a-53b0d133a0bc');
     end;
 
     local procedure GetDocumentAlreadyPostedNotificationId(): Guid
     begin
-        exit('14368812-7387-4ea0-a684-4207b8581700');
+        exit('dc539e17-55c5-4b2a-a340-ea58439440f7');
     end;
 
     local procedure GetDocumentCreatedInLiveEnvNotificationId(): Guid
     begin
-        exit('fced3743-2229-4bc6-9231-affd372ec9a0');
+        exit('4fa44f8a-c37b-4259-ad8e-9b17b3fcf61b');
     end;
+
     procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
     begin
-        exit("NPR Nc IL Update Handler"::B24GetOrder);
+        exit("NPR Nc IL Update Handler"::B24GetOrderResp);
     end;
 }

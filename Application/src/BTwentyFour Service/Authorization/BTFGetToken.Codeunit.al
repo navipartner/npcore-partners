@@ -4,8 +4,9 @@ codeunit 6014643 "NPR BTF GetToken" implements "NPR BTF IEndPoint"
         RequestNotSentLbl: Label 'Failed to send request to %1', Comment = '%1=Request URI';
         ServiceEndPointNotEnabledLbl: Label 'Service EndPoint %1 is not enabled. To be able to consume resource from this enpoint, first enable it (%2 -> %3)', Comment = '%1=ServiceEndPoint."EndPoint ID";%2=ServiceSetup.TableCaption();%3=ServiceEndPoint.TableCaption()';
         DefaultFileNameLbl: Label 'GetToken_%1', Comment = '%1=Current Date and Time';
+        MethodNotSupportedErr: Label 'This method is not supported for the current service endpoint';
 
-    procedure SendRequest(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var Response: Codeunit "Temp Blob")
+    procedure SendRequest(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; Request: Codeunit "Temp Blob"; var Response: Codeunit "Temp Blob"; var StatusCode: Integer)
     begin
         ClearLastError();
         if not CheckServiceSetup(ServiceSetup, Response, ServiceEndPoint) then
@@ -13,7 +14,7 @@ codeunit 6014643 "NPR BTF GetToken" implements "NPR BTF IEndPoint"
         if not CheckServiceEndPoint(ServiceEndPoint, Response) then
             exit;
 
-        GetToken(ServiceSetup, ServiceEndPoint, Response);
+        GetToken(ServiceSetup, ServiceEndPoint, Response, StatusCode);
     end;
 
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR BTF Service EndPoint"): Text
@@ -21,7 +22,7 @@ codeunit 6014643 "NPR BTF GetToken" implements "NPR BTF IEndPoint"
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
     end;
 
-    local procedure GetToken(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var Response: Codeunit "Temp Blob")
+    local procedure GetToken(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var Response: Codeunit "Temp Blob"; var StatusCode: Integer)
     var
         ServiceAPI: Codeunit "NPR BTF Service API";
         FormatResponse: Interface "NPR BTF IFormatResponse";
@@ -61,10 +62,12 @@ codeunit 6014643 "NPR BTF GetToken" implements "NPR BTF IEndPoint"
 
         if not Client.Send(RequestMessage, ResponseMessage) then begin
             FormatResponse := ServiceEndPoint.Accept;
+            StatusCode := 400;
             FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(RequestNotSentLbl, RequestMessage.GetRequestUri()), Response);
             exit;
         end;
 
+        StatusCode := ResponseMessage.HttpStatusCode();
         Content := ResponseMessage.Content();
         Content.ReadAs(ResponseText);
         Response.CreateOutStream(OutStr);
@@ -104,8 +107,21 @@ codeunit 6014643 "NPR BTF GetToken" implements "NPR BTF IEndPoint"
         exit(true);
     end;
 
-    procedure ProcessImportedContent(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
+    procedure ProcessImportedContent(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"): Boolean
     begin
         //If token should be saved to specific table, then reimplement this method
+        Error(MethodNotSupportedErr);
+    end;
+
+    procedure ProcessImportedContentOffline(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
+    begin
+        //If token should be saved to specific table, then reimplement this method
+        Error(MethodNotSupportedErr);
+    end;
+
+    procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
+    begin
+        //Not necessary for this endpoint
+        Error(MethodNotSupportedErr);
     end;
 }
