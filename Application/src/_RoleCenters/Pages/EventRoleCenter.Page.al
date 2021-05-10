@@ -104,7 +104,14 @@ page 6060165 "NPR Event Role Center"
                 ToolTip = 'Executes the Event Resource Availability Overview';
             }
 
+            action("Event Overview")
+            {
+                Caption = 'Event Overview';
+                Image = AnalysisView;
+                RunObject = report "NPR Event Overview";
+                ApplicationArea = All;
+                ToolTip = 'Executes the Event Overview';
+            }
         }
-
     }
 }
