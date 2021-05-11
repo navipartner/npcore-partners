@@ -33,6 +33,11 @@ page 6060121 "NPR TM Ticket BOM"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Default field';
                 }
+                field("Ticket Schedule Selection"; Rec."Ticket Schedule Selection")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Schedule Selection field';
+                }
                 field("Sales From Date"; Rec."Sales From Date")
                 {
                     ApplicationArea = NPRTicketAdvanced;
@@ -202,7 +207,7 @@ page 6060121 "NPR TM Ticket BOM"
                 PromotedOnly = true;
                 PromotedCategory = Category5;
                 RunObject = Page "NPR TM POS Default Admission";
-                RunPageLink = "Item No." = field ("Item No."), "Variant Code" = field ("Variant Code");
+                RunPageLink = "Item No." = field("Item No."), "Variant Code" = field("Variant Code");
             }
             Action(NavigateAdmissions)
             {
