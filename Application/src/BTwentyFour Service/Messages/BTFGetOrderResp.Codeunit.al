@@ -350,12 +350,12 @@ codeunit 6014650 "NPR BTF GetOrderResp" implements "NPR BTF IEndPoint", "NPR Nc 
         DocNotification: Notification;
     begin
         DocNotification.Id := DocNotificationId;
-        DocNotification.Recall;
+        DocNotification.Recall();
         DocNotification.Message(Msg);
         DocNotification.Scope(NOTIFICATIONSCOPE::LocalScope);
         DocNotification.SetData('DocNo', DocNo);
         DocNotification.AddAction(OpenCardLbl, Codeunit::"NPR BTF GetOrderResp", ActionName);
-        DocNotification.Send;
+        DocNotification.Send();
     end;
 
     local procedure GetDocumentAlreadyCreatedNotificationId(): Guid
