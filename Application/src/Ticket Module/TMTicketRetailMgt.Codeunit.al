@@ -1,31 +1,5 @@
 codeunit 6060117 "NPR TM Ticket Retail Mgt."
 {
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.09/TSA/20160223  CASE 232952 Refactor or PUSH button implementation
-    // TM1.09/TSA/20160301  CASE 235860 Sell event tickets in POS
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.15/TSA/20160512  CASE 240863 POS Quick Statistics
-    // TM1.15/TSA/20160512  CASE 240864 Cancel Ticket
-    // TM1.16/TSA/20160714  CASE 245004 Handling of ticket notification
-    // TM1.17/TSA/20130913  CASE 252053 Update schedules when the "more info" dialog is displayed
-    // TM1.17/TSA/20160913  CASE 251883 Added SMS as Notification Method
-    // TM1.17/TSA/20160930  CASE 253951 Missing the * between qty and itemnumber in RevokeTicketReservation!, Menuline must be declared VAR in prepush functions
-    // TM1.17/TSA/20160930  CASE 254019 GetRequestToken returns wrong token when receipt is blank,
-    // TM1.17/TSA/20160930  CASE 254019 Make ticket functions work on no sales line - query for ticket number.
-    // TM1.19/TSA/20170217  CASE 266372 Made function IssueTicket from inlined code
-    // TM1.20/TSA/20170323  CASE 269171 POS_CreateRevokeRequest signature change
-    // TM1.21/TSA/20170503  CASE 267611 Allowing quantity change in page AquireTicketAdmissionSchedule
-    // NPR5.32.10/TSA/20170616  CASE 250631 Changed Signature of POS_CreateRevokeRequest
-    // TM1.23/TSA /20170727 CASE 285079 Added LockResources() to RegisterArrival() and NewTicketSalesAdmissionCapture()
-    // TM1.28/TSA /20170727 CASE 284248 PickupPreConfirmedTicket() and 'PICKUP_RESERVATION' switch
-    // TM1.28/TSA /20180220 CASE 305707 Setting ticket item number to ticket request page
-    // TM1.30/TSA /20180420 CASE 310947 When there is no sale line available, item is selected from ticket request instead
-    // TM1.39/TSA /20181109 CASE 335653 Signature change on POS_CreateRevokeRequest
-    // TM1.41/TSA /20190509 CASE 353981 Dynamic ticket schedule price
-    // TM1.42/TSA /20190812 CASE 364739 Incorrect filter when receipt number is empty
-    // TM1.45/TSA /20191203 CASE 380754 Waiting List schedule selection, changed signature on AquireTicketAdmissionSchedule()
-
-
     var
         ABORTED: Label 'Aborted.';
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
@@ -59,7 +33,7 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         Commit();
         ResponseCode := -1;
         ResponseMessage := ABORTED;
-        if (AquireTicketAdmissionSchedule(Token, SaleLinePOS, UpdateSalesLine, ResponseMessage)) then begin //-+TM1.45 [380754]
+        if (AquireTicketAdmissionSchedule(Token, SaleLinePOS, UpdateSalesLine, ResponseMessage)) then begin
             ResponseMessage := '';
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
         end;
@@ -74,7 +48,6 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         end;
 
         exit(false);
-        //-TM1.19 [266372]
     end;
 
     procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
@@ -82,8 +55,8 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketeservationRequest: Page "NPR TM Ticket Make Reserv.";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        AdmissionScheduleMgt: Codeunit "NPR TM Admission Sch. Mgt.";
         NewQuantity: Integer;
         ResolvedByTable: Integer;
         ResultCode: Integer;
@@ -99,18 +72,17 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         TicketReservationRequest.FindSet();
         repeat
             if (TicketReservationRequest."Admission Code" <> '') then
-                TicketManagement.GetCurrentScheduleEntry(TicketReservationRequest."Admission Code", true);
+                AdmissionScheduleMgt.CreateAdmissionSchedule(TicketReservationRequest."Admission Code", false, Today());
         until (TicketReservationRequest.Next() = 0);
         Commit();
 
-        //-#310947 [310947]
         if (not HaveSalesLine) then begin
             // Get the ticket item from token line instead
             if (TicketReservationRequest.FindFirst()) then
                 TicketRequestManager.TranslateBarcodeToItemVariant(TicketReservationRequest."External Item Code", SaleLinePOS."No.", SaleLinePOS."Variant Code", ResolvedByTable);
         end;
-        //+#310947 [310947]
 
+        ResultCode := 0;
         repeat
             Clear(DisplayTicketeservationRequest);
             DisplayTicketeservationRequest.LoadTicketRequest(Token);
@@ -119,13 +91,12 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
             DisplayTicketeservationRequest.LookupMode(true);
             DisplayTicketeservationRequest.Editable(true);
 
-            //-TM1.45 [380754] refactored
             if (ResultCode <> 0) then
                 if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
                     exit(false);
 
             PageAction := DisplayTicketeservationRequest.RunModal();
-            if (PageAction <> ACTION::LookupOK) then begin
+            if (PageAction <> Action::LookupOK) then begin
                 ResponseMessage := ABORTED;
                 exit(false);
             end;
@@ -135,23 +106,15 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
                 ResponseMessage := ''; // Silent error downstream
                 exit(false);
             end;
-        //+TM1.45 [380754]
 
         until (ResultCode = 0);
 
         if (HaveSalesLine) then begin
-            //-TM1.41 [353981]
-            //  IF (DisplayTicketeservationRequest.GetChangedTicketQuantity (NewQuantity)) THEN BEGIN
-            //    SaleLinePOS.VALIDATE (Quantity, NewQuantity);
-            //    SaleLinePOS.MODIFY ();
-            //    Commit();
-            //  END;
             DisplayTicketeservationRequest.GetChangedTicketQuantity(NewQuantity);
             SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
             SaleLinePOS.Validate(Quantity, NewQuantity);
             SaleLinePOS.Modify();
             Commit();
-            //+TM1.41 [353981]
         end;
 
         exit(true);
@@ -204,7 +167,6 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        // assign same schedule to same admission objects
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -212,14 +174,12 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         if (TicketReservationRequest.FindSet()) then begin
             repeat
                 TicketReservationRequest2.Reset();
-                //-TM1.42 [364739]
-                // TicketReservationRequest2.SETFILTER ("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
                 if (TicketReservationRequest."Receipt No." <> '') then begin
                     TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
                 end else begin
                     TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
                 end;
-                //+TM1.42 [364739]
+
                 TicketReservationRequest2.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
                 TicketReservationRequest2.SetFilter("External Adm. Sch. Entry No.", '>%1', 0);
                 if (TicketReservationRequest2.FindLast()) then begin
@@ -237,7 +197,6 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        // assign same notification address
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -245,14 +204,12 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         if (TicketReservationRequest.FindSet()) then begin
             repeat
                 TicketReservationRequest2.Reset();
-                //-TM1.42 [364739]
-                // TicketReservationRequest2.SETFILTER ("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
                 if (TicketReservationRequest."Receipt No." <> '') then begin
                     TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
                 end else begin
                     TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
                 end;
-                //+TM1.42 [364739]
+
                 TicketReservationRequest2.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
                 TicketReservationRequest2.SetFilter("Notification Address", '<>%1', '');
                 if (TicketReservationRequest2.FindLast()) then begin

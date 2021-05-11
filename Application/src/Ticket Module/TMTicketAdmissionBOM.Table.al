@@ -66,6 +66,14 @@ table 6060121 "NPR TM Ticket Admission BOM"
             MaxValue = 100;
             MinValue = 0;
         }
+        field(21; "Ticket Schedule Selection"; Option)
+        {
+            Caption = 'Ticket Schedule Selection';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Same As Admission,Today,Next Available,Schedule Entry Required,None';
+            OptionMembers = ADMISSION,TODAY,NEXT_AVAILABLE,SCHEDULE_ENTRY,"NONE";
+            InitValue = ADMISSION;
+        }
         field(30; "Reschedule Policy"; Option)
         {
             Caption = 'Reschedule Policy';

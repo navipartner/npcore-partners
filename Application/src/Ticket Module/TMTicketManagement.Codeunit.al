@@ -429,6 +429,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         MaxCapacity: Integer;
         CapacityControl: Option;
+        ScheduleSelection: Option;
         ResponseMessage: Text;
         ResponseCode: Integer;
     begin
@@ -439,12 +440,13 @@ codeunit 6059784 "NPR TM Ticket Management"
         Admission.Get(AdmissionCode);
         TicketType.Get(Ticket."Ticket Type Code");
 
+
         if (AdmissionSchEntry."Entry No." <= 0) then begin
-            case Admission."Default Schedule" of
+            case GetAdmissionSchedule(Ticket."Item No.", Ticket."Variant Code", AdmissionCode) of
                 Admission."Default Schedule"::TODAY,
               Admission."Default Schedule"::NEXT_AVAILABLE:
 
-                    if (not AdmissionSchEntry.Get(GetCurrentScheduleEntry(Admission."Admission Code", true))) then
+                    if (not AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", true))) then
                         RaiseError(StrSubstNo(NO_DEFAULT_SCHEDULE, Admission."Admission Code", Admission.FieldCaption("Default Schedule"), Admission."Default Schedule"), NO_DEFAULT_SCHEDULE_NO);
             end;
         end else begin
@@ -475,7 +477,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         DetailedTicketAccessEntry.Insert(true);
 
         if (Admission.Type = Admission.Type::OCCASION) then begin
-            RegisterReservation_Worker(TicketAccessEntry."Entry No.", AdmissionSchEntry."Entry No.");
+            RegisterReservation_Worker(Ticket, TicketAccessEntry."Entry No.", AdmissionSchEntry."Entry No.");
             ValidateReservationCapacityExceeded(Ticket, AdmissionSchEntry);
         end;
 
@@ -550,7 +552,7 @@ codeunit 6059784 "NPR TM Ticket Management"
             OldDetTicketAccessEntry.FindLast();
 
             OldDetTicketAccessEntry.Type := OldDetTicketAccessEntry.Type::CANCELED_RESERVATION;
-            OldDetTicketAccessEntry."Closed By Entry No." := RegisterReservation_Worker(TicketAccessEntry."Entry No.", NewAdmissionScheduleEntry."Entry No.");
+            OldDetTicketAccessEntry."Closed By Entry No." := RegisterReservation_Worker(Ticket, TicketAccessEntry."Entry No.", NewAdmissionScheduleEntry."Entry No.");
             OldDetTicketAccessEntry.Open := false;
             OldDetTicketAccessEntry.Modify();
 
@@ -1119,7 +1121,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
             end else begin
                 // Get the current admission schedule
-                AdmissionScheduleEntryNo := GetCurrentScheduleEntry(AdmissionCode, true);
+                AdmissionScheduleEntryNo := GetCurrentScheduleEntry(Ticket, AdmissionCode, true);
                 if (not AdmissionSchEntry.Get(AdmissionScheduleEntryNo)) then
                     RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, Today), ADM_NOT_OPEN_NO2);
             end;
@@ -1310,6 +1312,32 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         exit(IsValid);
 
+    end;
+
+    procedure GetAdmissionSchedule(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]): Option
+    var
+        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+    begin
+        if (not Admission.Get(AdmissionCode)) then
+            exit(Admission."Default Schedule"::NONE);
+
+        if (TicketAdmissionBOM.Get(ItemNo, VariantCode, AdmissionCode)) then begin
+            case TicketAdmissionBom."Ticket Schedule Selection" of
+                TicketAdmissionBom."Ticket Schedule Selection"::ADMISSION:
+                    exit(Admission."Default Schedule");
+                TicketAdmissionBom."Ticket Schedule Selection"::TODAY:
+                    exit(Admission."Default Schedule"::TODAY);
+                TicketAdmissionBom."Ticket Schedule Selection"::NEXT_AVAILABLE:
+                    exit(Admission."Default Schedule"::NEXT_AVAILABLE);
+                TicketAdmissionBom."Ticket Schedule Selection"::SCHEDULE_ENTRY:
+                    exit(Admission."Default Schedule"::SCHEDULE_ENTRY);
+                TicketAdmissionBom."Ticket Schedule Selection"::"NONE":
+                    exit(Admission."Default Schedule"::"NONE")
+            end;
+        end;
+
+        exit(Admission."Default Schedule");
     end;
 
     local procedure GetDefaultAdmissionCode(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
@@ -1520,7 +1548,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         CloseReservationEntry(AdmittedTicketAccessEntry);
     end;
 
-    local procedure RegisterReservation_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer): Integer
+    local procedure RegisterReservation_Worker(Ticket: Record "NPR TM Ticket"; TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer): Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         ReservationTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1529,9 +1557,8 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
 
         TicketAccessEntry.Get(TicketAccessEntryNo);
-        Admission.Get(TicketAccessEntry."Admission Code");
-        if (Admission."Default Schedule" = Admission."Default Schedule"::NONE) then
-            exit;
+        if (Admission."Default Schedule"::NONE = GetAdmissionSchedule(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then
+            exit(0);
 
         if (not AdmissionScheduleEntry.Get(TicketAdmissionSchEntryNo)) then
             Error(NO_SCHEDULE_FOR_ADM, TicketAccessEntry."Admission Code");
@@ -1810,20 +1837,22 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(DetailedTicketAccessEntry.FindFirst());
     end;
 
-    procedure GetCurrentScheduleEntry(AdmissionCode: Code[20]; WithCreate: Boolean): Integer
+    procedure GetCurrentScheduleEntry(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
+    begin
+        exit(GetCurrentScheduleEntry(Ticket."Item No.", Ticket."Variant Code", AdmissionCode, WithCreate));
+    end;
+
+    procedure GetCurrentScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
     begin
 
-        Admission.Get(AdmissionCode);
-
         Clear(AdmissionScheduleEntry);
-        if (GetAdmScheduleEntry(AdmissionCode, Today, Time, AdmissionScheduleEntry, WithCreate)) then
+        if (GetAdmScheduleEntry(ItemNo, VariantCode, AdmissionCode, Today, Time, AdmissionScheduleEntry, WithCreate)) then
             exit(AdmissionScheduleEntry."Entry No.");
 
-        if (Admission."Default Schedule" = Admission."Default Schedule"::NEXT_AVAILABLE) then begin
-
+        if (Admission."Default Schedule"::NEXT_AVAILABLE = GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode)) then begin
             AdmissionScheduleEntry.Reset();
             AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
@@ -1836,7 +1865,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(0);
     end;
 
-    local procedure GetAdmScheduleEntry(AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean): Boolean
+    local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[20]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean): Boolean
     var
         Admission: Record "NPR TM Admission";
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -1913,7 +1942,7 @@ codeunit 6059784 "NPR TM Ticket Management"
             if (CurrentAdmissionEntryNo <> 0) then
                 exit(AdmissionSchEntry.Get(CurrentAdmissionEntryNo));
 
-            case Admission."Default Schedule" of
+            case GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode) of
                 Admission."Default Schedule"::TODAY:
                     if ((NextAdmissionEntryNo <> 0) and (AdmissionDate = Today)) then // not open yet, add a grace period here?
                         exit(AdmissionSchEntry.Get(NextAdmissionEntryNo));
@@ -2083,7 +2112,8 @@ codeunit 6059784 "NPR TM Ticket Management"
                 exit(false);
         end;
 
-        if (IsReservation) or (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
+        //if (IsReservation) or (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
+        if (IsReservation) or (Admission."Default Schedule"::SCHEDULE_ENTRY = GetAdmissionSchedule(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code")) then begin
             // when we pass arrival until time, we cant sell this time slot.
             if ((AdmissionScheduleEntry."Admission Start Date" = ReferenceDate) and (ReferenceTime > AdmissionScheduleEntry."Event Arrival Until Time")) then
                 exit(false);
