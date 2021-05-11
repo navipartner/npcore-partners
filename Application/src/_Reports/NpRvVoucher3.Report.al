@@ -156,8 +156,7 @@ report 6151015 "NPR NpRv Voucher 3"
             var
                 Language: Codeunit Language;
             begin
-                CurrReport.Language := Language.GetLanguageID("Language Code");
-
+                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
                 Evaluate(IssuedDate, Format("NpRv Voucher"."Issue Date"));
