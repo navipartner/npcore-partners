@@ -80,17 +80,6 @@ table 6150617 "NPR POS Payment Bin"
             OptionCaption = 'Cash Drawer,Bank,Safe,Virtual';
             OptionMembers = CASH_DRAWER,BANK,SAFE,VIRTUAL;
         }
-
-        /// <summary>
-        /// Contains timestamp for the purposes of optimizing paging during lookup operations from POS.
-        /// </summary>
-        field(50; Timestamp; BigInteger)
-        {
-            Caption = 'Timestamp';
-            DataClassification = SystemMetadata;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Front-end caching strategy is abandoned, NST should do the heavy lifting here.';
-        }
     }
 
     keys
