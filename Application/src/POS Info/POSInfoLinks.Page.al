@@ -1,7 +1,5 @@
 page 6150643 "NPR POS Info Links"
 {
-    // NPR5.26/OSFI/20160810 CASE 246167 Object Created
-
     Caption = 'POS Info Links';
     PageType = List;
     UsageCategory = Administration;
@@ -19,18 +17,18 @@ page 6150643 "NPR POS Info Links"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Info Code field';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.CalcFields("POS Info Description");
+                    end;
                 }
-                field("When to Use"; Rec."When to Use")
+                field("POS Info Description"; Rec."POS Info Description")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the When to Use field';
+                    ToolTip = 'Specifies the value of the POS Info Description field';
                 }
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

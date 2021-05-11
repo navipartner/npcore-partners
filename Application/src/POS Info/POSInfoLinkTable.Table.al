@@ -1,7 +1,5 @@
 table 6150642 "NPR POS Info Link Table"
 {
-    // NPR5.26/OSFI/20160810 CASE 246167 Object Created
-
     Caption = 'POS Info Link Table';
     DataClassification = CustomerContent;
 
@@ -29,6 +27,15 @@ table 6150642 "NPR POS Info Link Table"
             DataClassification = CustomerContent;
             OptionCaption = 'Always,Negative,Positive';
             OptionMembers = Always,Negative,Positive;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
+        }
+        field(20; "POS Info Description"; Text[50])
+        {
+            Caption = 'POS Info Description';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR POS Info".Description where(Code = field("POS Info Code")));
         }
     }
 
@@ -38,9 +45,4 @@ table 6150642 "NPR POS Info Link Table"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

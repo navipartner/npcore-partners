@@ -115,12 +115,12 @@
         if POSInfoLinkTable.FindSet() then
             repeat
                 POSInfo.Get(POSInfoLinkTable."POS Info Code");
-                ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope);
-
-                TempPOSInfoTransaction.Init();
-                TempPOSInfoTransaction.CopyFromPOSInfo(POSInfo);
-                TempPOSInfoTransaction."POS Info" := CopyStr(GetPosInfoOutput(POSInfo, UserInputString), 1, MaxStrLen(TempPOSInfoTransaction."POS Info"));
-                TempPOSInfoTransaction.Insert(true);
+                if ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope) then begin
+                    TempPOSInfoTransaction.Init();
+                    TempPOSInfoTransaction.CopyFromPOSInfo(POSInfo);
+                    TempPOSInfoTransaction."POS Info" := CopyStr(GetPosInfoOutput(POSInfo, UserInputString), 1, MaxStrLen(TempPOSInfoTransaction."POS Info"));
+                    TempPOSInfoTransaction.Insert();
+                end;
             until POSInfoLinkTable.Next() = 0;
 
         FrontEndUpdateIsNeeded := false;
@@ -142,7 +142,8 @@
         POSInfo.Get(pPOSInfoCode);
         CheckAndAdjustApplicationScope(pSaleLinePos, POSInfo, pApplicScope);
         if not pClearInfo then
-            ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope);
+            if not ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope) then
+                exit;
 
         POSInfoTransParam.Init();
         POSInfoTransParam.CopyFromPOSInfo(POSInfo);
@@ -181,7 +182,7 @@
             Error('');
     end;
 
-    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
+    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask): Boolean
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
         Confirmed: Boolean;
@@ -191,8 +192,7 @@
         Confirmed := POSInfoTransaction.IsEmpty();
         if not Confirmed then
             Confirmed := Confirm(StrSubstNo(ConfirmOverwriteQst, POSInfo.Code), true);
-        if not Confirmed then
-            Error('');
+        exit(Confirmed);
     end;
 
     local procedure SetPosInfoTransactionFilters(var POSInfoTransaction: Record "NPR POS Info Transaction"; pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
@@ -283,22 +283,18 @@
             SaleLinePos2.SetRange("Sale Type", pSaleLinePos."Sale Type");
             if pApplicScope = pApplicScope::"Current Line" then
                 SaleLinePos2.SetRange("Line No.", pSaleLinePos."Line No.");
-            if SaleLinePos2.FindSet() then
+            if SaleLinePos2.FindSet() then begin
                 repeat
                     SaleLinePosTmp := SaleLinePos2;
                     SaleLinePosTmp.Insert();
                 until SaleLinePos2.Next() = 0;
+            end else
+                if (pApplicScope = pApplicScope::"Current Line") and (pSaleLinePos."Line No." <> 0) then
+                    InsertTempSaleLine(SaleLinePosTmp, pSaleLinePos, pSaleLinePos."Line No.");
         end;
-        if POSInfoTransParam."Once per Transaction" or (pApplicScope in [pApplicScope::"All Lines", pApplicScope::"New Lines"]) then begin
-            SaleLinePosTmp.Init();
-            SaleLinePosTmp."Register No." := pSaleLinePos."Register No.";
-            SaleLinePosTmp."Sales Ticket No." := pSaleLinePos."Sales Ticket No.";
-            SaleLinePosTmp.Date := pSaleLinePos.Date;
-            SaleLinePosTmp."Sale Type" := pSaleLinePos."Sale Type";
-            SaleLinePosTmp.Type := SaleLinePosTmp.Type::Item;
-            SaleLinePosTmp."Line No." := 0;
-            SaleLinePosTmp.Insert();
-        end;
+        if POSInfoTransParam."Once per Transaction" or (pApplicScope in [pApplicScope::"All Lines", pApplicScope::"New Lines"]) then
+            InsertTempSaleLine(SaleLinePosTmp, pSaleLinePos, 0);
+
         POSInfo.Get(POSInfoTransParam."POS Info Code");
         SetPosInfoTransactionFilters(POSInfoTransaction, pSaleLinePos, POSInfo, pApplicScope);
         if SaleLinePosTmp.FindSet() then
@@ -331,6 +327,21 @@
             until SaleLinePosTmp.Next() = 0;
     end;
 
+    local procedure InsertTempSaleLine(var ToSaleLinePos: Record "NPR POS Sale Line"; pSaleLinePos: Record "NPR POS Sale Line"; LineNo: Integer)
+    begin
+        if not ToSaleLinePos.IsTemporary then
+            Exit;
+
+        ToSaleLinePos.Init();
+        ToSaleLinePos."Register No." := pSaleLinePos."Register No.";
+        ToSaleLinePos."Sales Ticket No." := pSaleLinePos."Sales Ticket No.";
+        ToSaleLinePos.Date := pSaleLinePos.Date;
+        ToSaleLinePos."Sale Type" := pSaleLinePos."Sale Type";
+        ToSaleLinePos.Type := ToSaleLinePos.Type::Item;
+        ToSaleLinePos."Line No." := LineNo;
+        ToSaleLinePos.Insert();
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnAfterDebitSalePostEvent', '', true, true)]
     local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     begin
@@ -354,7 +365,7 @@
         POSInfoTransaction.DeleteAll();
     end;
 
-    procedure DeleteLine(SaleLinePOS: Record "NPR POS Sale Line")
+    procedure DeleteLine(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
     begin
