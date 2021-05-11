@@ -174,7 +174,7 @@
     begin
     end;
 
-    procedure CalcLineDiscAmount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; BatchQty: Decimal; TotalQty: Decimal; TotalVATAmount: Decimal; TotalAmount: Decimal; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) LineDiscAmount: Decimal
+    procedure CalcLineDiscAmount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; BatchQty: Decimal; TotalQty: Decimal; TotalVATAmount: Decimal; TotalAmount: Decimal; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; InvQtyDict: Dictionary of [Guid, Decimal]) LineDiscAmount: Decimal
     var
         TotalAmountAfterDisc: Decimal;
         AvgDiscPct: Decimal;
@@ -209,14 +209,13 @@
             TempMixedDiscount."Discount Type"::"Priority Discount per Min. Qty":
                 begin
                     AvgDiscPct := TempMixedDiscount."Item Discount %" / 100;
-                    LineDiscAmount := TempSaleLinePOSApply."Unit Price" * TempSaleLinePOSApply."Invoice (Qty)" * AvgDiscPct;
+                    LineDiscAmount := TempSaleLinePOSApply."Unit Price" * InvQtyDict.Get(TempSaleLinePOSApply.SystemId) * AvgDiscPct;
                 end;
         end;
         if TempMixedDiscount.Lot then begin
-            TempMixedDiscountLine.Get(TempSaleLinePOSApply."Discount Code", TempSaleLinePOSApply."Sales Document Type", TempSaleLinePOSApply."Sales Document No.", TempSaleLinePOSApply."Retail Document No.");
+            TempMixedDiscountLine.Get(TempSaleLinePOSApply."Discount Code", TempSaleLinePOSApply."Sales Document Type", TempSaleLinePOSApply."Sales Document No.", TempSaleLinePOSApply."Variant Code");
             if TempMixedDiscountLine.Quantity = 0 then
                 exit(0);
-            //LineDiscAmount := LineDiscAmount * (TempSaleLinePOSApply."MR Anvendt antal" / TempMixedDiscountLine.Quantity);
         end;
 
         LineDiscAmount := Round(LineDiscAmount, GLSetup."Amount Rounding Precision");
@@ -491,7 +490,7 @@
     begin
     end;
 
-    local procedure AdjustBatchQty(var BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary)
+    local procedure AdjustBatchQty(var BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal])
     var
         TempSaleLinePOSApplyCopy: Record "NPR POS Sale Line" temporary;
         TempSaleLinePOSApplyNew: Record "NPR POS Sale Line" temporary;
@@ -521,12 +520,12 @@
             TempSaleLinePOSApplyCopy.SetRange("Discount Code");
             if TempMixedDiscount.Lot then
                 QtyToApply := Round(TempMixedDiscountLine.Quantity * BatchQty, 0.00001);
-            AdjustBatchQtyItems(BatchQty, QtyToApply, TempMixedDiscountLine, TempSaleLinePOSApplyCopy, TempSaleLinePOSApplyNew);
+            AdjustBatchQtyItems(BatchQty, QtyToApply, TempMixedDiscountLine, TempSaleLinePOSApplyCopy, TempSaleLinePOSApplyNew, InvQtyDict);
         until TempMixedDiscountLine.Next() = 0;
         TempSaleLinePOSApply.Copy(TempSaleLinePOSApplyNew, true);
     end;
 
-    local procedure AdjustBatchQtyItems(BatchQty: Decimal; var QtyToApply: Decimal; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApplyCopy: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApplyNew: Record "NPR POS Sale Line" temporary)
+    local procedure AdjustBatchQtyItems(BatchQty: Decimal; var QtyToApply: Decimal; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApplyCopy: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApplyNew: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal])
     var
         AppliedQty: Decimal;
     begin
@@ -546,9 +545,10 @@
                     if TempSaleLinePOSApplyNew.Quantity > QtyToApply then
                         TempSaleLinePOSApplyNew."MR Anvendt antal" -= TempSaleLinePOSApplyNew.Quantity - QtyToApply;
                 end;
-                TempSaleLinePOSApplyNew."Invoice (Qty)" := TempSaleLinePOSApplyNew."MR Anvendt antal";
                 TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal";
                 TempSaleLinePOSApplyNew.Insert();
+
+                InvQtyDict.Set(TempSaleLinePOSApplyCopy.SystemId, TempSaleLinePOSApplyNew."MR Anvendt antal");
 
                 QtyToApply -= TempSaleLinePOSApplyCopy."MR Anvendt antal";
             end;
@@ -556,7 +556,7 @@
         until TempSaleLinePOSApplyCopy.Next() = 0;
     end;
 
-    local procedure AdjustDiscQty(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary)
+    local procedure AdjustDiscQty(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal])
     var
         TempSaleLinePOSApplyCopy: Record "NPR POS Sale Line" temporary;
         TempSaleLinePOSApplyNew: Record "NPR POS Sale Line" temporary;
@@ -576,19 +576,18 @@
 
         TempSaleLinePOSApply.FindSet();
         repeat
-            AdjustDiscQtyItems(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempPriorityBufferHigh, TempSaleLinePOSApply);
+            AdjustDiscQtyItems(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempPriorityBufferHigh, TempSaleLinePOSApply, InvQtyDict);
         until TempSaleLinePOSApply.Next() = 0;
     end;
 
-    local procedure AdjustDiscQtyItems(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempPriorityBufferHigh: Record "NPR Mixed Disc. Prio. Buffer" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary)
+    local procedure AdjustDiscQtyItems(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempPriorityBufferHigh: Record "NPR Mixed Disc. Prio. Buffer" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal])
     var
         DiscQty: Decimal;
         Priority: Decimal;
     begin
         Priority := FindPriority(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply);
         if (not TempPriorityBufferHigh.Get(Priority, TempSaleLinePOSApply."Unit Price", TempSaleLinePOSApply."No.", TempSaleLinePOSApply."Variant Code")) or (TempPriorityBufferHigh.Quantity <= 0) then begin
-            TempSaleLinePOSApply."Invoice (Qty)" := 0;
-            TempSaleLinePOSApply.Modify();
+            InvQtyDict.Set(TempSaleLinePOSApply.SystemId, 0);
             exit;
         end;
 
@@ -602,37 +601,37 @@
         else
             TempPriorityBufferHigh.Delete();
 
-        TempSaleLinePOSApply."Invoice (Qty)" := DiscQty;
-        TempSaleLinePOSApply.Modify();
+        InvQtyDict.Set(TempSaleLinePOSApply.SystemId, DiscQty);
     end;
 
     local procedure ApplyMixDiscount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) TotalDiscAmount: Decimal
     var
         TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary;
+        InvQtyDict: Dictionary of [Guid, Decimal];
         TotalAmount: Decimal;
         BatchQty: Decimal;
         LastLineNo: Integer;
     begin
         TempSaleLinePOSApply.DeleteAll();
-        BatchQty := FindLinesToApply(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply);
+        BatchQty := FindLinesToApply(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply, InvQtyDict);
         if BatchQty < 1 then
             exit(0);
 
-        AdjustBatchQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply);
-        AdjustDiscQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply);
+        AdjustBatchQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply, InvQtyDict);
+        AdjustDiscQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply, InvQtyDict);
         Clear(TempSaleLinePOS);
         if TempSaleLinePOS.FindLast() then
             LastLineNo := TempSaleLinePOS."Line No.";
         if TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Multiple Discount Levels" then
-            TotalDiscAmount := ApplylMultiLevelMixDiscountOnLines(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, LastLineNo)
+            TotalDiscAmount := ApplylMultiLevelMixDiscountOnLines(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, LastLineNo, InvQtyDict)
         else
-            TotalDiscAmount := ApplyMixDiscountOnLines(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply);
-        TransferAppliedDiscountToSale(TempSaleLinePOSApply, TempSaleLinePOS, LastLineNo);
+            TotalDiscAmount := ApplyMixDiscountOnLines(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply, InvQtyDict);
+        TransferAppliedDiscountToSale(TempSaleLinePOSApply, TempSaleLinePOS, LastLineNo, InvQtyDict);
 
         exit(TotalDiscAmount);
     end;
 
-    local procedure ApplyMixDiscountOnLines(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) TotalDiscAmount: Decimal
+    local procedure ApplyMixDiscountOnLines(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; InvQtyDict: Dictionary of [Guid, Decimal]) TotalDiscAmount: Decimal
     var
         TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary;
         AppliedDiscAmount: Decimal;
@@ -654,7 +653,7 @@
             TempSaleLinePOSApply."Discount Type" := TempSaleLinePOSApply."Discount Type"::Mix;
             TempSaleLinePOSApply."Discount Code" := TempMixedDiscount.Code;
             TempSaleLinePOSApply."Custom Disc Blocked" := TempMixedDiscount."Block Custom Discount";
-            LineDiscAmount := CalcLineDiscAmount(TempMixedDiscount, TempMixedDiscountLine, BatchQty, TotalQty, TotalVATAmount, TotalAmount, TempSaleLinePOSApply);
+            LineDiscAmount := CalcLineDiscAmount(TempMixedDiscount, TempMixedDiscountLine, BatchQty, TotalQty, TotalVATAmount, TotalAmount, TempSaleLinePOSApply, InvQtyDict);
             if AmountExclVat(TempMixedDiscount) then
                 TempSaleLinePOSApply."Discount Amount" := LineDiscAmount * (1 + TempSaleLinePOSApply."VAT %" / 100)
             else
@@ -676,7 +675,7 @@
         exit(TotalDiscAmount);
     end;
 
-    local procedure ApplylMultiLevelMixDiscountOnLines(var SaleLinePOSApply: Record "NPR POS Sale Line"; MixedDiscount: Record "NPR Mixed Discount"; var MixedDiscountLine: Record "NPR Mixed Discount Line"; var LastLineNo: Integer): Decimal
+    local procedure ApplylMultiLevelMixDiscountOnLines(var SaleLinePOSApply: Record "NPR POS Sale Line"; MixedDiscount: Record "NPR Mixed Discount"; var MixedDiscountLine: Record "NPR Mixed Discount Line"; var LastLineNo: Integer; var InvQtyDict: Dictionary of [Guid, Decimal]): Decimal
     var
         MixedDiscountLevelTmp: Record "NPR Mixed Discount Level" temporary;
         PriorityBufferTmp: Record "NPR Mixed Disc. Prio. Buffer" temporary;
@@ -739,7 +738,6 @@
                                     InsertReminderLine := true;
                                 end;
 
-                                SaleLinePOSApply."Invoice (Qty)" := SaleLinePOSApply."MR Anvendt antal";
                                 SaleLinePOSApply."Discount Type" := SaleLinePOSApply."Discount Type"::Mix;
                                 SaleLinePOSApply."Discount Code" := MixedDiscount.Code;
                                 SaleLinePOSApply."Custom Disc Blocked" := MixedDiscount."Block Custom Discount";
@@ -747,6 +745,8 @@
                                   CalcLineMultiLevelDiscAmount(MixedDiscount, MixedDiscountLevelTmp, SaleLinePOSApply, SaleLinePOSApply."MR Anvendt antal", RemainderAmt);
                                 SaleLinePOSApply."Discount Amount" := Round(LineDiscountAmt, 0.01);
                                 SaleLinePOSApply.Modify();
+
+                                InvQtyDict.Set(SaleLinePOSApply.SystemId, SaleLinePOSApply."MR Anvendt antal");
 
                                 TotalAppliedDiscountAmt += SaleLinePOSApply."Discount Amount";
                                 RemainderAmt := LineDiscountAmt - SaleLinePOSApply."Discount Amount";
@@ -756,7 +756,8 @@
                                       SaleLinePOSApply, SaleLinePOSApply2, SaleLinePOSApply2.Quantity, SaleLinePOSApply2."Discount Type"::Mix, SaleLinePOSApply2."Discount Code", LastLineNo);
 
                                     SaleLinePOSApply."MR Anvendt antal" := SaleLinePOSApply2."MR Anvendt antal";
-                                    SaleLinePOSApply."Invoice (Qty)" := 0;
+                                    InvQtyDict.Set(SaleLinePOSApply.SystemId, 0);
+
                                     if not SaleLinePOSApply."Price Includes VAT" and
                                         (SaleLinePOSApply.Amount <> 0) and
                                         (SaleLinePOSApply.Amount <> SaleLinePOSApply."Amount Including VAT")
@@ -813,7 +814,7 @@
         exit(not TempSaleLinePOS.IsEmpty());
     end;
 
-    local procedure FindLinesToApply(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) BatchQty: Decimal
+    local procedure FindLinesToApply(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal]) BatchQty: Decimal
     var
         TempMixedDiscount2: Record "NPR Mixed Discount";
         AppliedQty: Decimal;
@@ -824,14 +825,14 @@
             TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::"Combination Part":
                 begin
                     if TempMixedDiscount.Lot then
-                        BatchQty := FindLinesToApplyLot(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply)
+                        BatchQty := FindLinesToApplyLot(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply, InvQtyDict)
                     else
-                        BatchQty := FindLinesToApplyTotalQty(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply);
+                        BatchQty := FindLinesToApplyTotalQty(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply, InvQtyDict);
                     exit(BatchQty);
                 end;
             TempMixedDiscount."Mix Type"::Combination:
                 begin
-                    BatchQty := FindLinesToApplyCombination(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply);
+                    BatchQty := FindLinesToApplyCombination(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply, InvQtyDict);
                     exit(BatchQty);
                 end;
         end;
@@ -839,7 +840,7 @@
         exit(0);
     end;
 
-    local procedure FindLinesToApplyCombination(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) BatchQty: Decimal
+    local procedure FindLinesToApplyCombination(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal]) BatchQty: Decimal
     var
         TempMixedDiscountLine2: Record "NPR Mixed Discount Line" temporary;
         TempMixedDiscount2: Record "NPR Mixed Discount" temporary;
@@ -859,7 +860,7 @@
         TempMixedDiscountLine2.FindSet();
         repeat
             TempMixedDiscount2.Get(TempMixedDiscountLine2."No.");
-            FindLinesToApply(TempMixedDiscount2, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply);
+            FindLinesToApply(TempMixedDiscount2, TempMixedDiscountLine, TempSaleLinePOS, TempSaleLinePOSApply, InvQtyDict);
         until TempMixedDiscountLine2.Next() = 0;
 
         MinQty := TempMixedDiscount.CalcMinQty();
@@ -872,7 +873,7 @@
         exit(BatchQty);
     end;
 
-    local procedure FindLinesToApplyLot(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) BatchQty: Decimal
+    local procedure FindLinesToApplyLot(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDisc: Dictionary of [Guid, Decimal]) BatchQty: Decimal
     var
         AppliedQty: Decimal;
         LastBatchQty: Decimal;
@@ -894,7 +895,7 @@
             if TempMixedDiscountLine.Quantity <= 0 then
                 exit(0);
 
-            AppliedQty := TransferLinesToApply(TempMixedDiscount, TempMixedDiscountLine, 0, TempSaleLinePOS, TempSaleLinePOSApply);
+            AppliedQty := TransferLinesToApply(TempMixedDiscount, TempMixedDiscountLine, 0, TempSaleLinePOS, TempSaleLinePOSApply, InvQtyDisc);
 
             LastBatchQty := AppliedQty div TempMixedDiscountLine.Quantity;
             if (LastBatchQty < BatchQty) or (BatchQty = -1) then
@@ -904,7 +905,7 @@
         exit(BatchQty);
     end;
 
-    local procedure FindLinesToApplyTotalQty(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) BatchQty: Decimal
+    local procedure FindLinesToApplyTotalQty(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal]) BatchQty: Decimal
     var
         AppliedQty: Decimal;
         MaxQtyToApply: Decimal;
@@ -927,7 +928,7 @@
         MaxQtyToApply := TempMixedDiscount."Max. Quantity";
         TempMixedDiscountLine.FindSet();
         repeat
-            AppliedQty += TransferLinesToApply(TempMixedDiscount, TempMixedDiscountLine, MaxQtyToApply, TempSaleLinePOS, TempSaleLinePOSApply);
+            AppliedQty += TransferLinesToApply(TempMixedDiscount, TempMixedDiscountLine, MaxQtyToApply, TempSaleLinePOS, TempSaleLinePOSApply, InvQtyDict);
             if TempMixedDiscount."Max. Quantity" > 0 then begin
                 MaxQtyToApply := TempMixedDiscount."Max. Quantity" - AppliedQty;
                 if MaxQtyToApply <= 0 then
@@ -958,7 +959,7 @@
         exit(HighestPriority);
     end;
 
-    local procedure TransferLinesToApply(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; MaxQtyToApply: Decimal; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary) AppliedQty: Decimal
+    local procedure TransferLinesToApply(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; MaxQtyToApply: Decimal; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDisc: Dictionary of [Guid, Decimal]) AppliedQty: Decimal
     begin
         if not FilterSaleLinePOS(TempMixedDiscountLine, TempSaleLinePOS) then
             exit(0);
@@ -974,7 +975,7 @@
                 TempSaleLinePOSApply."Discount Code" := TempMixedDiscountLine.Code;
                 TempSaleLinePOSApply."Sales Document Type" := TempMixedDiscountLine."Disc. Grouping Type";
                 TempSaleLinePOSApply."Sales Document No." := TempMixedDiscountLine."No.";
-                TempSaleLinePOSApply."Retail Document No." := TempMixedDiscountLine."Variant Code";
+                TempSaleLinePOSApply."Variant Code" := TempMixedDiscountLine."Variant Code";
 
                 TempSaleLinePOSApply."Quantity (Base)" := TempMixedDiscountLine.Quantity;
                 TempSaleLinePOSApply.Insert();
@@ -984,12 +985,12 @@
                     TempSaleLinePOSApply."MR Anvendt antal" := MaxQtyToApply - AppliedQty;
                     TempSaleLinePOS.FindLast();
                 end;
-                TempSaleLinePOSApply."Invoice (Qty)" := TempSaleLinePOSApply."MR Anvendt antal";
                 TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price";
                 TempSaleLinePOSApply."VAT Base Amount" := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."Amount Including VAT" / (1 + TempSaleLinePOSApply."VAT %" / 100);
                 TempSaleLinePOSApply.Amount := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."VAT Base Amount";
                 TempSaleLinePOSApply.Modify();
 
+                InvQtyDisc.Add(TempSaleLinePOSApply.SystemId, TempSaleLinePOSApply."MR Anvendt antal");
                 AppliedQty += TempSaleLinePOSApply."MR Anvendt antal";
             end;
         until TempSaleLinePOS.Next() = 0;
@@ -997,12 +998,13 @@
         exit(AppliedQty);
     end;
 
-    local procedure TransferAppliedDiscountToSale(var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; LastLineNo: Integer)
+    local procedure TransferAppliedDiscountToSale(var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; LastLineNo: Integer; InvQtyDict: Dictionary of [Guid, Decimal])
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         RemainingQty: Decimal;
         NonDiscQty: Decimal;
+        InvQty: Decimal;
     begin
         if TempSaleLinePOSApply.IsEmpty then
             exit;
@@ -1018,10 +1020,11 @@
             RemainingQty := TempSaleLinePOSApply.Quantity - TempSaleLinePOSApply."MR Anvendt antal";  //need this for "Multiple Discount Levels" type of discounts
             TempSaleLinePOS.Validate(Quantity, TempSaleLinePOSApply."MR Anvendt antal");
             NonDiscQty := 0;
-            if TempSaleLinePOSApply."Invoice (Qty)" > 0 then begin
-                NonDiscQty := TempSaleLinePOSApply."MR Anvendt antal" - TempSaleLinePOSApply."Invoice (Qty)";
-                if TempSaleLinePOS.Quantity <> TempSaleLinePOSApply."Invoice (Qty)" then
-                    TempSaleLinePOS.Validate(Quantity, TempSaleLinePOSApply."Invoice (Qty)");
+            InvQty := InvQtyDict.Get(TempSaleLinePOSApply.SystemId);
+            if InvQty > 0 then begin
+                NonDiscQty := TempSaleLinePOSApply."MR Anvendt antal" - InvQty;
+                if TempSaleLinePOS.Quantity <> InvQty then
+                    TempSaleLinePOS.Validate(Quantity, InvQty);
             end;
             TempSaleLinePOS."Discount Type" := TempSaleLinePOSApply."Discount Type";
             TempSaleLinePOS."Discount Code" := TempSaleLinePOSApply."Discount Code";
@@ -1048,7 +1051,8 @@
         SaleLinePOS := FromSaleLinePOS;
         SaleLinePOS."Sales Document Type" := SaleLinePOS2."Sales Document Type";
         SaleLinePOS."Sales Document No." := SaleLinePOS2."Sales Document No.";
-        SaleLinePOS."Retail Document No." := SaleLinePOS2."Retail Document No.";
+        if SaleLinePOS.IsTemporary() then
+            SaleLinePOS."Variant Code" := SaleLinePOS2."Variant Code";
         SaleLinePOS."Line No." := LastLineNo + 10000;
         SaleLinePOS.Validate(Quantity, Qty);
         SaleLinePOS."Discount Type" := DiscountType;

@@ -234,7 +234,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Invoice (Qty)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'No longer used except as dummy field.';
         }
         field(14; "To Ship (Qty)"; Decimal)
@@ -856,7 +856,7 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Retail Document No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'No longer used except as dummy field.';
         }
         field(140; "Sales Document Type"; Enum "Sales Document Type")
