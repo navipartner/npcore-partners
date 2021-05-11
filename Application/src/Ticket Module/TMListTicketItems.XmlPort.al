@@ -170,6 +170,27 @@ xmlport 6060112 "NPR TM List Ticket Items"
                                     end;
                                 }
 
+                                textelement(ticket_schedule)
+                                {
+                                    XmlName = 'ticket_schedule_selection';
+                                    textattribute(ticket_schedule_id)
+                                    {
+                                        XmlName = 'option_value';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+
+                                            ticket_schedule_id := Format(TicketBomResponse."Ticket Schedule Selection", 0, 9);
+                                        end;
+                                    }
+
+                                    trigger OnBeforePassVariable()
+                                    begin
+
+                                        ticket_schedule := Format(TicketBomResponse."Ticket Schedule Selection");
+                                    end;
+                                }
+
                                 trigger OnAfterGetRecord()
                                 begin
 

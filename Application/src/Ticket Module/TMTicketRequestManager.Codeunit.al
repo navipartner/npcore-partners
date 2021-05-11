@@ -391,7 +391,7 @@
             exit;
 
         if (ValidateWaitinglistReference) then
-            ValidateWaitingListReferenceCode(WaitingListReferenceCode, Admission."Admission Code", AdmissionSchEntry);
+            ValidateWaitingListReferenceCode(WaitingListReferenceCode, Ticket, Admission."Admission Code", AdmissionSchEntry);
 
         TicketManagement.CreateAdmissionAccessEntry(Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry);
 
@@ -401,7 +401,7 @@
 
     end;
 
-    local procedure ValidateWaitingListReferenceCode(WaitingListReferenceCode: Code[10]; AdmissionCode: Code[20]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
+    local procedure ValidateWaitingListReferenceCode(WaitingListReferenceCode: Code[10]; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
     var
         AdmissionSchEntryWaitingList: Record "NPR TM Admis. Schedule Entry";
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
@@ -411,7 +411,7 @@
     begin
 
         if (AdmissionSchEntry."Entry No." <= 0) then
-            if (not AdmissionSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(AdmissionCode, false))) then
+            if (not AdmissionSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(Ticket, AdmissionCode, false))) then
                 exit; // No default schedule - let someone else worry about that
 
         if (AdmissionSchEntry."Allocation By" = AdmissionSchEntry."Allocation By"::CAPACITY) then
@@ -960,11 +960,11 @@
 
 
         if (ExternalAdmissionScheduleEntryNo = 0) then begin
-            case Admission."Default Schedule" of
+            case TicketManagement.GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode) of
                 Admission."Default Schedule"::TODAY,
                 Admission."Default Schedule"::NEXT_AVAILABLE:
                     begin
-                        if (AdmSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(Admission."Admission Code", true))) then begin
+                        if (AdmSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(ItemNo, VariantCode, Admission."Admission Code", true))) then begin
                             if (AdmSchEntry."Admission Is" = AdmSchEntry."Admission Is"::OPEN) then begin
                                 ReservationRequest."External Adm. Sch. Entry No." := AdmSchEntry."External Schedule Entry No.";
                                 ReservationRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");

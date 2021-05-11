@@ -229,6 +229,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketeservationRequest: Page "NPR TM Ticket Make Reserv.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketScheduleMgt: Codeunit "NPR TM Admission Sch. Mgt.";
         ResponseCode: Integer;
         NewQty: Integer;
     begin
@@ -239,7 +240,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         TicketReservationRequest.FindSet();
         repeat
             if TicketReservationRequest."Admission Code" <> '' then
-                TicketManagement.GetCurrentScheduleEntry(TicketReservationRequest."Admission Code", true);
+                TicketScheduleMgt.CreateAdmissionSchedule(TicketReservationRequest."Admission Code", false, Today());
         until TicketReservationRequest.Next() = 0;
         Commit();
 
@@ -266,6 +267,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     var
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
         ErrorMsg: Text;
     begin
         Redirect := false;
@@ -274,7 +276,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         if TicketBOM.FindSet() then
             repeat
                 Admission.Get(TicketBOM."Admission Code");
-                if Admission."Default Schedule" in [Admission."Default Schedule"::SCHEDULE_ENTRY, Admission."Default Schedule"::NONE] then begin
+                if TicketManagement.GetAdmissionSchedule(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code") in [Admission."Default Schedule"::SCHEDULE_ENTRY, Admission."Default Schedule"::NONE] then begin
                     case Action of
                         0:
                             if CurrFieldNo = JobPlanningLine.FieldNo(Quantity) then
