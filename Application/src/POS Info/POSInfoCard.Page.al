@@ -1,10 +1,5 @@
 page 6150640 "NPR POS Info Card"
 {
-    // NPR5.26/OSFI/20160810 CASE 246167 Object Created
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.51/ALPO/20190826 CASE 364558 Define inheritable pos info codes (will be copied from Sales POS header to new lines)
-    // NPR5.51/ALPO/20190912 CASE 368351 Apply red color to POS sale lines only for selected POS info codes
-
     Caption = 'POS Info Card';
     PageType = Card;
     UsageCategory = Administration;
@@ -111,4 +106,3 @@ page 6150640 "NPR POS Info Card"
     var
         ErrorText001: Label 'You can only setup fieldmapping if input type is %1 and %2 is not empty.';
 }
-

@@ -1,12 +1,5 @@
 table 6150640 "NPR POS Info"
 {
-    // NPR5.26/OSFI/20160810 CASE 246167 Object Created
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 21
-    // NPR5.51/ALPO/20190826 CASE 364558 Define inheritable POS info codes (will be copied from Sales POS header to new lines)
-    //                                   Define accessible from front-end POS info codes
-    // NPR5.51/ALPO/20190912 CASE 368351 Apply red color to POS sale lines only for selected POS info codes
-    // NPR5.53/TJ  /20191022 CASE 370575 New Type option: "Write Default Message"
-
     Caption = 'POS Info';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Info List";
@@ -61,34 +54,36 @@ table 6150640 "NPR POS Info"
 
             trigger OnValidate()
             begin
-                //-NPR5.51 [364558]
-                if "Once per Transaction" then
+                if "Once per Transaction" then begin
                     "Copy from Header" := false;
-                //+NPR5.51 [364558]
+                    "Set POS Sale Line Color to Red" := false;
+                end;
             end;
         }
         field(50; "Copy from Header"; Boolean)
         {
             Caption = 'Copy from Header';
             DataClassification = CustomerContent;
-            Description = 'NPR5.51';
 
             trigger OnValidate()
             begin
-                TestField("Once per Transaction", false);  //NPR5.51 [364558]
+                TestField("Once per Transaction", false);
             end;
         }
         field(60; "Available in Front-End"; Boolean)
         {
             Caption = 'Available in Front-End';
             DataClassification = CustomerContent;
-            Description = 'NPR5.51';
         }
         field(70; "Set POS Sale Line Color to Red"; Boolean)
         {
             Caption = 'Set POS Sale Line Color to Red';
             DataClassification = CustomerContent;
-            Description = 'NPR5.51';
+
+            trigger OnValidate()
+            begin
+                TestField("Once per Transaction", false);
+            end;
         }
     }
 
@@ -128,4 +123,3 @@ table 6150640 "NPR POS Info"
         ConfText001: Label 'Deleting this %1 will delete all instances where it is used, continue?';
         ErrText001: Label 'Cancelled by user.';
 }
-
