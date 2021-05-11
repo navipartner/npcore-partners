@@ -292,6 +292,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
     local procedure CheckJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueCategory: Record "Job Queue Category";
         JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
     begin
         JobQueueEntry.Reset();
@@ -300,11 +301,15 @@ codeunit 6014444 "NPR DE Audit Mgt."
         if JobQueueEntry.FindFirst() then
             exit;
 
+        JobQueueCategory.Init();
+        JobQueueCategory.InsertRec('NPR_AUDIT', 'NPR Audit Jobs');
+
         JobQueueEntry.InitRecurringJob(10);
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
         JobQueueEntry."Object ID to Run" := Codeunit::"NPR DE Fiskaly Job";
         JobQueueEntry."User ID" := CopyStr(UserId, 1, 65);
         JobQueueEntry.Description := JobDescLbl;
+        JobQueueEntry."Job Queue Category Code" := JobQueueCategory.Code;
         JobQueueEntry.Insert(true);
     end;
 
