@@ -5,7 +5,7 @@ page 6060134 "NPR MM Member Info Capture"
     DataCaptionExpression = Rec."External Member No";
     InsertAllowed = false;
     SourceTable = "NPR MM Member Info Capture";
-    PageType = List;
+    PageType = Card;
     layout
     {
         area(content)
@@ -393,6 +393,11 @@ page 6060134 "NPR MM Member Info Capture"
                         CheckEmail();
                     end;
                 }
+                field("Store Code"; Rec."Store Code")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Code field';
+                }
                 field("Guardian External Member No."; Rec."Guardian External Member No.")
                 {
                     ApplicationArea = All;
@@ -759,23 +764,6 @@ page 6060134 "NPR MM Member Info Capture"
     {
         area(processing)
         {
-            action("Import Members")
-            {
-                Caption = 'Import Members';
-                Image = ImportCodes;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                Visible = ShowImportMemberAction;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Import Members action';
-
-                trigger OnAction()
-                begin
-                    ImportMembers();
-                end;
-            }
             action("Take Picture ")
             {
                 Caption = 'Take Picture';
@@ -878,7 +866,7 @@ page 6060134 "NPR MM Member Info Capture"
         BirthDateMandatory: Boolean;
         ExternalCardNoMandatory: Boolean;
         GuardianMandatory: Boolean;
-        ShowImportMemberAction: Boolean;
+
         ActivationDateEditable: Boolean;
         ActivationDateMandatory: Boolean;
         INVALID_ACTIVATION_DATE: Label 'The activation date %1 is not valid. The resulting membership must have remaining time when applying the membership duration formula to activation date.';
@@ -961,7 +949,7 @@ page 6060134 "NPR MM Member Info Capture"
         end;
     end;
 
-    local procedure HaveRequiredFields(MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    procedure HaveRequiredFields(MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         MissingInformation: Boolean;
         MissingFields: Text;
@@ -1273,25 +1261,6 @@ page 6060134 "NPR MM Member Info Capture"
 
             end;
         end;
-    end;
-
-    local procedure ImportMembers()
-    var
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
-        ImportMembersCU: Codeunit "NPR MM Import Members";
-    begin
-
-        CurrPage.SetSelectionFilter(MemberInfoCapture);
-        if (MemberInfoCapture.FindSet()) then begin
-            repeat
-                ImportMembersCU.insertMember(MemberInfoCapture."Entry No.");
-            until (MemberInfoCapture.Next() = 0);
-        end;
-    end;
-
-    procedure SetShowImportAction()
-    begin
-        ShowImportMemberAction := true;
     end;
 
     local procedure SetMissingInfo(var InfoIsMissing: Boolean; var AllInvalidFieldNames: Text; CurrentFieldName: Text; CurrentCondition: Boolean)

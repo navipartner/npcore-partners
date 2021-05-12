@@ -70,7 +70,7 @@ codeunit 6060132 "NPR MM Import Members"
         RunMode: Integer;
         LowEntryNo: Integer;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MemberInfoCapturePage: Page "NPR MM Member Info Capture";
+        MemberInfoCapturePage: Page "NPR MM Member Capture List";
         IComm: Record "NPR I-Comm";
     begin
 

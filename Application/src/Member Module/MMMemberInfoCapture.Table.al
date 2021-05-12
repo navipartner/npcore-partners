@@ -289,11 +289,18 @@ table 6060134 "NPR MM Member Info Capture"
             Caption = 'Auto-Admit Member';
             DataClassification = CustomerContent;
         }
+        field(500; "Store Code"; Code[20])
+        {
+            Caption = 'Store Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpCs Store";
+            ValidateTableRelation = false;
+        }
         field(1000; "Receipt No."; Code[20])
         {
             Caption = 'Receipt No.';
             DataClassification = CustomerContent;
-            Description = 'Externa Relations';
+            Description = 'External Relations';
         }
         field(1001; "Line No."; Integer)
         {

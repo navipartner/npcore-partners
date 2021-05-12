@@ -631,6 +631,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
+        MemberInfoCaptureListPage: Page "NPR MM Member Capture List";
         PageAction: Action;
     begin
 
@@ -642,14 +643,21 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
         MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
         MemberInfoCapture.FilterGroup(0);
-
-        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
         MemberInfoCapture.FindSet();
 
-        MemberInfoCapturePage.LookupMode(true);
-        MemberInfoCapturePage.Editable(true);
+        if (MemberInfoCapture.Count() > 1) then begin
+            MemberInfoCaptureListPage.SetTableView(MemberInfoCapture);
+            MemberInfoCaptureListPage.LookupMode(true);
+            MemberInfoCaptureListPage.Editable(true);
+            PageAction := MemberInfoCaptureListPage.RunModal();
 
-        PageAction := MemberInfoCapturePage.RunModal();
+        end else begin
+            MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+            MemberInfoCapturePage.LookupMode(true);
+            MemberInfoCapturePage.Editable(true);
+            PageAction := MemberInfoCapturePage.RunModal();
+
+        end;
 
         exit(PageAction = ACTION::LookupOK);
     end;

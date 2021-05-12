@@ -1104,6 +1104,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
         MemberInfoCapture."Contact No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'preassigned_contact_number', MaxStrLen(MemberInfoCapture."Contact No."), false);
+        MemberInfoCapture."Store Code" := NpXmlDomMgt.GetXmlText(MemberRequest, 'store_code', MaxStrLen(MemberInfoCapture."Store Code"), false);
 
         MemberInfoCapture.Insert();
     end;

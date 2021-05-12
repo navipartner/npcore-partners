@@ -98,6 +98,11 @@ page 6060126 "NPR MM Members"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Display Name field';
                 }
+                field("Store Code"; Rec."Store Code")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Code field';
+                }
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
                     ApplicationArea = All;

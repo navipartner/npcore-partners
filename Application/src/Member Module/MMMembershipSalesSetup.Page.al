@@ -163,14 +163,14 @@ page 6060125 "NPR MM Membership Sales Setup"
 
                 trigger OnAction()
                 var
-                    MemberInfoCapturePage: Page "NPR MM Member Info Capture";
+                    MemberInfoCaptureListPage: Page "NPR MM Member Capture List";
                     MemberInfoCapture: Record "NPR MM Member Info Capture";
                 begin
 
                     MemberInfoCapture.SetFilter("Originates From File Import", '=%1', true);
-                    MemberInfoCapturePage.SetTableView(MemberInfoCapture);
-                    MemberInfoCapturePage.SetShowImportAction();
-                    MemberInfoCapturePage.Run();
+                    MemberInfoCaptureListPage.SetTableView(MemberInfoCapture);
+                    MemberInfoCaptureListPage.SetShowImportAction();
+                    MemberInfoCaptureListPage.Run();
                 end;
             }
         }
