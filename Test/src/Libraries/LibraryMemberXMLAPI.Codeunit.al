@@ -137,6 +137,7 @@ codeunit 85015 "NPR Library - Member XML API"
         Request.Add(AddElement('newsletter', Format(MemberInfoCapture."News Letter", 0, 9), NameSpace));
         Request.Add(AddElement('username', MemberInfoCapture."User Logon ID", NameSpace));
         Request.Add(AddElement('password', MemberInfoCapture."Password SHA1", NameSpace));
+        Request.Add(AddElement('store_code', MemberInfoCapture."Store Code", NameSpace));
 
         if (MemberInfoCapture."External Card No." <> '') then begin
             MemberCard := XmlElement.Create('membercard', NameSpace);
@@ -380,6 +381,7 @@ codeunit 85015 "NPR Library - Member XML API"
         Request.Add(AddElement('birthday', Format(MemberInfoCapture.Birthday, 0, 9), NameSpace));
         Request.Add(AddElement('gender', Format(MemberInfoCapture.Gender, 0, 9), NameSpace));
         Request.Add(AddElement('newsletter', Format(MemberInfoCapture."News Letter", 0, 9), NameSpace));
+        Request.Add(AddElement('store_code', MemberInfoCapture."Store Code", NameSpace));
 
         if (MemberInfoCapture."Guardian External Member No." <> '') then begin
             Guardian := XmlElement.Create('guardian', NameSpace);

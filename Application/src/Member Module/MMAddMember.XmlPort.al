@@ -12,7 +12,7 @@ xmlport 6060128 "NPR MM Add Member"
             MaxOccurs = Once;
             textelement(addmember)
             {
-                tableelement(tmpmemberinfocapture; "NPR MM Member Info Capture")
+                tableelement(tmpMemberInfoCapture; "NPR MM Member Info Capture")
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
@@ -62,6 +62,12 @@ xmlport 6060128 "NPR MM Add Member"
                     }
                     fieldelement(password; tmpMemberInfoCapture."Password SHA1")
                     {
+                    }
+                    fieldelement(store_code; tmpMemberInfoCapture."Store Code")
+                    {
+                        MinOccurs = Zero;
+                        MaxOccurs = Once;
+                        XmlName = 'store_code';
                     }
                     textelement(membercard)
                     {
