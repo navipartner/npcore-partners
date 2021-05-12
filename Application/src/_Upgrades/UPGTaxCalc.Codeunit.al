@@ -14,17 +14,42 @@ codeunit 6150937 "NPR UPG Tax Calc."
             exit;
 
         // Run upgrade preconditions
-        ErrorIfPOSSaleIsOpen();
+        ArchiveActiveSale();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
     end;
 
-    local procedure ErrorIfPOSSaleIsOpen()
+    local procedure ArchiveActiveSale()
     var
+        POSSale: Record "NPR POS Sale";
         POSSaleLine: Record "NPR POS Sale Line";
+        POSArchiveSale: Record "NPR Archive Sale POS";
+        POSArchiveSaleLine: Record "NPR Archive Sale Line POS";
     begin
-        if not POSSaleLine.IsEmpty() then
-            Error('Can''t perform upgrade process when there is active POS sale. End all active POS sale (%1 is not empty)', POSSaleLine.TableName());
+        if POSSale.IsEmpty() then
+            exit;
+        POSSale.FindSet(true);
+        repeat
+            POSArchiveSale.Init();
+            POSArchiveSale.TransferFields(POSSale, true, true);
+            if not POSArchiveSale.Find() then
+                POSArchiveSale.Insert()
+            else
+                POSArchiveSale.Modify();
+            POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+            POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+            if POSSaleLine.FindSet(true) then
+                repeat
+                    POSArchiveSaleLine.Init();
+                    POSArchiveSaleLine.TransferFields(POSSaleLine, true, true);
+                    if not POSArchiveSaleLine.Find() then
+                        POSArchiveSaleLine.Insert()
+                    else
+                        POSArchiveSaleLine.Modify();
+                    POSSaleLine.Delete();
+                until POSSaleLine.next() = 0;
+            POSSale.Delete();
+        until POSSale.Next() = 0;
     end;
 }
