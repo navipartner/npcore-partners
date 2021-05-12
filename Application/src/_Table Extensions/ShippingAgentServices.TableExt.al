@@ -26,11 +26,15 @@ tableextension 6014446 "NPR Shipping Agent Services" extends "Shipping Agent Ser
         {
             Caption = 'Email Mandatory';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
         field(6014452; "NPR Phone Mandatory"; Boolean)
         {
             Caption = 'Phone Mandatory';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
     }
 }
