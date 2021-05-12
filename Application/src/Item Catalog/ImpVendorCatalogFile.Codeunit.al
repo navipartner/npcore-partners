@@ -5,8 +5,14 @@
         FileManagement: Codeunit "File Management";
         Filename: Text;
         VendorNo: Code[20];
+        TempBLOB: Codeunit "Temp Blob";
+        Attachment: Record Attachment temporary;
     begin
-        Filename := FileManagement.OpenFileDialog(CatalogFile, '', 'CSV files (*.csv)|*.csv|All files (*.*)|*.*');
+        Filename := FileManagement.BLOBImportWithFilter(TempBLOB, CatalogFile, '', 'CSV files (*.csv)|*.csv|All files (*.*)|*.*', 'csv');
+
+        Attachment.SetAttachmentFileFromBlob(TempBLOB);
+        Attachment."Attachment File".Export(Filename);
+
         VendorNo := SelectVendor();
         ReadFile(VendorNo, Filename, true, true);
     end;
