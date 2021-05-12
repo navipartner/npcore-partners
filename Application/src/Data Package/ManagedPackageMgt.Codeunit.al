@@ -119,7 +119,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         if not ResponseMessage.IsSuccessStatusCode then
             Error('Web service has returnend an error:\\' + 'Status code: %1\' + 'Status code: %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
 
-        //Even though Encoding is not set, it returns same result as DotNet code with direct read to Text:
+        //Even though Encoding is not set, it returns same result as Dot_Net code with direct read to Text:
         ResponseMessage.Content.ReadAs(JSON);
 
         //At the end if needed to put Encoding, instead of reading direct to Text, going through TemBlob:
