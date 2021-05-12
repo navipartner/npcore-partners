@@ -114,6 +114,7 @@ page 6150713 "NPR POS Stargate Packages"
         StargatePackage: Record "NPR POS Stargate Package";
         PackageMethod: Record "NPR POS Stargate Pckg. Method";
         FileMgt: Codeunit "File Management";
+        TempBLOB: Codeunit "Temp Blob";
         Package: DotNet NPRNetPackage;
         String: DotNet NPRNetString;
         [RunOnClient]
@@ -124,12 +125,12 @@ page 6150713 "NPR POS Stargate Packages"
         DefaultYes: Boolean;
         OutStr: OutStream;
         FileContent: Text;
+        InStr: InStream;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001, '', 'Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json');
-        if String.IsNullOrWhiteSpace(FilePath) then
+        if not UploadIntoStream(Text001, '', 'Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json', FilePath, InStr) then
             exit;
 
-        FileContent := IOFile.ReadAllText(FilePath);
+        InStr.ReadText(FileContent);
         Package := Package.FromJsonString(FileContent);
 
         if StargatePackage.Get(Package.Name) then begin

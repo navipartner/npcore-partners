@@ -177,8 +177,14 @@
         [RunOnClient]
         Assembly: DotNet NPRNetAssembly;
         FilePath: Text;
+        TempBLOB: Codeunit "Temp Blob";
+        Attachment: Record Attachment temporary;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll');
+        FilePath := FileMgt.BLOBImport(TempBLOB, '');
+
+        Attachment.SetAttachmentFileFromBlob(TempBLOB);
+        Attachment."Attachment File".Export(FilePath);
+
         if String.IsNullOrWhiteSpace(FilePath) then
             exit;
 
@@ -264,8 +270,14 @@
         [RunOnClient]
         Detector: DotNet NPRNetAssemblyDetector;
         FilePath: Text;
+        TempBLOB: Codeunit "Temp Blob";
+        Attachment: Record Attachment temporary;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll');
+        FilePath := FileMgt.BLOBImportWithFilter(TempBLOB, Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll', 'dll');
+
+        Attachment.SetAttachmentFileFromBlob(TempBLOB);
+        Attachment."Attachment File".Export(FilePath);
+
         if String.IsNullOrWhiteSpace(FilePath) then
             exit;
 
@@ -289,8 +301,14 @@
         [RunOnClient]
         Assembly: DotNet NPRNetAssembly;
         FilePath: Text;
+        TempBLOB: Codeunit "Temp Blob";
+        Attachment: Record Attachment temporary;
     begin
-        FilePath := FileMgt.OpenFileDialog(Text001, AssemblyPath, 'Assembly files (*.dll)|*.dll');
+        FilePath := FileMgt.BLOBImport(TempBLOB, '');
+
+        Attachment.SetAttachmentFileFromBlob(TempBLOB);
+        Attachment."Attachment File".Export(FilePath);
+
         if String.IsNullOrWhiteSpace(FilePath) then
             exit;
 
