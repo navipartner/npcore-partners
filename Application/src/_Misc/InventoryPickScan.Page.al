@@ -456,9 +456,8 @@
     local procedure GetItemReference(var ItemReference: Record "Item Reference"): Boolean
     begin
         Clear(ItemReference);
-        ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.", "Discontinue Bar Code");
+        ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
         ItemReference.SetRange("Reference No.", Barcode);
-        ItemReference.SetRange("Discontinue Bar Code", false);
         ItemReference.SetFilter("Reference Type No.", '%1', '');
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
         exit(ItemReference.FindFirst());

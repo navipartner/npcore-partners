@@ -624,7 +624,6 @@
             ItemReference.SetCurrentKey("Reference Type", "Reference No.");
             ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetFilter("Reference No.", '=%1', UpperCase(Barcode));
-            ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
             if ItemReference.FindFirst() then begin
                 ResolvingTable := DATABASE::"Item Reference";
                 ItemNo := ItemReference."Item No.";

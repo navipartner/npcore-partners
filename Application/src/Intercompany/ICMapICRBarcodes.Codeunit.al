@@ -111,11 +111,6 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
     begin
         ItemReference.SetRange("Item No.", ItemNo);
         ItemReference.SetRange("Variant Code", VariantCode);
-        ItemReference.SetRange("Discontinue Bar Code", false);
-        if ItemReference.FindFirst() then
-            exit(ItemReference."Reference No.");
-
-        ItemReference.SetRange("Discontinue Bar Code");
         if ItemReference.FindFirst() then
             exit(ItemReference."Reference No.");
     end;

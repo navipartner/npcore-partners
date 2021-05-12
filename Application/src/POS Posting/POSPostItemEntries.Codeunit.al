@@ -44,9 +44,6 @@
                 POSSalesLine.Modify();
 
                 CheckAndCreateServiceItemPos(POSEntry, POSSalesLine);
-
-                if (POSSalesLine."Retail Serial No." <> '') then
-                    HandleRetailSerialNo(POSSalesLine);
             until POSSalesLine.Next() = 0;
 
         OnAfterPostPOSEntry(Rec);
@@ -527,23 +524,6 @@
               CurrencyDate, CurrencyCode,
               FCAmount, CurrencyFactor),
             Currency."Unit-Amount Rounding Precision"));
-    end;
-
-    local procedure HandleRetailSerialNo(POSSalesLine: Record "NPR POS Entry Sales Line")
-    var
-        ItemReference: Record "Item Reference";
-    begin
-        if (POSSalesLine."Retail Serial No." = '') then
-            exit;
-
-        ItemReference.SetCurrentKey("Reference No.");
-        ItemReference.SetFilter("Reference No.", '=%1', POSSalesLine."Retail Serial No.");
-        ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Retail Serial No.");
-        ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
-        if (ItemReference.FindFirst()) then begin
-            ItemReference."Discontinue Bar Code" := true;
-            ItemReference.Modify();
-        end;
     end;
 
     procedure PostAssemblyOrders(POSEntry: Record "NPR POS Entry"; FailOnError: Boolean): Boolean

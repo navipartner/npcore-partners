@@ -20,8 +20,6 @@
             ItemReference.SetCurrentKey("Reference Type", "Reference No.");
             ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetFilter("Reference No.", '=%1', UpperCase(Barcode));
-            if not AllowDiscontinued then
-                ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
             if ItemReference.FindFirst() then begin
                 if (not Item.Get(ItemReference."Item No.")) then
                     exit(false);
@@ -68,8 +66,6 @@
             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetRange("Item No.", ItemNo);
             ItemReference.SetRange("Variant Code", VariantCode);
-            if not AllowDiscontinued then
-                ItemReference.SetRange("Discontinue Bar Code", false);
             if ItemReference.FindFirst() then begin
                 Barcode := ItemReference."Reference No.";
                 ResolvingTable := DATABASE::"Item Reference";
@@ -177,9 +173,8 @@
         TransferLine.Copy(TransferLine2);
         TempItemRefNo := TransferLine2."NPR Cross-Reference No.";
         ItemReference.Reset();
-        ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.", "Discontinue Bar Code");
+        ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
         ItemReference.SetRange("Reference No.", TransferLine."NPR Cross-Reference No.");
-        ItemReference.SetRange("Discontinue Bar Code", false);
         ItemReference.SetFilter("Reference Type No.", '%1', '');
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
 
@@ -289,9 +284,8 @@
         if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::Item then begin
             TempItemRefNo := MixedDiscountLine2."Cross-Reference No.";
             ItemReference.Reset();
-            ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.", "Discontinue Bar Code");
+            ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
             ItemReference.SetRange("Reference No.", MixedDiscountLine."Cross-Reference No.");
-            ItemReference.SetRange("Discontinue Bar Code", false);
             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetFilter("Reference Type No.", '%1', '');
             ItemReference.SetRange("Item No.", MixedDiscountLine."No.");
@@ -371,9 +365,8 @@
         PeriodDiscountLine.Copy(PeriodDiscountLine2);
         TempItemRefNo := PeriodDiscountLine2."Cross-Reference No.";
         ItemReference.Reset();
-        ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.", "Discontinue Bar Code");
+        ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
         ItemReference.SetRange("Reference No.", PeriodDiscountLine."Cross-Reference No.");
-        ItemReference.SetRange("Discontinue Bar Code", false);
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
         ItemReference.SetFilter("Reference Type No.", '%1', '');
         ItemReference.SetRange("Item No.", PeriodDiscountLine."Item No.");

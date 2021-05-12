@@ -717,7 +717,6 @@
             ItemReference.SetCurrentKey("Reference Type", "Reference No.");
             ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetFilter("Reference No.", '=%1', UpperCase(Barcode));
-            ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
             if ItemReference.FindFirst() then begin
                 ResolvingTable := DATABASE::"Item Reference";
                 ItemNo := ItemReference."Item No.";
@@ -1287,7 +1286,6 @@
 
         ItemReference.SetFilter("Item No.", '=%1', ItemNo);
         ItemReference.SetFilter("Variant Code", '=%1', VariantCode);
-        ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
         ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
         if (ItemReference.FindFirst()) then
             ExternalNo := ItemReference."Reference No.";
