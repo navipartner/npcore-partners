@@ -32,6 +32,16 @@ page 6014569 "NPR Package Shipping Agents"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Automatic Drop Point Service field';
                 }
+                field("Email Mandatory"; "Email Mandatory")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if the E-mail is mandatory';
+                }
+                field("Phone Mandatory"; "Phone Mandatory")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if the Phone Number is mandatory';
+                }
                 field("Use own Agreement"; Rec."Use own Agreement")
                 {
                     ApplicationArea = All;
@@ -42,6 +52,7 @@ page 6014569 "NPR Package Shipping Agents"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Package Type Required field';
                 }
+
             }
         }
     }

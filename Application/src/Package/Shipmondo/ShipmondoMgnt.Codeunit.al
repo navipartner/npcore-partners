@@ -1,4 +1,4 @@
-codeunit 6014578 "NPR Shipmondo Mgnt.V3"
+codeunit 6014578 "NPR Shipmondo Mgnt."
 {
     var
         ApiUser: Text;
@@ -516,7 +516,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
 
         if PackageProviderSetup."Package Service Codeunit ID" = 0 then
             exit(false);
-        if (PackageProviderSetup."Package Service Codeunit ID" <> CODEUNIT::"NPR Shipmondo Mgnt.V3") then
+        if (PackageProviderSetup."Package Service Codeunit ID" <> CODEUNIT::"NPR Shipmondo Mgnt.") then
             exit(false);
 
         if (PackageProviderSetup."Api User" = '') or (PackageProviderSetup."Api Key" = '') then
@@ -529,8 +529,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
     var
         Customer: Record Customer;
         SalesLine: Record "Sales Line";
-        ShippingAgentServices: Record "shipping Agent services";
-        ShippingAgent: Record "Shipping Agent";
         ShiptoAddress: Record "Ship-to Address";
         SalesHeader: Record "Sales Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
@@ -561,22 +559,21 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
                             if PakkeShippingAgent."Package Type Required" then
                                 SalesHeader.TESTFIELD("NPR Package Code");
 
-                            ShippingAgentServices.GET(SalesHeader."Shipping Agent Code", SalesHeader."Shipping Agent Service Code");
                             if SalesHeader."Ship-to Code" <> '' then begin
                                 ShiptoAddress.GET(SalesHeader."Sell-to Customer No.", SalesHeader."Ship-to Code");
-                                if ShippingAgentServices."NPR Phone Mandatory" then
+                                if PakkeShippingAgent."Phone Mandatory" then
                                     ShiptoAddress.TESTFIELD("Phone No.");
 
-                                if ShippingAgentServices."NPR Email Mandatory" then
+                                if PakkeShippingAgent."Email Mandatory" then
                                     ShiptoAddress.TESTFIELD("E-Mail");
 
                             end else begin
 
                                 Customer.GET(SalesHeader."Sell-to Customer No.");
-                                if ShippingAgentServices."NPR Phone Mandatory" then
+                                if PakkeShippingAgent."Phone Mandatory" then
                                     Customer.TESTFIELD("Phone No.");
 
-                                if ShippingAgentServices."NPR Email Mandatory" then
+                                if PakkeShippingAgent."Email Mandatory" then
                                     Customer.TESTFIELD("E-Mail");
                             end;
 
@@ -603,22 +600,22 @@ codeunit 6014578 "NPR Shipmondo Mgnt.V3"
 
                         SalesShipmentHeader.TESTFIELD("Shipping Agent Service Code");
 
-                        ShippingAgentServices.GET(SalesShipmentHeader."Shipping Agent Code", SalesShipmentHeader."Shipping Agent Service Code");
+                        PakkeShippingAgent.GET(SalesShipmentHeader."Shipping Agent Code", SalesShipmentHeader."Shipping Agent Service Code");
                         if SalesHeader."Ship-to Code" <> '' then begin
                             ShiptoAddress.GET(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code");
-                            if ShippingAgentServices."NPR Phone Mandatory" then
+                            if PakkeShippingAgent."Phone Mandatory" then
                                 ShiptoAddress.TESTFIELD("Phone No.");
 
-                            if ShippingAgentServices."NPR Email Mandatory" then
+                            if PakkeShippingAgent."Email Mandatory" then
                                 ShiptoAddress.TESTFIELD("E-Mail");
 
                         end else begin
 
                             Customer.GET(SalesShipmentHeader."Sell-to Customer No.");
-                            if ShippingAgentServices."NPR Phone Mandatory" then
+                            if PakkeShippingAgent."Phone Mandatory" then
                                 Customer.TESTFIELD("Phone No.");
 
-                            if ShippingAgentServices."NPR Email Mandatory" then
+                            if PakkeShippingAgent."Email Mandatory" then
                                 Customer.TESTFIELD("E-Mail");
                         end;
 

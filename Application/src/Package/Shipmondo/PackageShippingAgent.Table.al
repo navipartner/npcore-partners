@@ -38,6 +38,18 @@ table 6014577 "NPR Package Shipping Agent"
             Caption = 'Package Type Required';
             DataClassification = CustomerContent;
         }
+        field(60; "Email Mandatory"; Boolean)
+        {
+            Caption = 'Email Mandatory';
+            DataClassification = CustomerContent;
+
+        }
+        field(61; "Phone Mandatory"; Boolean)
+        {
+            Caption = 'Phone Mandatory';
+            DataClassification = CustomerContent;
+
+        }
     }
 
     keys
