@@ -104,7 +104,7 @@ report 6014495 "NPR Whse. - Shipment"
 
                     trigger OnAfterGetRecord()
                     var
-                        Code128Lbl: Label 'CODE128';
+                        Code128Lbl: Label 'CODE128', Locked = true;
                     begin
                         GetLocation("Location Code");
 
