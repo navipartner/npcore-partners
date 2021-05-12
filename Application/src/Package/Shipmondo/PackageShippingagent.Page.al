@@ -43,6 +43,16 @@ page 6014568 "NPR Package Shipping agent"
                     ApplicationArea = All;
                     ToolTip = 'Specifies if the "Automatic Drop Point" Service is mandatory';
                 }
+                field("Email Mandatory"; "Email Mandatory")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if the E-mail is mandatory';
+                }
+                field("Phone Mandatory"; "Phone Mandatory")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if the Phone Number is mandatory';
+                }
                 group(Advanced)
                 {
                     Caption = 'Advanced';

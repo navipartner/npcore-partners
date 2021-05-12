@@ -20,18 +20,6 @@ pageextension 6014467 "NPR Shipping Agent Services" extends "Shipping Agent Serv
                 ToolTip = 'Specifies the value of the NPR Default Option field';
             }
         }
-        addafter(CustomizedCalendar)
-        {
-            field("NPR Email Mandatory"; Rec."NPR Email Mandatory")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Email Mandatory field';
-            }
-            field("NPR Phone Mandatory"; Rec."NPR Phone Mandatory")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Phone Mandatory field';
-            }
-        }
+
     }
 }

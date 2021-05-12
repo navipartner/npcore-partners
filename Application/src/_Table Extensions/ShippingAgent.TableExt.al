@@ -45,21 +45,29 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             DataClassification = CustomerContent;
             OptionCaption = ' ,GLS,PDK';
             OptionMembers = " ",GLS,PDK;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
         field(6014451; "NPR Ship to Contact Mandatory"; Boolean)
         {
             Caption = 'Ship to Contact Mandatory';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
         field(6014452; "NPR Drop Point Service"; Boolean)
         {
             Caption = 'Drop Point Service';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
         field(6014453; "NPR Return Shipping agent"; Boolean)
         {
             Caption = 'Return Shipping agent';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
     }
 }
