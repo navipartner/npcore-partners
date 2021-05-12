@@ -197,6 +197,13 @@ table 6060126 "NPR MM Member"
             Caption = 'Document ID';
             DataClassification = CustomerContent;
         }
+        field(500; "Store Code"; Code[20])
+        {
+            Caption = 'Store Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpCs Store";
+            ValidateTableRelation = false;
+        }
     }
 
     keys

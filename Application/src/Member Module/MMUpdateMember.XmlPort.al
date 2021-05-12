@@ -57,6 +57,12 @@ xmlport 6060131 "NPR MM Update Member"
                     fieldelement(newsletter; tmpMemberInfoCapture."News Letter")
                     {
                     }
+                    fieldelement(store_code; tmpMemberInfoCapture."Store Code")
+                    {
+                        MinOccurs = Zero;
+                        MaxOccurs = Once;
+                        XmlName = 'store_code';
+                    }
                     textelement(guardian)
                     {
                         MaxOccurs = Once;

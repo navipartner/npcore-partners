@@ -136,6 +136,11 @@ page 6060136 "NPR MM Member Card"
                         PageMemberCommunication.RunModal();
                     end;
                 }
+                field("Store Code"; Rec."Store Code")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Code field';
+                }
             }
             part(MembershipListPart; "NPR MM Member Members.ListPart")
             {
