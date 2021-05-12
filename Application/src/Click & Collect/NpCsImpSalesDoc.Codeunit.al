@@ -575,9 +575,6 @@
         FromItemRefNo := NpXmlDomMgt.GetElementCode(Element, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false);
         if NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Item Cross Reference No.", StoreCode, FromItemRefNo) and (NpCsDocumentMapping."To No." <> '') then begin
             ItemRef.SetRange("Reference No.", NpCsDocumentMapping."To No.");
-            ItemRef.SetRange("Discontinue Bar Code", false);
-            if not ItemRef.FindFirst() then
-                ItemRef.SetRange("Discontinue Bar Code");
 
             if ItemRef.FindFirst() then begin
                 ItemVariant."Item No." := ItemRef."Item No.";
@@ -614,9 +611,6 @@
         end;
 
         ItemRef.SetRange("Reference No.", FromItemNo);
-        ItemRef.SetRange("Discontinue Bar Code", false);
-        if not ItemRef.FindFirst() then
-            ItemRef.SetRange("Discontinue Bar Code");
 
         if ItemRef.FindFirst() then begin
             ItemVariant."Item No." := ItemRef."Item No.";
@@ -644,9 +638,6 @@
         ItemRef.SetRange("Variant Code", ItemVariant.Code);
         ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
         ItemRef.SetFilter("Reference No.", '<>%1', '');
-        ItemRef.SetRange("Discontinue Bar Code", false);
-        if not ItemRef.FindFirst() then
-            ItemRef.SetRange("Discontinue Bar Code");
         if ItemRef.FindFirst() then
             exit(ItemRef."Reference No.");
 

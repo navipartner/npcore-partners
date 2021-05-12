@@ -183,7 +183,6 @@
 
         ItemRef.SetRange("Item No.", TMPVrtBuffer."Item No.");
         ItemRef.SetRange("Variant Code", TMPVrtBuffer."Variant Code");
-        ItemRef.SetRange("Discontinue Bar Code", false);
         if ItemRef.FindFirst() then
             FieldValue := ItemRef."Reference No.";
     end;
