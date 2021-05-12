@@ -79,7 +79,7 @@ report 6060123 "NPR MM Member Card Std Print"
                 MMMembershipSetup: Record "NPR MM Membership Setup";
                 BarcodeLib: Codeunit "NPR Barcode Image Library";
                 PointTo: Integer;
-                Code128Lbl: Label 'CODE128';
+                Code128Lbl: Label 'CODE128', Locked = true;
             begin
                 CalcFields("External Member No.");
                 BarcodeLib.SetAntiAliasing(false);
