@@ -251,9 +251,6 @@ codeunit 6151197 "NPR NpCs Send Order"
         ItemRef.SetRange("Variant Code", SalesLine."Variant Code");
         ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
         ItemRef.SetFilter("Reference No.", '<>%1', '');
-        ItemRef.SetRange("Discontinue Bar Code", false);
-        if not ItemRef.FindFirst() then
-            ItemRef.SetRange("Discontinue Bar Code");
         if ItemRef.FindFirst() then
             exit(ItemRef."Reference No.");
 

@@ -244,7 +244,6 @@
                 begin
                     ItemReference.SetFilter("Reference No.", '=%1', CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
-                    ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
                     ItemReference.FindFirst();
                     FirstRec := Format(ItemReference);
                     ItemReference.FindLast();
@@ -268,7 +267,6 @@
 
                     ItemReference.SetFilter("Reference No.", '=%1', CopyStr(TagId, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Retail Serial No.");
-                    ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
                     ItemReference.FindFirst();
                     FirstRec := Format(ItemReference);
                     ItemReference.FindLast();
@@ -674,7 +672,6 @@
 
         ItemReference.SetRange("Reference No.", UpperCase(EanBoxValue));
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-        ItemReference.SetRange("Discontinue Bar Code", false);
         if ItemReference.FindFirst() then
             InScope := true;
     end;

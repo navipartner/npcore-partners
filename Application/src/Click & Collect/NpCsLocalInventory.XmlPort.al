@@ -104,7 +104,6 @@ xmlport 6151199 "NPR NpCs Local Inventory"
         if StrLen(ItemRefNo) <= MaxStrLen(ItemReference."Reference No.") then begin
             ItemReference.SetRange("Reference No.", ItemRefNo);
             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-            ItemReference.SetRange("Discontinue Bar Code", false);
             if ItemReference.FindFirst() then begin
                 ItemVariant."Item No." := ItemReference."Item No.";
                 ItemVariant.Code := ItemReference."Variant Code";

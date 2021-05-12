@@ -940,7 +940,6 @@
         if StrLen(ReferenceNo) <= MaxStrLen(ItemRef."Reference No.") then begin
             ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
             ItemRef.SetRange("Reference No.", UpperCase(ReferenceNo));
-            ItemRef.SetRange("Discontinue Bar Code", false);
             if ItemRef.FindFirst() then begin
                 ItemVariant."Item No." := ItemRef."Item No.";
                 ItemVariant.Code := ItemRef."Variant Code";

@@ -249,7 +249,6 @@
                 begin
                     ItemRef.SetRange("Item No.", TMPVRTBuffer."Item No.");
                     ItemRef.SetRange("Variant Code", TMPVRTBuffer."Variant Code");
-                    ItemRef.SetRange("Discontinue Bar Code", false);
                     if ItemRef.FindFirst() then
                         exit(ItemRef."Reference No.");
                 end;
