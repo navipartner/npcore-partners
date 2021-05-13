@@ -368,6 +368,11 @@
             "id": "AL0606",
             "action":"Error",
             "justification": "The 'with' statement is deprecated."
+        },
+        {
+            "id": "AL0667",
+            "action":"Error",
+            "justification": "'Caption' is being deprecated in the versions: '1.0' or greater. This property does not have any effect on report columns. This warning will become an error in a future release."
         }, 
         {
             "id": "AA0470",
