@@ -82,49 +82,31 @@ report 6014494 "NPR MM Member Evaluation"
 
             column(Indent; Indent)
             {
-                Caption = 'Issued Guest Ticket Count';
-                IncludeCaption = true;
             }
             column(Indent_2; "Indent 2")
             {
-                Caption = 'Issued Member Ticket Count';
-                IncludeCaption = true;
             }
             column(Indent_3; "Indent 3")
             {
-                Caption = 'Arrival Log Success Count';
-                IncludeCaption = true;
             }
 
             column(Indent_4; "Indent 4")
             {
-                Caption = 'Issued Ticket Count';
-                IncludeCaption = true;
             }
             column(Color; Color)
             {
-                Caption = 'Pos Sales Count';
-                IncludeCaption = true;
             }
             column(Color_2; "Color 2")
             {
-                Caption = 'Invoice Count';
-                IncludeCaption = true;
             }
             column(Decimal_1; "Decimal 1")
             {
-                Caption = 'Total POS Amount Incl. Discount and Tax';
-                IncludeCaption = true;
             }
             column(Decimal_2; "Decimal 2")
             {
-                Caption = 'Total POS Discount';
-                IncludeCaption = true;
             }
             column(Decimal_3; "Decimal 3")
             {
-                Caption = 'Total Invoice Amount';
-                IncludeCaption = true;
             }
 
             dataitem(ReportedMembership; "NPR MM Membership")
