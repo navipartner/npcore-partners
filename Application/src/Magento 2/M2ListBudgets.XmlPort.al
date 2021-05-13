@@ -79,7 +79,9 @@ xmlport 6151140 "NPR M2 List Budgets"
                             trigger OnBeforePassVariable()
                             begin
 
+#if BC17
                                 case ItemBudgetNameResponse."Analysis Area" of
+
                                     0:
                                         AnalysisArea := 'sales';
                                     1:
@@ -87,6 +89,17 @@ xmlport 6151140 "NPR M2 List Budgets"
                                     else
                                         AnalysisArea := '';
                                 end;
+#else
+                                case ItemBudgetNameResponse."Analysis Area" of
+
+                                    "Analysis Area Type"::Sales:
+                                        AnalysisArea := 'sales';
+                                    "Analysis Area Type"::Purchase:
+                                        AnalysisArea := 'purchase';
+                                    else
+                                        AnalysisArea := '';
+                                end;
+#endif                                
                             end;
                         }
                     }

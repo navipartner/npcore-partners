@@ -9,13 +9,13 @@
         Print: Boolean;
         Receive: Boolean;
         Ship: Boolean;
-        Text000003: Label 'You cannot debit item groups!';
-        Text000007: Label 'Error. You can not post customer payments from the register using the sales module!';
-        Text000008: Label '%1 %2 was created';
+        CannotDeleteItemGroupsErr: Label 'You cannot debit item groups!';
+        CannotPostPaymentSalesModuleErr: Label 'Error. You can not post customer payments from the register using the sales module!';
+        SalesHeaderCreatedLbl: Label '%1 %2 was created', Comment = '%1=SalesHeader."Document Type";%2=SalesHeader."No."';
         ShowCreationMessage: Boolean;
         OrderTypeSet: Boolean;
-        Text000010: Label 'You cannot post when a payment has been made';
-        Text000012: Label 'Only one sales document can be created per sales ticket';
+        CannotPostPaymentErr: Label 'You cannot post when a payment has been made';
+        OneDocPerSalesTicketErr: Label 'Only one sales document can be created per sales ticket';
         OrderType: Integer;
         Text000013: Label 'Serial number must be supplied for item %1 - %2';
         TransferSalesPerson: Boolean;
@@ -250,7 +250,7 @@
         end;
 
         if ShowCreationMessage then
-            Message(Text000008, SalesHeader."Document Type", SalesHeader."No.");
+            Message(SalesHeaderCreatedLbl, SalesHeader."Document Type", SalesHeader."No.");
 
         TicketManagement.PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
 
@@ -428,7 +428,11 @@
                 if Item.Get(SaleLinePOS."No.") then begin
                     if Item."Item Tracking Code" <> '' then begin
                         ItemTrackingCode.Get(Item."Item Tracking Code");
+#if BC17                        
                         ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+#else
+                        ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
+#endif
                         if ItemTrackingSetup."Serial No. Required" then begin
                             if SaleLinePOS."Serial No." = '' then
                                 Error(Text000013, SaleLinePOS."No.", SaleLinePOS.Description);
@@ -458,20 +462,20 @@
     procedure TestSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then
-            Error(Text000010);
+            Error(CannotPostPaymentErr);
 
         if SaleLinePOS."Sales Document No." <> '' then
-            Error(Text000012);
+            Error(OneDocPerSalesTicketErr);
 
         if (SaleLinePOS.Type = SaleLinePOS.Type::Customer) and
            (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Deposit) then
-            Error(Text000007);
+            Error(CannotPostPaymentSalesModuleErr);
 
         if SaleLinePOS."Buffer Document No." <> '' then
-            Error(Text000007);
+            Error(CannotPostPaymentSalesModuleErr);
 
         if SaleLinePOS.Type = SaleLinePOS.Type::"Item Group" then
-            Error(Text000003);
+            Error(CannotDeleteItemGroupsErr);
     end;
 
     procedure OpenSalesDoc(var SalePOS: Record "NPR POS Sale")
