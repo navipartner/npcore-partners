@@ -1,9 +1,5 @@
 codeunit 6059784 "NPR TM Ticket Management"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text6059776: Label 'This value must be an integer between 1 and 4.';
         RandomHexString: Text[100];
@@ -2937,7 +2933,11 @@ codeunit 6059784 "NPR TM Ticket Management"
         DocumentEntry.Init();
         DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
         DocumentEntry."Table ID" := DocTableID;
+#if BC17         
         DocumentEntry."Document Type" := DocType;
+#else        
+        DocumentEntry."Document Type" := "Document Entry Document Type".FromInteger(DocType);
+#endif
         DocumentEntry."Document No." := DocNoFilter;
         DocumentEntry."Table Name" := CopyStr(DocTableName, 1, MaxStrLen(DocumentEntry."Table Name"));
         DocumentEntry."No. of Records" := DocNoOfRecords;

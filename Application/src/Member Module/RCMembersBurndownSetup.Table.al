@@ -108,6 +108,7 @@ table 6060149 "NPR RC Members. Burndown Setup"
         BusinessChart: Record "Business Chart Buffer";
     begin
         case "Chart Type" of
+#if BC17        
             "Chart Type"::"Stacked Area":
                 exit(BusinessChart."Chart Type"::StackedArea);
             "Chart Type"::"Stacked Area (%)":
@@ -116,6 +117,16 @@ table 6060149 "NPR RC Members. Burndown Setup"
                 exit(BusinessChart."Chart Type"::StackedColumn);
             "Chart Type"::"Stacked Column (%)":
                 exit(BusinessChart."Chart Type"::StackedColumn100);
+#else   
+            "Chart Type"::"Stacked Area":
+                exit(BusinessChart."Chart Type"::StackedArea.AsInteger());
+            "Chart Type"::"Stacked Area (%)":
+                exit(BusinessChart."Chart Type"::StackedArea100.AsInteger());
+            "Chart Type"::"Stacked Column":
+                exit(BusinessChart."Chart Type"::StackedColumn.AsInteger());
+            "Chart Type"::"Stacked Column (%)":
+                exit(BusinessChart."Chart Type"::StackedColumn100.AsInteger());
+#endif             
         end;
     end;
 

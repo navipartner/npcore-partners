@@ -1345,7 +1345,7 @@
         LineDiscPerc: Decimal;
         ShortcutDimCode1: Code[20];
         ShortcutDimCode2: Code[20];
-        DimSetID: Integer;
+        DimSetID, OrdinalValue : Integer;
     begin
         JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
         SourceCodeSetup.Get();
@@ -1448,7 +1448,13 @@
                                 DimSetID := SalesCrMemoLine."Dimension Set ID";
                             end;
                     end;
+#if BC17
                     JobJnlLine."Line Type" := JobPlanningLine."Line Type" + 1;
+#else
+                        OrdinalValue := JobPlanningLine."Line Type".AsInteger();
+                        OrdinalValue := OrdinalValue + 1;
+                        JobJnlLine."Line Type" := "Job Line Type".FromInteger(OrdinalValue);
+#endif
                     JobJnlLine."Source Code" := SourceCodeSetup.Sales;
                 end;
             EntryType::Usage:
@@ -1459,7 +1465,13 @@
                         DocumentNo := JobPlanningLine."Document No.";
                     if JobPlanningLine."Usage Link" then begin
                         JobJnlLine."Job Planning Line No." := JobPlanningLine."Line No.";
+#if BC17                        
                         JobJnlLine."Line Type" := JobPlanningLine."Line Type" + 1;
+#else
+                        OrdinalValue := JobPlanningLine."Line Type".AsInteger();
+                        OrdinalValue := OrdinalValue + 1;
+                        JobJnlLine."Line Type" := "Job Line Type".FromInteger(OrdinalValue);
+#endif
                     end;
                     PostingGroup := JobTask."Job Posting Group";
                     GenBusPostGroup := JobPlanningLine."Gen. Bus. Posting Group";
