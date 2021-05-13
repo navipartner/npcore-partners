@@ -2,7 +2,6 @@
 {
     // [Feature] Retail Voucher Test scenarios
     Subtype = Test;
-    
 
     var
         _Initialized: Boolean;
@@ -990,7 +989,8 @@
     begin
         LibraryRandom.Init();
         POSPaymentMethod.Get(PaymentMethod);
-        exit(Round(LibraryRandom.RandDecInRange(0, 10000, LibraryRandom.RandIntInRange(0, 2)), POSPaymentMethod."Rounding Precision"));
+        //Avoid lower limit to be zero for those cases where discount amount is greater then zero
+        exit(Round(LibraryRandom.RandDecInRange(100, 10000, LibraryRandom.RandIntInRange(0, 2)), POSPaymentMethod."Rounding Precision"));
     end;
 
 
