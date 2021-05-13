@@ -1907,87 +1907,6 @@
       </DefaultValue>
       <Prompt>Decimal_3_Label</Prompt>
     </ReportParameter>
-    <ReportParameter Name="IndentCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>IndentCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>IndentCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Indent_2Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Indent_2Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Indent_2Caption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Indent_3Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Indent_3Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Indent_3Caption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Indent_4Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Indent_4Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Indent_4Caption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="ColorCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>ColorCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>ColorCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Color_2Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Color_2Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Color_2Caption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Decimal_1Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Decimal_1Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Decimal_1Caption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Decimal_2Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Decimal_2Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Decimal_2Caption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Decimal_3Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Decimal_3Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Decimal_3Caption</Prompt>
-    </ReportParameter>
     <ReportParameter Name="External_Membership_No_Caption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -2136,7 +2055,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>34</NumberOfRows>
+      <NumberOfRows>25</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -2186,126 +2105,81 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>9</RowIndex>
-          <ParameterName>IndentCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
-          <ParameterName>Indent_2Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
-          <ParameterName>Indent_3Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
-          <ParameterName>Indent_4Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>13</RowIndex>
-          <ParameterName>ColorCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>14</RowIndex>
-          <ParameterName>Color_2Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>15</RowIndex>
-          <ParameterName>Decimal_1Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>16</RowIndex>
-          <ParameterName>Decimal_2Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>17</RowIndex>
-          <ParameterName>Decimal_3Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>18</RowIndex>
           <ParameterName>External_Membership_No_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>19</RowIndex>
+          <RowIndex>10</RowIndex>
           <ParameterName>Issued_DateCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>20</RowIndex>
+          <RowIndex>11</RowIndex>
           <ParameterName>Membership_CodeCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>21</RowIndex>
+          <RowIndex>12</RowIndex>
           <ParameterName>Customer_No_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>22</RowIndex>
+          <RowIndex>13</RowIndex>
           <ParameterName>External_Member_No_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>23</RowIndex>
+          <RowIndex>14</RowIndex>
           <ParameterName>First_NameCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>24</RowIndex>
+          <RowIndex>15</RowIndex>
           <ParameterName>Last_NameCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>25</RowIndex>
+          <RowIndex>16</RowIndex>
           <ParameterName>Display_NameCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>26</RowIndex>
+          <RowIndex>17</RowIndex>
           <ParameterName>E_Mail_AddressCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>27</RowIndex>
+          <RowIndex>18</RowIndex>
           <ParameterName>BirthdayCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>28</RowIndex>
+          <RowIndex>19</RowIndex>
           <ParameterName>GenderCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>29</RowIndex>
+          <RowIndex>20</RowIndex>
           <ParameterName>AddressCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>30</RowIndex>
+          <RowIndex>21</RowIndex>
           <ParameterName>Post_Code_CodeCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>31</RowIndex>
+          <RowIndex>22</RowIndex>
           <ParameterName>CityCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>32</RowIndex>
+          <RowIndex>23</RowIndex>
           <ParameterName>Country_CodeCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>33</RowIndex>
+          <RowIndex>24</RowIndex>
           <ParameterName>CountryCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
