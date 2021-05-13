@@ -1301,17 +1301,29 @@
 
             OnNavigateFindRecords(DocumentEntry, DocNoFilter, PostingDateFilter);
 
+#if BC17 
             if (DocumentEntry."Document Type" = 0) then begin
+#else
+            if (DocumentEntry."Document Type".AsInteger() = 0) then begin
+#endif
                 if not (POSEntry.SetCurrentKey(POSEntry."Document No.")) then;
                 POSEntry.SetFilter("Document No.", DocumentEntry."Document No.");
             end;
 
+#if BC17 
             if (DocumentEntry."Document Type" = 1) then begin
+#else
+            if (DocumentEntry."Document Type".AsInteger() = 2) then begin
+#endif
                 if not (POSEntry.SetCurrentKey(POSEntry."Fiscal No.")) then;
                 POSEntry.SetFilter("Fiscal No.", DocumentEntry."Document No.");
             end;
 
+#if BC17 
             if (DocumentEntry."Document Type" = 2) then begin
+#else
+            if (DocumentEntry."Document Type".AsInteger() = 2) then begin
+#endif
                 POSPeriodRegister.SetFilter("Document No.", DocumentEntry."Document No.");
                 if (POSPeriodRegister.FindFirst()) then begin
                     POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegister."No.");

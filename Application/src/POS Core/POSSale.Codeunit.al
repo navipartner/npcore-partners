@@ -520,7 +520,11 @@
                 end;
                 if Item."Item Tracking Code" <> '' then begin
                     ItemTrackingCode.Get(Item."Item Tracking Code");
+#if BC17
                     ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+#else
+                    ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
+#endif
                     if ItemTrackingSetup."Serial No. Required" then begin
                         if SaleLinePOS."Serial No." = '' then
                             Error(ErrSerialNumberRequired, SaleLinePOS."No.", SaleLinePOS.Description);

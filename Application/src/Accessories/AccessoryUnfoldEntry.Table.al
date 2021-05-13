@@ -29,14 +29,20 @@ table 6014508 "NPR Accessory Unfold Entry"
                                                                      Type = CONST(Accessory),
                                                                      "Add Extra Line Automatically" = CONST(false));
         }
+#if BC17
         field(15; "Source Type"; Option)
+#else
+        field(15; "Source Type"; Enum "Analysis Source Type")
+#endif
         {
             CalcFormula = Lookup("Item Ledger Entry"."Source Type" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Source Type';
             Editable = false;
             FieldClass = FlowField;
+#if BC17
             OptionCaption = ' ,Customer,Vendor,Item';
             OptionMembers = " ",Customer,Vendor,Item;
+#endif
         }
         field(20; "Source No."; Code[20])
         {

@@ -1,9 +1,9 @@
 codeunit 6059812 "NPR Retail Chart Mgt by Shop"
 {
     var
-        Text000: Label 'Margin';
-        Text001: Label 'Turnover';
-        Text002: Label 'Store';
+        MarginLbl: Label 'Margin';
+        TurnoverLbl: Label 'Turnover';
+        StoreLbl: Label 'Store';
 
     procedure TurnOver_RevenuebyDim1(var BusChartBuf: Record "Business Chart Buffer"; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; var StartDate: Date; var Enddate: Date; ChangedChartType: Boolean)
     var
@@ -17,17 +17,22 @@ codeunit 6059812 "NPR Retail Chart Mgt by Shop"
         if not ChangedChartType then
             Setdate(StartDate, Enddate, Period, PeriodType, BusChartBuf);
         BusChartBuf.Initialize();
-        BusChartBuf.AddMeasure(Text000, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
-        BusChartBuf.AddMeasure(Text001, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
-        BusChartBuf.SetXAxis(Text002, BusChartBuf."Data Type"::String);
+#if BC17        
+        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+#else
+        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+#endif
+        BusChartBuf.SetXAxis(StoreLbl, BusChartBuf."Data Type"::String);
 
         Query1.SetRange(Posting_Date, StartDate, Enddate);
         Query1.Open();
         while Query1.Read() do begin
             I += 1;
             BusChartBuf.AddColumn(Query1.Global_Dimension_1_Code);
-            BusChartBuf.SetValue(Text000, I - 1, Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual);
-            BusChartBuf.SetValue(Text001, I - 1, Query1.Sum_Sales_Amount_Actual);
+            BusChartBuf.SetValue(MarginLbl, I - 1, Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual);
+            BusChartBuf.SetValue(TurnoverLbl, I - 1, Query1.Sum_Sales_Amount_Actual);
         end;
         Query1.Close();
     end;
@@ -44,17 +49,22 @@ codeunit 6059812 "NPR Retail Chart Mgt by Shop"
         if not ChangedChartType then
             Setdate(StartDate, Enddate, Period, PeriodType, BusChartBuf);
         BusChartBuf.Initialize();
-        BusChartBuf.AddMeasure(Text000, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
-        BusChartBuf.AddMeasure(Text001, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
-        BusChartBuf.SetXAxis(Text002, BusChartBuf."Data Type"::String);
+#if BC17        
+        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+#else
+        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+#endif
+        BusChartBuf.SetXAxis(StoreLbl, BusChartBuf."Data Type"::String);
 
         Query1.SetRange(Posting_Date, StartDate, Enddate);
         Query1.Open();
         while Query1.Read() do begin
             I += 1;
             BusChartBuf.AddColumn(Query1.Global_Dimension_2_Code);
-            BusChartBuf.SetValue(Text000, I - 1, Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual);
-            BusChartBuf.SetValue(Text001, I - 1, Query1.Sum_Sales_Amount_Actual);
+            BusChartBuf.SetValue(MarginLbl, I - 1, Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual);
+            BusChartBuf.SetValue(TurnoverLbl, I - 1, Query1.Sum_Sales_Amount_Actual);
         end;
         Query1.Close();
     end;
