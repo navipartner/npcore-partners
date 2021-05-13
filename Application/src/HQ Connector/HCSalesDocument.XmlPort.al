@@ -281,18 +281,30 @@ xmlport 6150902 "NPR HC Sales Document"
                     textelement(creditcardno)
                     {
                     }
+#if BC17
                     fieldelement(selltocustomertemplatecode; SalesHeader."Sell-to Customer Template Code")
                     {
                     }
+#else
+                        fieldelement(selltocustomertemplatecode; SalesHeader."Sell-to Customer Templ. Code")
+                        {
+                        }
+#endif
                     fieldelement(selltocontactno; SalesHeader."Sell-to Contact No.")
                     {
                     }
                     fieldelement(billtocontactno; SalesHeader."Bill-to Contact No.")
                     {
                     }
+#if BC17
                     fieldelement(billtocustomertemplatecode; SalesHeader."Bill-to Customer Template Code")
                     {
                     }
+#else
+                        fieldelement(billtocustomertemplatecode; SalesHeader."Bill-to Customer Templ. Code")
+                        {
+                        }
+#endif
                     fieldelement(opportunityno; SalesHeader."Opportunity No.")
                     {
                     }
