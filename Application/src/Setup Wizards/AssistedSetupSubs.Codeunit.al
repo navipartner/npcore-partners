@@ -1,5 +1,6 @@
 codeunit 6014431 "NPR Assisted Setup Subs"
 {
+#if BC17
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Assisted Setup", 'OnRegister', '', false, false)]
     local procedure RegisterWizard_OnRegisterAssistedSetup()
     begin
@@ -79,4 +80,5 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     begin
         AssistedSetup.Complete(Page::"NPR Retail Wizard");
     end;
+#endif
 }
