@@ -18,6 +18,11 @@
             "justification": "Function calls should have parenthesis even if they do not have any parameters."
         },
         {
+            "id": "AA0013",
+            "action":"Error",
+            "justification": "When BEGIN follows THEN, ELSE, DO, it should be on the same line, preceded by one space character."
+        },
+        {
             "id": "AA0021",
             "action":"Hidden",
             "justification": "Variable declarations should be ordered by type."
