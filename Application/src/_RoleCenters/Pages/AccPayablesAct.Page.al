@@ -13,26 +13,12 @@
 
             {
                 Caption = 'Payments';
-                field("NP Purchase Order"; Rec."NPR Purchase Order")
-                {
-                    Caption = 'Purchase Order';
-                    ApplicationArea = Basic, Suite;
-                    DrillDownPageID = "Purchase List";
-                    ToolTip = 'Specifies the number of purchase.';
-                }
 
                 field("Purchase Return Orders"; Rec."Purchase Return Orders")
                 {
                     ApplicationArea = PurchReturnOrder;
                     DrillDownPageID = "Purchase Return Order List";
                     ToolTip = 'Specifies the number of purchase return orders that are displayed in the Finance Cue on the Role Center. The documents are filtered by today''s date.';
-                }
-
-                field("Pending Inc. Documents"; Rec."NPR Pending Inc. Documents")
-                {
-                    ApplicationArea = All;
-                    DrillDownPageId = "Incoming Documents";
-                    ToolTip = 'Specifies the value of the NPR Pending Inc. Documents field';
                 }
             }
             cuegroup("Document Approvals")
