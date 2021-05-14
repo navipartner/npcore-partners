@@ -1347,7 +1347,11 @@
         DocumentEntry.Init();
         DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
         DocumentEntry."Table ID" := DocTableID;
+#if BC17         
         DocumentEntry."Document Type" := DocType;
+#else        
+        DocumentEntry."Document Type" := "Document Entry Document Type".FromInteger(DocType);
+#endif
         DocumentEntry."Document No." := DocNoFilter;
         DocumentEntry."Table Name" := CopyStr(DocTableName, 1, MaxStrLen(DocumentEntry."Table Name"));
         DocumentEntry."No. of Records" := DocNoOfRecords;
