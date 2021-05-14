@@ -256,6 +256,7 @@ table 6150651 "NPR POS View Profile"
     var
         TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
+        OutStr: OutStream;
     begin
         TestField("Client Formatting Culture ID");
 
@@ -268,8 +269,9 @@ table 6150651 "NPR POS View Profile"
             exit(Formats);
         end;
 
+        TempBlob.CreateOutStream(OutStr);
+        Rec."Culture Info (Serializ.)".ExportStream(OutStr);
         TempBlob.CreateInStream(InStr);
-        Rec."Culture Info (Serializ.)".ImportStream(InStr, Rec.FieldName("Culture Info (Serializ.)"));
         Formats.ReadFrom(InStr);
         exit(Formats);
     end;
