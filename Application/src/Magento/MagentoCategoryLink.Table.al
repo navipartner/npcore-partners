@@ -26,13 +26,6 @@ table 6151415 "NPR Magento Category Link"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(7; "Item Description"; Text[50])
-        {
-            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
-            Caption = 'Item Description';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(10; Position; Integer)
         {
             Caption = 'Position';

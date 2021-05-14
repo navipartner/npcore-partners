@@ -26,7 +26,7 @@ table 6014506 "NPR Accessory/Spare Part"
                 CalcFields(Description);
             end;
         }
-        field(3; Description; Text[50])
+        field(3; Description; Text[100])
         {
             CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Description';
@@ -40,7 +40,7 @@ table 6014506 "NPR Accessory/Spare Part"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(5; "Buy-from Vendor Name"; Text[50])
+        field(5; "Buy-from Vendor Name"; Text[100])
         {
             CalcFormula = Lookup(Vendor.Name WHERE("No." = FIELD(Vendor)));
             Caption = 'Buy-from Vendor Name';

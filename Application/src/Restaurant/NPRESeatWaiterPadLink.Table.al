@@ -35,7 +35,7 @@ table 6150662 "NPR NPRE Seat.: WaiterPadLink"
             Caption = 'Seating Description';
             FieldClass = FlowField;
         }
-        field(13; "Waiter Pad Description FF"; Text[50])
+        field(13; "Waiter Pad Description FF"; Text[80])
         {
             CalcFormula = Lookup("NPR NPRE Waiter Pad".Description WHERE("No." = FIELD("Waiter Pad No.")));
             Caption = 'Waiter Pad Description';

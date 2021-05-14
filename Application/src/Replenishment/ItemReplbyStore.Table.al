@@ -100,14 +100,14 @@ table 6014474 "NPR Item Repl. by Store"
                     Evaluate("Maximum Inventory", "Maximum Inventory Text");
             end;
         }
-        field(50; "Item Description"; Text[30])
+        field(50; "Item Description"; Text[100])
         {
             CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(60; "Variant Description"; Text[30])
+        field(60; "Variant Description"; Text[100])
         {
             CalcFormula = Lookup("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
                                                                    "Item No." = FIELD("Item No.")));

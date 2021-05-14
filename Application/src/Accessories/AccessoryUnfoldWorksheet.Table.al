@@ -231,7 +231,7 @@
             Quantity := 0;
             exit;
         end;
-        Description := AccessorySparePart.Description;
+        Description := CopyStr(AccessorySparePart.Description, 1, MaxStrLen(Description));
 
         AmountPct := CalcAmountPct(AccessorySparePart);
         "Unit Price" := ItemLedgEntry."Sales Amount (Actual)" * AmountPct / ItemLedgEntry.Quantity;

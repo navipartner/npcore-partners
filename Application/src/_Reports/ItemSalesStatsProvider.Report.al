@@ -85,7 +85,6 @@ report 6014430 "NPR Item Sales Stats/Provider"
                 {
                     CalcFields = "Sales (Qty.)", "Sales (LCY)", "Scheduled Receipt (Qty.)", "Qty. on Purch. Order", "COGS (LCY)", "Purchases (Qty.)";
                     DataItemLink = "Item Category Code" = FIELD(Code);
-                    DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.") ORDER(Ascending);
                     RequestFilterFields = "Global Dimension 1 Filter", "Date Filter";
                     column(ItemDesc; Item.Description)
                     {

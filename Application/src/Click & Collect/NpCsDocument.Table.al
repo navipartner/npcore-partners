@@ -505,13 +505,6 @@ table 6151198 "NPR NpCs Document"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(2020; "To Store Contact Address"; Text[50])
-        {
-            CalcFormula = Lookup("NPR NpCs Store"."Contact Address" WHERE(Code = FIELD("To Store Code")));
-            Caption = 'To Store Contact Address';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(2025; "To Store Contact Address 2"; Text[50])
         {
             CalcFormula = Lookup("NPR NpCs Store"."Contact Address 2" WHERE(Code = FIELD("To Store Code")));
