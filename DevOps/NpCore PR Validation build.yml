@@ -50,6 +50,13 @@ jobs:
     stepList:
     - checkout: self
 
+    - template: YAML/Templates/Step/RunAdditionalChecks.yml@scriptsRepo
+      parameters:
+        objectVisibilityCheck:
+          enabled: false
+          alObjectsFolder: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application/src/
+          publicObjectsSubfolder: _public
+
     - task: PowerShell@2
       inputs:
         filePath: $(psScriptsFolder)/BuildDeploy/CalculateNewVersion.ps1
