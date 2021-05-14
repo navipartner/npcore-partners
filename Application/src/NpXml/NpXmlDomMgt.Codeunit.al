@@ -491,41 +491,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(ReturnValue);
     end;
 
-    [Obsolete('This function is not needed anymore. Now we are using native AL HttpClient filetype to send WebRequest.', '')]
-    procedure SendWebRequest(var XmlDoc: DotNet "NPRNetXmlDocument"; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse; var WebException: DotNet NPRNetWebException): Boolean
-    begin
-        HttpWebRequest.KeepAlive(false);
-        if TryGetWebResponse(XmlDoc, HttpWebRequest, HttpWebResponse) then
-            exit(true);
-
-        WebException := GetLastErrorObject();
-        exit(false);
-    end;
-
-    [Obsolete('We have agreed in "Remove .NET i AL" MS teams chat that we will skip calls for this function because it probably is not needed. And if at the end we find that it is still needed, we will lookup for alternatives.', '')]
-    procedure SetTrustedCertificateValidation(var HttpWebRequest: DotNet NPRNetHttpWebRequest)
-    var
-        NpWebRequest: DotNet NPRNetNpWebRequest;
-    begin
-        NpWebRequest := NpWebRequest.NpWebRequest();
-        NpWebRequest.SetTrustedCertificateValidation(HttpWebRequest);
-    end;
-
-    [TryFunction]
-    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
-    local procedure TryGetWebResponse(var XmlDoc: DotNet "NPRNetXmlDocument"; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    var
-        MemoryStream: DotNet NPRNetMemoryStream;
-    begin
-        MemoryStream := HttpWebRequest.GetRequestStream();
-        XmlDoc.Save(MemoryStream);
-        MemoryStream.Flush();
-        MemoryStream.Close();
-        Clear(MemoryStream);
-
-        HttpWebResponse := HttpWebRequest.GetResponse();
-    end;
-
     procedure GetAttributeFromElement(Element: XmlElement; AttributeName: Text; var Attribute: XmlAttribute; Required: Boolean);
     var
         AttributeCollection: XmlAttributeCollection;
