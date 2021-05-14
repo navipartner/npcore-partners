@@ -27,7 +27,7 @@ table 6150660 "NPR NPRE Waiter Pad"
             Caption = 'Start Time';
             DataClassification = CustomerContent;
         }
-        field(16; "Current Seating FF"; Code[10])
+        field(16; "Current Seating FF"; Code[20])
         {
             CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Seating Code" WHERE("Waiter Pad No." = FIELD("No.")));
             Caption = 'Current Seating';

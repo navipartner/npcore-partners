@@ -88,7 +88,7 @@ tableextension 6014422 "NPR Job" extends Job
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6060163; "NPR Person Responsible Name"; Text[50])
+        field(6060163; "NPR Person Responsible Name"; Text[100])
         {
             CalcFormula = Lookup(Resource.Name WHERE("No." = FIELD("Person Responsible")));
             Caption = 'Person Responsible Name';

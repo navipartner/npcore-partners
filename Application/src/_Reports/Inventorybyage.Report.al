@@ -92,7 +92,6 @@ report 6014400 "NPR Inventory by age"
             dataitem(Item; Item)
             {
                 DataItemLink = "Item Category Code" = FIELD("Code");
-                DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                 column(No_Item; "No.")
                 {
                 }
@@ -189,7 +188,6 @@ report 6014400 "NPR Inventory by age"
                 dataitem(Item1; Item)
                 {
                     DataItemLink = "Item Category Code" = FIELD("Code");
-                    DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                     column(No_Item1; "No.")
                     {
                     }
@@ -287,7 +285,6 @@ report 6014400 "NPR Inventory by age"
                     {
                         CalcFields = Inventory;
                         DataItemLink = "Item Category Code" = FIELD("Code");
-                        DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                         column(No_Item2; "No.")
                         {
                         }
@@ -385,7 +382,6 @@ report 6014400 "NPR Inventory by age"
                         {
                             CalcFields = Inventory;
                             DataItemLink = "Item Category Code" = FIELD("Code");
-                            DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                             column(No_Item3; "No.")
                             {
                             }
@@ -484,7 +480,6 @@ report 6014400 "NPR Inventory by age"
                             {
                                 CalcFields = Inventory;
                                 DataItemLink = "Item Category Code" = FIELD("Code");
-                                DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                                 column(No_Item4; "No.")
                                 {
                                 }

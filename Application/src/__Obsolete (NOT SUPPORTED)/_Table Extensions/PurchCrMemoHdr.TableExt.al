@@ -36,14 +36,6 @@ tableextension 6014414 "NPR Purch. Cr. Memo Hdr." extends "Purch. Cr. Memo Hdr."
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used.';
         }
-        field(6014422; "NPR Sell-to Address"; Text[50])
-        {
-            CalcFormula = Lookup(Customer.Address WHERE("No." = FIELD("Sell-to Customer No.")));
-            Caption = 'Sell-to Address';
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used.';
-        }
         field(6014423; "NPR Sell-to Address 2"; Text[50])
         {
             CalcFormula = Lookup(Customer."Address 2" WHERE("No." = FIELD("Sell-to Customer No.")));

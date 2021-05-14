@@ -85,7 +85,7 @@ table 6060151 "NPR Event Word Layout"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(60; "Basic Layout Description"; Text[80])
+        field(60; "Basic Layout Description"; Text[250])
         {
             CalcFormula = Lookup("Custom Report Layout".Description WHERE(Code = FIELD("Basic Layout Code")));
             Caption = 'Basic Layout Description';

@@ -544,13 +544,6 @@ table 6151061 "NPR Retail Repl. Demand Line"
             Caption = 'Photo';
             DataClassification = CustomerContent;
         }
-        field(6151070; "Vendor Name"; Text[50])
-        {
-            CalcFormula = Lookup(Vendor.Name WHERE("No." = FIELD("Vendor No.")));
-            Caption = 'Vendor Name';
-            Description = 'NPR5.39';
-            FieldClass = FlowField;
-        }
         field(6151071; "Discount Comment"; Text[50])
         {
             Caption = 'Discount Comment';

@@ -12,7 +12,7 @@ table 6151406 "NPR Magento VAT Prod. Group"
             NotBlank = true;
             TableRelation = "VAT Product Posting Group";
         }
-        field(2; Description; Text[50])
+        field(2; Description; Text[100])
         {
             CalcFormula = Lookup("VAT Product Posting Group".Description WHERE(Code = FIELD("VAT Product Posting Group")));
             Caption = 'Description';

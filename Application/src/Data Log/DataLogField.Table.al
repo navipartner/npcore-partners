@@ -1,8 +1,6 @@
 table 6059899 "NPR Data Log Field"
 {
-    // DL1.00/MH/20140801  NP-AddOn: Data Log
     //   - This Table contains Field Values of logged Record Changes.
-    // DL1.06/MH/20150126  CASE 203653 Added Log Date to Key for optimizing Cleanup: Log Date,Table ID.
 
     Caption = 'Data Log Field';
     DataClassification = CustomerContent;
@@ -59,7 +57,7 @@ table 6059899 "NPR Data Log Field"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1000; "Field Name"; Text[50])
+        field(1000; "Field Name"; Text[80])
         {
             CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
                                                               "No." = FIELD("Field No.")));

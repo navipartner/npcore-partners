@@ -34,7 +34,7 @@ table 6014612 "NPR Retail Campaign Items"
             TableRelation = Item."No.";
             DataClassification = CustomerContent;
         }
-        field(13; Description; Text[50])
+        field(13; Description; Text[100])
         {
             CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Description';

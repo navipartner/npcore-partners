@@ -34,7 +34,6 @@ report 6014533 "NPR Inventory - flow"
             {
                 CalcFields = "Sales (Qty.)", "Purchases (Qty.)", "Purchases (LCY)", "Sales (LCY)", "Positive Adjmt. (Qty.)", "Negative Adjmt. (Qty.)", "COGS (LCY)";
                 DataItemLink = "Vendor No." = FIELD("No.");
-                DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.") ORDER(Ascending);
                 RequestFilterFields = "No.", "Statistics Group", "Item Category Code", "Location Filter";
                 column(No_Item; Item."No.")
                 {
