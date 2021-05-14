@@ -22,7 +22,7 @@ table 6151211 "NPR NpCs Open. Hour Cal. Entry"
             Caption = 'End Time';
             DataClassification = CustomerContent;
         }
-        field(1000; Weekday; Text[30])
+        field(1000; Weekday; Text[31])
         {
             CalcFormula = Lookup(Date."Period Name" WHERE("Period Type" = CONST(Date),
                                                            "Period Start" = FIELD("Calendar Date")));

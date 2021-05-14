@@ -591,7 +591,6 @@
             Job."Bill-to Name 2" := '------';
             Job."Bill-to Post Code" := '';
             Job."NPR Organizer E-Mail" := '------@----';
-            Job."NPR Person Responsible Name" := '------';
             Job."Person Responsible" := '------';
             Job.Modify(true);
         until Job.Next() = 0;

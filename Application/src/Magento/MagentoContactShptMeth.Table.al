@@ -40,7 +40,7 @@ table 6151434 "NPR Magento Contact Shpt.Meth."
             Editable = false;
             FieldClass = FlowField;
         }
-        field(150; "Shipment Fee Account No."; Code[10])
+        field(150; "Shipment Fee Account No."; Code[20])
         {
             CalcFormula = Lookup("NPR Magento Shipment Mapping"."Shipment Fee No." WHERE("External Shipment Method Code" = FIELD("External Shipment Method Code")));
             Caption = 'Shipment Fee Account No.';

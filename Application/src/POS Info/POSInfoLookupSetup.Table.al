@@ -29,7 +29,7 @@ table 6150645 "NPR POS Info Lookup Setup"
             DataClassification = CustomerContent;
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No"));
         }
-        field(11; "Field Name"; Text[30])
+        field(11; "Field Name"; Text[80])
         {
             CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No"),
                                                               "No." = FIELD("Field No.")));

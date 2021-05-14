@@ -49,7 +49,7 @@ table 6151595 "NPR NpDc Extra Coupon Item"
             Caption = 'Discount Amount';
             DataClassification = CustomerContent;
         }
-        field(100; "Item Description"; Text[50])
+        field(100; "Item Description"; Text[100])
         {
             CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';

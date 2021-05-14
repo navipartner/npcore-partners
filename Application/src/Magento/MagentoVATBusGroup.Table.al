@@ -12,7 +12,7 @@ table 6151405 "NPR Magento VAT Bus. Group"
             NotBlank = true;
             TableRelation = "VAT Business Posting Group";
         }
-        field(2; Description; Text[50])
+        field(2; Description; Text[100])
         {
             CalcFormula = Lookup("VAT Business Posting Group".Description WHERE(Code = FIELD("VAT Business Posting Group")));
             Caption = 'Description';
