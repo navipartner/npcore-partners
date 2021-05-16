@@ -324,10 +324,6 @@ dotnet
         {
         }
 
-        type("System.Math"; "NPRNetMath")
-        {
-        }
-
         type("System.Exception"; "NPRNetException")
         {
         }
