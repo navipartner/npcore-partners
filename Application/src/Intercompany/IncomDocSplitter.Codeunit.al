@@ -1,5 +1,8 @@
 ﻿codeunit 6060074 "NPR Incom. Doc. Splitter"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore.';
+
     trigger OnRun()
     var
         VendorCode: Code[20];

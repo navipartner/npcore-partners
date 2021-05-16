@@ -1423,12 +1423,14 @@
     procedure ExportTicketRequestListToClientExcel(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
-        TempFile: File;
-        Name: Text;
+        DataTypeMgt: Codeunit "Data Type Management";
+        TempBlob: Codeunit "Temp Blob";
+        FileManagement: Codeunit "File Management";
+        RecRef: RecordRef;
+        OutStr: OutStream;
         NewStream: InStream;
         ToFile: Text;
         ReturnValue: Boolean;
-        FileManagement: Codeunit "File Management";
     begin
 
         // The link to ticket is only on the first request
@@ -1440,18 +1442,10 @@
         TicketReservationRequest.SetFilter("Entry No.", '=%1', TicketReservationRequest2."Entry No.");
         TicketReservationRequest.FindFirst();
 
-        TempFile.TextMode(false);
-        TempFile.WriteMode(true);
-
-        Name := FileManagement.ServerTempFileName('tmp');
-
-        TempFile.Create(Name);
-        TempFile.Close();
-
-        REPORT.SaveAsExcel(REPORT::"NPR TM Ticket Batch Resp.", Name, TicketReservationRequest);
-
-        TempFile.Open(Name);
-        TempFile.CreateInStream(NewStream);
+        TempBlob.CreateOutStream(OutStr);
+        DataTypeMgt.GetRecordRef(TicketReservationRequest, RecRef);
+        Report.SaveAs(REPORT::"NPR TM Ticket Batch Resp.", '', ReportFormat::Excel, OutStr, RecRef);
+        TempBlob.CreateInStream(NewStream);
         ToFile := 'TicketReport.xls';
 
         ReturnValue := DownloadFromStream(
@@ -1460,8 +1454,6 @@
           '',
           'Excel File *.xls| *.xls',
           ToFile);
-
-        TempFile.Close();
     end;
 
     local procedure CalculateNewExpireTime(): DateTime;

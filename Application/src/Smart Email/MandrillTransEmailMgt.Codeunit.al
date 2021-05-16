@@ -252,13 +252,12 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     procedure PreviewSmartEmail(SmartEmail: Record "NPR Smart Email")
     var
         FileManagement: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
         RecRef: RecordRef;
         JArray: JsonArray;
         JObject: JsonObject;
-        OutputFile: File;
-        OStream: OutStream;
-        ClientFilename: Text;
-        ServerFilename: Text;
+        OutStr: OutStream;
+        Filename: Text;
     begin
         Initialize(GetFullURL('/templates/render.json'), 'POST');
         BodyJObject.Add('template_name', SmartEmail."Smart Email ID");
@@ -279,13 +278,9 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
             Error(GetLastErrorText);
 
         JObject.ReadFrom(GetWebResonseText());
-        ServerFilename := FileManagement.ServerTempFileName('html');
-        OutputFile.Create(ServerFilename);
-        OutputFile.CreateOutStream(OStream);
-        OStream.Write(GetString(JObject, 'html'));
-        OutputFile.Close();
-        ClientFilename := SmartEmail."Smart Email Name" + '.html';
-        Download(ServerFilename, '', '', '', ClientFilename);
+        TempBlob.CreateOutStream(OutStr);
+        OutStr.WriteText(GetString(JObject, 'html'));
+        FileManagement.BLOBExport(TempBlob, SmartEmail."Smart Email Name" + '.html', true);
     end;
 
     local procedure Initialize(URL: Text; Method: Text[6])

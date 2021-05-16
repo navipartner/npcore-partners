@@ -171,12 +171,6 @@ report 6060150 "NPR Event Customer Template"
                     column(EndingTime_TextLine; FormatTime(TextLine."NPR Ending Time"))
                     {
                     }
-
-                    trigger OnPreDataItem()
-                    begin
-                        if TextLineView <> '' then
-                            SetView(TextLineView);
-                    end;
                 }
                 dataitem(ResourceLine; "Job Planning Line")
                 {
@@ -204,12 +198,6 @@ report 6060150 "NPR Event Customer Template"
                     column(ResourceEMail_ResourceLine; ResourceLine."NPR Resource E-Mail")
                     {
                     }
-
-                    trigger OnPreDataItem()
-                    begin
-                        if ResourceLineView <> '' then
-                            SetView(ResourceLineView);
-                    end;
                 }
                 dataitem(ItemLine; "Job Planning Line")
                 {
@@ -283,8 +271,7 @@ report 6060150 "NPR Event Customer Template"
 
                     trigger OnPreDataItem()
                     begin
-                        if ItemLineView <> '' then begin
-                            SetView(ItemLineView);
+                        if ItemLine.GetFilters() <> '' then begin
                             ItemLineTotal.CopyFilters(ItemLine);
                         end;
                         ItemLineTotal.SetRange("Job No.", Job."No.");
@@ -299,11 +286,6 @@ report 6060150 "NPR Event Customer Template"
                             until ItemLineTotal.Next() = 0;
                     end;
                 }
-                trigger OnPreDataItem()
-                begin
-                    if JobTaskView <> '' then
-                        SetView(JobTaskView);
-                end;
 
                 trigger OnAfterGetRecord()
                 begin
@@ -476,10 +458,6 @@ report 6060150 "NPR Event Customer Template"
         AttributeValue: array[5] of Text;
         ColumnCaption: array[5] of Text;
         CommentsForCustomer: Text;
-        ItemLineView: Text;
-        JobTaskView: Text;
-        ResourceLineView: Text;
-        TextLineView: Text;
 
     local procedure FormatDate(Date: Date): Text
     var
@@ -495,44 +473,6 @@ report 6060150 "NPR Event Customer Template"
         if Time <> 0T then
             exit(Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>'));
         exit('');
-    end;
-
-    procedure SetParameters(XmlParameters: Text)
-    var
-        NpXmlDomMgt: codeunit "NPR NpXml Dom Mgt.";
-        Element: XmlElement;
-        XmlDoc: XmlDocument;
-        Node: XmlNode;
-        NodeList: XmlNodeList;
-        name: Text;
-    begin
-        XmlDocument.ReadFrom(XmlParameters, XmlDoc);
-        if not XmlDoc.GetRoot(Element) then
-            exit;
-
-        if Element.IsEmpty() then
-            exit;
-
-        if not Element.SelectNodes('//DataItem', NodeList) then
-            exit;
-
-        foreach Node in NodeList do begin
-            Element := Node.AsXmlElement();
-            name := NpXmlDomMgt.GetXmlAttributeText(Element, 'name', true);
-            if name = '' then
-                exit;
-
-            case name of
-                'Job Task':
-                    JobTaskView := Element.InnerText;
-                'TextLine':
-                    TextLineView := Element.InnerText;
-                'ResourceLine':
-                    ResourceLineView := Element.InnerText;
-                'ItemLine':
-                    ItemLineView := Element.InnerText;
-            end;
-        end;
     end;
 }
 
