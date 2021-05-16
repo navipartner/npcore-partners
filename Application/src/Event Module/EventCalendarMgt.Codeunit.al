@@ -415,7 +415,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         Job: Record Job;
         JobPlanningLine: Record "Job Planning Line";
         FileName: Text;
-        FileMgt: Codeunit "File Management";
         LegacyFreeBusyStatus: DotNet NPRNetLegacyFreeBusyStatus;
         UseTemplate: Boolean;
         EventExchIntTemplate: Record "NPR Event Exch. Int. Template";
@@ -600,7 +599,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                     exit(false);
         end;
 
-        FileMgt.DeleteServerFile(FileName);
         exit(true);
     end;
 

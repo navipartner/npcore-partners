@@ -326,14 +326,14 @@
     var
         Rec2: Record "NPR POS Stargate Assem. Map";
         FileMgt: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
+        Json: Text;
         [RunOnClient]
         AssemblyContent: DotNet NPRNetAssemblyPackageContent;
-        String: DotNet NPRNetString;
-        [RunOnClient]
-        IOFile: DotNet NPRNetFile;
-        FilePath: Text;
+        FileName: Text;
     begin
-        // TODO: if there are Unknown, then warn and ask for confirmation!
+        // TODO: if there are Unknown, then warnand ask for confirmation!
         Rec2 := Rec;
 
         Package.Name := PackageName;
@@ -349,14 +349,11 @@
 
         Rec := Rec2;
 
-        FilePath := FileMgt.SaveFileDialog(Text005, PackageName + '.' + PackageVersion + '.stargate', 'Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json');
-        if String.IsNullOrWhiteSpace(FilePath) then
-            exit;
-
-        if IOFile.Exists(FilePath) then
-            IOFile.Delete(FilePath);
-
-        IOFile.AppendAllText(FilePath, Package.ToJsonString());
+        Json := Package.ToJsonString();
+        TempBlob.CreateOutStream(OutStr);
+        OutStr.WriteText(Json);
+        FileName := PackageName + '.' + PackageVersion + '.stargate';
+        FileMgt.BLOBExport(TempBlob, FileName, true);
     end;
 }
 

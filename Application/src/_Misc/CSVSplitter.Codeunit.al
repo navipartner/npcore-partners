@@ -1,5 +1,8 @@
 codeunit 6060073 "NPR CSV Splitter"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore.';
+
     trigger OnRun()
     begin
         Initialize('', ',', '"', 0, 0, '', 1, 3, true);

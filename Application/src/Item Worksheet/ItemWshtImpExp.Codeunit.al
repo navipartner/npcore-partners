@@ -38,13 +38,12 @@ codeunit 6060047 "NPR Item Wsht. Imp. Exp."
     procedure Import()
     var
         FileMgt: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
     begin
-        FromFile := FileMgt.UploadFile(TextDialogImportLbl, '.xml');
+        FromFile := FileMgt.BLOBImport(TempBlob, '.xml');
 
-        ItemWkshtXmlFile.Open(FromFile);
-        ItemWkshtXmlFile.CreateInStream(XmlINStream);
+        TempBlob.CreateInStream(XmlINStream);
         XMLPORT.Import(XMLPORT::"NPR Item Worksh. Import/Export", XmlINStream);
-        ItemWkshtXmlFile.Close();
     end;
 
     procedure ExportToExcel(ParItemWorksheetLine: Record "NPR Item Worksheet Line")
