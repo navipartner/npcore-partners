@@ -24,23 +24,18 @@ codeunit 6060062 "NPR Process Catalog File"
             Erase(TemporaryPath + NcImportEntry."Document Name");
         NcImportEntry.CalcFields("Document Source");
         TempBlob.FromRecord(NcImportEntry, NcImportEntry.FieldNo("Document Source"));
-        FileManagement.BLOBExportToServerFile(TempBlob, TemporaryPath + NcImportEntry."Document Name");
-        ImportVendorCatalogFile.ReadFile('', TemporaryPath + NcImportEntry."Document Name", false, true);
-        FileManagement.DeleteServerFile(TemporaryPath + NcImportEntry."Document Name");
+        FileManagement.BLOBImport(TempBlob, TemporaryPath + NcImportEntry."Document Name");
+        ImportVendorCatalogFile.ReadFile('', TempBlob, false, true);
     end;
 
     local procedure ProcessZipFile(var NcImportEntry: Record "NPR Nc Import Entry")
     var
         TempBlob: Codeunit "Temp Blob";
-        TempNameValueBuffer: Record "Name/Value Buffer" temporary;
-        FileManagement: Codeunit "File Management";
         ImportVendorCatalogFile: Codeunit "NPR Imp. Vendor Catalog File";
-        ServerTempPath: Text;
         DataCompression: Codeunit "Data Compression";
         ArchiveEntryList: List of [Text];
         ArchiveEntry: Text;
         ArchiveEntrySize: Integer;
-        TempFile: File;
         InStr: InStream;
         OutStr: OutStream;
     begin
@@ -51,32 +46,21 @@ codeunit 6060062 "NPR Process Catalog File"
         NcImportEntry.CalcFields("Document Source");
         TempBlob.FromRecord(NcImportEntry, NcImportEntry.FieldNo("Document Source"));
         TempBlob.CreateInStream(InStr);
-        //Extract zipfile
-        TempFile.CreateTempFile();
-        TempFile.CreateOutStream(OutStr);
 
         if DataCompression.IsGZip(InStr) then begin
+            TempBlob.CreateOutStream(OutStr);
             DataCompression.GZipDecompress(InStr, OutStr);
+            ImportVendorCatalogFile.ReadFile('', TempBlob, false, true);
         end else begin
             DataCompression.OpenZipArchive(TempBlob, false);
             DataCompression.GetEntryList(ArchiveEntryList);
             foreach ArchiveEntry in ArchiveEntryList do begin
+                TempBlob.CreateOutStream(OutStr);
                 DataCompression.ExtractEntry(ArchiveEntry, OutStr, ArchiveEntrySize);
+                ImportVendorCatalogFile.ReadFile('', TempBlob, false, true);
+                Clear(OutStr);
             end;
-            TempFile.Close();
         end;
-
-        FileManagement.GetServerDirectoryFilesList(TempNameValueBuffer, TempFile.Name);
-
-        //Process fields
-        if TempNameValueBuffer.FindFirst() then
-            repeat
-                ImportVendorCatalogFile.ReadFile('', TempNameValueBuffer.Name, false, true);
-            until TempNameValueBuffer.Next() = 0;
-
-        //Delete files
-        FileManagement.ServerRemoveDirectory(ServerTempPath, true);
-        FileManagement.DeleteServerFile(TemporaryPath + GetZipFilename());
     end;
 
     local procedure GetZipFilename(): Text

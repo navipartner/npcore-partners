@@ -12,12 +12,13 @@ codeunit 6059942 "NPR VAN Doc. Endpoint Deliv."
         FileManagement: Codeunit "File Management";
         OStream: OutStream;
         IStream: InStream;
-        Response: Text;
+        Response, FileName : Text;
     begin
-        ElectronicDocumentFormat.Get("Electronic Document Format");
+        ElectronicDocumentFormat.Get(Rec."Electronic Document Format");
         NcEndpoint.Get(ElectronicDocumentFormat."NPR Delivery Endpoint");
         NcEndpoint.TestField(Enabled);
-        FileManagement.BLOBImportFromServerFile(TempBlob, ServerFilePath);
+        Rec.ClientFileName := FileManagement.BLOBImport(TempBlob, '');
+        FileName := Rec.ClientFileName;
 
         TempNcTaskOutput.Data.CreateOutStream(OStream, TEXTENCODING::UTF8);
 
@@ -25,7 +26,7 @@ codeunit 6059942 "NPR VAN Doc. Endpoint Deliv."
         CopyStream(OStream, IStream);
 
         TempNcTaskOutput.Insert(false);
-        TempNcTaskOutput.Name := ClientFileName;
+        TempNcTaskOutput.Name := FileName;
         if not NcEndpointMgt.RunEndpoint(TempNcTaskOutput, NcEndpoint, Response) then
             Error(SendFailedErr, NcEndpoint.Code);
     end;

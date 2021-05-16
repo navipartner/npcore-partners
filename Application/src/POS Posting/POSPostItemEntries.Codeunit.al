@@ -9,7 +9,6 @@
         TempItemToAdjust: Record Item temporary;
         AdjustCostItemEntries: Report "Adjust Cost - Item Entries";
         PostInventoryCosttoGL: Report "Post Inventory Cost to G/L";
-        FileManagement: Codeunit "File Management";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         OnBeforePostPOSEntry(Rec);

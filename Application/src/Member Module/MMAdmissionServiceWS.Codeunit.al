@@ -772,17 +772,16 @@
     procedure ImportGuestAvatarImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         FileManagement: Codeunit "File Management";
-        FileName: Text;
-        ClientFileName: Text;
-        SelectPictureLbl: Label 'Select image.';
+        TempBlob: Codeunit "Temp Blob";
+        InStr: Instream;
     begin
-        ClientFileName := '';
-        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
-        if FileName = '' then
+        FileManagement.BLOBImport(TempBlob, '');
+        if not TempBlob.Hasvalue() then
             Error('');
 
+        TempBlob.CreateInStream(InStr);
         Clear(AdminsScannerStation."Guest Avatar Image");
-        AdminsScannerStation."Guest Avatar Image".ImportFile(FileName, AdminsScannerStation.FieldCaption("Guest Avatar Image"));
+        AdminsScannerStation."Guest Avatar Image".ImportStream(InStr, AdminsScannerStation.FieldCaption("Guest Avatar Image"));
         AdminsScannerStation.Modify(true);
     end;
 
@@ -800,18 +799,18 @@
     procedure ImportTurnstileErrorImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         FileManagement: Codeunit "File Management";
-        FileName: Text;
-        ClientFileName: Text;
-        SelectPictureLbl: Label 'Select image.';
+        TempBlob: Codeunit "Temp Blob";
+        InStr: Instream;
     begin
         AdminsScannerStation.Find();
-        ClientFileName := '';
-        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
-        if FileName = '' then
+        FileManagement.BLOBImport(TempBlob, '');
+        if not TempBlob.Hasvalue() then
             Error('');
 
+        TempBlob.CreateInStream(InStr);
+
         Clear(AdminsScannerStation."Error Image of Turnstile");
-        AdminsScannerStation."Error Image of Turnstile".ImportFile(FileName, AdminsScannerStation.FieldCaption("Error Image of Turnstile"));
+        AdminsScannerStation."Error Image of Turnstile".ImportStream(InStr, AdminsScannerStation.FieldCaption("Error Image of Turnstile"));
         AdminsScannerStation.Modify(true);
     end;
 
@@ -829,18 +828,18 @@
     procedure ImportDefaultTurnstileImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         FileManagement: Codeunit "File Management";
-        FileName: Text;
-        ClientFileName: Text;
-        SelectPictureLbl: Label 'Select image.';
+        TempBlob: Codeunit "Temp Blob";
+        InStr: Instream;
     begin
         AdminsScannerStation.Find();
-        ClientFileName := '';
-        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
-        if FileName = '' then
+        FileManagement.BLOBImport(TempBlob, '');
+        if not TempBlob.Hasvalue() then
             Error('');
 
+        TempBlob.CreateInStream(InStr);
+
         Clear(AdminsScannerStation."Default Turnstile Image");
-        AdminsScannerStation."Default Turnstile Image".ImportFile(FileName, AdminsScannerStation.FieldCaption("Default Turnstile Image"));
+        AdminsScannerStation."Default Turnstile Image".ImportStream(InStr, AdminsScannerStation.FieldCaption("Default Turnstile Image"));
         AdminsScannerStation.Modify(true);
     end;
 
@@ -861,17 +860,17 @@
     procedure ImportGuestAvatarImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         FileManagement: Codeunit "File Management";
-        FileName: Text;
-        ClientFileName: Text;
-        SelectPictureLbl: Label 'Select image.';
+        TempBlob: Codeunit "Temp Blob";
+        InStr: Instream;
     begin
-        ClientFileName := '';
-        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
-        if FileName = '' then
+        FileManagement.BLOBImport(TempBlob, '');
+        if not TempBlob.Hasvalue() then
             Error('');
 
+        TempBlob.CreateInStream(InStr);
+
         Clear(AdminsServiceSetup."Guest Avatar Image");
-        AdminsServiceSetup."Guest Avatar Image".ImportFile(FileName, AdminsServiceSetup.FieldCaption("Guest Avatar Image"));
+        AdminsServiceSetup."Guest Avatar Image".ImportStream(InStr, AdminsServiceSetup.FieldCaption("Guest Avatar Image"));
         AdminsServiceSetup.Modify(true);
     end;
 
@@ -889,18 +888,18 @@
     procedure ImportTurnstileErrorImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         FileManagement: Codeunit "File Management";
-        FileName: Text;
-        ClientFileName: Text;
-        SelectPictureLbl: Label 'Select image.';
+        TempBlob: Codeunit "Temp Blob";
+        InStr: Instream;
     begin
         AdminsServiceSetup.Find();
-        ClientFileName := '';
-        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
-        if FileName = '' then
+        FileManagement.BLOBImport(TempBlob, '');
+        if not TempBlob.Hasvalue() then
             Error('');
 
+        TempBlob.CreateInStream(InStr);
+
         Clear(AdminsServiceSetup."Error Image of Turnstile");
-        AdminsServiceSetup."Error Image of Turnstile".ImportFile(FileName, AdminsServiceSetup.FieldCaption("Error Image of Turnstile"));
+        AdminsServiceSetup."Error Image of Turnstile".ImportStream(InStr, AdminsServiceSetup.FieldCaption("Error Image of Turnstile"));
         AdminsServiceSetup.Modify(true);
     end;
 
@@ -918,18 +917,18 @@
     procedure ImportDefaultTurnstileImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         FileManagement: Codeunit "File Management";
-        FileName: Text;
-        ClientFileName: Text;
-        SelectPictureLbl: Label 'Select image.';
+        TempBlob: Codeunit "Temp Blob";
+        InStr: Instream;
     begin
         AdminsServiceSetup.Find();
-        ClientFileName := '';
-        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
-        if FileName = '' then
+        FileManagement.BLOBImport(TempBlob, '');
+        if not TempBlob.Hasvalue() then
             Error('');
 
+        TempBlob.CreateInStream(InStr);
+
         Clear(AdminsServiceSetup."Default Turnstile Image");
-        AdminsServiceSetup."Default Turnstile Image".ImportFile(FileName, AdminsServiceSetup.FieldCaption("Default Turnstile Image"));
+        AdminsServiceSetup."Default Turnstile Image".ImportStream(InStr, AdminsServiceSetup.FieldCaption("Default Turnstile Image"));
         AdminsServiceSetup.Modify(true);
     end;
 

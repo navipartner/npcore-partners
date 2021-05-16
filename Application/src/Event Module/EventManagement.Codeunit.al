@@ -820,9 +820,12 @@
         exit(Status.AsInteger() < 3);
     end;
 
-    procedure SaveReportAs(Job: Record Job; TemplateType: Option Customer,Team; SaveAs: Option Word,PDF; FileName: Text)
+    procedure SaveReportAs(Job: Record Job; TemplateType: Option Customer,Team; SaveAs: Option Word,PDF; var TempBlob: Codeunit "Temp Blob")
     var
         CurrentJob: Record Job;
+        RecRef: RecordRef;
+        DataTypeMgt: Codeunit "Data Type Management";
+        OutStr: OutStream;
         ReportID: Integer;
     begin
         CurrentJob.Copy(Job);
@@ -833,11 +836,13 @@
             TemplateType::Team:
                 ReportID := REPORT::"NPR Event Team Template";
         end;
+        DataTypeMgt.GetRecordRef(CurrentJob, RecRef);
+        TempBlob.CreateOutStream(OutStr);
         case SaveAs of
             SaveAs::Word:
-                REPORT.SaveAsWord(ReportID, FileName, CurrentJob);
+                Report.SaveAs(ReportID, '', ReportFormat::Word, OutStr, RecRef);
             SaveAs::PDF:
-                REPORT.SaveAsPdf(ReportID, FileName, CurrentJob);
+                Report.SaveAs(ReportID, '', ReportFormat::Pdf, OutStr, RecRef);
         end;
     end;
 
@@ -870,20 +875,19 @@
     procedure MergeAndSaveWordLayout(EventWordLayout: Record "NPR Event Word Layout"; SaveAs: Option Word,Pdf; FileName: Text)
     var
         Job: Record Job;
+        RecRef: RecordRef;
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
+        DataTypeMgt: Codeunit "Data Type Management";
         InStrWordDoc: InStream;
         InStrParameters: InStream;
-        OutStrWordDoc: OutStream;
+        OutStrWordDoc, OutStr : OutStream;
         InStrXmlData: InStream;
         FileNameXml: Text;
-        TempFile: File;
         FileExtension: Text;
         ExtensionMismatch: Label 'Provided file extension %1 can''t be used on file type %2.';
         EMailTemplateHeader: Record "NPR E-mail Template Header";
         Parameters: Text;
-        EventCustTemplate: Report "NPR Event Customer Template";
-        EventTeamTemplate: Report "NPR Event Team Template";
     begin
         EventWordLayout.GetJobFromRecID(Job);
         Job.SetRecFilter();
@@ -898,28 +902,22 @@
         ValidateWordLayoutCheckOnly(EventWordLayout."Report ID", InStrWordDoc);
         TempBlob.CreateOutStream(OutStrWordDoc);
 
-        FileNameXml := FileMgt.ServerTempFileName('xml');
         Case EventWordLayout.Usage of
             EventWordLayout.Usage::Customer:
                 begin
-                    EventCustTemplate.SetTableView(Job);
-                    if Parameters <> '' then
-                        EventCustTemplate.SetParameters(Parameters);
-                    EventCustTemplate.SaveAsXml(FileNameXml);
+                    DataTypeMgt.GetRecordRef(Job, RecRef);
+                    TempBlob.CreateOutStream(OutStr);
+                    Report.SaveAs(Report::"NPR Event Customer Template", Parameters, ReportFormat::Xml, OutStr, RecRef);
                 end;
             EventWordLayout.Usage::Team:
                 begin
-                    EventTeamTemplate.SetTableView(Job);
-                    if Parameters <> '' then
-                        EventTeamTemplate.SetParameters(Parameters);
-                    EventTeamTemplate.SaveAsXml(FileNameXml);
+                    DataTypeMgt.GetRecordRef(Job, RecRef);
+                    TempBlob.CreateOutStream(OutStr);
+                    Report.SaveAs(Report::"NPR Event Team Template", Parameters, ReportFormat::Xml, OutStr, RecRef);
                 end;
         end;
-        TempFile.Open(FileNameXml);
-        TempFile.CreateInStream(InStrXmlData);
+        TempBlob.CreateInStream(InStrXmlData);
         EventVersionSpecificMgt.WordXMLMergerMergeWordDocument(InStrWordDoc, InStrXmlData, OutStrWordDoc, OutStrWordDoc);
-        TempFile.Close();
-        FileMgt.DeleteServerFile(FileNameXml);
 
         FileExtension := 'docx';
         if SaveAs = SaveAs::Pdf then begin
@@ -929,12 +927,11 @@
 
         if FileName = '' then begin
             FileName := EventEWSMgt.CreateFileName(Job, EMailTemplateHeader) + '.' + FileExtension;
-            FileMgt.BLOBExport(TempBlob, FileName, true)
         end else begin
             if FileMgt.GetExtension(FileName) <> FileExtension then
                 Error(ExtensionMismatch, FileMgt.GetExtension(FileName), Format(SaveAs));
-            FileMgt.BLOBExportToServerFile(TempBlob, FileName);
         end;
+        FileMgt.BLOBExport(TempBlob, FileName, true);
     end;
 
     local procedure ValidateWordLayoutCheckOnly(ReportID: Integer; DocumentStream: InStream)

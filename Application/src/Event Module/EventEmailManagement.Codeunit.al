@@ -155,7 +155,6 @@ codeunit 6060153 "NPR Event Email Management"
         BodyType: DotNet NPRNetBodyType;
         FileName: Text;
         ResourceGroup: Record "Resource Group";
-        FileMgt: Codeunit "File Management";
         EMailTemplateHeader: Record "NPR E-mail Template Header";
         ParsedLine: Text;
         ParsedSuffix: Text;
@@ -233,7 +232,6 @@ codeunit 6060153 "NPR Event Email Management"
 
         if not EMailMessageSendAndSaveCopyWithLog(RecRef.RecordId, ExchService, EmailMessage, Job) then
             exit(false);
-        FileMgt.DeleteServerFile(FileName);
         exit(true);
     end;
 

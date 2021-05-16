@@ -67,14 +67,14 @@ report 6060044 "NPR Map Excel Item Worksh."
 
         trigger OnQueryClosePage(CloseAction: Action): Boolean
         var
-            FileMgt: Codeunit "File Management";
+            FileUploaded: Boolean;
         begin
             if CloseAction = ACTION::OK then begin
-                ServerFileName := FileMgt.UploadFile(ImportExcelLbl, ExcelFileExtensionTok);
-                if ServerFileName = '' then
-                    exit(false);
+                FileUploaded := UploadIntoStream(ImportExcelLbl, '', '', FileName, InStr);
+                if not FileUploaded then
+                    exit;
 
-                SheetName := ExcelBuf.SelectSheetsName(ServerFileName);
+                SheetName := ExcelBuf.SelectSheetsNameStream(InStr);
                 if SheetName = '' then
                     exit(false);
             end;
@@ -90,20 +90,21 @@ report 6060044 "NPR Map Excel Item Worksh."
     trigger OnPreReport()
     begin
         ExcelBuf.LockTable();
-        ExcelBuf.OpenBook(ServerFileName, SheetName);
+        ExcelBuf.OpenBookStream(InStr, SheetName);
         ExcelBuf.ReadSheet();
     end;
 
     var
         ExcelBuf: Record "Excel Buffer";
         ExcelBuf2: Record "Excel Buffer";
+        InStr: InStream;
         BoolTryMatch: Boolean;
         HeaderRow: Integer;
         ExcelFileExtensionTok: Label '.xlsx', Locked = true;
         ImportExcelLbl: Label 'Import Excel File';
         HeaderRowErr: Label 'Please indicate the Header Row';
         ImportItemWorksheetErr: Label 'Please start this import from the Item Worksheet Page.';
-        ServerFileName: Text;
+        FileName: Text;
         SheetName: Text[250];
 
     local procedure AnalyzeData()

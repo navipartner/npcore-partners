@@ -184,17 +184,20 @@
 
     procedure CreateAttachment(Job: Record Job; Usage: Option; EMailTemplateHeader: Record "NPR E-mail Template Header"; var FileName: Text): Boolean
     var
-        FileMgt: Codeunit "File Management";
         EventWordLayout: Record "NPR Event Word Layout";
         EventMgt: Codeunit "NPR Event Management";
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
     begin
-        FileName := CreateFilePath(Job, FileMgt.ServerTempFileName('pdf'), EMailTemplateHeader);
-        FileMgt.DeleteServerFile(FileName);
+        FileName := CreateFilePath(Job, Format(CreateGuid() + '.' + 'pdf'), EMailTemplateHeader);
         if CustomizedLayoutFound(Job, Usage) then begin
             EventWordLayout.Get(Job.RecordId, Usage + 1);
             EventMgt.MergeAndSaveWordLayout(EventWordLayout, 1, FileName);
-        end else
-            EventMgt.SaveReportAs(Job, Usage, 1, FileName);
+        end else begin
+            EventMgt.SaveReportAs(Job, Usage, 1, TempBlob);
+            TempBlob.CreateInStream(InStr);
+            DownloadFromStream(Instr, 'Export', '', 'All Files (*.*)|*.*', FileName);
+        end;
         exit(true);
     end;
 
