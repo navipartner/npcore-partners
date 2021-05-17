@@ -79,6 +79,6 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Receipt1Text: Text[50];
         Receipt2Text: Text[50];
-        TxtClickReceipt: Label 'Show receipt';
+        TxtClickReceipt: Label 'Show receipt %1';
 }
 

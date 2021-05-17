@@ -178,7 +178,7 @@ table 6150651 "NPR POS View Profile"
         //Error('TODO: This function requires an API url.');
         // TODO: We need to sort-out the URL below. Right now, it's a local function api on my machine. No good.
 
-        if not Http.Get(StrSubstNo('https://navipartner-af-dotnet-1-0-0.azurewebsites.net/api/GetLocaleFormats?code=GaBaj0Iepwn2nIizkdMO%2FuozjcRPEg%2FwClLNl49cI4MU%2FoZYFQegww%3D%3D&locale=%1', "Client Formatting Culture ID"), Response) then begin
+        if not Http.Get('https://navipartner-af-dotnet-1-0-0.azurewebsites.net/api/GetLocaleFormats?code=GaBaj0Iepwn2nIizkdMO%2FuozjcRPEg%2FwClLNl49cI4MU%2FoZYFQegww%3D%3D&locale=%1' + "Client Formatting Culture ID", Response) then begin
             // We need to see the message unconditionally. Simply doing Error would not show anything, and would exit with false.
             Message(CouldNotRetrieve, GetLastErrorText);
             Error('');

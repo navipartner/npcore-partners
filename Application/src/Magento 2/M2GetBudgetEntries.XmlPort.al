@@ -214,12 +214,12 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
             UntilDate := '2099-12-31';
 
         if (not Evaluate(BudgetFromDate, FromDate, 9)) then begin
-            SetError(102, StrSubstNo('FromDate does not evaluate to date of format YYYY-MM-DD.', FromDate));
+            SetError(102, StrSubstNo('FromDate does not evaluate to date of format YYYY-MM-DD.'));
             exit;
         end;
 
         if (not Evaluate(BudgetUntilDate, UntilDate, 9)) then begin
-            SetError(103, StrSubstNo('UntilDate does not evaluate to date of format YYYY-MM-DD.', UntilDate));
+            SetError(103, StrSubstNo('UntilDate does not evaluate to date of format YYYY-MM-DD.'));
             exit;
         end;
 

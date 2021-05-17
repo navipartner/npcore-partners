@@ -19,11 +19,11 @@
         ResponseOutStr: OutStream;
         Window: Dialog;
         PrimaryKeyValue: Text;
-        Text002: Label 'Exporting %1 to XML\Exporting:           @2@@@@@@@@@@@@@@@@@@@\Estimated Time Left: #3###################\Record:       #4###########################';
+        Text002: Label 'Exporting %1 to XML\Exporting:           #2###################\Estimated Time Left: #3###################\Record:       #4###########################';
         HideDialog: Boolean;
         Initialized: Boolean;
         OutputInitialized: Boolean;
-        Text200: Label 'Finding first record in %1 within the filters: @2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\Estimated Time Left:                           #3##############################\Record:  #4####################################################################';
+        Text200: Label 'Finding first record in %1 within the filters: #2##############################\Estimated Time Left:                           #3##############################\Record:  #4####################################################################';
 
     procedure CreateXml()
     var
@@ -42,7 +42,7 @@
         StartTime := Time;
         Counter := 0;
         Total := RecRef.Count();
-        OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code));
+        OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code, Total, 'Counting', 0));
 
         if NpXmlTemplate2."Max Records per File" <= 0 then
             NpXmlTemplate2."Max Records per File" := 10000000;
@@ -1047,7 +1047,7 @@
         Success := false;
 
         StartTime := Time;
-        OpenDialog(StrSubstNo(Text200, RecRef.Caption));
+        OpenDialog(StrSubstNo(Text200, RecRef.Caption, Total, 'Counting', 0));
         while not Success do begin
             Counter += 1;
             UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());

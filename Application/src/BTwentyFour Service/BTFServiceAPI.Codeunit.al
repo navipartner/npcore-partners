@@ -5,7 +5,7 @@ codeunit 6014641 "NPR BTF Service API"
     var
         SampleLbl: Label 'Sample.%1', Comment = '%1=File Extension';
         SendReqToLiveEnvQst: Label 'Do you want to send request on live environment?';
-        ResponseContentNotFoundMsg: Label 'Response content not found. Instead, check out Response Note to see error details.';
+        ResponseContentNotFoundMsg: Label 'Response content not found. Instead, check out Response Note to see error details: %1.';
         EmptyContentErr: Label 'Nothing to import';
         APIIntegrationLbl: Label 'BTwentyFour API Integration - %1', Comment = '%1=API Endpoint ID';
         ProcessImportListLbl: Label 'process_import_list', Locked = true;
@@ -184,7 +184,7 @@ codeunit 6014641 "NPR BTF Service API"
         OutStr: OutStream;
     begin
         if not ErrorLog.Response.HasValue() then begin
-            Message(ResponseContentNotFoundMsg);
+            Message(ResponseContentNotFoundMsg, Format(ErrorLog."Initiatied From Rec. ID"));
             exit;
         end;
         ResponseBlob.CreateOutStream(OutStr);

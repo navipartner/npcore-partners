@@ -84,7 +84,7 @@ xmlport 6151159 "NPR M2 Delete Shipto Address"
 
         ResponseCode := 'OK';
         ResponseMessage := '';
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
+        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
     end;
 
     procedure SetErrorResponse(ErrorMessage: Text)
@@ -92,6 +92,6 @@ xmlport 6151159 "NPR M2 Delete Shipto Address"
 
         ResponseCode := 'ERROR';
         ResponseMessage := ErrorMessage;
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
+        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
     end;
 }

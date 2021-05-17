@@ -867,12 +867,14 @@ codeunit 6151131 "NPR TM Seating UI"
         ScreenIllustrationHeight := Round(ViewPort * 0.05, 1);
 
         SeatText += StrSubstNo('%1%3%2%3',
-          StrSubstNo('<polygon points="%1,%5 %2,%5 %3,%6 %4,%6" style="fill:#000000;stroke:#000000;stroke-width:1"/>',
+          StrSubstNo('<polygon points="%1,%5 %2,%5 %3,%6 %4,%6" style="fill:%7;stroke:%7;stroke-width:1"/>',
             Middle - HalfScreenTop + 5,
             Middle + HalfScreenTop + 5,
             Middle + HalfScreenTop - HalfScreenBottom + 5,
             Middle - HalfScreenTop + HalfScreenBottom + 5,
-            10, 10 + ScreenIllustrationHeight),
+            10,
+            10 + ScreenIllustrationHeight,
+            '#000000'),
 
           StrSubstNo('<text x="%1" y="%2" class="btnText12" fill="white" text-anchor="middle" alignment-baseline="middle" >screen</text>',
             Middle + 5,

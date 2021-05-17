@@ -514,7 +514,7 @@
                 ItemLedgerEntry.SetRange("Variant Code", ItemRef."Variant Code");
             if not ItemLedgerEntry.FindSet() then begin
                 CanBeUsed := false;
-                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnILE, SerialNumber, Item."No.", Item.Description, TEXTitemTracking_instructions);  //NPR5.55 [398263]
+                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnILE, SerialNumber, Item."No.", Item.Description);  //NPR5.55 [398263]
             end else begin
                 CanBeUsed := true;
             end;
@@ -539,7 +539,7 @@
                     SaleLinePOS.FindFirst();
                     "Sale POS".Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
                     TextActiveSaved := TEXTActive;
-                    UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnSLP, SerialNumber, Item."No.", Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.", TEXTitemTracking_instructions);  //NPR5.55 [398263]
+                    UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnSLP, SerialNumber, Item."No.", Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.");  //NPR5.55 [398263]
                 end;
             end;
             if (UserInformationErrorWarning <> '') and not SerialSelectionFromList then

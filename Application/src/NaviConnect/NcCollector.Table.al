@@ -151,7 +151,7 @@ table 6151525 "NPR Nc Collector"
 
     var
         TxtRemoveFilters: Label 'Please remove filters first.';
-        TxtCannotDelete: Label 'You cannot delete %1 %2 because there are %1 records for this record.';
+        TxtCannotDelete: Label 'You cannot delete %1 %2 because there are %3 records for this record.';
         TxtActivationNotAllowed: Label 'Collector %1 must have a value in field %2 and-or field %3 to be active. ';
 
     local procedure CheckCriteriaActiveCollector()

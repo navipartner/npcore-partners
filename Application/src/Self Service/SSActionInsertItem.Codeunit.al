@@ -628,7 +628,7 @@
             if ItemLedgerEntry.IsEmpty then begin
                 CanBeUsed := false;
                 //Create user information message
-                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnILE, SerialNumber, ItemNo, Item.Description, TEXTitemTracking_instructions);
+                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnILE, SerialNumber, ItemNo, Item.Description);
             end else begin
                 CanBeUsed := true;
             end;
@@ -648,7 +648,7 @@
                 SaleLinePOS.FindFirst();
                 "Sale POS".Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
                 TextActiveSaved := TEXTActive;
-                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnSLP, SerialNumber, ItemNo, Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.", TEXTitemTracking_instructions);
+                UserInformationErrorWarning := StrSubstNo(TEXTWrongSerialOnSLP, SerialNumber, ItemNo, Item.Description, TextActiveSaved, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.");
 
             end;
         end;

@@ -305,7 +305,7 @@ table 6014570 "NPR POS Sale Tax"
     procedure SetTaxCalcTypeFromSource(SaleLinePOS: Record "NPR POS Sale Line")
     var
         Handled: Boolean;
-        UnknownTaxCalculationTypeErr: Label 'Unknown Tax Calculation Type';
+        UnknownTaxCalculationTypeErr: Label 'Unknown Tax Calculation Type: %1 %2';
     begin
         case SaleLinePOS."VAT Calculation Type" of
             SaleLinePOS."VAT Calculation Type"::"Full VAT":

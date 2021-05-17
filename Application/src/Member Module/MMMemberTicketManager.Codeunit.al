@@ -102,7 +102,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
                 if (not (MembershipAdmissionSetup.FindFirst())) then begin
                     if (not (FailWithError)) then
                         exit(false);
-                    Error(INVALID_EXTERNAL_ITEM, TmpTicketReservationRequest."Item No.", Membership."Membership Code");
+                    Error(INVALID_EXTERNAL_ITEM, TmpTicketReservationRequest."Item No.", Membership."Membership Code", TmpTicketReservationRequest."Admission Code");
 
                 end;
             end;
