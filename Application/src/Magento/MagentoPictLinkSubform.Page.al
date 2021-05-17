@@ -16,14 +16,6 @@
             repeater(Control6150624)
             {
                 ShowCaption = false;
-                field(MiniatureLine; TempMagentoPicture.Picture)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Miniature';
-                    Editable = false;
-                    Visible = MiniatureLinePicture;
-                    ToolTip = 'Specifies the value of the Miniature field';
-                }
                 field("Picture Name"; Rec."Picture Name")
                 {
                     ApplicationArea = All;
@@ -60,20 +52,7 @@
                     ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
-            field(MiniatureSingle; TempMagentoPicture.Picture)
-            {
-                ApplicationArea = All;
-                Caption = 'Miniature';
-                Editable = false;
-                Enabled = false;
-                Visible = MiniatureSinglePicture;
-                ToolTip = 'Specifies the value of the Miniature field';
-            }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnAfterGetCurrRecord()

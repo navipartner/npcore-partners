@@ -253,7 +253,9 @@ codeunit 6151403 "NPR Magento Webservice"
         MagentoPictureLink: Record "NPR Magento Picture Link";
         MagentoPicture: Record "NPR Magento Picture";
         Base64: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
+        OutStr: OutStream;
     begin
         MagentoPictureLink.SetCurrentKey("Item No.", "Line No."); // No key on sorting
         MagentoPictureLink.SetFilter("Item No.", '=%1', ItemNo);
@@ -274,11 +276,12 @@ codeunit 6151403 "NPR Magento Webservice"
         if (not MagentoPicture.FindFirst()) then
             exit(false);
 
-        if (not MagentoPicture.Picture.HasValue()) then
+        if (not MagentoPicture.Image.HasValue()) then
             exit(false);
 
-        MagentoPicture.CalcFields(Picture);
-        MagentoPicture.Picture.CreateInStream(InStr);
+        TempBlob.CreateOutStream(OutStr);
+        MagentoPicture.Image.ExportStream(OutStr);
+        TempBlob.CreateInStream(InStr);
 
         ImageBase64 := Base64.ToBase64(InStr);
 

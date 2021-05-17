@@ -88,6 +88,7 @@ codeunit 6014531 "NPR Retail Logo Mgt."
     var
         ImageHandler: Codeunit "Image Handler Management";
         ConvertBase64: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
         InStr: InStream;
         Width: Integer;
@@ -110,9 +111,10 @@ codeunit 6014531 "NPR Retail Logo Mgt."
 
         RetailLogo.Keyword := Text000001;
 
-        RetailLogo.Logo.CreateInStream(InStr);
-        RetailLogo.Logo.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         ConvertBase64.FromBase64(sourceBase64, OutStr);
+        TempBlob.CreateInStream(InStr);
+        RetailLogo."POS Logo".ImportStream(InStr, RetailLogo.FieldName("POS Logo"));
 
         ImageHandler.GetImageSize(InStr, Width, Height);
 
@@ -147,10 +149,11 @@ codeunit 6014531 "NPR Retail Logo Mgt."
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
     begin
-        RetailLogo.CalcFields(Logo);
-        if RetailLogo.Logo.HasValue() then begin
-            TempBlob.FromRecord(RetailLogo, RetailLogo.FieldNo(Logo));
+        if RetailLogo."POS Logo".HasValue() then begin
+            TempBlob.CreateOutStream(OutStr);
+            RetailLogo."POS Logo".ExportStream(OutStr);
             FileManagement.BLOBExport(TempBlob, RetailLogo.Keyword + Format(RetailLogo.Sequence) + '.bmp', true);
         end;
     end;

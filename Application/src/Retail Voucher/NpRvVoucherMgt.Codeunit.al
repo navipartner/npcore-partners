@@ -657,8 +657,7 @@
         ArchVoucher."Send via Print" := Voucher."Send via Print";
         ArchVoucher."Send via E-mail" := Voucher."Send via E-mail";
         ArchVoucher."Send via SMS" := Voucher."Send via SMS";
-        Voucher.CalcFields(Barcode);
-        ArchVoucher.Barcode := Voucher.Barcode;
+        ArchVoucher."Barcode Image" := Voucher."Barcode Image";
         ArchVoucher.Insert();
     end;
 

@@ -1,11 +1,11 @@
 page 6059954 "NPR MCS Faces Card"
 {
-
     Caption = 'MCS Faces Card';
     InsertAllowed = false;
     ModifyAllowed = false;
     UsageCategory = None;
     SourceTable = "NPR MCS Faces";
+    PageType = Card;
 
     layout
     {
@@ -88,16 +88,21 @@ page 6059954 "NPR MCS Faces Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created field';
                 }
-                field(Picture; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Picture field';
-                }
                 field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action field';
                 }
+            }
+        }
+        area(factboxes)
+        {
+            part(MCSFacesImage; "NPR MCS Faces Image")
+            {
+                ApplicationArea = All;
+                Caption = 'Image';
+                SubPageLink = PersonId = field(PersonId),
+                                FaceId = Field(FaceId);
             }
         }
     }

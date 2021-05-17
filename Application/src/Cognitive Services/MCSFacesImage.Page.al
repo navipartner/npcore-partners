@@ -1,36 +1,25 @@
-page 6014629 "NPR RP Template Media Factbox"
+page 6151307 "NPR MCS Faces Image"
 {
-    Caption = 'Template Media Factbox';
-    Editable = false;
+    Caption = 'NPR MCS Faces Image';
+    DeleteAllowed = false;
     InsertAllowed = false;
+    LinksAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-    SourceTable = "NPR RP Template Media Info";
+    SourceTable = "NPR MCS Faces";
 
     layout
     {
         area(content)
         {
-            field(URL; Rec.URL)
-            {
-                ApplicationArea = All;
-                ExtendedDatatype = URL;
-                ToolTip = 'Specifies the value of the URL field';
-            }
-            field(Description; Rec.Description)
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Description field';
-            }
             field(Picture; Rec.Image)
             {
                 ApplicationArea = Basic, Suite, Invoicing;
                 ShowCaption = false;
-                ToolTip = 'Specifies the picture that has been inserted for the item.';
+                ToolTip = 'Specifies the Image that has been inserted for the item.';
             }
         }
     }
+
     actions
     {
         area(processing)
@@ -40,7 +29,7 @@ page 6014629 "NPR RP Template Media Factbox"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Import';
                 Image = Import;
-                ToolTip = 'Import a picture file.';
+                ToolTip = 'Import a image file.';
 
                 trigger OnAction()
                 var
@@ -70,7 +59,7 @@ page 6014629 "NPR RP Template Media Factbox"
                 Caption = 'Export';
                 Enabled = DeleteExportEnabled;
                 Image = Export;
-                ToolTip = 'Export the picture to a file.';
+                ToolTip = 'Export the image to a file.';
 
                 trigger OnAction()
                 var

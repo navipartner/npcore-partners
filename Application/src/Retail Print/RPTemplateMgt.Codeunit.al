@@ -175,7 +175,6 @@
         DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
         DataItemConstraintLink.SetRange("Data Item Code", TemplateHeader.Code);
         DeviceSettings.SetRange(Template, TemplateHeader.Code);
-        MediaInfo.SetAutoCalcFields(Picture);
         MediaInfo.SetRange(Template, TemplateHeader.Code);
 
         TemplateHeader.Code := NewTemplateCode;

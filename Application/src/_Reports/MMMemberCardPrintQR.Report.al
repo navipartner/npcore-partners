@@ -27,14 +27,13 @@ report 6060127 "NPR MM Member Card Print QR"
                 column(MemberName; MemberName)
                 {
                 }
-                column(MemberPicture; "MM Member".Picture)
+                column(MemberPicture; TenantMediaMMMember.Content)
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "MM Member".Picture.HasValue() then
-                        "MM Member".CalcFields(Picture);
+                    "MM Member".GetImageContent(TenantMediaMMMember);
 
                     Clear(MemberName);
                     if "MM Member"."First Name" <> '' then
@@ -86,7 +85,7 @@ report 6060127 "NPR MM Member Card Print QR"
         MemberType: Text;
         MemberDate: Text;
         POSUnit: Record "NPR POS Unit";
-        TenantMedia: Record "Tenant Media";
+        TenantMedia, TenantMediaMMMember : Record "Tenant Media";
         BlobBuffer: Record "NPR BLOB buffer" temporary;
 }
 

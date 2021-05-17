@@ -607,7 +607,6 @@
     var
         MemberItem: Record "Item";
         ItemVariant: Record "Item Variant";
-        ItemCrossReference: Record "Item Cross Reference";
         LibraryInventory: Codeunit "NPR Library - Inventory";
     begin
         MemberItem.INIT();

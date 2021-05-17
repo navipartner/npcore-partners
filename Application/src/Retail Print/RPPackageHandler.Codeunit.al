@@ -322,7 +322,6 @@
                         DeviceSettings.Insert();
                     until tmpDeviceSettings.Next() = 0;
 
-                tmpMediaInfo.SetAutoCalcFields(Picture);
                 if tmpMediaInfo.FindSet() then
                     repeat
                         MediaInfo.Init();

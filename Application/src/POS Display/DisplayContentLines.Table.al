@@ -1,7 +1,5 @@
 table 6059952 "NPR Display Content Lines"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Object
-
     Caption = 'Display Content Lines';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Display Content Lines";
@@ -30,6 +28,13 @@ table 6059952 "NPR Display Content Lines"
             Caption = 'Image';
             DataClassification = CustomerContent;
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
+        }
+        field(13; Picture; Media)
+        {
+            Caption = 'Image';
+            DataClassification = CustomerContent;
         }
     }
 
@@ -43,5 +48,14 @@ table 6059952 "NPR Display Content Lines"
     fieldgroups
     {
     }
+
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec.Picture.HasValue() then
+            exit;
+        if TenantMedia.Get(Rec.Picture.MediaId()) then
+            TenantMedia.CalcFields(Content);
+    end;
 }
 

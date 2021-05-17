@@ -18,7 +18,7 @@ page 6059999 "NPR Disp. Cont. Line Card"
                     Visible = UrlIsVisible;
                     ToolTip = 'Specifies the value of the Url field';
                 }
-                field(Image; Rec.Image)
+                field(Image; Rec.Picture)
                 {
                     ApplicationArea = All;
                     Visible = ImageIsVisible;
@@ -30,6 +30,16 @@ page 6059999 "NPR Disp. Cont. Line Card"
                 SubPageLink = "Content Code" = FIELD("Content Code"),
                               "Line No." = FIELD("Line No.");
                 ApplicationArea = All;
+            }
+        }
+        area(factboxes)
+        {
+            part(DispContentLinesImg; "NPR Disp. Content Lines Img")
+            {
+                ApplicationArea = All;
+                Caption = 'Picture';
+                SubPageLink = "Content Code" = field("Content Code"),
+                              "Line No." = field("Line No.");
             }
         }
     }

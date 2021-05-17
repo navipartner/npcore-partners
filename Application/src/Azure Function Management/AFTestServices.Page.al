@@ -59,11 +59,6 @@ page 6151572 "NPR AF Test Services"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Image Type field';
                 }
-                field(Image; Rec.Image)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Image field';
-                }
             }
             group("MSG Service")
             {
@@ -87,6 +82,15 @@ page 6151572 "NPR AF Test Services"
                     TableRelation = "Sales Invoice Header";
                     ToolTip = 'Specifies the value of the Invoice No. field';
                 }
+            }
+        }
+        area(factboxes)
+        {
+            part(AFTestServicePicture; "NPR AF Test Service Picture")
+            {
+                ApplicationArea = All;
+                Caption = 'Picture';
+                SubPageLink = "Primary Key" = field("Primary Key");
             }
         }
     }

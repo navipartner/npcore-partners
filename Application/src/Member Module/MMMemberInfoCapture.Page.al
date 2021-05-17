@@ -200,17 +200,7 @@ page 6060134 "NPR MM Member Info Capture"
             {
                 Caption = 'Cardholder';
                 Visible = ShowCardholderSection;
-                field(Picture2; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Picture field';
 
-                    trigger OnValidate()
-                    begin
-                        Commit();
-                    end;
-                }
                 field(FirstName2; Rec."First Name")
                 {
                     ApplicationArea = All;
@@ -328,16 +318,7 @@ page 6060134 "NPR MM Member Info Capture"
             group(CRM)
             {
                 Visible = ShowNewMemberSection;
-                field(Picture; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Picture field';
 
-                    trigger OnValidate()
-                    begin
-                        Commit();
-                    end;
-                }
                 field(Gender; Rec.Gender)
                 {
                     ApplicationArea = All;
@@ -758,6 +739,15 @@ page 6060134 "NPR MM Member Info Capture"
                 }
             }
         }
+        area(factboxes)
+        {
+            part(MMMemberInfoCapturePicture; "NPR MM Member Info Picture")
+            {
+                ApplicationArea = All;
+                Caption = 'Picture';
+                SubPageLink = "Entry No." = field("Entry No.");
+            }
+        }
     }
 
     actions
@@ -787,7 +777,7 @@ page 6060134 "NPR MM Member Info Capture"
 
     trigger OnAfterGetCurrRecord()
     begin
-        Clear(xRec.Picture);
+        Clear(xRec.Image);
     end;
 
     trigger OnAfterGetRecord()
@@ -1340,11 +1330,10 @@ page 6060134 "NPR MM Member Info Capture"
         Rec."Member Entry No" := Member."Entry No.";
         Rec."External Member No" := Member."External Member No.";
 
-        Member.CalcFields(Picture);
-        if (Member.Picture.HasValue()) then begin
-            Rec.Picture := Member.Picture;
+        if (Member.Image.HasValue()) then begin
+            Rec.Image := Member.Image;
         end else begin
-            Clear(Rec.Picture);
+            Clear(Rec.Image);
         end;
 
         Rec."First Name" := Member."First Name";

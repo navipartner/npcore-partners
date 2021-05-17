@@ -155,13 +155,13 @@
     begin
         if MagentoPicture.Get(PictureType, TempMagentoPicture2.Name) then begin
             MagentoPicture."Size (kb)" := TempMagentoPicture."Size (kb)";
-            Clear(MagentoPicture.Picture);
+            Clear(MagentoPicture.Image);
             MagentoPicture.Modify(true);
         end else begin
             MagentoPicture.Init();
             MagentoPicture := TempMagentoPicture2;
             MagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
-            Clear(MagentoPicture.Picture);
+            Clear(MagentoPicture.Image);
             MagentoPicture.Insert(true);
         end;
         MagentoPictureMgt.DragDropPicture(MagentoPicture.Name, MagentoPicture.GetMagentoType(), TempMagentoPicture2.GetBase64());
@@ -250,7 +250,7 @@
             exit;
         end;
 
-        if Rec.Picture.HasValue() then begin
+        if Rec.Image.HasValue() then begin
             CurrPage.DragDropAddin.DisplayData(GetDataUri());
             exit;
         end;
@@ -262,15 +262,19 @@
     var
         Convert: Codeunit "Base64 Convert";
         ImageHelpers: Codeunit "Image Helpers";
-        InStream: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        OutStr: OutStream;
     begin
-        if not Rec.Picture.HasValue() then
+        if not Rec.Image.HasValue() then
             exit;
 
-        Rec.CalcFields(Picture);
-        Rec.Picture.CreateInStream(InStream);
-        DataUri := 'data:image/' + ImageHelpers.GetImageType(InStream);
-        DataUri += ';base64,' + Convert.ToBase64(InStream);
+        TempBlob.CreateOutStream(OutStr);
+        Rec.Image.ExportStream(OutStr);
+        TempBlob.CreateInStream(InStr);
+
+        DataUri := 'data:image/' + ImageHelpers.GetImageType(InStr);
+        DataUri += ';base64,' + Convert.ToBase64(InStr);
         exit(DataUri);
     end;
 
@@ -386,7 +390,9 @@
         Group1: Codeunit DotNet_Group;
         Group2: Codeunit DotNet_Group;
         Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
+        InStr: InStream;
         DataUri: Text;
     begin
         if not Initialized then
@@ -405,8 +411,10 @@
             TempMagentoPicture.Name := PictureName;
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
             TempMagentoPicture."Mime Type" := Group1.Value();
-            TempMagentoPicture.Picture.CreateOutStream(OutStr);
+            TempBlob.CreateOutStream(OutStr);
             Convert.FromBase64(Group2.Value(), OutStr);
+            TempBlob.CreateInStream(InStr);
+            TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
             TempMagentoPicture.Insert();
         end;
         PictureName := '';

@@ -154,6 +154,13 @@ table 6060126 "NPR MM Member"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
+        }
+        field(33; Image; Media)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
         }
         field(35; "E-Mail Address"; Text[80])
         {
@@ -266,11 +273,19 @@ table 6060126 "NPR MM Member"
         MembershipRole.SetFilter("Member Entry No.", '=%1', "Entry No.");
         if (MembershipRole.FindSet()) then begin
             repeat
-                //MembershipManagement.SynchronizeCustomerAndContact (MembershipRole."Membership Entry No.");
                 MembershipManagement.UpdateContactFromMember(MembershipRole."Membership Entry No.", Rec);
             until (MembershipRole.Next() = 0);
         end;
 
+    end;
+
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Image.HasValue() then
+            exit;
+        if TenantMedia.Get(Image.MediaId()) then
+            TenantMedia.CalcFields(Content);
     end;
 }
 
