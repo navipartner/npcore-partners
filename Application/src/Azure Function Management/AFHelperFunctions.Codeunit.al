@@ -113,7 +113,9 @@ codeunit 6151571 "NPR AF Helper Functions"
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
         Base64Convert: codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
+        OutStr: OutStream;
     begin
         MagentoPictureLink.SetRange("Item No.", Item."No.");
         MagentoPictureLink.SetRange("Base Image", true);
@@ -124,9 +126,11 @@ codeunit 6151571 "NPR AF Helper Functions"
             exit(Base64String);
 
         if MagentoPicture.DownloadPicture(TmpMagentoPicture) then begin
-            TmpMagentoPicture.Picture.CreateInStream(InStr);
-
+            TempBlob.CreateOutStream(OutStr);
+            TmpMagentoPicture.Image.ExportStream(OutStr);
+            TempBlob.CreateInStream(InStr);
             Base64String := Base64Convert.ToBase64(InStr);
+
             PictureFileName := MagentoPicture.Name;
 
             exit(Base64String);

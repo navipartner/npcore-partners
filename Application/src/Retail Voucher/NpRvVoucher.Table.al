@@ -349,6 +349,13 @@ table 6151013 "NPR NpRv Voucher"
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
+        }
+        field(306; "Barcode Image"; Media)
+        {
+            Caption = 'Barcode';
+            DataClassification = CustomerContent;
         }
         field(1000; "Issue Date"; Date)
         {
@@ -547,6 +554,15 @@ table 6151013 "NPR NpRv Voucher"
     begin
         CalcFields("In-use Quantity");
         exit("In-use Quantity");
+    end;
+
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec."Barcode Image".HasValue() then
+            exit;
+        if TenantMedia.Get(Rec."Barcode Image".MediaId()) then
+            TenantMedia.CalcFields(Content);
     end;
 }
 

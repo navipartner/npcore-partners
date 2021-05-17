@@ -1,11 +1,5 @@
 table 6014478 "NPR Retail Logo"
 {
-    // NPR5.27/MMV /20160927 CASE 253453 Added non-validated table relation to register table on field 2.
-    // NPR5.29/MMV /20161207 CASE 252253 Changed field 1 type from Code to Integer. Data upgrade being handled by CU 6059990.
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.40/MMV /20180306 CASE 284505 Added fields for permanent storage of ESCPOS specific constants per logo.
-    // NPR5.55/MITH/20200619 CASE 404276 Added fields to store a 1-bit version of the logo and its size (Boca Printer related)
-
     Caption = 'Retail Logo';
     DataClassification = CustomerContent;
 
@@ -45,6 +39,8 @@ table 6014478 "NPR Retail Logo"
             Caption = 'Logo';
             SubType = Bitmap;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(7; ESCPOSLogo; BLOB)
         {
@@ -59,6 +55,11 @@ table 6014478 "NPR Retail Logo"
         field(9; Width; Integer)
         {
             Caption = 'Width';
+            DataClassification = CustomerContent;
+        }
+        field(10; "POS Logo"; Media)
+        {
+            Caption = 'Logo';
             DataClassification = CustomerContent;
         }
         field(100; "ESCPOS Height Low Byte"; Integer)
@@ -108,14 +109,17 @@ table 6014478 "NPR Retail Logo"
     var
         RetailLogo2: Record "NPR Retail Logo";
     begin
-        //-NPR5.29 [252253]
         if RetailLogo2.FindLast() then;
         Sequence := RetailLogo2.Sequence + 1;
-        // IF RetailLogo2.FindLast() AND (RetailLogo2.Sequence <> '') THEN
-        //  Sequence := INCSTR(RetailLogo2.Sequence)
-        // ELSE
-        //  Sequence := '1';
-        //+NPR5.29 [252253]
+    end;
+
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec."POS Logo".HasValue() then
+            exit;
+        if TenantMedia.Get(Rec."POS Logo".MediaId()) then
+            TenantMedia.CalcFields(Content);
     end;
 }
 

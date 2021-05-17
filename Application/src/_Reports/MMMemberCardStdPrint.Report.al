@@ -53,14 +53,13 @@ report 6060123 "NPR MM Member Card Std Print"
                 column(MemberName; MemberName)
                 {
                 }
-                column(MemberPicture; "MM Member".Picture)
+                column(MemberPicture; TenantMediaMMMember.Content)
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "MM Member".Picture.HasValue() then
-                        "MM Member".CalcFields(Picture);
+                    "MM Member".GetImageContent(TenantMediaMMMember);
 
                     Clear(MemberName);
                     if "MM Member"."First Name" <> '' then
@@ -119,6 +118,7 @@ report 6060123 "NPR MM Member Card Std Print"
         CompanyInformation: Record "Company Information";
         MMMembershipEntry: Record "NPR MM Membership Entry";
         BlobBuffer: Record "NPR BLOB buffer" temporary;
+        TenantMediaMMMember: Record "Tenant Media";
         TmpBarcode: Codeunit "Temp Blob";
         ExpiryDateCaption: Label 'Expiry date: ';
         MemberCardNoCaption: Label 'Member No.:';

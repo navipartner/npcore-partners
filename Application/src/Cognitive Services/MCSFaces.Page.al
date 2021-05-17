@@ -91,11 +91,6 @@ page 6059959 "NPR MCS Faces"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created field';
                 }
-                field(Picture; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Picture field';
-                }
                 field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;

@@ -17,14 +17,6 @@
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field(MiniatureLine; TempMagentoPicture.Picture)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Miniature';
-                        Editable = false;
-                        Visible = MiniatureLinePicture;
-                        ToolTip = 'Specifies the value of the Miniature field';
-                    }
                     field(Type; Rec.Type)
                     {
                         ApplicationArea = All;
@@ -124,7 +116,6 @@
     begin
         CountRelations();
         if TempMagentoPicture.Get(Rec.Type, Rec.Name) then begin
-            TempMagentoPicture.CalcFields(Picture);
             exit;
         end;
         Clear(TempMagentoPicture2);
@@ -133,7 +124,7 @@
 
         TempMagentoPicture.Init();
         TempMagentoPicture := Rec;
-        TempMagentoPicture.Picture := TempMagentoPicture2.Picture;
+        TempMagentoPicture.Image := TempMagentoPicture2.Image;
         TempMagentoPicture.Insert();
     end;
 

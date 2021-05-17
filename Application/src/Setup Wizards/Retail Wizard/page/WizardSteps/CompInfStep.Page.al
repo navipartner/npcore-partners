@@ -129,20 +129,6 @@ page 6014652 "NPR Comp. Inf. Step"
                     Importance = Additional;
                     ToolTip = 'Specifies the company''s industrial classification code.';
                 }
-                group(Pic)
-                {
-                    Caption = 'Picture';
-                    field(Picture; Rec.Picture)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        ToolTip = 'Specifies the picture that has been set up for the company, such as a company logo.';
-
-                        trigger OnValidate()
-                        begin
-                            CurrPage.SaveRecord();
-                        end;
-                    }
-                }
                 group(Separator1)
                 {
                     Caption = '';

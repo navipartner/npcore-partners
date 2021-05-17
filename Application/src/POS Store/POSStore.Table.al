@@ -112,6 +112,8 @@ table 6150614 "NPR POS Store"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anywhere';
         }
         field(21; "Posting Compression"; Option)
         {

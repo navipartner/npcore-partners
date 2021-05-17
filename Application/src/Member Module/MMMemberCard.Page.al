@@ -100,11 +100,6 @@ page 6060136 "NPR MM Member Card"
             }
             group(CRM)
             {
-                field(Picture; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Picture field';
-                }
                 field(Gender; Rec.Gender)
                 {
                     ApplicationArea = All;
@@ -382,6 +377,12 @@ page 6060136 "NPR MM Member Card"
         }
         area(factboxes)
         {
+            part(MMMemberPicture; "NPR MM Member Picture")
+            {
+                ApplicationArea = All;
+                Caption = 'Picture';
+                SubPageLink = "Entry No." = field("Entry No.");
+            }
             systempart(Control6150638; Notes)
             {
                 ApplicationArea = All;

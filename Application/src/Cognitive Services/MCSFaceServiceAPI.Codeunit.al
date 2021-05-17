@@ -188,7 +188,6 @@
         MemberName: Text;
         ImageInStream: InStream;
         TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
     begin
         RecRef.Get(MMMember.RecordId);
 
@@ -201,12 +200,9 @@
             MemberName := MemberName + ' ' + MMMember."Last Name";
 
         DetectIdentifyPicture(RecRef, MemberName, ImageInStream);
-
-        TempBlob.CreateOutStream(OutStr);
-        CopyStream(OutStr, ImageInStream);
-        TempBlob.ToRecordRef(RecRef, MMMember.FieldNo(Picture));
-
-        RecRef.Modify();
+        RecRef.SetTable(MMMember);
+        MMMember.Image.ImportStream(ImageInStream, MMMember.FieldName(Image));
+        MMMember.Modify();
     end;
 
     procedure DetectIdentifyPicture(var RecRef: RecordRef; PersonName: Text; ImageInStream: InStream)

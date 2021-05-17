@@ -1,29 +1,17 @@
-page 6014629 "NPR RP Template Media Factbox"
+page 6151306 "NPR AF Test Service Picture"
 {
-    Caption = 'Template Media Factbox';
-    Editable = false;
+    Caption = 'AF Test Service Picture';
+    DeleteAllowed = false;
     InsertAllowed = false;
+    LinksAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-    SourceTable = "NPR RP Template Media Info";
+    SourceTable = "NPR AF Args: Spire Barcode";
 
     layout
     {
         area(content)
         {
-            field(URL; Rec.URL)
-            {
-                ApplicationArea = All;
-                ExtendedDatatype = URL;
-                ToolTip = 'Specifies the value of the URL field';
-            }
-            field(Description; Rec.Description)
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Description field';
-            }
-            field(Picture; Rec.Image)
+            field(Picture; Rec.Picture)
             {
                 ApplicationArea = Basic, Suite, Invoicing;
                 ShowCaption = false;
@@ -31,6 +19,7 @@ page 6014629 "NPR RP Template Media Factbox"
             }
         }
     }
+
     actions
     {
         area(processing)
@@ -50,7 +39,7 @@ page 6014629 "NPR RP Template Media Factbox"
                     FileName: Text;
                     ClientFileName: Text;
                 begin
-                    if Rec.Image.HasValue() then
+                    if Rec.Picture.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -58,9 +47,9 @@ page 6014629 "NPR RP Template Media Factbox"
                     if FileName = '' then
                         exit;
 
-                    Clear(Rec.Image);
+                    Clear(Rec.Picture);
                     TempBlob.CreateInStream(InStr);
-                    Rec.Image.ImportStream(InStr, FileName);
+                    Rec.Picture.ImportStream(InStr, FileName);
                     Rec.Modify(true);
                 end;
             }
@@ -83,7 +72,7 @@ page 6014629 "NPR RP Template Media Factbox"
                     Rec.GetImageContent(TenantMedia);
                     ToFile := TenantMedia."File Name";
                     TempBlob.CreateOutStream(OutStr);
-                    Rec.Image.ExportStream(OutStr);
+                    Rec.Picture.ExportStream(OutStr);
                     FileManagement.BLOBExport(TempBlob, ToFile, true);
                 end;
             }
@@ -100,7 +89,7 @@ page 6014629 "NPR RP Template Media Factbox"
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Rec.Image);
+                    Clear(Rec.Picture);
                     Rec.Modify(true);
                 end;
             }
@@ -119,7 +108,7 @@ page 6014629 "NPR RP Template Media Factbox"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Rec.Image.HasValue();
+        DeleteExportEnabled := Rec.Picture.HasValue();
     end;
 }
 
