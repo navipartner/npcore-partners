@@ -585,7 +585,7 @@
         gPrimaryRequestMode := not gChangeRequestMode;
 
         if (ShowDifferentDatesWarning) then
-            Message(DIFFERENT_DATES_WARNING, AdmissionScheduleEntry."Admission Start Date", gLimitToDateSelected);
+            Message(DIFFERENT_DATES_WARNING);
     end;
 
     procedure SetTicketItem(ItemNo: Code[20]; VariantCode: Code[10])

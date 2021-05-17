@@ -911,7 +911,7 @@
             Evaluate(MaxHour, Format(MaxTime, 0, '<Hours24>'));
             ZeroHourPrefix := '';
             if (MaxHour < 10) then ZeroHourPrefix := '0';
-            Evaluate(MaxTime, StrSubstNo('%1%2:00:00', ZeroHourPrefix, Format(MaxHour), 9));
+            Evaluate(MaxTime, StrSubstNo('%1%2:00:00', ZeroHourPrefix, Format(MaxHour)));
             DetailAccessEntry.SetFilter("Created Datetime", '<%1', CreateDateTime(MaxDate, MaxTime));
             DetailAccessEntry.FindLast();
         end;

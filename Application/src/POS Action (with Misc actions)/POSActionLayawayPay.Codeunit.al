@@ -160,7 +160,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
 
         if GetNextDuePrepayment(SalesHeader, NextInvoice, SalesInvoiceHeader."Due Date", false) then begin
             InsertCommentLine(POSSaleLine, StrSubstNo(LAYAWAY_NEXT_DATE, Format(NextInvoice."Due Date")));
-            InsertCommentLine(POSSaleLine, StrSubstNo(LAYAWAY_NEXT_AMOUNT, Format(NextInvoice."Amount Including VAT"), 0, '<Standard Format,0>'));
+            InsertCommentLine(POSSaleLine, StrSubstNo(LAYAWAY_NEXT_AMOUNT, Format(NextInvoice."Amount Including VAT", 0, '<Standard Format,0>')));
             InsertCommentLine(POSSaleLine, StrSubstNo(LAYAWAY_REMAINING, Format(GetTotalRemainingLayawayAmount(SalesHeader, SalesInvoiceHeader."Due Date"), 0, '<Standard Format,0>')));
         end else
             InsertCommentLine(POSSaleLine, LAYAWAY_COMPLETED);

@@ -1080,7 +1080,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
                                 if (TmpLoyaltyPointsSetup."Discount Type" = TmpLoyaltyPointsSetup."Discount Type"::"Discount %") then begin
                                     if (SubTotal = 0) then
-                                        exit(ErrorExit(ReasonText, StrSubstNo(SUBTOTAL_ZERO, SubTotal, TmpLoyaltyPointsSetup.FieldName("Coupon Type Code"), TmpLoyaltyPointsSetup."Coupon Type Code")));
+                                        exit(ErrorExit(ReasonText, StrSubstNo(SUBTOTAL_ZERO, TmpLoyaltyPointsSetup.FieldName("Coupon Type Code"), TmpLoyaltyPointsSetup."Coupon Type Code")));
 
                                     TmpLoyaltyPointsSetup."Amount LCY" := SubTotal * TmpLoyaltyPointsSetup."Discount %" / 100;
                                 end;

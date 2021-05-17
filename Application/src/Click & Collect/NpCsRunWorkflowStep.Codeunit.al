@@ -196,7 +196,7 @@
         if not NpCsDocument."Notify Store via E-mail" then
             exit(false);
 
-        LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."To Store Code");
+        LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."To Store Code", '');
 
         NpCsStore.Get(NpCsDocument."To Store Code");
         NpCsStore.TestField("E-mail");
@@ -264,7 +264,7 @@
         if not NpCsDocument."Notify Store via Sms" then
             exit(false);
 
-        LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."To Store Code");
+        LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."To Store Code", '');
 
         if NpCsStore.Get(NpCsDocument."To Store Code") then;
         NpCsStore.TestField("Mobile Phone No.");

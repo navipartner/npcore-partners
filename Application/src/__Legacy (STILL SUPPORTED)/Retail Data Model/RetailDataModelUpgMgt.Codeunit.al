@@ -138,7 +138,7 @@
     begin
         if TryOpenTable(RecRef, 6014401, 'Register') then begin
             if not RecRef.FindSet() then
-                CreateLogEntry(StrSubstNo('No existing cash registers found!', POSUnit.TableCaption, POSUnit."No."), 1, 1, 1)
+                CreateLogEntry(StrSubstNo('No existing cash registers found %1 %2!', POSUnit.TableCaption, POSUnit."No."), 1, 1, 1)
             else
                 repeat
                     if TryGetField(RecRef, FieldRef, 8, 'Location Code') then begin

@@ -357,7 +357,7 @@
 
     procedure DocManage(NaviDocsEntry: Record "NPR NaviDocs Entry") DocManageSuccess: Boolean
     var
-        Error002: Label 'Posted Sales Invoice %1 does not exist!';
+        Error002: Label 'Posted Sales Invoice %1 %2 does not exist!';
         Succes001: Label 'Handled succesfully by %1.';
         NaviDocsHandlingProfile: Record "NPR NaviDocs Handling Profile";
         RecRef: RecordRef;
@@ -1136,7 +1136,7 @@
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
         EmailSetup: Record "NPR E-mail Setup";
         MailSeparators: List of [Text];
-        Txt001: Label 'NaviDocs Error %1 - %2 %3';
+        Txt001: Label 'NaviDocs Error %1 - %2';
         MailManagement: Codeunit "Mail Management";
         EmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";

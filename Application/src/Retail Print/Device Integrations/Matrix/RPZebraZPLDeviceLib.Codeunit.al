@@ -446,7 +446,7 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
             'E': //EAN13
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
+                    AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5', Type, Format(Rotation), Height, SecondParam, LineAbove));
                 end;
             'U': //UPC-A
                 begin

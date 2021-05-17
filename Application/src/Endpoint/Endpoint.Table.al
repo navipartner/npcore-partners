@@ -1,9 +1,5 @@
 table 6014674 "NPR Endpoint"
 {
-    // NPR5.23\BR\20160518  CASE 237658 Object created
-    // NPR5.25\BR\20160804  CASE 234602 Delete Releated tables
-    // NPR5.48/JDH /20181109 CASE 334163 Added Captions, and changed lookup and drilldown to list pages
-
     Caption = 'Endpoint';
     DrillDownPageID = "NPR Endpoint List";
     LookupPageID = "NPR Endpoint List";
@@ -162,10 +158,6 @@ table 6014674 "NPR Endpoint"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         EndpointRequestBatch: Record "NPR Endpoint Request Batch";
@@ -174,18 +166,12 @@ table 6014674 "NPR Endpoint"
         EndpointRequestBatch.SetRange("Endpoint Code", Code);
         if not EndpointRequestBatch.IsEmpty then
             Error(TxtCannotDelete, TableCaption, Code, EndpointRequestBatch.TableCaption);
-        //-NPR5.25
         EndpointFilter.SetRange("Endpoint Code", Code);
         EndpointFilter.DeleteAll(true);
-        //+NPR5.25
     end;
 
     var
         TxtRemoveFilters: Label 'Please remove filters first.';
-        TxtCannotDelete: Label 'You cannot delete %1 %2 because there are %1 records for this record.';
-
-    local procedure LinkedSetupExists(): Boolean
-    begin
-    end;
+        TxtCannotDelete: Label 'You cannot delete %1 %2 because there are %3 records for this record.';
 }
 

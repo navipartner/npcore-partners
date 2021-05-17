@@ -1008,7 +1008,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         end;
 
         if not (ResponseStatusCodeBuffer = 200) then begin
-            Error(ERROR_INVOKE, URL, Format(ResponseStatusCodeBuffer));
+            Error(ERROR_INVOKE, Format(ResponseStatusCodeBuffer));
         end;
         //+NPR5.54 [387990]
 
