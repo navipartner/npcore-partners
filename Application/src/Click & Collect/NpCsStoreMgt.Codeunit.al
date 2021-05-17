@@ -1,4 +1,5 @@
-﻿codeunit 6151204 "NPR NpCs Store Mgt."
+﻿//One DotNet variable left. Can be easy removed after upgrade to BC 17.2 Described in function CalcDistance (after that delete this comment)
+codeunit 6151204 "NPR NpCs Store Mgt."
 {
     procedure InitLocalStore(var NpCsStore: Record "NPR NpCs Store")
     begin
