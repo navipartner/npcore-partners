@@ -44,7 +44,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Initialized: Boolean;
-        TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %1 state.';
+        TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %2 state.';
         MISSING_CASE: Label 'No handler for %1 [%2].';
         MUST_BE_POSITIVE: Label 'Quantity must be positive.';
 

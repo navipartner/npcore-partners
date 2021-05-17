@@ -20,7 +20,7 @@ codeunit 6150629 "NPR POS Entry Management"
     var
         FunctionToRun: Option " ",PrintEntry;
         LargePrint: Boolean;
-        TextInconsistent: Label '%1 is set to %2 on %3 and to %4 on %4. %5 is inconsistent.';
+        TextInconsistent: Label '%1 is set to %2 on %3 and to %4 on %5. %6 is inconsistent.';
         ReprintNotAllowedErrMsg: Label 'Additional reprints are not allowed for current sale (%1 %2).';
 
     procedure SetFunctionToRun(FunctionToRunIn: Option " ",PrintEntry)

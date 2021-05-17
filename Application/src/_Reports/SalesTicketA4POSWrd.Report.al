@@ -303,7 +303,7 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
             begin
                 TotalTaxText := GetVATText("Entry No.");
                 if DelChr(TotalTaxText, '=', '0123456789') = '' then
-                    TotalTaxText := StrSubstNo(TotalTaxAmountCaptionBlank, TotalTaxText)
+                    TotalTaxText := StrSubstNo(TotalTaxAmountCaptionBlank)
                 else
                     TotalTaxText := StrSubstNo(TotalTaxAmountCaption, TotalTaxText);
 

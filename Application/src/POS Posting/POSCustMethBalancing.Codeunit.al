@@ -244,7 +244,7 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
 
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
 
-        Message('Context is: ', JsonText);
+        Message('Context is: ' + JsonText);
         Message('%1 - %2', _POSWorkshiftCheckpoint."Entry No.", _POSWorkshiftCheckpoint."Created At");
     end;
 }

@@ -4,7 +4,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
         _workflow: Codeunit "NPR Workflow";
         _state: JsonObject;
         _base: Codeunit "NPR Base Action";
-        TextActionDoesNotExist: Label 'Action %1 does not exist, but it is used in %2.';
+        TextActionDoesNotExist: Label 'Action %1 does not exist.';
         TextUndefinedParameter: Label '%2 specifies a value for a parameter %3, that is not defined for action %1.';
         TextParameterNotDefined: Label 'Action %1 defines parameter %3, but the value for this parameter is not specified in %2.';
         TextParameterValueInvalid: Label '%2 specifies value [%5] for parameter %3, which is not a valid %4 as required by action %1.';

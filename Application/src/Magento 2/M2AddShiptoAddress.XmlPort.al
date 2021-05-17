@@ -186,7 +186,7 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
     begin
         ResponseCode := 'OK';
         ResponseMessage := '';
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
+        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
 
         if (not TmpShiptoAddress.FindSet()) then begin
             SetErrorResponse('There was a problem handling the request.');
@@ -203,6 +203,6 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
     begin
         ResponseCode := 'ERROR';
         ResponseMessage := ErrorMessage;
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
+        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
     end;
 }
