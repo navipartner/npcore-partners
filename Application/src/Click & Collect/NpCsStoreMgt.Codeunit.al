@@ -1,5 +1,4 @@
-﻿//One DotNet variable left. Can be easy removed after upgrade to BC 17.2 Described in function CalcDistance (after that delete this comment)
-codeunit 6151204 "NPR NpCs Store Mgt."
+﻿codeunit 6151204 "NPR NpCs Store Mgt."
 {
     procedure InitLocalStore(var NpCsStore: Record "NPR NpCs Store")
     begin
@@ -214,7 +213,7 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     procedure CalcDistance(FromNpCsStore: Record "NPR NpCs Store"; ToNpCsStore: Record "NPR NpCs Store") Distance: Decimal
     var
         Math: Codeunit Math;
-        Lat1,Lat2,Lon1,Lon2: Decimal;
+        Lat1, Lat2, Lon1, Lon2 : Decimal;
     begin
         if not Evaluate(Lat1, FromNpCsStore."Geolocation Latitude", 9) then
             if Evaluate(Lat1, FromNpCsStore."Geolocation Latitude") then;
