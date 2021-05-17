@@ -18,6 +18,8 @@ table 6014566 "NPR RP Template Media Info"
             Caption = 'Picture';
             SubType = Bitmap;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(11; URL; Text[250])
         {
@@ -27,6 +29,11 @@ table 6014566 "NPR RP Template Media Info"
         field(12; Description; Text[250])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
+        field(13; Image; Media)
+        {
+            Caption = 'Picture';
             DataClassification = CustomerContent;
         }
     }
@@ -70,6 +77,15 @@ table 6014566 "NPR RP Template Media Info"
             exit;
         if TemplateHeader.Get(Template) then
             TemplateHeader.Modify(true);
+    end;
+
+    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    begin
+        TenantMedia.Init();
+        if not Rec.Image.HasValue() then
+            exit;
+        if TenantMedia.Get(Rec.Image.MediaId()) then
+            TenantMedia.CalcFields(Content);
     end;
 }
 

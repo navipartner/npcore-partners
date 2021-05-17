@@ -11,7 +11,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
     {
         area(content)
         {
-            field("QR code"; Rec."QR code")
+            field("QR code"; Rec."QR Image")
             {
                 ApplicationArea = All;
                 ShowCaption = false;
@@ -37,14 +37,15 @@ page 6059963 "NPR MPOS QR Code FactBox"
                     FileManagement: Codeunit "File Management";
                     fPath: Text[1024];
                     FileBlob: Codeunit "Temp Blob";
+                    OutStr: OutStream;
                 begin
-                    if Rec."QR code".HasValue() then begin
-                        Rec.CalcFields("QR code");
+                    if Rec."QR Image".HasValue() then begin
                         if Rec.Company <> '' then
                             fPath := StringReplace(Rec."User ID" + '_' + Rec.Company) + '.png'
                         else
                             fPath := StringReplace(Rec."User ID") + '.png';
-                        FileBlob.FromRecord(Rec, Rec.FieldNo("QR code"));
+                        FileBlob.CreateOutStream(OutStr);
+                        Rec."QR Image".ExportStream(OutStr);
                         FileManagement.BLOBExport(FileBlob, fPath, true);
                     end;
                 end;

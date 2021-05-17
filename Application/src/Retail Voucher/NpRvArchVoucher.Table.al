@@ -248,6 +248,13 @@ table 6151018 "NPR NpRv Arch. Voucher"
             DataClassification = CustomerContent;
             Description = 'NPR5.49';
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Media instead of Blob type.';
+        }
+        field(306; "Barcode Image"; Media)
+        {
+            Caption = 'Barcode';
+            DataClassification = CustomerContent;
         }
         field(1000; "Issue Date"; Date)
         {

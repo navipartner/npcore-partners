@@ -1,28 +1,16 @@
-page 6014629 "NPR RP Template Media Factbox"
+page 6151309 "NPR MM Member Info Picture"
 {
-    Caption = 'Template Media Factbox';
-    Editable = false;
+    Caption = 'MM Member Info Capture Picture';
+    DeleteAllowed = false;
     InsertAllowed = false;
+    LinksAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-    SourceTable = "NPR RP Template Media Info";
+    SourceTable = "NPR MM Member Info Capture";
 
     layout
     {
         area(content)
         {
-            field(URL; Rec.URL)
-            {
-                ApplicationArea = All;
-                ExtendedDatatype = URL;
-                ToolTip = 'Specifies the value of the URL field';
-            }
-            field(Description; Rec.Description)
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Description field';
-            }
             field(Picture; Rec.Image)
             {
                 ApplicationArea = Basic, Suite, Invoicing;
@@ -31,6 +19,7 @@ page 6014629 "NPR RP Template Media Factbox"
             }
         }
     }
+
     actions
     {
         area(processing)

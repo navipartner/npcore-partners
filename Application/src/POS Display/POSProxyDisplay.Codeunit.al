@@ -981,17 +981,20 @@
 
     local procedure GetImageContentAndExtension(DisplayContentLines: Record "NPR Display Content Lines"; var Base64: Text; var Extension: Text[10])
     var
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
+        InS: InStream;
         Convert: DotNet NPRNetConvert;
         Bytes: DotNet NPRNetArray;
-        InS: InStream;
         MemoryStream: DotNet NPRNetMemoryStream;
         Image: DotNet NPRNetImage;
         ImageFormat: DotNet NPRNetImageFormat;
         Converter: DotNet NPRNetImageConverter;
     begin
-        DisplayContentLines.CalcFields(Image);
-        if DisplayContentLines.Image.HasValue() then begin
-            DisplayContentLines.Image.CreateInStream(InS);
+        if DisplayContentLines.Picture.HasValue() then begin
+            TempBlob.CreateOutStream(OutStr);
+            DisplayContentLines.Picture.ExportStream(OutStr);
+            TempBlob.CreateInStream(InS);
 
             MemoryStream := MemoryStream.MemoryStream();
             CopyStream(MemoryStream, InS);
