@@ -21,7 +21,7 @@ page 6014523 "NPR Customer Mapping WP"
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         CountryRegion: Record "Country/Region";
-                        CountryRegions: Page "Country/Regions Entity";
+                        CountryRegions: Page "Countries/Regions";
                     begin
                         CountryRegions.LookupMode := true;
 
