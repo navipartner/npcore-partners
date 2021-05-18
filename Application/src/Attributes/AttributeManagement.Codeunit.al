@@ -1327,7 +1327,7 @@
             RecRef.Open(Attribute."LookUp Table Id");
             FieldRefValue := RecRef.Field(Attribute."LookUp Value Field Id");
             FieldRefDescription := RecRef.Field(Attribute."LookUp Description Field Id");
-            if RecRef.FindFirst() then begin
+            if RecRef.FindSet() then
                 repeat
                     TEMPNPRAttributeLookupValue.Init();
                     TEMPNPRAttributeLookupValue."Attribute Code" := Attribute.Code;
@@ -1335,7 +1335,6 @@
                     TEMPNPRAttributeLookupValue."Attribute Value Description" := FieldRefDescription.Value;
                     TEMPNPRAttributeLookupValue.Insert();
                 until (0 = RecRef.Next());
-            end;
             if PAGE.RunModal(PAGE::"NPR Attribute Value Lookup", TEMPNPRAttributeLookupValue) = ACTION::LookupOK then begin
                 Value := TEMPNPRAttributeLookupValue."Attribute Value Code";
             end;

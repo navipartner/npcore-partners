@@ -217,7 +217,10 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
                     TempItemWorksheetVariantLine.Insert();
                     //also insert ItemWorksheetLine
                     if not TempItemWorksheetLine.Get(ItemWorksheetVariantLine."Worksheet Template Name", ItemWorksheetVariantLine."Worksheet Name", ItemWorksheetVariantLine."Worksheet Line No.") then begin
-                        ItemWorksheetLine.Get(ItemWorksheetVariantLine."Worksheet Template Name", ItemWorksheetVariantLine."Worksheet Name", ItemWorksheetVariantLine."Worksheet Line No.");
+                        ItemWorksheetLine."Worksheet Template Name" := ItemWorksheetVariantLine."Worksheet Template Name";
+                        ItemWorksheetLine."Worksheet Name" := ItemWorksheetVariantLine."Worksheet Name";
+                        ItemWorksheetLine."Line No." := ItemWorksheetVariantLine."Worksheet Line No.";
+                        ItemWorksheetLine.Find();
                         TempItemWorksheetLine := ItemWorksheetLine;
                         TempItemWorksheetLine.Insert();
                     end;

@@ -401,8 +401,8 @@ table 6014411 "NPR Mixed Discount"
         Total: Integer;
         Window: Dialog;
         LineText: Text;
+        ExitLoop: Boolean;
     begin
-        //-NPR5.31 [262904]
         if not GuiAllowed then
             exit;
 
@@ -432,15 +432,16 @@ table 6014411 "NPR Mixed Discount"
             MixedDiscountLine2.SetRange("No.", MixedDiscountLine."No.");
             MixedDiscountLine2.SetRange(Status, MixedDiscountLine2.Status::Active);
             if MixedDiscountLine2.FindSet() then begin
+                ExitLoop := false;
                 repeat
                     if (MixedDiscount.Get(MixedDiscountLine2.Code)) and (MixedDiscount."Starting date" <= Today) and (MixedDiscount."Ending date" >= Today) then begin
                         TempMixedDiscountLine.Init();
                         TempMixedDiscountLine := MixedDiscountLine2;
                         TempMixedDiscountLine.Insert();
 
-                        MixedDiscountLine2.FindLast();
+                        ExitLoop := true;
                     end;
-                until MixedDiscountLine2.Next() = 0;
+                until (MixedDiscountLine2.Next() = 0) or ExitLoop;
             end;
         until MixedDiscountLine.Next() = 0;
         Window.Close();

@@ -221,7 +221,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
         SaleLinePOS.SetFilter("Sale Type", '=%1', SaleLinePOS."Sale Type"::Sale);
         SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
-        if (SaleLinePOS.FindFirst()) then begin
+        if (SaleLinePOS.FindSet()) then
             repeat
                 TmpRegisterSalesLines."Entry No." := TmpRegisterSalesLines.Count() + 1;
                 case (SaleLinePOS."Amount Including VAT" >= 0) of
@@ -244,7 +244,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
                 TmpRegisterSalesLines.Insert();
             until (SaleLinePOS.Next() = 0);
-        end;
 
         EFTTransactionRequest2.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
         EFTTransactionRequest2.SetFilter("Integration Type", '=%1', LoyaltyPointsPSPClient.IntegrationName());

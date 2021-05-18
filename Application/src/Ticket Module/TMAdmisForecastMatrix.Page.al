@@ -218,7 +218,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
 
             if (not TmpAdmSchEntry.FindFirst()) then begin
                 TmpAdmSchEntry.Reset();
-                if (TmpAdmSchEntry.FindLast()) then
+                if (TmpAdmSchEntry.Find('+')) then
                     i := TmpAdmSchEntry.Next(-MATRIX_CurrentNoOfColumns + 1);
             end;
 

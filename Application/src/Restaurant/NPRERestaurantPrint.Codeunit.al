@@ -477,7 +477,9 @@
             if WaiterPad."Serving Step Code" = '' then
                 FlowStatus.FindFirst()
             else begin
-                FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow);
+                FlowStatus.Code := WaiterPad."Serving Step Code";
+                FlowStatus."Status Object" := FlowStatus."Status Object"::WaiterPadLineMealFlow;
+                FlowStatus.Find();
                 if FlowStatus.Next() = 0 then
                     Error(NoMoreMealGroupsLbl);
             end;

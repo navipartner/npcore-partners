@@ -43,7 +43,7 @@
         WaiterPadMgt.DuplicateWaiterPadHdr(WaiterPad, NewWaiterPad);
         WaiterPadMgt.MoveNumberOfGuests(WaiterPad, NewWaiterPad, NumberOfGuests);
 
-        TMPWaiterPadLine.FindFirst();
+        TMPWaiterPadLine.FindSet();
         repeat
             ChoosenWaiterPadLine.Get(TMPWaiterPadLine."Waiter Pad No.", TMPWaiterPadLine."Line No.");
             SplitWaiterPadLine(WaiterPad, ChoosenWaiterPadLine, TMPWaiterPadLine."Marked Qty", NewWaiterPad);

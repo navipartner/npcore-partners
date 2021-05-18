@@ -2235,7 +2235,7 @@ table 6060042 "NPR Item Worksheet Line"
         GetTempVarietyLines(ItemWorksheetVarietyValue3, TempItemWorksheetVarietyValue3, 3, LinesType);
         GetTempVarietyLines(ItemWorksheetVarietyValue4, TempItemWorksheetVarietyValue4, 4, LinesType);
 
-        if TempItemWorksheetVarietyValue1.FindFirst() then
+        if TempItemWorksheetVarietyValue1.FindSet() then
             repeat
                 if ("Variety 2 Table (New)" <> '') and IncludeHeaders then begin
                     //Insert Level 1 Header Line
@@ -2255,7 +2255,7 @@ table 6060042 "NPR Item Worksheet Line"
                     ItemWorksheetVariantLine.Insert();
                 end;
 
-                if TempItemWorksheetVarietyValue2.FindFirst() then
+                if TempItemWorksheetVarietyValue2.FindSet() then
                     repeat
                         if ("Variety 3 Table (New)" <> '') and IncludeHeaders then begin
                             //Insert Level 2 Header Line
@@ -2273,7 +2273,7 @@ table 6060042 "NPR Item Worksheet Line"
                             ItemWorksheetVariantLine."Existing Item No." := "Existing Item No.";
                             ItemWorksheetVariantLine.Insert();
                         end;
-                        if TempItemWorksheetVarietyValue3.FindFirst() then
+                        if TempItemWorksheetVarietyValue3.FindSet() then
                             repeat
                                 if ("Variety 4 Table (New)" <> '') and IncludeHeaders then begin
                                     //Insert Level 3 Header Line
@@ -2294,7 +2294,7 @@ table 6060042 "NPR Item Worksheet Line"
                                     ItemWorksheetVariantLine.Insert();
                                 end;
 
-                                if TempItemWorksheetVarietyValue4.FindFirst() then
+                                if TempItemWorksheetVarietyValue4.FindSet() then
                                     repeat
                                         if (((TempItemWorksheetVarietyValue4.Value <> '') or ("Variety 4 Table (Base)" = '')) and
                                             ((TempItemWorksheetVarietyValue3.Value <> '') or ("Variety 3 Table (Base)" = '')) and

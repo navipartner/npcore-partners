@@ -370,6 +370,11 @@
             "justification": "The 'with' statement is deprecated."
         },
         {
+            "id": "AA0233",
+            "action":"Error",
+            "justification": "The 'FindFirst', 'FindLast' and 'Get' methods must be used without the Next() method."
+        },
+        {
             "id": "AL0667",
             "action":"Error",
             "justification": "'Caption' is being deprecated in the versions: '1.0' or greater. This property does not have any effect on report columns. This warning will become an error in a future release."
@@ -383,11 +388,6 @@
             "id": "AS0006",
             "action": "Warning",
             "justification": "Temporarily disabled for PR 53324."
-        },
-        {
-            "id": "AS0001",
-            "action": "Warning",
-            "justification": "Temporarily disabled for PR 464944."            
         },
         {
             "id": "AA0131",

@@ -219,7 +219,7 @@
         LastRec := Format(NpCsStorePOSRelation);
         StoreCode := NpCsStorePOSRelation."Store Code";
 
-        NpCsStorePOSRelation.FindFirst();
+        NpCsStorePOSRelation.FindSet();
         if LastRec <> Format(NpCsStorePOSRelation) then begin
             repeat
                 if NpCsStore.Get(NpCsStorePOSRelation."Store Code") and NpCsStore."Local Store" and not TempNpCsStore.Get(NpCsStore.Code) then begin

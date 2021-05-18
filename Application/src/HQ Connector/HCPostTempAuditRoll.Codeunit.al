@@ -379,7 +379,7 @@
 
                 AuditRoll.SetRange("Register No.", Rec."Register No.");
                 AuditRoll.SetRange("Sale Date", Rec."Sale Date");
-                if AuditRoll.FindFirst() then
+                if AuditRoll.FindSet() then
                     repeat
                         if (AuditRoll."Sale Type" = AuditRoll."Sale Type"::Payment) and
                           (AuditRoll.Type = AuditRoll.Type::Payment) and

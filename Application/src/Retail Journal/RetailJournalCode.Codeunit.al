@@ -34,7 +34,7 @@
 
         Dialog.Open(Text001 + '\' + Text002);
 
-        if RetailJournalHeader.FindFirst() then
+        if RetailJournalHeader.FindSet() then
             repeat
                 Clear(RetailJournalLine2);
                 RetailJournalLine2.SetRange("No.", RetailJournalHeader."No.");
