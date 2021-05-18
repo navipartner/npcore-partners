@@ -299,8 +299,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 "Field": Record "Field";
                 TempRetailList: Record "NPR Retail List" temporary;
                 RetailListPage: Page "NPR Retail List";
-                StringArray: DotNet NPRNetArray;
-                Regex: DotNet NPRNetRegex;
+                StringArray: List of [Text];
                 String: Text;
                 DataItemConstraint: Record "NPR RP Data Item Constr.";
             begin
@@ -327,7 +326,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                         end;
                     'option':
                         begin
-                            StringArray := Regex.Split(FieldRef.OptionCaption, ',');
+                            StringArray := FieldRef.OptionCaption.Split(',');
                             foreach String in StringArray do begin
                                 TempRetailList.Number += 1;
                                 if not (String in ['', ' ']) then begin
