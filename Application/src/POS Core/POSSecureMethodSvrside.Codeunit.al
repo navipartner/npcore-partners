@@ -191,6 +191,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
 
     local procedure ValidatePOSUnitOpenRegisterPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; POSUnit: Record "NPR POS Unit"; Password: Text): Boolean
     var
+        POSViewProfile: Record "NPR POS View Profile";
         Reason: Text;
     begin
         Reason := StrSubstNo(Text006, Text005);
@@ -200,7 +201,8 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
             exit;
         end;
 
-        if (Password = POSUnit."Open Register Password") then begin
+        POSUnit.GetProfile(POSViewProfile);
+        if (Password = POSViewProfile."Open Register Password") then begin
             Sender.ConfirmPassword('OpenReg');
             exit(true);
         end;
@@ -210,6 +212,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
 
     local procedure ValidatePOSUnitAdminPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; POSUnit: Record "NPR POS Unit"; Password: Text): Boolean
     var
+        POSSecurityProfile: Record "NPR POS Security Profile";
         Reason: Text;
     begin
 
@@ -220,7 +223,8 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
             exit;
         end;
 
-        if (Password = POSUnit."Password on unblock discount") then begin
+        POSUnit.GetProfile(POSSecurityProfile);
+        if (Password = POSSecurityProfile."Password on Unblock Discount") then begin
             Sender.ConfirmPassword('SysAdmin');
             exit(true);
         end;

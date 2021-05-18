@@ -14,7 +14,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     local procedure ActionVersion(): Code[10]
     begin
 
-        exit('1.0');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -41,17 +41,18 @@ then begin
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        POSUnit: Record "NPR POS Unit";
+        POSSecurityProfile: Record "NPR POS Security Profile";
     begin
 
         Captions.AddActionCaption(ActionCode(), 'title', Title);
-        Captions.AddActionCaption(ActionCode(), 'password', StrSubstNo(PasswordPrompt, POSUnit.FieldCaption("Password on unblock discount")));
+        Captions.AddActionCaption(ActionCode(), 'password', StrSubstNo(PasswordPrompt, POSSecurityProfile.FieldCaption("Password on Unblock Discount")));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
+        POSSecurityProfile: Record "NPR POS Security Profile";
         Setup: Codeunit "NPR POS Setup";
         Context: Codeunit "NPR POS JSON Management";
     begin
@@ -62,7 +63,8 @@ then begin
         Handled := true;
 
         Setup.GetPOSUnit(POSUnit);
-        Context.SetContext('ShowPasswordPrompt', POSUnit."Password on unblock discount" <> '');
+        POSUnit.GetProfile(POSSecurityProfile);
+        Context.SetContext('ShowPasswordPrompt', POSSecurityProfile."Password on Unblock Discount" <> '');
 
         FrontEnd.SetActionContext(ActionCode(), Context);
     end;
@@ -95,6 +97,7 @@ then begin
     local procedure VerifyPassword(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
+        POSSecurityProfile: Record "NPR POS Security Profile";
         POSSetup: Codeunit "NPR POS Setup";
         JSON: Codeunit "NPR POS JSON Management";
         Password: Text;
@@ -109,7 +112,8 @@ then begin
 
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        if (POSUnit."Password on unblock discount" <> Password) then
+        POSUnit.GetProfile(POSSecurityProfile);
+        if (POSSecurityProfile."Password on Unblock Discount" <> Password) then
             Error('');
     end;
 

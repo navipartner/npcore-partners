@@ -118,9 +118,11 @@ codeunit 6150708 "NPR POS Setup"
     procedure CashDrawerPassword(CashDrawerNo: Text): Text
     var
         POSUnit: Record "NPR POS Unit";
+        POSViewProfile: Record "NPR POS View Profile";
     begin
         GetPOSUnit(POSUnit);
-        exit(POSUnit."Open Register Password");
+        POSUnit.GetProfile(POSViewProfile);
+        exit(POSViewProfile."Open Register Password");
     end;
 
     procedure RestaurantCode(): Code[20]
