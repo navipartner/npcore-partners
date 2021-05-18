@@ -2,10 +2,6 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 {
     layout
     {
-        modify("Name 2")
-        {
-            Visible = true;
-        }
         addafter(AdjProfitPct)
         {
             field("NPR To Anonymize On"; Rec."NPR To Anonymize On")
@@ -65,28 +61,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             group("NPR Retail")
             {
                 Caption = 'Retail';
-                action("NPR ItemLedgerEntries")
-                {
-                    Caption = 'Item Ledger Entries';
-                    Image = ItemLedger;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Item Ledger Entries action';
 
-                    trigger OnAction()
-                    var
-                        ItemLedgerEntry: Record "Item Ledger Entry";
-                    begin
-                        ItemLedgerEntry.SetRange("Source No.", Rec."No.");
-                        Page.RunModal(Page::"Item Ledger Entries", ItemLedgerEntry);
-                    end;
-                }
-                action("NPR AuditRoll")
-                {
-                    Caption = 'Audit Roll';
-                    Image = ListPage;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Audit Roll action';
-                }
                 action("NPR AlternativeNo")
                 {
                     Caption = 'Alternative No.';

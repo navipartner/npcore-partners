@@ -306,35 +306,6 @@ page 6151241 "NPR Retail Manager Role Center"
                         Caption = 'Goods';
                         Image = Item;
 
-                        group(Lists)
-                        {
-                            Caption = 'Lists';
-                            Image = List;
-                            action("Retail Item List")
-                            {
-                                Caption = 'Retail Item';
-                                Image = ListPage;
-                                RunObject = page "Item List";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Retail Item action';
-                            }
-                            action(Items)
-                            {
-                                Caption = 'Items';
-                                Image = ListPage;
-                                RunObject = page "Item List";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Items action';
-                            }
-                            action("Item AddOns")
-                            {
-                                Caption = 'Item AddOns';
-                                Image = ListPage;
-                                RunObject = page "NPR NpIa Item AddOns";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Item AddOns action';
-                            }
-                        }
                         group(ReportsGoods)
                         {
                             Caption = 'Reports and Analysis';
@@ -472,36 +443,6 @@ page 6151241 "NPR Retail Manager Role Center"
                         Caption = 'Lines';
                         Image = AllLines;
 
-                        group(ListsLine)
-                        {
-
-                            Caption = 'Lists';
-                            Image = List;
-                            action("Item Groups")
-                            {
-                                Caption = 'Item AddOns';
-                                Image = ListPage;
-                                RunObject = page "NPR NpIa Item AddOns";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Item AddOns action';
-                            }
-                            action("Sales Price Maintenance Setup")
-                            {
-                                Caption = 'Sales Price Maintenance Setup';
-                                Image = ListPage;
-                                RunObject = page "NPR Sales Price Maint. Setup";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Sales Price Maintenance Setup action';
-                            }
-                            action("Retail Price Log Entries")
-                            {
-                                Caption = 'Retail Price Log Entries';
-                                Image = ListPage;
-                                RunObject = page "NPR Retail Price Log Entries";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Retail Price Log Entries action';
-                            }
-                        }
                         group(LineReports)
                         {
 
@@ -545,35 +486,6 @@ page 6151241 "NPR Retail Manager Role Center"
                     {
                         Caption = 'Discount';
                         Image = Discount;
-                        group(DiscountList)
-                        {
-                            Caption = 'Lists';
-                            Image = List;
-                            action("Item Groups Tree")
-                            {
-                                Caption = 'Mix Discounts';
-                                Image = ListPage;
-                                RunObject = page "NPR Mixed Discount List";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Mix Discounts action';
-                            }
-                            action("Period Discounts")
-                            {
-                                Caption = 'Period Discounts';
-                                Image = ListPage;
-                                RunObject = page "NPR Campaign Discount List";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Period Discounts action';
-                            }
-                            action("Retail Campaigns")
-                            {
-                                Caption = 'Retail Campaigns';
-                                Image = ListPage;
-                                RunObject = page "NPR Retail Campaigns";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the Retail Campaigns action';
-                            }
-                        }
                         group(DiscountReports)
                         {
 

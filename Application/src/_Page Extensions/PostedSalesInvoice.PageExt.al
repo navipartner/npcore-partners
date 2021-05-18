@@ -39,24 +39,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     {
         addafter(ActivityLog)
         {
-            group("NPR DocExchFramework")
-            {
-                Caption = 'Doc. Exch. Framework';
-                action("NPR Export")
-                {
-                    Caption = 'Export';
-                    Image = ExportFile;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Export action';
-                }
-                action("NPR UpdateStatus")
-                {
-                    Caption = 'Update Status';
-                    Image = ChangeStatus;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Update Status action';
-                }
-            }
             action("NPR Consignor Label")
             {
                 Caption = 'Consignor Label';
