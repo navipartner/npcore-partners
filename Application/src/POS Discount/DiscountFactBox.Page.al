@@ -108,7 +108,7 @@
 
         MixDiscountLine.Reset();
         MixDiscountLine.SetFilter(MixDiscountLine."No.", Rec."No.");
-        if MixDiscountLine.FindFirst() then
+        if MixDiscountLine.FindSet() then
             repeat
                 MixDiscountHeader.Reset();
                 if MixDiscountHeader.Get(MixDiscountLine.Code) and ((MixDiscountHeader."Starting date" <= Today) and
@@ -120,7 +120,7 @@
         if not MixDiscount then begin
             MixDiscountLine.Reset();
             MixDiscountLine.SetFilter(MixDiscountLine."No.", Rec."No.");
-            if MixDiscountLine.FindFirst() then
+            if MixDiscountLine.FindSet() then
                 repeat
                     MixDiscountHeader.Reset();
                     if MixDiscountHeader.Get(MixDiscountLine.Code) and (MixDiscountHeader."Starting date" > Today) and

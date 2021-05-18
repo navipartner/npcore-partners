@@ -242,7 +242,7 @@ table 6014678 "NPR Endpoint Query"
         EndpointQueryFilter.SetRange("Endpoint Query No.", "No.");
         if EndpointQueryFilter.IsEmpty then
             exit;
-        if EndpointQueryFilter.FindFirst() then
+        if EndpointQueryFilter.FindSet() then
             repeat
                 //If there are mutiple tables in the filter, then it can't be stored in the Table Filter field on the query
                 if ("Table No." <> 0) and ("Table No." <> EndpointQueryFilter."Table No.") then begin

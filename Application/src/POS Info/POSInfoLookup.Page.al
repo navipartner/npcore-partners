@@ -97,7 +97,7 @@
         if POSInfo."Table No." = 0 then
             Error('error');
 
-        if not POSInfoLookupSetup.FindFirst() then
+        if not POSInfoLookupSetup.FindSet() then
             Error('Error');
         repeat
             case POSInfoLookupSetup."Map To" of
@@ -178,7 +178,7 @@
         EntryNo := 1;
         POSInfoSubcode.Reset();
         POSInfoSubcode.SetRange(Code, POSInfo.Code);
-        if not POSInfoSubcode.FindFirst() then
+        if not POSInfoSubcode.FindSet() then
             Error(ErrText001, POSInfo.Code);
         repeat
             Rec.Init();

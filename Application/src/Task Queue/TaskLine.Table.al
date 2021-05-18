@@ -712,7 +712,7 @@ table 6059902 "NPR Task Line"
         TaskLog.SetRange("Line No.", "Line No.");
         TaskLog.Ascending(false);
 
-        if TaskLog.FindFirst() then
+        if TaskLog.FindSet() then
             repeat
                 if TaskLog."Ending Time" <> 0DT then begin
                     Counter += 1;

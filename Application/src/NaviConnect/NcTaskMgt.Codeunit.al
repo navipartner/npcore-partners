@@ -448,7 +448,7 @@
             Clear(TaskField);
             TaskField.SetRange("Task Entry No.", Task."Entry No.");
             TaskField.SetFilter("Previous Value", '<>%1', '');
-            if TaskField.FindFirst() then
+            if TaskField.FindSet() then
                 repeat
                     if Fields.Get(Task."Table No.", TaskField."Field No.") then begin
                         FieldRef := RecRef.Field(TaskField."Field No.");
@@ -463,7 +463,7 @@
 
             Clear(TaskField);
             TaskField.SetRange("Task Entry No.", Task."Entry No.");
-            if TaskField.FindFirst() then
+            if TaskField.FindSet() then
                 repeat
                     if Fields.Get(Task."Table No.", TaskField."Field No.") then begin
                         FieldRef := RecRef.Field(TaskField."Field No.");

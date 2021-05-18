@@ -1264,7 +1264,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                         DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
                         DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', SourceAccessEntry."Entry No.");
                         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
-                        if (DetTicketAccessEntry.FindLast()) then begin
+                        if (DetTicketAccessEntry.Find('+')) then begin
                             AdmissionDateTime := DetTicketAccessEntry."Created Datetime";
                             // Find the previous admission entry
                             if (DetTicketAccessEntry.Next(-1) <> 0) then begin

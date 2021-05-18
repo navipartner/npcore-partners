@@ -587,7 +587,7 @@
     begin
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlElement);
-        if not NpXmlElement.FindLast() then
+        if not NpXmlElement.Find('+') then
             exit;
 
         if Rec.Next(-1) = 0 then

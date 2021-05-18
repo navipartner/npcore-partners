@@ -209,7 +209,7 @@
     begin
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
-        if not NpXmlTemplateTrigger.FindLast() then
+        if not NpXmlTemplateTrigger.Find('+') then
             exit;
 
         if Rec.Next(-1) = 0 then
