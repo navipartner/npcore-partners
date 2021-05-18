@@ -3,7 +3,7 @@
     trigger OnRun()
     var
         FileManagement: Codeunit "File Management";
-        TempBLOB: Codeunit "Temp Blob";        
+        TempBLOB: Codeunit "Temp Blob";
         Filename: Text;
         VendorNo: Code[20];
     begin
@@ -138,8 +138,11 @@
             ConfigTemplateLine."Default Value" := ItemCategory.Code;
             ConfigTemplateLine.Insert();
         end;
+#if BC17
         NonstockItem.Validate("Item Template Code", ItemCategory.Code);
-
+#else
+        NonstockItem.Validate("Item Templ. Code", ItemCategory.Code);
+#endif
         Manufacturer.Code := CSVBuffer.GetValue(CSVBuffer."Line No.", 3);
         if not Manufacturer.Find() then begin
             Manufacturer.Init();

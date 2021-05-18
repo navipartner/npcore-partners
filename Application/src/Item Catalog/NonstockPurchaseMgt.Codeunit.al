@@ -37,7 +37,11 @@
             Execute := true;
         end;
         if Execute then begin
+#if BC17
             NonstockItem.TestField("Item Template Code");
+#else
+            NonstockItem.TestField("Item Templ. Code");
+#endif               
             PurchaseLine."No." := NonstockItem."Entry No.";
             NonStockPurchase(PurchaseLine);
             PurchaseLine.Validate("No.", PurchaseLine."No.");
@@ -108,7 +112,11 @@
         NewItem."Net Weight" := NonStock."Net Weight";
         NewItem."Gross Weight" := NonStock."Gross Weight";
         NewItem."Manufacturer Code" := NonStock."Manufacturer Code";
+#if BC17
         NewItem."Item Category Code" := NonStock."Item Template Code";
+#else
+        NewItem."Item Category Code" := NonStock."Item Templ. Code";
+#endif        
         NewItem."Created From Nonstock Item" := true;
         NewItem."Unit Price" := NonStock."Unit Price";
         NewItem.Insert();
