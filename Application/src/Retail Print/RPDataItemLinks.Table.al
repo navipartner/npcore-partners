@@ -1,8 +1,5 @@
 table 6014562 "NPR RP Data Item Links"
 {
-    // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
-    // NPR5.47/MMV /20181017 CASE 318084 Added field 19
-
     Caption = 'Data Item Links';
     DataClassification = CustomerContent;
 
@@ -199,8 +196,7 @@ table 6014562 "NPR RP Data Item Links"
                 "Field": Record "Field";
                 TempRetailList: Record "NPR Retail List" temporary;
                 RetailListPage: Page "NPR Retail List";
-                StringArray: DotNet NPRNetArray;
-                Regex: DotNet NPRNetRegex;
+                StringArray: List of [Text];
                 String: Text;
             begin
                 if not Field.Get("Table ID", "Field ID") then
@@ -222,7 +218,7 @@ table 6014562 "NPR RP Data Item Links"
                         end;
                     'option':
                         begin
-                            StringArray := Regex.Split(FieldRef.OptionCaption, ',');
+                            StringArray := FieldRef.OptionCaption.Split(',');
                             foreach String in StringArray do begin
                                 TempRetailList.Number += 1;
                                 if not (String in ['', ' ']) then begin
@@ -267,10 +263,6 @@ table 6014562 "NPR RP Data Item Links"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
         ModifiedRec();
@@ -302,4 +294,3 @@ table 6014562 "NPR RP Data Item Links"
             TemplateHeader.Modify(true);
     end;
 }
-
