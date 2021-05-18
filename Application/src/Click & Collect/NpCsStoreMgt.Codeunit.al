@@ -162,6 +162,36 @@
         until NpCsStore.Next() = 0;
     end;
 
+    procedure CalcDistance(FromNpCsStore: Record "NPR NpCs Store"; ToNpCsStore: Record "NPR NpCs Store") Distance: Decimal
+    var
+        PI: Decimal;
+        Lat1: Decimal;
+        Lat2: Decimal;
+        Lon1: Decimal;
+        Lon2: Decimal;
+        Math: Codeunit "NPR Math";
+    begin
+        //DotNet from this function can be easy removed after upgrade to BC 17.2 because Microsoft added theese functions to Codeunit Math (currently it has procedure "Abs" only.)
+        //https://github.com/microsoft/ALAppExtensions/tree/master/Modules/System/Math
+        //I have tried with our function 'StreetDistance' from Codeunit "NPR MathLib" but it does not return same result as this function. Close, but not the same. DotNet: 60.82725957 StreetDistance: 54.902801393
+        if not Evaluate(Lat1, FromNpCsStore."Geolocation Latitude", 9) then
+            if Evaluate(Lat1, FromNpCsStore."Geolocation Latitude") then;
+        if not Evaluate(Lon1, FromNpCsStore."Geolocation Longitude", 9) then
+            if Evaluate(Lon1, FromNpCsStore."Geolocation Longitude") then;
+        if not Evaluate(Lat2, ToNpCsStore."Geolocation Latitude", 9) then
+            if Evaluate(Lat2, ToNpCsStore."Geolocation Latitude") then;
+        if not Evaluate(Lon2, ToNpCsStore."Geolocation Longitude", 9) then
+            if Evaluate(Lon2, ToNpCsStore."Geolocation Longitude") then;
+
+        PI := 3.14159265358979;
+        Lon1 *= PI / 180;
+        Lat1 *= PI / 180;
+        Lon2 *= PI / 180;
+        Lat2 *= PI / 180;
+
+        Distance := Math.Acos(Math.Sin(Lat1) * Math.Sin(Lat2) + Math.Cos(Lat1) * Math.Cos(Lat2) * Math.Cos(Lon2 - Lon1)) * 6371;
+    end;
+
     procedure GetCollectWSUrl(ServiceCompanyName: Text) Url: Text
     begin
         exit(GetUrl(CLIENTTYPE::SOAP, ServiceCompanyName, OBJECTTYPE::Codeunit, CollectWsCodeunitId()));
@@ -208,29 +238,6 @@
             exit(true);
 
         exit(false);
-    end;
-
-    procedure CalcDistance(FromNpCsStore: Record "NPR NpCs Store"; ToNpCsStore: Record "NPR NpCs Store") Distance: Decimal
-    var
-        Math: Codeunit Math;
-        Lat1, Lat2, Lon1, Lon2 : Decimal;
-    begin
-        if not Evaluate(Lat1, FromNpCsStore."Geolocation Latitude", 9) then
-            if Evaluate(Lat1, FromNpCsStore."Geolocation Latitude") then;
-        if not Evaluate(Lon1, FromNpCsStore."Geolocation Longitude", 9) then
-            if Evaluate(Lon1, FromNpCsStore."Geolocation Longitude") then;
-        if not Evaluate(Lat2, ToNpCsStore."Geolocation Latitude", 9) then
-            if Evaluate(Lat2, ToNpCsStore."Geolocation Latitude") then;
-        if not Evaluate(Lon2, ToNpCsStore."Geolocation Longitude", 9) then
-            if Evaluate(Lon2, ToNpCsStore."Geolocation Longitude") then;
-
-        Lon1 *= Math.Pi() / 180;
-        Lat1 *= Math.Pi() / 180;
-        Lon2 *= Math.Pi() / 180;
-        Lat2 *= Math.Pi() / 180;
-
-        Distance := Math.Acos(Math.Sin(Lat1) * Math.Sin(Lat2) + Math.Cos(Lat1) * Math.Cos(Lat2) * Math.Cos(Lon2 - Lon1)) * 6371;
-        exit(Distance);
     end;
 
     procedure SetBufferInventory(var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)
