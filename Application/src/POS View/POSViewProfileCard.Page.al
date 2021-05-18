@@ -67,6 +67,12 @@ page 6150636 "NPR POS View Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the tax type, POS view should be adjusted for by default';
                 }
+                field("Open Register Password"; Rec."Open Register Password")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Open POS Unit Password field.';
+                    ExtendedDatatype = Masked;
+                }
             }
             group("Number and Date Formatting")
             {

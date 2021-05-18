@@ -762,6 +762,7 @@ table 6014405 "NPR POS Sale"
     trigger OnInsert()
     var
         POSPricingProfile: Record "NPR POS Pricing Profile";
+        POSViewProfile: Record "NPR POS View Profile";
     begin
         GetPOSUnit();
         GetPOSStore();

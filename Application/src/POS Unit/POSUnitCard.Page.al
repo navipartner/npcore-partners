@@ -54,31 +54,6 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field(ActiveEventNo; ActiveEventNo)
-                {
-                    Caption = 'Active Event No.';
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Unit Active Event No.';
-
-                    trigger OnValidate()
-                    begin
-                        Rec.SetActiveEventForCurrPOSUnit(ActiveEventNo);
-                        CurrPage.Update();
-                    end;
-                }
-                field("Open Register Password"; Rec."Open Register Password")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Open POS Unit Password field.';
-                    ExtendedDatatype = Masked;
-                }
-                field("Password on unblock discount"; Rec."Password on unblock discount")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Administrator Password field.';
-                    ExtendedDatatype = Masked;
-                }
-
             }
             group(Profiles)
             {
@@ -157,6 +132,11 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Tax Free Profile field';
                 }
+                field("POS Security Profile"; Rec."POS Security Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Security Profile field';
+                }
             }
         }
     }
@@ -213,13 +193,5 @@ page 6150617 "NPR POS Unit Card"
             }
         }
     }
-
-    var
-        ActiveEventNo: Code[20];
-
-    trigger OnAfterGetRecord()
-    begin
-        ActiveEventNo := Rec.FindActiveEventFromCurrPOSUnit();
-    end;
 }
 

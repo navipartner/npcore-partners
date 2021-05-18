@@ -227,15 +227,25 @@ table 6150615 "NPR POS Unit"
             DataClassification = CustomerContent;
             TableRelation = "NPR Display Setup";
         }
+        field(620; "POS Security Profile"; Code[20])
+        {
+            Caption = 'POS Security Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Security Profile";
+        }
         field(5058; "Open Register Password"; Code[20])
         {
             Caption = 'Open POS Unit Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS View Profile';
         }
         field(6211; "Password on unblock discount"; Text[4])
         {
             Caption = 'Administrator Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS View Profile';
         }
         field(630; "POS Tax Free Profile"; Code[10])
         {
@@ -325,6 +335,14 @@ table 6150615 "NPR POS Unit"
         if "POS Tax Free Profile" = '' then
             exit;
         exit(TaxFreeProfile.Get("POS Tax Free Profile"));
+    end;
+
+    procedure GetProfile(var SecurityProfile: Record "NPR POS Security Profile"): Boolean
+    begin
+        Clear(SecurityProfile);
+        if "POS Security Profile" = '' then
+            exit;
+        exit(SecurityProfile.Get("POS Security Profile"));
     end;
 
     procedure GetCurrentPOSUnit(): Code[10]

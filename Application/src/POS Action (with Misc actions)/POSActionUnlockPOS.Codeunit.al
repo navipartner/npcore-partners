@@ -46,6 +46,7 @@ then begin
         PasswordValid: Boolean;
         SalePOS: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
+        POSViewProfile: Record "NPR POS View Profile";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -66,9 +67,10 @@ then begin
                     SalespersonPurchaser.SetFilter("NPR Register Password", '=%1', Password);
                     PasswordValid := SalespersonPurchaser.FindFirst();
 
-                    if (not PasswordValid) then
-                        PasswordValid := (Password = POSUnit."Open Register Password");
-
+                    if (not PasswordValid) then begin
+                        POSUnit.GetProfile(POSViewProfile);
+                        PasswordValid := (Password = POSViewProfile."Open Register Password");
+                    end;
                     if (DelChr(Password, '<=>', ' ') = '') then
                         PasswordValid := false;
                 end;

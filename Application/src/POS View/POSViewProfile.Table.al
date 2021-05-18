@@ -110,6 +110,11 @@ table 6150651 "NPR POS View Profile"
             OptionMembers = VAT,"Sales Tax";
             OptionCaption = 'VAT,Sales Tax';
         }
+        field(5058; "Open Register Password"; Code[20])
+        {
+            Caption = 'Open POS Unit Password';
+            DataClassification = CustomerContent;
+        }
         field(6232; "POS - Show discount fields"; Boolean)
         {
             Caption = 'Show Discount';
