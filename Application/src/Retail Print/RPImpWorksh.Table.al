@@ -1,7 +1,5 @@
 table 6014569 "NPR RP Imp. Worksh."
 {
-    // NPR5.38/MMV /20171212 CASE 294095 Created object.
-
     Caption = 'Import Worksheet';
     DataClassification = CustomerContent;
 
@@ -84,10 +82,6 @@ table 6014569 "NPR RP Imp. Worksh."
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         SetDefaultAction();
@@ -139,9 +133,9 @@ table 6014569 "NPR RP Imp. Worksh."
 
     local procedure IsSafeVersionIncrease(): Boolean
     var
-        VersionArray: DotNet NPRNetArray;
-        Regex: DotNet NPRNetRegex;
-        Version: DotNet NPRNetString;
+        VersionArray: List of [Text];
+        ExistingVersion: Text;
+        Version: Text;
         VersionPos: Integer;
         EndOfString: Boolean;
         Length: Integer;
@@ -163,7 +157,8 @@ table 6014569 "NPR RP Imp. Worksh."
         if "Existing Last Modified At" > "New Last Modified At" then
             exit(false);
 
-        VersionArray := Regex.Split("Existing Version", ',');
+        ExistingVersion := "Existing Version";
+        VersionArray := ExistingVersion.Split(',');
         foreach Version in VersionArray do begin
             VersionTag := DelChr(Version, '=', '0123456789.');
             VersionPos := StrPos("New Version", VersionTag);
@@ -203,4 +198,3 @@ table 6014569 "NPR RP Imp. Worksh."
         exit((RoundDateTime(DateTime1, 60000, '<') = RoundDateTime(DateTime2, 60000, '<')) and (DateTime1 <> 0DT));
     end;
 }
-
