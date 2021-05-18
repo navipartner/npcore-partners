@@ -49,13 +49,6 @@ codeunit 6014582 "NPR Print Method Mgt."
         end;
     end;
 
-    procedure PrintViaEpsonWebService(PrinterName: Text; SlavePrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
-    var
-        WebPrintMgt: Codeunit "NPR RP Epson Web Print Mgt.";
-    begin
-        WebPrintMgt.CreatePrintJob(PrinterName, SlavePrinterName, PrintBytes, TargetEncoding);
-    end;
-
     [Obsolete('Use the overload without DotNet. This method can be deleted when there are 0 references left')]
     procedure PrintViaEmail(PrinterName: Text; var Stream: DotNet NPRNetMemoryStream)
     var
