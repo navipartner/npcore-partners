@@ -118,7 +118,7 @@ report 6014533 "NPR Inventory - flow"
                         ItemL3.SetRange("Item Category Code", "Item Category"."Code");
                         if Item.GetFilter("Statistics Group") <> '' then
                             ItemL3.SetRange("Statistics Group", Item."Statistics Group");
-                        if ItemL3.FindFirst() then
+                        if ItemL3.FindSet() then
                             repeat
                                 if ItemL3."No." = ItemNo then begin
                                     if ItemL3.Next() = 0 then begin
@@ -135,7 +135,7 @@ report 6014533 "NPR Inventory - flow"
                             until Done;
 
                         if NewGroup then begin
-                            if Item2.FindFirst() then
+                            if Item2.FindSet() then
                                 repeat
                                     ShowTotalGroup := true;
 
@@ -205,7 +205,7 @@ report 6014533 "NPR Inventory - flow"
                     if SkipWithoutPortfolio then begin
                         Done := false;
                         ItemL.SetRange("Vendor No.", Item."Vendor No.");
-                        if ItemL.FindFirst() then
+                        if ItemL.FindSet() then
                             repeat
                                 if ItemL."No." = ItemNo then begin
                                     if ItemL.Next() = 0 then begin
@@ -226,7 +226,7 @@ report 6014533 "NPR Inventory - flow"
                     if SkipNoSales then begin
                         Done := false;
                         ItemL.SetRange("Vendor No.", Item."Vendor No.");
-                        if ItemL.FindFirst() then
+                        if ItemL.FindSet() then
                             repeat
                                 if ItemL."No." = ItemNo then begin
                                     if ItemL.Next() = 0 then begin

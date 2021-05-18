@@ -10,7 +10,7 @@
         if NPRAttributeKey.FindSet() then
             repeat
                 NPRAttributeValueSet.SetRange("Attribute Set ID", NPRAttributeKey."Attribute Set ID");
-                if NPRAttributeValueSet.FindFirst() then
+                if NPRAttributeValueSet.FindSet() then
                     repeat
                         UpdateItemAttribute(0, NonstockItem."Item No.", NPRAttributeValueSet."Attribute Code", NPRAttributeValueSet."Text Value");
                     until NPRAttributeValueSet.Next() = 0;

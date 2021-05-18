@@ -340,13 +340,13 @@ table 6059974 "NPR Variety Buffer"
         TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindFirst() then
+        if TMPVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindFirst() then
+                if TMPVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindFirst() then
+                        if TMPVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindFirst() then
+                                if TMPVRT4.FindSet() then
                                     repeat
                                         TMPVRTBuffer.Init();
                                         TMPVRTBuffer."Variety 1 Value" := TMPVRT1.Value;
@@ -466,13 +466,13 @@ table 6059974 "NPR Variety Buffer"
         TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindFirst() then
+        if TMPVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindFirst() then
+                if TMPVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindFirst() then
+                        if TMPVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindFirst() then
+                                if TMPVRT4.FindSet() then
                                     repeat
                                         TMPVRTBuffer.Init();
                                         TMPVRTBuffer."Variety 1 Value" := TMPVRT1.Value;
@@ -566,13 +566,13 @@ table 6059974 "NPR Variety Buffer"
         TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindFirst() then
+        if TMPVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindFirst() then
+                if TMPVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindFirst() then
+                        if TMPVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindFirst() then
+                                if TMPVRT4.FindSet() then
                                     repeat
                                         //-NPR5.50 [348210]
                                         Window.Update(1, TMPVRT1.Value + ' ' + TMPVRT2.Value + ' ' + TMPVRT3.Value + ' ' + TMPVRT4.Value + ' ');
@@ -677,13 +677,13 @@ table 6059974 "NPR Variety Buffer"
         TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
         TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindFirst() then
+        if TMPVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindFirst() then
+                if TMPVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindFirst() then
+                        if TMPVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindFirst() then
+                                if TMPVRT4.FindSet() then
                                     repeat
                                         TMPVRTBuffer.Init();
                                         TMPVRTBuffer."Variety 1 Value" := TMPVRT1.Value;

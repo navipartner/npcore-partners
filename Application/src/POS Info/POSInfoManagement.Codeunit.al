@@ -408,7 +408,7 @@
         if POSInfoTransaction."Sales Line No." <> 0 then
             SaleLinePOS.SetRange("Line No.", POSInfoTransaction."Sales Line No.");
 
-        if SaleLinePOS.FindFirst() then
+        if SaleLinePOS.FindSet() then
             repeat
                 if POSInfoTransaction."Sales Line No." <> 0 then begin
                     POSInfoTransaction."No." := SaleLinePOS."No.";

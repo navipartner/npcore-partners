@@ -448,7 +448,7 @@ report 6060042 "NPR Import Excel Item Worksh."
             ItemWorksheetExcelColumn.SetRange("Map to Table No.", ParTableNo);
         if ParFieldNoFilter <> '' then
             ItemWorksheetExcelColumn.SetFilter("Map to Field Number", ParFieldNoFilter);
-        if ItemWorksheetExcelColumn.FindFirst() then
+        if ItemWorksheetExcelColumn.FindSet() then
             repeat
                 if ExcelBuf2.Get(ExcelBuf."Row No.", ItemWorksheetExcelColumn."Excel Column No.") then
                     if RecField.Get(ItemWorksheetExcelColumn."Map to Table No.", ItemWorksheetExcelColumn."Map to Field Number") then begin
