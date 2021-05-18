@@ -170,14 +170,6 @@ codeunit 6014580 "NPR Object Output Mgt."
                         PrintMethodMgt.PrintBytesLocal(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
                 end;
 
-            ObjectOutput."Output Type"::"Epson Web":
-                begin
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
-                    for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, TargetEncoding);
-                end;
-
             ObjectOutput."Output Type"::HTTP:
                 begin
                     Printer.OnPrepareJobForHTTP(TargetEncoding, HTTPEndpoint, Supported);
@@ -237,14 +229,6 @@ codeunit 6014580 "NPR Object Output Mgt."
                     Printer.OnGetTargetEncoding(TargetEncoding);
                     for i := 1 to NoOfPrints do
                         PrintMethodMgt.PrintBytesLocal(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
-                end;
-
-            ObjectOutput."Output Type"::"Epson Web":
-                begin
-                    Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
-                    for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, TargetEncoding);
                 end;
 
             ObjectOutput."Output Type"::HTTP:
