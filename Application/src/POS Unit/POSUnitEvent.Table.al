@@ -2,7 +2,6 @@ table 6150631 "NPR POS Unit Event"
 {
     DataClassification = CustomerContent;
     Caption = 'POS Unit Event';
-    LookupPageId = "NPR POS Unit Event List";
 
     fields
     {

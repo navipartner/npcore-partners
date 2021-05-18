@@ -89,6 +89,8 @@ codeunit 6150925 "NPR UPG Register"
     end;
 
     local procedure UpsertPOSUnitActiveEvent(Register: Record "NPR Register"; POSUnit: Record "NPR POS Unit")
+    var
+        POSViewProfile: Record "NPR POS View Profile";
     begin
         POSUnit.SetActiveEventForCurrPOSUnit(Register."Active Event No.");
     end;
