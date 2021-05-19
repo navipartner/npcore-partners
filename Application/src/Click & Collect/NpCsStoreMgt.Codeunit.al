@@ -169,7 +169,7 @@
         Lat2: Decimal;
         Lon1: Decimal;
         Lon2: Decimal;
-        Math: Codeunit "NPR Math";
+        Math: Codeunit Math;
     begin
         //DotNet from this function can be easy removed after upgrade to BC 17.2 because Microsoft added theese functions to Codeunit Math (currently it has procedure "Abs" only.)
         //https://github.com/microsoft/ALAppExtensions/tree/master/Modules/System/Math
