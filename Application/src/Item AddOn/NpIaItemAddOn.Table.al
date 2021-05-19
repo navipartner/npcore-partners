@@ -27,7 +27,7 @@ table 6151125 "NPR NpIa Item AddOn"
         {
             Caption = 'Comment POS Info Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Info";
+            TableRelation = "NPR POS Info" where("Once per Transaction" = const(false), Type = const("Request Data"), "Input Type" = const(Text));
         }
     }
 
