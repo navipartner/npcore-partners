@@ -597,7 +597,7 @@ table 6014405 "NPR POS Sale"
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use systemID instead';
         }
         field(180; "Event No."; Code[20])
@@ -770,12 +770,7 @@ table 6014405 "NPR POS Sale"
         POSUnit.GetProfile(POSPricingProfile);
         "Location Code" := POSStore."Location Code";
         "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
-        "POS Sale ID" := 0;
         "Event No." := POSUnit.FindActiveEventFromCurrPOSUnit();
-
-        if IsNullGuid("Retail ID") then begin
-            "Retail ID" := CreateGuid();
-        end;
     end;
 
     var

@@ -142,7 +142,7 @@
             until SaleLinePOS.Next() = 0;
 
             WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-            WaiterPadLine.SetRange("Sale Retail ID", SalePOS."Retail ID");
+            WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
             WaiterPadLine.SetAutoCalcFields("Kitchen Order Sent", "Serving Requested");
             if WaiterPadLine.FindSet() then
                 repeat
@@ -186,8 +186,8 @@
         NewLine: Boolean;
     begin
         WaiterPadLine2.SetRange("Waiter Pad No.", WaiterPad."No.");
-        WaiterPadLine2.SetRange("Sale Line Retail ID", SaleLinePOS."Retail ID");
-        NewLine := not WaiterPadLine2.FindFirst() or IsNullGuid(SaleLinePOS."Retail ID");
+        WaiterPadLine2.SetRange("Sale Line Retail ID", SaleLinePOS.SystemID);
+        NewLine := not WaiterPadLine2.FindFirst() or IsNullGuid(SaleLinePOS.SystemID);
         if not NewLine then begin
             WaiterPadLine := WaiterPadLine2;
             WaiterPadLine.TestField(WaiterPadLine.Type, SaleLinePOS.Type);
@@ -214,8 +214,8 @@
             WaiterPadLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
             WaiterPadLine."Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
 
-            WaiterPadLine."Sale Retail ID" := SalePOS."Retail ID";
-            WaiterPadLine."Sale Line Retail ID" := SaleLinePOS."Retail ID";
+            WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
+            WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
             WaiterPadLine.Insert(true);
 
             WaiterPadMgt.AssignWPadLinePrintCategories(WaiterPadLine, true);
@@ -260,7 +260,7 @@
         SalePOS.TestField("NPRE Pre-Set Waiter Pad No.", '');
 
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        WaiterPadLine.SetFilter("Sale Retail ID", '<>%1&<>%2', GetNullGuid(), SalePOS."Retail ID");
+        WaiterPadLine.SetFilter("Sale Retail ID", '<>%1&<>%2', GetNullGuid(), SalePOS.SystemId);
         if not WaiterPadLine.IsEmpty then
             if not Confirm(WPInAnotherSale, false, WaiterPad."No.", WaiterPad."Current Seating FF") then
                 Error('');
@@ -327,8 +327,8 @@
         POSSaleLine.SetUseLinePriceVATParams(false);
         CopyPOSInfo(SaleLinePOS, WaiterPadLine."Waiter Pad No.", WaiterPadLine."Line No.", false);
 
-        WaiterPadLine."Sale Retail ID" := SalePOS."Retail ID";
-        WaiterPadLine."Sale Line Retail ID" := SaleLinePOS."Retail ID";
+        WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
+        WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
         WaiterPadLine.Modify();
     end;
 
@@ -700,9 +700,9 @@
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        if IsNullGuid(SalePOS."Retail ID") then
+        if IsNullGuid(SalePOS.SystemId) then
             exit;
-        WaiterPadLine.SetRange("Sale Retail ID", SalePOS."Retail ID");
+        WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
         WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
     end;
 
@@ -710,9 +710,9 @@
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        if IsNullGuid(SaleLinePOS."Retail ID") then
+        if IsNullGuid(SaleLinePOS.SystemId) then
             exit;
-        WaiterPadLine.SetRange("Sale Line Retail ID", SaleLinePOS."Retail ID");
+        WaiterPadLine.SetRange("Sale Line Retail ID", SaleLinePOS.SystemId);
         WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
@@ -747,9 +747,9 @@
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        if IsNullGuid(POSSalesLine."Retail ID") then
+        if IsNullGuid(POSSalesLine.SystemId) then
             exit;
-        WaiterPadLine.SetRange("Sale Line Retail ID", POSSalesLine."Retail ID");
+        WaiterPadLine.SetRange("Sale Line Retail ID", POSSalesLine.SystemId);
         if WaiterPadLine.FindFirst() then begin
             if POSSalesLine."Quantity (Base)" <> 0 then begin
                 if WaiterPadLine."Qty. per Unit of Measure" = POSSalesLine."Qty. per Unit of Measure" then

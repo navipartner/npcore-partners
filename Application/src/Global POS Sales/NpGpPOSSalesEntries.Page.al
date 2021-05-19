@@ -103,10 +103,10 @@ page 6151167 "NPR NpGp POS Sales Entries"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
-                field("Retail ID"; Rec."Retail ID")
+                field("System Id"; Rec.SystemId)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Retail ID field';
+                    ToolTip = 'Specifies the value of the System Id field';
                 }
             }
             part("POS Sales Lines"; "NPR NpGp POSSalesEntry Subpage")

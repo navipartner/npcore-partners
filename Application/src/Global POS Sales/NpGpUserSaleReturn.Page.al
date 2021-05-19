@@ -112,7 +112,7 @@ page 6151174 "NPR NpGp User Sale Return"
 
     trigger OnAfterGetRecord()
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        POSCrossReference: Record "NPR POS Cross Reference";
     begin
         if GetLastErrorCode > '' then begin
             Rec.ClearMarks();
@@ -123,16 +123,16 @@ page 6151174 "NPR NpGp User Sale Return"
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
 
-        RetailCrossReference.SetRange("Reference No.", Rec."Global Reference");
-        if RetailCrossReference.FindSet() then
+        POSCrossReference.SetRange("Reference No.", Rec."Global Reference");
+        if POSCrossReference.FindSet() then
             repeat
-                SaleLinePOS.SetRange("Retail ID", RetailCrossReference."Retail ID");
+                SaleLinePOS.SetRange(SystemId, POSCrossReference.SystemId);
                 SaleLinePOS.SetFilter(Quantity, '<0');
                 if SaleLinePOS.FindFirst() and not SaleLinePOS.Mark() then begin
                     Rec.Quantity += SaleLinePOS.Quantity;
                     SaleLinePOS.Mark(true);
                 end;
-            until RetailCrossReference.Next() = 0;
+            until POSCrossReference.Next() = 0;
 
         if not Rec.Mark() then begin
             OriginalQuantity := Rec."Quantity (Base)" / Rec."Qty. per Unit of Measure";

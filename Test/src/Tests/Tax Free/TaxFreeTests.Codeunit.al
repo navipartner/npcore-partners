@@ -1344,7 +1344,7 @@ codeunit 85019 "NPR Tax Free Tests"
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
             _Initialized := true;
         end;
-NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
+        NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
         Commit();
     end;
 
@@ -1380,19 +1380,6 @@ NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
         _POSSession.BeginAction(POSActionPayment.ActionCode()); //Required for EFT payments as they depend on outer PAYMENT workflow session state.
     end;
 
-    procedure AssertPaymentLine(LineRetailID: Guid; Amount: Decimal; ShouldExist: Boolean)
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-    begin
-        SaleLinePOS.SetRange("Retail ID", LineRetailID);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
-        if ShouldExist then begin
-            SaleLinePOS.FindFirst();
-            SaleLinePOS.TestField("Amount Including VAT", Amount);
-        end else begin
-            asserterror SaleLinePOS.FindFirst();
-        end;
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Tax Free Handler Mgt.", 'OnBeforeSetConstructor', '', true, true)]
     procedure OnBeforeSetConstructor(var TaxFreeHandlerIfaceIn: Interface "NPR Tax Free Handler Interface"; var ConstrSet: Boolean)

@@ -153,16 +153,6 @@ page 6150670 "NPR POS Balancing Line"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Balancing Details field';
                 }
-                field("Orig. POS Sale ID"; Rec."Orig. POS Sale ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Orig. POS Sale ID field';
-                }
-                field("Orig. POS Line No."; Rec."Orig. POS Line No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Orig. POS Line No. field';
-                }
                 field("POS Bin Checkpoint Entry No."; Rec."POS Bin Checkpoint Entry No.")
                 {
                     ApplicationArea = All;

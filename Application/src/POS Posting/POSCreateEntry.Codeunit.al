@@ -158,8 +158,6 @@
         POSEntry."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
         POSEntry."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
         POSEntry."Dimension Set ID" := SalePOS."Dimension Set ID";
-        POSEntry."POS Sale ID" := SalePOS."POS Sale ID";
-        POSEntry."Retail ID" := SalePOS."Retail ID";
         POSEntry.SystemId := SalePOS.SystemId;
         POSEntry."Starting Time" := SalePOS."Start Time";
         POSEntry."Ending Time" := Time;
@@ -310,9 +308,6 @@
         POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := POSSalesLine."Line Discount Amount Excl. VAT" * POSEntry."Currency Factor";
         POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := POSSalesLine."Line Discount Amount Incl. VAT" * POSEntry."Currency Factor";
 
-        POSSalesLine."Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
-        POSSalesLine."Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
-        POSSalesLine."Retail ID" := SaleLinePOS."Retail ID";
         POSSalesLine.SystemId := SaleLinePOS.SystemId;
 
         POSSalesLine."Item Category Code" := SaleLinePOS."Item Category Code";
@@ -399,7 +394,6 @@
 #pragma warning restore
 
         POSPaymentLine."POS Payment Bin Code" := SelectUnitBin(POSPaymentLine."POS Unit No.");
-        POSPaymentLine."Retail ID" := SaleLinePOS."Retail ID";
 
         POSPaymentLine.Description := SaleLinePOS.Description;
         if SaleLinePOS."Currency Amount" <> 0 then begin
@@ -413,8 +407,6 @@
         POSPaymentLine."Amount (Sales Currency)" := SaleLinePOS."Amount Including VAT"; //Sales Currency is always LCY for now
         POSPaymentLine."Currency Code" := POSPaymentMethod."Currency Code";
 
-        POSPaymentLine."Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
-        POSPaymentLine."Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
         POSPaymentLine.EFT := SaleLinePOS."EFT Approved";
         POSPaymentLine.SystemId := SaleLinePOS.SystemId;
 

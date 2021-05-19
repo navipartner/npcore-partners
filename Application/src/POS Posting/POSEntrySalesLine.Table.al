@@ -340,15 +340,15 @@ table 6150622 "NPR POS Entry Sales Line"
             Caption = 'Orig. POS Sale ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Replaced by SystemID';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
         {
             Caption = 'Orig. POS Line No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)

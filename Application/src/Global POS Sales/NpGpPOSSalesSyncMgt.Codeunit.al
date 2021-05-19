@@ -102,7 +102,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSInfoPOSEntry: Record "NPR POS Info POS Entry";
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        POSCrossReference: Record "NPR POS Cross Reference";
         Xml: Text;
     begin
         Xml :=
@@ -117,7 +117,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
                    '  company="' + XmlEscape(CompanyName) + '">' +
                      '<entry_time>' + Format(CreateDateTime(POSEntry."Entry Date", POSEntry."Ending Time"), 0, 9) + '</entry_time>' +
                      '<entry_type>' + Format(POSEntry."Entry Type", 0, 2) + '</entry_type>' +
-                     '<retail_id>' + Format(POSEntry."Retail ID") + '</retail_id>' +
+                     '<retail_id>' + Format(POSEntry.SystemId) + '</retail_id>' +
                      '<posting_date>' + Format(POSEntry."Posting Date", 0, 9) + '</posting_date>' +
                      '<fiscal_no>' + POSEntry."Fiscal No." + '</fiscal_no>' +
                      '<salesperson_code>' + POSEntry."Salesperson Code" + '</salesperson_code>' +
@@ -133,10 +133,10 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSSalesLine.FindSet() then
             repeat
-                if RetailCrossReference.Get(POSSalesLine."Retail ID") then;
+                if POSCrossReference.GetBySystemId(POSSalesLine.SystemId) then;
                 Xml +=
                             '<sales_line line_no="' + Format(POSSalesLine."Line No.", 0, 9) + '">' +
-                              '<retail_id>' + Format(POSSalesLine."Retail ID") + '</retail_id>' +
+                              '<retail_id>' + Format(POSSalesLine.SystemId) + '</retail_id>' +
                               '<type>' + Format(POSSalesLine.Type, 0, 2) + '</type>' +
                               '<no>' + POSSalesLine."No." + '</no>' +
                               '<variant_code>' + POSSalesLine."Variant Code" + '</variant_code>' +
@@ -162,7 +162,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
                               '<line_discount_amount_incl_vat_lcy>' + Format(POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)", 0, 9) + '</line_discount_amount_incl_vat_lcy>' +
                               '<amount_excl_vat_lcy>' + Format(POSSalesLine."Amount Excl. VAT (LCY)", 0, 9) + '</amount_excl_vat_lcy>' +
                               '<amount_incl_vat_lcy>' + Format(POSSalesLine."Amount Incl. VAT (LCY)", 0, 9) + '</amount_incl_vat_lcy>' +
-                              '<global_reference>' + RetailCrossReference."Reference No." + '</global_reference>' +
+                              '<global_reference>' + POSCrossReference."Reference No." + '</global_reference>' +
                               '<extension_fields/>' +
                             '</sales_line>';
             until POSSalesLine.Next() = 0;

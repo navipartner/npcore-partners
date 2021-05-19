@@ -222,7 +222,7 @@ table 6150621 "NPR POS Entry"
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(180; "Event No."; Code[20])
@@ -412,6 +412,8 @@ table 6150621 "NPR POS Entry"
         }
         key(Key2; "Retail ID")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by SystemID';
         }
         key(Key3; "POS Store Code", "POS Unit No.", "Document No.")
         {

@@ -167,6 +167,8 @@ table 6150637 "NPR POS Audit Log"
         {
             Caption = 'Active POS Sale ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(32; "Active POS Unit No."; Code[10])
         {

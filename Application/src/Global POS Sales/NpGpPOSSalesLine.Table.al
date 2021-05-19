@@ -21,6 +21,8 @@ table 6151168 "NPR NpGp POS Sales Line"
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(100; "POS Store Code"; Code[10])
         {
@@ -219,6 +221,8 @@ table 6151168 "NPR NpGp POS Sales Line"
         }
         key(Key3; "Retail ID")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use systemID instead';
         }
     }
 
