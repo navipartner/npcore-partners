@@ -82,7 +82,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                     field("GL Payment (LCY)"; Rec."GL Payment (LCY)")
                     {
                         ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the GL Payment (LCY) field';
+                        ToolTip = 'Specifies the value of the GL Payment (LCY) field which groups all payments that are handled via an GL Account, such as Payin/Payout transactions.';
                     }
                 }
                 group(Voucher)
