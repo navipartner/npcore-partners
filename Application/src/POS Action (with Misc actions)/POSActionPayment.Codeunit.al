@@ -99,7 +99,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type() = CurrentView.Type()::Sale) then
+        if (CurrentView.Type() = CurrentView.Type() ::Sale) then
             POSSession.ChangeViewPayment();
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
@@ -355,6 +355,8 @@ codeunit 6150725 "NPR POS Action: Payment"
                     Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
                 POSPaymentMethod."Processing Type"::PAYOUT:
                     Handled := CapturePayoutPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
+                POSPaymentMethod."Processing Type"::CHECK:
+                    Handled := CaptureCheckPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
                 else
                     Handled := false;
             end;
@@ -458,6 +460,27 @@ codeunit 6150725 "NPR POS Action: Payment"
         EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
         FrontEnd.PauseWorkflow(); //THIS IS ONLY REQUIRED BECAUSE A CONFIRM DIALOG IN THE EFT MODULE TO LOOKUP LAST TRX WOULD, IN NAV2016, CAUSE A CONTINUE IN THE FRONT END...
         EFTTransactionMgt.StartPayment(EFTSetup, AmountToCapture, POSLine."Currency Code", SalePOS);
+        exit(true);
+    end;
+
+    local procedure CaptureCheckPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    var
+        AmountToCapture: Decimal;
+    begin
+        AmountToCapture := AmountToCaptureLCY;
+
+        if AmountToCaptureLCY = 0 then
+            exit(true);
+
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
+
+        if (POSPaymentMethod."Fixed Rate" <> 0) then begin
+            POSLine."Amount Including VAT" := 0;
+            POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
+        end else begin
+            POSLine."Amount Including VAT" := AmountToCaptureLCY;
+            POSPaymentLine.InsertPaymentLine(POSLine, 0);
+        end;
         exit(true);
     end;
 
