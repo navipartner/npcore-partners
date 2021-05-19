@@ -1,169 +1,180 @@
 codeunit 6151128 "NPR POS Action: Run Item AddOn"
 {
-    SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        CurrNpIaItemAddOn: Record "NPR NpIa Item AddOn";
-        [WithEvents]
-        Model: DotNet NPRNetModel;
-        ActiveModelID: Guid;
-        Text000: Label 'Insert Item AddOns from the currently selected POS Sales Line';
-        BaseLineNo: Integer;
-
     local procedure ActionCode(): Text
     begin
         exit('RUN_ITEM_ADDONS');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure BuiltInSaleLine(): Text
     begin
-        exit('1.1');
+        exit('BUILTIN_SALELINE');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    local procedure ActionVersion(): Text
     begin
-        if Sender.DiscoverAction(
-  ActionCode(),
-  Text000,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
-            Sender.RegisterWorkflowStep('run_addons', 'respond();');
+        exit('2.0');
+    end;
 
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
-            Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField("ItemAddOn.ItemAddOn").rawValue;');
-            Sender.RegisterIntegerParameter('BaseLineNo', 0);
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
+    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        ActionDescriptionLbl: Label 'This built-in action inserts Item AddOns for a selected POS Sale Line', MaxLength = 250;
+    begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+            Sender.RegisterWorkflow20(
+                'let AddonJson = await workflow.respond("GetSalesLineAddonConfigJson");' +
+                'if ($context.UserSelectionRequired) {' +
+                '  let AddonConfig = JSON.parse(AddonJson);' +
+                '  $context.UserSelectedAddons = await popup.configuration(AddonConfig);' +
+                '}' +
+                'await workflow.respond("SetItemAddons");');
+
+            Sender.RegisterDataSourceBinding(BuiltInSaleLine());
+            Sender.RegisterTextParameter('ItemAddOnNo', '');
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
+    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        BaseLineNo := JSON.GetIntegerParameter('BaseLineNo');
+        Handled := true;
 
         case WorkflowStep of
-            'run_addons':
-                OnActionRunAddOns(POSSession, FrontEnd);
+            'GetSalesLineAddonConfigJson':
+                GenerateItemAddonConfig(POSSession, FrontEnd, Context);
+            'SetItemAddons':
+                OnActionRunAddOns(POSSession, FrontEnd, Context);
         end;
-
-        Handled := true;
     end;
 
-    local procedure OnActionRunAddOns(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure GenerateItemAddonConfig(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management")
     var
         Item: Record Item;
-        NpIaItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOn: Record "NPR NpIa Item AddOn";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        AddOnNo: Code[20];
+        ItemAddonConfigAsString: Text;
         AppliesToLineNo: Integer;
-        UpdateCurrentSaleLine: Boolean;
+        BaseLineNo: Integer;
     begin
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        if BaseLineNo <> 0 then
-            AppliesToLineNo := BaseLineNo
-        else
-            AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
-        UpdateCurrentSaleLine := SaleLinePOS."Line No." <> AppliesToLineNo;
-        SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
-        IF UpdateCurrentSaleLine THEN
-            POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
-
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
-            exit;
-        Item.Get(SaleLinePOS."No.");
-        Item.TestField("NPR Item AddOn No.");
-
-        NpIaItemAddOn.Get(Item."NPR Item AddOn No.");
-        NpIaItemAddOn.TestField(Enabled);
-
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        CurrNpIaItemAddOn := NpIaItemAddOn;
-        if not NpIaItemAddOnMgt.UserInterfaceIsRequired(NpIaItemAddOn) then begin
-            NpIaItemAddOnMgt.InsertFixedPOSAddOnLinesSilent(NpIaItemAddOn, POSSession, AppliesToLineNo);
-            if NpIaItemAddOnMgt.InsertedWithAutoSplitKey() then
-                POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
-            exit;
-        end;
-        NpIaItemAddOnMgt.CreateUserInterface(Model, SalePOS, SaleLinePOS, NpIaItemAddOn);
-        ActiveModelID := FrontEnd.ShowModel(Model);
-    end;
-
-    //--- Approve ---
-
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', true, true)]
-    local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
-    begin
-        if ModelID <> ActiveModelID then
-            exit;
-
-        Handled := true;
-
-        Approve(EventName, FrontEnd, Sender <> 'approve');
-        FrontEnd.CloseModel(ModelID);
-    end;
-
-    local procedure Approve(JsonText: Text; FrontEnd: Codeunit "NPR POS Front End Management"; OnlyFixedQtyLines: Boolean)
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSSession: Codeunit "NPR POS Session";
-        NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
-        POSJavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
-        AddOnLines: JsonToken;
-        AppliesToLineNo: Integer;
-    begin
-        AddOnLines.ReadFrom(JsonText);
-        FrontEnd.GetSession(POSSession);
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        BaseLineNo := Context.GetInteger('BaseLineNo');
         if BaseLineNo <> 0 then
             AppliesToLineNo := BaseLineNo
-        else
+        else begin
             AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
-        if NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn, AddOnLines, POSSession, AppliesToLineNo, OnlyFixedQtyLines) then begin
-            SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
+            Context.SetContext('BaseLineNo', AppliesToLineNo);
+        end;
+
+        SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
+        SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
+
+        AddOnNo := Context.GetStringParameter('ItemAddOnNo');
+        if AddOnNo = '' then begin
+            Item.Get(SaleLinePOS."No.");
+            AddOnNo := Item."NPR Item AddOn No.";
+            Context.SetContext('CompulsoryAddOn', not ItemAddOnMgt.AttachedIteamAddonLinesExist(SaleLinePOS));
+        end;
+        if AddOnNo = '' then
+            if not LookupItemAddOn(AddOnNo) then
+                Error('');
+
+        ItemAddOn.Get(AddOnNo);
+        ItemAddOn.TestField(Enabled);
+        Context.SetContext('ApplyItemAddOnNo', AddOnNo);
+
+        if not ItemAddOnMgt.UserInterfaceIsRequired(ItemAddOn) then begin
+            FrontEnd.WorkflowResponse('{}');
+            exit;
+        end;
+        Context.SetContext('UserSelectionRequired', true);
+        ItemAddOnMgt.GenerateItemAddOnConfigJson(SalePOS, SaleLinePOS, ItemAddOn).WriteTo(ItemAddonConfigAsString);
+        FrontEnd.WorkflowResponse(ItemAddonConfigAsString);
+    end;
+
+    local procedure OnActionRunAddOns(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management")
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        UserSelectionJToken: JsonToken;
+        AppliesToLineNo: Integer;
+        CompulsoryAddOn: Boolean;
+        RequestFrontEndRefresh: Boolean;
+        UpdateActiveSaleLine: Boolean;
+        ReadingErr: Label 'reading in %1 of %2';
+    begin
+        AppliesToLineNo := Context.GetIntegerOrFail('BaseLineNo', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        UpdateActiveSaleLine := SaleLinePOS."Line No." <> AppliesToLineNo;
+        SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
+        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+            exit;
+        IF UpdateActiveSaleLine THEN
             POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
-            if NpIaItemAddOnMgt.InsertedWithAutoSplitKey() then begin
+
+        ItemAddOn.Get(Context.GetStringOrFail('ApplyItemAddOnNo', StrSubstNo(ReadingErr, 'OnAction', ActionCode())));
+        ItemAddOn.TestField(Enabled);
+        CompulsoryAddOn := Context.GetBoolean('CompulsoryAddOn');
+
+        Clear(ItemAddOnMgt);
+        if not Context.GetBoolean('UserSelectionRequired') then
+            RequestFrontEndRefresh := ItemAddOnMgt.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn)
+        else begin
+            UserSelectionJToken := Context.GetJTokenOrFail('UserSelectedAddons', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+            if UserSelectionJToken.IsValue then
+                if UserSelectionJToken.AsValue().IsNull and not Context.GetBoolean('CompulsoryAddOn') then
+                    Error('');
+            RequestFrontEndRefresh := ItemAddOnMgt.InsertPOSAddOnLines(ItemAddOn, UserSelectionJToken, POSSession, AppliesToLineNo, CompulsoryAddOn);
+        end;
+
+        if RequestFrontEndRefresh then begin
+            if ItemAddOnMgt.InsertedWithAutoSplitKey() then begin
                 POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
                 exit;
             end;
             POSSession.RequestRefreshData();
         end;
-        POSJavaScriptInterface.RefreshData(POSSession, FrontEnd);
     end;
 
-    //--- Aux ---
+    local procedure LookupItemAddOn(var AddOnNo: Code[20]): Boolean
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+    begin
+        ItemAddOn.FilterGroup(2);
+        ItemAddOn.SetRange(Enabled, true);
+        ItemAddOn.FilterGroup(0);
+        if AddOnNo <> '' then begin
+            ItemAddOn."No." := AddOnNo;
+            if ItemAddOn.find('=><') then;
+        end;
+        if Page.RunModal(0, ItemAddOn) = Action::LookupOK then begin
+            AddOnNo := ItemAddOn."No.";
+            exit(true);
+        end;
+        exit(false);
+    end;
 
     local procedure FindAppliesToLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
-        NpIaSaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
-        NpIaSaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
-        NpIaSaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        NpIaSaleLinePOSAddOn.SetRange("Sale Type", SaleLinePOS."Sale Type");
-        NpIaSaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
-        NpIaSaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-        if NpIaSaleLinePOSAddOn.FindFirst() then
-            exit(NpIaSaleLinePOSAddOn."Applies-to Line No.");
+        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        if SaleLinePOSAddOn.FindFirst() then
+            exit(SaleLinePOSAddOn."Applies-to Line No.");
 
         if SaleLinePOS.Accessory then
             exit(SaleLinePOS."Main Line No.");
@@ -171,11 +182,74 @@ then begin
         exit(SaleLinePOS."Line No.");
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet NPRNetControl; eventName: Text; data: DotNet NPRNetDictionary_Of_T_U)
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, false)]
+    local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean);
+    var
+        AddOnNo: Code[20];
     begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                begin
+                    AddOnNo := CopyStr(POSParameterValue.Value, 1, MaxStrLen(AddOnNo));
+                    if LookupItemAddOn(AddOnNo) then
+                        POSParameterValue.Value := AddOnNo;
+                end;
+        end;
     end;
 
-    trigger Model::OnTimer()
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]
+    local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
     begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+
+                    ItemAddOn.SetRange(Enabled, true);
+                    ItemAddOn."No." := POSParameterValue.Value;
+                    if not ItemAddOn.Find() then begin
+                        ItemAddOn.SetFilter("No.", CopyStr(StrSubstNo('@%1*', POSParameterValue.Value), 1, MaxStrLen(ItemAddOn."No.")));
+                        ItemAddOn.FindFirst();
+                    end;
+                    POSParameterValue.Value := ItemAddOn."No.";
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        CaptionItemAddOnNo: Label 'Item AddOn No.';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                Caption := CaptionItemAddOnNo;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        DescItemAddOnNo: Label 'Specifies Item AddOn No. This value will override Item AddOn selected on Item Cards';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                Caption := DescItemAddOnNo;
+        end;
     end;
 }

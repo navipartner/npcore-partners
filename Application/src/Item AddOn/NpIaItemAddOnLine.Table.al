@@ -21,7 +21,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             OptionCaption = 'Quantity,Select';
             OptionMembers = Quantity,Select;
 
@@ -37,7 +36,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = Item;
 
             trigger OnValidate()
@@ -86,7 +84,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
         {
             Caption = 'Use Unit Price';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             OptionCaption = 'Non-Zero,Always';
             OptionMembers = "Non-Zero",Always;
         }
@@ -126,15 +123,16 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
             trigger OnValidate()
             begin
-                if Quantity = 0 then
-                    TestField("Fixed Quantity", false);
+                if Quantity = 0 then begin
+                    "Fixed Quantity" := false;
+                    Mandatory := false;
+                end;
             end;
         }
         field(110; "Fixed Quantity"; Boolean)
         {
             Caption = 'Fixed Quantity';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
 
             trigger OnValidate()
             begin
@@ -146,14 +144,23 @@ table 6151126 "NPR NpIa Item AddOn Line"
         {
             Caption = 'Per unit';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
+        }
+        field(130; Mandatory; Boolean)
+        {
+            Caption = 'Mandatory';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if Mandatory then
+                    TestField(Quantity);
+            end;
         }
         field(200; "Before Insert Codeunit ID"; Integer)
         {
             BlankZero = true;
             Caption = 'Before Insert Codeunit ID';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
 
             trigger OnLookup()
             var
@@ -192,7 +199,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Before Insert Codeunit ID")));
             Caption = 'Before Insert Codeunit Name';
-            Description = 'NPR5.48';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -200,7 +206,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
         {
             Caption = 'Before Insert Function';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
 
             trigger OnLookup()
             var
@@ -241,13 +246,7 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
     keys
     {
-        key(Key1; "AddOn No.", "Line No.")
-        {
-        }
-    }
-
-    fieldgroups
-    {
+        key(Key1; "AddOn No.", "Line No.") { }
     }
 
     trigger OnDelete()
@@ -272,4 +271,3 @@ table 6151126 "NPR NpIa Item AddOn Line"
             TestField("Item No.");
     end;
 }
-

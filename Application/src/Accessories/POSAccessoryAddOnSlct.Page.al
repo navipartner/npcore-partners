@@ -4,8 +4,9 @@ page 6014548 "NPR POS Accessory AddOn Slct."
 
     Caption = 'Item AddOns';
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Some kind of a test page. Shouldn''t be included in production environments';
 
     layout
     {

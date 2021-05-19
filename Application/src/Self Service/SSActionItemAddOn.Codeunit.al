@@ -347,9 +347,7 @@
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         SaleLinePOS: Record "NPR POS Sale Line";
-        EntryNo: Integer;
     begin
-
         if (NpIaItemAddOn."Comment POS Info Code" = '') then
             exit;
 
@@ -358,14 +356,6 @@
 
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        POSInfoTransaction.SetCurrentKey("Entry No.");
-        POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
-        POSInfoTransaction.SetRange("Register No.", SaleLinePOS."Register No.");
-        POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        if (POSInfoTransaction.FindLast()) then;
-        EntryNo := POSInfoTransaction."Entry No.";
-
-        Clear(POSInfoTransaction);
         POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
         POSInfoTransaction.SetRange("Register No.", SaleLinePOS."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
@@ -378,15 +368,13 @@
             exit;
 
         while Comment <> '' do begin
-            EntryNo += 1;
-
             POSInfoTransaction.Init();
             POSInfoTransaction."Register No." := SaleLinePOS."Register No.";
             POSInfoTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             POSInfoTransaction."Sales Line No." := SaleLinePOS."Line No.";
             POSInfoTransaction."Sale Date" := SaleLinePOS.Date;
             POSInfoTransaction."Receipt Type" := SaleLinePOS.Type;
-            POSInfoTransaction."Entry No." := EntryNo;
+            POSInfoTransaction."Entry No." := 0;
             POSInfoTransaction."POS Info Code" := POSInfo.Code;
             POSInfoTransaction."POS Info" := CopyStr(Comment, 1, MaxStrLen(POSInfoTransaction."POS Info"));
             POSInfoTransaction.Insert(true);
@@ -446,6 +434,7 @@
         SaleLinePOSAddOn."AddOn Line No." := NpIaItemAddOnLine."Line No.";
         SaleLinePOSAddOn."Fixed Quantity" := NpIaItemAddOnLine."Fixed Quantity";
         SaleLinePOSAddOn."Per Unit" := NpIaItemAddOnLine."Per Unit";
+        SaleLinePOSAddOn.Mandatory := NpIaItemAddOnLine.Mandatory;
         SaleLinePOSAddOn.Insert(true);
     end;
 
