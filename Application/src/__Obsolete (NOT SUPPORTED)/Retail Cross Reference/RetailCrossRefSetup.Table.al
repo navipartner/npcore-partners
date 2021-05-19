@@ -4,8 +4,8 @@ table 6151181 "NPR Retail Cross Ref. Setup"
 
     Caption = 'Retail Cross Reference Setup';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Retail Cross Ref. Setup";
-    LookupPageID = "NPR Retail Cross Ref. Setup";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Use Setup from module POS Item Reference.';
 
     fields
     {

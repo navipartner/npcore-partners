@@ -1,11 +1,9 @@
-page 6151181 "NPR Retail Cross Ref. Setup"
+page 6059810 "NPR POS Cross Ref. Setup"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-
-    Caption = 'Retail Cross Reference Setup';
+    Caption = 'POS Cross Reference Setup';
     DelayedInsert = true;
     PageType = List;
-    SourceTable = "NPR Retail Cross Ref. Setup";
+    SourceTable = "NPR POS Cross Ref. Setup";
     UsageCategory = Administration;
     ApplicationArea = All;
 
@@ -39,10 +37,10 @@ page 6151181 "NPR Retail Cross Ref. Setup"
             }
             repeater(Group)
             {
-                field("Table ID"; Rec."Table ID")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Table ID field';
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Reference No. Pattern"; Rec."Reference No. Pattern")
                 {
@@ -54,15 +52,9 @@ page 6151181 "NPR Retail Cross Ref. Setup"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
-    var
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
     begin
-        RetailCrossRefMgt.DiscoverRetailCrossReferenceSetup(Rec);
+        Rec.OnDiscoverSetup(Rec);
     end;
 }
 

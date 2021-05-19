@@ -157,12 +157,16 @@ table 6150624 "NPR POS Balancing Line"
             Caption = 'Orig. POS Sale ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
         {
             Caption = 'Orig. POS Line No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use systemID instead';
         }
         field(200; "POS Bin Checkpoint Entry No."; Integer)
         {

@@ -75,7 +75,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
 
             POSAuditLog."Active POS Unit No." := POSSetup.GetPOSUnitNo();
             POSAuditLog."Active Salesperson Code" := POSSetup.Salesperson();
-            POSAuditLog."Active POS Sale ID" := SalePOS."POS Sale ID";
+            POSAuditLog.SystemId := SalePOS.SystemId;
         end;
 
         if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then
@@ -101,7 +101,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
 
         OnHandleAuditLogBeforeInsert(POSAuditLog);
 
-        POSAuditLog.Insert(true);
+        POSAuditLog.Insert(true, true);
     end;
 
     procedure ShowAuditLogForRecord(RecordIDIn: RecordID)

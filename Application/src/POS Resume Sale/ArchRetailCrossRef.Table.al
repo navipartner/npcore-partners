@@ -8,8 +8,6 @@ table 6014495 "NPR Arch. Retail Cross Ref."
     // NPR5.55/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
 
     Caption = 'Retail Cross Reference';
-    DrillDownPageID = "NPR Retail Cross References";
-    LookupPageID = "NPR Retail Cross References";
     DataClassification = CustomerContent;
 
     fields

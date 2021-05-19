@@ -408,10 +408,10 @@ page 6151245 "NPR Retail Setup RC"
                 Caption = 'Miscellaneous';
                 action("Retail Cross References")
                 {
-                    Caption = 'Retail Cross References';
-                    RunObject = Page "NPR Retail Cross References";
+                    Caption = 'POS Cross References';
+                    RunObject = Page "NPR POS Cross References";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Retail Cross References action';
+                    ToolTip = 'Executes the POS Cross References action';
                 }
                 action("POS Info List")
                 {

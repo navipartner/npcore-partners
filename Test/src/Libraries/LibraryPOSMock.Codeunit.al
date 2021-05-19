@@ -143,10 +143,10 @@ codeunit 85003 "NPR Library - POS Mock"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(NewSalePOS);
-        if NewSalePOS."Retail ID" = SalePOS."Retail ID" then
+        if NewSalePOS.SystemId = SalePOS.SystemId then
             exit(false); //Sale did not end. This is not an error, it happens in prod whenever you pay less than full amount.
 
-        if IsNullGuid(NewSalePOS."Retail ID") then begin
+        if IsNullGuid(NewSalePOS.SystemId) then begin
             //Sale ended, but new one did not start automatically (depends on setup)
             POSSession.StartTransaction();
         end;
@@ -201,7 +201,7 @@ codeunit 85003 "NPR Library - POS Mock"
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
         NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";

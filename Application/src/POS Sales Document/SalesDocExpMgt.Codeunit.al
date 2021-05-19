@@ -447,7 +447,7 @@
                     end;
                 end;
                 NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
-                NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
+                NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
                 if NpRvSalesLine.FindSet() then
                     repeat
                         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";

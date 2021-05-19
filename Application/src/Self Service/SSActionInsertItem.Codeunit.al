@@ -400,7 +400,8 @@
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        SaleLinePOS.SetFilter("Orig. POS Sale ID", '=%1', SalePOS."POS Sale ID");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetFilter("No.", '=%1', Item."No.");
         SaleLinePOS.SetFilter(Quantity, '>=%1', ItemQuantity);
         if (not SaleLinePOS.FindFirst()) then
@@ -427,7 +428,8 @@
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        SaleLinePOS.SetFilter("Orig. POS Sale ID", '=%1', SalePOS."POS Sale ID");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetFilter("No.", '=%1', Item."No.");
         SaleLinePOS.SetFilter(Quantity, '>=%1', ItemQuantity);
         if (not SaleLinePOS.FindFirst()) then
@@ -455,7 +457,8 @@
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        SaleLinePOS.SetFilter("Orig. POS Sale ID", '=%1', SalePOS."POS Sale ID");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetFilter("No.", '=%1', Item."No.");
         SaleLinePOS.SetFilter(Quantity, '>=%1', 1);
         if (not SaleLinePOS.FindFirst()) then

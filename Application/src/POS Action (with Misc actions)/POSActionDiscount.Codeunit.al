@@ -561,9 +561,6 @@ codeunit 6150792 "NPR POS Action - Discount"
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if PrevRec <> Format(SaleLinePOS) then
             SaleLinePOS.Modify();
-
-        // Recalculate VAT Difference rounding error distribution on all lines
-        UpdateSalesVAT(SaleLinePOS."Orig. POS Sale ID");
     end;
 
     local procedure ApplyFilterOnLines(var SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
@@ -741,9 +738,6 @@ codeunit 6150792 "NPR POS Action - Discount"
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if PrevRec <> Format(SaleLinePOS) then
             SaleLinePOS.Modify();
-
-        // Recalculate VAT Difference rounding error distribution on all lines
-        UpdateSalesVAT(SaleLinePOS."Orig. POS Sale ID");
     end;
 
     local procedure AdjustAmountForVat(SaleLinePOS: Record "NPR POS Sale Line"; var UserInputAmount: Decimal)
@@ -894,23 +888,6 @@ codeunit 6150792 "NPR POS Action - Discount"
         if SaleLinePOS.Quantity < 0 then
             exit(-1);
         exit(1);
-    end;
-
-    local procedure UpdateSalesVAT(POSSaleID: Integer)
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-    begin
-        if (not SaleLinePOS.SetCurrentKey("Orig. POS Sale ID")) then;
-
-        SaleLinePOS.SetFilter("Orig. POS Sale ID", '=%1', POSSaleID);
-        SaleLinePOS.SetFilter("Sale Type", '%1|%2', SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale");
-        SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.type::Comment);
-        if (SaleLinePOS.FindSet()) then begin
-            repeat
-                SaleLinePOS.UpdateAmounts(SaleLinePOS);
-                SaleLinePOS.Modify();
-            until (SaleLinePOS.Next() = 0);
-        end;
     end;
 
     local procedure GetAdditionalParams(JSON: Codeunit "NPR POS JSON Management")
