@@ -50,7 +50,6 @@ table 6151127 "NPR NpIa SaleLinePOS AddOn"
         {
             Caption = 'AddOn No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "NPR NpIa Item AddOn";
         }
         field(35; "AddOn Line No."; Integer)
@@ -62,13 +61,16 @@ table 6151127 "NPR NpIa SaleLinePOS AddOn"
         {
             Caption = 'Fixed Quantity';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
         }
         field(50; "Per Unit"; Boolean)
         {
             Caption = 'Per unit';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
+        }
+        field(60; Mandatory; Boolean)
+        {
+            Caption = 'Mandatory';
+            DataClassification = CustomerContent;
         }
     }
 
@@ -78,9 +80,4 @@ table 6151127 "NPR NpIa SaleLinePOS AddOn"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

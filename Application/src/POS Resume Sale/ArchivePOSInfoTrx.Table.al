@@ -108,13 +108,9 @@ table 6014491 "NPR Archive POS Info Trx"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     var
-        POSInfoTransaction: Record "NPR POS Info Transaction";
+        POSInfoTransaction: Record "NPR Archive POS Info Trx";
     begin
         if "Entry No." = 0 then begin
             POSInfoTransaction.SetCurrentKey("Entry No.");
@@ -124,22 +120,4 @@ table 6014491 "NPR Archive POS Info Trx"
                 "Entry No." := 1;
         end;
     end;
-
-    procedure CopyFromPOSInfo(POSInfo: Record "NPR POS Info")
-    begin
-        //-NPR5.53 [388697]
-        "POS Info Code" := POSInfo.Code;
-        "POS Info Type" := POSInfo.Type;
-        "Once per Transaction" := POSInfo."Once per Transaction";
-        //+NPR5.53 [388697]
-    end;
-
-    procedure ShowMessage()
-    begin
-        //-NPR5.53 [388697]
-        if ("POS Info Type" = "POS Info Type"::"Show Message") and ("POS Info" <> '') then
-            Message("POS Info");
-        //+NPR5.53 [388697]
-    end;
 }
-

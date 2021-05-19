@@ -466,7 +466,7 @@
             exit;
 
         POSAction.Get('RUN_ITEM_ADDONS');
-        POSAction.SetWorkflowInvocationParameter('BaseLineNo', BaseLineNo, POSFrontEnd);
+        POSAction.SetWorkflowInvocationContext('BaseLineNo', BaseLineNo);
         POSFrontEnd.InvokeWorkflow(POSAction);
     end;
 

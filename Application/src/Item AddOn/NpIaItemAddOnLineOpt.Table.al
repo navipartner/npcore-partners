@@ -81,14 +81,13 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
             trigger OnValidate()
             begin
                 if Quantity = 0 then
-                    TestField("Fixed Quantity", false);
+                    "Fixed Quantity" := false;
             end;
         }
         field(40; "Fixed Quantity"; Boolean)
         {
             Caption = 'Fixed Quantity';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
 
             trigger OnValidate()
             begin
@@ -100,7 +99,6 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
         {
             Caption = 'Use Unit Price';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             OptionCaption = 'Non-Zero,Always';
             OptionMembers = "Non-Zero",Always;
         }
@@ -109,7 +107,6 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
             AutoFormatType = 2;
             Caption = 'Unit Price';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
         }
         field(60; "Discount %"; Decimal)
         {
@@ -117,7 +114,6 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
             Caption = 'Discount %';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 1;
-            Description = 'NPR5.52';
             MaxValue = 100;
             MinValue = 0;
         }
@@ -125,7 +121,6 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
         {
             Caption = 'Per unit';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
         }
     }
 
@@ -135,9 +130,4 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

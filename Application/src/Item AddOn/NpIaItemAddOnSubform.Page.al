@@ -48,12 +48,17 @@ page 6151127 "NPR NpIa Item AddOn Subform"
                 field("Per Unit"; Rec."Per Unit")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies how many units are being sold in base unit of measure.';
+                    ToolTip = 'Specifies that the quantity is calculated per each unit of base item.';
                 }
                 field("Fixed Quantity"; Rec."Fixed Quantity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies if quantity can be changed on POS unit. If it''s current entry have a flag fixed quantity, then POS entry will be created with predefined Quantity.';
+                }
+                field(Mandatory; Rec.Mandatory)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if salesperson can omit inserting the line to the sale.';
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
