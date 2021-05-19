@@ -133,6 +133,7 @@ jobs:
     - package:
         source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
         id: NaviPartner.NPCore.BC$(majorVersion)
+        prerelease: true
         destinationPath: '$(Agent.TempDirectory)/NpRetail/'
       appsToDeploy:
         - path: '$(Agent.TempDirectory)/NpRetail/Np_Retail.app'              
