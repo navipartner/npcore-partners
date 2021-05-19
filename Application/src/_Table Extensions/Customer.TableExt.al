@@ -117,7 +117,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
-        field(6151455; "NPR Magento Display Group"; Code[20])
+        field(6151455; "NPR Magento Display Group"; Code[255])
         {
             Caption = 'Magento Display Group';
             DataClassification = CustomerContent;
