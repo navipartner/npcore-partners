@@ -39,25 +39,46 @@ codeunit 6014603 "NPR RP Templ. Output Log Mgt."
     local procedure LogPrintJob(Template: Text; TargetEncoding: Text; PrintJob: Text)
     var
         RPTemplateOutputLog: Record "NPR RP Template Output Log";
+        DotNetEncoding: Codeunit DotNet_Encoding;
+        BinaryWriter: Codeunit DotNet_BinaryWriter;
+        ByteArray: Codeunit DotNet_Array;
+        DotNetStream: Codeunit DotNet_Stream;
         OStream: OutStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
-        ByteArray: DotNet NPRNetArray;
-
+        i: Integer;
     begin
         if TargetEncoding = '' then
             TargetEncoding := 'Windows-1252';
 
-        ByteArray := Encoding.GetEncoding(TargetEncoding).GetBytes(PrintJob);
-        MemoryStream := MemoryStream.MemoryStream();
-        MemoryStream.Write(ByteArray, 0, ByteArray.Length);
+        //Encoding Code Page: https://docs.microsoft.com/en-us/dotnet/api/system.text.encoding?view=net-5.0
+        //TODO: Maybe change event OnGetTargetEncoding to send encoding object?
+        case TargetEncoding of
+            'iso-8859-1':
+                DotNetEncoding.ISO88591();
+            'Windows-1256':
+                DotNetEncoding.Encoding(1256);
+            'ibm850':
+                DotNetEncoding.Encoding(850);
+            'IBM437':
+                DotNetEncoding.Encoding(437);
+            'Windows-1252':
+                DotNetEncoding.Encoding(1252);
+            'utf-8':
+                DotNetEncoding.UTF8();
+            'IBM00858':
+                DotNetEncoding.Encoding(858);
+        end;
 
         RPTemplateOutputLog.Init();
         RPTemplateOutputLog."Template Name" := Template;
         RPTemplateOutputLog."User ID" := USERID;
         RPTemplateOutputLog."Printed At" := CURRENTDATETIME;
         RPTemplateOutputLog.Output.CREATEOUTSTREAM(OStream);
-        COPYSTREAM(OStream, MemoryStream);
+
+        DotNetStream.FromOutStream(OStream);
+        BinaryWriter.BinaryWriterWithEncoding(DotNetStream, DotNetEncoding);
+        for i := 1 to StrLen(PrintJob) do
+            BinaryWriter.WriteChar(PrintJob[i]);
+
         RPTemplateOutputLog.Insert();
     end;
 }
