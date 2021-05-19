@@ -181,7 +181,6 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         POSQuoteEntry."Customer Disc. Group" := SalePOS."Customer Disc. Group";
         POSQuoteEntry.Attention := SalePOS."Contact No.";
         POSQuoteEntry.Reference := SalePOS.Reference;
-        POSQuoteEntry."Retail ID" := SalePOS."Retail ID";
         POSQuoteEntry.SystemId := SalePOS.SystemId;
         POSQuoteMgt.POSSale2Xml(SalePOS, XmlDoc);
         POSQuoteEntry."POS Sales Data".CreateOutStream(OutStr, TEXTENCODING::UTF8);
@@ -219,7 +218,6 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         POSQuoteLine."Discount Code" := SaleLinePOS."Discount Code";
         POSQuoteLine."Discount Authorised by" := SaleLinePOS."Discount Authorised by";
         POSQuoteLine."EFT Approved" := SaleLinePOS."EFT Approved";
-        POSQuoteLine."Line Retail ID" := SaleLinePOS."Retail ID";
         POSQuoteLine.SystemId := SaleLinePOS.SystemId;
         POSQuoteLine.Insert(true, true);
     end;
@@ -227,8 +225,6 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSaveAsQuote(var SalePOS: Record "NPR POS Sale")
     begin
-        //-NPR5.48 [338537]
-        //+NPR5.48 [338537]
     end;
 }
 

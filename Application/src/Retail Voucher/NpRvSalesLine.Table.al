@@ -309,7 +309,6 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(1020; "Parent Id"; Guid)
         {

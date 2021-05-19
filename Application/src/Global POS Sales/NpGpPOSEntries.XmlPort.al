@@ -35,7 +35,7 @@ xmlport 6151167 "NPR NpGp POS Entries"
                 fieldelement(entry_type; TempNpGpPOSSalesEntry."Entry Type")
                 {
                 }
-                fieldelement(retail_id; TempNpGpPOSSalesEntry."Retail ID")
+                fieldelement(retail_id; TempNpGpPOSSalesEntry.SystemId)
                 {
                 }
                 fieldelement(posting_date; TempNpGpPOSSalesEntry."Posting Date")
@@ -80,7 +80,7 @@ xmlport 6151167 "NPR NpGp POS Entries"
                         fieldattribute(line_no; TempNpGpPOSSalesLine."Line No.")
                         {
                         }
-                        fieldelement(retail_id; TempNpGpPOSSalesLine."Retail ID")
+                        fieldelement(retail_id; TempNpGpPOSSalesLine.SystemId)
                         {
                         }
                         fieldelement(type; TempNpGpPOSSalesLine.Type)

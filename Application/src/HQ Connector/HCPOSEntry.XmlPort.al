@@ -184,7 +184,7 @@ xmlport 6150901 "NPR HC POS Entry"
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(possaleid; POSEntry."POS Sale ID")
+                    fieldelement(possaleid; POSEntry.SystemId)
                     {
                         MinOccurs = Zero;
                     }
@@ -440,11 +440,7 @@ xmlport 6150901 "NPR HC POS Entry"
                         {
                             MinOccurs = Zero;
                         }
-                        fieldelement(origpossaleid; possalesline."Orig. POS Sale ID")
-                        {
-                            MinOccurs = Zero;
-                        }
-                        fieldelement(origposlineno; possalesline."Orig. POS Line No.")
+                        fieldelement(origpossaleid; possalesline.SystemId)
                         {
                             MinOccurs = Zero;
                         }
@@ -634,11 +630,7 @@ xmlport 6150901 "NPR HC POS Entry"
                         {
                             MinOccurs = Zero;
                         }
-                        fieldelement(origpossaleid; pospaymentline."Orig. POS Sale ID")
-                        {
-                            MinOccurs = Zero;
-                        }
-                        fieldelement(origposlineno; pospaymentline."Orig. POS Line No.")
+                        fieldelement(origpossaleid; pospaymentline.SystemId)
                         {
                             MinOccurs = Zero;
                         }
@@ -885,11 +877,7 @@ xmlport 6150901 "NPR HC POS Entry"
                         {
                             MinOccurs = Zero;
                         }
-                        fieldelement(origpossaleid; posbalancingline."Orig. POS Sale ID")
-                        {
-                            MinOccurs = Zero;
-                        }
-                        fieldelement(origposlineno; posbalancingline."Orig. POS Line No.")
+                        fieldelement(origpossaleid; posbalancingline.SystemId)
                         {
                             MinOccurs = Zero;
                         }

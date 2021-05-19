@@ -257,8 +257,7 @@ page 6151018 "NPR NpRv Sales Line Card"
                     case Rec."Document Source" of
                         Rec."Document Source"::POS:
                             begin
-                                SaleLinePOS.SetRange("Retail ID", Rec."Retail ID");
-                                if SaleLinePOS.FindFirst() then
+                                if SaleLinePOS.GetBySystemId(Rec."Retail ID") then
                                     Qty := SaleLinePOS.Quantity;
                             end;
                         Rec."Document Source"::"Sales Document":

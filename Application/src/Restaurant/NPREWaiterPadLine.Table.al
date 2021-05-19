@@ -316,7 +316,7 @@
         }
         field(93; "Qty. On POS Sale Line (Base)"; Decimal)
         {
-            CalcFormula = Sum("NPR POS Sale Line"."Quantity (Base)" WHERE("Retail ID" = FIELD("Sale Line Retail ID")));
+            CalcFormula = Sum("NPR POS Sale Line"."Quantity (Base)" WHERE(SystemId = FIELD("Sale Line Retail ID")));
             Caption = 'Qty. On POS Sale Line (Base)';
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.55';

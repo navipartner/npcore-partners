@@ -163,10 +163,10 @@ page 6151169 "NPR NpGp POS Sales Lines"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Retail ID"; Rec."Retail ID")
+                field("System Id"; Rec.SystemId)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Retail ID field';
+                    ToolTip = 'Specifies the value of the System Id field';
                 }
             }
         }

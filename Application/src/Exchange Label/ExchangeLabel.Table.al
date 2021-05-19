@@ -128,9 +128,9 @@ table 6014498 "NPR Exchange Label"
         }
         field(70; "Retail Cross Reference No."; Code[50])
         {
-            Caption = 'Retail Cross Reference No.';
-            Description = 'NPR5.51';
-            TableRelation = "NPR Retail Cross Reference"."Reference No.";
+            Caption = 'POS Cross Reference No.';
+            TableRelation = "NPR POS Cross Reference"."Reference No.";
+            ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
     }
@@ -152,10 +152,6 @@ table 6014498 "NPR Exchange Label"
         key(Key5; Barcode)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

@@ -330,11 +330,11 @@
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        RetailCrossReference: Record "NPR Retail Cross Reference";
         Item: Record Item;
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
         ReturnReasonCode: Code[10];
         FullSale: Boolean;
     begin
@@ -398,13 +398,7 @@
                 SaleLinePOS."Return Reason Code" := ReturnReasonCode;
                 SaleLinePOS.Modify(true);
 
-                RetailCrossReference."Retail ID" := SaleLinePOS.SystemId;
-                RetailCrossReference.Insert();
-
-                RetailCrossReference."Reference No." := TempNpGpPOSSalesLine."Global Reference";
-                RetailCrossReference."Table ID" := DATABASE::"NPR POS Sale Line";
-                RetailCrossReference."Record Value" := SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No.");
-                RetailCrossReference.Modify();
+                POSCrossRefMgt.InitReference(SaleLinePOS.SystemId, TempNpGpPOSSalesLine."Global Reference", SaleLinePOS.TableName(), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
             until not FullSale or (TempNpGpPOSSalesLine.Next() = 0);
 
         POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
@@ -490,7 +484,7 @@
 
     local procedure TestQuantity(var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; SalePOS: Record "NPR POS Sale")
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        POSCrossReference: Record "NPR POS Cross Reference";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if TempNpGpPOSSalesLine.Quantity > 0 then begin
@@ -499,13 +493,13 @@
             SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
             SaleLinePOS.SetFilter(Quantity, '<0');
 
-            RetailCrossReference.SetRange("Reference No.", TempNpGpPOSSalesLine."Global Reference");
-            if RetailCrossReference.FindSet() then
+            POSCrossReference.SetRange("Reference No.", TempNpGpPOSSalesLine."Global Reference");
+            if POSCrossReference.FindSet() then
                 repeat
-                    SaleLinePOS.SetRange(SystemId, RetailCrossReference."Retail ID");
+                    SaleLinePOS.SetRange(SystemId, POSCrossReference.SystemId);
                     if SaleLinePOS.FindFirst() then
                         TempNpGpPOSSalesLine.Quantity += SaleLinePOS.Quantity;
-                until RetailCrossReference.Next() = 0;
+                until POSCrossReference.Next() = 0;
 
             if TempNpGpPOSSalesLine.Quantity > 0 then
                 exit;

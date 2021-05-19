@@ -224,7 +224,7 @@ table 6150623 "NPR POS Entry Payment Line"
             Caption = 'Orig. POS Sale ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(161; "Orig. POS Line No."; Integer)
@@ -232,14 +232,14 @@ table 6150623 "NPR POS Entry Payment Line"
             Caption = 'Orig. POS Line No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)
         {
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(480; "Dimension Set ID"; Integer)

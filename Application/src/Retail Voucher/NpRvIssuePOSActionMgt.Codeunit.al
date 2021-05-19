@@ -267,7 +267,7 @@
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
         NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
@@ -323,7 +323,7 @@
         if not GuiAllowed then
             exit;
 
-        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
+        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
         if not NpRvSalesLine.FindFirst() then
             exit;

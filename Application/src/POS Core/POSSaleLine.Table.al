@@ -976,7 +976,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Orig. POS Sale ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
@@ -984,7 +984,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Orig. POS Line No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use systemID instead';
         }
         field(170; "Retail ID"; Guid)
@@ -992,7 +992,7 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use systemID instead';
         }
         field(200; "Qty. per Unit of Measure"; Decimal)
@@ -1674,20 +1674,6 @@ table 6014406 "NPR POS Sale Line"
         end;
 
         TicketRequestManager.OnDeleteSaleLinePos(Rec);
-    end;
-
-    trigger OnInsert()
-    begin
-        if "Orig. POS Sale ID" = 0 then begin
-            GetPOSHeader();
-
-            "Orig. POS Sale ID" := SalePOS."POS Sale ID";
-            "Orig. POS Line No." := "Line No.";
-        end;
-
-        if IsNullGuid("Retail ID") then begin
-            "Retail ID" := CreateGuid();
-        end;
     end;
 
     trigger OnRename()

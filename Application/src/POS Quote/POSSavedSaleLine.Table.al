@@ -180,6 +180,8 @@ table 6151003 "NPR POS Saved Sale Line"
         {
             Caption = 'Line Retail ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use systemID instead';
         }
     }
 

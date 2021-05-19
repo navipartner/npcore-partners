@@ -1,4 +1,4 @@
-codeunit 6151180 "NPR Retail Cross Ref. Mgt."
+codeunit 6014620 "NPR POS Cross Reference Mgt."
 {
     trigger OnRun()
     begin
@@ -25,78 +25,72 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
         Message('Duration: %1\Pattern: %2\Reference: %3', Duration, Pattern, ReferenceNo);
     end;
 
-    [IntegrationEvent(false, false)]
-    procedure DiscoverRetailCrossReferenceSetup(var RetailCrossReferenceSetup: Record "NPR Retail Cross Ref. Setup")
-    begin
-    end;
-
-    procedure InitRetailReference(RetailID: Guid; ReferenceNo: Text; TableID: Integer; RecordValue: Text)
+    procedure InitReference(SysID: Guid; ReferenceNo: Text; TableName: Text[250]; RecordValue: Text)
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        Rec: Record "NPR POS Cross Reference";
     begin
-        if RetailCrossReference.Get(RetailID) then
-            exit;
         if ReferenceNo = '' then
             exit;
+        if Rec.GetBySystemId(SysID) then
+            exit;
 
-        RetailCrossReference.Init();
-        RetailCrossReference."Retail ID" := RetailID;
-        RetailCrossReference."Table ID" := TableID;
-        RetailCrossReference."Record Value" := RecordValue;
-        RetailCrossReference."Reference No." := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(RetailCrossReference."Reference No.")));
-        RetailCrossReference.Insert(true);
+        Rec.Init();
+        Rec.SystemId := SysID;
+        Rec."Table Name" := TableName;
+        Rec."Record Value" := RecordValue;
+        Rec."Reference No." := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Rec."Reference No.")));
+        Rec.Insert(true, true);
     end;
 
-    procedure UpdateTableReference(RetailID: Guid; TableID: Integer; RecordValue: Text)
+    procedure UpdateReference(SysID: Guid; TableName: Text[250]; RecordValue: Text)
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        Rec: Record "NPR POS Cross Reference";
         PrevRec: Text;
     begin
-        if IsNullGuid(RetailID) then
+        if IsNullGuid(SysID) then
             exit;
-        if not RetailCrossReference.Get(RetailID) then
+        if not Rec.GetBySystemId(SysID) then
             exit;
 
-        PrevRec := Format(RetailCrossReference);
+        PrevRec := Format(Rec);
 
-        RetailCrossReference."Table ID" := TableID;
-        RetailCrossReference."Record Value" := CopyStr(RecordValue, 1, MaxStrLen(RetailCrossReference."Record Value"));
+        Rec."Table Name" := TableName;
+        Rec."Record Value" := CopyStr(RecordValue, 1, MaxStrLen(Rec."Record Value"));
 
-        if PrevRec <> Format(RetailCrossReference) then
-            RetailCrossReference.Modify(true);
+        if PrevRec <> Format(Rec) then
+            Rec.Modify(true);
     end;
 
-    procedure RemoveRetailReference(RetailID: Guid; TableID: Integer)
+    procedure RemoveReference(SysID: Guid; TableName: Text[250])
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        Rec: Record "NPR POS Cross Reference";
     begin
-        if IsNullGuid(RetailID) then
+        if IsNullGuid(SysID) then
+            exit;
+        if not Rec.GetBySystemId(SysID) then
             exit;
 
-        if not RetailCrossReference.Get(RetailID) then
-            exit;
-
-        if RetailCrossReference."Table ID" = TableID then
-            RetailCrossReference.Delete(true);
+        if Rec."Table Name" = TableName then
+            Rec.Delete(true);
     end;
 
-    procedure GetRetailID(TableID: Integer; ReferenceNo: Text) RetailID: Guid
+    procedure GetSysID(TableName: Text[250]; ReferenceNo: Text) SysID: Guid
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        Rec: Record "NPR POS Cross Reference";
     begin
         if ReferenceNo = '' then
             exit;
 
-        if StrLen(ReferenceNo) > MaxStrLen(RetailCrossReference."Reference No.") then
+        if StrLen(ReferenceNo) > MaxStrLen(Rec."Reference No.") then
             exit;
 
-        RetailCrossReference.SetCurrentKey("Reference No.", "Table ID");
-        RetailCrossReference.SetRange("Reference No.", ReferenceNo);
-        RetailCrossReference.SetRange("Table ID", TableID);
-        if not RetailCrossReference.FindFirst() then
+        Rec.SetCurrentKey("Reference No.", "Table Name");
+        Rec.SetRange("Reference No.", ReferenceNo);
+        Rec.SetRange("Table Name", TableName);
+        if not Rec.FindFirst() then
             exit;
 
-        RetailID := RetailCrossReference."Retail ID";
+        SysID := Rec.SystemId;
     end;
 
     #region Generate Reference No

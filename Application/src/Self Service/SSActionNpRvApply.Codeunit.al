@@ -192,7 +192,7 @@
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SalePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
         NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";

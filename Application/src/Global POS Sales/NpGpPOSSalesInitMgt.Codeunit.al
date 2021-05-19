@@ -1,12 +1,8 @@
 ﻿codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
 {
     var
-        Text000: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars';
-        Text001: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars\[NL] ~ Natural Line No.\[L] ~ Line No.';
-
-    local procedure "--- Global Pos Entry"()
-    begin
-    end;
+        POSSalePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars';
+        POSSaleLinePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars\[NL] ~ Natural Line No.\[L] ~ Line No.';
 
     procedure InsertPosSalesEntries(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary)
     var
@@ -166,210 +162,163 @@
         exit(NcTaskSetup."Task Processor Code");
     end;
 
-    local procedure "--- Retail Cross Reference"()
+    #region POS Cross Reference
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Cross Ref. Setup", 'OnDiscoverSetup', '', true, true)]
+    local procedure OnDiscoverPOSCrossReferenceSetup(var Setup: Record "NPR POS Cross Ref. Setup")
+    var
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
     begin
+        Setup.InitSetup(POSSale.TableName());
+        Setup.InitSetup(POSSaleLine.TableName());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151180, 'DiscoverRetailCrossReferenceSetup', '', true, true)]
-    local procedure OnDiscoverRetailCrossReferenceSetup(var RetailCrossReferenceSetup: Record "NPR Retail Cross Ref. Setup")
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Cross Ref. Setup", 'OnAfterValidateEvent', 'Table Name', true, true)]
+    local procedure OnValidateSetupTableName(var Rec: Record "NPR POS Cross Ref. Setup"; var xRec: Record "NPR POS Cross Ref. Setup")
+    var
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
     begin
-        if not RetailCrossReferenceSetup.Get(DATABASE::"NPR POS Sale") then begin
-            RetailCrossReferenceSetup.Init();
-            RetailCrossReferenceSetup.Validate("Table ID", DATABASE::"NPR POS Sale");
-            RetailCrossReferenceSetup.Insert(true);
-        end;
-
-        if not RetailCrossReferenceSetup.Get(DATABASE::"NPR POS Sale Line") then begin
-            RetailCrossReferenceSetup.Init();
-            RetailCrossReferenceSetup.Validate("Table ID", DATABASE::"NPR POS Sale Line");
-            RetailCrossReferenceSetup.Insert(true);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6151181, 'OnAfterValidateEvent', 'Table ID', true, true)]
-    local procedure OnValidateRetailCrossRefSetupTableId(var Rec: Record "NPR Retail Cross Ref. Setup"; var xRec: Record "NPR Retail Cross Ref. Setup"; CurrFieldNo: Integer)
-    begin
-        case Rec."Table ID" of
-            DATABASE::"NPR POS Sale":
+        case Rec."Table Name" of
+            POSSale.TableName():
                 begin
                     Rec."Reference No. Pattern" := '[PS][PU][AN*2][S][AN*2]';
-                    Rec."Pattern Guide" := CopyStr(Text000, 1, MaxStrLen(Rec."Pattern Guide"));
+                    Rec."Pattern Guide" := CopyStr(POSSalePatternGuideLbl, 1, MaxStrLen(Rec."Pattern Guide"));
                 end;
-            DATABASE::"NPR POS Sale Line":
+            POSSaleLine.TableName():
                 begin
                     Rec."Reference No. Pattern" := '[PS][PU][NL][AN*2][S][AN*2]';
-                    Rec."Pattern Guide" := CopyStr(Text001, 1, MaxStrLen(Rec."Pattern Guide"));
+                    Rec."Pattern Guide" := CopyStr(POSSaleLinePatternGuideLbl, 1, MaxStrLen(Rec."Pattern Guide"));
+                end;
+            else begin
+                    OnAfterValidateSetupTableName(Rec, xRec);
                 end;
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150621, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertPOSEntry(var Rec: Record "NPR POS Entry"; RunTrigger: Boolean)
-    var
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateSetupTableName(var Rec: Record "NPR POS Cross Ref. Setup"; var xRec: Record "NPR POS Cross Ref. Setup")
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        RetailCrossRefMgt.UpdateTableReference(Rec."Retail ID", DATABASE::"NPR POS Entry", Rec."Document No.");
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150622, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertPOSSalesLine(var Rec: Record "NPR POS Entry Sales Line"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry", 'OnAfterInsertEvent', '', true, true)]
+    local procedure OnAfterInsertPOSEntry(var Rec: Record "NPR POS Entry"; RunTrigger: Boolean)
     var
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
     begin
-        if Rec.IsTemporary then
+        if Rec.IsTemporary() then
             exit;
 
-        RetailCrossRefMgt.UpdateTableReference(Rec."Retail ID", DATABASE::"NPR POS Entry Sales Line", Rec."Document No." + '_' + Format(Rec."Line No."));
+        POSCrossRefMgt.UpdateReference(Rec.SystemId, Rec.TableName(), Rec."Document No.");
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014405, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry Sales Line", 'OnAfterInsertEvent', '', true, true)]
+    local procedure OnAfterInsertPOSSalesLine(var Rec: Record "NPR POS Entry Sales Line"; RunTrigger: Boolean)
+    var
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        POSCrossRefMgt.UpdateReference(Rec.SystemId, Rec.TableName(), Rec."Document No." + '_' + Format(Rec."Line No."));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnAfterDeleteSalePOS(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
     var
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
     begin
-        if Rec.IsTemporary then
+        if Rec.IsTemporary() then
             exit;
 
-        RetailCrossRefMgt.RemoveRetailReference(Rec."Retail ID", DATABASE::"NPR POS Sale");
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
     begin
-        if Rec.IsTemporary then
+        if Rec.IsTemporary() then
             exit;
 
-        RetailCrossRefMgt.RemoveRetailReference(Rec."Retail ID", DATABASE::"NPR POS Sale Line");
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150621, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnAfterDeletePOSEntry(var Rec: Record "NPR POS Entry"; RunTrigger: Boolean)
     var
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
     begin
-        if Rec.IsTemporary then
+        if Rec.IsTemporary() then
             exit;
 
-        RetailCrossRefMgt.RemoveRetailReference(Rec."Retail ID", DATABASE::"NPR POS Entry");
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150622, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry Sales Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnAfterDeletePOSSalesLine(var Rec: Record "NPR POS Entry Sales Line"; RunTrigger: Boolean)
     var
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
     begin
-        if Rec.IsTemporary then
+        if Rec.IsTemporary() then
             exit;
 
-        RetailCrossRefMgt.RemoveRetailReference(Rec."Retail ID", DATABASE::"NPR POS Entry Sales Line");
-    end;
-
-    local procedure GenerateHeaderReferenceNo(SalePOS: Record "NPR POS Sale") ReferenceNo: Text
-    var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
-        RetailCrossReferenceSetup: Record "NPR Retail Cross Ref. Setup";
-        POSUnit: Record "NPR POS Unit";
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
-        i: Integer;
-    begin
-        if not RetailCrossReferenceSetup.Get(DATABASE::"NPR POS Sale") then
-            exit('');
-        if RetailCrossReferenceSetup."Reference No. Pattern" = '' then
-            exit;
-
-        if POSUnit.Get(SalePOS."Register No.") then;
-
-        for i := 1 to 10 do begin
-            ReferenceNo := RetailCrossReferenceSetup."Reference No. Pattern";
-            ReferenceNo := RetailCrossRefMgt.RegExReplacePS(ReferenceNo, POSUnit."POS Store Code");
-            ReferenceNo := RetailCrossRefMgt.RegExReplacePU(ReferenceNo, SalePOS."Register No.");
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceS(ReferenceNo, SalePOS."Sales Ticket No.");
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceN(ReferenceNo);
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceAN(ReferenceNo);
-            ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(RetailCrossReference."Reference No.")));
-
-            if IsNullGuid(RetailCrossRefMgt.GetRetailID(DATABASE::"NPR POS Sale", ReferenceNo)) then
-                exit(ReferenceNo);
-
-            if ReferenceNo = RetailCrossReferenceSetup."Reference No. Pattern" then
-                exit(ReferenceNo);
-        end;
-
-        exit(ReferenceNo);
-    end;
-
-    procedure InitReferenceNoSalePOS(SalePOS: Record "NPR POS Sale") ReferenceNo: Text
-    var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
-    begin
-        if IsNullGuid(SalePOS."Retail ID") then
-            exit('');
-
-        if RetailCrossReference.Get(SalePOS."Retail ID") then
-            exit(RetailCrossReference."Reference No.");
-
-        ReferenceNo := GenerateHeaderReferenceNo(SalePOS);
-        RetailCrossRefMgt.InitRetailReference(SalePOS."Retail ID", ReferenceNo, DATABASE::"NPR POS Sale", SalePOS."Sales Ticket No.");
-
-        exit(ReferenceNo);
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
     end;
 
     procedure InitReferenceNoSaleLinePOS(SaleLinePOS: Record "NPR POS Sale Line") ReferenceNo: Text
     var
-        RetailCrossReference: Record "NPR Retail Cross Reference";
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+        POSCrossReference: Record "NPR POS Cross Reference";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
+        POSSaleLine: Record "NPR POS Sale Line";
     begin
-        if IsNullGuid(SaleLinePOS."Retail ID") then
+        if IsNullGuid(SaleLinePOS.SystemId) then
             exit('');
 
-        if RetailCrossReference.Get(SaleLinePOS."Retail ID") then
-            exit(RetailCrossReference."Reference No.");
+        if POSCrossReference.Get(SaleLinePOS.SystemId) then
+            exit(POSCrossReference."Reference No.");
 
         ReferenceNo := GenerateLineReferenceNo(SaleLinePOS);
-        RetailCrossRefMgt.InitRetailReference(
-          SaleLinePOS."Retail ID", ReferenceNo, DATABASE::"NPR POS Sale Line", SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
+        POSCrossRefMgt.InitReference(
+          SaleLinePOS.SystemId, ReferenceNo, POSSaleLine.TableName(), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
 
         exit(ReferenceNo);
     end;
 
-    local procedure GenerateLineReferenceNo(SaleLinePOS: Record "NPR POS Sale Line") ReferenceNo: Text
+    local procedure GenerateLineReferenceNo(POSSaleLine: Record "NPR POS Sale Line") ReferenceNo: Text
     var
         POSUnit: Record "NPR POS Unit";
-        RetailCrossReference: Record "NPR Retail Cross Reference";
-        RetailCrossReferenceSetup: Record "NPR Retail Cross Ref. Setup";
-        RetailCrossRefMgt: Codeunit "NPR Retail Cross Ref. Mgt.";
+        POSCrossReference: Record "NPR POS Cross Reference";
+        POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
+        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
         i: Integer;
         NaturalLineNo: Integer;
     begin
-        if not RetailCrossReferenceSetup.Get(DATABASE::"NPR POS Sale Line") then
+        if not POSCrossRefSetup.Get(POSSaleLine.TableName()) then
             exit('');
-        if RetailCrossReferenceSetup."Reference No. Pattern" = '' then
+        if POSCrossRefSetup."Reference No. Pattern" = '' then
             exit('');
 
-        if POSUnit.Get(SaleLinePOS."Register No.") then;
+        if POSUnit.Get(POSSaleLine."Register No.") then;
 
         for i := 1 to 10 do begin
-            ReferenceNo := RetailCrossReferenceSetup."Reference No. Pattern";
-            ReferenceNo := RetailCrossRefMgt.RegExReplacePS(ReferenceNo, POSUnit."POS Store Code");
-            ReferenceNo := RetailCrossRefMgt.RegExReplacePU(ReferenceNo, POSUnit."No.");
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceS(ReferenceNo, SaleLinePOS."Sales Ticket No.");
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceN(ReferenceNo);
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceAN(ReferenceNo);
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceL(ReferenceNo, Format(SaleLinePOS."Line No."));
-            NaturalLineNo := GetNaturalLineNo(SaleLinePOS);
-            ReferenceNo := RetailCrossRefMgt.RegExReplaceNL(ReferenceNo, Format(NaturalLineNo));
-            ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(RetailCrossReference."Reference No.")));
+            ReferenceNo := POSCrossRefSetup."Reference No. Pattern";
+            ReferenceNo := POSCrossRefMgt.RegExReplacePS(ReferenceNo, POSUnit."POS Store Code");
+            ReferenceNo := POSCrossRefMgt.RegExReplacePU(ReferenceNo, POSUnit."No.");
+            ReferenceNo := POSCrossRefMgt.RegExReplaceS(ReferenceNo, POSSaleLine."Sales Ticket No.");
+            ReferenceNo := POSCrossRefMgt.RegExReplaceN(ReferenceNo);
+            ReferenceNo := POSCrossRefMgt.RegExReplaceAN(ReferenceNo);
+            ReferenceNo := POSCrossRefMgt.RegExReplaceL(ReferenceNo, Format(POSSaleLine."Line No."));
+            NaturalLineNo := GetNaturalLineNo(POSSaleLine);
+            ReferenceNo := POSCrossRefMgt.RegExReplaceNL(ReferenceNo, Format(NaturalLineNo));
+            ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(POSCrossReference."Reference No.")));
 
-            if IsNullGuid(RetailCrossRefMgt.GetRetailID(DATABASE::"NPR POS Sale Line", ReferenceNo)) then
+            if IsNullGuid(POSCrossRefMgt.GetSysID(POSSaleLine.TableName(), ReferenceNo)) then
                 exit(ReferenceNo);
 
-            if ReferenceNo = RetailCrossReferenceSetup."Reference No. Pattern" then
+            if ReferenceNo = POSCrossRefSetup."Reference No. Pattern" then
                 exit(ReferenceNo);
         end;
 
@@ -386,5 +335,7 @@
         NaturalLineNo := SaleLinePOS2.Count() + 1;
         exit(NaturalLineNo);
     end;
+
+    #endregion
 }
 

@@ -140,11 +140,6 @@ page 6150673 "NPR POS Audit Log"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handled by External Impl. field';
                 }
-                field("Active POS Sale ID"; Rec."Active POS Sale ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Active POS Sale ID field';
-                }
                 field("Acted on POS Unit No."; Rec."Acted on POS Unit No.")
                 {
                     ApplicationArea = All;

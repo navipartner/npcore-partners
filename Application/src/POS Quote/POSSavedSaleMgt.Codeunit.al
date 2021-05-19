@@ -74,7 +74,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        POSCrossReference: Record "NPR POS Cross Reference";
         SaleLinePOS: Record "NPR POS Sale Line";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
@@ -82,7 +82,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         NpRvSalesLineReferenceFieldBuffer: Record "Field" temporary;
         NpRvSalesLineFieldBuffer: Record "Field" temporary;
         POSInfoTransactionFieldBuffer: Record "Field" temporary;
-        RetailCrossReferenceFieldBuffer: Record "Field" temporary;
+        POSCrossReferenceFieldBuffer: Record "Field" temporary;
         SalePOSFieldBuffer: Record "Field" temporary;
         SaleLinePOSFieldBuffer: Record "Field" temporary;
         XmlRoot: XmlElement;
@@ -118,8 +118,8 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         RecRef.GetTable(NpDcSaleLinePOSNewCoupon);
         FindFields(RecRef, false, NpDcSaleLinePOSNewCouponFieldBuffer, false);
 
-        RecRef.GetTable(RetailCrossReference);
-        FindFields(RecRef, false, RetailCrossReferenceFieldBuffer, false);
+        RecRef.GetTable(POSCrossReference);
+        FindFields(RecRef, false, POSCrossReferenceFieldBuffer, false);
 
         XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?><pos_sale />', XmlDoc);
         XmlDoc.GetRoot(XmlRoot);
@@ -185,7 +185,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
                     until NpIaSaleLinePOSAddOn.Next() = 0;
                 end;
 
-                NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
+                NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
                 if NpRvSalesLine.FindSet() then begin
                     Element3 := XmlElement.Create('retail_vouchers');
                     Element2.Add(Element3);
@@ -241,14 +241,14 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
                     until NpDcSaleLinePOSNewCoupon.Next() = 0;
                 end;
 
-                if not IsNullGuid(SaleLinePOS."Retail ID") then
-                    if RetailCrossReference.Get(SaleLinePOS."Retail ID") then begin
+                if not IsNullGuid(SaleLinePOS.SystemId) then
+                    if POSCrossReference.GetBySystemId(SaleLinePOS.SystemId) then begin
                         Element3 := XmlElement.Create('retail_cross_references');
                         Element2.Add(Element3);
                         Element4 := XmlElement.Create('retail_cross_reference');
                         Element3.Add(Element4);
-                        RecRef.GetTable(RetailCrossReference);
-                        RecRef2Xml(RecRef, Element4, RetailCrossReferenceFieldBuffer);
+                        RecRef.GetTable(POSCrossReference);
+                        RecRef2Xml(RecRef, Element4, POSCrossReferenceFieldBuffer);
                     end;
 
                 OnPOSSaleLine2Xml(SaleLinePOS, Element);
@@ -379,7 +379,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        RetailCrossReference: Record "NPR Retail Cross Reference";
+        POSCrossReference: Record "NPR POS Cross Reference";
         SaleLinePOS: Record "NPR POS Sale Line";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
@@ -387,7 +387,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         NpRvSalesLineReferenceFieldBuffer: Record "Field" temporary;
         NpRvSalesLineFieldBuffer: Record "Field" temporary;
         POSInfoTransactionFieldBuffer: Record "Field" temporary;
-        RetailCrossReferenceFieldBuffer: Record "Field" temporary;
+        POSCrossReferenceFieldBuffer: Record "Field" temporary;
         SalePOSFieldBuffer: Record "Field" temporary;
         SaleLinePOSFieldBuffer: Record "Field" temporary;
         Element: XmlElement;
@@ -444,8 +444,8 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         RecRef.GetTable(NpDcSaleLinePOSNewCoupon);
         FindFields(RecRef, false, NpDcSaleLinePOSNewCouponFieldBuffer, false);
 
-        RecRef.GetTable(RetailCrossReference);
-        FindFields(RecRef, false, RetailCrossReferenceFieldBuffer, false);
+        RecRef.GetTable(POSCrossReference);
+        FindFields(RecRef, false, POSCrossReferenceFieldBuffer, false);
 
         xSalePOS := SalePOS;
         RecRef.GetTable(SalePOS);
@@ -514,7 +514,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
                 RecRef.GetTable(NpRvSalesLine);
                 Xml2RecRef(RetailVoucherNode.AsXmlElement(), NpRvSalesLineFieldBuffer, RecRef);
                 RecRef.SetTable(NpRvSalesLine);
-                NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+                NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
                 NpRvSalesLine."Register No." := SalePOS."Register No.";
                 NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
                 NpRvSalesLine."Sale Date" := SalePOS.Date;
@@ -558,16 +558,16 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
 
             Element.SelectNodes('retail_cross_references/retail_cross_reference', RetailCrossReferenceNodes);
             foreach RetailCrossReferenceNode in RetailCrossReferenceNodes do begin
-                RetailCrossReference.Init();
-                RecRef.GetTable(RetailCrossReference);
-                Xml2RecRef(RetailCrossReferenceNode.AsXmlElement(), RetailCrossReferenceFieldBuffer, RecRef);
-                RecRef.SetTable(RetailCrossReference);
-                Position := StrPos(RetailCrossReference."Record Value", '_');
+                POSCrossReference.Init();
+                RecRef.GetTable(POSCrossReference);
+                Xml2RecRef(RetailCrossReferenceNode.AsXmlElement(), POSCrossReferenceFieldBuffer, RecRef);
+                RecRef.SetTable(POSCrossReference);
+                Position := StrPos(POSCrossReference."Record Value", '_');
                 if Position <> 0 then
-                    RetailCrossReference."Record Value" := StrSubstNo('%1_%2', SalePOS."Sales Ticket No.", CopyStr(RetailCrossReference."Record Value", Position + 1))
+                    POSCrossReference."Record Value" := StrSubstNo('%1_%2', SalePOS."Sales Ticket No.", CopyStr(POSCrossReference."Record Value", Position + 1))
                 else
-                    RetailCrossReference."Record Value" := SalePOS."Sales Ticket No.";
-                RetailCrossReference.Insert(true);
+                    POSCrossReference."Record Value" := SalePOS."Sales Ticket No.";
+                POSCrossReference.Insert(true);
             end;
 
             OnXml2POSSaleLine(Element, SaleLinePOS);

@@ -153,8 +153,7 @@
         case NpRvSalesLine."Document Source" of
             NpRvSalesLine."Document Source"::POS:
                 begin
-                    SaleLinePOS.SetRange("Retail ID", NpRvSalesLine."Retail ID");
-                    if not SaleLinePOS.FindFirst() then
+                    if not SaleLinePOS.GetBySystemId(NpRvSalesLine."Retail ID") then
                         exit;
 
                     if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then begin
@@ -422,8 +421,7 @@
         case NpRvSalesLine."Document Source" of
             NpRvSalesLine."Document Source"::POS:
                 begin
-                    SaleLinePOS.SetRange("Retail ID", NpRvSalesLine."Retail ID");
-                    if not SaleLinePOS.FindFirst() then
+                    if not SaleLinePOS.GetBySystemId(NpRvSalesLine."Retail ID") then
                         exit;
 
                     if SaleLinePOS."Amount Including VAT" <= 0 then
@@ -769,7 +767,7 @@
     begin
         Clear(NpRvSalesLine);
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
-        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
+        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
     end;
 
     procedure SetSalesLineReferenceFilter(NpRvSalesLine: Record "NPR NpRv Sales Line"; var NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.")
@@ -1045,7 +1043,7 @@
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := POSLine."Retail ID";
+        NpRvSalesLine."Retail ID" := POSLine.SystemID;
         NpRvSalesLine."Register No." := SalePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
         NpRvSalesLine."Sale Type" := POSLine."Sale Type";
@@ -1147,7 +1145,7 @@
             NpRvSalesLine."Phone No." := PhoneNo;
         NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
         NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
@@ -1225,7 +1223,7 @@
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
         NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";

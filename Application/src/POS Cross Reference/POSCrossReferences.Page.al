@@ -1,10 +1,8 @@
-page 6151180 "NPR Retail Cross References"
+page 6059811 "NPR POS Cross References"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-
-    Caption = 'Retail Cross References';
+    Caption = 'POS Cross References';
     PageType = List;
-    SourceTable = "NPR Retail Cross Reference";
+    SourceTable = "NPR POS Cross Reference";
     UsageCategory = Lists;
     ApplicationArea = All;
 
@@ -14,20 +12,15 @@ page 6151180 "NPR Retail Cross References"
         {
             repeater(Group)
             {
-                field("Retail ID"; Rec."Retail ID")
+                field("Table Name"; Rec."Table Name")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Retail ID field';
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reference No. field';
-                }
-                field("Table ID"; Rec."Table ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Table ID field';
                 }
                 field("Record Value"; Rec."Record Value")
                 {
@@ -36,10 +29,6 @@ page 6151180 "NPR Retail Cross References"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

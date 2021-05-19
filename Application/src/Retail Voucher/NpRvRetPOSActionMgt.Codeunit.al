@@ -234,7 +234,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
 
-        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
+        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
         if not NpRvSalesLine.FindFirst() then
             exit;

@@ -122,7 +122,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
         Evaluate(TempPOSEntry."Amount Incl. Tax", NpXmlDomMgt.GetXmlText(Element, 'totalamountincltax', 0, false), 9);
         Evaluate(TempPOSEntry."Rounding Amount (LCY)", NpXmlDomMgt.GetXmlText(Element, 'roundingamountLCY', 0, false), 9);
         Evaluate(TempPOSEntry."Tax Area Code", NpXmlDomMgt.GetXmlText(Element, 'taxareacode', 0, false), 9);
-        Evaluate(TempPOSEntry."POS Sale ID", NpXmlDomMgt.GetXmlText(Element, 'possaleid', 0, false), 9);
+        Evaluate(TempPOSEntry.SystemId, NpXmlDomMgt.GetXmlText(Element, 'possaleid', 0, false), 9);
         Evaluate(TempPOSEntry."Customer Posting Group", NpXmlDomMgt.GetXmlText(Element, 'customerpostinggroup', 0, false), 9);
         Evaluate(TempPOSEntry."Country/Region Code", NpXmlDomMgt.GetXmlText(Element, 'countryregioncode', 0, false), 9);
         Evaluate(TempPOSEntry."Transaction Type", NpXmlDomMgt.GetXmlText(Element, 'transactiontype', 0, false), 9);
@@ -161,7 +161,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
         POSEntry.TransferFields(TempPOSEntry);
         POSEntry."Entry No." := 0;
         POSEntry."From External Source" := true;
-        POSEntry.Insert();
+        POSEntry.Insert(false, true);
     end;
 
     local procedure UpdatePOSLedgerRegister(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
@@ -253,8 +253,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
         Evaluate(TempPOSSalesLine."Sales Document Type", NpXmlDomMgt.GetXmlText(Element, 'salesdocumenttype', 0, false), 9);
         Evaluate(TempPOSSalesLine."Sales Document No.", NpXmlDomMgt.GetXmlText(Element, 'salesdocumentno', 0, false), 9);
         Evaluate(TempPOSSalesLine."Sales Document Line No.", NpXmlDomMgt.GetXmlText(Element, 'salesdocumentline', 0, false), 9);
-        Evaluate(TempPOSSalesLine."Orig. POS Sale ID", NpXmlDomMgt.GetXmlText(Element, 'origpossaleid', 0, false), 9);
-        Evaluate(TempPOSSalesLine."Orig. POS Line No.", NpXmlDomMgt.GetXmlText(Element, 'origposlineno', 0, false), 9);
+        Evaluate(TempPOSSalesLine.SystemId, NpXmlDomMgt.GetXmlText(Element, 'origpossaleid', 0, false), 9);
         Evaluate(TempPOSSalesLine."Bin Code", NpXmlDomMgt.GetXmlText(Element, 'bincode', 0, false), 9);
         Evaluate(TempPOSSalesLine."Qty. per Unit of Measure", NpXmlDomMgt.GetXmlText(Element, 'qtyerunitofmeasure', 0, false), 9);
         Evaluate(TempPOSSalesLine."Cross-Reference No.", NpXmlDomMgt.GetXmlText(Element, 'crossreferenceno', 0, false), 9);
@@ -300,19 +299,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
         POSSalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
         POSSalesLine."Appl.-to Item Entry" := 0;
         POSSalesLine."Item Entry No." := 0;
-        if TempPOSSalesLine."Orig. POS Sale ID" <> 0 then begin
-            OrigPOSEntry.SetRange("From External Source", true);
-            OrigPOSEntry.SetRange("External Source Name", POSEntry."External Source Name");
-            OrigPOSEntry.SetRange("External Source Entry No.", TempPOSSalesLine."Orig. POS Sale ID");
-            if OrigPOSEntry.FindFirst() then begin
-                POSSalesLine."Orig. POS Sale ID" := OrigPOSEntry."Entry No.";
-                POSSalesLine."Orig. POS Line No." := TempPOSSalesLine."Orig. POS Line No.";
-            end else begin
-                POSSalesLine."Orig. POS Sale ID" := 0;
-                POSSalesLine."Orig. POS Line No." := 10000;
-            end;
-        end;
-        POSSalesLine.Insert();
+        POSSalesLine.Insert(false, true);
     end;
 
     local procedure InsertPOSPaymentLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
@@ -349,8 +336,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
         Evaluate(TempPOSPaymentLine."Applies-to Doc. Type", NpXmlDomMgt.GetXmlText(Element, 'appliestodoctype', 0, false), 9);
         Evaluate(TempPOSPaymentLine."Applies-to Doc. No.", NpXmlDomMgt.GetXmlText(Element, 'appliestodocno', 0, false), 9);
         Evaluate(TempPOSPaymentLine."External Document No.", NpXmlDomMgt.GetXmlText(Element, 'externaldocno', 0, false), 9);
-        Evaluate(TempPOSPaymentLine."Orig. POS Sale ID", NpXmlDomMgt.GetXmlText(Element, 'origpossaleid', 0, false), 9);
-        Evaluate(TempPOSPaymentLine."Orig. POS Line No.", NpXmlDomMgt.GetXmlText(Element, 'origposlineno', 0, false), 9);
+        Evaluate(TempPOSPaymentLine.SystemId, NpXmlDomMgt.GetXmlText(Element, 'origpossaleid', 0, false), 9);
         if NpXmlDomMgt.GetXmlText(Element, 'dimensionsetid', 0, false) <> '' then
             Evaluate(TempPOSPaymentLine."Dimension Set ID", NpXmlDomMgt.GetXmlText(Element, 'dimensionsetid', 0, false), 9);
         Evaluate(TempPOSPaymentLine.EFT, NpXmlDomMgt.GetXmlText(Element, 'eft', 0, false), 9);
@@ -376,19 +362,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
         POSPaymentLine."POS Unit No." := POSEntry."POS Unit No.";
         POSPaymentLine."Document No." := POSEntry."Document No.";
         POSPaymentLine."POS Period Register No." := POSEntry."POS Period Register No.";
-        if TempPOSPaymentLine."Orig. POS Sale ID" <> 0 then begin
-            OrigPOSEntry.SetRange("From External Source", true);
-            OrigPOSEntry.SetRange("External Source Name", POSEntry."External Source Name");
-            OrigPOSEntry.SetRange("External Source Entry No.", TempPOSPaymentLine."Orig. POS Sale ID");
-            if OrigPOSEntry.FindFirst() then begin
-                POSPaymentLine."Orig. POS Sale ID" := OrigPOSEntry."Entry No.";
-                POSPaymentLine."Orig. POS Line No." := TempPOSPaymentLine."Orig. POS Line No.";
-            end else begin
-                POSPaymentLine."Orig. POS Sale ID" := 0;
-                POSPaymentLine."Orig. POS Line No." := 10000;
-            end;
-        end;
-        POSPaymentLine.Insert();
+        POSPaymentLine.Insert(false, true);
     end;
 
     local procedure InsertPOSTaxAmountLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
@@ -475,8 +449,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
         Evaluate(TempPOSBalancingLine."Move-To Bin Code", NpXmlDomMgt.GetXmlText(Element, 'movetobincode', 0, false), 9);
         Evaluate(TempPOSBalancingLine."Move-To Reference", NpXmlDomMgt.GetXmlText(Element, 'movetoreference', 0, false), 9);
         Evaluate(TempPOSBalancingLine."Balancing Details", NpXmlDomMgt.GetXmlText(Element, 'balancingdetails', 0, false), 9);
-        Evaluate(TempPOSBalancingLine."Orig. POS Sale ID", NpXmlDomMgt.GetXmlText(Element, 'origpossaleid', 0, false), 9);
-        Evaluate(TempPOSBalancingLine."Orig. POS Line No.", NpXmlDomMgt.GetXmlText(Element, 'origposlineno', 0, false), 9);
+        Evaluate(TempPOSBalancingLine.SystemId, NpXmlDomMgt.GetXmlText(Element, 'origpossaleid', 0, false), 9);
         Evaluate(TempPOSBalancingLine."POS Bin Checkpoint Entry No.", NpXmlDomMgt.GetXmlText(Element, 'posbincheckpointentryno', 0, false), 9);
         Evaluate(TempPOSBalancingLine."Currency Code", NpXmlDomMgt.GetXmlText(Element, 'currencycode', 0, false), 9);
         if NpXmlDomMgt.GetXmlText(Element, 'dimensionsetid', 0, false) <> '' then
