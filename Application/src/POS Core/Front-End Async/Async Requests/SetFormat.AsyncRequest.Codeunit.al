@@ -7,7 +7,11 @@ codeunit 6150783 "NPR Front-End: SetFormat" implements "NPR Front-End Async Requ
 
         LabelNumberDecimalSeparator: Label 'NumberDecimalSeparator', Locked = true;
         LabelNumberGroupSeparator: Label 'NumberGroupSeparator', Locked = true;
+        LabelNumberDecimalDigits: Label 'NumberDecimalDigits', Locked = true;
+        LabelCurrencySymbol: Label 'CurrencySymbol', Locked = true;
         LabelDateSeparator: Label 'DateSeparator', Locked = true;
+        LabelShortDatePattern: Label 'ShortDatePattern', Locked = true;
+        LabelDayNames: Label 'DayNames', Locked = true;
 
     procedure Initialize(ViewProfile: Record "NPR POS View Profile");
     var
@@ -16,7 +20,7 @@ codeunit 6150783 "NPR Front-End: SetFormat" implements "NPR Front-End Async Requ
         Token: JsonToken;
     begin
         _ready := false;
-        _json := ViewProfile.GetLocaleFormats();
+        _json := ViewProfile.GetLocalFormats();
 
         _json.Get('NumberFormat', Token);
         NumberFormat := Token.AsObject();
@@ -32,10 +36,25 @@ codeunit 6150783 "NPR Front-End: SetFormat" implements "NPR Front-End Async Requ
             NumberFormat.Remove(LabelNumberGroupSeparator);
             NumberFormat.Add(LabelNumberGroupSeparator, ViewProfile."Client Thousands Separator");
         end;
-
+        if ViewProfile."Client Number Decimal Digits" > 0 then begin
+            NumberFormat.Remove(LabelNumberDecimalDigits);
+            NumberFormat.Add(LabelNumberDecimalDigits, ViewProfile."Client Number Decimal Digits");
+        end;
+        if ViewProfile."Client Currency Symbol" <> '' then begin
+            NumberFormat.Remove(LabelCurrencySymbol);
+            NumberFormat.Add(LabelCurrencySymbol, ViewProfile."Client Currency Symbol");
+        end;
         if ViewProfile."Client Date Separator" <> '' then begin
             DateFormat.Remove(LabelDateSeparator);
-            Dateformat.Add(LabelDateSeparator, ViewProfile."Client Date Separator");
+            DateFormat.Add(LabelDateSeparator, ViewProfile."Client Date Separator");
+        end;
+        if ViewProfile."Client Short Date Pattern" <> '' then begin
+            DateFormat.Remove(LabelShortDatePattern);
+            DateFormat.Add(LabelShortDatePattern, ViewProfile."Client Short Date Pattern");
+        end;
+        if ViewProfile."Client Day Names" <> '' then begin
+            DateFormat.Remove(LabelDayNames);
+            DateFormat.Add(LabelDayNames, ViewProfile."Client Day Names");
         end;
 
         _ready := true;

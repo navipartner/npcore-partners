@@ -24,11 +24,6 @@ page 6150635 "NPR POS View Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Client Formatting Culture ID"; Rec."Client Formatting Culture ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Client Formatting Culture ID field';
-                }
                 field("Client Decimal Separator"; Rec."Client Decimal Separator")
                 {
                     ApplicationArea = All;

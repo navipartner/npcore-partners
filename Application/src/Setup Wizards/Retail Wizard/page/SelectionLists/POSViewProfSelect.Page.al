@@ -18,11 +18,6 @@ page 6014695 "NPR POS View Prof. Select"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Client Formatting Culture ID"; Rec."Client Formatting Culture ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Client Formatting Culture ID field';
-                }
                 field("Client Decimal Separator"; Rec."Client Decimal Separator")
                 {
                     ApplicationArea = All;
