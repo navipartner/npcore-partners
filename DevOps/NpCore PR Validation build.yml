@@ -19,7 +19,7 @@ pool:
 jobs:
 - template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
   parameters:
-    containerJobs:
+    containerDefinitions:
     - name: BC17
       containerImageName: npretail.azurecr.io/np/dynamicsnav:17.3.20469.20605-w1
 
