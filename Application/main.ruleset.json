@@ -338,7 +338,12 @@
             "id": "AS0091",
             "action":"Hidden",
             "justification": "One or more dependencies of the previous version of the extension could not be found."
-        },        
+        },  
+        {
+            "id": "AW0005",
+            "action":"Error",
+            "justification": "Actions should use the Image property."
+        },      
         {
             "id": "AW0006",
             "action":"Error",
