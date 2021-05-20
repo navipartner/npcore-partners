@@ -137,9 +137,9 @@ jobs:
         destinationPath: '$(Agent.TempDirectory)/NpRetail/'
       appsToDeploy:
         - path: '$(Agent.TempDirectory)/NpRetail/Np_Retail.app'              
-    - package:
-        source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NPCoreTestFixture/nuget/v3/index.json'
-        id: NaviPartner.NPCore.TestFixture.BC160
-        destinationPath: '$(Agent.TempDirectory)/TestFixture/'
-      appsToDeploy:
-        - path: '$(Agent.TempDirectory)/TestFixture/Test_Fixture_Initializer.app'
+    # - package:
+    #     source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NPCoreTestFixture/nuget/v3/index.json'
+    #     id: NaviPartner.NPCore.TestFixture.BC160
+    #     destinationPath: '$(Agent.TempDirectory)/TestFixture/'
+    #   appsToDeploy:
+    #     - path: '$(Agent.TempDirectory)/TestFixture/Test_Fixture_Initializer.app'
