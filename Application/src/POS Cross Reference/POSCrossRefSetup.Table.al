@@ -92,7 +92,7 @@ table 6014661 "NPR POS Cross Ref. Setup"
         TableObjects.SetTableView(AllObjWithCaption);
         TableObjects.SetRecord(AllObjWithCaption);
         TableObjects.LookupMode := true;
-        Result := TableObjects.RunModal = ACTION::LookupOK;
+        Result := TableObjects.RunModal() = ACTION::LookupOK;
         if Result then
             TableObjects.GetRecord(AllObjWithCaption)
         else
