@@ -10,6 +10,7 @@
         NaviDocsProgressDialogText: Label 'Adding Messages to NaviDocs: @1@@@@@@@@@@@@@@@@@@@@@@@';
         SendingProgressDialogText: Label 'Sending Messages: @1@@@@@@@@@@@@@@@@@@@@@@@';
         PermissionErr: Label 'You do not have right permissions to set up Job Queue.';
+        NpRegex: Codeunit "NPR RegEx";
 
     #region SMS functions
     procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
@@ -131,7 +132,7 @@
         if Sender = '' then
             Sender := GetDefaultSender();
 
-        SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
+        SendTo := NpRegex.MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0, AFReportLinkTag());
         SMSSendMessage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", '', DummyRecRef, Sender, 2, StrSubstNo(BatchSendStatusText, SMSTemplateHeader."Table Caption", Total), false);
 
         SMSSendMessage.SetRecord(SMSTemplateHeader);
@@ -151,8 +152,9 @@
             repeat
                 Counter += 1;
                 Window.Update(1, Round((Counter / Total) * 10000, 1));
-                PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0));
-                QueueMessages(SendToList, Sender, MergeDataFields(MessageText, RecRef, 0), DelayUntil);
+                PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group",
+                    NpRegex.MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0, AFReportLinkTag()));
+                QueueMessages(SendToList, Sender, NpRegex.MergeDataFields(MessageText, RecRef, 0, AFReportLinkTag()), DelayUntil);
             until RecRef.Next() = 0;
         Window.Close();
         QueuedNotification();
@@ -178,7 +180,7 @@
             Sender := SMSTemplateHeader."Alt. Sender";
             if Sender = '' then
                 Sender := GetDefaultSender();
-            SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
+            SendTo := NpRegex.MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0, AFReportLinkTag());
 
             DialogPage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo, RecRef, Sender, 1, '', true);
 
@@ -552,69 +554,12 @@
                 if SMSMessage <> '' then
                     SMSMessage += Format(Char13) + Format(Char10);
                 if MergeRecord then
-                    SMSMessage += MergeDataFields(TemplateLine."SMS Text", RecRef, Template."Report ID")
+                    SMSMessage += NpRegex.MergeDataFields(TemplateLine."SMS Text", RecRef, Template."Report ID", AFReportLinkTag())
                 else
                     SMSMessage += TemplateLine."SMS Text";
 
             until TemplateLine.Next() = 0;
         exit(SMSMessage);
-    end;
-
-    local procedure MergeDataFields(TextLine: Text; var RecRef: RecordRef; ReportID: Integer): Text
-    var
-        DotNetRegEx: Codeunit DotNet_Regex;
-        DotNetMatch: Codeunit DotNet_Match;
-        ResultText: Text;
-    begin
-        ResultText := '';
-        repeat
-            DotNetRegEx.Regex('{\d+}');
-            DotNetRegEx.Match(TextLine, DotNetMatch);
-            if DotNetMatch.Success() then begin
-                ResultText += CopyStr(TextLine, 1, DotNetMatch.Index());
-                ResultText += ConvertToValue(DotNetMatch.Value(), RecRef);
-                TextLine := CopyStr(TextLine, DotNetMatch.Index() + DotNetMatch.Length() + 1);
-            end;
-        until not DotNetMatch.Success();
-
-        ResultText += TextLine;
-        TextLine := ResultText;
-        ResultText := '';
-        repeat
-            DotNetRegEx.Regex(StrSubstNo(AFReportLinkTag(), '.*?'));
-            DotNetRegEx.Match(TextLine, DotNetMatch);
-            if DotNetMatch.Success() then begin
-                ResultText += CopyStr(TextLine, 1, DotNetMatch.Index());
-                TextLine := CopyStr(TextLine, DotNetMatch.Index() + DotNetMatch.Length() + 1);
-            end;
-        until not DotNetMatch.Success();
-
-        ResultText += TextLine;
-        exit(ResultText);
-    end;
-
-    local procedure ConvertToValue(FieldNoText: Text; RecRef: RecordRef): Text
-    var
-        FldRef: FieldRef;
-        FieldNumber: Integer;
-        OptionString: Text;
-        OptionNo: Integer;
-        AutoFormat: Codeunit "Auto Format";
-    begin
-        if not Evaluate(FieldNumber, DelChr(FieldNoText, '<>', '{}')) then
-            exit(FieldNoText);
-        if not RecRef.FieldExist(FieldNumber) then
-            exit(FieldNoText);
-        FldRef := RecRef.Field(FieldNumber);
-        if UpperCase(Format(FldRef.Class)) = 'FLOWFIELD' then
-            FldRef.CalcField();
-
-        if UpperCase(Format(Format(FldRef.Type))) = 'OPTION' then begin
-            OptionString := Format(FldRef.OptionCaption);
-            Evaluate(OptionNo, Format(FldRef.Value, 0, 9));
-            exit(SelectStr(OptionNo + 1, OptionString));
-        end else
-            exit(Format(FldRef.Value, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format".FromInteger(1), '')));
     end;
 
     local procedure IsRecRefEmpty(var RecRef: RecordRef): Boolean
@@ -711,7 +656,7 @@
         if Sender = '' then
             Sender := GetDefaultSender();
 
-        SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
+        SendTo := NpRegex.MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0, AFReportLinkTag());
 
         PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo);
         QueueMessages(SendToList, Sender, SMSBodyText, CurrentDateTime + 1000 * 60); //Delay 1 minute

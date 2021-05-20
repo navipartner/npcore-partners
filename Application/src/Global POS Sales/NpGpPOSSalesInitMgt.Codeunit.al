@@ -295,6 +295,7 @@
         POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
         i: Integer;
         NaturalLineNo: Integer;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
         if not POSCrossRefSetup.Get(POSSaleLine.TableName()) then
             exit('');
@@ -305,14 +306,14 @@
 
         for i := 1 to 10 do begin
             ReferenceNo := POSCrossRefSetup."Reference No. Pattern";
-            ReferenceNo := POSCrossRefMgt.RegExReplacePS(ReferenceNo, POSUnit."POS Store Code");
-            ReferenceNo := POSCrossRefMgt.RegExReplacePU(ReferenceNo, POSUnit."No.");
-            ReferenceNo := POSCrossRefMgt.RegExReplaceS(ReferenceNo, POSSaleLine."Sales Ticket No.");
-            ReferenceNo := POSCrossRefMgt.RegExReplaceN(ReferenceNo);
-            ReferenceNo := POSCrossRefMgt.RegExReplaceAN(ReferenceNo);
-            ReferenceNo := POSCrossRefMgt.RegExReplaceL(ReferenceNo, Format(POSSaleLine."Line No."));
+            ReferenceNo := NpRegEx.RegExReplacePS(ReferenceNo, POSUnit."POS Store Code");
+            ReferenceNo := NpRegEx.RegExReplacePU(ReferenceNo, POSUnit."No.");
+            ReferenceNo := NpRegEx.RegExReplaceS(ReferenceNo, POSSaleLine."Sales Ticket No.");
+            ReferenceNo := NpRegEx.RegExReplaceN(ReferenceNo);
+            ReferenceNo := NpRegEx.RegExReplaceAN(ReferenceNo);
+            ReferenceNo := NpRegEx.RegExReplaceL(ReferenceNo, Format(POSSaleLine."Line No."));
             NaturalLineNo := GetNaturalLineNo(POSSaleLine);
-            ReferenceNo := POSCrossRefMgt.RegExReplaceNL(ReferenceNo, Format(NaturalLineNo));
+            ReferenceNo := NpRegEx.RegExReplaceNL(ReferenceNo, Format(NaturalLineNo));
             ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(POSCrossReference."Reference No.")));
 
             if IsNullGuid(POSCrossRefMgt.GetSysID(POSSaleLine.TableName(), ReferenceNo)) then

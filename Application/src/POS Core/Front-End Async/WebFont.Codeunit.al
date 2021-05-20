@@ -44,7 +44,7 @@ codeunit 6150759 "NPR Web Font" implements "NPR Font Definition"
     procedure Initialize(Code: Text; Name: Text; FontFace: Text; Prefix: Text; CssStream: InStream; WoffStream: InStream)
     var
         Base64: Codeunit "Base64 Convert";
-        Regex: Codeunit DotNet_Regex;
+        NpRegex: Codeunit "NPR RegEx";
     begin
         _code := Code;
         _name := Name;
@@ -53,13 +53,13 @@ codeunit 6150759 "NPR Web Font" implements "NPR Font Definition"
         _woff := 'data:application/x-font-woff;charset=utf-8;base64,' + Base64.ToBase64(WoffStream);
 
         CssStream.ReadText(_css);
-        _css := Regex.Replace(_css, '[a-zA-Z]+#', '#');
-        _css := Regex.Replace(_css, '[\n\r]+\s*', '');
-        _css := Regex.Replace(_css, '\s+', ' ');
-        _css := Regex.Replace(_css, '\s?([:,;{}])\s?', '$1');
+        _css := NpRegex.Replace(_css, '[a-zA-Z]+#', '#');
+        _css := NpRegex.Replace(_css, '[\n\r]+\s*', '');
+        _css := NpRegex.Replace(_css, '\s+', ' ');
+        _css := NpRegex.Replace(_css, '\s?([:,;{}])\s?', '$1');
         _css := _css.Replace(';}', '}');
-        _css := Regex.Replace(_css, '([\s:]0)(px|pt|%|em)', '$1');
-        _css := Regex.Replace(_css, '/\*[\d\D]*?\*/', '');
+        _css := NpRegex.Replace(_css, '([\s:]0)(px|pt|%|em)', '$1');
+        _css := NpRegex.Replace(_css, '/\*[\d\D]*?\*/', '');
     end;
 
     local procedure GetValue(Json: JsonObject; TokenName: Text): JsonValue

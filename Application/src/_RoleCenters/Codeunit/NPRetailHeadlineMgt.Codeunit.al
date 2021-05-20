@@ -41,10 +41,10 @@
 
     procedure GetHeadlineText(Qualifier: Text; Payload: Text; var ResultText: Text[250]): Boolean
     var
-        RegExMgt: Codeunit DotNet_Regex;
         PayloadWithoutEmphasize: Text[158];
         PayloadTagsLength: Integer;
         QualifierTagsLength: Integer;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
         QualifierTagsLength := 23;
         PayloadTagsLength := 19;
@@ -58,7 +58,7 @@
         if StrLen(Qualifier) > GetMaxQualifierLength() then
             exit(false); // qualifier is too long to be a qualifier
 
-        PayloadWithoutEmphasize := RegExMgt.Replace(Payload, '<emphasize>|</emphasize>', '');
+        PayloadWithoutEmphasize := NpRegEx.Replace(Payload, '<emphasize>|</emphasize>', '');
         if StrLen(PayloadWithoutEmphasize) > GetMaxPayloadLength() then
             exit(false); // payload is too long for being a headline
 
@@ -88,12 +88,12 @@
 
     procedure GetUserGreetingTextInternal(UserName: Text[80]; CurrentTimeOfDay: Option; var GreetingText: Text[250])
     var
-        RegExMgt: Codeunit DotNet_Regex;
         UserNameFound: Boolean;
         CleanUserName: Text;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
         if UserName <> '' then begin
-            CleanUserName := RegExMgt.Replace(UserName, '\s', '');
+            CleanUserName := NpRegEx.Replace(UserName, '\s', '');
             UserNameFound := CleanUserName <> '';
         end;
 

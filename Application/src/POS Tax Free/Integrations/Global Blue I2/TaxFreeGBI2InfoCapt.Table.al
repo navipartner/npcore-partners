@@ -302,10 +302,10 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
 
     procedure ValidateEmail()
     var
-        RegEx: Codeunit DotNet_Regex;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
         //Simple error catcher - not required in global blue docs.
-        if not RegEx.IsMatch("E-mail", '^[^@\s]+@[^@\s]+\.[^@\s]+$') then
+        if not NpRegEx.IsMatch("E-mail", '^[^@\s]+@[^@\s]+\.[^@\s]+$') then
             Error(Error_InvalidValue, FieldCaption("E-mail"), "E-mail");
     end;
 
@@ -318,9 +318,9 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
 
     procedure ValidatePhoneNo()
     var
-        RegEx: Codeunit DotNet_Regex;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
-        if not RegEx.IsMatch("Mobile No.", '^(0|[1-9][0-9]*)$') then
+        if not NpRegEx.IsMatch("Mobile No.", '^(0|[1-9][0-9]*)$') then
             Error(Error_InvalidValue, FieldCaption("Mobile No."), "Mobile No.");
 
         if StrLen("Mobile No.") < 5 then

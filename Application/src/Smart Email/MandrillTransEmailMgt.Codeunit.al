@@ -55,6 +55,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JObject: JsonObject;
         I: Integer;
         CodeString: Text;
+        NpRegex: Codeunit "NPR RegEx";
     begin
         Initialize(GetFullURL('/templates/info.json'), 'POST');
         BodyJObject.Add('name', SmartEmail."Smart Email ID");
@@ -72,7 +73,7 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         CodeString := GetString(JObject, 'publish_code');
         if CodeString = '' then
             CodeString := GetString(JObject, 'code');
-        FindVariables(TempVariable, CodeString);
+        NpRegex.FindVariables(TempVariable, CodeString);
 
         SmartEmailVariable.SetRange("Transactional Email Code", SmartEmail.Code);
         if SmartEmailVariable.FindSet() then
@@ -480,45 +481,6 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
                     JArray.Add(JObject.Clone());
                 end;
             until Attachment.Next() = 0;
-    end;
-
-
-    local procedure FindVariables(var TempVariable: Record "NPR Smart Email Variable" temporary; CodeString: Text)
-    var
-        RegEx: Codeunit DotNet_Regex;
-        Match: Codeunit DotNet_Match;
-        i: Integer;
-        OffSet: Integer;
-    begin
-        if CodeString = '' then
-            exit;
-        RegEx.Regex('(\*\|)(.*?)(\|\*)');
-        RegEx.Match(CodeString, Match);
-        while Match.Success() do begin
-            TempVariable.Init();
-            TempVariable."Line No." := i;
-            TempVariable."Variable Name" := Match.Value();
-            TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
-            TempVariable."Variable Type" := TempVariable."Variable Type"::Mailchimp;
-            TempVariable.Insert();
-            i += 1;
-            OffSet := i + 1;
-            Match.NextMatch(Match);
-        end;
-
-        RegEx.Regex('({{)(.*?)(}})');
-        RegEx.Match(CodeString, Match);
-        i := 0;
-        while Match.Success() do begin
-            TempVariable.Init();
-            TempVariable."Line No." := i + OffSet;
-            TempVariable."Variable Name" := Match.Value();
-            TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
-            TempVariable."Variable Type" := TempVariable."Variable Type"::Handlebars;
-            TempVariable.Insert();
-            i += 1;
-            Match.NextMatch(Match);
-        end;
     end;
 
     local procedure GetString(JObject: JsonObject; Property: Text): Text

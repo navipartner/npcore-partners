@@ -1,5 +1,8 @@
 codeunit 6014620 "NPR POS Cross Reference Mgt."
 {
+    var
+        NpRegEx: Codeunit "NPR RegEx";
+
     trigger OnRun()
     begin
         TestReferenceRegEx();
@@ -15,11 +18,11 @@ codeunit 6014620 "NPR POS Cross Reference Mgt."
         Starttime := CurrentDateTime;
 
         Pattern := '[PS]||[PU]||[S]||[N*4]||[AN*4]||[PS]||[PU]||[S]||[N*4]||[AN*4]';
-        ReferenceNo := RegExReplacePS(Pattern, 'StoreCode');
-        ReferenceNo := RegExReplacePU(ReferenceNo, 'PosUnit');
-        ReferenceNo := RegExReplaceS(ReferenceNo, 'SalesTicket');
-        ReferenceNo := RegExReplaceN(ReferenceNo);
-        ReferenceNo := RegExReplaceAN(ReferenceNo);
+        ReferenceNo := NpRegEx.RegExReplacePS(Pattern, 'StoreCode');
+        ReferenceNo := NpRegEx.RegExReplacePU(ReferenceNo, 'PosUnit');
+        ReferenceNo := NpRegEx.RegExReplaceS(ReferenceNo, 'SalesTicket');
+        ReferenceNo := NpRegEx.RegExReplaceN(ReferenceNo);
+        ReferenceNo := NpRegEx.RegExReplaceAN(ReferenceNo);
 
         Duration := CurrentDateTime - Starttime;
         Message('Duration: %1\Pattern: %2\Reference: %3', Duration, Pattern, ReferenceNo);
@@ -92,150 +95,5 @@ codeunit 6014620 "NPR POS Cross Reference Mgt."
 
         SysID := Rec.SystemId;
     end;
-
-    #region Generate Reference No
-    procedure RegExReplace(Input: Text; PosStoreCode: Text) Output: Text
-    var
-        RegEx: Codeunit DotNet_Regex;
-        Pattern: Text;
-    begin
-        Pattern := '(?<SerialNo>\[PS\])';
-        RegEx.Regex(Pattern);
-        Output := RegEx.Replace(Input, PosStoreCode);
-    end;
-
-    procedure RegExReplacePS(Input: Text; PosStoreCode: Text) Output: Text
-    var
-        RegEx: Codeunit DotNet_Regex;
-        Pattern: Text;
-    begin
-        Pattern := '(?<SerialNo>\[PS\])';
-        RegEx.Regex(Pattern);
-        Output := RegEx.Replace(Input, PosStoreCode);
-    end;
-
-    procedure RegExReplacePU(Input: Text; PosUnitNo: Text) Output: Text
-    var
-        RegEx: Codeunit DotNet_Regex;
-        Pattern: Text;
-    begin
-        Pattern := '(?<SerialNo>\[PU\])';
-        RegEx.Regex(Pattern);
-        Output := RegEx.Replace(Input, PosUnitNo);
-    end;
-
-    procedure RegExReplaceS(Input: Text; SerialNo: Text) Output: Text
-    var
-        RegEx: Codeunit DotNet_Regex;
-        Pattern: Text;
-    begin
-        Pattern := '(?<SerialNo>\[S\])';
-        RegEx.Regex(Pattern);
-        Output := RegEx.Replace(Input, SerialNo);
-    end;
-
-    procedure RegExReplaceAN(Input: Text) Output: Text
-    var
-        Match: Codeunit DotNet_Match;
-        RegEx: Codeunit DotNet_Regex;
-        GroupCollection: Codeunit DotNet_GroupCollection;
-        DotNetGroup: Codeunit DotNet_Group;
-        Pattern: Text;
-        ReplaceString: Text;
-        RandomQty: Integer;
-        i: Integer;
-    begin
-        Pattern := '(?<RandomStart>\[AN\*?)' +
-                   '(?<RandomQty>\d?)' +
-                   '(?<RandomEnd>\])';
-        RegEx.Regex(Pattern);
-        RegEx.Match(Input, Match);
-        while Match.Success() do begin
-            ReplaceString := '';
-            RandomQty := 1;
-            Match.Groups(GroupCollection);
-            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
-            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
-            for i := 1 to RandomQty do
-                ReplaceString += Format(GenerateRandomChar());
-            Input := RegEx.Replace(Input, ReplaceString, 1);
-
-            RegEx.Match(Input, Match);
-        end;
-
-        Output := Input;
-    end;
-
-    procedure RegExReplaceN(Input: Text) Output: Text
-    var
-        Match: Codeunit DotNet_Match;
-        RegEx: Codeunit DotNet_Regex;
-        GroupCollection: Codeunit DotNet_GroupCollection;
-        DotNetGroup: Codeunit DotNet_Group;
-        Pattern: Text;
-        ReplaceString: Text;
-        RandomQty: Integer;
-        i: Integer;
-    begin
-        Pattern := '(?<RandomStart>\[N\*?)' +
-                   '(?<RandomQty>\d?)' +
-                   '(?<RandomEnd>\])';
-        RegEx.Regex(Pattern);
-        RegEx.Match(Input, Match);
-        while Match.Success() do begin
-            ReplaceString := '';
-            RandomQty := 1;
-            Match.Groups(GroupCollection);
-            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
-            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
-            for i := 1 to RandomQty do
-                ReplaceString += Format(Random(9));
-            Input := RegEx.Replace(Input, ReplaceString, 1);
-
-            RegEx.Match(Input, Match);
-        end;
-
-        Output := Input;
-    end;
-
-    procedure RegExReplaceL(Input: Text; LineNo: Text) Output: Text
-    var
-        RegEx: Codeunit DotNet_Regex;
-        Pattern: Text;
-    begin
-        Pattern := '(?<SerialNo>\[L\])';
-        RegEx.Regex(Pattern);
-        Output := RegEx.Replace(Input, LineNo);
-    end;
-
-    procedure RegExReplaceNL(Input: Text; NaturalLineNo: Text) Output: Text
-    var
-        RegEx: Codeunit DotNet_Regex;
-        Pattern: Text;
-    begin
-        Pattern := '(?<SerialNo>\[NL\])';
-        RegEx.Regex(Pattern);
-        Output := RegEx.Replace(Input, NaturalLineNo);
-    end;
-
-    local procedure GenerateRandomChar() RandomChar: Char
-    var
-        RandomInt: Integer;
-        RandomText: Text[1];
-    begin
-        RandomInt := Random(9999);
-
-        if Random(35) < 10 then begin
-            RandomText := Format(RandomInt mod 10);
-            RandomChar := RandomText[1];
-            exit(RandomChar);
-        end;
-
-        RandomChar := (RandomInt mod 25) + 65;
-        RandomText := UpperCase(Format(RandomChar));
-        RandomChar := RandomText[1];
-    end;
-
-    #endregion
 }
 

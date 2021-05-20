@@ -446,7 +446,7 @@
     [EventSubscriber(ObjectType::Table, 6184484, 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidateUnitGenParameterValue(var Parameter: Record "NPR EFTType POSUnit Gen.Param.")
     var
-        RegEx: Codeunit DotNet_Regex;
+        RegEx: Codeunit "NPR RegEx";
     begin
         if Parameter."Integration Type" <> IntegrationType() then
             exit;
