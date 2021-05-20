@@ -9817,7 +9817,8 @@ body {
       max-width: 65%;
       min-width: 35%;
       margin: 0 auto;
-      border-radius: 3px; }
+      border-radius: 3px;
+      overflow: hidden; }
     .counting-backdrop .counting__view-options {
       display: flex;
       width: 100%;
@@ -9842,6 +9843,8 @@ body {
         display: flex;
         flex-direction: column;
         position: relative; }
+        .counting-backdrop .counting__view-options .payment-type-selection--no-radius {
+          border-bottom-right-radius: 0; }
         .counting-backdrop .counting__view-options .payment-type-selection__controls {
           display: flex; }
         .counting-backdrop .counting__view-options .payment-type-selection__go-to {
@@ -9858,6 +9861,10 @@ body {
           .counting-backdrop .counting__view-options .payment-type-selection__dropdown:hover {
             background: var(--color-primary-300);
             cursor: pointer; }
+          .counting-backdrop .counting__view-options .payment-type-selection__dropdown .dropdown-icon {
+            transition: transform 0.15s ease-in-out; }
+            .counting-backdrop .counting__view-options .payment-type-selection__dropdown .dropdown-icon--rotate {
+              transform: rotate(180deg); }
         .counting-backdrop .counting__view-options .payment-type-selection__options {
           display: flex;
           flex-direction: column;
@@ -9866,13 +9873,13 @@ body {
           top: 100%;
           background: var(--color-secondary-100);
           border-radius: 0 0 3px 3px;
-          border: 1px solid var(--color-primary-300);
           z-index: 100;
           overflow: hidden;
-          opacity: 0;
-          transition: all 0.15s ease-in-out; }
+          transition: height 0.15s ease-in-out;
+          height: 0; }
           .counting-backdrop .counting__view-options .payment-type-selection__options--visible {
-            opacity: 1; }
+            height: 250%;
+            border: 1px solid var(--color-primary-300); }
           .counting-backdrop .counting__view-options .payment-type-selection__options span {
             padding: 0.5em 2em;
             text-align: center; }
@@ -9884,6 +9891,11 @@ body {
     .counting-backdrop .counting__content {
       background: var(--color-secondary-200);
       padding: 1em 2em 2em 2em; }
+      .counting-backdrop .counting__content--default {
+        display: flex;
+        align-items: center; }
+    .counting-backdrop .counting__data-container {
+      z-index: 2; }
     .counting-backdrop .counting h1 {
       font-size: 1.2em;
       margin-top: 0;
@@ -9905,16 +9917,17 @@ body {
         grid-row: 1; }
     .counting-backdrop .counting .inline-properties {
       display: flex;
-      flex-wrap: wrap; }
+      flex-wrap: wrap;
+      align-content: center; }
       .counting-backdrop .counting .inline-properties--grid {
         display: grid;
-        grid-template-columns: 50% 50%; }
+        grid-template-columns: calc(50% - 1em) calc(50% - 1em);
+        column-gap: 1em; }
       .counting-backdrop .counting .inline-properties--column {
         flex-direction: column; }
     .counting-backdrop .counting .inline-property {
       padding: 0.75em 1em 0.5em 1em;
       background: var(--color-secondary-100);
-      width: fit-content;
       border-radius: 3px;
       margin: 0.5em;
       display: flex;
@@ -9924,12 +9937,17 @@ body {
       box-shadow: var(--box-shadow-light);
       position: relative;
       border: 1px solid transparent;
-      transition: all 0.3s linear; }
+      width: fit-content;
+      width: 100%; }
       .counting-backdrop .counting .inline-property--disabled {
         background: unset; }
       .counting-backdrop .counting .inline-property--focused {
         border-color: var(--color-primary-100);
         box-shadow: none; }
+      .counting-backdrop .counting .inline-property--focused-lookup {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom: none; }
       .counting-backdrop .counting .inline-property__label {
         font-size: 1em;
         position: absolute;
@@ -9949,19 +9967,46 @@ body {
           font-size: 0.7em;
           top: 0; }
       .counting-backdrop .counting .inline-property__value {
-        width: 100%;
         text-align: right;
         font-size: 1.4em;
         font-weight: 500;
         height: 1.6em;
         display: flex;
         align-items: center;
-        justify-content: flex-end; }
+        justify-content: flex-end;
+        overflow: hidden; }
+        .counting-backdrop .counting .inline-property__value .input-with-lookup {
+          width: 100%; }
+          .counting-backdrop .counting .inline-property__value .input-with-lookup__dropdown {
+            font-size: 0.6em;
+            font-weight: 400;
+            border-radius: 0 0 3px 3px;
+            z-index: 1;
+            position: absolute;
+            width: calc(100% + 2px);
+            left: -1px;
+            top: 4.1em;
+            background: var(--color-secondary-100);
+            border: 1px solid var(--color-primary-100);
+            border-top-color: var(--color-primary-300);
+            padding: 0 0.25em 0 0; }
+            .counting-backdrop .counting .inline-property__value .input-with-lookup__dropdown--hidden {
+              display: none; }
+          .counting-backdrop .counting .inline-property__value .input-with-lookup__dropdown-content {
+            max-height: 9.5em;
+            overflow-y: scroll;
+            width: 100%; }
+          .counting-backdrop .counting .inline-property__value .input-with-lookup__row {
+            padding: 0.5em 0.75em;
+            text-align: left;
+            border-bottom: 1px solid var(--color-primary-300); }
+            .counting-backdrop .counting .inline-property__value .input-with-lookup__row:hover {
+              background: var(--color-primary-300);
+              cursor: pointer; }
       .counting-backdrop .counting .inline-property__input {
         border: none;
         outline: none;
         text-align: right;
-        width: 60%;
         font-size: 1em;
         color: var(--color-text-100);
         font-weight: 500;
@@ -9979,8 +10024,9 @@ body {
       justify-content: space-between; }
       .counting-backdrop .counting__primary-data .inline-property {
         margin: 0;
-        min-width: calc(33% - 0.5em);
-        width: calc(33% - 0.5em); }
+        min-width: calc(33.33% - 0.5em);
+        width: calc(33.33% - 0.5em);
+        max-width: 12em; }
     .counting-backdrop .counting__section {
       padding: 1em;
       background: var(--color-secondary-100);
@@ -10019,6 +10065,24 @@ body {
       .counting-backdrop .counting .button:hover {
         cursor: pointer;
         background: var(--color-primary-200); }
+    .counting-backdrop .counting .nothing-to-do-here {
+      min-height: 40vh;
+      max-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding: 2em; }
+      .counting-backdrop .counting .nothing-to-do-here p {
+        font-size: 1.4em;
+        margin: 0.5em 0; }
+      .counting-backdrop .counting .nothing-to-do-here .button {
+        flex: unset;
+        position: absolute;
+        bottom: 1em;
+        height: 2.4em;
+        right: 1em; }
 
 .modal-backdrop {
   position: fixed;
@@ -10049,27 +10113,6 @@ body {
       margin-bottom: 1em; }
     .modal-backdrop .modal .button {
       padding: 0.75em 0; }
-  .modal-backdrop .coin-type-numpad {
-    display: grid;
-    grid-gap: 0.5em;
-    justify-content: center;
-    justify-items: center;
-    grid-template-columns: repeat(3, auto);
-    font-size: 1.4em;
-    margin-left: 2em;
-    height: fit-content; }
-    .modal-backdrop .coin-type-numpad .button {
-      width: 3.5em;
-      height: 3.5em;
-      border-radius: 3px;
-      display: flex;
-      min-width: unset;
-      margin: 0;
-      box-shadow: var(--box-shadow); }
-      .modal-backdrop .coin-type-numpad .button--transparent {
-        visibility: hidden; }
-      .modal-backdrop .coin-type-numpad .button:hover {
-        cursor: pointer; }
 
 .coin-types {
   background-color: var(--color-secondary-100);
@@ -10133,6 +10176,39 @@ body {
       .coin-types .row .cell ::-webkit-input-placeholder {
         text-align: center;
         font-size: 0.9em; }
+
+.counting .counting-numpad {
+  display: grid;
+  grid-gap: 0.5em;
+  justify-content: center;
+  justify-items: center;
+  grid-template-columns: repeat(3, auto);
+  font-size: 1.4em;
+  margin-left: 0.75em;
+  height: fit-content;
+  position: relative;
+  z-index: 1;
+  padding: 1em; }
+  .counting .counting-numpad .button {
+    width: 3.5em;
+    height: 3.5em;
+    border-radius: 3px;
+    display: flex;
+    min-width: unset;
+    margin: 0;
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease-in-out; }
+    .counting .counting-numpad .button--transparent {
+      visibility: hidden; }
+    .counting .counting-numpad .button:hover {
+      cursor: pointer; }
+  .counting .counting-numpad--disabled:hover {
+    cursor: not-allowed; }
+  .counting .counting-numpad--disabled .button {
+    pointer-events: none;
+    background: transparent;
+    color: var(--color-text-100);
+    box-shadow: var(--box-shadow-light); }
 
 .balance-view {
   height: 100%; }

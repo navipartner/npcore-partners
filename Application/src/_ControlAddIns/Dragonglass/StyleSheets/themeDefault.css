@@ -1,6 +1,6 @@
 :root {
   --color-primary-100: #549ad3;
-  --color-primary-200: #29578d;
+  --color-primary-200: #3d7fb6;
   --color-primary-300: #caddf0;
   --color-primary-mobile-100: #0074bd;
   --color-primary-mobile-200: #3390ca;
@@ -36,20 +36,20 @@
   --primary-hover: var(--color-primary-200);
   --primary-mobile-hover: var(--color-primary-mobile-200);
   --secondary-hover: var(--color-secondary-200);
-  --green-hover: #34803c;
-  --red-hover: #b30d13;
-  --dark-red-hover: #6c1714;
-  --gray-hover: #76889c;
-  --purple-hover: #5e3b69;
-  --indigo-hover: #45346a;
-  --yellow-hover: #aea115;
-  --orange-hover: #a76b07;
-  --white-hover: #9c9c9c;
-  --light-gray-hover: #686868;
-  --dark-gray-hover: #363636;
-  --blue-hover: #415467;
-  --dark-blue-hover: #314355;
-  --light-blue-hover: #596877;
+  --green-hover: #4ea557;
+  --red-hover: #ca292e;
+  --dark-red-hover: #881b18;
+  --gray-hover: #8a9cb3;
+  --purple-hover: #6f497a;
+  --indigo-hover: #594486;
+  --yellow-hover: #b3a402;
+  --orange-hover: #d39120;
+  --white-hover: #bebaba;
+  --light-gray-hover: #b5bec9;
+  --dark-gray-hover: #565c63;
+  --blue-hover: #134185;
+  --dark-blue-hover: #082a5d;
+  --light-blue-hover: #4d76b3;
   --primary-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --light-font: "Segoe UI Light" Tahoma, Geneva, Verdana, sans-serif;
   --font-mobile: "Raleway", sans-serif; }
