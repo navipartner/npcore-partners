@@ -6,8 +6,6 @@ tableextension 6151240 "NPR Finance Cue" extends "Finance Cue"
         {
             CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Order)));
             FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151242; "NPR Pending Inc. Documents"; Integer)
         {
@@ -22,6 +20,11 @@ tableextension 6151240 "NPR Finance Cue" extends "Finance Cue"
             FieldClass = FlowField;
             ObsoleteState = Removed;
             ObsoleteReason = 'Removing unnecesarry table extensions.';
+        }
+        field(6151244; "NPR Purchase Quote"; Integer)
+        {
+            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Quote)));
+            FieldClass = FlowField;
         }
     }
 }
