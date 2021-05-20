@@ -59,6 +59,7 @@ codeunit 6150931 "NPR UPG POS View Profile"
         POSViewProfile: Record "NPR POS View Profile";
         TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
+        Formats: JsonObject;
         InStr: InStream;
         TenantMediaDesc: Text;
         ModifyProfile: Boolean;
@@ -75,11 +76,11 @@ codeunit 6150931 "NPR UPG POS View Profile"
                     ModifyProfile := true;
                 end;
             end;
-            if not POSViewProfile."Culture Info (Serializ.)".HasValue() then begin
-                if POSViewProfile."Culture Info (Serialized)".HasValue() then begin
-                    POSViewProfile.CalcFields("Culture Info (Serialized)");
-                    POSViewProfile."Culture Info (Serialized)".CreateInStream(InStr);
-                    POSViewProfile."Culture Info (Serializ.)".ImportStream(InStr, POSViewProfile.FieldName("Culture Info (Serializ.)"));
+            if POSViewProfile."Culture Info (Serialized)".HasValue() then begin
+                POSViewProfile.CalcFields("Culture Info (Serialized)");
+                POSViewProfile."Culture Info (Serialized)".CreateInStream(InStr);
+                if Formats.ReadFrom(InStr) then begin
+                    POSViewProfile.SetFormats(Formats);
                     ModifyProfile := true;
                 end;
             end;

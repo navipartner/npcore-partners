@@ -21,15 +21,8 @@ table 6150651 "NPR POS View Profile"
         {
             Caption = 'Client Formatting Culture ID';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Client Formatting Culture ID" <> xRec."Client Formatting Culture ID" then begin
-                    "Client Decimal Separator" := '';
-                    "Client Thousands Separator" := '';
-                    DetectDecimalThousandsSeparator();
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Client* fields to prepare culture info.';
         }
         field(11; "Client Decimal Separator"; Text[1])
         {
@@ -57,6 +50,8 @@ table 6150651 "NPR POS View Profile"
         {
             Caption = 'Culture Info (Serialized)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Client* fields to prepare culture info.';
         }
         field(20; Picture; Blob)
         {
@@ -69,6 +64,28 @@ table 6150651 "NPR POS View Profile"
         field(21; Image; Media)
         {
             Caption = 'Picture';
+            DataClassification = CustomerContent;
+        }
+        field(22; "Client Currency Symbol"; Text[10])
+        {
+            Caption = 'Client Currency Symbol';
+            DataClassification = CustomerContent;
+        }
+        field(23; "Client Number Decimal Digits"; Integer)
+        {
+            Caption = 'Client Number Decimal Digits';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
+        field(24; "Client Short Date Pattern"; Text[30])
+        {
+            Caption = 'Client Short Date Pattern';
+            DataClassification = CustomerContent;
+        }
+
+        field(25; "Client Day Names"; Text[250])
+        {
+            Caption = 'Client Day Names';
             DataClassification = CustomerContent;
         }
         field(30; "POS Theme Code"; Code[10])
@@ -131,7 +148,7 @@ table 6150651 "NPR POS View Profile"
 
     trigger OnInsert()
     begin
-        DetectDecimalThousandsSeparator();
+        SetFormats(GetDefaultFormats());
     end;
 
     local procedure ToCamelCase(String: Text): Text;
@@ -157,6 +174,7 @@ table 6150651 "NPR POS View Profile"
         Property: Text;
         Token: JsonToken;
         Element: JsonToken;
+
     begin
         foreach Property in Object.Keys do begin
             Object.Get(Property, Token);
@@ -172,72 +190,37 @@ table 6150651 "NPR POS View Profile"
         end;
     end;
 
-    [TryFunction]
-    local procedure GetLocaleFormatsFromAzure(var Formats: JsonObject);
+    procedure SetFormats(CultureJson: JsonObject)
     var
-        Http: HttpClient;
-        Response: HttpResponseMessage;
-        CouldNotRetrieve: Label 'We could not retrieve the culture info due to an error.\\%1';
-        ResponseText: Text;
-    begin
-        //Error('TODO: This function requires an API url.');
-        // TODO: We need to sort-out the URL below. Right now, it's a local function api on my machine. No good.
-
-        if not Http.Get('https://navipartner-af-dotnet-1-0-0.azurewebsites.net/api/GetLocaleFormats?code=GaBaj0Iepwn2nIizkdMO%2FuozjcRPEg%2FwClLNl49cI4MU%2FoZYFQegww%3D%3D&locale=%1' + "Client Formatting Culture ID", Response) then begin
-            // We need to see the message unconditionally. Simply doing Error would not show anything, and would exit with false.
-            Message(CouldNotRetrieve, GetLastErrorText);
-            Error('');
-        end;
-
-        Response.Content.ReadAs(ResponseText);
-        if not Response.IsSuccessStatusCode() then begin
-            // We need to see the message unconditionally. Simply doing Error would not show anything, and would exit with false.
-            Message(CouldNotRetrieve, StrSubstNo('%1 %2', Response.HttpStatusCode, ResponseText));
-            Error('');
-        end;
-
-        Formats.ReadFrom(ResponseText);
-        ConvertPropertyNamesToCamelCase(Formats);
-
-        exit(true);
-    end;
-
-    [TryFunction]
-    local procedure GetLocaleFormatsFromAzureAndCacheThem(var CultureJson: JsonObject);
-    var
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
-    begin
-        GetLocaleFormatsFromAzure(CultureJson);
-
-        TempBlob.CreateOutStream(OutStr);
-        "Culture Info (Serializ.)".ExportStream(OutStr);
-        CultureJson.WriteTo(OutStr);
-    end;
-
-    procedure DetectDecimalThousandsSeparator()
-    var
-        Culture: Codeunit DotNet_CultureInfo;
-        CultureJson: JsonObject;
         JsonMgt: Codeunit "NPR POS JSON Management";
+        DayNames: JsonArray;
+        Day: JsonToken;
     begin
-        if "Client Formatting Culture ID" = '' then
-            "Client Formatting Culture ID" := Culture.CurrentCultureName();
+        if "Client Decimal Separator" = '' then
+            "Client Decimal Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberDecimalSeparator').AsValue().AsText();
+        if "Client Thousands Separator" = '' then
+            "Client Thousands Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberGroupSeparator').AsValue().AsText();
+        if "Client Currency Symbol" = '' then
+            "Client Currency Symbol" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.CurrencySymbol').AsValue().AsText();
+        if "Client Number Decimal Digits" = 0 then
+            "Client Number Decimal Digits" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberDecimalDigits').AsValue().AsInteger();
 
-        GetLocaleFormatsFromAzureAndCacheThem(CultureJson);
-
-        if ("Client Decimal Separator" = '') or ("Client Thousands Separator" = '') or ("Client Date Separator" = '') then begin
-            if "Client Decimal Separator" = '' then
-                "Client Decimal Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberDecimalSeparator').AsValue().AsText();
-            if "Client Thousands Separator" = '' then
-                "Client Thousands Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberGroupSeparator').AsValue().AsText();
-            if "Client Date Separator" = '' then
-                "Client Date Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.DateSeparator').AsValue().AsText();
+        if "Client Date Separator" = '' then
+            "Client Date Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.DateSeparator').AsValue().AsText();
+        if "Client Short Date Pattern" = '' then
+            "Client Short Date Pattern" := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.ShortDatePattern').AsValue().AsText();
+        if "Client Day Names" = '' then begin
+            DayNames := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.DayNames').AsArray();
+            foreach Day in DayNames do begin
+                "Client Day Names" += Day.AsValue().AsText() + ',';
+            end;
+            if "Client Day Names" <> '' then
+                "Client Day Names" := CopyStr("Client Day Names", 1, StrLen("Client Day Names") - 1);
         end;
+
     end;
 
-    // Fallback, when web service is unavailable, default format information for da-DK is used
-    local procedure GetDefaultFormats() Formats: JsonObject;
+    internal procedure GetDefaultFormats() Formats: JsonObject;
     var
         NumberFormat: JsonObject;
         DateFormat: JsonObject;
@@ -251,34 +234,43 @@ table 6150651 "NPR POS View Profile"
         NumberFormat.Add('CurrencySymbol', 'kr.');
         NumberFormat.Add('NumberDecimalDigits', 2);
 
-        DateFormat.Add('ShortTimePattern', 'HH:mm');
         DateFormat.Add('ShortDatePattern', 'dd-MM-yyyy');
-        DayNames.ReadFrom('["søndag", "mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag"]');
+        DateFormat.Add('DateSeparator', '-');
+        DayNames.ReadFrom('["søndag","mandag","tirsdag","onsdag","torsdag","fredag","lørdag"]');
         DateFormat.Add('DayNames', DayNames);
     end;
 
-    procedure GetLocaleFormats() Formats: JsonObject;
+    local procedure GetClientFormats() Formats: JsonObject;
     var
-        TempBlob: Codeunit "Temp Blob";
-        InStr: InStream;
-        OutStr: OutStream;
+        NumberFormat, DateFormat, DayFormat : JsonObject;
+        DayNames: JsonArray;
+        Days: List of [Text];
+        Day: Text;
     begin
-        TestField("Client Formatting Culture ID");
+        Formats.Add('NumberFormat', NumberFormat);
+        Formats.Add('DateFormat', DateFormat);
 
-        if not "Culture Info (Serializ.)".HasValue() then begin
-            if not GetLocaleFormatsFromAzureAndCacheThem(Formats) then begin
-                exit(GetDefaultFormats());
+        NumberFormat.Add('NumberGroupSeparator', "Client Thousands Separator");
+        NumberFormat.Add('NumberDecimalSeparator', "Client Decimal Separator");
+        NumberFormat.Add('CurrencySymbol', "Client Currency Symbol");
+        NumberFormat.Add('NumberDecimalDigits', "Client Number Decimal Digits");
+
+        DateFormat.Add('ShortDatePattern', "Client Short Date Pattern");
+        DateFormat.Add('DateSeparator', "Client Date Separator");
+        if "Client Day Names" <> '' then begin
+            Days := "Client Day Names".Split(',');
+            foreach Day in Days do begin
+                DayNames.Add(Day);
             end;
-
-            Modify();
-            exit(Formats);
+            DateFormat.Add('DayNames', DayNames);
         end;
 
-        TempBlob.CreateOutStream(OutStr);
-        Rec."Culture Info (Serializ.)".ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
-        Formats.ReadFrom(InStr);
-        exit(Formats);
+    end;
+
+    procedure GetLocalFormats() Formats: JsonObject;
+    begin
+        SetFormats(GetDefaultFormats());
+        exit(GetClientFormats());
     end;
 
     procedure GetImageContent(var TenantMedia: Record "Tenant Media")
