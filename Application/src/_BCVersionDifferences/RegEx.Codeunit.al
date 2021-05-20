@@ -161,7 +161,7 @@ codeunit 6014569 "NPR RegEx"
         Regex.Regex(Pattern);
 
         Regex.Match(Input, Match);
-        while Match.Success do begin
+        while Match.Success() do begin
             ReplaceString := '';
             RandomQty := 1;
             Match.Groups(GroupCollection);
@@ -250,7 +250,7 @@ codeunit 6014569 "NPR RegEx"
 #if BC17
         RegEx.Regex('(\*\|)(.*?)(\|\*)');
         RegEx.Match(CodeString, Match);
-        while Match.Success do begin
+        while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i;
             TempVariable."Variable Name" := Match.Value();
@@ -265,7 +265,7 @@ codeunit 6014569 "NPR RegEx"
         RegEx.Regex('({{)(.*?)(}})');
         RegEx.Match(CodeString, Match);
         i := 0;
-        while Match.Success do begin
+        while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i + OffSet;
             TempVariable."Variable Name" := Match.Value();
@@ -379,10 +379,10 @@ codeunit 6014569 "NPR RegEx"
         if not RecRef.FieldExist(FieldNumber) then
             exit(FieldNoText);
         FldRef := RecRef.Field(FieldNumber);
-        if UpperCase(Format(FldRef.Class)) = 'FLOWFIELD' then
-            FldRef.CalcField;
+        if FldRef.Class = FieldClass::FlowField then
+            FldRef.CalcField();
 
-        if UpperCase(Format(Format(FldRef.Type))) = 'OPTION' then begin
+        if FldRef.Type = FieldType::Option then begin
             OptionString := Format(FldRef.OptionCaption);
             Evaluate(OptionNo, Format(FldRef.Value, 0, 9));
             exit(SelectStr(OptionNo + 1, OptionString));
@@ -411,7 +411,7 @@ codeunit 6014569 "NPR RegEx"
 #if BC17
         RegEx.Regex('data\:image/(.*?);base64,(.*)');
         RegEx.Match(DataUri, Match);
-        if Match.Success then begin
+        if Match.Success() then begin
             Match.Groups(Groups);
             Groups.Item(1, Group1);
             Groups.Item(2, Group2);
@@ -419,9 +419,9 @@ codeunit 6014569 "NPR RegEx"
             TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
             TempMagentoPicture.Name := PictureName;
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
-            TempMagentoPicture."Mime Type" := Group1.Value;
+            TempMagentoPicture."Mime Type" := Group1.Value();
             TempMagentoPicture.Image.ExportStream(OutStr);
-            Convert.FromBase64(Group2.Value, OutStr);
+            Convert.FromBase64(Group2.Value(), OutStr);
             TempMagentoPicture.Insert();
         end;
 #else
