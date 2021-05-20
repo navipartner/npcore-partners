@@ -384,39 +384,19 @@
 
     procedure SaveTempPicture()
     var
-        RegEx: Codeunit DotNet_Regex;
-        Match: Codeunit DotNet_Match;
-        Groups: Codeunit DotNet_GroupCollection;
-        Group1: Codeunit DotNet_Group;
-        Group2: Codeunit DotNet_Group;
         Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
         InStr: InStream;
         DataUri: Text;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
         if not Initialized then
             exit;
 
         DataUri := PictureDataUri;
+        NpRegEx.ExtractMagentoPicture(DataUri, PictureName, PictureSize, PictureType, TempMagentoPicture);
         PictureDataUri := '';
-        RegEx.Regex('data\:image/(.*?);base64,(.*)');
-        RegEx.Match(DataUri, Match);
-        if Match.Success() then begin
-            Match.Groups(Groups);
-            Groups.Item(1, Group1);
-            Groups.Item(2, Group2);
-            TempMagentoPicture.Init();
-            TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
-            TempMagentoPicture.Name := PictureName;
-            TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
-            TempMagentoPicture."Mime Type" := Group1.Value();
-            TempBlob.CreateOutStream(OutStr);
-            Convert.FromBase64(Group2.Value(), OutStr);
-            TempBlob.CreateInStream(InStr);
-            TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
-            TempMagentoPicture.Insert();
-        end;
         PictureName := '';
     end;
 
