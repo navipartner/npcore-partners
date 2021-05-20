@@ -22,11 +22,6 @@ page 6014655 "NPR POS View Profiles Step"
                         CheckIfNoAvailableInPOSViewProfile(ExistingViewProfiles, Rec.Code);
                     end;
                 }
-                field("Client Formatting Culture ID"; Rec."Client Formatting Culture ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Client Formatting Culture ID field';
-                }
                 field("Client Decimal Separator"; Rec."Client Decimal Separator")
                 {
                     ApplicationArea = All;

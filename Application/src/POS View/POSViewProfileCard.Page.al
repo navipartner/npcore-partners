@@ -76,25 +76,42 @@ page 6150636 "NPR POS View Profile Card"
             }
             group("Number and Date Formatting")
             {
-                field("Client Formatting Culture ID"; Rec."Client Formatting Culture ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Client Formatting Culture ID field';
-                }
+                Caption = 'Name and Date Formatting';
                 field("Client Decimal Separator"; Rec."Client Decimal Separator")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Client Decimal Separator field';
+                    ToolTip = 'Specifies decimal separator (e.g. 1234,10 or 1234.10)';
                 }
                 field("Client Thousands Separator"; Rec."Client Thousands Separator")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Client Thousands Separator field';
+                    ToolTip = 'Specifies decimal separator (e.g. 1.234,10 or 1,234.10)';
+                }
+                field("Client Number Decimal Digits"; Rec."Client Number Decimal Digits")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies number of decimal places. Enter an integer value (e.g. 2 digits = 1.234,10; 5 digits = 1.234,43210)';
+                    BlankZero = true;
+                }
+                field("Client Currency Symbol"; Rec."Client Currency Symbol")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies currency symbol (e.g. kr. or $)';
+                }
+                field("Client Short Date Pattern"; Rec."Client Short Date Pattern")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies short date pattern. Insert value in form dd-MM-yyyy or M/d/yyyy';
                 }
                 field("Client Date Separator"; Rec."Client Date Separator")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Client Date Separator field';
+                    ToolTip = 'Specifies date separator. Value inserted here depends on the value set in the field "Client Short Date Pattern". Insert value - or / or . as a date separator.';
+                }
+                field("Client Day Names"; Rec."Client Day Names")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies name of days in the week. Separate each value with comma (e.g. søndag,mandag,tirsdag,onsdag,torsdag,fredag,lørdag or Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)';
                 }
             }
         }
@@ -107,20 +124,20 @@ page 6150636 "NPR POS View Profile Card"
             group(Functions)
             {
                 Caption = 'Functions';
-                action(DetectSeparators)
+                action(SetDefaultNumberAndFormats)
                 {
-                    Caption = 'Detect Decimal and Thousands Separators';
+                    Caption = 'Set Default Formats';
                     Image = SuggestNumber;
                     ApplicationArea = All;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Detect Decimal and Thousands Separators action';
+                    ToolTip = 'If any value under the group "Name and Date Formatting" is not defined, this action will set default values in empty fields.';
 
                     trigger OnAction()
                     begin
-                        Rec.DetectDecimalThousandsSeparator();
+                        Rec.SetFormats(Rec.GetDefaultFormats());
                         CurrPage.Update(true);
                     end;
                 }
