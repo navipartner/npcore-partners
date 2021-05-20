@@ -815,6 +815,7 @@
         Voucher2: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
+        NpRegex: Codeunit "NPR RegEx";
     begin
         VoucherType.Get(Voucher."Voucher Type");
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::Pattern then
@@ -822,9 +823,9 @@
 
         for i := 1 to 100 do begin
             ReferenceNo := VoucherType."Reference No. Pattern";
-            ReferenceNo := RegExReplaceN(ReferenceNo);
-            ReferenceNo := RegExReplaceAN(ReferenceNo);
-            ReferenceNo := RegExReplaceS(ReferenceNo, Voucher."No.");
+            ReferenceNo := NpRegex.RegExReplaceN(ReferenceNo);
+            ReferenceNo := NpRegex.RegExReplaceAN(ReferenceNo);
+            ReferenceNo := NpRegex.RegExReplaceS(ReferenceNo, Voucher."No.");
             ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Voucher."Reference No.")));
 
             Voucher2.SetFilter("No.", '<>%1', Voucher."No.");
@@ -845,6 +846,7 @@
         VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
         CheckSum: Integer;
+        NpRegex: Codeunit "NPR RegEx";
     begin
         VoucherType.Get(Voucher."Voucher Type");
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::EAN13 then
@@ -852,9 +854,9 @@
 
         for i := 1 to 100 do begin
             ReferenceNo := VoucherType."Reference No. Pattern";
-            ReferenceNo := RegExReplaceN(ReferenceNo);
-            ReferenceNo := RegExReplaceAN(ReferenceNo);
-            ReferenceNo := RegExReplaceS(ReferenceNo, Voucher."No.");
+            ReferenceNo := NpRegex.RegExReplaceN(ReferenceNo);
+            ReferenceNo := NpRegex.RegExReplaceAN(ReferenceNo);
+            ReferenceNo := NpRegex.RegExReplaceS(ReferenceNo, Voucher."No.");
             ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Voucher."Reference No.")));
             if StrLen(ReferenceNo) < 12 then
                 ReferenceNo := CopyStr(ReferenceNo, 1, 2) + PadStr('', 12 - StrLen(ReferenceNo), '0') + CopyStr(ReferenceNo, 3);
@@ -880,98 +882,6 @@
     local procedure TryGetCheckSum(ReferenceNo: Text; var CheckSum: Integer)
     begin
         CheckSum := StrCheckSum(ReferenceNo, '131313131313');
-    end;
-
-    local procedure RegExReplaceAN(Input: Text) Output: Text
-    var
-        Match: Codeunit DotNet_Match;
-        Regex: Codeunit DotNet_Regex;
-        GroupCollection: Codeunit DotNet_GroupCollection;
-        DotNetGroup: Codeunit DotNet_Group;
-        Pattern: Text;
-        ReplaceString: Text;
-        RandomQty: Integer;
-        i: Integer;
-    begin
-        Pattern := '(?<RandomStart>\[AN\*?)' +
-                   '(?<RandomQty>\d?)' +
-                   '(?<RandomEnd>\])';
-        Regex.Regex(Pattern);
-
-        Regex.Match(Input, Match);
-        while Match.Success() do begin
-            ReplaceString := '';
-            RandomQty := 1;
-            Match.Groups(GroupCollection);
-            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
-            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
-            for i := 1 to RandomQty do
-                ReplaceString += Format(GenerateRandomChar());
-            Input := Regex.Replace(Input, ReplaceString, 1);
-
-            Regex.Match(Input, Match);
-        end;
-
-        Output := Input;
-        exit(Output);
-    end;
-
-    local procedure RegExReplaceN(Input: Text) Output: Text
-    var
-        Match: Codeunit DotNet_Match;
-        Regex: Codeunit DotNet_Regex;
-        GroupCollection: Codeunit DotNet_GroupCollection;
-        DotNetGroup: Codeunit DotNet_Group;
-        Pattern: Text;
-        ReplaceString: Text;
-        RandomQty: Integer;
-        i: Integer;
-    begin
-        Pattern := '(?<RandomStart>\[N\*?)' +
-                   '(?<RandomQty>\d?)' +
-                   '(?<RandomEnd>\])';
-        Regex.Regex(Pattern);
-
-        Regex.Match(Input, Match);
-        while Match.Success() do begin
-            ReplaceString := '';
-            RandomQty := 1;
-            Match.Groups(GroupCollection);
-            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
-            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
-            for i := 1 to RandomQty do
-                ReplaceString += Format(Random(9));
-            Input := Regex.Replace(Input, ReplaceString, 1);
-
-            Regex.Match(Input, Match);
-        end;
-
-        Output := Input;
-        exit(Output);
-    end;
-
-    local procedure RegExReplaceS(Input: Text; SerialNo: Text) Output: Text
-    begin
-        Output := Input.Replace('[S]', SerialNo);
-    end;
-
-    local procedure GenerateRandomChar() RandomChar: Char
-    var
-        RandomInt: Integer;
-        RandomText: Text[1];
-    begin
-        RandomInt := Random(9999);
-
-        if Random(35) < 10 then begin
-            RandomText := Format(RandomInt mod 10);
-            RandomChar := RandomText[1];
-            exit(RandomChar);
-        end;
-
-        RandomChar := (RandomInt mod 25) + 65;
-        RandomText := UpperCase(Format(RandomChar));
-        RandomChar := RandomText[1];
-        exit(RandomChar);
     end;
 
     procedure ArchiveRetailVoucher(var RetailVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)

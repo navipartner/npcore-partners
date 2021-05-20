@@ -62,14 +62,12 @@ table 6184510 "NPR EFT BIN Range"
     [TryFunction]
     local procedure TryParseBIN(BINText: Text; var BINOut: BigInteger)
     var
-        DotNet_Regex: Codeunit DotNet_Regex;
-        DotNet_Match: Codeunit DotNet_Match;
+        NpRegEx: Codeunit "NPR RegEx";
+        MatchValue: Text;
     begin
-        DotNet_Regex.Regex('^\d*');
-        DotNet_Regex.Match(BINText, DotNet_Match);
-        if not DotNet_Match.Success() then
+        if not NpRegEx.GetSingleMatchValue(BINText, '^\d*', MatchValue) then
             Error('');
-        Evaluate(BINOut, DotNet_Match.Value());
+        Evaluate(BINOut, MatchValue);
     end;
 }
 

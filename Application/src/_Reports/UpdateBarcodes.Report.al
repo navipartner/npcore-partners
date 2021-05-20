@@ -60,9 +60,9 @@ report 6014601 "NPR Update Barcodes"
 
     local procedure CheckBarcodeValidEAN13(barcode: Code[50]): Boolean
     var
-        RegEx: Codeunit DotNet_Regex;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
-        if (StrLen(barcode) <> 13) or (not RegEx.IsMatch(barcode, '^[0-9]+$')) then
+        if (StrLen(barcode) <> 13) or (not NpRegEx.IsMatch(barcode, '^[0-9]+$')) then
             exit(false)
         else
             exit(not (StrCheckSum(barcode, '1313131313131') <> 0))
@@ -70,9 +70,9 @@ report 6014601 "NPR Update Barcodes"
 
     local procedure CheckBarcodeValidEAN8(barcode: Code[50]): Boolean
     var
-        RegEx: Codeunit DotNet_Regex;
+        NpRegEx: Codeunit "NPR RegEx";
     begin
-        if (StrLen(barcode) <> 8) or (not RegEx.IsMatch(barcode, '^[0-9]+$')) then
+        if (StrLen(barcode) <> 8) or (not NpRegEx.IsMatch(barcode, '^[0-9]+$')) then
             exit(false)
         else
             exit(not (StrCheckSum(barcode, '3131313') <> 0))

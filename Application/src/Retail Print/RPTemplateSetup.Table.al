@@ -24,9 +24,9 @@ table 6014565 "NPR RP Template Setup"
 
             trigger OnValidate()
             var
-                RegEx: Codeunit DotNet_Regex;
+                NpRegEx: Codeunit "NPR RegEx";
             begin
-                if not RegEx.IsMatch("Version Prefix", '^[a-zA-Z]+$') then
+                if not NpRegEx.IsMatch("Version Prefix", '^[a-zA-Z]+$') then
                     Error(Err_InvalidPrefix);
             end;
         }
