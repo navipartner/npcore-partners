@@ -31,20 +31,19 @@ page 6151241 "NPR Retail Manager Role Center"
                 ApplicationArea = All;
                 Visible = false;
             }
-
-            part("MyReports"; "NPR My Reports")
+            part(Control21; "Report Inbox Part")
             {
-                ApplicationArea = All;
+                AccessByPermission = TableData "Report Inbox" = R;
+                ApplicationArea = Suite;
             }
             part(MyjobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
                 ApplicationArea = All;
             }
-            part(Control21; "Report Inbox Part")
+            part("MyReports"; "NPR My Reports")
             {
-                AccessByPermission = TableData "Report Inbox" = R;
-                ApplicationArea = Suite;
+                ApplicationArea = All;
             }
         }
     }
