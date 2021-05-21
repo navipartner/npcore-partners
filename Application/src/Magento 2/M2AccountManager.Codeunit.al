@@ -37,6 +37,7 @@
         TmpGlobalOneTimePassword: Record "NPR M2 One Time Password" temporary;
         TmpGlobsalShiptoAddressRequest: Record "Ship-to Address" temporary;
         TmpGlobalShiptoAddressResponse: Record "Ship-to Address" temporary;
+        CONFIRM_GLOBAL_RESET_PASSWORD: Label 'Are you sure that you want to send an email to %1 Magento contacts?';
 
     procedure SetFunction(FunctionIn: Option)
     begin
@@ -191,6 +192,59 @@
         Contact := Rec;
         if not (ResetMagentoPassword(Contact, ReasonText)) then
             Error(ReasonText);
+    end;
+
+    procedure ShowMagentoContacts()
+    var
+        Customer: Record Customer;
+        Contact: Record Contact;
+        ContactBusinessRelation: Record "Contact Business Relation";
+        tmpMagentoContactBuffer: Record "NPR M2 Contact Buffer" temporary;
+    begin
+        // Filter requirements
+        Contact.SetFilter("NPR Magento Contact", '%1', true);
+        Customer.SetFilter("NPR Magento Store Code", '<>%1', '');
+        ContactBusinessRelation.SetFilter("Link to Table", '%1', ContactBusinessRelation."Link to Table"::Customer);
+
+        if Contact.FindSet() then
+            repeat
+                ContactBusinessRelation.SetFilter("Contact No.", '%1', Contact."No.");
+                if ContactBusinessRelation.FindFirst() then begin
+                    Customer.SetFilter("No.", '%1', ContactBusinessRelation."No.");
+                    if Customer.FindFirst() then begin
+                        tmpMagentoContactBuffer."Entry No." += 1;
+                        tmpMagentoContactBuffer."Customer No." := Customer."No.";
+                        tmpMagentoContactBuffer."Customer Name" := Customer.Name;
+                        tmpMagentoContactBuffer."Contact No." := Contact."No.";
+                        tmpMagentoContactBuffer."Contact Name" := Contact.Name;
+                        tmpMagentoContactBuffer."Contact Email" := Contact."E-Mail";
+                        tmpMagentoContactBuffer."Magento Contact" := Contact."NPR Magento Contact";
+                        tmpMagentoContactBuffer."Magento Store Code" := Customer."NPR Magento Store Code";
+                        tmpMagentoContactBuffer.Insert();
+                    end;
+                end;
+            until Contact.Next() = 0;
+
+        // Design choice, in case that we need to run reset password again
+        tmpMagentoContactBuffer.SetFilter("Password Reset", '%1', false);
+
+        Page.Run(Page::"NPR M2 Contact List", tmpMagentoContactBuffer);
+    end;
+
+    procedure ResetPasswordAllMagentoContacts(var MagentoContactBuffer: Record "NPR M2 Contact Buffer")
+    begin
+        if Dialog.Confirm(CONFIRM_GLOBAL_RESET_PASSWORD, false, MagentoContactBuffer.Count) then begin
+            if MagentoContactBuffer.FindSet() then
+                repeat
+                    if TryResetPassword(MagentoContactBuffer."Contact Email") then begin
+                        MagentoContactBuffer."Password Reset" := true;
+                        MagentoContactBuffer."Error Message" := '';
+                    end else begin
+                        MagentoContactBuffer."Error Message" := CopyStr(GetLastErrorText(), 1, 250);
+                    end;
+                    MagentoContactBuffer.Modify();
+                until MagentoContactBuffer.Next() = 0;
+        end;
     end;
 
     procedure TransferSetContact(var TmpContact: Record Contact temporary)
