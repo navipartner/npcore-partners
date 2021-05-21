@@ -67,6 +67,8 @@ codeunit 6014629 "NPR Managed Package Builder"
     begin
         TempBlob.CreateOutStream(OutStm);
         OutStm.WriteText(CreateManifest(Name, Version, Description, PrimaryPackageTable));
+        TempBlob.CreateInStream(InStm);
+
         CopyStream(OutStm, InStm);
         FileName := StrSubstNo('%1 Package.json', Name);
         DownloadFromStream(InStm, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
