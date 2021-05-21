@@ -46,11 +46,6 @@ page 6151242 "NPR Retail Magento Setup List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Max. Picture Size (kb) field';
                 }
-                field("Generic Setup"; Rec."Generic Setup")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Generic Setup field';
-                }
                 field("Inventory Location Filter"; Rec."Inventory Location Filter")
                 {
                     ApplicationArea = All;

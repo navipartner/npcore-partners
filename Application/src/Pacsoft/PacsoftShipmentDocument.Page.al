@@ -174,12 +174,6 @@ page 6014486 "NPR Pacsoft Shipment Document"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Send Link To Print field';
                 }
-                field("Request XML"; Rec."Request XML")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Document Source field';
-                }
                 field("Request XML Name"; Rec."Request XML Name")
                 {
                     ApplicationArea = All;
