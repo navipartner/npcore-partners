@@ -890,6 +890,24 @@ page 6151401 "NPR Magento Setup"
                     end;
                 }
             }
+            group("Magento Contacts")
+            {
+                Caption = 'Magento Contacts';
+                action("Show All Magento Contacts")
+                {
+                    Caption = 'Show All Magento Contacts';
+                    Image = ListPage;
+                    ApplicationArea = All;
+                    ToolTip = 'Shows a list of all Magento Contacts';
+
+                    trigger OnAction()
+                    var
+                        M2AccountManager: Codeunit "NPR M2 Account Manager";
+                    begin
+                        M2AccountManager.ShowMagentoContacts();
+                    end;
+                }
+            }
         }
         area(navigation)
         {
