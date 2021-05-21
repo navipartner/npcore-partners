@@ -17,9 +17,8 @@ function initializeControlAddIn() {
     iframe.style.flexGrow = '1';
     iframe.style.flexShrink = '1';
     iframe.style.flexBasis = 'auto';
-    //iframe.style.paddingBottom = '42px';
 
-    Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("OnControlReady",[]);
+    Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("OnControlReady", []);
 }
 function SetContent(content) {
     inputText = content;
@@ -35,7 +34,7 @@ function SendContentToNav() {
 };
 
 function InitTinyMce() {
-    
+
     var div = document.getElementById("controlAddIn");
     div.innerHTML = "";
 
@@ -45,27 +44,34 @@ function InitTinyMce() {
 
     div.appendChild(InputArea);
 
-    var init = {    
+    var useDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    var init = {
         selector: '#textarea',
 
-        plugins: [
-            "advlist autolink autosave link lists charmap preview hr anchor pagebreak ",
-            "searchreplace wordcount visualblocks visualchars code nonbreaking",
-            "table contextmenu directionality template paste textcolor colorpicker textpattern autoresize"
-        ],
+        menubar: "file edit view insert format tools table help",
 
-        toolbar1: "bold italic underline strikethrough | formatselect fontsizeselect | bullist numlist",
-        toolbar2: "cut copy paste | searchreplace | undo redo | link unlink | forecolor | outdent indent blockquote | preview",
-        toolbar3: "table | removeformat | subscript superscript | visualchars visualblocks restoredraft | code",
-        toolbar_mode: 'wrap',
-        
+        plugins: "print preview paste searchreplace autolink autosave directionality code visualblocks visualchars fullscreen link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount textpattern noneditable help charmap quickbars emoticons",
+
+        toolbar: "undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile media template link anchor codesample | ltr rtl",
+        toolbar_sticky: true,
+        toolbar_mode: 'sliding',
+
         paste_auto_cleanup_on_paste: true,
         paste_as_text: true,
-        max_height: 500,
-        toolbar_sticky: true,
 
+        quickbars_selection_toolbar: "bold italic | quicklink h2 h3 blockquote quicktable",
+        noneditable_noneditable_class: "mceNonEditable",
+        contextmenu: "link table",
+        skin: useDarkMode ? "oxide-dark" : "oxide",
+        content_css: useDarkMode ? "dark" : "default",
+        content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+
+        resize: "both",
+        statusbar: true,
+        branding: true,
         setup: SetupTinyMce
-        
+
     };
 
     // Apply Customer Settings:
@@ -75,12 +81,12 @@ function InitTinyMce() {
 
     tmce.init(init);
 
-    Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("OnAfterInit",[]);
+    Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("OnAfterInit", []);
 
 };
 
 function SetupTinyMce(editor) {
-    editor.on("init", function () {      
+    editor.on("init", function () {
         editor.setContent(inputText);
     });
 };
