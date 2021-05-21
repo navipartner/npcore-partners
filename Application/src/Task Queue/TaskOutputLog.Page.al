@@ -41,11 +41,6 @@ page 6059911 "NPR Task Output Log"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Journal Line No. field';
                 }
-                field("File"; Rec.File)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the File field';
-                }
                 field("File Name"; Rec."File Name")
                 {
                     ApplicationArea = All;

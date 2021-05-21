@@ -8,6 +8,11 @@
             "justification": "There must be exactly one space character on each side of a binary operator such as := + - AND OR =."
         },
         {
+            "id": "AW0004",
+            "action": "Error",
+            "justification": "A Blob cannot be used as a source expression for a page field."
+        },
+        {
             "id": "AA0005",
             "action":"Hidden",
             "justification": "Only use BEGIN..END to enclose compound statements."

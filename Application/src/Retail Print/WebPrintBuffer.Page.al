@@ -25,11 +25,6 @@ page 6014581 "NPR Web Print Buffer"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Printer ID field';
                 }
-                field("Print Data"; Rec."Print Data")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Print Data field';
-                }
                 field("Time Created"; Rec."Time Created")
                 {
                     ApplicationArea = All;
