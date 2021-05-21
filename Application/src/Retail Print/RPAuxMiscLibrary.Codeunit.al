@@ -143,19 +143,23 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
 
     procedure IntToHex(BigInt: BigInteger): Text
     var
-        IntPtr: DotNet NPRNetIntPtr;
+        TypeHelper: Codeunit "Type Helper";
     begin
-        IntPtr := IntPtr.IntPtr(BigInt);
-        exit(IntPtr.ToString('X'));
+        exit(TypeHelper.IntToHex(BigInt));
     end;
 
     procedure StringToHex(Text: Text): Text
     var
-        Encoding: DotNet NPRNetEncoding;
-        BitConverter: DotNet NPRNetBitConverter;
-        Regex: DotNet NPRNetRegex;
+        TypeHelper: Codeunit "Type Helper";
+        TmpInt: Integer;
+        ResultText: Text;
+        i: Integer;
     begin
-        exit(Regex.Replace(BitConverter.ToString(Encoding.Unicode.GetBytes(Text)), '-', ''));
+        for i := 1 to StrLen(Text) do begin
+            TmpInt := Text[i];
+            ResultText += TypeHelper.IntToHex(TmpInt).PadRight(4, '0');
+        end;
+        exit(ResultText);
     end;
 
     procedure MultiplicativeInverseEncode(plain: Integer) encoded: BigInteger
