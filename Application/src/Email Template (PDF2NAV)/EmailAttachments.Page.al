@@ -23,11 +23,6 @@ page 6059797 "NPR E-mail Attachments"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Attached File"; Rec."Attached File")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Attached data field';
-                }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
