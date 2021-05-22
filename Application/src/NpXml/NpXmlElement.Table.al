@@ -414,6 +414,13 @@ table 6151552 "NPR NpXml Element"
                     Error(ErrorText, "Round Direction");
             end;
         }
+        field(5237; "No of Chars (Trunc. to Length)"; Integer)
+        {
+            Caption = 'No of Chars (Trunc. to Length)';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+            BlankZero = true;
+        }
         field(5240; "Lower Case"; Boolean)
         {
             Caption = 'Lower Case';
