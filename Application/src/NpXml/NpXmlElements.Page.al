@@ -176,6 +176,12 @@
                     ApplicationArea = All;
                     ToolTip = 'Specifies rounding direction for number values. There are three options: ''<'' (rounds down), ''>'' (rounds up) and ''='' (rounds up or down to the nearest value (default). Values of 5 or greater are rounded up. Values less than 5 are rounded down)';
                 }
+                field("No of Chars (Trunc. to Length)"; Rec."No of Chars (Trunc. to Length)")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the length of field. Enter number of characters on which the value will be truncated.';
+                }
+
                 field("Lower Case"; Rec."Lower Case")
                 {
                     ApplicationArea = All;

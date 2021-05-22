@@ -80,6 +80,9 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         if (NpXmlElement.Prefix <> '') then
             XmlValue := NpXmlElement.Prefix + XmlValue;
 
+        if NpXmlElement."No of Chars (Trunc. to Length)" > 0 then
+            XmlValue := CopyStr(XmlValue, 1, NpXmlElement."No of Chars (Trunc. to Length)");
+
         exit(XmlValue);
     end;
 
@@ -183,6 +186,8 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                 Value := Format(DecimalValue, 0, 9)
             end;
         end;
+        if NPXmlElement."No of Chars (Trunc. to Length)" > 0 then
+            Value := CopyStr(Value, 1, NpXmlElement."No of Chars (Trunc. to Length)");
         exit(Value);
     end;
 
