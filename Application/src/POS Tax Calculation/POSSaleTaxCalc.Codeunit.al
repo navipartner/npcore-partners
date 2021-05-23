@@ -94,10 +94,7 @@ codeunit 6014630 "NPR POS Sale Tax Calc."
         if IsNullGuid(Rec.SystemId) then
             exit;
 
-        if not (Rec."Sale Type" in [Rec."Sale Type"::Sale, Rec."Sale Type"::Deposit]) then
-            exit;
-
-        if Rec.Type = Rec.Type::"G/L Entry" then
+        if not (Rec."Sale Type" in [Rec."Sale Type"::Sale, Rec."Sale Type"::Deposit, Rec."Sale Type"::"Debit Sale"]) then
             exit;
 
         if CurrencyFactor = 0 then

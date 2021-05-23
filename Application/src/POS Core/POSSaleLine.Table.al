@@ -144,10 +144,18 @@ table 6014406 "NPR POS Sale Line"
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                GetItem();
-                "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
-                "Quantity (Base)" := CalcBaseQty(Quantity);
-                "Unit Price" := FindItemSalesPrice();
+                case Type of
+                    Type::"G/L Entry":
+                        begin
+                            "Qty. per Unit of Measure" := 1;
+                        end;
+                    else begin
+                            GetItem();
+                            "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
+                            "Quantity (Base)" := CalcBaseQty(Quantity);
+                            "Unit Price" := FindItemSalesPrice();
+                        end;
+                end;
                 UpdateAmounts(Rec);
             end;
         }
@@ -2034,6 +2042,14 @@ table 6014406 "NPR POS Sale Line"
                         "Gen. Prod. Posting Group" := '';
                         "VAT Bus. Posting Group" := '';
                         "VAT Prod. Posting Group" := '';
+                    end;
+                else begin
+                        VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                        "VAT Identifier" := VATPostingSetup."VAT Identifier";
+                        "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+
+                        POSSaleTaxCalc.UpdateSourceTaxSetup(Rec, VATPostingSetup, SalePOS, 0);
                     end;
             end;
         end else begin

@@ -21,6 +21,7 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         SaleLinePOS.Get(SaleLinePOSVoucher."Register No.", SaleLinePOSVoucher."Sales Ticket No.", SaleLinePOSVoucher."Sale Date", SaleLinePOSVoucher."Sale Type", SaleLinePOSVoucher."Sale Line No.");
         SaleLinePOS."Amount Including VAT" += Subtotal;
         SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
+
         SaleLinePOS.Modify();
 
         if SaleLinePOS."Amount Including VAT" < 0 then
