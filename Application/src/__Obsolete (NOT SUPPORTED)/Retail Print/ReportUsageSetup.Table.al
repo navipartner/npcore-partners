@@ -4,6 +4,8 @@ table 6014481 "NPR Report Usage Setup"
 
     Caption = 'Report Usage Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used anymore';
 
     fields
     {
@@ -16,11 +18,6 @@ table 6014481 "NPR Report Usage Setup"
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                ReportUsageMgt.EnableDisableSetup(Enabled);
-            end;
         }
     }
 
@@ -35,7 +32,5 @@ table 6014481 "NPR Report Usage Setup"
     {
     }
 
-    var
-        ReportUsageMgt: Codeunit "NPR Report Usage Mgt.";
 }
 
