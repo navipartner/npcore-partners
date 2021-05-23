@@ -4,6 +4,8 @@ table 6014482 "NPR Report Usage Log Entry"
 
     Caption = 'Report Usage Log Entry';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used anymore';
 
     fields
     {
