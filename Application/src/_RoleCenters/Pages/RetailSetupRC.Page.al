@@ -600,6 +600,13 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the No. Series action';
                 }
+                action("NPR Attributes")
+                {
+                    Caption = 'Client Attributes';
+                    RunObject = Page "NPR Attributes";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Client Attributes action';
+                }
             }
             group("Posting Setup")
             {
