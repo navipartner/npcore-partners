@@ -247,6 +247,14 @@ page 6014425 "NPR Magento Store Items Card"
                         ToolTip = 'Specifies the value of the Display Only Enabled field';
                     }
                 }
+                grid(DisplayOnlyTextGrid)
+                {
+                    field("Display Only Text"; "Display Only Text")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Display Only Text field';
+                    }
+                }
                 grid(SeoLinkGrid)
                 {
                     field("Seo Link"; Rec."Seo Link")
