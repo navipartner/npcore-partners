@@ -25,7 +25,13 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         //run upgrade code only for NpCode 17.6 and above
         NavApp.GetCurrentModuleInfo(ModInfo);
         CurrVer := ModInfo.AppVersion;
-        if CurrVer.Major < 6 then
+        // <Summary>
+        //Do upgrade only if major version is lower then 6
+        //<major>.<minor>.<build>.<revision>
+        //1700.5.4.10000 -> 1700.6.0.1 => Skip upgrade
+        //5.60.0.9 -> 1700.6.0.1 => Don't skip upgrade
+        // </Summary>
+        if CurrVer.Major > 6 then
             exit;
 
         POSEntry.SetFilter("Entry Type", '<>%1', POSEntry."Entry Type"::Balancing);
