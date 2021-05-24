@@ -91,6 +91,11 @@ table 6151420 "NPR Magento Store Item"
             Caption = 'Display Only Enabled';
             DataClassification = CustomerContent;
         }
+        field(150; "Display Only Text"; Text[250])
+        {
+            Caption = 'Display Only Text';
+            DataClassification = CustomerContent;
+        }
         field(200; "Unit Price"; Decimal)
         {
             AutoFormatType = 2;
@@ -284,6 +289,9 @@ table 6151420 "NPR Magento Store Item"
 
         if "Display Only Enabled" then
             EnabledFieldsCaption += ',' + FieldCaption("Display Only");
+
+        if "Display Only Enabled" then
+            EnabledFieldsCaption += ',' + FieldCaption("Display Only Text");
 
         if "Seo Link Enabled" then
             EnabledFieldsCaption += ',' + FieldCaption("Seo Link");
