@@ -37,6 +37,7 @@ page 6151249 "NPR Entertainment RC"
             }
             part(MyJobQueue; "My Job Queue")
             {
+                Caption = 'Job Queue';
                 ApplicationArea = All;
             }
             part(MyReports; "NPR My Reports")
