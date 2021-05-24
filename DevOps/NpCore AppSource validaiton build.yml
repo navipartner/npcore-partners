@@ -12,7 +12,7 @@ resources:
   - repository: scriptsRepo
     type: git
     name: 'NpCore/NpDevOps'
-    ref: 'refs/heads/topic/User-Story-4213--Run---ALvalidation-the-new-function-to-validate-your-app-for-app-store'
+    ref: 'refs/heads/releases/1.0'
 
 pool:
   name: NP Core Pipelines
