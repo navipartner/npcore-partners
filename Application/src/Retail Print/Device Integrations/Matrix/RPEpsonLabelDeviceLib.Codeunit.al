@@ -204,6 +204,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
 
     procedure PrintBarcode(BarcodeType: Text[30]; Width: Integer; Height: Integer; Align: Integer; Rotation: Integer; X: Integer; Y: Integer; Text: Text[30])
     var
+        TypeHelper: Codeunit "Type Helper";
         BarcodeId: Char;
         highY: Integer;
         lowY: Integer;
@@ -214,8 +215,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AreaHeight: Integer;
         highP: Integer;
         lowP: Integer;
-        BitConverter: DotNet NPRNetBitConverter;
-        ByteArray: DotNet NPRNetArray;
     begin
         case UpperCase(BarcodeType) of
             'UPC-A':
@@ -241,17 +240,14 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         else
             AreaHeight := LabelHeight - 1;
 
-        ByteArray := BitConverter.GetBytes(X);
-        lowX := ByteArray.GetValue(0);
-        highX := ByteArray.GetValue(1);
+        lowX := TypeHelper.BitwiseAnd(X, 255);
+        highX := (X - lowX) / 256;
 
-        ByteArray := BitConverter.GetBytes(Y);
-        lowY := ByteArray.GetValue(0);
-        highY := ByteArray.GetValue(1);
+        lowY := TypeHelper.BitwiseAnd(Y, 255);
+        highY := (Y - lowY) / 256;
 
-        ByteArray := BitConverter.GetBytes(AreaHeight);
-        lowH := ByteArray.GetValue(0);
-        highH := ByteArray.GetValue(1);
+        lowH := TypeHelper.BitwiseAnd(AreaHeight, 255);
+        highH := (AreaHeight - lowH) / 256;
 
         //width is maxed (255 in each) since horizontal limit doesn't affect print
         SetPrintAreaInPageMode(lowX, highX, lowY, highY, 255, 255, lowH, highH);
@@ -261,9 +257,8 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
 
         //Calc low & high byte for print pos
         if Height > 0 then begin
-            ByteArray := BitConverter.GetBytes(Height);
-            lowP := ByteArray.GetValue(0);
-            highP := ByteArray.GetValue(1);
+            lowP := TypeHelper.BitwiseAnd(Height, 255);
+            highP := (Height - lowP) / 256;
             SetRelativeVerticalPrintPos(lowP, highP);
         end;
 
@@ -740,6 +735,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
 
     local procedure Text(Type: Text; Rotation: Integer; X: Integer; Y: Integer; Height: Integer; Bold: Boolean; TextIn: Text)
     var
+        TypeHelper: Codeunit "Type Helper";
         highY: Integer;
         lowY: Integer;
         highX: Integer;
@@ -749,8 +745,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AreaHeight: Integer;
         highP: Integer;
         lowP: Integer;
-        BitConverter: DotNet NPRNetBitConverter;
-        ByteArray: DotNet NPRNetArray;
     begin
         // Align     :   Alignment of text
         // Rotate    :   Orientation,                [0,1,2,3] -> [0º,90º,180º,270º]
@@ -769,17 +763,14 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         else
             AreaHeight := LabelHeight - 1;
 
-        ByteArray := BitConverter.GetBytes(X);
-        lowX := ByteArray.GetValue(0);
-        highX := ByteArray.GetValue(1);
+        lowX := TypeHelper.BitwiseAnd(X, 255);
+        highX := (X - lowX) / 256;
 
-        ByteArray := BitConverter.GetBytes(Y);
-        lowY := ByteArray.GetValue(0);
-        highY := ByteArray.GetValue(1);
+        lowY := TypeHelper.BitwiseAnd(Y, 255);
+        highY := (Y - lowY) / 256;
 
-        ByteArray := BitConverter.GetBytes(AreaHeight);
-        lowH := ByteArray.GetValue(0);
-        highH := ByteArray.GetValue(1);
+        lowH := TypeHelper.BitwiseAnd(AreaHeight, 255);
+        highH := (AreaHeight - lowH) / 256;
 
         //width is maxed (255 in each) since horizontal limit doesn't affect print
         SetPrintAreaInPageMode(lowX, highX, lowY, highY, 255, 255, lowH, highH);
@@ -789,9 +780,8 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         SetFontFace(Type);
 
         if Height > 0 then begin
-            ByteArray := BitConverter.GetBytes(Height);
-            lowP := ByteArray.GetValue(0);
-            highP := ByteArray.GetValue(1);
+            lowP := TypeHelper.BitwiseAnd(Height, 255);
+            highP := (Height - lowP) / 256;
             SetRelativeVerticalPrintPos(lowP, highP);
         end;
 
@@ -991,4 +981,3 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         PrintBuffer += Text;
     end;
 }
-
