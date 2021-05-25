@@ -68,7 +68,7 @@ report 6060137 "NPR MM Membership Batch Renew"
                             MemberInfoCapture.DeleteAll();
 
                     repeat
-                        if (DoRenew(ReportMembership, RenewUsingItem, LogMessage)) then begin
+                        if (DoRenew(ReportMembership, LogMessage)) then begin
                             AddToJournal(ReportMembership);
                         end else
                             if (Verbose) then begin
@@ -206,7 +206,7 @@ report 6060137 "NPR MM Membership Batch Renew"
         TypeOfActive: Option ACTIVE,LAST_PERIOD;
         RenewDescription: Text;
 
-    local procedure DoRenew(Membership: Record "NPR MM Membership"; RenewUsingItem: Code[20]; var ReasonText: Text): Boolean
+    local procedure DoRenew(Membership: Record "NPR MM Membership"; var ReasonText: Text): Boolean
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";

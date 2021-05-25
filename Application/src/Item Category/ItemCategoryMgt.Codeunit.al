@@ -178,8 +178,6 @@ codeunit 6014456 "NPR Item Category Mgt."
 
     procedure SetupItemFromCategory(var Item: Record Item; var ItemCategory: Record "Item Category")
     var
-        DefaultDimension: Record "Default Dimension";
-        DefaultDimension2: Record "Default Dimension";
         // TempItem: Record Item temporary;
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";

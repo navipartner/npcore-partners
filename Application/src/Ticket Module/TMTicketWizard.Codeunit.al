@@ -124,10 +124,6 @@
         exit(NoSerieCode);
     end;
 
-    local procedure CreateTicket(TicketWizard: Page "NPR TM Ticket Wizard")
-    begin
-    end;
-
     local procedure CreateTicketType(var TypeCode: Code[10]; TypeDescription: Text[30]; TypeTemplateCode: Code[10])
     var
         TicketSetup: Record "NPR TM Ticket Setup";

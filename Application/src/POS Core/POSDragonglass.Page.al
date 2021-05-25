@@ -28,7 +28,7 @@ page 6150750 "NPR POS (Dragonglass)"
                     if POSSession.IsFinalized() then
                         exit;
                     POSSession.DebugWithTimestamp('Method:' + method);
-                    if not PreHandleMethod(method, eventContext) then
+                    if not PreHandleMethod(method) then
                         JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd, JavaScript);
                 end;
 
@@ -78,7 +78,7 @@ page 6150750 "NPR POS (Dragonglass)"
         POSSession.Destructor();
     end;
 
-    local procedure PreHandleMethod(Method: Text; Context: JsonObject): Boolean
+    local procedure PreHandleMethod(Method: Text): Boolean
     begin
         case Method of
             'KeepAlive':

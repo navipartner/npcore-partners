@@ -109,7 +109,7 @@
 
                 trigger OnAction()
                 begin
-                    TransferContentsToBin(Rec."No.");
+                    TransferContentsToBin();
                 end;
             }
             action("Insert Initial Float")
@@ -136,7 +136,7 @@
     var
         InitialFloatDesc: Label 'Initial Float';
 
-    local procedure TransferContentsToBin(FromBinNo: Code[10])
+    local procedure TransferContentsToBin()
     var
         CheckpointEntryNo: Integer;
         PaymentBinCheckpoint: Codeunit "NPR POS Payment Bin Checkpoint";

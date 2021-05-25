@@ -37,7 +37,6 @@ page 6151307 "NPR MCS Faces Image"
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
                     FileName: Text;
-                    ClientFileName: Text;
                 begin
                     if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then

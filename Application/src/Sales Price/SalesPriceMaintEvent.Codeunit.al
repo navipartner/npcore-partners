@@ -2,7 +2,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
 {
     trigger OnRun()
     begin
-        EventTest(true);
+        EventTest();
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterModifyEvent', '', true, true)]
@@ -56,7 +56,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         end;
     end;
 
-    local procedure EventTest(RuntriggerTest: Boolean)
+    local procedure EventTest()
     var
         Item: Record Item;
     begin

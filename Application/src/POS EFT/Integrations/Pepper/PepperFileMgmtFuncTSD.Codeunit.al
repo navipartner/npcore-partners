@@ -122,7 +122,7 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
         end;
     end;
 
-    local procedure GetFirstChunk(Data: Text; var B64FileChunk: Text)
+    local procedure GetFirstChunk(var B64FileChunk: Text)
     var
         Convert: DotNet NPRNetConvert;
     begin
@@ -139,7 +139,7 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
         end;
     end;
 
-    local procedure GetNextChunk(Data: Text; var B64FileChunk: Text)
+    local procedure GetNextChunk(var B64FileChunk: Text)
     var
         Convert: DotNet NPRNetConvert;
     begin
@@ -210,9 +210,9 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
 
                 end;
             'GetFirstChunk':
-                GetFirstChunk(Data, ReturnData);
+                GetFirstChunk(ReturnData);
             'GetNextChunk':
-                GetNextChunk(Data, ReturnData);
+                GetNextChunk(ReturnData);
 
         end;
     end;

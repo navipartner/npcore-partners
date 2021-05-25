@@ -436,7 +436,7 @@ codeunit 6060136 "NPR MM Member Notification"
         if (MemberNotificationEntry."E-Mail Address" <> '') then begin
             case MemberNotificationEntry."Notification Engine" OF
                 MemberNotificationEntry."Notification Engine"::M2_EMAILER:
-                    ResponseMessage := SendEmailUsingM2Engine(MemberNotificationEntry, MemberNotificationEntry."E-Mail Address");
+                    ResponseMessage := SendEmailUsingM2Engine(MemberNotificationEntry);
                 MemberNotificationEntry."Notification Engine"::NATIVE:
                     ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", true);
             end;
@@ -658,7 +658,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
     end;
 
-    local procedure SendEmailUsingM2Engine(MemberNotificationEntry: Record "NPR MM Member Notific. Entry"; Recipient: Text) ResponseMessage: Text;
+    local procedure SendEmailUsingM2Engine(MemberNotificationEntry: Record "NPR MM Member Notific. Entry") ResponseMessage: Text;
     var
         MemberCommunicationSetup: Record "NPR MM Member Comm. Setup";
         TemplateData: Text;

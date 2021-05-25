@@ -89,7 +89,6 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                     DEFiskalyComm: Codeunit "NPR DE Fiskaly Communication";
                     DocumentJson: JsonObject;
                     ResponseJson: JsonObject;
-                    StrOut: OutStream;
                 begin
                     if Rec."Fiscalization Status" = Rec."Fiscalization Status"::Fiscalized then
                         exit;
@@ -124,7 +123,6 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                     DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
                     DEFiskalyComm: Codeunit "NPR DE Fiskaly Communication";
                     ResponseJson: JsonObject;
-                    StrOut: OutStream;
                     HasData: Label 'This record have data, do you really want to get data from Fiskaly?';
                 begin
                     IF Rec."Time Format" <> '' THEN

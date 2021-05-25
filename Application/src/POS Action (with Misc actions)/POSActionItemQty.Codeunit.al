@@ -65,11 +65,11 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
             'InsertItemQty':
-                OnActionInsertItemQty(JSON, POSSession, FrontEnd);
+                OnActionInsertItemQty(JSON, FrontEnd);
         end;
     end;
 
-    local procedure OnActionInsertItemQty(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionInsertItemQty(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Item: Record Item;
         POSAction: Record "NPR POS Action";

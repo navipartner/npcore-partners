@@ -128,8 +128,6 @@ codeunit 6014480 "NPR NpDc Mod. Val. Item L. M."
     end;
 
     local procedure FindCouponListItems(Coupon: Record "NPR NpDc Coupon"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", Coupon."Coupon Type");

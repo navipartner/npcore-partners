@@ -69,7 +69,7 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
 
-        if not SelectDocument(Context, POSSession, FrontEnd, SalesHeader) then
+        if not SelectDocument(POSSession, SalesHeader) then
             exit;
 
         CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, DeleteDocumentAfterRefund, Send, Pdf2Nav);
@@ -104,7 +104,7 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
         exit(true);
     end;
 
-    local procedure SelectDocument(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var SalesHeader: Record "Sales Header"): Boolean
+    local procedure SelectDocument(POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"): Boolean
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "NPR POS Sale";

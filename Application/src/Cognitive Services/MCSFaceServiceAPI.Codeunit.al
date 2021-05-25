@@ -187,7 +187,6 @@
         RecRef: RecordRef;
         MemberName: Text;
         ImageInStream: InStream;
-        TempBlob: Codeunit "Temp Blob";
     begin
         RecRef.Get(MMMember.RecordId);
 
@@ -697,13 +696,10 @@
 
     procedure FindMember(PersonGroups: Record "NPR MCS Person Groups"; JsonFacesArr: JsonArray; JsonIdArr: JsonArray; PictureStream: InStream) PersonId: Text[50]
     var
-        MCSPerson: Record "NPR MCS Person";
-        MCSFaces: Record "NPR MCS Faces";
         JsonTok: JsonToken;
         JsonObj: JsonObject;
         JsonTokValue: JsonToken;
         FaceId: Text;
-        PersonIdentified: Boolean;
     begin
         foreach JsonTok in JsonFacesArr do begin
             JsonObj := JsonTok.AsObject();

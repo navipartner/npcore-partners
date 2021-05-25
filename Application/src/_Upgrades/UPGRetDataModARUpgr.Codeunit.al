@@ -5,13 +5,9 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
     var
         TmpAuditRollBuffer: Record "NPR Audit Roll" temporary;
         //EstNoOfEntries: Integer;
-        Progress: Integer;
-        NextProgress: Integer;
         NoOfPOSEntriesCreated: Integer;
         StartDateTime: DateTime;
         Counter: Integer;
-        CHECKPOINT_PROGRESS: Label 'Creating checkpoints for: %1 %2\\@1@@@@@@@@';
-        ALL_REGISTERS_MUST_BE_BALANCED: Label 'Not all %1 have %2 %3! Only %1 with %2 %3 will have their balance transfered. Do you want to continue anyway?';
         NOT_ALL_CR_HAVE_POS_UNIT: Label 'All %1 must have a %2 when activating POS Entry posting. %1 %3 is missing its %2.';
 
     trigger OnUpgradePerCompany()
@@ -64,8 +60,6 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         POSLedgerRegister: Record "NPR POS Period Register";
         VATAmountLine: Record "VAT Amount Line" temporary;
         HasOpenPOSLedgerRegister: Boolean;
-        POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
-        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         AuditRoll.SetCurrentKey("Clustered Key");
         AuditRolltoPOSEntryLink.LockTable();
@@ -85,7 +79,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
                    (AuditRoll."Sales Ticket No." <> xAuditRoll."Sales Ticket No.") or
                    ((AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment) and (AuditRoll.Type = AuditRoll.Type::"Open/Close")) then begin
                     if NoOfPOSEntriesCreated > 0 then begin
-                        FinalizePOSEntry(POSEntry, AuditRoll);
+                        FinalizePOSEntry(POSEntry);
                         CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
                         PersistVATAmountLines(POSEntry, VATAmountLine);
                     end;
@@ -155,7 +149,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
             until AuditRoll.Next() = 0;
 
             if NoOfPOSEntriesCreated > 0 then begin
-                FinalizePOSEntry(POSEntry, AuditRoll);
+                FinalizePOSEntry(POSEntry);
                 CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
                 PersistVATAmountLines(POSEntry, VATAmountLine);
             end;
@@ -166,7 +160,6 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
         POSEntry: Record "NPR POS Entry";
-        RunningDuration: Duration;
         PreviousEntryNo: Integer;
     begin
         if Step < 2 then
@@ -436,7 +429,6 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
         CashRegister: Record "NPR Register";
         CashRegPeriod: Record "NPR Period";
-        POSPostingControl: Codeunit "NPR POS Posting Control";
     begin
         with POSBalancingLine do begin
             Init();
@@ -585,7 +577,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         end;
     end;
 
-    local procedure FinalizePOSEntry(var POSEntry: Record "NPR POS Entry"; var AuditRoll: Record "NPR Audit Roll")
+    local procedure FinalizePOSEntry(var POSEntry: Record "NPR POS Entry")
     begin
         if POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Unposted then
             POSEntry."Post Item Entry Status" := POSEntry."Post Entry Status";
@@ -645,12 +637,7 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
     procedure CalcVATAmountLines(POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line" temporary;
         POSSalesLine: Record "NPR POS Entry Sales Line")
     var
-        PrevVatAmountLine: Record "VAT Amount Line";
-        Currency: Record Currency;
         POSEntry: Record "NPR POS Entry";
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
-        QtyToHandle: Decimal;
-        RoundingLineInserted: Boolean;
     begin
         POSEntry := POSEntryIn;
         VATAmountLine.DeleteAll();
@@ -746,10 +733,9 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         CashRegister.ModifyAll(Status, CashRegister.Status::Ekspedition);
     end;
 
-    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]; Description: Text[80]) EntryNo: Integer
+    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]; Description: Text[80]): Integer
     var
         POSEntry: Record "NPR POS Entry";
-        POSPeriodRegister: Record "NPR POS Period Register";
     begin
         POSEntry.Init();
         POSEntry."Entry No." := 0;

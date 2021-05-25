@@ -19,8 +19,6 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    var
-        itemTrackingCode: Text;
     begin
         if Sender.DiscoverAction(
           ActionCode(),
@@ -75,9 +73,6 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        ControlId: Text;
-        Value: Text;
-        DoNotClearTextBox: Boolean;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -87,11 +82,11 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
             'save_as_quote':
-                OnActionSaveAsQuote(JSON, POSSession, FrontEnd);
+                OnActionSaveAsQuote(JSON, POSSession);
         end;
     end;
 
-    local procedure OnActionSaveAsQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionSaveAsQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         RPTemplateHeader: Record "NPR RP Template Header";
@@ -165,7 +160,6 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
     local procedure InsertPOSQuoteEntry(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
     var
         POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDoc: XmlDocument;
         OutStr: OutStream;
     begin

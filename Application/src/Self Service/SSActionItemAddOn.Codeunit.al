@@ -4,7 +4,6 @@
     var
         ActionDescription: Label 'This built in function sets the item addon values';
         CommentCaption: Label 'Comment';
-        PopupTitle: Label 'Select your options...';
 
     local procedure ActionCode(): Text
     begin
@@ -96,7 +95,7 @@
         Value: Text;
     begin
 
-        JsonString := StrSubstNo('{"caption":"%1","title":"%2","settings":[', FormatJson(ItemAddOn.Description), FormatJson(PopupTitle));
+        JsonString := StrSubstNo('{"caption":"%1","title":"%2","settings":[', FormatJson(), FormatJson());
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if (ItemAddOnLine.FindSet()) then begin
@@ -109,16 +108,16 @@
 
                     CommentText := '';
                     if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then
-                        Append(JsonString, StrSubstNo('{"caption":"%1", "type":"group", "expanded":%2, "settings":[', FormatJson(ItemAddOnLine."Description 2"), 'true'));
+                        Append(JsonString, StrSubstNo('{"caption":"%1", "type":"group", "expanded":%2, "settings":[', FormatJson(), 'true'));
 
                     Quantity := SaleLinePOS.Quantity;
                     if (Quantity = 0) then
                         Quantity := ItemAddOnLine.Quantity;
                     case (ItemAddOnLine."Fixed Quantity") of
                         false:
-                            Append(JsonString, StrSubstNo('{"type":"plusminus","id":"%1","caption":"%2","value":%3}', ItemAddOnLine."Line No.", FormatJson(ItemAddOnLine.Description), Quantity));
+                            Append(JsonString, StrSubstNo('{"type":"plusminus","id":"%1","caption":"%2","value":%3}', ItemAddOnLine."Line No.", FormatJson(), Quantity));
                         true:
-                            Append(JsonString, StrSubstNo('{"type":"switch","id":"%1","caption":"%2","value":%3}', ItemAddOnLine."Line No.", FormatJson(ItemAddOnLine.Description), 'false'));
+                            Append(JsonString, StrSubstNo('{"type":"switch","id":"%1","caption":"%2","value":%3}', ItemAddOnLine."Line No.", FormatJson(), 'false'));
                     end;
 
                     if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then begin
@@ -135,16 +134,16 @@
                     if (ItemAddOnLineOption.FindSet()) then begin
                         CommentText := '';
                         if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then
-                            Append(JsonString, StrSubstNo('{"caption":"%1", "type":"group", "expanded":%2, "settings":[', FormatJson(ItemAddOnLine."Description 2"), 'true'));
+                            Append(JsonString, StrSubstNo('{"caption":"%1", "type":"group", "expanded":%2, "settings":[', FormatJson(), 'true'));
 
-                        Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(SaleLinePOS."No."), FormatJson(SaleLinePOS."Variant Code"));
+                        Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(), FormatJson());
                         if ((SaleLinePOS."No." = '') and (SaleLinePOS."Variant Code" = '')) then
-                            Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(ItemAddOnLineOption."Item No."), FormatJson(ItemAddOnLineOption."Variant Code"));
-                        Append(JsonString, StrSubstNo('{"type":"radio", "id":"%1", "caption":"%2", "value":"%3", "options":[', ItemAddOnLine."Line No.", FormatJson(ItemAddOnLine.Description), Value));
+                            Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(), FormatJson());
+                        Append(JsonString, StrSubstNo('{"type":"radio", "id":"%1", "caption":"%2", "value":"%3", "options":[', ItemAddOnLine."Line No.", FormatJson(), Value));
 
                         repeat
-                            Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(ItemAddOnLineOption."Item No."), FormatJson(ItemAddOnLineOption."Variant Code"));
-                            Append(JsonString, StrSubstNo('{"caption":"%1","value":"%2"}', FormatJson(ItemAddOnLineOption.Description), Value));
+                            Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(), FormatJson());
+                            Append(JsonString, StrSubstNo('{"caption":"%1","value":"%2"}', FormatJson(), Value));
 
                         until (ItemAddOnLineOption.Next() = 0);
                         JsonString += ']}';
@@ -162,7 +161,7 @@
         JsonString += ']}';
     end;
 
-    local procedure FormatJson(Value: Text) JsonValue: Text
+    local procedure FormatJson() JsonValue: Text
     var
         JsonVal: JsonValue;
     begin
@@ -185,7 +184,6 @@
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
-        ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;

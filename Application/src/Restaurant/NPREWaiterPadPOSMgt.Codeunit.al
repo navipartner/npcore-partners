@@ -24,7 +24,6 @@
         TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         ChoosenWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin

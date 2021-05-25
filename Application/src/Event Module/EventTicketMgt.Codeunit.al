@@ -228,7 +228,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketeservationRequest: Page "NPR TM Ticket Make Reserv.";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketScheduleMgt: Codeunit "NPR TM Admission Sch. Mgt.";
         ResponseCode: Integer;
         NewQty: Integer;

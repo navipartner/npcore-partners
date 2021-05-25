@@ -42,11 +42,7 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
         httpClient: HttpClient;
         respMessage: HttpResponseMessage;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        jsonResponse: JsonObject;
-        jsonRequest: JsonObject;
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        posUnit: Record "NPR POS Unit";
-        beaconTypes: JsonArray;
         eftSetup: Record "NPR EFT Setup";
         requestUrl: Text;
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
@@ -69,10 +65,10 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
         _responseHttpCode := respMessage.HttpStatusCode;
         respMessage.Content.ReadAs(_response);
 
-        ParseResponse(reqMessage, respMessage, eftTrxRequest);
+        ParseResponse(reqMessage, respMessage);
     end;
 
-    local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
+    local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage)
     var
         jsonToken: JsonToken;
         jsonResponse: JsonObject;

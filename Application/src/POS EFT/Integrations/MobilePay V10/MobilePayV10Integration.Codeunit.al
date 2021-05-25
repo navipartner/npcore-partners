@@ -393,8 +393,6 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     end;
 
     internal procedure FindAndSetDefaultMobilePayV10IntegrationType(var DefaultMobilePayEftIntType: Record "NPR EFT Integration Type" temporary): Boolean
-    var
-        EFTInterface: Codeunit "NPR EFT Interface";
     begin
         DefaultMobilePayEftIntType.reset();
         DiscoverEftIntegrationTypes(DefaultMobilePayEftIntType);
@@ -425,7 +423,6 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforeResumeFrontEnd', '', false, false)]
     local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
     begin
         if not EFTTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then

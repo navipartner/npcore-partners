@@ -41,7 +41,6 @@ codeunit 6014603 "NPR RP Templ. Output Log Mgt."
         RPTemplateOutputLog: Record "NPR RP Template Output Log";
         DotNetEncoding: Codeunit DotNet_Encoding;
         BinaryWriter: Codeunit DotNet_BinaryWriter;
-        ByteArray: Codeunit DotNet_Array;
         DotNetStream: Codeunit DotNet_Stream;
         TextEncodingMapper: Codeunit "NPR Text Encoding Mapper";
         OStream: OutStream;

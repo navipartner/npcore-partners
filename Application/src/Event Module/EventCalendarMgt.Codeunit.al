@@ -463,7 +463,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                 exit(true);
             end;
             if ActionToTake = ActionToTake::Remove then begin
-                if not RunAppointmentItemMethodWithLog(RecRef.RecordId, ExchService, AppointmentItem, Job, 'Delete', 0) then
+                if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Delete', 0) then
                     exit(false);
                 ProcessCalendarItemID(0, RecRef, '');
                 exit(true);
@@ -505,10 +505,10 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         AppointmentItem.EndTimeZone := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
 
         if CalendarItemID <> '' then begin
-            if not RunAppointmentItemMethodWithLog(RecRef.RecordId, ExchService, AppointmentItem, Job, 'Update', 0) then
+            if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Update', 0) then
                 exit(false);
         end else
-            if not RunAppointmentItemMethodWithLog(RecRef.RecordId, ExchService, AppointmentItem, Job, 'Save', 0) then
+            if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Save', 0) then
                 exit(false);
         ItemId := AppointmentItem.Id;
         ProcessCalendarItemID(1, RecRef, ItemId.UniqueId);
@@ -590,12 +590,12 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         case RecRef.Number of
             DATABASE::Job:
                 begin
-                    if not RunAppointmentItemMethodWithLog(RecRef.RecordId, ExchService, AppointmentItem, Job, 'Update', 0) then
+                    if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Update', 0) then
                         exit(false);
                     RecRef.Get(Job.RecordId);
                 end;
             DATABASE::"Job Planning Line":
-                if not RunAppointmentItemMethodWithLog(RecRef.RecordId, ExchService, AppointmentItem, Job, 'Update', 1) then
+                if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Update', 1) then
                     exit(false);
         end;
 
@@ -770,7 +770,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         end;
     end;
 
-    local procedure RunAppointmentItemMethodWithLog(RecordId: RecordID; ExchService: DotNet NPRNetExchangeService; var AppointmentItem: DotNet NPRNetAppointment; var Job: Record Job; MethodName: Text; SendMode: Integer): Boolean
+    local procedure RunAppointmentItemMethodWithLog(RecordId: RecordID; var AppointmentItem: DotNet NPRNetAppointment; MethodName: Text; SendMode: Integer): Boolean
     var
         ActivityLog: Record "Activity Log";
         Context: Text;

@@ -61,7 +61,6 @@ then begin
         JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        LinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         CurrentView: Codeunit "NPR POS View";
     begin

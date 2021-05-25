@@ -182,10 +182,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale', '', true, true)]
     local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        OpenDrawer: Boolean;
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        POSUnit: Record "NPR POS Unit";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Payment Bin Eject Mgt." then
             exit;

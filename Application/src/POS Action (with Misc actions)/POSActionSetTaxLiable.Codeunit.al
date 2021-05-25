@@ -44,8 +44,6 @@ then begin
     local procedure SetTaxLiable(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Line: Record "NPR POS Sale Line";
-        SaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         TaxLiableValue: Boolean;

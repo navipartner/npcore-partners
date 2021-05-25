@@ -17,10 +17,10 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
                 exit(false);
         end;
 
-        exit(SelectItemtoCreate(ItemWorksheet, VendorNo, VendorItemNo, ItemNo, VariantCode));
+        exit(SelectItemtoCreate(ItemWorksheet, VendorNo, VendorItemNo, ItemNo));
     end;
 
-    local procedure SelectItemtoCreate(ItemWorksheet: Record "NPR Item Worksheet"; VendorNo: Code[20]; VendorItemNo: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]): Boolean
+    local procedure SelectItemtoCreate(ItemWorksheet: Record "NPR Item Worksheet"; VendorNo: Code[20]; VendorItemNo: Text[50]; var ItemNo: Code[20]): Boolean
     var
         TempItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line" temporary;
         TempItemWorksheetLine: Record "NPR Item Worksheet Line" temporary;
@@ -33,11 +33,11 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
             TempItemWorksheetLine."Vendor No." := VendorNo;
             if GuiAllowed then begin
                 if Confirm(StrSubstNo(OneLineFoundQst, TempItemWorksheetLine.Description)) then begin
-                    if CreateItem(TempItemWorksheetLine, ItemNo, VariantCode) then
+                    if CreateItem(TempItemWorksheetLine, ItemNo) then
                         exit(true);
                 end;
             end else
-                if CreateItem(TempItemWorksheetLine, ItemNo, VariantCode) then
+                if CreateItem(TempItemWorksheetLine, ItemNo) then
                     exit(true);
         end;
         if not GuiAllowed then
@@ -63,7 +63,7 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
         exit(false);
     end;
 
-    local procedure CreateItem(TempItemWorksheetLine: Record "NPR Item Worksheet Line" temporary; var ItemNo: Code[20]; var VariantCode: Code[10]): Boolean
+    local procedure CreateItem(TempItemWorksheetLine: Record "NPR Item Worksheet Line" temporary; var ItemNo: Code[20]): Boolean
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         RegisteredItemWorksheetLine: Record "NPR Regist. Item Worksh Line";

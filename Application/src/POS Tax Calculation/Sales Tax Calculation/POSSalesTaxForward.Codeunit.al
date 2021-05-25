@@ -14,50 +14,35 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
     begin
         POSSaleTax."Source Amount" := Rec.Amount;
         CalculateTaxLines(POSSaleTax, Rec, Currency, ExchangeFactor);
-        SetHeaderValues(POSSaleTax, Currency, ExchangeFactor);
-        UpdateSourceAfterCalculateTax(POSSaleTax, Rec, Currency);
+        SetHeaderValues(POSSaleTax);
+        UpdateSourceAfterCalculateTax(POSSaleTax, Rec);
     end;
 
     local procedure CalculateTaxLines(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency; ExchangeFactor: Decimal)
     begin
         if Rec."Tax Liable" then
-            CalculateTaxLinesTaxLiable(POSSaleTax, Rec, Currency, ExchangeFactor)
+            CalculateTaxLinesTaxLiable(POSSaleTax, Currency, ExchangeFactor)
         else
-            CalculateTaxLinesTaxUnliable(POSSaleTax, Rec, Currency, ExchangeFactor);
+            CalculateTaxLinesTaxUnliable(POSSaleTax, Currency, ExchangeFactor);
     end;
 
-    local procedure CalculateTaxLinesTaxUnliable(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency; ExchangeFactor: Decimal)
+    local procedure CalculateTaxLinesTaxUnliable(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; ExchangeFactor: Decimal)
     var
         POSSaleTaxLine: record "NPR POS Sale Tax Line";
-        xPOSSaleTaxLine: record "NPR POS Sale Tax Line";
         TaxAreaLine: Record "Tax Area Line";
-        TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
-        TaxArea: Record "Tax Area";
-        TaxSetup: Record "Tax Setup";
-        DataTypeMgt: Codeunit "Data Type Management";
-        POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-        RecRef: RecordRef;
-        FieldReference: FieldRef;
         CalculatedUnit: Decimal;
-        LastCalculationOrder: Integer;
-        CalculationOrderViolation: Boolean;
     begin
         Upsert(POSSaleTaxLine, POSSaleTax, TaxAreaLine, TaxDetail, CalculatedUnit, ExchangeFactor, Currency);
     end;
 
-    local procedure CalculateTaxLinesTaxLiable(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency; ExchangeFactor: Decimal)
+    local procedure CalculateTaxLinesTaxLiable(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; ExchangeFactor: Decimal)
     var
         POSSaleTaxLine: record "NPR POS Sale Tax Line";
         xPOSSaleTaxLine: record "NPR POS Sale Tax Line";
         TaxAreaLine: Record "Tax Area Line";
-        TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
-        DataTypeMgt: Codeunit "Data Type Management";
-        POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-        RecRef: RecordRef;
-        FieldReference: FieldRef;
         CalculatedUnit: Decimal;
         LastCalculationOrder: Integer;
         CalculationOrderViolation: Boolean;
@@ -277,7 +262,7 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         end;
     end;
 
-    local procedure SetHeaderValues(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; ExchangeFactor: Decimal)
+    local procedure SetHeaderValues(var POSSaleTax: Record "NPR POS Sale Tax")
     var
         POSSaleTaxLine: record "NPR POS Sale Tax Line";
     begin
@@ -308,7 +293,7 @@ codeunit 6014632 "NPR POS Sales Tax Forward"
         POSSaleTaxLine.FindFirst();
     end;
 
-    local procedure UpdateSourceAfterCalculateTax(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
+    local procedure UpdateSourceAfterCalculateTax(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line")
     begin
         Rec.Amount := POSSaleTax."Calculated Amount Excl. Tax";
         Rec."VAT Base Amount" := Rec.Amount;

@@ -21,17 +21,17 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         RequestMethod := JSON.GetStringOrFail('method', ReadingErr);
         case RequestMethod of
             'save':
-                Success := SaveConfiguration(Request, JSON, POSSession, FrontEnd);
+                Success := SaveConfiguration(JSON);
             'lookup_action':
-                Success := LookupAction(Request, JSON, POSSession, FrontEnd);
+                Success := LookupAction(Request, JSON, POSSession);
             'lookup_item':
-                Success := LookupItem(Request, JSON, POSSession, FrontEnd);
+                Success := LookupItem(Request, JSON);
             'lookup_customer':
-                Success := LookupCustomer(Request, JSON, POSSession, FrontEnd);
+                Success := LookupCustomer(Request, JSON);
             'lookup_parameters':
-                Success := LookupParameters(Request, JSON, POSSession, FrontEnd);
+                Success := LookupParameters(Request, JSON, POSSession);
             'lookup_popup':
-                Success := LookupPopup(Request, JSON, POSSession, FrontEnd);
+                Success := LookupPopup(Request, JSON);
         end;
         JSON.SetScopeRoot();
         Request.GetContent().Add('requestId', JSON.GetStringOrFail('requestId', ReadingErr));
@@ -42,7 +42,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         Handled := true;
     end;
 
-    local procedure SaveConfiguration(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure SaveConfiguration(JSON: Codeunit "NPR POS JSON Management"): Boolean
     var
         POSAction: Record "NPR POS Action";
         TargetType: Text;
@@ -214,7 +214,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
             POSMenuButton.Modify();
     end;
 
-    local procedure LookupAction(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupAction(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"): Boolean
     var
         POSAction: Record "NPR POS Action";
         POSActions: Page "NPR POS Actions";
@@ -247,7 +247,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         end;
     end;
 
-    local procedure LookupItem(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupItem(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"): Boolean
     var
         Item: Record Item;
         Items: Page "Item List";
@@ -282,7 +282,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         end;
     end;
 
-    local procedure LookupCustomer(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupCustomer(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"): Boolean
     var
         Cust: Record Customer;
         Customers: Page "Customer List";
@@ -317,7 +317,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         end;
     end;
 
-    local procedure LookupParameters(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupParameters(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"): Boolean
     var
         POSAction: Record "NPR POS Action";
         POSParam: Record "NPR POS Action Parameter";
@@ -359,7 +359,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         exit(true);
     end;
 
-    local procedure LookupPopup(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupPopup(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"): Boolean
     var
         POSMenu: Record "NPR POS Menu";
         POSMenus: Page "NPR POS Menus";

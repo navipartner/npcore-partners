@@ -32,8 +32,6 @@ then begin
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
         ExchLabelBarcode: Text;
         InputExchLabelBarcode: Text;
         PromptForBarcode: Boolean;

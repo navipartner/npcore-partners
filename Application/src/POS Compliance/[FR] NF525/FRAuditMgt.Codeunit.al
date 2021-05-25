@@ -899,7 +899,6 @@
     local procedure LogNonItemAmounts(POSEntry: Record "NPR POS Entry")
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
-        POSAuditLog: Record "NPR POS Audit Log";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         AddInfo: Text;
         Amount: Decimal;
@@ -958,7 +957,6 @@
     var
         RetentionPolicySetup: Record "Retention Policy Setup";
         RetPeriod: Record "Retention Period";
-        RtnPeriodEnum: Enum "Retention Period Enum";
     begin
         if not RetentionPolicySetup.Get(Database::"NPR Data Log Record") then
             exit;

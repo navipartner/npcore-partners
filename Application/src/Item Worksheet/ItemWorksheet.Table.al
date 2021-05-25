@@ -176,7 +176,6 @@ table 6060041 "NPR Item Worksheet"
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
         CheckingLinesLbl: Label 'Checking lines        #2######';
 
     procedure SetupNewBatch()

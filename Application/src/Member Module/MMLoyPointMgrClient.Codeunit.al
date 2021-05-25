@@ -63,7 +63,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         if (TransformToSoapAction(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
             XmlDocument.ReadFrom(XmlRequest, XmlRequestDoc);
             Success := ForeignMembership.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
-            HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
+            HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
 
         end else begin
             EFTTransactionRequest.Successful := false;
@@ -114,7 +114,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         exit(TransformOk);
     end;
 
-    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlRequestDoc: XmlDocument; var XmlResponseDoc: XmlDocument)
+    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlResponseDoc: XmlDocument)
     var
         OStream: OutStream;
     begin
@@ -240,7 +240,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
                     SaleLinePOS."Currency Code" := GeneralLedgerSetup."LCY Code";
                 TmpRegisterSalesLines."Currency Code" := SaleLinePOS."Currency Code";
 
-                TmpRegisterSalesLines."Total Points" := EarnAmountToPoints(LoyaltyStoreSetup, TmpRegisterSalesLines."Currency Code", TmpRegisterSalesLines."Total Amount");
+                TmpRegisterSalesLines."Total Points" := EarnAmountToPoints(LoyaltyStoreSetup, TmpRegisterSalesLines."Total Amount");
 
                 TmpRegisterSalesLines.Insert();
             until (SaleLinePOS.Next() = 0);
@@ -263,7 +263,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
                     TmpRegisterPaymentLines."Authorization Code" := EFTTransactionRequest2."Authorisation Number";
                     TmpRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
                     TmpRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
-                    TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, TmpRegisterPaymentLines."Currency Code", EFTTransactionRequest2."Amount Output");
+                    TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
                     TmpRegisterPaymentLines.Insert();
                 end;
             until (EFTTransactionRequest2.Next() = 0);
@@ -279,8 +279,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
 
         if (not GetStoreSetup(EFTTransactionRequest."Register No.", ResponseText, LoyaltyStoreSetup)) then
@@ -298,7 +296,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
                 TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::NA;
         end;
         TmpRegisterPaymentLines."Currency Code" := EFTTransactionRequest."Currency Code";
-        TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, TmpRegisterPaymentLines."Currency Code", EFTTransactionRequest."Amount Input");
+        TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest."Amount Input");
         TmpRegisterPaymentLines."Total Points" := EFTTransactionRequest."Amount Input";
         TmpRegisterPaymentLines.Description := CopyStr(EFTTransactionRequest."POS Description", 1, MaxStrLen(TmpRegisterPaymentLines.Description));
         TmpRegisterPaymentLines.Insert();
@@ -722,7 +720,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     begin
     end;
 
-    local procedure EarnAmountToPoints(LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; CurrencyCode: Code[10]; Amount: Decimal) Points: Integer
+    local procedure EarnAmountToPoints(LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; Amount: Decimal) Points: Integer
     var
         LoyaltySetup: Record "NPR MM Loyalty Setup";
     begin
@@ -732,7 +730,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         Points := Round(Amount * LoyaltySetup."Amount Factor", 1);
     end;
 
-    local procedure BurnPointsToAmount(LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; CurrencyCode: Code[10]; Points: Decimal) Amount: Decimal
+    local procedure BurnPointsToAmount(LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; Points: Decimal) Amount: Decimal
     var
         PaymentMethod: Record "NPR POS Payment Method";
     begin

@@ -37,7 +37,6 @@ page 6014406 "NPR POS View Picture"
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
                     FileName: Text;
-                    ClientFileName: Text;
                 begin
                     Rec.TestField(Code);
 
@@ -68,12 +67,10 @@ page 6014406 "NPR POS View Picture"
 
                 trigger OnAction()
                 var
-                    DummyPictureEntity: Record "Picture Entity";
                     FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
                     OutStr: OutStream;
                     ToFile: Text;
-                    ExportPath: Text;
                 begin
                     Rec.TestField(Code);
 

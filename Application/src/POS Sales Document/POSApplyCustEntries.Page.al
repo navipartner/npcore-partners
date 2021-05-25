@@ -596,11 +596,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         PostingDone: Boolean;
         [InDataSet]
         "Applies-to IDVisible": Boolean;
-        Text012: Label 'The application was successfully posted.';
-        Text013: Label 'The %1 entered must not be before the %1 on the %2.';
-        Text019: Label 'Post application process has been canceled.';
         SaleLinePOS: Record "NPR POS Sale Line";
-        BalancePOSLine: Boolean;
 
     procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
     begin

@@ -55,7 +55,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
             'list':
                 begin
                     Handled := true;
-                    OnActionList(Context, POSSession, FrontEnd);
+                    OnActionList(POSSession);
                     exit;
                 end;
             'textfield', 'numpad':
@@ -63,12 +63,12 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
                     Handled := true;
                     JSON.InitializeJObjectParser(Context, FrontEnd);
                     NewRegisterNo := CopyStr(JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(NewRegisterNo));
-                    SwitchRegister(Context, POSSession, FrontEnd, NewRegisterNo);
+                    SwitchRegister(POSSession, NewRegisterNo);
                 end;
         end;
     end;
 
-    local procedure OnActionList(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionList(POSSession: Codeunit "NPR POS Session")
     var
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
@@ -79,7 +79,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         if not SelectRegister(SalePOS."Register No.", NewRegisterNo) then
             exit;
 
-        SwitchRegister(Context, POSSession, FrontEnd, NewRegisterNo);
+        SwitchRegister(POSSession, NewRegisterNo);
     end;
 
     local procedure SelectRegister(CurrUnitNo: Code[10]; var NewUnitNo: Code[10]) LookupOK: Boolean
@@ -102,7 +102,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         exit(LookupOK);
     end;
 
-    local procedure SwitchRegister(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; NewUnitNo: Code[10])
+    local procedure SwitchRegister(POSSession: Codeunit "NPR POS Session"; NewUnitNo: Code[10])
     var
         Setup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";

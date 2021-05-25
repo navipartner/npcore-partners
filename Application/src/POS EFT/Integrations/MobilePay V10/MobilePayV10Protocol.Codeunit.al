@@ -141,12 +141,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftSetup: Record "NPR EFT Setup";
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
-        success: Boolean;
-        updateTrxRec: Boolean;
         mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
-        origEftTrxRequest: Record "NPR EFT Transaction Request";
-        captured: Boolean;
-        posActionPayment: Codeunit "NPR POS Action: Payment";
     begin
         eftSetup.FindSetup(EftTrxRequest."Register No.", EftTrxRequest."Original POS Payment Type Code");
 
@@ -491,7 +486,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     internal procedure GetToken(EFTSetup: Record "NPR EFT Setup"): Text
     var
         mobilePayToken: codeunit "NPR MobilePayV10 Token";
-        mobilePayAuthRequest: Codeunit "NPR MobilePayV10 Auth";
         token: Text;
         eftTrxRequest: Record "NPR EFT Transaction Request";
         eftFramework: Codeunit "NPR EFT Framework Mgt.";

@@ -39,7 +39,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
             EftTransactionRequest."Processing Type"::LOOK_UP:
                 LookupTransaction(EftTransactionRequest);
             EftTransactionRequest."Processing Type"::SETUP:
-                VerifySetup(EftTransactionRequest);
+                VerifySetup();
             EftTransactionRequest."Processing Type"::GIFTCARD_LOAD:
                 RefundTransaction(EftTransactionRequest);
             EftTransactionRequest."Processing Type"::REFUND:
@@ -77,7 +77,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         TransactionRequest.TransactionType := 'PURCHASE';
         TransactionRequest.TransactionTypeCaption := DIALOG_TYPE_PURCHASE;
 
-        PrepareGenericTransaction(EftTransactionRequest, EFTSetup, TransactionRequest, POSSession);
+        PrepareGenericTransaction(EftTransactionRequest, EFTSetup, TransactionRequest);
 
         POSFrontEnd.InvokeDevice(TransactionRequest, ActionCode(), 'Purchase');
     end;
@@ -112,7 +112,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
             TransactionRequest.TransactionToRevertTerminalTrxTimestamp := CreateDateTime(OriginalEftTrxRequest."Transaction Date", OriginalEftTrxRequest."Transaction Time");
         end;
 
-        PrepareGenericTransaction(EftTransactionRequest, EFTSetup, TransactionRequest, POSSession);
+        PrepareGenericTransaction(EftTransactionRequest, EFTSetup, TransactionRequest);
 
         POSFrontEnd.InvokeDevice(TransactionRequest, ActionCode(), 'Refund');
     end;
@@ -145,12 +145,12 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         TransactionRequest.TransactionToRevertTerminalID := OriginalEftTrxRequest."Hardware ID";
         TransactionRequest.TransactionToRevertTerminalTrxTimestamp := CreateDateTime(OriginalEftTrxRequest."Transaction Date", OriginalEftTrxRequest."Transaction Time");
 
-        PrepareGenericTransaction(EftTransactionRequest, EFTSetup, TransactionRequest, POSSession);
+        PrepareGenericTransaction(EftTransactionRequest, EFTSetup, TransactionRequest);
 
         POSFrontEnd.InvokeDevice(TransactionRequest, ActionCode(), 'Reversal');
     end;
 
-    local procedure PrepareGenericTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var TransactionRequest: DotNet NPRNetTransactionRequest2; POSSession: Codeunit "NPR POS Session")
+    local procedure PrepareGenericTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var TransactionRequest: DotNet NPRNetTransactionRequest2)
     var
         EFTVerifoneVimIntegration: Codeunit "NPR EFT Verifone Vim Integ.";
         Licenceinformation: Codeunit "NPR License Information";
@@ -403,7 +403,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         POSFrontEnd.InvokeDevice(TransactionStatusRequest, ActionCode(), 'TransactionStatus');
     end;
 
-    local procedure VerifySetup(EftTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure VerifySetup()
     var
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";

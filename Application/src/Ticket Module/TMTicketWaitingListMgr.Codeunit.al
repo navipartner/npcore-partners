@@ -163,7 +163,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         if (not WaitingListSetup.Get(Admission."Waiting List Setup Code")) then
             exit;
 
-        AssignGeneralNotificationData(WaitingListSetup, TicketWaitingList, Admission, AdmissionScheduleEntry, NotificationEntry);
+        AssignGeneralNotificationData(TicketWaitingList, Admission, AdmissionScheduleEntry, NotificationEntry);
 
         NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADDED_TO_WL;
         NotificationEntry.Insert();
@@ -220,7 +220,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         WaitingListEntry.Insert();
 
 
-        AssignGeneralNotificationData(WaitingListSetup, TicketWaitingList, Admission, AdmissionScheduleEntry, NotificationEntry);
+        AssignGeneralNotificationData(TicketWaitingList, Admission, AdmissionScheduleEntry, NotificationEntry);
 
         NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::NOTIFIED_BY_WL;
         NotificationEntry."Waiting List Reference Code" := WaitingListEntry."Reference Code";
@@ -231,7 +231,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         TmpNotificationEntryOut.Insert();
     end;
 
-    local procedure AssignGeneralNotificationData(WaitingListSetup: Record "NPR TM Waiting List Setup"; TicketWaitingList: Record "NPR TM Ticket Wait. List"; Admission: Record "NPR TM Admission"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; var NotificationEntry: Record "NPR TM Ticket Notif. Entry")
+    local procedure AssignGeneralNotificationData(TicketWaitingList: Record "NPR TM Ticket Wait. List"; Admission: Record "NPR TM Admission"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; var NotificationEntry: Record "NPR TM Ticket Notif. Entry")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin

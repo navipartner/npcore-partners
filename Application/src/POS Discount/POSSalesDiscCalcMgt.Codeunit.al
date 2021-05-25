@@ -161,7 +161,6 @@
     procedure OnAfterInsertSaleLinePOSCoupon(var Rec: Record "NPR NpDc SaleLinePOS Coupon")
     var
         SalePOS: Record "NPR POS Sale";
-        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
         if not CheckDiscTriggerCoupon(Rec) then
@@ -178,9 +177,6 @@
     end;
 
     local procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
-    var
-        DiscPriority: Record "NPR Discount Priority";
-        NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
 
         tmpDiscountPriority.SetCurrentKey(Priority);
@@ -303,7 +299,6 @@
 
     procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
-        Item: Record Item;
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if not TempSaleLinePOS.IsTemporary then

@@ -61,7 +61,7 @@ then begin
 
         case LineSetting of
             LineSetting::"All Lines":
-                PrintAllLines(POSSession, FrontEnd, PrintType);
+                PrintAllLines(POSSession, PrintType);
             LineSetting::"Selected Line":
                 PrintSelectedLine(Context, POSSession, FrontEnd, PrintType);
         end;
@@ -69,7 +69,7 @@ then begin
         Handled := true;
     end;
 
-    local procedure PrintAllLines(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; PrintType: Integer)
+    local procedure PrintAllLines(POSSession: Codeunit "NPR POS Session"; PrintType: Integer)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOS2: Record "NPR POS Sale Line";

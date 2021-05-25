@@ -45,7 +45,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
             'GetSalesLineAddonConfigJson':
                 GenerateItemAddonConfig(POSSession, FrontEnd, Context);
             'SetItemAddons':
-                OnActionRunAddOns(POSSession, FrontEnd, Context);
+                OnActionRunAddOns(POSSession, Context);
         end;
     end;
 
@@ -102,7 +102,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         FrontEnd.WorkflowResponse(ItemAddonConfigAsString);
     end;
 
-    local procedure OnActionRunAddOns(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management")
+    local procedure OnActionRunAddOns(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management")
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         SaleLinePOS: Record "NPR POS Sale Line";

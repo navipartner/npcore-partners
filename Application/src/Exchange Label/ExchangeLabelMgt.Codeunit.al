@@ -86,8 +86,6 @@
     var
         ExchangeLabel: Record "NPR Exchange Label";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SaleLinePOSSelected: Record "NPR POS Sale Line";
-        SalePOS: Record "NPR POS Sale";
         t001: Label 'No lines to print exchange labels from';
         FieldRef: FieldRef;
         LabelBatchNumber: Integer;
@@ -171,7 +169,6 @@
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         RecRef: RecordRef;
         ExchangeLabelRec: Record "NPR Exchange Label";
-        POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
     begin
         UserSetup.Get(UserId);

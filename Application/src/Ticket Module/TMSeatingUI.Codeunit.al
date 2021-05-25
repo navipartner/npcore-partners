@@ -58,7 +58,7 @@ codeunit 6151131 "NPR TM Seating UI"
         end;
 
         Model := Model.Model();
-        Model.AddHtml(RenderSeatSelection(AdmissionCode, ScheduleCode, ExtAdmScheduleEntryNo));
+        Model.AddHtml(RenderSeatSelection(AdmissionCode, ExtAdmScheduleEntryNo));
         Model.AddStyle(CSS());
         Model.AddScript(Javascript());
 
@@ -218,7 +218,7 @@ codeunit 6151131 "NPR TM Seating UI"
                     end;
 
                     if (not ShowUI) then
-                        OnSeatReservationCompleted(TicketReservationRequest."Session Token ID");
+                        OnSeatReservationCompleted();
 
                 end;
 
@@ -254,10 +254,10 @@ codeunit 6151131 "NPR TM Seating UI"
         end;
     end;
 
-    local procedure RenderSeatSelection(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ExtAdmScheduleEntryNo: Integer): Text
+    local procedure RenderSeatSelection(AdmissionCode: Code[20]; ExtAdmScheduleEntryNo: Integer): Text
     begin
 
-        exit(SVG_Example(AdmissionCode, ScheduleCode, ExtAdmScheduleEntryNo));
+        exit(SVG_Example(AdmissionCode, ExtAdmScheduleEntryNo));
     end;
 
     local procedure CSS(): Text
@@ -286,7 +286,7 @@ codeunit 6151131 "NPR TM Seating UI"
         );
     end;
 
-    local procedure SVG_Example(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ExtAdmScheduleEntryNo: Integer) SvGText: Text
+    local procedure SVG_Example(AdmissionCode: Code[20]; ExtAdmScheduleEntryNo: Integer) SvGText: Text
     var
         Admission: Record "NPR TM Admission";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -715,7 +715,7 @@ codeunit 6151131 "NPR TM Seating UI"
         until (SeatList = '');
     end;
 
-    local procedure OnSeatReservationCompleted(Token: Text[100])
+    local procedure OnSeatReservationCompleted()
     begin
     end;
 
@@ -816,7 +816,7 @@ codeunit 6151131 "NPR TM Seating UI"
 
         for a := 0 to rows - 1 do begin
             for b := 0 to cols - 1 do begin
-                SeatText += CreateSeatWithPreset((b + a * cols + 1), 'free_seat', a, b, cols, rows);
+                SeatText += CreateSeatWithPreset((b + a * cols + 1), 'free_seat', a, b, cols);
             end;
         end;
 
@@ -896,7 +896,7 @@ codeunit 6151131 "NPR TM Seating UI"
             if (SeatingTemplate."Reservation Category" = SeatingTemplate."Reservation Category"::HIDDEN) then
                 CssClassName := 'hidden_seat';
 
-            SeatText += CreateSeatWithPreset(SeatingTemplate.ElementId, CssClassName, Row, Col, MaxCols, MaxRows);
+            SeatText += CreateSeatWithPreset(SeatingTemplate.ElementId, CssClassName, Row, Col, MaxCols);
 
             Col += 1;
             if (Col >= MaxCols) then begin
@@ -909,7 +909,7 @@ codeunit 6151131 "NPR TM Seating UI"
         SeatText += '</svg>';
     end;
 
-    local procedure CreateSeatWithPreset(elementId: Integer; cssClassName: Text; a: Integer; b: Integer; cols: Integer; rows: Integer): Text
+    local procedure CreateSeatWithPreset(elementId: Integer; cssClassName: Text; a: Integer; b: Integer; cols: Integer): Text
     var
         width: Integer;
         height: Integer;
@@ -923,10 +923,10 @@ codeunit 6151131 "NPR TM Seating UI"
         rx := 5;
         ry := 5;
 
-        exit(CreateSeat(elementId, cssClassName, a, b, cols, rows, width, height, rx, ry));
+        exit(CreateSeat(elementId, cssClassName, a, b, cols, width, height, rx, ry));
     end;
 
-    local procedure CreateSeat(elementId: Integer; cssClassName: Text; a: Integer; b: Integer; cols: Integer; rows: Integer; width: Integer; height: Integer; rx: Integer; ry: Integer) SeatText: Text
+    local procedure CreateSeat(elementId: Integer; cssClassName: Text; a: Integer; b: Integer; cols: Integer; width: Integer; height: Integer; rx: Integer; ry: Integer) SeatText: Text
     var
         arcfactor: Decimal;
         v: Decimal;

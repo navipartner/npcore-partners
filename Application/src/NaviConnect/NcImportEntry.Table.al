@@ -164,8 +164,6 @@ table 6151504 "NPR Nc Import Entry"
             Date := CurrentDateTime;
     end;
 
-    var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
 
     procedure LoadXmlDoc(var Document: XmlDocument): Boolean
     var

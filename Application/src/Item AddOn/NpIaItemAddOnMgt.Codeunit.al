@@ -111,10 +111,6 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        Color: Text;
-        Weight: Text;
-        Style: Text;
     begin
         if DataSourceName <> BuiltInSaleLine() then
             exit;
@@ -537,7 +533,6 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     local procedure ParsePOSAddOnLine(ItemAddOn: Record "NPR NpIa Item AddOn"; SelectedAddOnLine: JsonToken; AddonLineKey: Text; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Boolean
     var
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
-        AddOnLineVariant: JsonToken;
         ItemNo: Code[20];
         VariantCode: Code[10];
         LineNo: Integer;

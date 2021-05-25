@@ -84,7 +84,6 @@ page 6014457 "NPR MM Member Capture List"
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ImportMembersCU: Codeunit "NPR MM Import Members";
-        c: Page "Customer List";
     begin
 
         CurrPage.SetSelectionFilter(MemberInfoCapture);

@@ -157,11 +157,8 @@
     procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Silent: Boolean)
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        SaleLinePOSCheck: Record "NPR POS Sale Line";
-        LineAmount: Decimal;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
     begin
         if DocumentNo = '' then

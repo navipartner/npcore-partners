@@ -68,7 +68,6 @@ then begin
         OpenUnit: Boolean;
         BalanceEntryToPrint: Integer;
         CurrentView: Codeunit "NPR POS View";
-        BalanceViewParameters: JsonObject;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -111,7 +110,7 @@ then begin
 
             'Eft_Close':
                 if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
-                    EftClose(POSSession, FrontEnd);
+                    EftClose(POSSession);
 
             'Eft_CloseDone':
                 if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
@@ -165,7 +164,7 @@ then begin
             'EndOfWorkflow':
                 begin
                     POSSession.GetCurrentView(CurrentView);
-                    if (CurrentView.Type() <> CurrentView.Type()::Login) then
+                    if (CurrentView.Type() <> CurrentView.Type() ::Login) then
                         POSSession.ChangeViewLogin();
                 end;
         end;
@@ -338,7 +337,7 @@ then begin
         POSSession.StoreActionState('eft_close_list', EFTSetup);
     end;
 
-    local procedure EftClose(POSSession: Codeunit "NPR POS Session"; POSFrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure EftClose(POSSession: Codeunit "NPR POS Session")
     var
         RecRef: RecordRef;
         EFTSetup: Record "NPR EFT Setup";

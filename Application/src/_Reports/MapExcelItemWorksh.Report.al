@@ -100,7 +100,6 @@ report 6060044 "NPR Map Excel Item Worksh."
         InStr: InStream;
         BoolTryMatch: Boolean;
         HeaderRow: Integer;
-        ExcelFileExtensionTok: Label '.xlsx', Locked = true;
         ImportExcelLbl: Label 'Import Excel File';
         HeaderRowErr: Label 'Please indicate the Header Row';
         ImportItemWorksheetErr: Label 'Please start this import from the Item Worksheet Page.';

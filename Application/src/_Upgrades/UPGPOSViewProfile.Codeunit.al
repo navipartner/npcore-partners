@@ -58,7 +58,6 @@ codeunit 6150931 "NPR UPG POS View Profile"
     var
         POSViewProfile: Record "NPR POS View Profile";
         TenantMedia: Record "Tenant Media";
-        TempBlob: Codeunit "Temp Blob";
         Formats: JsonObject;
         InStr: InStream;
         TenantMediaDesc: Text;

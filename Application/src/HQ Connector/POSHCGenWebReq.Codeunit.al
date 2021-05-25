@@ -84,10 +84,6 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         Node: XmlNode;
         TextOk: Text;
         ElementPath: Text;
-        NumberText: Text[100];
-        DecimalNumber: Decimal;
-        IntegerNumber: Integer;
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
 
         if Element.IsEmpty then begin

@@ -78,7 +78,7 @@
     local procedure InsertPOSSale(var TempSalePOS: Record "NPR POS Sale" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var SalePOS: Record "NPR POS Sale")
     begin
         TempSalePOS.FindFirst();
-        InsertSalePOS(TempSalePOS, SalePOS);
+        InsertSalePOS(SalePOS);
 
         TempSaleLinePOS.FindSet();
         repeat
@@ -86,7 +86,7 @@
         until TempSaleLinePOS.Next() = 0;
     end;
 
-    local procedure InsertSalePOS(TempSalePOS: Record "NPR POS Sale" temporary; var SalePOS: Record "NPR POS Sale")
+    local procedure InsertSalePOS(var SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";

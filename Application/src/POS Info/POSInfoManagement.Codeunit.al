@@ -136,8 +136,6 @@
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransParam: Record "NPR POS Info Transaction";
-        SaleLinePos2: Record "NPR POS Sale Line";
-        SaleLinePosTmp: Record "NPR POS Sale Line" temporary;
     begin
         POSInfo.Get(pPOSInfoCode);
         CheckAndAdjustApplicationScope(pSaleLinePos, POSInfo, pApplicScope);

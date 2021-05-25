@@ -83,13 +83,13 @@ then begin
                 end;
             'reason':
                 begin
-                    ReturnReasonCode := SelectReturnReason(Context, POSSession, FrontEnd);
+                    ReturnReasonCode := SelectReturnReason();
                     JSON.SetContext('ReturnReasonCode', ReturnReasonCode);
                     FrontEnd.SetActionContext(ActionCode(), JSON);
                 end;
             'handle':
                 begin
-                    VerifyReceiptForReversal(Context, POSSession, FrontEnd);
+                    VerifyReceiptForReversal(Context, FrontEnd);
                     CopySalesReceiptForReversal(Context, POSSession, FrontEnd);
                     POSSession.ChangeViewSale();
                     POSSession.RequestRefreshData();
@@ -107,7 +107,7 @@ then begin
         Captions.AddActionCaption(ActionCode(), 'reasonprompt', ReasonPrompt);
     end;
 
-    local procedure VerifyReceiptForReversal(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure VerifyReceiptForReversal(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
         POSEntry: Record "NPR POS Entry";
@@ -190,10 +190,7 @@ then begin
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOS2: Record "NPR POS Sale Line";
-        VoucherNo: Text[100];
-        POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
-        POSPaymnetLine: Record "NPR POS Entry Payment Line";
     begin
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
@@ -258,7 +255,7 @@ then begin
         SaleLinePOS."Dimension Set ID" := POSSalesLine."Dimension Set ID";
     end;
 
-    local procedure SelectReturnReason(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Code[20]
+    local procedure SelectReturnReason(): Code[20]
     var
         ReturnReason: Record "Return Reason";
     begin

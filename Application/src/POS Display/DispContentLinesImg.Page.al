@@ -34,7 +34,6 @@ page 6059953 "NPR Disp. Content Lines Img"
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
                     FileName: Text;
-                    ClientFileName: Text;
                 begin
                     Rec.TestField("Content Code");
                     Rec.TestField("Line No.");

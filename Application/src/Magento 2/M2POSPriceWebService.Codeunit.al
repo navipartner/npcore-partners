@@ -178,8 +178,6 @@
     procedure ItemPrice(var ItemPriceRequest: XMLport "NPR M2 Item Price Request")
     var
         TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary;
-        TmpPriceBracketResponse: Record "NPR M2 Price Calc. Buffer" temporary;
-        TmpDiscountBracketResponse: Record "NPR M2 Price Calc. Buffer" temporary;
         TmpPricePointResponse: Record "NPR M2 Price Calc. Buffer" temporary;
         TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary;
         ResponseMessage: Text;
@@ -190,7 +188,7 @@
         ItemPriceRequest.Import();
         ItemPriceRequest.GetSalesPriceRequest(TmpSalesPriceRequest);
 
-        if (TryItemPriceRequest(TmpSalesPriceRequest, TmpPriceBracketResponse, TmpDiscountBracketResponse, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode)) then begin
+        if (TryItemPriceRequest(TmpSalesPriceRequest, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode)) then begin
             OnBeforeSetSalesPriceResponse(TmpPricePointResponse, TmpSalesPriceResponse);
             ItemPriceRequest.SetSalesPriceResponse(TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
         end else begin
@@ -199,7 +197,7 @@
     end;
 
     [TryFunction]
-    local procedure TryItemPriceRequest(var TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary; var TmpPriceBracket: Record "NPR M2 Price Calc. Buffer" temporary; var TmpDiscountBracket: Record "NPR M2 Price Calc. Buffer" temporary; var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary; var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; var ResponseMessage: Text; var ResponseCode: Code[10])
+    local procedure TryItemPriceRequest(var TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary; var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary; var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; var ResponseMessage: Text; var ResponseCode: Code[10])
     var
         Item: Record Item;
         Customer: Record Customer;
@@ -549,8 +547,6 @@
         iStream: InStream;
         oStream: OutStream;
         TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary;
-        TmpPriceBracketResponse: Record "NPR M2 Price Calc. Buffer" temporary;
-        TmpDiscountBracketResponse: Record "NPR M2 Price Calc. Buffer" temporary;
         TmpPricePointResponse: Record "NPR M2 Price Calc. Buffer" temporary;
         TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary;
         ResponseMessage: Text;
@@ -577,7 +573,7 @@
 
         // Process
         M2ItemPriceRequest.GetSalesPriceRequest(TmpSalesPriceRequest);
-        TryItemPriceRequest(TmpSalesPriceRequest, TmpPriceBracketResponse, TmpDiscountBracketResponse, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
+        TryItemPriceRequest(TmpSalesPriceRequest, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
         M2ItemPriceRequest.SetSalesPriceResponse(TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
 
         // Reponse

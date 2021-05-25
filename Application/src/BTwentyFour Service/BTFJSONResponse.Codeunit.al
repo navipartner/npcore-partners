@@ -2,7 +2,6 @@ codeunit 6014647 "NPR BTF JSON Response" implements "NPR BTF IFormatResponse"
 {
     var
         NoBodyReturnedLbl: Label 'No body returned';
-        ServiceAPI: Codeunit "NPR BTF Service API";
 
     procedure FormatInternalError(ErrorCode: Text; ErrorDescription: Text; var Result: Codeunit "Temp Blob")
     var

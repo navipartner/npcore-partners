@@ -87,7 +87,7 @@
         POSSession.GetSale(POSSale);
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
-        ImportFromDocument(Context, POSSession, FrontEnd, SalesHeader);
+        ImportFromDocument(POSSession, SalesHeader);
     end;
 
     local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
@@ -158,14 +158,9 @@
         exit(RetailSalesDocImpMgt.SelectSalesDocument('', SalesHeader));
     end;
 
-    local procedure ImportFromDocument(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var SalesHeader: Record "Sales Header")
+    local procedure ImportFromDocument(POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header")
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        DocumentType: Option Quote,"Order",Invoice,CreditMemo,BlanketOrder,ReturnOrder;
-        OrderType: Option NotSet,"Order",Lending;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
         RetailSalesDocImpMgt.SalesDocumentToPOS(POSSession, SalesHeader);
         POSSession.RequestRefreshData();

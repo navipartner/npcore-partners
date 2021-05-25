@@ -230,7 +230,7 @@ codeunit 6060153 "NPR Event Email Management"
         if EventEWSMgt.CreateAttachment(Job, MailFor, EMailTemplateHeader, FileName) then
             EmailMessage.Attachments.AddFileAttachment(FileName);
 
-        if not EMailMessageSendAndSaveCopyWithLog(RecRef.RecordId, ExchService, EmailMessage, Job) then
+        if not EMailMessageSendAndSaveCopyWithLog(RecRef.RecordId, EmailMessage) then
             exit(false);
         exit(true);
     end;
@@ -269,7 +269,7 @@ codeunit 6060153 "NPR Event Email Management"
             end;
     end;
 
-    local procedure EMailMessageSendAndSaveCopyWithLog(RecordId: RecordID; ExchService: DotNet NPRNetExchangeService; EmailMessage: DotNet NPRNetEmailMessage; var Job: Record Job): Boolean
+    local procedure EMailMessageSendAndSaveCopyWithLog(RecordId: RecordID; EmailMessage: DotNet NPRNetEmailMessage): Boolean
     var
         ActivityLog: Record "Activity Log";
         SendContext: Label 'E-MAIL SEND';

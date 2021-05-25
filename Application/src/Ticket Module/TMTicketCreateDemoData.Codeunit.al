@@ -276,7 +276,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         exit(AdmissionCode);
     end;
 
-    local procedure CreateAdmissionScheduleEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; StartDate: Date; StartTime: Time; EndDate: Date; EndTime: Time): Integer
+    local procedure CreateAdmissionScheduleEntry(AdmissionCode: Code[20]; StartDate: Date; StartTime: Time; EndDate: Date; EndTime: Time): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin

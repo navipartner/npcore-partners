@@ -169,7 +169,7 @@
             exit;
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
-        if not IsValidLineOperation(Rec, xRec, LineOperation) then
+        if not IsValidLineOperation() then
             exit;
 
         QuantityDiscountHeader.SetCurrentKey("Item No.", Status, "Starting Date", "Closing Date");
@@ -184,9 +184,7 @@
         end;
     end;
 
-    local procedure IsValidLineOperation(Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
+    local procedure IsValidLineOperation(): Boolean
     begin
         exit(true);
     end;

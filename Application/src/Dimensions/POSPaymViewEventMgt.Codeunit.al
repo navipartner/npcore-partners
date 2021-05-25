@@ -26,7 +26,6 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         POSPaymentViewLogEntry: Record "NPR POS Paym. View Log Entry";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
-        DimensionValue: Code[20];
         POSSalesNo: Integer;
         POSAction: Record "NPR POS Action";
         POSFrontEndMgt: Codeunit "NPR POS Front End Management";
@@ -133,13 +132,13 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
                 exit(true);
         end;
 
-        if SkipOnItemFilter(SalePOS) then
+        if SkipOnItemFilter() then
             exit(true);
 
         exit(false);
     end;
 
-    local procedure SkipOnItemFilter(SalePOS: Record "NPR POS Sale"): Boolean;
+    local procedure SkipOnItemFilter(): Boolean;
     var
         SalePOSLine: Record "NPR POS Sale Line";
         PopupDimFilter: Record "NPR Popup Dim. Filter";

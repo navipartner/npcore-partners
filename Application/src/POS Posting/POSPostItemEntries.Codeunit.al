@@ -6,9 +6,6 @@
     var
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
-        TempItemToAdjust: Record Item temporary;
-        AdjustCostItemEntries: Report "Adjust Cost - Item Entries";
-        PostInventoryCosttoGL: Report "Post Inventory Cost to G/L";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         OnBeforePostPOSEntry(Rec);
