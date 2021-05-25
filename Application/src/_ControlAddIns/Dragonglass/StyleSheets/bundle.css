@@ -6116,7 +6116,7 @@ body {
       background-color: var(--color-primary-300) !important;
       cursor: default !important;
       transform: none !important;
-      color: var(--color-text-200) !important; }
+      color: var(--color-text-300) !important; }
       .transcendence .button > div.button--disabled:hover, .transcendence .button > div.button--disabled:focus {
         background-color: var(--color-primary-300) !important; }
   .transcendence .button:last-child {
@@ -9655,6 +9655,7 @@ body {
     overflow: hidden; }
     .statistics .filter-container .filter {
       background: var(--color-secondary-100);
+      color: var(--color-text-100);
       padding: 0 2em;
       display: flex;
       align-items: center; }
@@ -10197,18 +10198,38 @@ body {
     min-width: unset;
     margin: 0;
     box-shadow: var(--box-shadow);
-    transition: all 0.3s ease-in-out; }
+    transition: all 0.3s ease-in-out;
+    align-items: center; }
+    .counting .counting-numpad .button--secondary {
+      background: transparent;
+      border: 2px solid var(--color-primary-100);
+      color: var(--color-text-100);
+      box-shadow: none; }
+      .counting .counting-numpad .button--secondary:hover {
+        border-color: var(--color-primary-200); }
     .counting .counting-numpad .button--transparent {
-      visibility: hidden; }
+      background: transparent;
+      color: var(--color-primary-300);
+      box-shadow: none;
+      pointer-events: none; }
+    .counting .counting-numpad .button--disabled {
+      pointer-events: none;
+      background: var(--color-primary-300);
+      color: var(--color-text-300);
+      box-shadow: none;
+      border: 2px solid transparent; }
     .counting .counting-numpad .button:hover {
-      cursor: pointer; }
+      cursor: pointer;
+      color: var(--color-text-200); }
   .counting .counting-numpad--disabled:hover {
     cursor: not-allowed; }
   .counting .counting-numpad--disabled .button {
     pointer-events: none;
-    background: transparent;
-    color: var(--color-text-100);
-    box-shadow: var(--box-shadow-light); }
+    background: var(--color-primary-300);
+    color: var(--color-text-300);
+    box-shadow: none; }
+    .counting .counting-numpad--disabled .button--secondary {
+      border: 2px solid transparent; }
 
 .balance-view {
   height: 100%; }
