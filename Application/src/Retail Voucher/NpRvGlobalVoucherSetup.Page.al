@@ -33,6 +33,7 @@ page 6151024 "NPR NpRv Global Voucher Setup"
                     field("Service Password"; Rec."Service Password")
                     {
                         ApplicationArea = All;
+                        ExtendedDatatype = Masked;
                         ToolTip = 'Specifies the value of the Service Password field';
                     }
                 }
