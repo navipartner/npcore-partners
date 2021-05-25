@@ -411,7 +411,6 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         NewDiscountCouponNodes: XmlNodeList;
         NewDiscountCouponNode: XmlNode;
         xSalePOS: Record "NPR POS Sale";
-        ErrReplaceSalesHeader: Label 'Could not replace POS sales header when loading POS quote. Please try again.';
     begin
         if not XmlDoc.GetRoot(Root) then
             exit;
@@ -695,18 +694,22 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         Message(POSSalesData);
     end;
 
+    [IntegrationEvent(false, false)]
     local procedure OnPOSSale2Xml(SalePOS: Record "NPR POS Sale"; XmlRoot: XmlElement)
     begin
     end;
 
+    [IntegrationEvent(false, false)]
     local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "NPR POS Sale Line"; XmlElement: XmlElement)
     begin
     end;
 
+    [IntegrationEvent(false, false)]
     local procedure OnXml2POSSale(XmlRoot: XmlElement; SalePOS: Record "NPR POS Sale")
     begin
     end;
 
+    [IntegrationEvent(false, false)]
     local procedure OnXml2POSSaleLine(XmlElement: XmlElement; SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;

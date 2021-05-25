@@ -93,8 +93,6 @@ codeunit 6014531 "NPR Retail Logo Mgt."
         InStr: InStream;
         Width: Integer;
         Height: Integer;
-        ImageHelper: Codeunit "Image Helpers";
-        Chr: Char;
         DotNetEncoding: Codeunit DotNet_Encoding;
         DotNetBinarwWriter: Codeunit DotNet_BinaryWriter;
         DotNetStream: Codeunit DotNet_Stream;

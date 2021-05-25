@@ -662,7 +662,7 @@
                 if not FindItemReferenceFromVendor(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                     if not FindItemReferenceFromVendorItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                         if not FindItemReferenceFromItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                            if not FindItemReferenceFromItem(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
+                            if not FindItemReferenceFromItem(EntryNo, HeaderRecordNo, RecordNo) then
                                 if not FindItemReferenceFromSubscriber(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                                     if not CreateItemWorksheetLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                                         if not FindGLAccountForLine(EntryNo, HeaderRecordNo, RecordNo) then
@@ -812,7 +812,7 @@
         exit(false);
     end;
 
-    local procedure FindItemReferenceFromItem(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
+    local procedure FindItemReferenceFromItem(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer): Boolean
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";

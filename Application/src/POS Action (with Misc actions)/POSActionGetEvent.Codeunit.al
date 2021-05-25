@@ -70,7 +70,7 @@ then begin
                 end;
         end;
 
-        ImportEvent(Context, POSSession, FrontEnd, EventNo);
+        ImportEvent(POSSession, EventNo);
     end;
 
     local procedure SelectEvent(var EventNo: Code[20]): Boolean
@@ -90,7 +90,7 @@ then begin
         exit(EventNo <> '');
     end;
 
-    local procedure ImportEvent(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; EventNo: Code[20])
+    local procedure ImportEvent(POSSession: Codeunit "NPR POS Session"; EventNo: Code[20])
     var
         Job: Record Job;
         Customer: Record Customer;

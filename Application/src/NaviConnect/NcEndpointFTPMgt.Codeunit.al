@@ -134,7 +134,7 @@
             NcEndpointFTP.Type::DotNet:
                 SendDotNetFtp(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText, ConnectionString);
             NcEndpointFTP.Type::SharpSFTP:
-                SendSharpSFTP(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText, ConnectionString);
+                SendSharpSFTP(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText);
         end;
         exit(true);
     end;
@@ -147,7 +147,6 @@
         JToken: JsonToken;
         InStr: InStream;
         OutStr: OutStream;
-        ErrorDescription: Text;
         FtpPort: Integer;
         Encoding: TextEncoding;
         UseDefaultEncoding: Boolean;
@@ -208,7 +207,7 @@
         exit(false);
     end;
 
-    local procedure SendSharpSFTP(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
+    local procedure SendSharpSFTP(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text): Boolean
     var
         RemotePath: Text;
         TempBlob: Codeunit "Temp Blob";
@@ -216,7 +215,6 @@
         JToken: JsonToken;
         InStr: InStream;
         OutStr: OutStream;
-        ErrorDescription: Text;
         FtpPort: Integer;
         Encoding: TextEncoding;
         UseDefaultEncoding: Boolean;
@@ -341,7 +339,7 @@
             FtpPort := 21;
 
         InitializeFTP(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive);
-        TryListFtpDirectory(FtpPath, DirectoryList);
+        TryListFtpDirectory(DirectoryList);
 
         if NcEndpointFTP.Directory = '' then
             exit;
@@ -359,7 +357,7 @@
         FtpPath := FtpServer;
         while CutNextFtpFolder(FtpFolders, FtpFolder) do begin
             FtpPath += '/' + FtpFolder;
-            if (not TryListFtpDirectory(FtpPath, DirectoryList)) or (DirectoryList.Count = 0) then
+            if (not TryListFtpDirectory(DirectoryList)) or (DirectoryList.Count = 0) then
                 TryCreateFtpFolder(FtpPath);
         end;
     end;
@@ -412,7 +410,7 @@
     end;
 
     [TryFunction]
-    local procedure TryListFtpDirectory(FtpPath: Text; var DirectoryList: List of [Text])
+    local procedure TryListFtpDirectory(var DirectoryList: List of [Text])
     var
         FTPResponse: JsonObject;
         FileObject: JsonObject;

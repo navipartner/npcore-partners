@@ -157,7 +157,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         ValidateHeader(JToken, EFTTransactionRequest);
 
         JObject := JObject.Item('DiagnosisResponse');
-        EFTTransactionRequest."Result Display Text" := CopyStr(ParseDiagnoseResponse(JObject, EFTTransactionRequest), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
+        EFTTransactionRequest."Result Display Text" := CopyStr(ParseDiagnoseResponse(JObject), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
 
         EFTTransactionRequest.Successful := true;
         EFTTransactionRequest."External Result Known" := true;
@@ -353,7 +353,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         ParseResponse(StatusResponse, EFTTransactionRequest); //Sets trx record result to match the lookup response rather than the repeated response result.
     end;
 
-    local procedure ParseDiagnoseResponse(JObject: DotNet NPRNetJObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    local procedure ParseDiagnoseResponse(JObject: DotNet NPRNetJObject): Text
     var
         TerminalStatus: Text;
         TerminalCommunication: Text;

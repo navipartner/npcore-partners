@@ -176,7 +176,7 @@
         PreviousRecordEntryNo := InsertDataRecord(xRecRef, TimeStamp, 3);
         ProcessDataLogRecord(PreviousRecordEntryNo, xRecRef.Number);
         RecordEntryNo := InsertDataRecordRename(RecRef, xRecRef, TimeStamp, 2);
-        InsertPKDataFields(RecRef, xRecRef, RecordEntryNo, TimeStamp, false);
+        InsertPKDataFields(RecRef, xRecRef, RecordEntryNo, TimeStamp);
 
         ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
@@ -310,7 +310,7 @@
         RecRefInit.Close();
     end;
 
-    local procedure InsertPKDataFields(var RecRef: RecordRef; var XRecRef: RecordRef; RecordEntryNo: BigInteger; LastModified: DateTime; LogChanges: Boolean)
+    local procedure InsertPKDataFields(var RecRef: RecordRef; var XRecRef: RecordRef; RecordEntryNo: BigInteger; LastModified: DateTime)
     var
         DataLogField: Record "NPR Data Log Field";
         FieldRef: FieldRef;

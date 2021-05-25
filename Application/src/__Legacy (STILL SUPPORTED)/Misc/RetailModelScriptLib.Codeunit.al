@@ -14,7 +14,6 @@ codeunit 6150673 "NPR Retail Model Script Lib."
         InStr: InStream;
         OutStr: OutStream;
         WebResponce: HttpResponseMessage;
-        TempBlob: Codeunit "Temp Blob";
     begin
         if not WebClientDependency.Get(WebClientDependency.Type::JavaScript, 'ANGULAR') then begin
             WebClient.Get('https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js', WebResponce);

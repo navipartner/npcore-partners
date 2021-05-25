@@ -293,10 +293,6 @@ page 6151061 "NPR Distrib. Matrix"
     begin
     end;
 
-    local procedure UpdateAmount(INT: Integer)
-    begin
-    end;
-
     local procedure MATRIX_OnDrillDown(INT: Integer)
     var
         DistributionLines: Record "NPR Distribution Lines";

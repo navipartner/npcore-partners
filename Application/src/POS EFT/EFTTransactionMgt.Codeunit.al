@@ -248,7 +248,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
 
         case true of
-            LookupError(EftTransactionRequest, OriginalEftTransactionRequest):
+            LookupError(EftTransactionRequest):
                 ;
             LookupFailure(EftTransactionRequest, OriginalEftTransactionRequest):
                 ;
@@ -367,8 +367,6 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     local procedure HandleSurcharge(POSSession: Codeunit "NPR POS Session"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         OriginalProcessingType: Integer;
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -399,8 +397,6 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     local procedure HandleTip(POSSession: Codeunit "NPR POS Session"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         OriginalProcessingType: Integer;
@@ -547,7 +543,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(not Annul);
     end;
 
-    local procedure SaleSuccessful(ReceiptNo: Text; SystemID: Guid): Boolean
+    local procedure SaleSuccessful(SystemID: Guid): Boolean
     var
         POSEntry: Record "NPR POS Entry";
     begin
@@ -674,12 +670,12 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
             EFTTransactionRequest.Get(EFTTransactionRequest."Recovered by Entry No.");
         end;
 
-        if (not SaleSuccessful(EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Sales ID")) and (EFTTransactionRequest."Sales ID" <> SalePOS.SystemId) then begin
+        if (not SaleSuccessful(EFTTransactionRequest."Sales ID")) and (EFTTransactionRequest."Sales ID" <> SalePOS.SystemId) then begin
             Error(SALE_NOT_FOUND);
         end;
     end;
 
-    local procedure LookupError(EFTTransactionRequest: Record "NPR EFT Transaction Request"; OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure LookupError(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
         if ((EFTTransactionRequest.Finished = 0DT) or (not EFTTransactionRequest."External Result Known")) then begin
             Message(CAPTION_RECOVER_FAIL_HARD, EFTTransactionRequest."Integration Type");
@@ -745,7 +741,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         POSEntry: Record "NPR POS Entry";
     begin
         if (EFTTransactionRequest."Result Amount" <> 0) then begin
-            if (SaleSuccessful(OriginalEFTTransactionRequest."Sales Ticket No.", OriginalEFTTransactionRequest."Sales ID")) then begin
+            if (SaleSuccessful(OriginalEFTTransactionRequest."Sales ID")) then begin
                 Message(CAPTION_RECOVER_WARN,
                   EFTTransactionRequest."Integration Type",
                   OriginalEFTTransactionRequest."Sales Ticket No.",

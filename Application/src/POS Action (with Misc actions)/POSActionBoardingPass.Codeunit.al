@@ -113,7 +113,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         BoardingPassString: Text;
         RequiredTravelToday: Boolean;
         RequiredLegAirPortCode: Code[3];

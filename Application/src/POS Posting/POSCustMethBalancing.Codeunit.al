@@ -142,8 +142,6 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
     end;
 
     local procedure GetStatistics() Statistics: JsonObject
-    var
-        Balancing: JsonObject;
     begin
         Statistics.Add('balancing', GetSectionBalancing());
         Statistics.Add('overview', GetSectionOverview());

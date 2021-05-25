@@ -189,12 +189,12 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
                         if CopyStr(FontType, 1, 4) = 'Font' then begin
                             StringLib.Construct(FontType);
                             FontParam := StringLib.SelectStringSep(2, ' ');
-                            Text(FontParam, Align, Rotation, X, Y, Height, false, TextIn);
+                            Text(FontParam, Rotation, X, Y, Height, false, TextIn);
                         end else
                             if CopyStr(FontType, 1, 9) = 'Bold Font' then begin
                                 StringLib.Construct(FontType);
                                 FontParam := StringLib.SelectStringSep(3, ' ');
-                                Text(FontParam, Align, Rotation, X, Y, Height, true, TextIn);
+                                Text(FontParam, Rotation, X, Y, Height, true, TextIn);
                             end else
                                 if CopyStr(FontType, 1, 5) = 'SETUP' then
                                     exit
@@ -738,7 +738,7 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)))
     end;
 
-    local procedure Text(Type: Text; Align: Integer; Rotation: Integer; X: Integer; Y: Integer; Height: Integer; Bold: Boolean; TextIn: Text)
+    local procedure Text(Type: Text; Rotation: Integer; X: Integer; Y: Integer; Height: Integer; Bold: Boolean; TextIn: Text)
     var
         highY: Integer;
         lowY: Integer;

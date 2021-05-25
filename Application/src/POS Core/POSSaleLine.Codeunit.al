@@ -146,20 +146,7 @@
 
     procedure InsertLine(var Line: Record "NPR POS Sale Line"; IncludeDiscountFields: Boolean) Return: Boolean
     var
-        Contact: Record Contact;
-        Linie: Record "NPR POS Sale Line";
-        "Linie 2": Record "NPR POS Sale Line";
-        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-        LinieInteger: Integer;
-        Mikspris: Record "NPR Mixed Discount Line";
-        cust: Record Customer;
-        t001: Label 'Customer club member does not exist';
-        GL: Record "G/L Account";
-        t002: Label 'G/L Account\ "%1 - %2"\ is not prepared for outpayment on register';
-        tmpStr: Text[250];
         Item: Record Item;
-        ItemVariant: Record "Item Variant";
-        PrefilledUnitPrice: Decimal;
     begin
         if UsePresetLineNo then
             Rec."Line No." := Line."Line No.";

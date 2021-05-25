@@ -595,9 +595,8 @@ codeunit 6014646 "NPR BTF XML Response" implements "NPR BTF IFormatResponse"
         Node, Node2 : XmlNode;
         NodeList: XmlNodeList;
         Element: XmlElement;
-        NamespaceManager: XmlNamespaceManager;
         InStr: InStream;
-        DocumentSource, XPath, MessageId, ItemWrksTemplate, ItemWrksName, CurrencyCode, VendorGLN, B24Action, LineParameter, ItemCategoryDesc : Text;
+        DocumentSource, XPath, MessageId, ItemWrksTemplate, ItemWrksName, CurrencyCode, B24Action, LineParameter, ItemCategoryDesc : Text;
         AttrText: array[10] of Text;
         ValidFrom, ValidTo : DateTime;
     begin

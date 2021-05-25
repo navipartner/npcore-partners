@@ -6,7 +6,6 @@
         TEXTitemTracking_lead: Label 'This item requires serial number, enter serial number.';
         TEXTitemTracking_instructions: Label 'Enter serial number now and press OK. Press Cancel to enter serial number later.';
         TEXTActive: Label 'active';
-        TEXTSaved: Label 'saved';
         TEXTWrongSerialOnILE: Label 'Serial number %1 for item %2 - %3 can not be used since it can not be found as received.';
         TEXTWrongSerialOnSLP: Label 'Serial number %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6.';
         TEXTWrongSerial_Instr: Label ' \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
@@ -204,7 +203,7 @@
                 SerialNumberInput := '';
                 POSSession.GetSetup(Setup);
                 Setup.GetPOSStore(POSStore);
-                SelectSerialNoFromList(ItemReference, POSStore."Location Code", 1, false, SerialNumberInput);
+                SelectSerialNoFromList(ItemReference, POSStore."Location Code", SerialNumberInput);
                 if SerialNumberInput = '' then
                     Error('');
             end;
@@ -284,7 +283,6 @@
     procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; SetUnitPrice: Boolean; CustomDescription: Text; InputSerial: Text; UseSpecificTracking: Boolean; ValidatedSerialNumber: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Line: Record "NPR POS Sale Line";
-        JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
@@ -355,7 +353,6 @@
 
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        BOMComponent: Record "BOM Component";
         SaleLinePOS: Record "NPR POS Sale Line";
         Level: Integer;
     begin
@@ -549,11 +546,9 @@
         exit(CanBeUsed);
     end;
 
-    local procedure SelectSerialNoFromList(var ItemRef: Record "Item Reference"; LocationCode: Code[10]; Qty: Decimal; InsertIsBlocked: Boolean; var SerialNo: Text)
+    local procedure SelectSerialNoFromList(var ItemRef: Record "Item Reference"; LocationCode: Code[10]; var SerialNo: Text)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        TrackingSpecification: Record "Tracking Specification" temporary;
-        ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection";
     begin
         SaleLinePOS.Init();
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;

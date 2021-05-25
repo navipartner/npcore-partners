@@ -16,7 +16,7 @@ codeunit 6151457 "NPR Magento NpXml Ext. Item"
         if not RecRef.Find() then
             exit;
 
-        CustomValue := GetVariantCode(RecRef, NpXmlElement."Field No.");
+        CustomValue := GetVariantCode(RecRef);
         RecRef.Close();
 
         Clear(RecRef);
@@ -30,7 +30,7 @@ codeunit 6151457 "NPR Magento NpXml Ext. Item"
         Text000: Label 'Unsupported table: %1 %2 - codeunit 6059834 "NpXml Value External Item No." - NpXml Element: %3 %4';
         NpXmlElement: Record "NPR NpXml Element";
 
-    local procedure GetVariantCode(RecRef: RecordRef; FieldNo: Integer): Text
+    local procedure GetVariantCode(RecRef: RecordRef): Text
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";

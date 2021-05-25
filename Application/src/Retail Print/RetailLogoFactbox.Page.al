@@ -43,7 +43,6 @@ page 6014567 "NPR Retail Logo Factbox"
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
                     FileName: Text;
-                    ClientFileName: Text;
                 begin
                     if Rec."POS Logo".HasValue() then
                         if not Confirm(OverrideImageQst) then

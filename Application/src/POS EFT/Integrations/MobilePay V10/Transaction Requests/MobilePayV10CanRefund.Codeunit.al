@@ -48,11 +48,11 @@ codeunit 6014507 "NPR MobilePayV10 Can. Refund"
         _responseHttpCode := respMessage.HttpStatusCode;
         respMessage.Content.ReadAs(_response);
 
-        ParseResponse(reqMessage, respMessage, eftTrxRequest);
+        ParseResponse(reqMessage, respMessage);
 
     end;
 
-    local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
+    local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage)
     var
         jsonResponse: JsonObject;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";

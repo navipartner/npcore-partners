@@ -36,7 +36,7 @@ page 6150700 "NPR POS (Transcendence)"
                         exit;
                     //+NPR5.43 [318028]
                     POSSession.DebugWithTimestamp('Method:' + method);
-                    if not PreHandleMethod(method, eventContext) then
+                    if not PreHandleMethod(method) then
                         JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd, JavaScript);
                 end;
 
@@ -107,7 +107,7 @@ page 6150700 "NPR POS (Transcendence)"
         //+NPR5.43 [318028]
     end;
 
-    local procedure PreHandleMethod(Method: Text; Context: JsonObject): Boolean
+    local procedure PreHandleMethod(Method: Text): Boolean
     begin
         case Method of
             'KeepAlive':

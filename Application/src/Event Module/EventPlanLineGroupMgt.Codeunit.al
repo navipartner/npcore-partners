@@ -34,7 +34,7 @@
         if EventPeriodDistrDlg.RunModal() <> ACTION::OK then
             exit;
         EventPeriodDistrDlg.GetParameters(JobPlanningLineTemp, DaysOfWeek);
-        CheckParameters(JobPlanningLineTemp, DaysOfWeek);
+        CheckParameters(DaysOfWeek);
 
         BackupCurrentDistribution(Rec, JobPlanningLineBackupTemp);
         NewRec := Rec;
@@ -66,7 +66,7 @@
             RestoreOldDistribution(JobPlanningLineBackupTemp);
     end;
 
-    local procedure CheckParameters(var JobPlanningLine: Record "Job Planning Line"; DaysOfWeek: array[7] of Boolean)
+    local procedure CheckParameters(DaysOfWeek: array[7] of Boolean)
     var
         i: Integer;
     begin

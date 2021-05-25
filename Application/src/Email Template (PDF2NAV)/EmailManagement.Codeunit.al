@@ -189,10 +189,6 @@
     var
         EmailTemplateLine: Record "NPR E-mail Templ. Line";
         EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
-        Email: Text;
-        EmailString: Text;
-        Filepath: Text;
-        Filename: Text;
         HtmlLine: Text;
         InStream: InStream;
         Separators: List of [Text];
@@ -272,8 +268,6 @@
         HandledByTransactional: Boolean;
         FromName: Text;
         FromAddress: Text;
-        CCAddressList: List of [Text];
-        BCCAddressList: List of [Text];
         EmailLogPrepared: Boolean;
         InStr: InStream;
         BodyText: Text;
@@ -518,10 +512,8 @@
     procedure GetReportIDFromRecRef(RecRef: RecordRef) ReportID: Integer
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
-        PurchHeader: Record "Purchase Header";
         ReportSelections: Record "Report Selections";
         SalesHeader: Record "Sales Header";
-        ServHeader: Record "Service Header";
     begin
         ReportID := 0;
 
@@ -696,7 +688,6 @@
     local procedure PrepareEmailLogEntry(var EmailLog: Record "NPR E-mail Log"; RecRef: RecordRef)
     var
         Chr: array[2] of Char;
-        MailAddresses: List of [Text];
     begin
         Chr[1] := 13;
         Chr[2] := 10;

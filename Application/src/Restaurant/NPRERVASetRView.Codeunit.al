@@ -30,12 +30,12 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View"
 
         Handled := true;
 
-        SaveToWaiterPad(POSSession, FrontEnd);
-        SelectRestaurantView(POSSession, FrontEnd, Context);
+        SaveToWaiterPad(POSSession);
+        SelectRestaurantView(POSSession, Context);
         POSSession.RequestRefreshData();
     end;
 
-    local procedure SaveToWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management");
+    local procedure SaveToWaiterPad(POSSession: Codeunit "NPR POS Session");
     var
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
         SalePOS: Record "NPR POS Sale";
@@ -55,7 +55,7 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View"
         POSSale.Modify(true, false);
     end;
 
-    local procedure SelectRestaurantView(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management");
+    local procedure SelectRestaurantView(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management");
     var
         POSSale: Codeunit "NPR POS Sale";
     begin

@@ -2,9 +2,6 @@
 {
     var
         TextFileDownloaded: Label 'The file was downloaded.';
-        TextFileExistsSkipped: Label 'The file was not exported because the file %1 already exists.';
-        TextFileExistsOverwitten: Label 'The file was exported, overwriting the file %1 that already existed.';
-        TextFileExistsAppendedSuffix: Label 'The file was exported to %1 with an appended Timestamp in the filename because the file already existed.';
         TextFileExported: Label 'The file was exported.';
 
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text)
@@ -101,7 +98,6 @@
     local procedure FileProcess(var NcTask: Record "NPR Nc Task"; NcEndpointFile: Record "NPR Nc Endpoint File"; OutputText: Text; Filename: Text)
     var
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
-        FileMgt: Codeunit "File Management";
         InStm: InStream;
         OutStm: OutStream;
         TempBlob: Codeunit "Temp Blob";
@@ -130,7 +126,6 @@
 
     local procedure FileProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFile: Record "NPR Nc Endpoint File")
     var
-        FileMgt: Codeunit "File Management";
         InStr: InStream;
     begin
         NcEndpointFile.TestField(Path);

@@ -47,7 +47,7 @@ codeunit 6014517 "NPR MobilePayV10 Dialog"
 
         case Sender of
             'mobilepay-timer':
-                CheckResponse(POSSession, FrontEnd);
+                CheckResponse(FrontEnd);
             'mobilepay-abort':
                 RequestAbort(FrontEnd);
             'mobilepay-force-abort':
@@ -55,12 +55,11 @@ codeunit 6014517 "NPR MobilePayV10 Dialog"
         end;
     end;
 
-    local procedure CheckResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure CheckResponse(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         eftTrxRequest: Record "NPR EFT Transaction Request";
         eftSetup: Record "NPR EFT Setup";
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        newPollingDelay: Integer;
         mobilePayResultCode: Enum "NPR MobilePayV10 Result Code";
         captured: Boolean;
         captureAttempts: Integer;

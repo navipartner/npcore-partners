@@ -12,7 +12,7 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
             FunctionName := GetWebserviceFunction(Rec."Import Type");
             case FunctionName of
                 'Createendpointquery':
-                    CreateEndpointQueries(Document, Rec."Entry No.", Rec."Document ID");
+                    CreateEndpointQueries(Document);
                 else
                     Error(MissingCaseErr, Rec."Import Type", FunctionName);
             end;
@@ -23,7 +23,7 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
     var
         MissingCaseErr: Label 'No handler for %1 [%2].', Comment = '%1="NPR Nc Import Entry"."Import Type",%2="NPR Nc Import Entry"."Webservice Function"';
 
-    local procedure CreateEndpointQueries(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure CreateEndpointQueries(Document: XmlDocument)
     var
         Element: XmlElement;
         Node: XmlNode;
@@ -58,11 +58,11 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
 
         foreach Node in NodeList do begin
             Element := Node.AsXmlElement();
-            CreateEndpointQuery(Element, DocumentID, XPathExcludeNamespacePattern);
+            CreateEndpointQuery(Element, XPathExcludeNamespacePattern);
         end;
     end;
 
-    local procedure CreateEndpointQuery(Element: XmlElement; DocumentID: Text[100]; XPathExcludeNamespacePattern: Text)
+    local procedure CreateEndpointQuery(Element: XmlElement; XPathExcludeNamespacePattern: Text)
     var
         EndpointQuery: Record "NPR Endpoint Query";
         Element2: XmlElement;
@@ -73,12 +73,12 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
         if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'endpointqueryfilter'), NodeList) then
             foreach Node in NodeList do begin
                 Element := Node.AsXmlElement();
-                CreateEndpointQueryFilter(Element2, DocumentID, EndpointQuery, XPathExcludeNamespacePattern);
+                CreateEndpointQueryFilter(Element2, EndpointQuery, XPathExcludeNamespacePattern);
             end;
         EndpointQuery.ProcessQuery();
     end;
 
-    local procedure CreateEndpointQueryFilter(Element: XmlElement; DocumentID: Text[100]; EndpointQuery: Record "NPR Endpoint Query"; XPathExcludeNamespacePattern: Text)
+    local procedure CreateEndpointQueryFilter(Element: XmlElement; EndpointQuery: Record "NPR Endpoint Query"; XPathExcludeNamespacePattern: Text)
     var
         EndpointQueryFilter: Record "NPR Endpoint Query Filter";
     begin

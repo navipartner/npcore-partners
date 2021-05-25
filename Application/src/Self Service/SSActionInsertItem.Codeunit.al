@@ -4,8 +4,6 @@
         TEXTActive: Label 'active';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
         EnterQuantityCaption: Label 'Enter Quantity';
-        TEXTitemTracking_instructions: Label 'Enter serial number now and press OK. Press Cancel to enter serial number later.';
-        TEXTSaved: Label 'saved';
         TEXTWrongSerialOnILE: Label 'Serial number %1 for item %2 - %3 can not be used since it can not be found as received. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
         TEXTWrongSerialOnSLP: Label 'Serial number %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\''';
         ValidRangeText: Label 'The valid range is %1 to %2.';
@@ -87,13 +85,13 @@
 
         case WorkflowStep of
             'itemTrackingForce':
-                Step_ItemTracking(Context, POSSession, FrontEnd);
+                Step_ItemTracking(Context, FrontEnd);
             'AddSalesLine':
                 Step_AddSalesLine(Context, POSSession, FrontEnd);
             'IncreaseQuantity':
                 Step_IncreaseQuantity(Context, POSSession, FrontEnd);
             'DecreaseQuantity':
-                Step_DecreaseQuantity(Context, POSSession, FrontEnd);
+                Step_DecreaseQuantity(Context, POSSession);
             'SetSpecificQuantity':
                 Step_SetQuantity(Context, POSSession, FrontEnd);
         end;
@@ -142,7 +140,7 @@
         AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UsePresetUnitPrice, PresetUnitPrice, JSON, POSSession, FrontEnd);
     end;
 
-    local procedure Step_ItemTracking(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure Step_ItemTracking(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         SerialNumberInput: Text;
         ItemNo: Code[20];
@@ -172,7 +170,7 @@
         exit;
     end;
 
-    local procedure Step_DecreaseQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure Step_DecreaseQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
@@ -191,7 +189,7 @@
             ItemIdentifierType := 0;
 
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
-        RemoveQuantityFromItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, ItemMinQuantity, JSON, POSSession, FrontEnd);
+        RemoveQuantityFromItemLine(Item, ItemQuantity, ItemMinQuantity, POSSession);
     end;
 
     local procedure Step_IncreaseQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -214,7 +212,7 @@
             ItemIdentifierType := 0;
 
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
-        if (not AddQuantityToItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd)) then
+        if (not AddQuantityToItemLine(Item, ItemQuantity, POSSession)) then
             Step_AddSalesLine(JSON, POSSession, FrontEnd);
 
     end;
@@ -384,12 +382,12 @@
         SaleLine.InsertLine(Line);
         AddAccessories(Item, SaleLine);
         AutoExplodeBOM(Item, SaleLine);
-        AddItemAddOns(FrontEnd, Item, Line."Line No.");
+        AddItemAddOns(FrontEnd, Item);
 
         POSSession.RequestRefreshData();
     end;
 
-    local procedure AddQuantityToItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure AddQuantityToItemLine(Item: Record Item; ItemQuantity: Decimal; POSSession: Codeunit "NPR POS Session"): Boolean
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -416,7 +414,7 @@
         exit(true);
     end;
 
-    local procedure RemoveQuantityFromItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; ItemMinQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure RemoveQuantityFromItemLine(Item: Record Item; ItemQuantity: Decimal; ItemMinQuantity: Decimal; POSSession: Codeunit "NPR POS Session")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -477,7 +475,6 @@
 
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        BOMComponent: Record "BOM Component";
         SaleLinePOS: Record "NPR POS Sale Line";
         Level: Integer;
     begin
@@ -578,7 +575,7 @@
         until (AccessorySparePart.Next() = 0);
     end;
 
-    local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item; BaseLineNo: Integer)
+    local procedure AddItemAddOns(POSFrontEnd: Codeunit "NPR POS Front End Management"; Item: Record Item)
     var
         POSAction: Record "NPR POS Action";
     begin

@@ -119,12 +119,8 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
 
     local procedure DocumentNoPrompt(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         InvoiceNo: Text;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         InvoiceNo := GetInput(JSON, 'Prompt');
@@ -137,12 +133,8 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
 
     local procedure CrMemoNoPrompt(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         CrMemoNo: Text;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         CrMemoNo := GetInput(JSON, 'Prompt');

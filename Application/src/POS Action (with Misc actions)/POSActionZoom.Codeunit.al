@@ -25,20 +25,19 @@ then begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
-        ZoomLine(Context, POSSession, FrontEnd);
+        ZoomLine(POSSession);
         Handled := true;
     end;
 
-    local procedure ZoomLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure ZoomLine(POSSession: Codeunit "NPR POS Session")
     var
-        JSON: Codeunit "NPR POS JSON Management";
         Line: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
         CurrentView: Codeunit "NPR POS View";
     begin
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type() <> CurrentView.Type()::Sale) then
+        if (CurrentView.Type() <> CurrentView.Type() ::Sale) then
             exit;
 
         POSSession.GetSaleLine(SaleLine);

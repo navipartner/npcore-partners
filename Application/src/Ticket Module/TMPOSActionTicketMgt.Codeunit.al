@@ -231,7 +231,7 @@
         end;
 
         if (WorkflowStep = 'ticketnumber') then begin
-            TicketMaxQty := GetGroupTicketQuantity(POSSession, JSON, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
+            TicketMaxQty := GetGroupTicketQuantity(JSON, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
 
             if (FunctionId = 6) then begin
                 if (not ShowQtyDialog) then begin
@@ -250,7 +250,7 @@
                     ShowQuickStatistics(AdmissionCode);
                 1:
                     begin
-                        SetGroupTicketConfirmedQuantity(POSSession, JSON, ExternalTicketNumber, AdmissionCode);
+                        SetGroupTicketConfirmedQuantity(JSON, ExternalTicketNumber, AdmissionCode);
                         RegisterArrival(ExternalTicketNumber, AdmissionCode, POSUnitNo, WithTicketPrint);
 
                     end;
@@ -259,17 +259,17 @@
                 3:
                     EditReservation(POSSession, ExternalTicketNumber);
                 4:
-                    ReconfirmReservation(POSSession, ExternalTicketNumber);
+                    ReconfirmReservation(POSSession);
                 5:
                     EditTicketHolder(POSSession, ExternalTicketNumber);
                 6:
-                    SetGroupTicketConfirmedQuantity(POSSession, JSON, ExternalTicketNumber, '');
+                    SetGroupTicketConfirmedQuantity(JSON, ExternalTicketNumber, '');
                 7:
                     PickupPreConfirmedTicket(POSSession, TicketReference);
                 8:
                     ConvertToMembership(POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
                 9:
-                    RegisterDeparture(ExternalTicketNumber, AdmissionCode, WithTicketPrint); //-+TM1.47 [408018]
+                    RegisterDeparture(ExternalTicketNumber, AdmissionCode);
                 else
                     Error('Function with ID %1 is not implemented.', FunctionId);
             end;
@@ -295,7 +295,7 @@
 
         Handled := true;
 
-        OnActionWorker(WorkflowStep, Context, POSSession, State, FrontEnd);
+        OnActionWorker(WorkflowStep, Context, POSSession);
     end;
 
     local procedure ConfigureWorkflow(Context: Codeunit "NPR POS JSON Management"; FunctionId: Integer; DefaultTicketNumber: Text; SalesReceiptNo: Code[20]; SaleLineNo: Integer)
@@ -350,7 +350,7 @@
 
     end;
 
-    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text; PosUnitNo: Code[10]; WithTicketPrint: Boolean)
+    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text; PosUnitNo: Code[10]; WithTicketPrint: Boolean)
     begin
 
         case FunctionId of
@@ -358,7 +358,7 @@
                 ShowQuickStatistics(AdmissionCode);
             1:
                 begin
-                    SetGroupTicketConfirmedQuantity(POSSession, Context, ExternalTicketNumber, AdmissionCode);
+                    SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, AdmissionCode);
                     // RegisterArrival (ExternalTicketNumber, AdmissionCode);
                     RegisterArrival(ExternalTicketNumber, AdmissionCode, PosUnitNo, WithTicketPrint);
                 end;
@@ -367,23 +367,23 @@
             3:
                 EditReservation(POSSession, ExternalTicketNumber);
             4:
-                ReconfirmReservation(POSSession, ExternalTicketNumber);
+                ReconfirmReservation(POSSession);
             5:
                 EditTicketHolder(POSSession, ExternalTicketNumber);
             6:
-                SetGroupTicketConfirmedQuantity(POSSession, Context, ExternalTicketNumber, '');
+                SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, '');
             7:
                 PickupPreConfirmedTicket(POSSession, TicketReference);
             8:
                 Error('WF20 support for EAN box is not completed yet.'); //ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
             9:
-                RegisterDeparture(ExternalTicketNumber, AdmissionCode, WithTicketPrint); //-+TM1.47 [408018]
+                RegisterDeparture(ExternalTicketNumber, AdmissionCode);
             else
                 Error('Function with ID %1 is not implemented.', FunctionId);
         end;
     end;
 
-    local procedure OnActionWorker(WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionWorker(WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         FunctionId: Integer;
         AdmissionCode: Code[20];
@@ -430,13 +430,13 @@
                 ConfigureWorkflow(Context, FunctionId, '', '', 0);
             'RefineWorkflow':
                 begin
-                    TicketMaxQty := GetGroupTicketQuantity(POSSession, Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
+                    TicketMaxQty := GetGroupTicketQuantity(Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
                     Context.SetContext('TicketMaxQty', TicketMaxQty);
                     Context.SetContext('ShowTicketQtyDialog', ShowQtyDialog);
                 end;
             'DoAction':
                 begin
-                    DoWorkflowFunction(FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference, PosUnitNo, WithTicketPrint);
+                    DoWorkflowFunction(FunctionId, Context, POSSession, AdmissionCode, ExternalTicketNumber, TicketReference, PosUnitNo, WithTicketPrint);
                 end;
         end;
     end;
@@ -643,7 +643,7 @@
     begin
     end;
 
-    local procedure NewTicketSales(SaleLinePOS: Record "NPR POS Sale Line") ReturnCode: Integer
+    local procedure NewTicketSales(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -752,9 +752,7 @@
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        Admission: Record "NPR TM Admission";
         Ticket: Record "NPR TM Ticket";
-        POSDefaultAdmission: Record "NPR TM POS Default Admission";
     begin
 
         TicketRequestManager.LockResources();
@@ -777,7 +775,7 @@
         end;
     end;
 
-    local procedure RegisterDeparture(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; WithPrint: Boolean)
+    local procedure RegisterDeparture(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -909,7 +907,7 @@
             AquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesTicket, ResponseMessage); //-+TM1.45 [380754]
     end;
 
-    local procedure ReconfirmReservation(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50])
+    local procedure ReconfirmReservation(POSSession: Codeunit "NPR POS Session")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -963,7 +961,7 @@
             AquireTicketParticipant(Token, Ticket."External Member Card No.", true);
     end;
 
-    local procedure GetGroupTicketQuantity(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var ShowQtyDialogOut: Boolean) TicketMaxQty: Integer
+    local procedure GetGroupTicketQuantity(JSON: Codeunit "NPR POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var ShowQtyDialogOut: Boolean) TicketMaxQty: Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
@@ -1006,7 +1004,7 @@
         exit(TicketMaxQty);
     end;
 
-    local procedure SetGroupTicketConfirmedQuantity(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])
+    local procedure SetGroupTicketConfirmedQuantity(JSON: Codeunit "NPR POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         Ticket: Record "NPR TM Ticket";

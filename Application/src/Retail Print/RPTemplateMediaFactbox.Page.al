@@ -48,7 +48,6 @@ page 6014629 "NPR RP Template Media Factbox"
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
                     FileName: Text;
-                    ClientFileName: Text;
                 begin
                     if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then

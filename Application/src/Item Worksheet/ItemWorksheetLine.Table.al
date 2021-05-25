@@ -3376,7 +3376,6 @@ table 6060042 "NPR Item Worksheet Line"
         DimMgt: Codeunit DimensionManagement;
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
         ItemWorksheetItemMgt: Codeunit "NPR Item Worksheet Item Mgt.";
-        ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
         NewItemNoLbl: Label '<NEWITEMNO>';
         NewNosNoLbl: Label '<NEWNOSNO>';
         VarietyErr: Label 'Delete all Item Worksheet Variety Lines belonging to this Item Worksheet Line before changing %1.', Comment = '%1 = Variety Group';

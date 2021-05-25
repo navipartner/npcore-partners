@@ -616,8 +616,7 @@ table 6059974 "NPR Variety Buffer"
     var
         VRTValue: Record "NPR Variety Value";
     begin
-        //-NPR5.36 [285733]
-        if IsVarietyTypeUsed(VarietyType, VarietyTable) then begin
+        if IsVarietyTypeUsed(VarietyType) then begin
             VRTValue.SetRange(Type, VarietyType);
             VRTValue.SetRange(Table, VarietyTable);
             if VRTValue.FindSet() then
@@ -627,33 +626,26 @@ table 6059974 "NPR Variety Buffer"
                 until VRTValue.Next() = 0;
         end else
             InsertEmptyRecord(TMPVRTValue);
-        //+NPR5.36 [285733]
     end;
 
     local procedure LoadTmpValue(var TMPVRTValue: Record "NPR Variety Value" temporary; VarietyType: Code[20]; VarietyTable: Code[40]; ForceEmptyRecord: Boolean)
     begin
-        //-NPR5.36 [285733]
-        if not IsVarietyTypeUsed(VarietyType, VarietyTable) or (ForceEmptyRecord) then
+        if not IsVarietyTypeUsed(VarietyType) or (ForceEmptyRecord) then
             InsertEmptyRecord(TMPVRTValue)
         else
             InsertAllValuesInTmpTable(VarietyType, VarietyTable, TMPVRTValue); //full load is needed
-        //+NPR5.36 [285733]
     end;
 
     local procedure InsertEmptyRecord(var TMPVRTValue: Record "NPR Variety Value" temporary)
     begin
-        //-NPR5.36 [285733]
         TMPVRTValue.Type := '';
         TMPVRTValue.Table := '';
         TMPVRTValue.Insert();
-        //+NPR5.36 [285733]
     end;
 
-    local procedure IsVarietyTypeUsed(VarietyType: Code[20]; VarietyTable: Code[40]): Boolean
+    local procedure IsVarietyTypeUsed(VarietyType: Code[20]): Boolean
     begin
-        //-NPR5.36 [285733]
         exit(VarietyType <> '');
-        //+NPR5.36 [285733]
     end;
 
     local procedure LoadAllRows(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)

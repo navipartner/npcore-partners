@@ -396,10 +396,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         ySpace := Height;
     end;
 
-    local procedure PrintControlChar(Char: Text[1])
-    begin
-    end;
-
     local procedure SendCommand(Command: Text)
     var
         StringLib: Codeunit "NPR String Library";

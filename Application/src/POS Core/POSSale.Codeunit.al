@@ -86,8 +86,6 @@
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
-        NoSeriesLine: Record "No. Series Line";
-        NoSeries: Record "No. Series";
         DuplicateReceiptNo: Label 'Duplicate Receipt Number %1';
     begin
         POSUnit.Get(POSUnitNo);
@@ -213,8 +211,6 @@
     end;
 
     procedure RefreshCurrent()
-    var
-        LocalSaleLinePOS: Record "NPR POS Sale Line";
     begin
         Rec.Get(Rec."Register No.", Rec."Sales Ticket No.");
         OnRefresh(Rec);
@@ -571,8 +567,6 @@
     end;
 
     procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
-    var
-        SalePOS: Record "NPR POS Sale";
     begin
         Initialized := true;
 

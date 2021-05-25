@@ -413,7 +413,7 @@
             HandlingTypeMailCode():
                 DocManageSuccess := DocManageMail(NaviDocsEntry, RecRef, ReportID);
             HandlingTypeElecDocCode():
-                DocManageSuccess := DocManageElectronicDoc(NaviDocsEntry, RecRef, ReportID);
+                DocManageSuccess := DocManageElectronicDoc(NaviDocsEntry, RecRef);
         end;
 
         if not DocManageSuccess then
@@ -469,7 +469,7 @@
             exit(true);
     end;
 
-    local procedure DocManageElectronicDoc(NaviDocsEntry: Record "NPR NaviDocs Entry"; RecRef: RecordRef; ReportID: Integer): Boolean
+    local procedure DocManageElectronicDoc(NaviDocsEntry: Record "NPR NaviDocs Entry"; RecRef: RecordRef): Boolean
     var
         Customer: Record Customer;
         CustomerDocumentSendingProfile: Record "Document Sending Profile";

@@ -794,7 +794,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        ReasonNotFound: Text;
     begin
 
         MemberCard.Reset();
@@ -803,7 +802,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberCard.SetFilter("External Card No.", '=%1 | =%2', ExternalCardNo, EncodeSHA1(ExternalCardNo));
 
         if (not MemberCard.FindFirst()) then begin
-            GetMembershipFromForeignCardNo(ExternalCardNo, ReferenceDate, ReasonNotFound, CardEntryNo);
+            GetMembershipFromForeignCardNo(ExternalCardNo, ReferenceDate, CardEntryNo);
             if ((CardEntryNo = 0) or (not MemberCard.Get(CardEntryNo))) then
                 exit(false);
         end;
@@ -1494,7 +1493,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 exit(false);
 
         if (MembershipAlterationSetup."To Membership Code" <> '') then
-            if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", StartDateNew, MembershipAlterationSetup."To Membership Code", ReasonText))) then
+            if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", MembershipAlterationSetup."To Membership Code", ReasonText))) then
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
         if (not CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
@@ -1674,7 +1673,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 exit(false);
 
         if (MembershipAlterationSetup."To Membership Code" <> '') then
-            if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", StartDateNew, MembershipAlterationSetup."To Membership Code", ReasonText))) then
+            if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", MembershipAlterationSetup."To Membership Code", ReasonText))) then
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
         if (MembershipEntry."Unit Price (Base)" = 0) then begin
@@ -1867,7 +1866,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             if (not Confirm(UPGRADE_MEMBERSHIP, false, MembershipAlterationSetup.Description, StartDateNew, EndDateNew)) then
                 exit(false);
 
-        if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", StartDateNew, MembershipAlterationSetup."To Membership Code", ReasonText))) then
+        if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", MembershipAlterationSetup."To Membership Code", ReasonText))) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
         if (MembershipEntry."Unit Price (Base)" = 0) then begin
@@ -2933,7 +2932,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(InGracePeriod);
     end;
 
-    local procedure ValidateChangeMembershipCode(WithConfirm: Boolean; MembershipEntryNo: Integer; StartDate: Date; ToMembershipCode: Code[20]; var ReasonText: Text): Boolean
+    local procedure ValidateChangeMembershipCode(WithConfirm: Boolean; MembershipEntryNo: Integer; ToMembershipCode: Code[20]; var ReasonText: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -3881,7 +3880,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(0);
     end;
 
-    local procedure ActivateCustomerForWeb(MembershipEntryNo: Integer)
+    local procedure ActivateCustomerForWeb()
     begin
 
         // TODO: Defer customer / contact sync until activated.
@@ -4724,11 +4723,11 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         // Foreign cards might have more information then just a raw card number.
         if (MembershipEntryNo = 0) then
-            MembershipEntryNo := GetMembershipFromForeignCardNo(ExternalCardNo, ReferenceDate, ReasonNotFound, CardEntryNo);
+            MembershipEntryNo := GetMembershipFromForeignCardNo(ExternalCardNo, ReferenceDate, CardEntryNo);
 
     end;
 
-    local procedure GetMembershipFromForeignCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text; var CardEntryNo: Integer) MembershipEntryNo: Integer
+    local procedure GetMembershipFromForeignCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var CardEntryNo: Integer) MembershipEntryNo: Integer
     var
         Membership: Record "NPR MM Membership";
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";

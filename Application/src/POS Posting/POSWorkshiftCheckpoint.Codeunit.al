@@ -32,13 +32,6 @@
         CheckPointEntryNo: Integer;
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
-        PageAction: Action;
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        SalePOS: Record "NPR POS Sale";
-        POSPostEntries: Codeunit "NPR POS Post Entries";
-        POSEntryToPost: Record "NPR POS Entry";
-        EntryNo: Integer;
     begin
 
         CheckPointEntryNo := POSCheckpointMgr.CreateEndWorkshiftCheckpoint_POSEntry(UnitNo);
@@ -79,19 +72,6 @@
     end;
 
     procedure CloseWorkshift(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10]) PosEntryNo: Integer
-    var
-        POSUnit: Record "NPR POS Unit";
-        POSWorkshiftCheckpointPage: Page "NPR POS Workshift Checkp. Card";
-        CheckPointEntryNo: Integer;
-        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
-        PageAction: Action;
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        SalePOS: Record "NPR POS Sale";
-        POSPostEntries: Codeunit "NPR POS Post Entries";
-        POSEntryToPost: Record "NPR POS Entry";
-        EntryNo: Integer;
     begin
         exit(CloseWorkshiftWithDimension(UsePosEntry, WithPosting, UnitNo, 0));
     end;

@@ -4,8 +4,6 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        Sale: Record "NPR POS Sale";
-        DataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
         if Name <> GetSourceNameText() then

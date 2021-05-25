@@ -126,8 +126,6 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
     end;
 
     local procedure FindCouponListItems(Coupon: Record "NPR NpDc Coupon"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", Coupon."Coupon Type");

@@ -149,13 +149,13 @@
         if not IsValidTime(PeriodDiscount, Time) then
             exit(false);
 
-        if not IsValidCustDiscGroup(PeriodDiscount, TempSaleLinePOS, SalePOS) then
+        if not IsValidCustDiscGroup(PeriodDiscount, SalePOS) then
             exit(false);
 
         exit(true);
     end;
 
-    local procedure IsValidCustDiscGroup(PeriodDiscount: Record "NPR Period Discount"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; SalePOS: Record "NPR POS Sale"): Boolean
+    local procedure IsValidCustDiscGroup(PeriodDiscount: Record "NPR Period Discount"; SalePOS: Record "NPR POS Sale"): Boolean
     begin
         if PeriodDiscount."Customer Disc. Group Filter" = '' then
             exit(true);
@@ -263,7 +263,7 @@
             exit;
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
-        if not IsValidLineOperation(Rec, xRec, LineOperation) then
+        if not IsValidLineOperation(LineOperation) then
             exit;
 
         PeriodDiscountLine.SetCurrentKey("Item No.", "Variant Code", "Starting Date", "Ending Date", Status);
@@ -291,7 +291,7 @@
         exit(true);
     end;
 
-    local procedure IsValidLineOperation(Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete): Boolean
+    local procedure IsValidLineOperation(LineOperation: Option Insert,Modify,Delete): Boolean
     begin
         if LineOperation = LineOperation::Delete then
             exit(false);

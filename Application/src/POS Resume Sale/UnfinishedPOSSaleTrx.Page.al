@@ -173,7 +173,6 @@
 
     var
         POSSession: Codeunit "NPR POS Session";
-        POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
 
     procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session")
     begin

@@ -201,12 +201,9 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
     procedure GetTransaction(TssId: Text; TxId: Text): JsonObject
     var
         RequestObject: JsonObject;
-        HeadersObject: JsonObject;
-        RequestBody: JsonObject;
         ResponseJson: JsonObject;
         ParamsJson: JsonObject;
         BodyToken: JsonToken;
-        Base64Body: Text;
         BodyTxt: Text;
     begin
         GetContext();

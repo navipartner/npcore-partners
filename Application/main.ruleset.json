@@ -83,6 +83,11 @@
             "justification": "Do not write code that will never be hit."
         },
         {
+            "id": "AA0137",
+            "action":"Error",
+            "justification": "Do not declare variables that are unused."
+        },
+        {
             "id": "AA0161",
             "action":"Error",
             "justification": "Only use AssertError in Test Codeunits."

@@ -80,14 +80,14 @@ then begin
             'FixedReturnReason':
                 begin
                     Handled := true;
-                    OnActionFixedReturnReason(JSON, POSSession);
+                    OnActionFixedReturnReason(JSON);
                     FrontEnd.SetActionContext(ActionCode(), JSON);
                     exit;
                 end;
             'LookupReturnReason':
                 begin
                     Handled := true;
-                    OnActionLookupReturnReason(JSON, POSSession);
+                    OnActionLookupReturnReason(JSON);
                     FrontEnd.SetActionContext(ActionCode(), JSON);
                     exit;
                 end;
@@ -126,7 +126,7 @@ then begin
         PerformAdjustInventory(POSSession, Quantity, ReturnReasonCode);
     end;
 
-    local procedure OnActionFixedReturnReason(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionFixedReturnReason(JSON: Codeunit "NPR POS JSON Management")
     var
         ReturnReasonCode: Code[10];
         ReadingErr: Label 'reading in OnActionFixedReturnReason';
@@ -139,7 +139,7 @@ then begin
         JSON.SetContext('ReturnReason', ReturnReasonCode);
     end;
 
-    local procedure OnActionLookupReturnReason(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionLookupReturnReason(JSON: Codeunit "NPR POS JSON Management")
     var
         ReturnReasonCode: Code[10];
         ReturnReason: Record "Return Reason";

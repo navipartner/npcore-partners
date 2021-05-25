@@ -17,7 +17,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         EXPIRE_CALC_NEXT: Label 'When testing %1, next period start %2 must be the day after previous period end %3.';
         MISSING_VALUE: Label 'Missing value in field %1.';
         EXPIRE_FORMULA: Label '%1  is expected to be greater than %2.';
-        PointsCalculationOption: Option PREVIOUS_PERIOD,UNCOLLECTED;
         SUBTOTAL_ZERO: Label 'The SubTotal parameter must not be zero when discount type is based on "discount %" for %1 %2.';
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterInsertValueEntry', '', true, true)]
@@ -944,8 +943,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
             LoyaltySetup."Voucher Point Source"::UNCOLLECTED:
                 begin
-                    ThresholdPoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, true);
-                    PointsToSpend := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false);
+                    ThresholdPoints := CalculateAvailablePoints(MembershipEntryNo, Today, true);
+                    PointsToSpend := CalculateAvailablePoints(MembershipEntryNo, Today, false);
                 end;
         end;
         exit(DoGetCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal, ThresholdPoints, PointsToSpend, ReasonText));
@@ -1396,7 +1395,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
     end;
 
-    local procedure CalculateExpirePointsToDateWorker(var Membership: Record "NPR MM Membership"; EarnPeriodStart: Date; EarnPeriodEnd: Date; BurnPeriodEnd: Date) PointsToExpire: Integer
+    local procedure CalculateExpirePointsToDateWorker(var Membership: Record "NPR MM Membership"; EarnPeriodEnd: Date; BurnPeriodEnd: Date) PointsToExpire: Integer
     var
         PeriodPoints: Integer;
         TotalExpiredPoints: Integer;
@@ -1458,9 +1457,9 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         case LoyaltySetup."Auto Upgrade Point Source" of
             LoyaltySetup."Auto Upgrade Point Source"::PREVIOUS_PERIOD:
-                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, Today, false);
+                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, Today, false);
             LoyaltySetup."Auto Upgrade Point Source"::UNCOLLECTED:
-                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false);
+                AvailablePoints := CalculateAvailablePoints(MembershipEntryNo, Today, false);
             else
                 exit(false);
         end;
@@ -1537,7 +1536,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
     end;
 
-    local procedure CalculateAvailablePoints(MembershipEntryNo: Integer; CalculationOption: Option; ReferenceDate: Date; ForThreshold: Boolean) AvailablePoints: Integer
+    local procedure CalculateAvailablePoints(MembershipEntryNo: Integer; ReferenceDate: Date; ForThreshold: Boolean) AvailablePoints: Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -1625,9 +1624,9 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         case (LoyaltySetup."Voucher Point Source") of
             LoyaltySetup."Voucher Point Source"::PREVIOUS_PERIOD:
-                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, PeriodEnd, false);
+                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PeriodEnd, false);
             LoyaltySetup."Voucher Point Source"::UNCOLLECTED:
-                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, false);
+                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, Today, false);
         end;
     end;
 
@@ -1653,9 +1652,9 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         case (LoyaltySetup."Voucher Point Source") of
             LoyaltySetup."Voucher Point Source"::PREVIOUS_PERIOD:
-                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD, PeriodEnd, true);
+                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PeriodEnd, true);
             LoyaltySetup."Voucher Point Source"::UNCOLLECTED:
-                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, PointsCalculationOption::UNCOLLECTED, Today, true);
+                RedeemablePoints := CalculateAvailablePoints(MembershipEntryNo, Today, true);
         end;
 
     end;

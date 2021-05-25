@@ -88,7 +88,7 @@
             end;
         end;
 
-        UpdateCurrentEvent(Context, POSSession, FrontEnd, EventNo, not OnlyCurrentSale);
+        UpdateCurrentEvent(POSSession, EventNo, not OnlyCurrentSale);
     end;
 
     local procedure ThisDataSource(): Text
@@ -183,12 +183,11 @@
         exit(false);
     end;
 
-    local procedure UpdateCurrentEvent(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; EventNo: Code[20]; UpdateRegister: Boolean)
+    local procedure UpdateCurrentEvent(POSSession: Codeunit "NPR POS Session"; EventNo: Code[20]; UpdateRegister: Boolean)
     var
         Job: Record Job;
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
-        DimMgt: Codeunit DimensionManagement;
         POSSale: Codeunit "NPR POS Sale";
     begin
         if EventNo <> '' then begin

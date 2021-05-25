@@ -122,7 +122,7 @@
         ReturnData := State.Serialize();
     end;
 
-    local procedure GetGiftVoucherBalance(GiftVoucherNo: Text; var ReturnData: Text)
+    local procedure GetGiftVoucherBalance(var ReturnData: Text)
     begin
         ReturnData := SerializeJson(0);
     end;
@@ -273,7 +273,7 @@
                 ; //Delete when event is completely gone from stargate assembly.
                   //-NPR5.54 [387965]
             'GetGiftVoucherBalance':
-                GetGiftVoucherBalance(Data, ReturnData);
+                GetGiftVoucherBalance(ReturnData);
             else
                 Error('Unhandled event sent from PaymentGateway %1', EventName);
         end;

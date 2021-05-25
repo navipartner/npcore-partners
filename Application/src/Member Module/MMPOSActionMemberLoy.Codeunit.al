@@ -128,7 +128,7 @@
                         0:
                             SetCustomer(POSSession, MemberCardNumber);
                         1:
-                            ViewPoints(POSSession, MemberCardNumber);
+                            ViewPoints(MemberCardNumber);
                         2:
                             RedeemPoints(Context, POSSession, FrontEnd, MemberCardNumber);
                         3:
@@ -157,7 +157,7 @@
     begin
     end;
 
-    local procedure ViewPoints(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[100])
+    local procedure ViewPoints(MemberCardNumber: Text[100])
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntryNo: Integer;
@@ -188,7 +188,6 @@
     var
         POSSale: Codeunit "NPR POS Sale";
         LoyaltyPointMgr: Codeunit "NPR MM Loyalty Point Mgt.";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         Membership: Record "NPR MM Membership";
         TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;

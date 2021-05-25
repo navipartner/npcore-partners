@@ -46,7 +46,7 @@
 
     procedure AuthenticatePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary; var ReasonText: Text): Boolean
     begin
-        if (TryAuthenticatePassword(TmpOneTimePassword, TmpContact, true)) then begin
+        if (TryAuthenticatePassword(TmpOneTimePassword, TmpContact)) then begin
             ReasonText := '';
             AddLogEntry(LogEntry.Type::AUTHENTICATE, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
 
@@ -60,7 +60,7 @@
 
     procedure ChangePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary; var ReasonText: Text): Boolean
     begin
-        if (TryAuthenticatePassword(TmpOneTimePassword, TmpContact, true)) then begin
+        if (TryAuthenticatePassword(TmpOneTimePassword, TmpContact)) then begin
             if (TryChangePassword(TmpOneTimePassword, TmpContact)) then begin
                 ReasonText := '';
                 AddLogEntry(LogEntry.Type::PASSWORD_CHANGE, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
@@ -358,7 +358,7 @@
 
     #region Try Function - by invoking self
 
-    local procedure TryAuthenticatePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary; AllowBlankPassword: Boolean) bOk: Boolean
+    local procedure TryAuthenticatePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary) bOk: Boolean
     begin
         Clear(AccountManager);
         AccountManager.SetFunction(AccountFunctions::AUTHENTICATE);
@@ -672,7 +672,7 @@
 
         Customer."No." := '';
 
-        if (not CreateMembership(TmpContact, TmpCustomer, Customer)) then
+        if (not CreateMembership(TmpContact, Customer)) then
             Customer.Insert(true);
 
         if (MagentoSetup.Get()) then begin
@@ -1178,7 +1178,7 @@
 
     #region Member Management
 
-    local procedure CreateMembership(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var Customer: Record Customer): Boolean
+    local procedure CreateMembership(var TmpContact: Record Contact temporary; var Customer: Record Customer): Boolean
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";

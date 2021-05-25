@@ -41,7 +41,6 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
-                        lookupValue: Text;
                     begin
                         if mobilePayIntegration.LookupPOS(_eftSetup, Rec) then begin
                             Text := Rec."MobilePay POS ID";

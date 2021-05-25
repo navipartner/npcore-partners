@@ -16,23 +16,23 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             FunctionName := GetWebServiceFunction(Rec."Import Type");
             case FunctionName of
                 'MakeTicketReservation':
-                    ImportTicketReservations(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketReservations(XmlDoc, Rec."Document ID");
                 'ReserveConfirmArrive':
-                    ImportTicketReservationConfirmArriveDoc(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketReservationConfirmArriveDoc(XmlDoc, Rec."Document ID");
                 'PreConfirmReservation':
-                    ImportTicketPreConfirmation(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketPreConfirmation(XmlDoc);
                 'CancelReservation':
-                    ImportTicketCancellation(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketCancellation(XmlDoc);
                 'ConfirmReservation':
-                    ImportTicketConfirmation(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketConfirmation(XmlDoc);
 
                 'SetAttributes':
-                    ImportTicketAttributes(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketAttributes(XmlDoc);
 
                 'GetTicketChangeRequest':
-                    ImportTicketChangeRequest(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketChangeRequest(XmlDoc, Rec."Document ID");
                 'ConfirmTicketChangeRequest':
-                    ImportTicketConfirmChangeRequest(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    ImportTicketConfirmChangeRequest(XmlDoc, Rec."Document ID");
                 else
                     Error(MISSING_CASE, Rec."Import Type", FunctionName);
             end;
@@ -48,7 +48,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         MISSING_CASE: Label 'No handler for %1 [%2].';
         MUST_BE_POSITIVE: Label 'Quantity must be positive.';
 
-    local procedure ImportTicketReservations(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure ImportTicketReservations(Document: XmlDocument; DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
@@ -86,7 +86,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
             for NTicketAdmission := 1 to TicketAdmissionNodeList.Count() do begin
                 TicketAdmissionNodeList.Get(NTicketAdmission, Node);
-                ImportTicketReservation(Node.AsXmlElement(), Token, DocumentID);
+                ImportTicketReservation(Node.AsXmlElement(), Token);
             end;
         end;
 
@@ -117,7 +117,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             TicketRequestManager.DeleteReservationRequest(Token, false);
     end;
 
-    local procedure ImportTicketReservation(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]): Boolean
+    local procedure ImportTicketReservation(Element: XmlElement; Token: Text[100]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -128,7 +128,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportTicketPreConfirmation(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure ImportTicketPreConfirmation(Document: XmlDocument)
     var
         Reservation: XmlElement;
         ReservationNodeList: XmlNodeList;
@@ -201,7 +201,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         end;
     end;
 
-    local procedure ImportTicketConfirmation(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure ImportTicketConfirmation(Document: XmlDocument)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Reservation: XmlElement;
@@ -233,7 +233,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         end;
     end;
 
-    local procedure ImportTicketCancellation(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure ImportTicketCancellation(Document: XmlDocument)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Reservation: XmlElement;
@@ -259,7 +259,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
     end;
 
-    local procedure ImportTicketReservationConfirmArriveDoc(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure ImportTicketReservationConfirmArriveDoc(Document: XmlDocument; DocumentID: Text[100])
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationResponse2: Record "NPR TM Ticket Reserv. Resp.";
@@ -352,7 +352,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketRequestManager.RegisterArrivalRequest(Token);
     end;
 
-    local procedure ImportTicketAttributes(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure ImportTicketAttributes(Document: XmlDocument)
     var
         Token: Text[50];
         AdmissionCode: Code[20];
@@ -405,7 +405,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
     end;
 
-    local procedure ImportTicketChangeRequest(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100]);
+    local procedure ImportTicketChangeRequest(Document: XmlDocument; DocumentID: Text[100]);
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
@@ -439,7 +439,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
     end;
 
-    local procedure ImportTicketConfirmChangeRequest(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure ImportTicketConfirmChangeRequest(Document: XmlDocument; DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketManagement: Codeunit "NPR TM Ticket Management";

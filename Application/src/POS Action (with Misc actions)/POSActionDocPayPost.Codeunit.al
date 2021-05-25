@@ -68,7 +68,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
 
-        if not SelectDocument(Context, POSSession, FrontEnd, SalesHeader) then
+        if not SelectDocument(POSSession, SalesHeader) then
             exit;
 
         if not ConfirmDocument(SalesHeader, OpenDocument) then
@@ -106,7 +106,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         exit(true);
     end;
 
-    local procedure SelectDocument(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var SalesHeader: Record "Sales Header"): Boolean
+    local procedure SelectDocument(POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"): Boolean
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "NPR POS Sale";
@@ -132,13 +132,6 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     local procedure CreateDocumentPaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        DocumentType: Option Quote,"Order",Invoice,CreditMemo,BlanketOrder,ReturnOrder;
-        OrderType: Option NotSet,"Order",Lending;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
-        InvoiceNo: Text;
     begin
         RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, Print, Pdf2Nav, Send, true);
     end;

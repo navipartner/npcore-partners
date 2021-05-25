@@ -113,11 +113,7 @@ page 6150713 "NPR POS Stargate Packages"
     var
         StargatePackage: Record "NPR POS Stargate Package";
         PackageMethod: Record "NPR POS Stargate Pckg. Method";
-        TempBLOB: Codeunit "Temp Blob";
         Package: DotNet NPRNetPackage;
-        String: DotNet NPRNetString;
-        [RunOnClient]
-        IOFile: DotNet NPRNetFile;
         FilePath: Text;
         Method: Text;
         WhichIs: Text;

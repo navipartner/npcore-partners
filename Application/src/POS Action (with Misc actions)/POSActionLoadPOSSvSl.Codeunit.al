@@ -2,7 +2,6 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
 {
     var
         Text000: Label 'Load POS Sale from POS saved Sale';
-        Text001: Label 'POS Saved Sale';
         CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
         ReadingErr: Label 'reading in %1';
 
@@ -73,7 +72,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
             'preview':
                 OnActionPreview(JSON, FrontEnd);
             'load_from_quote':
-                OnActionLoadFromQuote(JSON, POSSession, FrontEnd);
+                OnActionLoadFromQuote(JSON, POSSession);
         end;
     end;
 
@@ -120,7 +119,6 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
     local procedure OnActionPreview(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        PageMgt: Codeunit "Page Management";
         QuoteEntryNo: BigInteger;
     begin
         QuoteEntryNo := JSON.GetInteger('quote_entry_no');
@@ -139,11 +137,10 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
         end;
     end;
 
-    local procedure OnActionLoadFromQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionLoadFromQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         SalePOS: Record "NPR POS Sale";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSQuoteLine: Record "NPR POS Saved Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS2: Record "NPR POS Sale";
         POSStore: Record "NPR POS Store";

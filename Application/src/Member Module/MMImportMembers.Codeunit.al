@@ -425,7 +425,7 @@ codeunit 6060132 "NPR MM Import Members"
         exit(rInteger);
     end;
 
-    local procedure text2Money(pCents: Text[30]; pCurrency: Text[30]) rMoney: Decimal
+    local procedure text2Money(pCents: Text[30]) rMoney: Decimal
     begin
         if ('' = pCents) then exit(0);
 

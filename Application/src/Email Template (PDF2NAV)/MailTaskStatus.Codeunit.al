@@ -46,7 +46,6 @@ codeunit 6059905 "NPR Mail Task Status"
         EmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
         MailManagement: Codeunit "Mail Management";
-        Text009: Label 'J-Mail is discontinued';
 
     local procedure SendMailOnStart()
     var
@@ -349,9 +348,6 @@ codeunit 6059905 "NPR Mail Task Status"
     var
         Recipients: List of [Text];
         Separators: List of [Text];
-        RecValue: Text;
-        RecipientsText: Text;
-        i: Integer;
     begin
         InitMailAdrSeparators(Separators);
         Recipients := NewRecipient.Split(Separators);
@@ -362,9 +358,6 @@ codeunit 6059905 "NPR Mail Task Status"
     var
         CCRecipients: List of [Text];
         Separators: List of [Text];
-        RecValue: Text;
-        RecipientsText: Text;
-        i: Integer;
     begin
         InitMailAdrSeparators(Separators);
         CCRecipients := NewRecipientCC.Split(Separators);
@@ -375,9 +368,6 @@ codeunit 6059905 "NPR Mail Task Status"
     var
         BCCRecipients: List of [Text];
         Separators: List of [Text];
-        RecValue: Text;
-        RecipientsText: Text;
-        i: Integer;
     begin
         InitMailAdrSeparators(Separators);
         BCCRecipients := NewRecipientBCC.Split(Separators);
@@ -385,9 +375,6 @@ codeunit 6059905 "NPR Mail Task Status"
     end;
 
     procedure AppendHTML(TextLine: Text[260]): Boolean
-    var
-        InStr: InStream;
-        BodyText: Text;
     begin
         EmailSenderHandler.AppendBodyLine(EmailItem, TextLine + '<br/>');
     end;

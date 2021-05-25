@@ -8,7 +8,6 @@ codeunit 6060047 "NPR Item Wsht. Imp. Exp."
         TextExportCancelledMsg: Label 'Export Cancelled.';
         TextExportCompleteMsg: Label 'Export Complete.';
         TextExportFailedMsg: Label 'Export Failed.';
-        TextDialogImportLbl: Label 'Import XML file';
         XmlOUTStream: OutStream;
         FromFile: Text[250];
         ToFile: Text[250];

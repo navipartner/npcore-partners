@@ -36,12 +36,8 @@ codeunit 6150721 "NPR POS Action - Login"
     var
         JSON: Codeunit "NPR POS JSON Management";
         Setup: Codeunit "NPR POS Setup";
-        UserSetup: Record "User Setup";
         Type: Text;
         Password: Text;
-        HardwareId: Text;
-        SessionName: Text;
-        HostName: Text;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -173,7 +169,6 @@ codeunit 6150721 "NPR POS Action - Login"
     procedure StartPOS(POSSession: Codeunit "NPR POS Session"): Integer
     var
         SalePOS: Record "NPR POS Sale";
-        POSAction: Record "NPR POS Action";
         POSViewProfile: Record "NPR POS View Profile";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
         POSSale: Codeunit "NPR POS Sale";

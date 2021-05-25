@@ -9,8 +9,8 @@ codeunit 6014639 "NPR POS Normal Tax Forward"
     begin
         POSSaleTax."Source Amount" := Rec.Amount;
         CalculateTaxLines(POSSaleTax, Rec, Currency);
-        SetHeaderValues(POSSaleTax, Currency);
-        UpdateSourceAfterCalculateTax(POSSaleTax, Rec, Currency);
+        SetHeaderValues(POSSaleTax);
+        UpdateSourceAfterCalculateTax(POSSaleTax, Rec);
     end;
 
     local procedure CalculateTaxLines(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
@@ -61,7 +61,7 @@ codeunit 6014639 "NPR POS Normal Tax Forward"
         end;
     end;
 
-    local procedure SetHeaderValues(var POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency)
+    local procedure SetHeaderValues(var POSSaleTax: Record "NPR POS Sale Tax")
     var
         POSSaleTaxLine: record "NPR POS Sale Tax Line";
     begin
@@ -92,7 +92,7 @@ codeunit 6014639 "NPR POS Normal Tax Forward"
         POSSaleTaxLine.FindFirst();
     end;
 
-    local procedure UpdateSourceAfterCalculateTax(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
+    local procedure UpdateSourceAfterCalculateTax(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line")
     begin
         Rec.Amount := POSSaleTax."Calculated Amount Excl. Tax";
         Rec."VAT Base Amount" := Rec.Amount;

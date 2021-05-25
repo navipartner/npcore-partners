@@ -190,7 +190,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
             'issue_return_voucher':
                 IssueReturnVoucher(JSON, POSSession);
             'contact_info':
-                ContactInfo(JSON, POSSession);
+                ContactInfo(POSSession);
             'scan_reference_nos':
                 ScanReferenceNos(POSSession);
             'end_sale':
@@ -198,7 +198,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         end;
     end;
 
-    local procedure ContactInfo(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure ContactInfo(POSSession: Codeunit "NPR POS Session")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         SaleLinePOS: Record "NPR POS Sale Line";

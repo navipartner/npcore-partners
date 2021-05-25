@@ -33,8 +33,6 @@ codeunit 6150630 "NPR POS Manage POS Unit"
     end;
 
     procedure OpenPOSUnit(var POSUnit: Record "NPR POS Unit")
-    var
-        SalePOS: Record "NPR POS Sale";
     begin
         if POSUnit."No." = '' then
             exit;

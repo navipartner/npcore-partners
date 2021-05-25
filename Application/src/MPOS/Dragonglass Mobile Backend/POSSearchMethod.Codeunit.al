@@ -51,7 +51,6 @@ codeunit 6014564 "NPR POS Search Method"
         UpdateSearchRequest: Codeunit "NPR Front-End: UpdateSearch";
         Results: JsonArray;
         Result: JsonObject;
-        Token: JsonToken;
         ResultCount: Integer;
         HasMore: Boolean;
     begin

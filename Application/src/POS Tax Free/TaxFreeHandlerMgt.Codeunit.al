@@ -233,7 +233,7 @@
     begin
         CreateRequest('VOUCHER_LOOKUP', TaxFreeUnit, TaxFreeRequest);
 
-        RunVoucherLookupEvent(TaxFreeRequest, VoucherNo, Handled);
+        RunVoucherLookupEvent(TaxFreeRequest, Handled);
 
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
     end;
@@ -338,7 +338,6 @@
 
     procedure IsValidTerminalIIN(TaxFreeUnit: Record "NPR Tax Free POS Unit"; MaskedCardNo: Text): Boolean
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
         Handled: Boolean;
         Valid: Boolean;
         TaxFreeRequest: Record "NPR Tax Free Request";
@@ -357,7 +356,6 @@
 
     procedure IsActiveSaleEligible(TaxFreeUnit: Record "NPR Tax Free POS Unit"; SalesTicketNo: Code[20]): Boolean
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
         TaxFreeRequest: Record "NPR Tax Free Request";
         Eligible: Boolean;
         Handled: Boolean;
@@ -695,7 +693,7 @@
         TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
-    local procedure RunVoucherLookupEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
+    local procedure RunVoucherLookupEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; var Handled: Boolean)
     var
         TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin

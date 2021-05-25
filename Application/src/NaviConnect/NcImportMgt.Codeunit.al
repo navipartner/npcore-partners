@@ -155,7 +155,7 @@
         exit(Body);
     end;
 
-    local procedure GetErrorMailSenderAddress(NcImportEntry: Record "NPR Nc Import Entry"): Text
+    local procedure GetErrorMailSenderAddress(): Text
     begin
         exit('noreply@navipartner.com');
     end;
@@ -193,7 +193,7 @@
         NcImportType.TestField("Send e-mail on Error");
         NcImportType.TestField("E-mail address on Error");
 
-        SenderAddress := GetErrorMailSenderAddress(NcImportEntry);
+        SenderAddress := GetErrorMailSenderAddress();
         Subject := GetErrorMailSubject(NcImportEntry);
         Body := GetErrorMailBody(NcImportEntry);
         EmailSenderHandler.CreateEmailItem(EmailItem,

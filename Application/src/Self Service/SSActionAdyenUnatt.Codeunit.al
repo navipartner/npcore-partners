@@ -65,9 +65,9 @@
 
         case WorkflowStep of
             'StartTrx':
-                StartTrx(POSSession, Context, FrontEnd);
+                StartTrx(Context);
             'CheckResponse':
-                FrontEnd.WorkflowResponse(CheckResponse(POSSession, Context, FrontEnd));
+                FrontEnd.WorkflowResponse(CheckResponse(Context));
         end;
     end;
 
@@ -86,7 +86,7 @@
         IntegrationWorkflow := ActionCode();
     end;
 
-    local procedure StartTrx(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure StartTrx(Context: Codeunit "NPR POS JSON Management")
     var
         EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -98,7 +98,7 @@
         EFTAdyenCloudProtocol.SendEftDeviceRequest(EFTTransactionRequest, false);
     end;
 
-    local procedure CheckResponse(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure CheckResponse(Context: Codeunit "NPR POS JSON Management"): Boolean
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTAdyenCloudBackgndResp: Codeunit "NPR EFT Adyen Backgnd. Resp.";

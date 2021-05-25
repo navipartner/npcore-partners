@@ -77,14 +77,6 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        OperationType: Option VoidLast,ReprintLast,LookupLast,OpenConn,CloseConn,VerifySetup,ShowTransactions,AuxOperation;
-        EftType: Text;
-        JSON: Codeunit "NPR POS JSON Management";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        AuxId: Integer;
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;

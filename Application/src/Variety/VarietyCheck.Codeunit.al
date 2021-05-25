@@ -35,7 +35,7 @@ codeunit 6059974 "NPR Variety Check"
 
         //if we are here, an update of the variants is required.
         if CheckModifyAlloved(Item, XRecItem) then begin
-            UpdateVariants(Item, XRecItem);
+            UpdateVariants(Item);
             exit;
         end;
 
@@ -241,7 +241,7 @@ codeunit 6059974 "NPR Variety Check"
         exit(true);
     end;
 
-    local procedure UpdateVariants(Item: Record Item; XRecItem: Record Item)
+    local procedure UpdateVariants(Item: Record Item)
     var
         ItemVar: Record "Item Variant";
         VarValue: Record "NPR Variety Value";

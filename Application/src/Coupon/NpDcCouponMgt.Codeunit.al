@@ -779,7 +779,6 @@
     local procedure OnAfterDeletePOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
     begin
         if Rec.IsTemporary then
             exit;

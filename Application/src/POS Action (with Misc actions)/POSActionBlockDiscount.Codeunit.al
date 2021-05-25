@@ -82,7 +82,7 @@ then begin
             'PasswordPrompt':
                 VerifyPassword(Context, POSSession, FrontEnd);
             'ToggleBlockState':
-                ToggleBlockState(Context, POSSession, FrontEnd);
+                ToggleBlockState(POSSession);
         end;
     end;
 
@@ -117,7 +117,7 @@ then begin
             Error('');
     end;
 
-    local procedure ToggleBlockState(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure ToggleBlockState(POSSession: Codeunit "NPR POS Session")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";

@@ -49,7 +49,7 @@
 
                 trigger WriteDataStream(Data: Text; Finalize: Boolean);
                 begin
-                    WriteDataStream(data, finalize);
+                    WriteDataStream(data);
                 end;
             }
         }
@@ -384,10 +384,6 @@
 
     procedure SaveTempPicture()
     var
-        Convert: Codeunit "Base64 Convert";
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
-        InStr: InStream;
         DataUri: Text;
         NpRegEx: Codeunit "NPR RegEx";
     begin
@@ -400,7 +396,7 @@
         PictureName := '';
     end;
 
-    local procedure WriteDataStream(NewData: Text; Finalize: Boolean)
+    local procedure WriteDataStream(NewData: Text)
     begin
         PictureDataUri := PictureDataUri + Format(NewData);
     end;

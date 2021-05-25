@@ -16,7 +16,7 @@ codeunit 6151458 "NPR Magento Npxml ItemCrossRef"
         if not RecRef.Find() then
             exit;
 
-        CustomValue := GetItemReferenceNo(RecRef, NpXmlElement."Field No.");
+        CustomValue := GetItemReferenceNo(RecRef);
         RecRef.Close();
 
         Clear(RecRef);
@@ -30,7 +30,7 @@ codeunit 6151458 "NPR Magento Npxml ItemCrossRef"
         Text000: Label 'Unsupported table: %1 %2 - codeunit 6151458  "Magento Npxml Item CrossRef" - NpXml Element: %3 %4';
         NpXmlElement: Record "NPR NpXml Element";
 
-    local procedure GetItemReferenceNo(RecRef: RecordRef; FieldNo: Integer): Text
+    local procedure GetItemReferenceNo(RecRef: RecordRef): Text
     var
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";

@@ -148,7 +148,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         if ItemNo = '' then begin
             exit;
         end else begin
-            AddItemToSale(ItemNo, POSSession, FrontEnd, Context);
+            AddItemToSale(ItemNo, POSSession, FrontEnd);
         end;
     end;
 
@@ -195,10 +195,9 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure AddItemToSale(ItemNo: Code[20]; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
+    local procedure AddItemToSale(ItemNo: Code[20]; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Setup: Codeunit "NPR POS Setup";
-        NewSaleLinePOS: Record "NPR POS Sale Line";
         POSSetup: Record "NPR POS Setup";
         POSAction: Record "NPR POS Action";
     begin

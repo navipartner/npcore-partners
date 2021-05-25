@@ -2,7 +2,7 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
 {
     EventSubscriberInstance = StaticAutomatic;
 
-    local procedure SetItemField(Item: Record Item; WorkflowStepInstance: Record "Workflow Step Instance")
+    local procedure SetItemField(WorkflowStepInstance: Record "Workflow Step Instance")
     var
         WorkflowStepArgument: Record "Workflow Step Argument";
     begin
@@ -14,7 +14,7 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
         exit('SETITEMFIELD');
     end;
 
-    local procedure SetItemStatus(Item: Record Item; WorkflowStepInstance: Record "Workflow Step Instance")
+    local procedure SetItemStatus(WorkflowStepInstance: Record "Workflow Step Instance")
     var
         WorkflowStepArgument: Record "Workflow Step Argument";
     begin
@@ -60,7 +60,7 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
             case WorkflowResponse."Function Name" of
                 SetItemFieldCode():
                     begin
-                        SetItemField(Variant, ResponseWorkflowStepInstance);
+                        SetItemField(ResponseWorkflowStepInstance);
                         ResponseExecuted := true;
                     end;
             end;
@@ -75,7 +75,7 @@ codeunit 6060054 "NPR Item Wksht. Wf Responses"
             case WorkflowResponse."Function Name" of
                 SetItemStatusCode():
                     begin
-                        SetItemStatus(Variant, ResponseWorkflowStepInstance);
+                        SetItemStatus(ResponseWorkflowStepInstance);
                         ResponseExecuted := true;
                     end;
             end;

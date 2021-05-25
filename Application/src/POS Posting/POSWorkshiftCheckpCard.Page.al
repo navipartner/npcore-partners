@@ -384,8 +384,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
 
                 trigger OnAction()
                 begin
-
-                    CreateBinCheckpoint(Rec."POS Unit No.");
+                    CreateBinCheckpoint();
                 end;
             }
             action("Create X-Report")
@@ -483,7 +482,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
         PageMode: Option PRELIMINARY,FINAL,VIEW;
         IsBlindCount: Boolean;
 
-    local procedure CreateBinCheckpoint(POSUnitNo: Code[10])
+    local procedure CreateBinCheckpoint()
     var
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";

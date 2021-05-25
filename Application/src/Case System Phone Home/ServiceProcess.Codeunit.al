@@ -62,7 +62,7 @@ codeunit 6014483 "NPR Service Process"
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
-    local procedure CreateTransactionLogEntryAmt(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]; Quantity: Decimal; Description: Text[50]; Amount: Decimal): Boolean
+    local procedure CreateTransactionLogEntryAmt(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; Quantity: Decimal; Description: Text[50]; Amount: Decimal): Boolean
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
@@ -122,11 +122,11 @@ codeunit 6014483 "NPR Service Process"
                 CustomerSubscribed := IsCustomerSubscribed(CustomerNo, ServiceId);
                 if CustomerSubscribed then begin
                     AccountCreated := CreateUserAccount(SubscriptionUserId, CustomerNo, ServiceId);
-                    CreateTransactionLogEntryAmt(SubscriptionUserId, CustomerNo, ServiceId, QtyUsed, LogDescription, AmountUsed);
+                    CreateTransactionLogEntryAmt(SubscriptionUserId, CustomerNo, QtyUsed, LogDescription, AmountUsed);
                     ServiceUsed := true;
                 end;
             end else begin
-                CreateTransactionLogEntryAmt(SubscriptionUserId, CustomerNo, ServiceId, QtyUsed, LogDescription, AmountUsed);
+                CreateTransactionLogEntryAmt(SubscriptionUserId, CustomerNo, QtyUsed, LogDescription, AmountUsed);
                 ServiceUsed := true;
             end;
         end;

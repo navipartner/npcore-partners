@@ -122,7 +122,6 @@ table 6014523 "NPR BTF Service EndPoint"
 
     procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
     var
-        ImportListUpdateHandler: Enum "NPR Nc IL Update Handler";
         EndPoint: Interface "NPR BTF IEndPoint";
     begin
         EndPoint := Rec."EndPoint Method";

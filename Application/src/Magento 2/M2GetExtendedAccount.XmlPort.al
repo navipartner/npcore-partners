@@ -88,7 +88,7 @@ xmlport 6151144 "NPR M2 Get Extended Account"
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    TryGetEanNo(TmpSellToCustomer, SellToEan);
+                                    TryGetEanNo(SellToEan);
                                 end;
                             }
                         }
@@ -110,7 +110,7 @@ xmlport 6151144 "NPR M2 Get Extended Account"
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    TryGetEanNo(TmpBillToCustomer, BillToEan);
+                                    TryGetEanNo(BillToEan);
                                 end;
                             }
                         }
@@ -169,7 +169,7 @@ xmlport 6151144 "NPR M2 Get Extended Account"
     end;
 
     [TryFunction]
-    local procedure TryGetEanNo(Customer: Record Customer temporary; var EanNo: Text)
+    local procedure TryGetEanNo(var EanNo: Text)
     begin
         EanNo := 'NOT IN W1';
     end;

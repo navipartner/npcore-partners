@@ -398,7 +398,7 @@
         AddExchObjToBuffer(EventExchIntSumBuffer, 1, FromText, EventExchIntEmailGlobal."E-Mail", FromSource, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
         JobPlanningLine.SetRange("Job No.", Job."No.");
         JobPlanningLine.SetFilter("NPR Resource E-Mail", '<>%1', '');
-        AddJobPlanningLineToBuffer(EventExchIntSumBuffer, JobPlanningLine, ToText, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
+        AddJobPlanningLineToBuffer(EventExchIntSumBuffer, JobPlanningLine, ToText, ParentEntryNo);
 
         AddExchObjToBuffer(EventExchIntSumBuffer, 0, AppointmentText, '', '', EventExchIntSumBuffer."Entry No.", 0);
         ExchItemType := ExchItemType::Appointment;
@@ -416,11 +416,11 @@
         AddExchObjToBuffer(EventExchIntSumBuffer, 1, FromText, FromEmail, FromSource, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
         JobPlanningLine.Reset();
         EventCalendarMgt.SetJobPlanLineMeetingRequestSendFilter(Job, JobPlanningLine);
-        AddJobPlanningLineToBuffer(EventExchIntSumBuffer, JobPlanningLine, ToText, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
+        AddJobPlanningLineToBuffer(EventExchIntSumBuffer, JobPlanningLine, ToText, ParentEntryNo);
         EventExchIntSumBuffer.FindFirst();
     end;
 
-    local procedure AddJobPlanningLineToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; var JobPlanningLine: Record "Job Planning Line"; ExchItem: Text; var EntryNo: Integer; ParentEntryNo: Integer)
+    local procedure AddJobPlanningLineToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; var JobPlanningLine: Record "Job Planning Line"; ExchItem: Text; ParentEntryNo: Integer)
     var
         Source: Text;
     begin

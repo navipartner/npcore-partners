@@ -122,7 +122,7 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
             'validate_voucher':
                 OnActionValidateVoucher(JSON, FrontEnd);
             'show_voucher_card':
-                OnActionShowVoucherCard(JSON, SaleLinePOS);
+                OnActionShowVoucherCard(JSON);
             'topup_voucher':
                 OnActionTopupVoucher(JSON, POSSession);
         end;
@@ -150,7 +150,7 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionShowVoucherCard(JSON: Codeunit "NPR POS JSON Management"; SaleLinePOS: Record "NPR POS Sale Line")
+    local procedure OnActionShowVoucherCard(JSON: Codeunit "NPR POS JSON Management")
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         VoucherNo: Text;

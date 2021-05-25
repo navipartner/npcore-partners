@@ -35,16 +35,16 @@
         Coupon.Get(SaleLinePOSCoupon."Coupon No.");
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then begin
             repeat
-                ApplyDiscountListItemPct(SaleLinePOSCoupon, Coupon."Discount %", TotalAmt, NpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
+                ApplyDiscountListItemPct(SaleLinePOSCoupon, Coupon."Discount %", NpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
             until NpDcCouponListItem.Next() = 0;
             exit;
         end;
         repeat
-            ApplyDiscountListItem(SaleLinePOSCoupon, DiscountAmt, TotalAmt, NpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
+            ApplyDiscountListItem(SaleLinePOSCoupon, DiscountAmt, NpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
         until (NpDcCouponListItem.Next() = 0) or (DiscountAmt <= 0);
     end;
 
-    local procedure ApplyDiscountListItem(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; TotalAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; RemainingQty: Decimal)
+    local procedure ApplyDiscountListItem(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; RemainingQty: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         AppliedListItemDiscAmt: Decimal;
@@ -59,11 +59,11 @@
         AppliedListItemDiscAmt := 0;
         SaleLinePOS.FindSet();
         repeat
-            ApplyDiscountSaleLinePOS(SaleLinePOSCoupon, DiscountAmt, TotalAmt, NpDcCouponListItem, SaleLinePOS, AppliedListItemDiscAmt, RemainingDiscountAmt, AppliedQty, RemainingQty);
+            ApplyDiscountSaleLinePOS(SaleLinePOSCoupon, NpDcCouponListItem, SaleLinePOS, AppliedListItemDiscAmt, RemainingDiscountAmt, AppliedQty, RemainingQty);
         until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
-    local procedure ApplyDiscountListItemPct(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountPct: Decimal; TotalAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; var RemainingQty: Decimal)
+    local procedure ApplyDiscountListItemPct(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountPct: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; var RemainingQty: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
@@ -118,10 +118,9 @@
         until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
-    local procedure ApplyDiscountSaleLinePOS(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; TotalAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; var AppliedQty: Decimal; var RemainingQty: Decimal)
+    local procedure ApplyDiscountSaleLinePOS(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; var AppliedQty: Decimal; var RemainingQty: Decimal)
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
-        SalePOS: Record "NPR POS Sale";
         LineNo: Integer;
         LineDiscountAmt: Decimal;
         QtyToApply: Integer;
@@ -249,8 +248,6 @@
     end;
 
     local procedure FindCouponListItems(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");

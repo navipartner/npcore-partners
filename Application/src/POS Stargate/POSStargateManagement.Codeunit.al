@@ -87,7 +87,7 @@ codeunit 6150716 "NPR POS Stargate Management"
         end;
 
         if (State = State::InstallingAssemblies) then begin
-            CompleteInstallingMissingAssemblies(Envelope, FrontEnd, Method, ActionName, Step)
+            CompleteInstallingMissingAssemblies(Envelope, FrontEnd, ActionName, Step)
         end else begin
             if Requests.ContainsKey(Method) then
                 Requests.Remove(Method);
@@ -258,7 +258,7 @@ codeunit 6150716 "NPR POS Stargate Management"
         FrontEnd.InvokeDeviceInternal(Request, ActionName, Step, false);
     end;
 
-    local procedure CompleteInstallingMissingAssemblies(Envelope: DotNet NPRNetResponseEnvelope0; FrontEnd: Codeunit "NPR POS Front End Management"; Method: Text; ActionName: Text; Step: Text)
+    local procedure CompleteInstallingMissingAssemblies(Envelope: DotNet NPRNetResponseEnvelope0; FrontEnd: Codeunit "NPR POS Front End Management"; ActionName: Text; Step: Text)
     var
         Request: DotNet NPRNetRequest0;
         EmptyResponse: DotNet NPRNetEmptyResponse;

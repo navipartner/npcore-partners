@@ -10,7 +10,6 @@ codeunit 6014449 "NPR DE Fiskaly Job"
         DEFiskalyComm: Codeunit "NPR DE Fiskaly Communication";
         DocumentJson: JsonObject;
         ResponseJson: JsonObject;
-        StrOut: OutStream;
     begin
         DEPOSAuditLogAux.Reset();
         DEPOSAuditLogAux.SetFilter("Fiscalization Status", '<> %1', DEPOSAuditLogAux."Fiscalization Status"::Fiscalized);

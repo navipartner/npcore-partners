@@ -278,7 +278,7 @@ report 6060042 "NPR Import Excel Item Worksh."
                         ItemWorksheetLine.Modify();
                         ProcessColumnMapping(DATABASE::"NPR Item Worksheet Line", '', ExcludeColumnsFilter);
                         ItemWorksheetLine.Get(ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.");
-                        GetAttributeMapping(DATABASE::"NPR Item Worksheet Line");
+                        GetAttributeMapping();
                     end else begin
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 1) then
                             ItemWorksheetLine.Validate("Item No.", ExcelBuf2."Cell Value as Text");
@@ -511,7 +511,7 @@ report 6060042 "NPR Import Excel Item Worksh."
             exit(false);
     end;
 
-    local procedure GetAttributeMapping(ParTableNo: Integer): Boolean
+    local procedure GetAttributeMapping(): Boolean
     var
         AttributeID: Record "NPR Attribute ID";
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";

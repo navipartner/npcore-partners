@@ -56,7 +56,6 @@ then begin
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         LinePOS: Record "NPR POS Sale Line";
-        Item: Record Item;
         CurrentView: Codeunit "NPR POS View";
         POSInventoryOverview: Page "NPR POS Inventory Overview";
         ItemsByLocationOverview: Page "NPR Items by Location Overview";

@@ -284,7 +284,7 @@
         TaxFreeRequest."Service ID" := SelectService(tmpEligibleServices); //Can have modal prompts
         CustomerXML := CaptureCustomerInfo(); //Has modal prompts
         PurchaseXML := GetPurchaseDetailsXML(tmpTaxFreeConsolidation);
-        PaymentXML := GetPurchasePaymentMethodsXML(tmpTaxFreeConsolidation);
+        PaymentXML := GetPurchasePaymentMethodsXML();
 
         OnBeforeIssueVoucher(TaxFreeRequest, CustomerXML, PaymentXML, PurchaseXML, Handeled);
         if Handeled then
@@ -1194,7 +1194,7 @@
 
         if not IsAllRequiredCustomerInfoCaptured(tmpCustomerInfoCapture) then begin
             tmpCustomerInfoCapture."Is Identity Checked" := false;
-            if not ManualCustomerInfoEntry(tmpCustomerInfoCapture, LookupCompleted) then begin
+            if not ManualCustomerInfoEntry(tmpCustomerInfoCapture) then begin
                 if Confirm(Caption_CancelOperation) then
                     Error(Error_UserCancel)
                 else
@@ -1335,7 +1335,7 @@
         exit(true);
     end;
 
-    local procedure ManualCustomerInfoEntry(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary; LookupCompleted: Boolean): Boolean
+    local procedure ManualCustomerInfoEntry(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary): Boolean
     var
         TravellerInfoCapture: Page "NPR Tax Free GB I2 Info Capt.";
     begin
@@ -1652,8 +1652,6 @@
     var
         Item: Record Item;
         PosSalesLine: Record "NPR POS Entry Sales Line";
-        ItemXML: Text;
-        ReceiptXML: Text;
         XML: Text;
     begin
         XML := '<PurchaseDetails>';
@@ -1692,7 +1690,7 @@
         exit(XML);
     end;
 
-    local procedure GetPurchasePaymentMethodsXML(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary): Text
+    local procedure GetPurchasePaymentMethodsXML(): Text
     begin
         //NON-MANDATORY - Will be left out for now since it doesn't make sense for consolidated vouchers either when the paymentmethod element isn't inside each receipt element.
         exit('');

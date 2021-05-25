@@ -68,14 +68,14 @@
                 repeat
                     AdmissionScheduleLines.FindSet();
                     repeat
-                        GenerateScheduleEntry(AdmissionScheduleLines, Regenerate, DateRecord."Period Start", TmpAdmissionScheduleEntry);
+                        GenerateScheduleEntry(AdmissionScheduleLines, DateRecord."Period Start", TmpAdmissionScheduleEntry);
 
                     until (AdmissionScheduleLines.Next() = 0);
 
                     if (not TmpAdmissionScheduleEntry.IsEmpty) then begin
                         AreEqual := CompareScheduleEntries(AdmissionCode, DateRecord."Period Start", TmpAdmissionScheduleEntry);
                         if (not AreEqual) then
-                            StoreScheduleEntries(AdmissionScheduleLines."Admission Code", DateRecord."Period Start", TmpAdmissionScheduleEntry);
+                            StoreScheduleEntries(TmpAdmissionScheduleEntry);
                     end;
 
                     TmpAdmissionScheduleEntry.Reset();
@@ -116,7 +116,7 @@
 
     end;
 
-    local procedure GenerateScheduleEntry(AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines"; Regenerate: Boolean; GenerateForDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
+    local procedure GenerateScheduleEntry(AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines"; GenerateForDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
         Admission: Record "NPR TM Admission";
         Schedule: Record "NPR TM Admis. Schedule";
@@ -459,7 +459,7 @@
         exit(CheckExists(TmpAdmissionScheduleEntry));
     end;
 
-    local procedure StoreScheduleEntries(AdmissionCode: Code[20]; ReferenceDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
+    local procedure StoreScheduleEntries(var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         PreviousAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";

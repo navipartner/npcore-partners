@@ -91,10 +91,10 @@ codeunit 6014590 "NPR Service Tier User Mgt."
             Error(format(response.HttpStatusCode));
 
         Response.Content().ReadAs(responseMessage);
-        responseMessage := GetWebResponseResult(responseMessage, serviceMethod);
+        responseMessage := GetWebResponseResult(responseMessage);
     end;
 
-    local procedure GetWebResponseResult(response: Text; ServiceMethod: Text) ResponseText: Text
+    local procedure GetWebResponseResult(response: Text) ResponseText: Text
     var
         XmlDoc: XmlDocument;
         XmlNode: XMLNode;

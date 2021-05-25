@@ -1703,8 +1703,6 @@ table 6014406 "NPR POS Sale Line"
         TotalItemLedgerEntryQuantity: Decimal;
         TotalAuditRollQuantity: Decimal;
         SkipCalcDiscount: Boolean;
-        Text000: Label 'Only one means of payment type allowed as payment choice on Invoice';
-        Text001: Label 'Account is missing on Payment Type %1';
         Text002: Label '%1 %2 is used more than once.';
         Text003: Label 'Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
@@ -1864,7 +1862,6 @@ table 6014406 "NPR POS Sale Line"
     var
         Err001: Label '%2 %1 is already in stock but has not been posted yet';
         Err002: Label '%2 %1 has already been sold to a customer but is not yet posted';
-        POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSSalesLine.SetRange("Item Entry No.", 0);
@@ -2028,7 +2025,6 @@ table 6014406 "NPR POS Sale Line"
     procedure UpdateVATSetup()
     var
         VATPostingSetup: Record "VAT Posting Setup";
-        GLAcc: Record "G/L Account";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Handled: Boolean;
     begin

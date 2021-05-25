@@ -52,7 +52,7 @@
 
         case Sender of
             'nets-timer':
-                CheckResponse(POSSession, FrontEnd);
+                CheckResponse(FrontEnd);
             'nets-abort':
                 RequestAbort(FrontEnd);
             'nets-force-abort':
@@ -60,7 +60,7 @@
         end;
     end;
 
-    local procedure CheckResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure CheckResponse(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTNETSCloudBgResp: Codeunit "NPR EFT NETSCloud Bg. Resp.";

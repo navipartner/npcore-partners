@@ -20,7 +20,7 @@
         if not TempSalesHeader.FindFirst() then
             exit;
 
-        InsertImportEntry('ImportSalesDocuments', ImportEntry);
+        InsertImportEntry(ImportEntry);
         ImportEntry."Document Name" := Format(TempSalesHeader."Document Type") + ' ' + TempSalesHeader."No." + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_documents.SetDestination(OutStr);
@@ -218,7 +218,7 @@
         NcImportType.Insert(true);
     end;
 
-    local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
+    local procedure InsertImportEntry(var ImportEntry: Record "NPR Nc Import Entry")
     var
         NcImportType: Record "NPR Nc Import Type";
     begin

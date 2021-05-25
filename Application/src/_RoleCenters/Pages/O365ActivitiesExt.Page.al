@@ -155,7 +155,7 @@
               (CompanyInformation."IC Partner Code" <> '') and ((Rec."IC Inbox Transactions" <> 0) or (Rec."IC Outbox Transactions" <> 0));
     end;
 
-    local procedure StartWhatIsNewTour(hasTourCompleted: Boolean)
+    local procedure StartWhatIsNewTour()
     var
         O365UserTours: Record "User Tours";
         TourID: Integer;

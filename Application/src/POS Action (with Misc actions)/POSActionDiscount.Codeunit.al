@@ -161,7 +161,7 @@ codeunit 6150792 "NPR POS Action - Discount"
             'SalespersonPassword':
                 begin
                     Handled := true;
-                    OnActionSalespersonPassword(JSON, POSSession, FrontEnd);
+                    OnActionSalespersonPassword(JSON, FrontEnd);
                     exit;
                 end;
             'CurrentSalespersonPassword':
@@ -173,25 +173,25 @@ codeunit 6150792 "NPR POS Action - Discount"
             'SupervisorPassword':
                 begin
                     Handled := true;
-                    OnActionSupervisorPassword(JSON, POSSession, FrontEnd);
+                    OnActionSupervisorPassword(JSON, FrontEnd);
                     exit;
                 end;
             'FixedReasonCode':
                 begin
                     Handled := true;
-                    OnActionFixedReasonCode(JSON, POSSession, FrontEnd);
+                    OnActionFixedReasonCode(JSON, FrontEnd);
                     exit;
                 end;
             'LookupReasonCode':
                 begin
                     Handled := true;
-                    OnActionLookupReasonCode(JSON, POSSession, FrontEnd);
+                    OnActionLookupReasonCode(JSON, FrontEnd);
                     exit;
                 end;
             'AddDimensionValue':
                 begin
                     Handled := true;
-                    OnActionAddDimensionValue(JSON, POSSession, FrontEnd);
+                    OnActionAddDimensionValue(JSON, FrontEnd);
                     exit;
                 end;
         end;
@@ -296,7 +296,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         Handled := true;
     end;
 
-    local procedure OnActionSalespersonPassword(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionSalespersonPassword(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Salesperson: Record "Salesperson/Purchaser";
         SalespersonPassword: Text;
@@ -330,7 +330,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionSupervisorPassword(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionSupervisorPassword(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Salesperson: Record "Salesperson/Purchaser";
         SupervisorPassword: Text;
@@ -345,7 +345,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionFixedReasonCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionFixedReasonCode(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         ReasonCode: Code[10];
     begin
@@ -358,7 +358,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionLookupReasonCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionLookupReasonCode(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         ReasonCode: Record "Reason Code";
         ReasonCodeMandatoryErr: Label 'Reason Code is mandatory for this discount';
@@ -373,7 +373,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionAddDimensionValue(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionAddDimensionValue(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         DimensionValue: Record "Dimension Value";
         DimensionCodeParameter: Text;

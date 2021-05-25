@@ -199,7 +199,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
     var
         TempPOSSalesLine: Record "NPR POS Entry Sales Line" temporary;
         POSSalesLine: Record "NPR POS Entry Sales Line";
-        OrigPOSEntry: Record "NPR POS Entry";
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
         NodeList: XmlNodeList;
@@ -306,7 +305,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
     var
         TempPOSPaymentLine: Record "NPR POS Entry Payment Line" temporary;
         POSPaymentLine: Record "NPR POS Entry Payment Line";
-        OrigPOSEntry: Record "NPR POS Entry";
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
         NodeList: XmlNodeList;
@@ -369,7 +367,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
     var
         TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
-        OStream: OutStream;
     begin
         POSEntry.TestField("Entry No.");
         Evaluate(TempPOSTaxAmountLine."Tax Area Code", NpXmlDomMgt.GetXmlText(Element, 'lineno', 0, false), 9);

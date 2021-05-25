@@ -177,7 +177,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
 
         if (AdmissionScheduleEntry.FindSet()) then begin
             repeat
-                AddToTempRecord(AdmissionScheduleEntry, TicketQty, TicketItemNo, TicketVariantCode);
+                AddToTempRecord(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode);
             until (AdmissionScheduleEntry.Next() = 0);
         end;
 
@@ -187,7 +187,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
         exit(true);
     end;
 
-    local procedure AddToTempRecord(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10])
+    local procedure AddToTempRecord(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10])
     begin
 
         if (TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, Remaining)) then begin

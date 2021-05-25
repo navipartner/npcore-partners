@@ -52,7 +52,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
         MobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
         EftSetup: Record "NPR EFT Setup";
         eftTrxRequest: Record "NPR EFT Transaction Request";
-        lookupEftTrxRequest: Record "NPR EFT Transaction Request";
     begin
         BindSubscription(MobilePayV10SelfCert);
 
@@ -239,8 +238,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
 
     local procedure InitPayment(var EftSetup: Record "NPR EFT Setup"; var EftTrxRequest: Record "NPR EFT Transaction Request"; ThrowError: Boolean): Boolean
     var
-        mobilePayV10Integration: Codeunit "NPR MobilePayV10 Integration";
-        eftTrxMgt: Codeunit "NPR EFT Transaction Mgt.";
         mobilePayStartPaymentRequest: Codeunit "NPR MobilePayV10 Start Payment";
         success: Boolean;
     begin
@@ -265,8 +262,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     local procedure InitRefund(var EftSetup: Record "NPR EFT Setup"; var EftTrxRequest: Record "NPR EFT Transaction Request";
         var OrigEftTrxRequest: Record "NPR EFT Transaction Request"; ThrowError: Boolean): Boolean
     var
-        mobilePayV10Integration: Codeunit "NPR MobilePayV10 Integration";
-        eftTrxMgt: Codeunit "NPR EFT Transaction Mgt.";
         mobilePayStartRefundRequest: Codeunit "NPR MobilePayV10 Start Refund";
         success: Boolean;
     begin
@@ -284,11 +279,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     end;
 
     local procedure StartNewPayment(var EftSetup: Record "NPR EFT Setup"; var EftTrxRequest: Record "NPR EFT Transaction Request")
-    var
-        mobilePayV10Integration: Codeunit "NPR MobilePayV10 Integration";
-        eftTrxMgt: Codeunit "NPR EFT Transaction Mgt.";
-        mobilePayStartPaymentRequest: Codeunit "NPR MobilePayV10 Start Payment";
-        success: Boolean;
     begin
         CreatePaymentRequest(EftSetup, eftTrxRequest);
         Commit();
@@ -363,9 +353,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     end;
 
     local procedure CreatePaymentRequest(EftSetup: Record "NPR EFT Setup"; var EftTrxRequest: Record "NPR EFT Transaction Request")
-    var
-        eftTrxMgt: Codeunit "NPR EFT Transaction Mgt.";
-        eftFrmwrkMgt: Codeunit "NPR EFT Framework Mgt.";
     begin
         EftTrxRequest.Init();
         EftTrxRequest."Entry No." := 0;
@@ -381,9 +368,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     end;
 
     local procedure CreateRefundRequest(EftSetup: Record "NPR EFT Setup"; var EftTrxRequest: Record "NPR EFT Transaction Request"; var OrigEftTrxRequest: Record "NPR EFT Transaction Request")
-    var
-        eftTrxMgt: Codeunit "NPR EFT Transaction Mgt.";
-        eftFrmwrkMgt: Codeunit "NPR EFT Framework Mgt.";
     begin
         EftTrxRequest.Init();
         EftTrxRequest."Entry No." := 0;
@@ -400,9 +384,6 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     end;
 
     local procedure CreateLookupRequest(EftSetup: Record "NPR EFT Setup"; var EftTrxRequest: Record "NPR EFT Transaction Request"; var OrigEftTrxRequest: Record "NPR EFT Transaction Request")
-    var
-        eftTrxMgt: Codeunit "NPR EFT Transaction Mgt.";
-        eftFrmwrkMgt: Codeunit "NPR EFT Framework Mgt.";
     begin
         EftTrxRequest.Init();
         EftTrxRequest."Entry No." := 0;

@@ -347,7 +347,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, type));
     end;
 
-    local procedure BarcodePDF417(x: Integer; y: Integer; w: Integer; AspectRatio: Boolean; h: Integer; ec: Integer; ErrorCorrectionPct: Boolean; rows: Integer; UseSymbolAspectRatio: Boolean; cols: Integer; bytes: Integer; T: Integer; M: Integer; date: Text[1024])
+    local procedure BarcodePDF417()
     begin
         // Ref sheet 30-33
         // Type, refer to table 3 in documentation.
@@ -414,7 +414,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, mode, x, dottime, maxY, numlbls));
     end;
 
-    local procedure Index(mode: Text[2]; x: Integer; dottime: Integer; maxY: Integer; numlbls: Integer)
+    local procedure Index()
     begin
         // Ref sheet 55
         TempPattern := 'INDEX';
@@ -437,7 +437,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, nnn));
     end;
 
-    local procedure NoIndex(mode: Text[2]; x: Integer; dottime: Integer; maxY: Integer; numlbls: Integer)
+    local procedure NoIndex()
     begin
         // Ref sheet 55
         TempPattern := 'NOINDEX';
@@ -512,7 +512,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, spacing, rotation, xmult, ymult, fontID, x, y, characters));
     end;
 
-    local procedure UniversalClear(characters: Text[30])
+    local procedure UniversalClear()
     begin
         // Ref sheet 86
         TempPattern := '23 23 23 23 23 CLEAR 23 23 23 23 23';

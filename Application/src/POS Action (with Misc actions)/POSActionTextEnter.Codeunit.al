@@ -33,8 +33,6 @@ codeunit 6150722 "NPR POS Action: Text Enter"
         EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
         ControlId: Text;
         Value: Text;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;

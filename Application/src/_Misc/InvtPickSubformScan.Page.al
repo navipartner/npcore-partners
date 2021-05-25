@@ -253,7 +253,6 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     trigger OnAction()
                     var
                         WhseActivityHeader: Record "Warehouse Activity Header";
-                        InventoryPickScan: Page "NPR Inventory Pick Scan";
                     begin
                         CallSplitLine();
                         WhseActivityHeader.Get(Rec."Activity Type", Rec."No.");

@@ -161,7 +161,7 @@
                 end;
             'select_customer':
                 begin
-                    OnActionSelectCustomer(POSSession, FrontEnd);
+                    OnActionSelectCustomer(FrontEnd);
                 end;
             'create_collect_order':
                 begin
@@ -432,7 +432,7 @@
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionSelectCustomer(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionSelectCustomer(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         SalePOS: Record "NPR POS Sale";
         JSON: Codeunit "NPR POS JSON Management";

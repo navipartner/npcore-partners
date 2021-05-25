@@ -58,7 +58,6 @@ codeunit 6014570 "NPR POS Lookup Method"
         RecRef: RecordRef;
         LookupType: Interface "NPR IPOSLookupType";
         Row: JsonObject;
-        SkippedCount: Integer;
         ReadCount: Integer;
         BackEndGeneration: Integer;
         HasMore: Boolean;

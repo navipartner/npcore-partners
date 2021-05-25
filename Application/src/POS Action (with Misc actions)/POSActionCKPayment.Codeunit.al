@@ -65,7 +65,7 @@
             exit;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type() = CurrentView.Type()::Sale) then
+        if (CurrentView.Type() = CurrentView.Type() ::Sale) then
             POSSession.ChangeViewPayment();
 
         POSSession.GetSetup(Setup);
@@ -138,7 +138,7 @@
             'CheckTransactionResult':
                 begin
                     GetTransactionRequest(POSSession, CashKeeperTransaction);
-                    CheckTransactionResult(POSSession, FrontEnd, CashKeeperTransaction);
+                    CheckTransactionResult(POSSession, CashKeeperTransaction);
                 end;
 
         end;
@@ -210,11 +210,10 @@
         exit(Handled);
     end;
 
-    local procedure CheckTransactionResult(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var CashKeeperTransaction: Record "NPR CashKeeper Transaction"): Boolean
+    local procedure CheckTransactionResult(POSSession: Codeunit "NPR POS Session"; var CashKeeperTransaction: Record "NPR CashKeeper Transaction"): Boolean
     var
         PaymentTypeNo: Code[10];
         POSPaymentMethod: Record "NPR POS Payment Method";
-        Context: JsonObject;
         Txt001: Label 'CashKeeper error: %1 - %2';
         Txt002: Label 'Payment was cancelled';
     begin
@@ -231,7 +230,7 @@
         PaymentTypeNo := CashKeeperTransaction."Payment Type";
 #pragma warning restore        
         POSPaymentMethod.Get(PaymentTypeNo);
-        UpdatePaymentLine(CashKeeperTransaction, POSPaymentMethod, Context, POSSession, FrontEnd);
+        UpdatePaymentLine(CashKeeperTransaction, POSPaymentMethod, POSSession);
         POSSession.RequestRefreshData();
         POSSession.ClearActionState();
         exit(true);
@@ -299,10 +298,9 @@
         exit(Round(Amount, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType()));
     end;
 
-    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "NPR CashKeeper Transaction"; POSPaymentMethod: Record "NPR POS Payment Method"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "NPR CashKeeper Transaction"; POSPaymentMethod: Record "NPR POS Payment Method"; POSSession: Codeunit "NPR POS Session"): Boolean
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        AlternativTransactionRequest: Record "NPR EFT Transaction Request";
         POSLine: Record "NPR POS Sale Line";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;

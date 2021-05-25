@@ -86,8 +86,6 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
     end;
 
     local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
     begin
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
             exit;

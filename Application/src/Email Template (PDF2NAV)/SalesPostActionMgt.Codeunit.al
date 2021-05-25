@@ -2,8 +2,6 @@ codeunit 6014462 "NPR Sales-Post Action Mgt"
 {
     var
         StdActionDisabledMsg: Label 'This Action is disabled by setup. Please use ''Post and Pdf2Nav''';
-        Pdf2NavActionDisabledMsg1: Label 'This Action is disabled by setup. Please use ''Post and Print'' or ''Post and Email ''';
-        Pdf2NavActionDisabledMsg2: Label 'This Action is disabled by setup. Please use ''Post and Send'', ''Post and Print'' or ''Post and Email ''';
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Invoice", 'OnBeforeActionEvent', 'PostAndSend', true, true)]
     local procedure Page43OnBeforeActionEventPostAndSend(var Rec: Record "Sales Header")

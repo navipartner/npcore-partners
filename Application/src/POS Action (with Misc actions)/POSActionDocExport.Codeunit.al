@@ -212,7 +212,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     var
         JSON: Codeunit "NPR POS JSON Management";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -243,7 +242,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
         POSSession.StoreActionState('CreatedSalesHeader', SalesHeader);
-        SetPaymentParameters(POSSession, JSON, FrontEnd, SalesHeader);
+        SetPaymentParameters(JSON, FrontEnd, SalesHeader);
     end;
 
     local procedure DocumentPayment(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -299,7 +298,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             end;
     end;
 
-    local procedure SetPaymentParameters(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; SalesHeader: Record "Sales Header")
+    local procedure SetPaymentParameters(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; SalesHeader: Record "Sales Header")
     var
         Choice: Integer;
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";

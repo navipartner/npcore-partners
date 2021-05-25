@@ -85,7 +85,6 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
     procedure CancelSaleAndStartNew(POSSession: Codeunit "NPR POS Session"): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
-        Line: Record "NPR POS Sale Line";
     begin
         if not CancelSale(POSSession) then
             exit(false);

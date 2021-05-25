@@ -83,7 +83,7 @@
                    (AuditRoll."Sales Ticket No." <> xAuditRoll."Sales Ticket No.") or
                    ((AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment) and (AuditRoll.Type = AuditRoll.Type::"Open/Close")) then begin
                     if NoOfPOSEntriesCreated > 0 then begin
-                        FinalizePOSEntry(POSEntry, AuditRoll);
+                        FinalizePOSEntry(POSEntry);
                         CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
                         PersistVATAmountLines(POSEntry, VATAmountLine);
                     end;
@@ -152,7 +152,7 @@
                 xAuditRoll := AuditRoll;
             until AuditRoll.Next() = 0;
             if NoOfPOSEntriesCreated > 0 then begin
-                FinalizePOSEntry(POSEntry, AuditRoll);
+                FinalizePOSEntry(POSEntry);
                 CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
                 PersistVATAmountLines(POSEntry, VATAmountLine);
             end;
@@ -583,7 +583,7 @@
         end;
     end;
 
-    local procedure FinalizePOSEntry(var POSEntry: Record "NPR POS Entry"; var AuditRoll: Record "NPR Audit Roll")
+    local procedure FinalizePOSEntry(var POSEntry: Record "NPR POS Entry")
     begin
         if POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Unposted then
             POSEntry."Post Item Entry Status" := POSEntry."Post Entry Status";
@@ -630,7 +630,7 @@
                 (AuditRoll."Sales Ticket No." <> xAuditRoll."Sales Ticket No.") or
                 ((AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment) and (AuditRoll.Type = AuditRoll.Type::"Open/Close")) then begin
                 if NoOfPOSEntriesCreated > 0 then
-                    FinalizePOSEntry(POSEntry, AuditRoll);
+                    FinalizePOSEntry(POSEntry);
 
                 if POSUnit."No." <> AuditRoll."Register No." then
                     if POSUnit.Get(AuditRoll."Register No.") then;
@@ -696,7 +696,7 @@
         until AuditRoll.Next() = 0;
 
         if NoOfPOSEntriesCreated > 0 then
-            FinalizePOSEntry(POSEntry, AuditRoll);
+            FinalizePOSEntry(POSEntry);
     end;
 
     procedure UpgradeSetupsBalancingV3()
@@ -840,7 +840,7 @@
                     POSPaymentBin.Insert(true);
                 end;
                 //Default POS Payment Bin
-                CreateDefaultBins(POSUnit."No.");
+                CreateDefaultBins();
             until POSUnit.Next() = 0;
 
         POSPostingSetupCheck.Reset();
@@ -958,7 +958,7 @@
         exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment, AuditRoll."Sale Type"::"Open/Close"]);//Remove "Sale Type"::"Debit Sale"
     end;
 
-    local procedure CreateDefaultBins(POSUnitNo: Code[10])
+    local procedure CreateDefaultBins()
     var
         BinNoArray: array[3] of Code[10];
         BinDescArray: array[3] of Text[20];

@@ -37,7 +37,6 @@ page 6151306 "NPR AF Test Service Picture"
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
                     FileName: Text;
-                    ClientFileName: Text;
                 begin
                     if Rec.Picture.HasValue() then
                         if not Confirm(OverrideImageQst) then

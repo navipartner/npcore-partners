@@ -17,14 +17,6 @@
 
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        InsuranceCompanyCode: Code[50];
-        RegisterNo: Code[20];
-        DG: Decimal;
-        DB: Decimal;
-        CostPrice: Decimal;
-        Netto: Decimal;
-        SalesPrice: Decimal;
-        DiscountAmt: Decimal;
         InvoiceDiscountAmt: Decimal;
 
     procedure EnableMenu()

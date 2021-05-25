@@ -146,9 +146,6 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     end;
 
     procedure LoadFromPOSQuote(var SalePOS: Record "NPR POS Sale"; POSQuoteEntryNo: Integer) Success: Boolean
-    var
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSActionLoadPOSQuote: Codeunit "NPR POS Action: LoadPOSSvSl";
     begin
         Success := DoLoadFromPOSQuote(SalePOS, POSQuoteEntryNo);
         if Success then

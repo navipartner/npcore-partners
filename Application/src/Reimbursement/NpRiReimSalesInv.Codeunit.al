@@ -125,7 +125,7 @@
         ReimbursementAmt: Decimal;
         PostImmediately: Boolean;
     begin
-        FindCust(NpRiReimbursement, Cust, PostImmediately);
+        FindCust(NpRiReimbursement, Cust);
 
         InsertSalesInvHeader(Cust, NpRiReimbursement, NpRiReimbursementEntryApply, SalesHeader);
 
@@ -154,7 +154,7 @@
         LastErrorText: Text;
         PostImmediately: Boolean;
     begin
-        FindCust(NpRiReimbursement, Cust, PostImmediately);
+        FindCust(NpRiReimbursement, Cust);
         NpRiReimbursementEntry.SetRange("Closed by Entry No.", NpRiReimbursementEntryApply."Entry No.");
         if not NpRiReimbursementEntry.FindSet() then
             exit;
@@ -350,7 +350,7 @@
         SalesLine.Insert(true);
     end;
 
-    local procedure FindCust(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var Cust: Record Customer; var PostImmediately: Boolean)
+    local procedure FindCust(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var Cust: Record Customer)
     var
         NpRiPartyType: Record "NPR NpRi Party Type";
         NpRiSalesInvSetup: Record "NPR NpRi Sales Inv. Setup";

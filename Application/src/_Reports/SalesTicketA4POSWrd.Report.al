@@ -298,8 +298,6 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
             }
 
             trigger OnAfterGetRecord()
-            var
-                POSTaxAmountLine: Record "NPR POS Entry Tax Line";
             begin
                 TotalTaxText := GetVATText("Entry No.");
                 if DelChr(TotalTaxText, '=', '0123456789') = '' then

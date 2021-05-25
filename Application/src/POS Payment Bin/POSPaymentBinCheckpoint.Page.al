@@ -346,8 +346,6 @@
     local procedure OnAssistEditCounting()
     var
         EODDenomination: Record "NPR EOD Denomination";
-        EODDenominationCount: Page "NPR EOD Denomination Count";
-        POSCountingDenomination: Record "NPR POS Counting Denomination";
     begin
         FillDenominationBuffer(EODDenomination);
 

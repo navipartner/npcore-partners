@@ -126,8 +126,6 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
     end;
 
     local procedure CreateOldEftSetupTempRecords(var OldEftSetup: Record "NPR EFT Setup")
-    var
-        NewEftSetup: Record "NPR EFT Setup";
     begin
         OldEftSetup.TestField("Payment Type POS");
         OldEftSetup.TestField("POS Unit No.");

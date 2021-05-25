@@ -92,13 +92,8 @@ codeunit 6150707 "NPR POS Payment Line"
     //Look at how the payment action calculates remaining amount to pay instead of using the parameter in new code.
     procedure CalculateBalance(var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
-        PaymentLine: Record "NPR POS Sale Line";
         POSUnit: Record "NPR POS Unit";
         RoundingAmount: Decimal;
-        Decimal: Decimal;
-        DiscountRounding: Decimal;
-        i: Integer;
-        t001: Label 'You have to set a return payment type on the register.';
         SaleLinePOS: Record "NPR POS Sale Line";
         ReturnRounding: Decimal;
     begin

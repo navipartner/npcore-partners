@@ -53,7 +53,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         RecRef.GetTable(RecVariant);
         case RecRef.Number of
             DATABASE::Customer:
-                SendReportCustomerStatement(RecVariant, Silent);
+                SendReportCustomerStatement(RecVariant);
             DATABASE::"Issued Fin. Charge Memo Header":
                 SendReportIssuedFinChrgMemoHdr(RecVariant, Silent);
             DATABASE::"Issued Reminder Header":
@@ -301,7 +301,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         EmailMgt.SendReport(ReportID, RecRef, GetMailReceipients(RecRef, ReportID), Silent);
     end;
 
-    local procedure SendReportCustomerStatement(var Customer: Record Customer; Silent: Boolean)
+    local procedure SendReportCustomerStatement(var Customer: Record Customer)
     var
         Customer2: Record Customer;
     begin
@@ -313,7 +313,6 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
     procedure CreateEmailTemplates() NewEmailTemplateCount: Integer
     var
         TempField: Record "Field" temporary;
-        EmailRetailMgt: Codeunit "NPR E-mail Retail Mgt.";
         i: Integer;
     begin
         NewEmailTemplateCount := 0;

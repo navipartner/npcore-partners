@@ -125,8 +125,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
         POSUnit: Record "NPR POS Unit";
         POSAction: Record "NPR POS Action";
         POSViewProfile: Record "NPR POS View Profile";
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        SalePOS: Record "NPR POS Sale";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         JSON: Codeunit "NPR POS JSON Management";
         Setup: Codeunit "NPR POS Setup";

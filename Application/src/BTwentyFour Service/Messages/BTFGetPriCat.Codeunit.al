@@ -184,7 +184,7 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
         if not ItemWrksCreated(ItemWrks, TempItemWrks) then begin
             CreateItemWrksTemplateIfNotFound(TempItemWrks."Item Template Name");
             CreateItemWorksheet(ItemWrks, TempItemWrks);
-            CreateItemWorksheetLines(ItemWrks, TempItemWrks, TempItemWrksLine);
+            CreateItemWorksheetLines(TempItemWrksLine);
             if not ItemWrksLineCreated(ItemWrks) then begin
                 FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(PriCatRemovedLbl, ItemWrks.Description), Response);
                 ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), ItemWrks.RecordId());
@@ -273,7 +273,7 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
 
         CreateItemWrksTemplateIfNotFound(TempItemWrks."Item Template Name");
         CreateItemWorksheet(ItemWrks, TempItemWrks);
-        CreateItemWorksheetLines(ItemWrks, TempItemWrks, TempItemWrksLine);
+        CreateItemWorksheetLines(TempItemWrksLine);
 
         ItemWrks.SetRecFilter();
         Page.Run(0, ItemWrks);
@@ -298,8 +298,6 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
     end;
 
     local procedure CreateItemWorksheet(var ItemWrks: Record "NPR Item Worksheet"; TempItemWrks: Record "NPR Item Worksheet")
-    var
-        ItemWrksLine: Record "NPR Item Worksheet Line";
     begin
         ItemWrks.TransferFields(TempItemWrks);
         ItemWrks.Validate("Vendor No.");
@@ -307,7 +305,7 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
         ItemWrks.Insert(true);
     end;
 
-    local procedure CreateItemWorksheetLines(var ItemWrks: Record "NPR Item Worksheet"; TempItemWrks: Record "NPR Item Worksheet"; var TempItemWrksLine: Record "NPR Item Worksheet Line")
+    local procedure CreateItemWorksheetLines(var TempItemWrksLine: Record "NPR Item Worksheet Line")
     var
         ItemWrksLine: Record "NPR Item Worksheet Line";
         ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";

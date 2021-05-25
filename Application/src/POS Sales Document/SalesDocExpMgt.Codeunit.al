@@ -172,7 +172,6 @@
     procedure ProcessPOSSale(var SalePOS: Record "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesPost: Codeunit "Sales-Post";
         SalesPostYesNo: Codeunit "Sales-Post (Yes/No)";

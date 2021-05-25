@@ -15,7 +15,6 @@ codeunit 6151509 "NPR Nc Import List Processing"
 
     var
         Text000: Label 'Download Ftp';
-        Text001: Label 'Download Server File';
         Text002: Label 'Process Import List';
         Text003: Label 'All';
 

@@ -344,7 +344,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if PoSUnitID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
 
-        if InvokeUnAssignPoSUnitIdToPoS(PoSUnitID) then begin
+        if InvokeUnAssignPoSUnitIdToPoS() then begin
             EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit Assigned', false);
             PoSUnitAssigned := false;
             Message(Text6014522);
@@ -470,7 +470,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     begin
         ClearLastError();
         InitializeGlobals(EFTTransReq."POS Payment Type Code", EFTTransReq."Register No.");
-        exit(InvokePaymentCancel(EFTTransReq));
+        exit(InvokePaymentCancel());
     end;
 
     local procedure "// Web Request Mgt."()
@@ -580,7 +580,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     [TryFunction]
-    local procedure InvokeUnAssignPoSUnitIdToPoS(var PoSUnitIdIn: Text[30])
+    local procedure InvokeUnAssignPoSUnitIdToPoS()
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
@@ -685,7 +685,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     [TryFunction]
-    local procedure InvokePaymentCancel(var EFTTransReq: Record "NPR EFT Transaction Request")
+    local procedure InvokePaymentCancel()
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
