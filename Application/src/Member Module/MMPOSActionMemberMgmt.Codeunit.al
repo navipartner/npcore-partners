@@ -135,7 +135,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 1:
                     SelectMembership(POSSession, DialogMethodType, MemberCardNumber);
                 2:
-                    ViewMembershipEntry(POSSession, DialogMethodType, MemberCardNumber);
+                    ViewMembershipEntry(DialogMethodType, MemberCardNumber);
                 3:
                     RegretMembership(POSSession, DialogMethodType, MemberCardNumber);
                 4:
@@ -147,12 +147,12 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 7:
                     CancelMembership(POSSession, DialogMethodType, MemberCardNumber);
                 8:
-                    EditMembership(POSSession, DialogMethodType, MemberCardNumber);
+                    EditMembership(POSSession);
                 9:
                     ShowMember(POSSession, DialogMethodType, MemberCardNumber);
 
                 10:
-                    EditActiveMembership(POSSession, DialogMethodType, MemberCardNumber);
+                    EditActiveMembership(POSSession);
 
                 else
                     Error('POS Action: Function with ID %1 is not implemented.', FunctionId);
@@ -301,8 +301,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         POSSale: Codeunit "NPR POS Sale";
-        ItemNo: Code[20];
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
     begin
 
@@ -468,7 +466,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         AddItemToPOS(POSSession, MemberInfoEntryNo, ItemNo, MembershipAlterationSetup.Description, ExternalMemberCardNo, 1, MemberInfoCapture."Unit Price", SaleLinePOS);
     end;
 
-    local procedure ViewMembershipEntry(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
+    local procedure ViewMembershipEntry(InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -611,7 +609,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure EditMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
+    local procedure EditMembership(POSSession: Codeunit "NPR POS Session")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
@@ -641,7 +639,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure EditActiveMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
+    local procedure EditActiveMembership(POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
@@ -1040,7 +1038,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnAfterLogin', '', true, true)]
     local procedure OnAfterLogin_SelectMemberRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         Member: Record "NPR MM Member";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";

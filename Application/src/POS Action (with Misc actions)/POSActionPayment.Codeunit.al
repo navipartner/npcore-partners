@@ -64,7 +64,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
@@ -196,7 +195,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        SalePOS: Record "NPR POS Sale";
         PaymentMethodCode: Code[20];
         PaymentHandled: Boolean;
         POSUnit: Record "NPR POS Unit";
@@ -436,7 +434,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
 
         POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
-        ApplyCreditVoucherToPaymentLine(VoucherTypeCode, VoucherNumber, POSLine, POSPaymentMethod, AmountToCaptureLCY, AmountToCapture, SalePOS, POSSession, FrontEnd);
+        ApplyCreditVoucherToPaymentLine(VoucherTypeCode, VoucherNumber, POSLine, AmountToCaptureLCY, AmountToCapture, SalePOS, POSSession, FrontEnd);
 
         exit(true);
     end;
@@ -620,7 +618,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
     end;
 
-    local procedure ApplyCreditVoucherToPaymentLine(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCaptureLCY: Decimal; AmountToCapture: Decimal; SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure ApplyCreditVoucherToPaymentLine(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; AmountToCaptureLCY: Decimal; AmountToCapture: Decimal; SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";

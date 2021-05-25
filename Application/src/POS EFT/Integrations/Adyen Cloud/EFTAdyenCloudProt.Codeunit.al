@@ -655,7 +655,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
                        '"RequestedAmount":' + GetAmount(EftTransactionRequest) + ',' +
                        '"CashBackAmount":' + GetCashbackAmount(EftTransactionRequest) +
                     '}' +
-                    GetTransactionConditions(EftTransactionRequest, EFTSetup) +
+                    GetTransactionConditions(EFTSetup) +
                  '},' +
                  '"PaymentData":{' +
                     GetCardAcquisitionJSON(EftTransactionRequest, false) +
@@ -664,7 +664,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
            '}' +
         '}';
 
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 600 * 1000, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 600 * 1000);
     end;
 
     [TryFunction]
@@ -695,7 +695,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
                     '"SaleReferenceID":' + JsonConvert.ToString(EftTransactionRequest.Token) +
                  '},' +
                  '"PaymentTransaction":{' +
-                    GetTransactionConditions(EftTransactionRequest, EFTSetup) +
+                    GetTransactionConditions(EFTSetup) +
                     '"AmountsReq":{' +
                        '"Currency":' + JsonConvert.ToString(EftTransactionRequest."Currency Code") + ',' +
                        '"RequestedAmount":' + GetAmount(EftTransactionRequest) +
@@ -709,7 +709,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
            '}' +
         '}';
 
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 600 * 1000, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 600 * 1000);
     end;
 
     [TryFunction]
@@ -752,7 +752,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
            '}' +
         '}';
 
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 20 * 1000, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 20 * 1000);
     end;
 
     [TryFunction]
@@ -783,7 +783,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
             '}' +
         '}';
 
-        InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 10 * 1000, EftTransactionRequest);
+        InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 10 * 1000);
     end;
 
     [TryFunction]
@@ -821,7 +821,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
            '}' +
         '}';
 
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 600 * 1000, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 600 * 1000);
     end;
 
     [TryFunction]
@@ -851,7 +851,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
            '}' +
         '}';
 
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 10 * 1000, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 10 * 1000);
     end;
 
     [TryFunction]
@@ -888,7 +888,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         '}';
 
         //-NPR5.53 [377533]
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), TimeoutMs, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), TimeoutMs);
         //+NPR5.53 [377533]
     end;
 
@@ -916,7 +916,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
            '}' +
         '}';
 
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 20 * 1000, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetTerminalURL(EftTransactionRequest), 20 * 1000);
     end;
 
     [TryFunction]
@@ -933,11 +933,11 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
            '"merchantAccount":' + JsonConvert.ToString(EFTAdyenCloudIntegration.GetMerchantAccount(EFTSetup)) +
          '}';
 
-        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetRecurringURL(EftTransactionRequest, EFTSetup, 'disable'), 20 * 1000, EftTransactionRequest);
+        Response := InvokeAPI(Body, GetAPIKey(EFTSetup), GetRecurringURL(EftTransactionRequest, EFTSetup, 'disable'), 20 * 1000);
         //+NPR5.53 [377533]
     end;
 
-    local procedure InvokeAPI(Body: Text; APIKey: Text; URL: Text; TimeoutMs: Integer; EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    local procedure InvokeAPI(Body: Text; APIKey: Text; URL: Text; TimeoutMs: Integer): Text
     var
         HttpWebRequest: DotNet NPRNetHttpWebRequest;
         ReqStream: DotNet NPRNetStream;
@@ -1103,7 +1103,7 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         exit(Value);
     end;
 
-    local procedure GetTransactionConditions(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
+    local procedure GetTransactionConditions(EFTSetup: Record "NPR EFT Setup"): Text
     var
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
         Condition: Integer;

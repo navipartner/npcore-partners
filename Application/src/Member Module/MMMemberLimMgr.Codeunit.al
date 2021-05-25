@@ -199,33 +199,33 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
         if (IsTemporaryCard(ExternalMemberCardNo)) then begin
             RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::TEMP_MEMBERCARD,
-                                        ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
+                                        ExternalMemberCardNo, AdmissionCode, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
             if (RuleNo <> 0) then
                 exit(RuleNo);
         end;
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::MEMBERCARD,
-                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
+                                    ExternalMemberCardNo, AdmissionCode, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::MEMBER,
-                                    ExternalMemberNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
+                                    ExternalMemberNo, AdmissionCode, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::MEMBERSHIP,
-                                    ExternalMemberShipNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
+                                    ExternalMemberShipNo, AdmissionCode, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::GDPR_PENDING,
-                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
+                                    ExternalMemberCardNo, AdmissionCode, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::GDPR_REJECTED,
-                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
+                                    ExternalMemberCardNo, AdmissionCode, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
@@ -235,7 +235,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             exit(CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, '', ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode));
     end;
 
-    local procedure CheckLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; KeyValueType: Option; KeyValue: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; KeyValueType: Option; KeyValue: Text[100]; AdmissionCode: Code[20]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         LimitFound: Boolean;
@@ -259,7 +259,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
             if (MembershipLimitationSetup.FindSet()) then begin
                 repeat
-                    LimitFound := DoesRuleApply(ClientType, MembershipLimitationSetup."Entry No.", KeyValue, AdmissionCode, IgnoreLogEntryNo, RuleMatchCount, ContraintText, RuleCondition);
+                    LimitFound := DoesRuleApply(MembershipLimitationSetup."Entry No.", KeyValue, AdmissionCode, IgnoreLogEntryNo, RuleMatchCount, RuleCondition);
 
                     if (LimitFound) then begin
                         RuleNo := MembershipLimitationSetup."Entry No.";
@@ -285,7 +285,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(RuleNo);
     end;
 
-    local procedure DoesRuleApply(ClientType: Option; RuleEntryNo: Integer; KeyValue: Text[100]; AdmissionCode: Code[20]; var MatchCount: Integer; IgnoreLogEntryNo: Integer; var RuleConstraint: Text; var RuleConditionalValue: Text): Boolean
+    local procedure DoesRuleApply(RuleEntryNo: Integer; KeyValue: Text[100]; AdmissionCode: Code[20]; var MatchCount: Integer; IgnoreLogEntryNo: Integer; var RuleConditionalValue: Text): Boolean
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";

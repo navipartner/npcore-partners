@@ -51,7 +51,6 @@ codeunit 6014553 "NPR Email Sending Handler"
         Attachment: Record Attachment temporary;
         TempBLOB: Codeunit "Temp Blob";
         Outstr: OutStream;
-        FileMgt: Codeunit "File Management";
 #endif
     begin
 #if BC17

@@ -234,7 +234,7 @@
 
         // Handle the RECOVERY scenario
         if (PepperBeginWorkshift.GetCDP_RecoveryRequired()) then begin
-            CreateRecoveryTransactionRequest(EFTTransactionRequest."Register No.", '', '', 0, EftRecoverTransactionRequest);
+            CreateRecoveryTransactionRequest(EFTTransactionRequest."Register No.", '', '', EftRecoverTransactionRequest);
             EftRecoverTransactionRequest."Initiated from Entry No." := EFTTransactionRequest."Entry No.";
             if (EFTTransactionRequest."Initiated from Entry No." <> 0) then
                 EftRecoverTransactionRequest."Initiated from Entry No." := EFTTransactionRequest."Initiated from Entry No.";
@@ -891,7 +891,7 @@
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreateRecoveryTransactionRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateRecoveryTransactionRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         GLSetup: Record "General Ledger Setup";
     begin

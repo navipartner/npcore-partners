@@ -171,11 +171,10 @@
                 begin
 
                     CurrPage.SetSelectionFilter(MemberInfoCapture);
-                    if (MemberInfoCapture.FindSet()) then begin
+                    if MemberInfoCapture.FindSet() then
                         repeat
-                            PrintOwner(MemberInfoCapture."Card Entry No.");
-                        until (MemberInfoCapture.Next() = 0);
-                    end;
+                            PrintOwner();
+                        until MemberInfoCapture.Next() = 0;
                 end;
             }
         }
@@ -281,7 +280,7 @@
         MemberRetailIntegration.PrintMemberCardWorker(MemberCard, MembershipSetup);
     end;
 
-    local procedure PrintOwner(CardEntryNo: Integer)
+    local procedure PrintOwner()
     var
         MemberCardOwner: Report "NPR MM Member Card Owner";
         MemberCard: Record "NPR MM Member Card";

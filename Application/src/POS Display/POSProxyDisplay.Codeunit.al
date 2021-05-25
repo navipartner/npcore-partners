@@ -41,7 +41,6 @@
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
-        SaleHeader: Record "NPR POS Sale";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
         CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
@@ -51,10 +50,10 @@
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
         if DisplayIsActivated then
-            Login(FrontEnd, POSUnit."No.")
+            Login(FrontEnd)
         else
             if MatrixIsActivated then
-                UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Login, '', '');
+                UpdateDisplayFromSalePOS(Action::Login, '', '');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitSale', '', true, true)]
@@ -74,7 +73,7 @@
             Update2ndDisplayFromSalePOS(FrontEnd, SaleHeader, POSUnit, Action::Clear, TextValue, 0)
         else
             if MatrixIsActivated then
-                UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Login, TextValue, '');
+                UpdateDisplayFromSalePOS(Action::Login, TextValue, '');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
@@ -114,7 +113,6 @@
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
-        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -135,9 +133,9 @@
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
-                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
+                    UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
-                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
+                    UpdateDisplayFromSalePOS(Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
             end;
     end;
 
@@ -198,7 +196,6 @@
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
-        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -219,9 +216,9 @@
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
-                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
+                    UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
-                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
+                    UpdateDisplayFromSalePOS(Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
             end;
     end;
 
@@ -232,10 +229,6 @@
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
-        SalesAmount: Decimal;
-        PaidAmount: Decimal;
-        ReturnAmount: Decimal;
-        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -255,7 +248,7 @@
         else
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-                UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
+                UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
             end;
     end;
 
@@ -266,7 +259,6 @@
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -289,7 +281,7 @@
             exit;
 
         CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-        UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
+        UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Payment", 'OnBeforeActionWorkflow', '', true, true)]
@@ -302,7 +294,6 @@
         CurrencyAmount: Decimal;
         Line1: Text;
         Line2: Text;
-        SaleHeader: Record "NPR POS Sale";
         GrandTotal: Decimal;
         Payment: Decimal;
         Change: Decimal;
@@ -328,7 +319,7 @@
             UpdateDisplay(Line1, Line2);
         end else begin
             CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-            UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
+            UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
         end;
     end;
 
@@ -369,7 +360,7 @@
         UpdateDisplay(Line1, Line2);
     end;
 
-    local procedure UpdateDisplayFromSalePOS(SalePOS: Record "NPR POS Sale"; POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; TextValue2: Text[30]): Boolean
+    local procedure UpdateDisplayFromSalePOS("Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; TextValue2: Text[30]): Boolean
     var
         Line1: Text;
         Line2: Text;
@@ -453,7 +444,7 @@
             case Action of
                 Action::Login:
                     begin
-                        Login(FrontEnd, POSUnit."No.");
+                        Login(FrontEnd);
                     end;
                 Action::Clear:
                     begin
@@ -708,7 +699,7 @@
             Change := (Payment - GrandTotal) * -1;
     end;
 
-    local procedure Login(var FrontEnd: Codeunit "NPR POS Front End Management"; RegisterNo: Code[10])
+    local procedure Login(var FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSSession: Codeunit "NPR POS Session";
     begin
@@ -717,7 +708,7 @@
         else
             SetAction(6);
 
-        SetRegister(RegisterNo);
+        SetRegister();
         SetReceiptCloseDuration(0);
         DisplayHandler();
         if (POSSession.IsActiveSession(FrontEnd)) then
@@ -746,7 +737,7 @@
 
     procedure EndSale(var FrontEnd: Codeunit "NPR POS Front End Management"; EndSaleDescription: Text; RegisterNo: Code[10])
     begin
-        SetRegister(RegisterNo);
+        SetRegister();
         SetAction(4);
         SetReceiptContent(EndSaleDescription);
         DisplayHandler();
@@ -781,7 +772,7 @@
         DisplayHandlerAction := ActionIn;
     end;
 
-    local procedure SetRegister(RegisterNoIn: Code[10])
+    local procedure SetRegister()
     begin
         DisplayContent.Get(DisplaySetup."Display Content Code");
         ContentType := DisplayContent.Type;

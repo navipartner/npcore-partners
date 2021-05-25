@@ -4,7 +4,7 @@
 
     trigger OnRun()
     begin
-        Process(Rec);
+        Process();
     end;
 
     var
@@ -12,7 +12,7 @@
         IncorrectFunctionCallErr: Label 'Function call on a non-temporary variable. This is a critical programming error. Please contact system vendor.';
         SalespersonTmp: Record "Salesperson/Purchaser" temporary;
 
-    local procedure Process(var JobQueueEntry: Record "Job Queue Entry")
+    local procedure Process()
     var
         TempDataLog: Record "NPR Data Log Record" temporary;
         ItemLedger: Record "Item Ledger Entry";

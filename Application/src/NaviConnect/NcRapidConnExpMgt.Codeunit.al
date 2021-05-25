@@ -47,7 +47,7 @@
                     end;
             end;
 
-            Success := Success and RunEndpoints(NcRapidConnectSetup, NcTask, NcTaskOutput, Response);
+            Success := Success and RunEndpoints(NcRapidConnectSetup, NcTaskOutput, Response);
             CommitResponse(Response, NcTask, NcTaskOutput);
         until TempExportTrigger.Next() = 0;
 
@@ -136,7 +136,7 @@
         Commit();
     end;
 
-    local procedure RunEndpoints(NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup"; var NcTask: Record "NPR Nc Task"; var NcTaskOutput: Record "NPR Nc Task Output"; var Response: Text) Success: Boolean
+    local procedure RunEndpoints(NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup"; var NcTaskOutput: Record "NPR Nc Task Output"; var Response: Text) Success: Boolean
     var
         NcRapidConnectEndpoint: Record "NPR Nc RapidConn. Endpoint";
         EndpointResponse: Text;

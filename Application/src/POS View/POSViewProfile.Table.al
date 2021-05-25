@@ -242,7 +242,7 @@ table 6150651 "NPR POS View Profile"
 
     local procedure GetClientFormats() Formats: JsonObject;
     var
-        NumberFormat, DateFormat, DayFormat : JsonObject;
+        NumberFormat, DateFormat : JsonObject;
         DayNames: JsonArray;
         Days: List of [Text];
         Day: Text;

@@ -131,23 +131,23 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
             1:
                 SelectMembership(Context, POSSession, State, Frontend);
             2:
-                JsonText := GetMembershipEntryLookupJson(Context, POSSession, State, Frontend);
+                JsonText := GetMembershipEntryLookupJson(Context);
             3:
-                ExecuteMembershipAlteration(Context, POSSession, State, Frontend, MembershipAlterationSetup."Alteration Type"::REGRET);
+                ExecuteMembershipAlteration(Context, POSSession, MembershipAlterationSetup."Alteration Type"::REGRET);
             4:
-                ExecuteMembershipAlteration(Context, POSSession, State, Frontend, MembershipAlterationSetup."Alteration Type"::RENEW);
+                ExecuteMembershipAlteration(Context, POSSession, MembershipAlterationSetup."Alteration Type"::RENEW);
             5:
-                ExecuteMembershipAlteration(Context, POSSession, State, Frontend, MembershipAlterationSetup."Alteration Type"::EXTEND);
+                ExecuteMembershipAlteration(Context, POSSession, MembershipAlterationSetup."Alteration Type"::EXTEND);
             6:
-                ExecuteMembershipAlteration(Context, POSSession, State, Frontend, MembershipAlterationSetup."Alteration Type"::UPGRADE);
+                ExecuteMembershipAlteration(Context, POSSession, MembershipAlterationSetup."Alteration Type"::UPGRADE);
             7:
-                ExecuteMembershipAlteration(Context, POSSession, State, Frontend, MembershipAlterationSetup."Alteration Type"::CANCEL);
+                ExecuteMembershipAlteration(Context, POSSession, MembershipAlterationSetup."Alteration Type"::CANCEL);
             8:
-                EditMembership(Context, POSSession, State, Frontend);
+                EditMembership(POSSession);
             9:
                 ShowMember(Context, POSSession, State, Frontend);
             10:
-                EditActiveMembership(Context, POSSession, State, Frontend);
+                EditActiveMembership(POSSession);
         end;
         exit(JsonText);
     end;
@@ -219,9 +219,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         POSSale: Codeunit "NPR POS Sale";
         FrontEndInputMethod: Option;
         ExternalMemberCardNo: Text;
@@ -246,7 +244,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         exit(Membership."Entry No.");
     end;
 
-    local procedure GetMembershipEntryLookupJson(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
+    local procedure GetMembershipEntryLookupJson(Context: Codeunit "NPR POS JSON Management") JsonText: Text
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -282,14 +280,13 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     end;
 
-    local procedure ExecuteMembershipAlteration(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; AlterationType: Option)
+    local procedure ExecuteMembershipAlteration(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; AlterationType: Option)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         SaleLinePOS: Record "NPR POS Sale Line";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
@@ -330,7 +327,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     end;
 
-    local procedure EditMembership(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure EditMembership(POSSession: Codeunit "NPR POS Session")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
@@ -361,7 +358,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     end;
 
-    local procedure EditActiveMembership(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure EditActiveMembership(POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";

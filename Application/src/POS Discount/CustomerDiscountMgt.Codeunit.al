@@ -7,7 +7,6 @@
     procedure ApplyCustomerDiscount(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; RecalculateAllLines: Boolean)
     var
         Customer: Record Customer;
-        TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
     begin
         if Customer.Get(SalePOS."Customer No.") and not Customer."Allow Line Disc." then
             exit;
@@ -103,7 +102,7 @@
             exit;
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
-        if not IsValidLineOperation(Rec, xRec, LineOperation) then
+        if not IsValidLineOperation(LineOperation) then
             exit;
 
         if POSSalesPriceCalcMgt.SalesLineLineDiscExists(SalePOS, Rec, false) then begin
@@ -113,7 +112,7 @@
         end;
     end;
 
-    local procedure IsValidLineOperation(Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete): Boolean
+    local procedure IsValidLineOperation(LineOperation: Option Insert,Modify,Delete): Boolean
     begin
         if LineOperation = LineOperation::Delete then
             exit(false);

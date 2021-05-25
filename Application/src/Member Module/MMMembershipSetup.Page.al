@@ -426,7 +426,7 @@ page 6060124 "NPR MM Membership Setup"
 
                 trigger OnAction()
                 begin
-                    UpdateAllWallets(Rec.Code);
+                    UpdateAllWallets();
                 end;
             }
 
@@ -568,7 +568,7 @@ page 6060124 "NPR MM Membership Setup"
 
     end;
 
-    local procedure UpdateAllWallets(MembershipCode: Code[20])
+    local procedure UpdateAllWallets()
     var
         MembershipRole: Record "NPR MM Membership Role";
         MembershipNotification: Record "NPR MM Membership Notific.";

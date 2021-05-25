@@ -98,24 +98,12 @@
         Handled := true;
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
-    local procedure OnConfirmRefussion(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-    begin
-    end;
 
     local procedure OnDoRefussion(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SalePOS: Record "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaymentLinePOS: Record "NPR POS Sale Line";
-        TotalVATOnSale: Decimal;
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
 
@@ -137,12 +125,10 @@
         POSSession.RequestRefreshData();
     end;
 
-    local procedure CalcVATFromSale(SalePOS: Record "NPR POS Sale") VATAmount: Decimal
+    local procedure CalcVATFromSale(SalePOS: Record "NPR POS Sale"): Decimal
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TotalVAT: Decimal;
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaymentLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");

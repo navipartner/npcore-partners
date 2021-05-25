@@ -258,7 +258,6 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
         JArray: JsonArray;
         JObject: JsonObject;
         OutStr: OutStream;
-        Filename: Text;
     begin
         Initialize(GetFullURL('/templates/render.json'), 'POST');
         BodyJObject.Add('template_name', SmartEmail."Smart Email ID");

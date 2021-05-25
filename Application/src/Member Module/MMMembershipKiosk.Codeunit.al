@@ -35,21 +35,21 @@ codeunit 6060126 "NPR MM Membership Kiosk"
 
         case PageId of
             0:
-                Html := WelcomePage(Parameters);
+                Html := WelcomePage();
             1:
-                Html := ScanTicketBarcodePage(Parameters);
+                Html := ScanTicketBarcodePage();
             2:
                 Html := MemberInfoCapturePage(Parameters);
             3:
-                Html := TakePhotoPage(Parameters);
+                Html := TakePhotoPage();
             4:
                 Html := PreviewCardPage(Parameters);
             5:
-                Html := PrintPage(Parameters);
+                Html := PrintPage();
             6:
                 Html := ShowErrorPage(Parameters);
             else
-                Html := WelcomePage(Parameters);
+                Html := WelcomePage();
         end;
     end;
 
@@ -128,7 +128,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '}';
     end;
 
-    local procedure WelcomePage(var Parameters: JsonObject) Html: Text
+    local procedure WelcomePage() Html: Text
     begin
         Html :=
         '<!doctype html>' +
@@ -170,7 +170,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         ContainerCss(Css);
     end;
 
-    local procedure ScanTicketBarcodePage(var Parameters: JsonObject) Html: Text
+    local procedure ScanTicketBarcodePage() Html: Text
     begin
 
         Html :=
@@ -306,7 +306,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         ContainerCss(Css);
     end;
 
-    local procedure TakePhotoPage(var Parameters: JsonObject) Html: Text
+    local procedure TakePhotoPage() Html: Text
     begin
         Html :=
         '<!doctype html>' +
@@ -439,7 +439,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '}';
     end;
 
-    local procedure PrintPage(var Parameters: JsonObject) Html: Text
+    local procedure PrintPage() Html: Text
     begin
 
         Html :=

@@ -43,7 +43,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
             'LookupSalespersonCode':
                 begin
                     Handled := true;
-                    OnActionLookupSalespersonCode(JSON, POSSession);
+                    OnActionLookupSalespersonCode(POSSession);
                     exit;
                 end;
         end;
@@ -63,7 +63,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
         POSSession.RequestRefreshData();
     end;
 
-    local procedure OnActionLookupSalespersonCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionLookupSalespersonCode(POSSession: Codeunit "NPR POS Session")
     var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalePOS: Record "NPR POS Sale";

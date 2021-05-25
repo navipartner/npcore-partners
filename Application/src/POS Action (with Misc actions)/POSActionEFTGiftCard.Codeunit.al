@@ -66,11 +66,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        PaymentType: Text;
-        Amount: Decimal;
-        EFTSetup: Record "NPR EFT Setup";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -191,7 +186,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         LineAmount: Decimal;
         EftEntryNo: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";

@@ -75,11 +75,11 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 
         case OperationType of
             OperationType::VoidLast:
-                VoidLastTransaction(EFTSetup, SalePOS, FrontEnd);
+                VoidLastTransaction(EFTSetup, SalePOS);
             OperationType::ReprintLast:
                 ReprintLastTransaction(EFTSetup, SalePOS);
             OperationType::LookupLast:
-                LookupLastTransaction(EFTSetup, SalePOS, FrontEnd);
+                LookupLastTransaction(EFTSetup, SalePOS);
             OperationType::OpenConn:
                 EFTTransactionMgt.StartBeginWorkshift(EFTSetup, SalePOS);
             OperationType::CloseConn:
@@ -137,7 +137,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
     begin
     end;
 
-    local procedure VoidLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure VoidLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale")
     var
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -156,7 +156,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         LastEFTTransactionRequest.PrintReceipts(true);
     end;
 
-    local procedure LookupLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure LookupLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale")
     var
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";

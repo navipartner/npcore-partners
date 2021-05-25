@@ -58,10 +58,10 @@ codeunit 6014525 "NPR MobilePayV10 Get Payment"
         _responseHttpCode := respMessage.HttpStatusCode;
         respMessage.Content.ReadAs(_response);
 
-        ParseResponse(reqMessage, respMessage, eftTrxRequest);
+        ParseResponse(reqMessage, respMessage);
     end;
 
-    local procedure ParseResponse(var reqMessage: HttpRequestMessage; respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
+    local procedure ParseResponse(var reqMessage: HttpRequestMessage; respMessage: HttpResponseMessage)
     var
         jsonToken: JsonToken;
         jsonResponse: JsonObject;

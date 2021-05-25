@@ -74,7 +74,6 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
     procedure FillData(BaseCalculationDate: Date; var POSStore: Record "NPR POS Store"; var POSUnit: Record "NPR POS Unit";
         var Buffer: Record "NPR POS Turnover Calc. Buffer")
     var
-        POSEntry: Record "NPR POS Entry";
         i: Integer;
         FromDate, ToDate : array[2] of Date;
         DayOfWeek, WeekNo, CurrYear : Integer;
@@ -167,7 +166,6 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         var Buffer: Record "NPR POS Turnover Calc. Buffer"; var i: Integer)
     var
         Values: array[10] of Decimal;
-        Value1, Value2 : Decimal;
     begin
         CalcRowData(FromDate1, ToDate1,
             Values[1], Values[2], Values[3], Values[4]);
@@ -240,7 +238,6 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
     local procedure CalcRowData(FromDate: Date; ToDate: Date; var NetAmount: Decimal; var CostOfSalesAmount: Decimal; var ProfitAmount: Decimal;
         var ProfitPct: Decimal)
     var
-        POSSalesLine: Record "NPR POS Entry Sales Line";
         POSTurnoverQuery: Query "NPR POS Turnover";
     begin
         NetAmount := 0;

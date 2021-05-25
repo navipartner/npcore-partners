@@ -43,19 +43,13 @@ then begin
 
     [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        RaptorAction: Record "NPR Raptor Action";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        RaptorMgt: Codeunit "NPR Raptor Management";
-        RaptorActionCode: Code[20];
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
         //-NPR5.54 [400510]
-        if not TryToRunAction(Action, Context, POSSession) then begin
+        if not TryToRunAction(Context, POSSession) then begin
             Context.SetContext('ActionFailed', true);
             Context.SetContext('ActionFailReasonMsg', GetLastErrorText);
         end;
@@ -79,7 +73,7 @@ then begin
     end;
 
     [TryFunction]
-    local procedure TryToRunAction("Action": Record "NPR POS Action"; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure TryToRunAction(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         RaptorAction: Record "NPR Raptor Action";
         SalePOS: Record "NPR POS Sale";

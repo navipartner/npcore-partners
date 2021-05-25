@@ -315,8 +315,8 @@
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if (Rec.Type = Rec.Type::Resource) and (CurrFieldNo = Rec.FieldNo("No.")) then
-            CalcResTimeQty(CurrFieldNo, Rec, xRec);
-        FindJobUnitPriceInclVAT(Rec, CurrFieldNo);
+            CalcResTimeQty(CurrFieldNo, Rec);
+        FindJobUnitPriceInclVAT(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Starting Time', false, false)]
@@ -324,7 +324,7 @@
     begin
         if CurrFieldNo = Rec.FieldNo("NPR Starting Time") then begin
             CheckTime(Rec."Planning Date", Rec."Planning Date", Rec."NPR Starting Time", Rec."NPR Ending Time");
-            CalcResTimeQty(CurrFieldNo, Rec, xRec);
+            CalcResTimeQty(CurrFieldNo, Rec);
             CheckResTimeFrameAvailability(Rec);
         end;
     end;
@@ -334,7 +334,7 @@
     begin
         if CurrFieldNo = Rec.FieldNo("NPR Ending Time") then begin
             CheckTime(Rec."Planning Date", Rec."Planning Date", Rec."NPR Starting Time", Rec."NPR Ending Time");
-            CalcResTimeQty(CurrFieldNo, Rec, xRec);
+            CalcResTimeQty(CurrFieldNo, Rec);
             CheckResTimeFrameAvailability(Rec);
         end;
     end;
@@ -344,7 +344,7 @@
     begin
         if Rec.Type = Rec.Type::Resource then begin
             if CurrFieldNo = Rec.FieldNo(Quantity) then begin
-                CalcResTimeQty(CurrFieldNo, Rec, xRec);
+                CalcResTimeQty(CurrFieldNo, Rec);
                 CheckResAvailability(Rec, xRec);
             end else begin
                 if Rec.Quantity = 0 then begin
@@ -601,7 +601,7 @@
                 Error(Text001, Job.FieldCaption("NPR Starting Time"), Job.FieldCaption("NPR Ending Time"));
     end;
 
-    local procedure CalcResTimeQty(FromFieldNo: Integer; var Rec: Record "Job Planning Line"; xRec: Record "Job Planning Line")
+    local procedure CalcResTimeQty(FromFieldNo: Integer; var Rec: Record "Job Planning Line")
     var
         Job: Record Job;
     begin
@@ -883,7 +883,6 @@
         InStrParameters: InStream;
         OutStrWordDoc, OutStr : OutStream;
         InStrXmlData: InStream;
-        FileNameXml: Text;
         FileExtension: Text;
         ExtensionMismatch: Label 'Provided file extension %1 can''t be used on file type %2.';
         EMailTemplateHeader: Record "NPR E-mail Template Header";
@@ -1041,7 +1040,7 @@
         exit(OverCapacitateResourceSetupValue in [JobsSetup."NPR Over Capacitate Resource"::" ".AsInteger(), JobsSetup."NPR Over Capacitate Resource"::Allow.AsInteger()]);
     end;
 
-    local procedure FindJobUnitPriceInclVAT(var JobPlanningLine: Record "Job Planning Line"; CalledByFieldNo: Integer)
+    local procedure FindJobUnitPriceInclVAT(var JobPlanningLine: Record "Job Planning Line")
     var
         Job: Record Job;
         VATPostingSetup: Record "VAT Posting Setup";
@@ -1142,7 +1141,7 @@
         if not CheckJobsSetup(2) then
             exit;
         InitJobRegister();
-        PrepareAndPostJournal(JobPlanningLineInvoice2, PostedDocNo);
+        PrepareAndPostJournal(JobPlanningLineInvoice2);
     end;
 
     procedure CheckJobsSetup(ProcessStep: Option Creation,PostingInventoryOnly,PostingBothInventoryAndJob): Boolean
@@ -1292,7 +1291,7 @@
         JobRegisterInitialized := true;
     end;
 
-    local procedure PrepareAndPostJournal(var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocNo: Code[20])
+    local procedure PrepareAndPostJournal(var JobPlanningLineInvoice: Record "Job Planning Line Invoice")
     var
         JobJnlLine: Record "Job Journal Line";
     begin
@@ -1342,7 +1341,10 @@
         LineDiscPerc: Decimal;
         ShortcutDimCode1: Code[20];
         ShortcutDimCode2: Code[20];
-        DimSetID, OrdinalValue : Integer;
+        DimSetID: Integer;
+#if not BC17
+        OrdinalValue : Integer;
+#endif
     begin
         JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
         SourceCodeSetup.Get();
@@ -1926,7 +1928,7 @@
                     PAGE.RunModal(PAGE::"Sales Invoice", SalesHeader);
                 end else begin
                     //sales ticket remains as Document Type = Invoice until posted from Audit Roll/POS Entry
-                    if ShowProcessedPOSDocument(JobPlanningLineInvoice, false) then
+                    if ShowProcessedPOSDocument(JobPlanningLineInvoice) then
                         exit;
                     POSQuoteEntry.SetRange("Register No.", JobPlanningLineInvoice."NPR POS Unit No.");
                     POSQuoteEntry.SetRange("Sales Ticket No.", JobPlanningLineInvoice."Document No.");
@@ -1946,7 +1948,7 @@
                         Error(SalesDocErr, SalesInvHeader.TableCaption, JobPlanningLineInvoice."Document No.");
                     PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvHeader);
                 end else begin
-                    if not ShowProcessedPOSDocument(JobPlanningLineInvoice, true) then
+                    if not ShowProcessedPOSDocument(JobPlanningLineInvoice) then
                         Error(POSDocErr, JobPlanningLineInvoice."NPR POS Unit No.", JobPlanningLineInvoice."Document No.");
                 end;
             JobPlanningLineInvoice."Document Type"::"Posted Credit Memo":
@@ -2061,7 +2063,7 @@
         end;
     end;
 
-    local procedure ShowProcessedPOSDocument(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; Posted: Boolean) HasEntries: Boolean
+    local procedure ShowProcessedPOSDocument(JobPlanningLineInvoice: Record "Job Planning Line Invoice") HasEntries: Boolean
     var
         POSEntry: Record "NPR POS Entry";
     begin

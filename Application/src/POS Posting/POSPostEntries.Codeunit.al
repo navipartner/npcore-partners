@@ -19,7 +19,6 @@
         ReplacePostingDate: Boolean;
         ReplaceDocumentDate: Boolean;
         TextErrorMultiple: Label '%3 %1 and %2 cannot be posted together. Only one %3 can be posted at a time.';
-        TextErrorTaxMismatch: Label 'There is a mismatch between the calculated taxes and the tax lines for Pos Entry %1.';
         TextErrorSalesTaxCompressed: Label '%1 %2 cannot be posted compressed because it has Sales Tax Lines. Please check the POS posting compression settings.';
         TextErrorBufferLinesnotmade: Label '%1 were not created from Sales and Payment Lines.';
         TextErrorGJLinesnotmade: Label '%1 were not be created from buffer.';
@@ -41,16 +40,13 @@
         Text006: Label 'Posting POS Entries individually\#1######\@2@@@@@@@@@@@@@\';
         TextPostingSetupMissing: Label '%1 is missing for %2 in %3 %4.\\Values [%5].';
         TextClosingEntryFloat: Label 'Float Amount Closing POS Entry %1';
-        TextSalesTaxDiscrepancy: Label 'There is a Sales Tax discrepancy. Sum of %1 on the lines is %2, while the calculated amount is %3.';
         TextPostingDifference: Label 'POS Posting Difference';
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
         TempPOSPostingBuffer: Record "NPR POS Posting Buffer" temporary;
         TempPOSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary;
-        POSSalesLine: Record "NPR POS Entry Sales Line";
         TempPOSPaymentLinetoPost: Record "NPR POS Entry Payment Line" temporary;
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         POSEntryTemp: Record "NPR POS Entry" temporary;
     begin
@@ -83,8 +79,8 @@
             Commit();
 
             CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost);
-            CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer, PostCompressedVar);
-            CreatePostingBufferLinesFromPOSSPaymentLines(TempPOSPaymentLinetoPost, TempPOSPostingBuffer, PostCompressedVar);
+            CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer);
+            CreatePostingBufferLinesFromPOSSPaymentLines(TempPOSPaymentLinetoPost, TempPOSPostingBuffer);
 
             if ((not TempPOSPaymentLinetoPost.IsEmpty) or (not TempPOSSalesLineToPost.IsEmpty)) and (TempPOSPostingBuffer.IsEmpty) then
                 Error(TextErrorBufferLinesnotmade, TempPOSPostingBuffer.TableCaption);
@@ -276,8 +272,6 @@
                                                   GenJournalLine."Gen. Posting Type"::Sale,
                                                   GenJournalLine."Account Type"::"G/L Account",
                                                   GeneralPostingSetup."Sales Account",
-                                                  GenJournalLine."Account Type"::"G/L Account",
-                                                  '',
                                                   Round(POSPostingBuffer."VAT Amount" + POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
                                                   Round(POSPostingBuffer."VAT Amount (LCY)" + POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
                                                   GenJournalLine);
@@ -291,8 +285,6 @@
                                                       GenJournalLine."Gen. Posting Type"::Sale,
                                                       GenJournalLine."Account Type"::"G/L Account",
                                                       GeneralPostingSetup."Sales Line Disc. Account",
-                                                      GenJournalLine."Account Type"::"G/L Account",
-                                                      '',
                                                       Round(-POSPostingBuffer."VAT Amount Discount", Currency."Amount Rounding Precision"),
                                                       Round(-POSPostingBuffer."VAT Amount Discount (LCY)", Currency."Amount Rounding Precision"),
                                                       GenJournalLine);
@@ -304,8 +296,6 @@
                                                    GenJournalLine."Gen. Posting Type"::Sale,
                                                    GenJournalLine."Account Type"::"G/L Account",
                                                    GeneralPostingSetup."Sales Account",
-                                                   GenJournalLine."Account Type"::"G/L Account",
-                                                   '',
                                                    POSPostingBuffer."VAT Amount",
                                                    POSPostingBuffer."VAT Amount (LCY)",
                                                    GenJournalLine);
@@ -322,8 +312,6 @@
                                                 GenPostingType,
                                                 GenJournalLine."Account Type"::"G/L Account",
                                                 POSPostingBuffer."No.",
-                                                GenJournalLine."Account Type"::"G/L Account",
-                                                '',
                                                 POSPostingBuffer."VAT Amount",
                                                 POSPostingBuffer."VAT Amount (LCY)",
                                                 GenJournalLine);
@@ -334,8 +322,6 @@
                                                 GenJournalLine."Gen. Posting Type"::Sale,
                                                 GenJournalLine."Account Type"::"G/L Account",
                                                 POSPostingBuffer."No.",
-                                                GenJournalLine."Account Type"::"G/L Account",
-                                                '',
                                                 POSPostingBuffer."VAT Amount",
                                                 POSPostingBuffer."VAT Amount (LCY)",
                                                 GenJournalLine);
@@ -349,8 +335,6 @@
                                             GenJournalLine."Gen. Posting Type"::" ",
                                             GenJournalLine."Account Type"::Customer,
                                             POSPostingBuffer."No.",
-                                            GenJournalLine."Account Type"::"G/L Account",
-                                            '',
                                             POSPostingBuffer."VAT Amount",
                                             POSPostingBuffer."VAT Amount (LCY)",
                                             GenJournalLine);
@@ -364,8 +348,6 @@
                                             GenJournalLine."Gen. Posting Type"::Purchase,
                                             GenJournalLine."Account Type"::"G/L Account",
                                             POSPostingBuffer."No.",
-                                            GenJournalLine."Account Type"::"G/L Account",
-                                            '',
                                             POSPostingBuffer."VAT Amount",
                                             POSPostingBuffer."VAT Amount (LCY)",
                                             GenJournalLine);
@@ -386,8 +368,6 @@
                               GenPostingType,
                               GetGLAccountType(POSPostingSetup),
                               POSPostingSetup."Account No.",
-                              GenJournalLine."Account Type"::"G/L Account",
-                              '',
                               POSPostingBuffer."VAT Amount",
                               POSPostingBuffer."VAT Amount (LCY)",
                               GenJournalLine);
@@ -405,8 +385,6 @@
                                   GenJournalLine."Gen. Posting Type"::" ",
                                   GenJournalLine."Account Type"::"G/L Account",
                                   POSPaymentMethod."Rounding Gains Account",
-                                  GenJournalLine."Account Type"::"G/L Account",
-                                  '',
                                   POSPostingBuffer."VAT Amount",
                                   POSPostingBuffer."VAT Amount (LCY)",
                                   GenJournalLine);
@@ -420,8 +398,6 @@
                                   GenJournalLine."Gen. Posting Type"::" ",
                                   GenJournalLine."Account Type"::"G/L Account",
                                   POSPaymentMethod."Rounding Losses Account",
-                                  GenJournalLine."Account Type"::"G/L Account",
-                                  '',
                                   POSPostingBuffer."VAT Amount",
                                   POSPostingBuffer."VAT Amount (LCY)",
                                   GenJournalLine);
@@ -626,8 +602,6 @@
             MakeGenJournalLine(
               Enum::"Gen. Journal Account Type"::"G/L Account",
               POSPostingProfile."POS Posting Diff. Account",
-              Enum::"Gen. Journal Account Type"::"G/L Account",
-              '',
               Enum::"General Posting Type"::" ",
               GenJournalLine."Posting Date",
               GenJournalLine."Document No.",
@@ -647,9 +621,6 @@
               GenJournalLine."Salespers./Purch. Code",
               GenJournalLine."Reason Code",
               GenJournalLine."External Document No.",
-              GenJournalLine."Tax Area Code",
-              GenJournalLine."Tax Liable",
-              GenJournalLine."Tax Group Code",
               GenJournalLine."Use Tax",
               0,
               0,
@@ -702,7 +673,7 @@
     end;
 
 
-    local procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
+    local procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -834,7 +805,7 @@
             until POSSalesLineToBeCompressed.Next() = 0;
     end;
 
-    local procedure CreatePostingBufferLinesFromPOSSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; PostCompressed: Boolean)
+    local procedure CreatePostingBufferLinesFromPOSSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -1141,7 +1112,7 @@
             until POSEntry.Next() = 0;
     end;
 
-    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; VATAmountIn: Decimal; VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; VATAmountIn: Decimal; VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
     var
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1155,8 +1126,6 @@
         MakeGenJournalLine(
           AccountType,
           AccountNo,
-          BalancingAccountType,
-          BalancingAccountNo,
           PostingType,
           POSPostingBuffer."Posting Date",
           POSPostingBuffer."Document No.",
@@ -1176,9 +1145,6 @@
           POSPostingBuffer."Salesperson Code",
           POSPostingBuffer."Reason Code",
           POSPostingBuffer."External Document No.",
-          POSPostingBuffer."Tax Area Code",
-          POSPostingBuffer."Tax Liable",
-          POSPostingBuffer."Tax Group Code",
           POSPostingBuffer."Use Tax",
           VATAmountIn,
           VATAmountInLCY,
@@ -1202,8 +1168,6 @@
         MakeGenJournalLine(
           AccountType,
           AccountNo,
-          Enum::"Gen. Journal Account Type"::"G/L Account",
-          '',
           Enum::"General Posting Type"::" ",
           POSEntry."Posting Date",
           POSBalancingLine."Document No.",
@@ -1223,9 +1187,6 @@
           '',
           '',
           '',
-          '',
-          false,
-          '',
           false,
           0,
           0,
@@ -1237,7 +1198,7 @@
         OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
     end;
 
-    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[20]; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
     begin
         LineNumber := LineNumber + 10000;
         GenJournalLine.Init();
@@ -1687,8 +1648,6 @@
     local procedure CreateGenJournalLinesFromSalesTaxUnliableNA(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile"; TaxSetup: Record "Tax Setup")
     var
         CurrExchRate: Record "Currency Exchange Rate";
-        RemSalesTaxAmt: Decimal;
-        RemSalesTaxSrcAmt: Decimal;
         RecRef: RecordRef;
         FldRef: FieldRef;
     begin

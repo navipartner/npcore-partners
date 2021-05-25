@@ -337,21 +337,21 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         case DetTicketAccessEntry.Type of
             DetTicketAccessEntry.Type::ADMITTED:
                 if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::ADMIT, Schedule."Notify Stakeholder"::ADMIT_DEPART, Schedule."Notify Stakeholder"::ALL]) then
-                    CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                    CreateStakeholderNotification(Admission, AdmissionScheduleEntry, DetTicketAccessEntry);
 
             DetTicketAccessEntry.Type::DEPARTED:
                 if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::ADMIT_DEPART, Schedule."Notify Stakeholder"::ALL]) then
-                    CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                    CreateStakeholderNotification(Admission, AdmissionScheduleEntry, DetTicketAccessEntry);
 
             DetTicketAccessEntry.Type::RESERVATION:
                 begin
                     if (DetTicketAccessEntry.Quantity > 0) and (ReservationConfirmed) then
                         if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::RESERVE, Schedule."Notify Stakeholder"::RESERVE_CANCEL, Schedule."Notify Stakeholder"::ALL]) then
-                            CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                            CreateStakeholderNotification(Admission, AdmissionScheduleEntry, DetTicketAccessEntry);
 
                     if (DetTicketAccessEntry.Quantity < 0) then
                         if (Schedule."Notify Stakeholder" in [Schedule."Notify Stakeholder"::RESERVE_CANCEL, Schedule."Notify Stakeholder"::ALL]) then
-                            CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
+                            CreateStakeholderNotification(Admission, AdmissionScheduleEntry, DetTicketAccessEntry);
                 end;
 
             DetTicketAccessEntry.Type::CANCELED_ADMISSION:
@@ -383,7 +383,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 CreateStakeholderSellOutNotification(StakeholderNotificationGroupType::WAITINGLIST, Ticket, AdmissionScheduleEntry, AdmittedCount);
     end;
 
-    local procedure CreateStakeholderNotification(Admission: Record "NPR TM Admission"; Schedule: Record "NPR TM Admis. Schedule"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
+    local procedure CreateStakeholderNotification(Admission: Record "NPR TM Admission"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
     var
         NotificationEntry: Record "NPR TM Ticket Notif. Entry";
         Ticket: Record "NPR TM Ticket";

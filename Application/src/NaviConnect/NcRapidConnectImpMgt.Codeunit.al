@@ -53,8 +53,6 @@
         "Field": Record "Field";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         DocumentElement: XmlElement;
-        Element: XmlElement;
-        Element2: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
         NodeList2: XmlNodeList;

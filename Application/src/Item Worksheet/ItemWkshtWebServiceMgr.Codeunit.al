@@ -11,7 +11,7 @@
             FunctionName := GetWebserviceFunction(Rec."Import Type");
             case FunctionName of
                 'CreateItemWorksheetLine':
-                    CreateItemWorksheetLines(XmlDoc, Rec."Entry No.", Rec."Document ID");
+                    CreateItemWorksheetLines(XmlDoc);
                 else
                     Error(MissingCaseErr, Rec."Import Type", FunctionName);
             end;
@@ -24,7 +24,7 @@
             Initialized := true;
     end;
 
-    local procedure CreateItemWorksheetLine(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]): Boolean
+    local procedure CreateItemWorksheetLine(Element: XmlElement): Boolean
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
@@ -32,18 +32,17 @@
             exit(false);
 
         ItemWorksheetLine.Init();
-        ReadItemWorksheetLine(Element, Token, ItemWorksheetLine);
+        ReadItemWorksheetLine(Element, ItemWorksheetLine);
         InsertWorksheetline(ItemWorksheetLine);
 
         exit(true);
     end;
 
-    local procedure CreateItemWorksheetLines(XmlDoc: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure CreateItemWorksheetLines(XmlDoc: XmlDocument)
     var
         Element: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
-        Token: Text[50];
     begin
         if not XmlDoc.GetRoot(Element) then
             exit;
@@ -60,19 +59,19 @@
         if not Element.SelectNodes('InsertItemWorksheetLine', NodeList) then
             exit;
 
-        SetImportParameters(Element, Token);
+        SetImportParameters(Element);
 
         if not Element.SelectNodes('//ItemWorksheetLine', NodeList) then
             exit;
 
         foreach Node in NodeList do begin
             Element := Node.AsXmlElement();
-            CreateItemWorksheetLine(Element, Token, DocumentID);
+            CreateItemWorksheetLine(Element);
         end;
         Commit();
     end;
 
-    local procedure FindWorksheetLine(VendorNo: Code[20]; VendorVATRegNo: Text; ItemNo: Code[20]; var ItemWorksheetTemplateCode: Code[10]; var ItemWorksheetCode: Code[10]; var ItemWorksheetLineNo: Integer)
+    local procedure FindWorksheetLine(VendorNo: Code[20]; VendorVATRegNo: Text; var ItemWorksheetTemplateCode: Code[10]; var ItemWorksheetCode: Code[10]; var ItemWorksheetLineNo: Integer)
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
@@ -130,10 +129,6 @@
         end;
     end;
 
-    local procedure FindWorksheetVendorNio(VendorNo: Code[20])
-    begin
-    end;
-
     local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text[100]
     var
         ImportType: Record "NPR Nc Import Type";
@@ -149,7 +144,7 @@
         ItemWorksheetLine.Init();
     end;
 
-    local procedure ReadItemWorksheetLine(Element: XmlElement; Token: Text[100]; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    local procedure ReadItemWorksheetLine(Element: XmlElement; var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
@@ -172,7 +167,7 @@
         VendorVATRegNo := GetXmlText(Element, 'VATRegno', 0, false);
         ItemWorksheetLine."Item No." := GetXmlText(Element, 'ItemNo', MaxStrLen(ItemWorksheetLine."Item No."), false);
 
-        FindWorksheetLine(ItemWorksheetLine."Vendor No.", VendorVATRegNo, ItemWorksheetLine."Item No.", ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.");
+        FindWorksheetLine(ItemWorksheetLine."Vendor No.", VendorVATRegNo, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.");
 
         ItemWorksheetLine.SetUpNewLine(LastItemWorksheetLine);
         ItemWorksheetLine.Insert(true);
@@ -884,7 +879,7 @@
         end;
     end;
 
-    local procedure SetImportParameters(Element: XmlElement; Token: Text[100])
+    local procedure SetImportParameters(Element: XmlElement)
     var
         TempText: Text;
     begin

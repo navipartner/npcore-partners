@@ -10,7 +10,6 @@
         RefNoBlankErr: Label 'The reference number can not be blank or empty';
         EmptyFieldErr: Label 'The %1 in %2 can not be blank or empty';
         NoGlobalSaleErr: Label 'Could not find record of sale';
-        WebSrvErr: Label 'An error has occurred while processing the web request, error message: %1';
         NpGpCrossCompanySetup: Record "NPR NpGp Cross Company Setup";
         NoInterCompTradeErr: Label 'Inter company exchange is not set up between "%1" and "%2"';
         NotFoundErr: Label 'Return receipt reference number %1 not found.';
@@ -89,7 +88,7 @@
         case WorkflowStep of
             'reasonReturn':
                 begin
-                    ReturnReasonCode := SelectReturnReason(Context, POSSession, FrontEnd);
+                    ReturnReasonCode := SelectReturnReason();
                     JSON.SetContext('ReturnReasonCode', ReturnReasonCode);
                     FrontEnd.SetActionContext(ActionCode(), JSON);
                 end;
@@ -117,7 +116,7 @@
         Captions.AddActionCaption(ActionCode(), 'refprompt', RefNoPromptCaption);
     end;
 
-    local procedure SelectReturnReason(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Code[20]
+    local procedure SelectReturnReason(): Code[20]
     var
         ReturnReason: Record "Return Reason";
     begin
@@ -160,13 +159,11 @@
     local procedure FindGlobalSaleByReferenceNo(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; Context: JsonObject; ReferenceNo: Code[50]; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
     var
         NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
-        ObjectMetadata: Record "Object Metadata";
         POSUnit: Record "NPR POS Unit";
         ServicePassword: Text;
         SalePOS: Record "NPR POS Sale";
         NpGpUserSaleReturn: Page "NPR NpGp User Sale Return";
         NpGpPOSSalesSetupCard: Page "NPR NpGp POS Sales Setup Card";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
         JSON: Codeunit "NPR POS JSON Management";
@@ -458,7 +455,6 @@
         Customer: Record Customer;
         Contact: Record Contact;
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSEntry.SetRange("POS Unit No.", TempNpGpPOSSalesEntry."POS Unit No.");
         POSEntry.SetRange("Document No.", TempNpGpPOSSalesEntry."Document No.");

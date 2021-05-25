@@ -435,7 +435,7 @@
         InsertEmptyPurchaseLine(PurchaseHeader, PurchaseLine);
         RecRef.GetTable(PurchaseLine);
 
-        SetLineMandatoryFields(RecRef, DataExchNo, ParentRecNo, RecordNo);
+        SetLineMandatoryFields(RecRef, DataExchNo, RecordNo);
 
         CorrelateCreatedPurchLineWithRecordNo(RecRef, ComposeKeyForCreatedPurchLine(ParentRecNo, RecordNo));
     end;
@@ -463,7 +463,7 @@
         PurchaseLine.Modify(true);
     end;
 
-    local procedure SetLineMandatoryFields(var RecRef: RecordRef; DataExchNo: Integer; ParentRecNo: Integer; RecordNo: Integer)
+    local procedure SetLineMandatoryFields(var RecRef: RecordRef; DataExchNo: Integer; RecordNo: Integer)
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";

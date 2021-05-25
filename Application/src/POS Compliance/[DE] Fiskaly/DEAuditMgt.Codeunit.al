@@ -91,7 +91,6 @@ codeunit 6014444 "NPR DE Audit Mgt."
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DocumentJson: JsonObject;
         ResponseJson: JsonObject;
-        StrOut: OutStream;
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;

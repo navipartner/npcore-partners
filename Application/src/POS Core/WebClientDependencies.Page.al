@@ -172,7 +172,7 @@ page 6014659 "NPR Web Client Dependencies"
     procedure ConvertImgToDataUri(InStr: InStream; var OutStr: OutStream)
     var
         DataUri: Text;
-        i, p : integer;
+        p: integer;
         b: Byte;
         OutStm1: OutStream;
         OutStm2: OutStream;

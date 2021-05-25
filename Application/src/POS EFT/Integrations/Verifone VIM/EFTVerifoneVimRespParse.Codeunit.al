@@ -27,7 +27,7 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
             'TransactionStatus':
                 ParseTransactionStatusResponse(StargateEnvelope);
             'VerifySetup':
-                ParseVerifySetupResponse(StargateEnvelope);
+                ParseVerifySetupResponse();
             'TransactionResponse':
                 ParseTransactionResponse(SerializedResponse);
             'SaveTrxReferenceNumber':
@@ -163,7 +163,7 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
         EFTTransactionRequest.Modify(true);
     end;
 
-    local procedure ParseVerifySetupResponse(Envelope: DotNet NPRNetResponseEnvelope0)
+    local procedure ParseVerifySetupResponse()
     begin
     end;
 

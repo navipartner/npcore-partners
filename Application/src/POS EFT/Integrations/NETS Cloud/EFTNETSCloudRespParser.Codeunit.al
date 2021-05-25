@@ -43,7 +43,7 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
             'Reconciliation':
                 ParseReconciliation(Data, EFTTransactionRequest);
             'Cancel':
-                ParseCancel(Data, EFTTransactionRequest);
+                ParseCancel(EFTTransactionRequest);
             else
                 Error(ERROR_RESPONSE_TYPE, ResponseType);
         end;
@@ -356,7 +356,7 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
         Clear(OutStream);
     end;
 
-    local procedure ParseCancel(Response: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure ParseCancel(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     begin
         EFTTransactionRequest.Successful := true;
         EFTTransactionRequest."External Result Known" := true;

@@ -44,7 +44,7 @@ table 6150704 "NPR POS Action Parameter"
 
             trigger OnValidate()
             begin
-                ValidateOptions(0);
+                ValidateOptions();
             end;
         }
     }
@@ -144,7 +144,7 @@ table 6150704 "NPR POS Action Parameter"
         end;
     end;
 
-    local procedure ValidateOptions(Ordinal: Integer)
+    local procedure ValidateOptions()
     begin
         if GetOptionInt("Default Value") = -1 then
             "Default Value" := GetDefaultOptionString();

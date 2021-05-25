@@ -262,12 +262,6 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
         OnValidateParameterValue(Rec);
     end;
 
-    local procedure ValidateOptions(Ordinal: Integer; OptionStringIn: Text)
-    begin
-        if GetOptionInt(Value, OptionStringIn) = -1 then
-            Value := GetDefaultOption(OptionStringIn);
-    end;
-
     procedure GetOptionInt(Value: Text; OptionStringIn: Text) Result: Integer
     var
         TypeHelper: Codeunit "Type Helper";

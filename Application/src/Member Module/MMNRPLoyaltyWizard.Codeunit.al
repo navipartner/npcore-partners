@@ -49,7 +49,7 @@
         CreateEndpoints(CommunityCode, StrSubstNo('%1-M', CommunityCode), BaseUrl, 0, UserName, Password, TenantName);
         CreateEndpoints(CommunityCode, StrSubstNo('%1-L', CommunityCode), BaseUrl, 1, UserName, Password, TenantName);
 
-        CreatePOSPaymentMethod(PaymentTypeCode, GL_Account, BurnFactor);
+        CreatePOSPaymentMethod(PaymentTypeCode, BurnFactor);
         CreateEFTSetup(PaymentTypeCode);
 
         CreateStoreSetup(CommunityCode, AuthCode, LoyaltyCompanyName, LoyaltyCode, PaymentTypeCode);
@@ -153,7 +153,7 @@
         exit(LoyaltyCode);
     end;
 
-    local procedure CreatePOSPaymentMethod(PaymentTypeCode: Code[10]; GLAccountNo: Code[20]; FixedRate: Decimal): Code[10]
+    local procedure CreatePOSPaymentMethod(PaymentTypeCode: Code[10]; FixedRate: Decimal): Code[10]
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         GeneralLedgerSetup: Record "General Ledger Setup";

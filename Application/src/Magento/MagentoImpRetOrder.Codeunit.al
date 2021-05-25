@@ -115,7 +115,7 @@
         end;
 
         TaxClass := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'tax_class', true);
-        NewCust := not GetCustomer(ExternalCustomerNo, XmlElement, Customer);
+        NewCust := not GetCustomer(XmlElement, Customer);
         if NewCust then begin
             VATBusPostingGroup := MagentoMgt.GetVATBusPostingGroup(TaxClass);
 
@@ -536,7 +536,7 @@
         exit(Customer.Get(ContBusRel."No."));
     end;
 
-    local procedure GetCustomer(ExternalCustomerNo: Code[20]; XmlElement: XmlElement; var Customer: Record Customer): Boolean
+    local procedure GetCustomer(XmlElement: XmlElement; var Customer: Record Customer): Boolean
     begin
         Initialize();
         Clear(Customer);

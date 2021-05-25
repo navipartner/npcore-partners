@@ -672,12 +672,12 @@
                 end;
             4:
                 begin
-                    DetectShopper(POSSession, EFTTransactionRequest);
+                    DetectShopper(EFTTransactionRequest);
                     exit(false);
                 end;
             5:
                 begin
-                    ClearShopperContract(POSSession, EFTTransactionRequest);
+                    ClearShopperContract(EFTTransactionRequest);
                     exit(false);
                 end;
             else
@@ -696,7 +696,7 @@
         if not ContinueAfterShopperRecognition(EFTTransactionRequest, POSSession) then
             exit(false);
 
-        if CancelContractCreation(EFTTransactionRequest, POSSession) then
+        if CancelContractCreation(EFTTransactionRequest) then
             exit(false);
 
         EFTPaymentTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
@@ -708,7 +708,7 @@
         exit(true);
     end;
 
-    local procedure ClearShopperContract(POSSession: Codeunit "NPR POS Session"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure ClearShopperContract(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -761,7 +761,7 @@
         exit(true);
     end;
 
-    local procedure DetectShopper(POSSession: Codeunit "NPR POS Session"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure DetectShopper(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
     begin
@@ -893,7 +893,7 @@
         exit(AbortEFTTransactionRequest.Successful);
     end;
 
-    local procedure CancelContractCreation(EFTTransactionRequest: Record "NPR EFT Transaction Request"; POSSession: Codeunit "NPR POS Session"): Boolean
+    local procedure CancelContractCreation(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         EFTSetup: Record "NPR EFT Setup";
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";

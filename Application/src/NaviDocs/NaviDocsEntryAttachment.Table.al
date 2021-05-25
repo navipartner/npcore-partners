@@ -54,11 +54,7 @@ table 6059944 "NPR NaviDocs Entry Attachment"
 
     procedure ShowOutput()
     var
-        SyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         FileMgt: Codeunit "File Management";
-        InStr: InStream;
-        Path: Text;
-        Content: Text;
         IsHandled: Boolean;
         TempBlob: Codeunit "Temp Blob";
     begin

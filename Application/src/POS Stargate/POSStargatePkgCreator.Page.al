@@ -167,7 +167,6 @@
         Text002: Label 'The assembly you selected has a different assembly name.\\Expected: %1\Actual: %2';
         Text003: Label 'Assembly you selected does not seem to be a valid match for %1.';
         Text004: Label 'Deleting this assembly will exclude it from the Stargate Package, and this may prevent the entier package from working correctly on the client.\\Are you sure you want to do this?';
-        Text005: Label 'Specify destination';
         Text006: Label 'The assembly you selected does not contain any Stargate methods.';
 
     local procedure LoadAssembly()

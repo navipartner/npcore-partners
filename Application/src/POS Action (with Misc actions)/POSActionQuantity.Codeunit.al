@@ -123,7 +123,6 @@ codeunit 6150808 "NPR POS Action: Quantity"
         ConstraintOption: Integer;
         ReturnReasonCode: Code[20];
         NegativeInput: Boolean;
-        QtyCheck: Boolean;
         POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         if not Action.IsThisAction(ActionCode()) then

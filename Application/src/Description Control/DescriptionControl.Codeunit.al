@@ -75,12 +75,6 @@ codeunit 6059969 "NPR Description Control"
     end;
 
     procedure GetDescriptionPOS(var Rec: Record "NPR POS Sale Line"; XRec: Record "NPR POS Sale Line"; Item: Record Item)
-    var
-        Vendor: Record Vendor;
-        Pos: Integer;
-        VendorName: Text[100];
-        ItemGroupName: Text[50];
-        ItemVariant: Record "Item Variant";
     begin
         if Rec."Custom Descr" then
             exit;

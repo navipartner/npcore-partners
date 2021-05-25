@@ -12,7 +12,7 @@
             FunctionName := GetWebserviceFunction("Import Type");
             case FunctionName of
                 'Createcollectorrequest':
-                    CreateCollectorRequests(XmlDoc, "Entry No.", "Document ID");
+                    CreateCollectorRequests(XmlDoc);
                 else
                     Error(MISSING_CASE, "Import Type", FunctionName);
             end;
@@ -25,12 +25,11 @@
         Initialized: Boolean;
         MISSING_CASE: Label 'No handler for %1 [%2].';
 
-    local procedure CreateCollectorRequests(XmlDoc: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure CreateCollectorRequests(XmlDoc: XmlDocument)
     var
         Element: XmlElement;
         NodeList: XmlNodeList;
         Node: XmlNode;
-        Token: Text[50];
     begin
         NodeList := XmlDoc.GetChildElements();
         if NodeList.Count = 0 then
@@ -54,12 +53,12 @@
             exit;
 
         foreach Node in NodeList do
-            CreateCollectorRequest(Node.AsXmlElement(), Token, DocumentID);
+            CreateCollectorRequest(Node.AsXmlElement());
 
         Commit();
     end;
 
-    local procedure CreateCollectorRequest(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]): Boolean
+    local procedure CreateCollectorRequest(Element: XmlElement): Boolean
     var
         NodeList: XmlNodeList;
         Node: XmlNode;
@@ -71,17 +70,17 @@
 
         NcCollectorRequest.Init();
 
-        ReadCollectorRequest(Element, Token, NcCollectorRequest);
+        ReadCollectorRequest(Element, NcCollectorRequest);
         if NpXmlDomMgt.FindNodes(Element.AsXmlNode(), 'collectorrequestfilter', NodeList) then
             foreach Node in NodeList do
-                CreateCollectorRequestFilter(Node.AsXmlElement(), Token, DocumentID, NcCollectorRequest);
+                CreateCollectorRequestFilter(Node.AsXmlElement(), NcCollectorRequest);
 
         InsertCollectorRequests(NcCollectorRequest);
 
         exit(true);
     end;
 
-    local procedure CreateCollectorRequestFilter(Element: XmlElement; Token: Text[100]; DocumentID: Text[100]; var NcCollectorRequest: Record "NPR Nc Collector Request"): Boolean
+    local procedure CreateCollectorRequestFilter(Element: XmlElement; var NcCollectorRequest: Record "NPR Nc Collector Request"): Boolean
     var
         NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter";
     begin
@@ -90,7 +89,7 @@
 
         NcCollectorRequestFilter.Init();
 
-        ReadCollectorRequestFilter(Element, Token, NcCollectorRequestFilter, NcCollectorRequest);
+        ReadCollectorRequestFilter(Element, NcCollectorRequestFilter, NcCollectorRequest);
         InsertCollectorRequestFilters(NcCollectorRequestFilter);
 
         exit(true);
@@ -101,7 +100,7 @@
         NcCollectorRequest.Init();
     end;
 
-    local procedure ReadCollectorRequest(Element: XmlElement; Token: Text[100]; var NcCollectorRequest: Record "NPR Nc Collector Request")
+    local procedure ReadCollectorRequest(Element: XmlElement; var NcCollectorRequest: Record "NPR Nc Collector Request")
     begin
         Initialize();
 
@@ -126,7 +125,7 @@
         NcCollectorRequestFilter.Init();
     end;
 
-    local procedure ReadCollectorRequestFilter(Element: XmlElement; Token: Text[100]; var NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter"; var NcCollectorRequest: Record "NPR Nc Collector Request")
+    local procedure ReadCollectorRequestFilter(Element: XmlElement; var NcCollectorRequestFilter: Record "NPR Nc Collector Req. Filter"; var NcCollectorRequest: Record "NPR Nc Collector Request")
     begin
         Initialize();
 

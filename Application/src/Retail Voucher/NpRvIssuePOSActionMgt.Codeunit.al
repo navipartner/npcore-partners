@@ -178,13 +178,13 @@
             'issue_voucher':
                 IssueVoucher(JSON, POSSession);
             'contact_info':
-                ContactInfo(JSON, SaleLinePOS);
+                ContactInfo(SaleLinePOS);
             'scan_reference_nos':
                 ScanReferenceNos(SaleLinePOS, SaleLinePOS.Quantity);
         end;
     end;
 
-    local procedure ContactInfo(JSON: Codeunit "NPR POS JSON Management"; SaleLinePOS: Record "NPR POS Sale Line")
+    local procedure ContactInfo(SaleLinePOS: Record "NPR POS Sale Line")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin

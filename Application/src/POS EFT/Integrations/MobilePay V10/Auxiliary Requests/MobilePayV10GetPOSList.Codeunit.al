@@ -33,11 +33,7 @@ codeunit 6014524 "NPR MobilePayV10 GetPOSList"
         httpClient: HttpClient;
         respMessage: HttpResponseMessage;
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
-        jsonResponse: JsonObject;
-        jsonRequest: JsonObject;
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        posUnit: Record "NPR POS Unit";
-        beaconTypes: JsonArray;
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
     begin
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");

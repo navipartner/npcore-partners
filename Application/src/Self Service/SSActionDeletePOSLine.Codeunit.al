@@ -30,11 +30,6 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        Qty: Integer;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -47,8 +42,6 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
     procedure DeletePosLine(POSSession: Codeunit "NPR POS Session")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        LinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSActionDeletePOSLine: Codeunit "NPR POSAction: Delete POS Line";
     begin

@@ -488,8 +488,6 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
             }
 
             trigger OnAfterGetRecord()
-            var
-                POSTaxAmountLine: Record "NPR POS Entry Tax Line";
             begin
                 TotalTaxText := GetVATText("Entry No.");
                 CompanyInformation.CalcFields(Picture);

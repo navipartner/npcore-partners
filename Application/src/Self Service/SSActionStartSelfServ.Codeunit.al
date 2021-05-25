@@ -55,7 +55,6 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        UserSetup: Record "User Setup";
         Language: Record Language;
         POSSetup: Codeunit "NPR POS Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -63,9 +62,6 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
         POSUIManagement: Codeunit "NPR POS UI Management";
         OpeningEntryNo: Integer;
-        HardwareId: Text;
-        SessionName: Text;
-        HostName: Text;
     begin
         DATABASE.SelectLatestVersion();
         POSSession.GetSetup(POSSetup);

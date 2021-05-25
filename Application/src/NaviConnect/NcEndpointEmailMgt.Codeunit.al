@@ -106,7 +106,6 @@
         TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
         TextEmailSuccess: Label 'File emailed to %1.';
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
-        MailManagement: Codeunit "Mail Management";
         EmailItem: Record "Email Item" temporary;
         IStream: InStream;
         OStream: OutStream;
@@ -154,7 +153,6 @@
         CCRecipients: List of [Text];
         BCCRecipients: List of [Text];
         Separators: List of [Text];
-        ErrorMessageManagement: Codeunit "Error Message Management";
         ErrorMessage: Text;
         EmailSendingHandler: Codeunit "NPR Email Sending Handler";
     begin

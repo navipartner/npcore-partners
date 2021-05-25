@@ -40,13 +40,9 @@ then begin
     var
         JSON: Codeunit "NPR POS JSON Management";
         Setup: Codeunit "NPR POS Setup";
-        UserSetup: Record "User Setup";
         SalespersonCode: Text;
         Type: Text;
         Password: Text;
-        HardwareId: Text;
-        SessionName: Text;
-        HostName: Text;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -163,7 +159,6 @@ then begin
     local procedure StartPOS(POSSession: Codeunit "NPR POS Session"): Integer
     var
         SalePOS: Record "NPR POS Sale";
-        POSAction: Record "NPR POS Action";
         POSSale: Codeunit "NPR POS Sale";
     begin
 

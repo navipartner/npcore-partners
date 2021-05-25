@@ -58,7 +58,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     begin
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
-        if not InvokeReconciliation(EftTransactionRequest, EFTSetup, Response) then begin
+        if not InvokeReconciliation(EftTransactionRequest, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
             EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
@@ -187,7 +187,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         if OriginalEFTTransactionRequest.Recovered then
             OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Recovered by Entry No.");
 
-        if not InvokeVoid(EftTransactionRequest, EFTSetup, OriginalEFTTransactionRequest, Response) then begin
+        if not InvokeVoid(EftTransactionRequest, Response) then begin
             HandleError(EftTransactionRequest, GetLastErrorText);
             EftTransactionRequest.Modify();
             HandleProtocolResponse(EftTransactionRequest);
@@ -263,7 +263,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
         EFTSetup.FindSetup(OriginalEFTTransactionRequest."Register No.", OriginalEFTTransactionRequest."Original POS Payment Type Code");
 
-        if not InvokeCancelAction(EFTTransactionRequest, EFTSetup, Response) then begin
+        if not InvokeCancelAction(EFTTransactionRequest, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
             EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
@@ -299,7 +299,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        if not InvokeBalanceEnquiry(EFTTransactionRequest, EFTSetup, Response) then begin
+        if not InvokeBalanceEnquiry(EFTTransactionRequest, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
             EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
@@ -335,7 +335,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        if not InvokeDownloadDataset(EFTTransactionRequest, EFTSetup, Response) then begin
+        if not InvokeDownloadDataset(EFTTransactionRequest, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
             EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
@@ -371,7 +371,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        if not InvokeDownloadSoftware(EFTTransactionRequest, EFTSetup, Response) then begin
+        if not InvokeDownloadSoftware(EFTTransactionRequest, Response) then begin
             HandleError(EFTTransactionRequest, GetLastErrorText);
             EFTTransactionRequest.Modify();
             HandleProtocolResponse(EFTTransactionRequest);
@@ -513,11 +513,11 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         '}';
 
         Endpoint := '/v1/login';
-        Response := InvokeAPI(Body, '', GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 10 * 1000, EftTransactionRequest, false);
+        Response := InvokeAPI(Body, '', GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 10 * 1000, false);
     end;
 
     [TryFunction]
-    local procedure InvokeReconciliation(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
+    local procedure InvokeReconciliation(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Response: Text)
     var
         Body: Text;
         Endpoint: Text;
@@ -529,7 +529,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
         //-NPR5.55 [405984]
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 60 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 60 * 1000, true);
         //+NPR5.55 [405984]
     end;
 
@@ -547,7 +547,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
     end;
 
     [TryFunction]
@@ -564,11 +564,11 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         '}';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
     end;
 
     [TryFunction]
-    local procedure InvokeVoid(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request"; var Response: Text)
+    local procedure InvokeVoid(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Response: Text)
     var
         JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
@@ -581,7 +581,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
         //-NPR5.55 [405984]
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'DELETE', Endpoint, 60 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'DELETE', Endpoint, 60 * 1000, true);
         //+NPR5.55 [405984]
     end;
 
@@ -596,12 +596,12 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
         //-NPR5.55 [405984]
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, TimeoutMs, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, TimeoutMs, true);
         //+NPR5.55 [405984]
     end;
 
     [TryFunction]
-    local procedure InvokeCancelAction(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
+    local procedure InvokeCancelAction(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Response: Text)
     var
         Body: Text;
         Endpoint: Text;
@@ -613,12 +613,12 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
         //-NPR5.55 [405984]
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 10 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 10 * 1000, true);
         //+NPR5.55 [405984]
     end;
 
     [TryFunction]
-    local procedure InvokeDownloadDataset(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
+    local procedure InvokeDownloadDataset(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Response: Text)
     var
         Body: Text;
         Endpoint: Text;
@@ -630,12 +630,12 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
         //-NPR5.55 [405984]
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
         //+NPR5.55 [405984]
     end;
 
     [TryFunction]
-    local procedure InvokeDownloadSoftware(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
+    local procedure InvokeDownloadSoftware(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Response: Text)
     var
         Body: Text;
         Endpoint: Text;
@@ -647,12 +647,12 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
         //-NPR5.55 [405984]
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
         //+NPR5.55 [405984]
     end;
 
     [TryFunction]
-    local procedure InvokeBalanceEnquiry(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
+    local procedure InvokeBalanceEnquiry(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Response: Text)
     var
         Body: Text;
         Endpoint: Text;
@@ -664,7 +664,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
         Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
         //-NPR5.55 [405984]
-        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, EftTransactionRequest, true);
+        Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
         //+NPR5.55 [405984]
     end;
 
@@ -678,7 +678,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         '';
 
         Endpoint := StrSubstNo('/v1/terminal/%1/settings', EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, GetToken(EFTSetup), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, 10 * 1000, EftTransactionRequest, false);
+        Response := InvokeAPI(Body, GetToken(EFTSetup), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, 10 * 1000, false);
     end;
 
     [TryFunction]
@@ -691,10 +691,10 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         '';
 
         Endpoint := '/v1/terminal';
-        Response := InvokeAPI(Body, GetToken(EFTSetup), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, 10 * 1000, EftTransactionRequest, false);
+        Response := InvokeAPI(Body, GetToken(EFTSetup), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, 10 * 1000, false);
     end;
 
-    local procedure InvokeAPI(Body: Text; Token: Text; URL: Text; Method: Text; Endpoint: Text; TimeoutMs: Integer; EFTTransactionRequest: Record "NPR EFT Transaction Request"; AllowBadRequest: Boolean): Text
+    local procedure InvokeAPI(Body: Text; Token: Text; URL: Text; Method: Text; Endpoint: Text; TimeoutMs: Integer; AllowBadRequest: Boolean): Text
     var
         HttpWebRequest: DotNet NPRNetHttpWebRequest;
         ReqStream: DotNet NPRNetStream;

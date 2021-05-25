@@ -50,7 +50,6 @@ codeunit 6151281 "NPR SS Action - Qty Decrease"
     var
         SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
 
         // This function should be "not local", so test framework can invoke it

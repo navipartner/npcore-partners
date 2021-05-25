@@ -24,7 +24,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         ADMISSION_MISMATCH: Label 'The Schedule Entry %1 is for admission to %2, but the Ticket Access Entry requires %3.';
         NO_SCHEDULE_FOR_ADM: Label 'There is no valid admission schedule available for %1 today.';
         NO_ADMISSION_CODE: Label 'No admission code was specified and no admission code was marked as default for item %1.';
-        SCHEDULE_REQUIRED: Label 'Admission %1 requires a valid schedule entry to register arrival.';
         TICKET_NOT_VALID_YET: Label 'Ticket %1 is not valid until %2.';
         TICKET_EXPIRED: Label 'Ticket %1 expired on %2.';
         SHOULD_NOT_BE_ZERO: Label 'Should not be zero.';
@@ -425,7 +424,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         MaxCapacity: Integer;
         CapacityControl: Option;
-        ScheduleSelection: Option;
         ResponseMessage: Text;
         ResponseCode: Integer;
     begin

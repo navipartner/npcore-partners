@@ -15,7 +15,6 @@
     var
         ImportEntryTmp: Record "NPR Nc Import Entry" temporary;
         Filename: Text;
-        ListDirectory: Text;
         ListOfDirectory: List of [Text];
     begin
         case true of
@@ -57,7 +56,6 @@
         Base64Convert: Codeunit "Base64 Convert";
         FtpPort: Integer;
         FTPResponse: JsonObject;
-        FileObject: JsonObject;
         JToken: JsonToken;
         ResponseCodeText: Text;
         FileContent: Text;
@@ -126,10 +124,7 @@
         Base64Convert: Codeunit "Base64 Convert";
         FtpPort: Integer;
         FTPResponse: JsonObject;
-        FileObject: JsonObject;
         JToken: JsonToken;
-        JArray: JsonArray;
-        i: Integer;
         ResponseCodeText: Text;
         FileContent: Text;
     begin
@@ -689,7 +684,7 @@
     #endregion Constants
 
     #region UI
-    local procedure GetMaxSyncDuration() SyncDuration: Duration
+    local procedure GetMaxSyncDuration(): Duration
     begin
     end;
     #endregion UI

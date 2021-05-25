@@ -228,7 +228,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
         CurrentTemplate.Modify();
     end;
 
-    local procedure ChangeParentN(CurrentEntryNumber: Integer; NewParentEntryNumber: Integer; StopAfterCount: Integer)
+    local procedure ChangeParentN(CurrentEntryNumber: Integer; NewParentEntryNumber: Integer)
     var
         CurrentTemplate: Record "NPR TM Seating Template";
         NewTemplate: Record "NPR TM Seating Template";
@@ -429,7 +429,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
             WizardOption::SPLIT:
                 begin
                     SeatingWizard.GetSplitOptions(SplitOptions, SplitAtCSVList);
-                    SplitSelection(ApplyToEntryNo, SplitOptions, SplitAtCSVList, 0);
+                    SplitSelection(ApplyToEntryNo, SplitOptions, SplitAtCSVList);
                 end;
 
         end;
@@ -522,7 +522,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
         until (NodeList.Next() = 0);
     end;
 
-    local procedure SplitSelection(ApplyToEntryNumber: Integer; SplitOption: Option HORIZONTAL,VERTICAL,DIAGONAL_LR,DIAGONAL_RL; SplitAtLocationCsvList: Text; SplitUnit: Option ABSOLUTE,PERCENTAGE)
+    local procedure SplitSelection(ApplyToEntryNumber: Integer; SplitOption: Option HORIZONTAL,VERTICAL,DIAGONAL_LR,DIAGONAL_RL; SplitAtLocationCsvList: Text)
     var
         SeatingTemplate: Record "NPR TM Seating Template";
         NodeCount: Integer;
@@ -576,7 +576,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
                     //        NodeIndex := 0;
                     //        NewNodeEntryNumber := AddSibling (ApplyToEntryNumber);
                     //        REPEAT
-                    //          ChangeParentN (SeatingTemplate."Entry No.", NewNodeEntryNumber, NewNodeAt);
+                    //          ChangeParentN (SeatingTemplate."Entry No.", NewNodeEntryNumber);
                     //          NewNodeAt := GetNextSplitFraction (SplitAtLocationCsvList, NodeCount); // Advance to next threshold
                     //        UNTIL (SeatingTemplate.Next() () = 0);
 

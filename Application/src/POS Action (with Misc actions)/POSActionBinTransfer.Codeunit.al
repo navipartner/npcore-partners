@@ -157,7 +157,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
             1:
                 FromBinNo := UserSelectBin(POSSession);
             2:
-                FromBinNo := GetFixedBin(Context, POSSession, FrontEnd);
+                FromBinNo := GetFixedBin(Context, FrontEnd);
             else
                 FromBinNo := GetDefaultUnitBin(POSSession);
         end;
@@ -190,7 +190,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         exit(POSUnittoBinRelation."POS Payment Bin No.");
     end;
 
-    local procedure GetFixedBin(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Code[10]
+    local procedure GetFixedBin(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): Code[10]
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin

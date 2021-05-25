@@ -5,26 +5,14 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         ApiKey: Text;
         RequestString: Text;
         RequestURL: Text;
-        ResponseString: Text;
-        CurrentPage: Integer;
-        TotalPages: Integer;
-        HTTPStatusCode: Integer;
-        JSONString: Text;
-        ProfileID: Code[10];
-        txt0001: Label 'Der er allerede oprettet en forsendelse for %1 %2. Vil du fortsætte?';
         Text0001: Label 'Login Details Missing';
-        Err0000: Label 'Not authenticated';
         Err0001: Label 'Pakkelabels Return the following  error: %1';
-        Text0002: Label 'Test Connection successful.';
 
         PackageProviderSetup: Record "NPR Pacsoft Setup";
         ErrorTextFound: Text;
-        ErrorText: Text;
-        CurrentArrayIndex: Integer;
 
     local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") services: Text;
     var
-        MissingShippingAgentTxt: Label 'Pakkelabels.dk Shipping Agent must have a value Shipping Agent %1 and Shipment Menthod %2 in Pakkelabels.dk in Pakkelabels.dk Shippment Setup';
         ServicesCombination: Record "NPR Services Combination";
         Counter: Integer;
     begin
@@ -72,7 +60,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         i: Integer;
         Jarray: JsonArray;
         Jtoken: Jsontoken;
-        ResponseText: Text;
     begin
         RequestURL := 'https://app.pakkelabels.dk/api/public/v3/printers';
         QueryParams := '';
@@ -340,11 +327,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Headers: HttpHeaders;
         Content: HttpContent;
         RequestMessage: HttpRequestMessage;
-        ResponseMessage: HttpResponseMessage;
-        Client: HttpClient;
         ResponseText: Text;
-        HeaderText: array[20] of text;
-        i: Integer;
 
     begin
 
@@ -468,7 +451,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostSalesDoc', '', true, false)]
     local procedure C80OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
     var
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         RecRefSalesHeader: RecordRef;
     begin
         if not InitPackageProvider() then
@@ -480,11 +462,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', false, false)]
     local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]);
     var
-        RecRef: RecordRef;
-        SalesInvHeader: Record "Sales Invoice Header";
         SalesShptHeader: Record "Sales Shipment Header";
         SalesSetup: Record "Sales & Receivables Setup";
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         RecRefShipment: RecordRef;
         LastErrorText: Text;
     begin
@@ -644,17 +623,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     var
         CompanyInfo: Record "Company Information";
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-        ShipmentDocument2: Record "NPR Pacsoft Shipment Document";
-        ShipmentDocServices: Record "NPR Pacsoft Shipm. Doc. Serv.";
         Customer: Record Customer;
         SalesShipmentHeader: Record "Sales Shipment Header";
         ShipToAddress: Record "Ship-to Address";
-        ShippingAgentServices: Record "Shipping Agent Services";
-        TextNotActivated: Label 'The Pacsoft integration is not activated.';
-        CreateShipmentDocument: Page "NPR Pacsoft Shipment Document";
         SalesShipmentLine: Record "Sales Shipment Line";
         DocFound: Boolean;
-        ShippingAgent: Record "NPR Package Shipping Agent";
     begin
 
         ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
@@ -798,15 +771,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     local procedure P130OnAfterActionEventCreatePackage(var Rec: Record "Sales Shipment Header");
     var
         RecRef: RecordRef;
-        SalesInvHeader: Record "Sales Invoice Header";
         SalesShptHeader: Record "Sales Shipment Header";
-        SalesSetup: Record "Sales & Receivables Setup";
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
         RecRefShipment: RecordRef;
         text000: Label 'Do you Want to create a Package entry ?';
         Text001: Label 'Do you want to print the Document?';
-        LabelType: Option Post,Return;
-        Output: Text;
         Jtoken: JsonToken;
 
     begin
@@ -840,7 +809,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     [EventSubscriber(ObjectType::Page, 6014440, 'OnAfterActionEvent', 'PrintDocument', false, false)]
     local procedure P6014440OnAfterActionEventPrintDocument(var Rec: Record "NPR Pacsoft Shipment Document");
     var
-        LabelType: Option Post,Return;
         JToken: JsonToken;
     begin
 

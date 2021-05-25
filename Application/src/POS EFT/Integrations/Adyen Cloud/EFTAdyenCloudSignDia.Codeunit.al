@@ -41,11 +41,11 @@ codeunit 6184520 "NPR EFT Adyen Cloud Sign Dia."
         if not POSSession.IsActiveSession(POSFrontEnd) then
             Error(ERROR_SESSION);
 
-        CreateSignatureApprovalDialog(EFTTransactionRequest);
+        CreateSignatureApprovalDialog();
         ActiveModelID := POSFrontEnd.ShowModel(Model);
     end;
 
-    local procedure CreateSignatureApprovalDialog(EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure CreateSignatureApprovalDialog()
     begin
         Model := Model.Model();
         Model.AddHtml(HTML());

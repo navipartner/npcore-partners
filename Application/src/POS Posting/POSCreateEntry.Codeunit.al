@@ -6,7 +6,6 @@
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
-        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         WasModified: Boolean;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
@@ -199,7 +198,6 @@
 
     local procedure InsertPOSSaleLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
-        POSSalesLine2: Record "NPR POS Entry Sales Line";
         PricesIncludeTax: Boolean;
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";

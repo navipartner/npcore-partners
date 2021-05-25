@@ -38,8 +38,6 @@ codeunit 6014641 "NPR BTF Service API"
         Request: Codeunit "Temp Blob";
         EndPoint: Interface "NPR BTF IEndPoint";
         FormatResponse: Interface "NPR BTF IFormatResponse";
-        OutStr: OutStream;
-        ReqText: Text;
         StatusCode: Integer;
     begin
         ServiceEndPoint.TestField(Enabled);

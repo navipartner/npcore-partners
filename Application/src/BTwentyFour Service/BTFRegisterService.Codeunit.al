@@ -11,9 +11,6 @@ codeunit 6014640 "NPR BTF Register Service"
         GetInvoicesEndPointIDLbl: Label 'GetInvoice', Locked = true;
         GetInvoicesDescriptionIDLbl: Label 'Get Invoice';
         GetInvoicesPathLbl: Label '/messages/queue/next', Locked = true;
-        GetOrdersEndPointIDLbl: Label 'GetOrders', Locked = true;
-        GetOrdersDescriptionIDLbl: Label 'List Orders';
-        GetOrdersPathLbl: Label '/messages/queue/next', Locked = true;
         ProcessMessageEndPointIDLbl: Label 'ProcessMessage', Locked = true;
         ProcessMessageDescriptionIDLbl: Label 'Set message status, e.g to mark message as delivered (status 40) after processing';
         ProcessMessagePathLbl: Label '/messages/%1/status/%2', Locked = true, Comment = '%1={message_id};%2={status_id}';

@@ -117,7 +117,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
             MemberCardNumber := DefaultInputValue;
 
         if (WorkflowStep = '9') then
-            MemberArrival(POSSession, DialogMethodType, POSWorkflowType, ConfirmMember, MemberCardNumber, AdmissionCode);
+            MemberArrival(POSSession, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode);
 
         Handled := true;
     end;
@@ -126,7 +126,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
     begin
     end;
 
-    local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ConfirmMember: Boolean; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20])
+    local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20])
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";

@@ -32,15 +32,7 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
             ItemWorksheetLine.Validate("Existing Item No.", ItemNo);
     end;
 
-    local procedure GetItemNo(VendorsBarCode: Code[20]; VendorsItemNo: Code[20]; OurBarCode: Code[20]; OurItemNo: Code[20])
-    begin
-    end;
-
     procedure GetVariantCode(OurItemNo: Code[20]; Var1Value: Code[20]; Var2Value: Code[20]; Var3Value: Code[20]; Var4Value: Code[20]) Variant: Code[20]
-    begin
-    end;
-
-    local procedure GetFromVendorItemNo(VendorNo: Code[20]; VendorItemNo: Code[20])
     begin
     end;
 
@@ -50,14 +42,14 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
         ItemNo: Code[20];
     begin
         if FindItemNo(
-            ItemWorksheetLine."Vendors Bar Code", ItemWorksheetLine."Internal Bar Code",
+            ItemWorksheetLine."Vendors Bar Code",
             ItemWorksheetLine."Vendor Item No.", ItemWorksheetLine."Vendor No.", ItemNo, VarCode) then
             ItemWorksheetLine.Validate("Item No.", ItemNo)
         else
             ItemWorksheetLine.Validate("Item No.", '');
     end;
 
-    local procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]): Boolean
+    local procedure FindItemNo(ItemRefNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]): Boolean
     var
         ItemRef: Record "Item Reference";
         Item: Record Item;

@@ -229,8 +229,6 @@
     end;
 
     local procedure FindCouponListItems(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         Clear(NpDcCouponListItem);
         NpDcCouponListItem.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");

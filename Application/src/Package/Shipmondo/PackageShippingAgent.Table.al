@@ -64,8 +64,6 @@ table 6014577 "NPR Package Shipping Agent"
     }
 
     trigger OnDelete();
-    var
-        ShippingAgentServices: Record "Shipping Agent Services";
     begin
     end;
 }

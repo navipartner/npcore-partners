@@ -22,8 +22,6 @@ codeunit 6150708 "NPR POS Setup"
     #region Initialization
 
     procedure Initialize()
-    var
-        POSStore: Record "NPR POS Store";
     begin
         if (Initialized) then
             exit;

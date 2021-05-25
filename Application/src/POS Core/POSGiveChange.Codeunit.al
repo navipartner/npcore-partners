@@ -22,8 +22,6 @@ codeunit 6150634 "NPR POS Give Change"
 
     procedure CalcAndInsertChange(var SalePOS: Record "NPR POS Sale") ChangeToGive: Decimal
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        GLAccount: Record "G/L Account";
         SaleAmount: Decimal;
         PaymentAmount: Decimal;
         RoundingAmount: Decimal;
@@ -38,7 +36,7 @@ codeunit 6150634 "NPR POS Give Change"
         if (Abs(SaleAmount) + Abs(RoundingAmount)) = Abs(PaymentAmount) then
             exit;
 
-        InsertOutPaymentLine(SalePOS, -(PaymentAmount - SaleAmount - RoundingAmount), GetReturnPaymentType(SalePOS), TextChange);
+        InsertOutPaymentLine(SalePOS, -(PaymentAmount - SaleAmount - RoundingAmount), GetReturnPaymentType(), TextChange);
         exit((PaymentAmount - SaleAmount - RoundingAmount));
     end;
 
@@ -65,7 +63,7 @@ codeunit 6150634 "NPR POS Give Change"
         SaleLinePOS.Modify(true);
     end;
 
-    local procedure GetReturnPaymentType(SalePOS: Record "NPR POS Sale"): Code[10]
+    local procedure GetReturnPaymentType(): Code[10]
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
