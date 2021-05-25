@@ -218,19 +218,11 @@ codeunit 6014569 "NPR RegEx"
     procedure GenerateRandomChar() RandomChar: Char
     var
         RandomInt: Integer;
-        RandomText: Text[1];
+        AllowedChars: Text;
     begin
-        RandomInt := Random(9999);
-
-        if Random(35) < 10 then begin
-            RandomText := Format(RandomInt mod 10);
-            RandomChar := RandomText[1];
-            exit(RandomChar);
-        end;
-
-        RandomChar := (RandomInt mod 25) + 65;
-        RandomText := UpperCase(Format(RandomChar));
-        RandomChar := RandomText[1];
+        AllowedChars := 'QWERTYUPASDFGHJKZXCVBNM';
+        RandomInt := Random(StrLen(AllowedChars));
+        RandomChar := CopyStr(AllowedChars, RandomInt, 1) [1];
         exit(RandomChar);
     end;
 
