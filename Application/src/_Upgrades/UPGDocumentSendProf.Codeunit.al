@@ -57,28 +57,29 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
             repeat
                 case CustomerVar."NPR Document Processing" of
                     CustomerVar."NPR Document Processing"::Print:
-                        if HavePrintProfile(DocSendProfile) then begin
-                            CustomerVar1.Get(CustomerVar."No.");
-                            CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                            CustomerVar1.Modify();
-                        end;
+                        if HavePrintProfile(DocSendProfile) then
+                            if CustomerVar1.Get(CustomerVar."No.") then begin
+                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
+                                CustomerVar1.Modify();
+                            end;
                     CustomerVar."NPR Document Processing"::Email:
-                        if HaveEmailProfile(DocSendProfile) then begin
-                            CustomerVar1.Get(CustomerVar."No.");
-                            CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                            CustomerVar1.Modify();
-                        end;
+                        if HaveEmailProfile(DocSendProfile) then
+                            if CustomerVar1.Get(CustomerVar."No.") then begin
+                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
+                                CustomerVar1.Modify();
+                            end;
                     CustomerVar."NPR Document Processing"::OIO:
-                        if DocSendProfile.Get('OIOUBL') then begin
-                            CustomerVar1.Get(CustomerVar."No.");
-                            CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                            CustomerVar1.Modify();
-                        end;
+                        if DocSendProfile.Get('OIOUBL') then
+                            if CustomerVar1.Get(CustomerVar."No.") then begin
+                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
+                                CustomerVar1.Modify();
+                            end;
                     CustomerVar."NPR Document Processing"::PrintAndEmail:
                         if HavePrintAndEmailProfile(DocSendProfile) then begin
-                            CustomerVar1.Get(CustomerVar."No.");
-                            CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                            CustomerVar1.Modify();
+                            if CustomerVar1.Get(CustomerVar."No.") then begin
+                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
+                                CustomerVar1.Modify();
+                            end;
                         end;
                 end;
             until CustomerVar.Next() = 0;
@@ -88,29 +89,29 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
             repeat
                 case VendorVar."NPR Document Processing" of
                     VendorVar."NPR Document Processing"::Print:
-                        if HavePrintProfile(DocSendProfile) then begin
-                            VendorVar1.Get(VendorVar."No.");
-                            VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                            VendorVar1.Modify();
-                        end;
+                        if HavePrintProfile(DocSendProfile) then
+                            if VendorVar1.Get(VendorVar."No.") then begin
+                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
+                                VendorVar1.Modify();
+                            end;
                     VendorVar."NPR Document Processing"::Email:
-                        if HaveEmailProfile(DocSendProfile) then begin
-                            VendorVar1.Get(VendorVar."No.");
-                            VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                            VendorVar1.Modify();
-                        end;
+                        if HaveEmailProfile(DocSendProfile) then
+                            if VendorVar1.Get(VendorVar."No.") then begin
+                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
+                                VendorVar1.Modify();
+                            end;
                     VendorVar."NPR Document Processing"::OIO:
-                        if DocSendProfile.Get('OIOUBL') then begin
-                            VendorVar1.Get(VendorVar."No.");
-                            VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                            VendorVar1.Modify();
-                        end;
+                        if DocSendProfile.Get('OIOUBL') then
+                            if VendorVar1.Get(VendorVar."No.") then begin
+                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
+                                VendorVar1.Modify();
+                            end;
                     VendorVar."NPR Document Processing"::PrintAndEmail:
-                        if HavePrintAndEmailProfile(DocSendProfile) then begin
-                            VendorVar1.Get(VendorVar."No.");
-                            VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                            VendorVar1.Modify();
-                        end;
+                        if HavePrintAndEmailProfile(DocSendProfile) then
+                            if VendorVar1.Get(VendorVar."No.") then begin
+                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
+                                VendorVar1.Modify();
+                            end;
                 end;
             until VendorVar.Next() = 0;
     end;
