@@ -102,9 +102,12 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Item: Record Item;
         POSViewProfile: Record "NPR POS View Profile";
         PeriodDiscountLine: Record "NPR Period Discount Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
         LineAmtInclTax: Decimal;
@@ -161,6 +164,218 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Assert.AreEqual(Round(LineDiscAmt), POSSaleLine."Discount Amount", '(Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100) <> POSSaleLine."Discount Amount"');
         Assert.AreEqual(Round(LineAmtInclTax), POSSaleLine."Amount Including VAT", '(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleLine."Amount Including VAT"');
         Assert.AreEqual(Round(LineAmtExclTax), POSSaleLine.Amount, '((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleLine."Amount Including VAT"');
+
+        POSActiveTaxCalc.Find(POSSaleTax, POSSaleLine.SystemId);
+        POSActiveTaxCalc.FilterLines(POSSaleTax, POSSaleTaxLine);
+        Assert.IsTrue(POSSaleTaxLine.FindFirst(), 'Active Sale Tax Line not created');
+
+        Assert.AreEqual(Round(LineAmtInclTax), POSSaleTaxLine."Amount Incl. Tax", '(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1');
+        Assert.AreEqual(Round(LineAmtExclTax), POSSaleTaxLine."Amount Excl. Tax", '((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1');
+    end;
+
+    [Test]
+    procedure ApplyDiscountWhenPOSSaleLineCreatedForNormalTaxInDirectSaleMultiLinesSameItem()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        POSViewProfile: Record "NPR POS View Profile";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        COD: codeunit "NPR POS Normal Tax Backward";
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        LineAmtInclTax: Decimal;
+        LineAmtExclTax: Decimal;
+    begin
+        // [SCENARIO] Discount is prioritized and applied when POS Sale Line is created
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 16;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+
+        // [GIVEN] POS View Profile
+        CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
+        POSViewProfile.Modify();
+        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 250;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateDiscount(Item, 22.02, PeriodDiscountLine);
+
+        LineDiscPct := 100 - PeriodDiscountLine."Campaign Unit Price" / Item."Unit Price" * 100;
+        LineDiscAmt := PeriodDiscountLine."Discount Amount";
+        LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
+        LineAmtExclTax := LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        // [WHEN] Add Item to active sale
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+
+        // [THEN] Verify Discount applied
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type"::Sale);
+        Assert.IsTrue(POSSaleLine.FindSet(), 'Active Sale Line not created');
+        repeat
+            Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+            Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Campaign, 'Campaign Discount not applied to POS Sale Line');
+            Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+            Assert.AreEqual(LineDiscPct, POSSaleLine."Discount %", 'PeriodLineDiscountLine."Discount %" <> POSSaleLine."Discount %"');
+            Assert.AreEqual(Round(LineDiscAmt), POSSaleLine."Discount Amount", '(Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100) <> POSSaleLine."Discount Amount"');
+            Assert.AreEqual(Round(LineAmtInclTax), POSSaleLine."Amount Including VAT", '(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleLine."Amount Including VAT"');
+            Assert.AreEqual(Round(LineAmtExclTax), POSSaleLine.Amount, '((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleLine."Amount Including VAT"');
+
+            POSActiveTaxCalc.Find(POSSaleTax, POSSaleLine.SystemId);
+            POSActiveTaxCalc.FilterLines(POSSaleTax, POSSaleTaxLine);
+            Assert.AreEqual(1, POSSaleTaxLine.Count(), 'Multiple tax line attached to one active sale line for Normal VAT Calculation');
+            Assert.IsTrue(POSSaleTaxLine.FindFirst(), 'Active Sale Tax Line not created');
+
+            Assert.AreEqual(Round(LineAmtInclTax), POSSaleTaxLine."Amount Incl. Tax", StrSubstNo('(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1', POSSAleLine."Line No."));
+            Assert.AreEqual(Round(LineAmtExclTax), POSSaleTaxLine."Amount Excl. Tax", StrSubstNo('((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1', POSSaleLine."Line No."));
+        until POSSaleLine.Next() = 0;
+    end;
+
+    [Test]
+    procedure ApplyDiscountWhenPOSSaleLineCreatedForNormalTaxInDirectSaleMultiLinesDiffItem()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Array[2] of Record Item;
+        POSViewProfile: Record "NPR POS View Profile";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        COD: codeunit "NPR POS Normal Tax Backward";
+        LineDiscPct: Array[2] of Decimal;
+        LineDiscAmt: Array[2] of Decimal;
+        LineAmtInclTax: Array[2] of Decimal;
+        LineAmtExclTax: Array[2] of Decimal;
+    begin
+        // [SCENARIO] Discount is prioritized and applied when POS Sale Line is created
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 16;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+
+        // [GIVEN] POS View Profile
+        CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Tax Type" := POSViewProfile."Tax Type"::VAT;
+        POSViewProfile.Modify();
+        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item[1], VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item[1]."Unit Price" := 250;
+        Item[1].Modify();
+
+        CreateItem(Item[2], VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item[2]."Unit Price" := 250;
+        Item[2].Modify();
+
+        // [GIVEN] Discount
+        CreateDiscount(Item[1], 22.02, PeriodDiscountLine);
+        CreateDiscount(Item[2], 22.02, PeriodDiscountLine);
+
+        LineDiscPct[1] := 100 - PeriodDiscountLine."Campaign Unit Price" / Item[1]."Unit Price" * 100;
+        LineDiscAmt[1] := PeriodDiscountLine."Discount Amount";
+        LineAmtInclTax[1] := Item[1]."Unit Price" - LineDiscAmt[1];
+        LineAmtExclTax[1] := LineAmtInclTax[1] / (1 + VATPostingSetup."VAT %" / 100);
+
+        LineDiscPct[2] := 100 - PeriodDiscountLine."Campaign Unit Price" / Item[2]."Unit Price" * 100;
+        LineDiscAmt[2] := PeriodDiscountLine."Discount Amount";
+        LineAmtInclTax[2] := Item[2]."Unit Price" - LineDiscAmt[2];
+        LineAmtExclTax[2] := LineAmtInclTax[2] / (1 + VATPostingSetup."VAT %" / 100);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        // [WHEN] Add Item to active sale
+        LibraryPOSMock.CreateItemLine(POSSession, Item[1]."No.", 1);
+        LibraryPOSMock.CreateItemLine(POSSession, Item[2]."No.", 1);
+
+        // [THEN] Verify Discount applied
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type"::Sale);
+        Assert.IsTrue(POSSaleLine.FindFirst(), 'Active Sale Line not created');
+
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed to first active sale line');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Campaign, 'Campaign Discount not applied to POS Sale Line to first active sale line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line to first active sale line');
+        Assert.AreEqual(LineDiscPct[1], POSSaleLine."Discount %", 'PeriodLineDiscountLine."Discount %" <> POSSaleLine."Discount %"');
+        Assert.AreEqual(Round(LineDiscAmt[1]), POSSaleLine."Discount Amount", '(Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100) <> POSSaleLine."Discount Amount"');
+        Assert.AreEqual(Round(LineAmtInclTax[1]), POSSaleLine."Amount Including VAT", '(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleLine."Amount Including VAT"');
+        Assert.AreEqual(Round(LineAmtExclTax[1]), POSSaleLine.Amount, '((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleLine."Amount Including VAT"');
+
+        POSActiveTaxCalc.Find(POSSaleTax, POSSaleLine.SystemId);
+        POSActiveTaxCalc.FilterLines(POSSaleTax, POSSaleTaxLine);
+        Assert.AreEqual(1, POSSaleTaxLine.Count(), 'Multiple tax line attached to first active sale line for Normal VAT Calculation');
+        Assert.IsTrue(POSSaleTaxLine.FindFirst(), 'Active Sale Tax Line not created');
+
+        Assert.AreEqual(Round(LineAmtInclTax[1]), POSSaleTaxLine."Amount Incl. Tax", StrSubstNo('(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1', POSSAleLine."Line No."));
+        Assert.AreEqual(Round(LineAmtExclTax[1]), POSSaleTaxLine."Amount Excl. Tax", StrSubstNo('((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1', POSSaleLine."Line No."));
+
+        Assert.IsTrue(POSSaleLine.FindLast(), 'Active Sale Line not created');
+
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed to first active sale line');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Campaign, 'Campaign Discount not applied to POS Sale Line to first active sale line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line to first active sale line');
+        Assert.AreEqual(LineDiscPct[2], POSSaleLine."Discount %", 'PeriodLineDiscountLine."Discount %" <> POSSaleLine."Discount %"');
+        Assert.AreEqual(Round(LineDiscAmt[2]), POSSaleLine."Discount Amount", '(Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100) <> POSSaleLine."Discount Amount"');
+        Assert.AreEqual(Round(LineAmtInclTax[2]), POSSaleLine."Amount Including VAT", '(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleLine."Amount Including VAT"');
+        Assert.AreEqual(Round(LineAmtExclTax[2]), POSSaleLine.Amount, '((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleLine."Amount Including VAT"');
+
+        POSActiveTaxCalc.Find(POSSaleTax, POSSaleLine.SystemId);
+        POSActiveTaxCalc.FilterLines(POSSaleTax, POSSaleTaxLine);
+        Assert.AreEqual(1, POSSaleTaxLine.Count(), 'Multiple tax line attached to second active sale line for Normal VAT Calculation');
+        Assert.IsTrue(POSSaleTaxLine.FindFirst(), 'Active Sale Tax Line not created');
+
+        Assert.AreEqual(Round(LineAmtInclTax[2]), POSSaleTaxLine."Amount Incl. Tax", StrSubstNo('(Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100)) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1', POSSAleLine."Line No."));
+        Assert.AreEqual(Round(LineAmtExclTax[2]), POSSaleTaxLine."Amount Excl. Tax", StrSubstNo('((Item."Unit Price" - (Item."Unit Price" * PeriodLineDiscountLine."Discount %" / 100))) / (1 + VATPostingSetup."VAT %" / 100) <> POSSaleTaxLine."Amount Incl. Tax" for sale line %1', POSSaleLine."Line No."));
     end;
 
     [Test]

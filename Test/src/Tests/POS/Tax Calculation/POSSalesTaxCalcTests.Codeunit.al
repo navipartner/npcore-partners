@@ -2161,11 +2161,9 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
             LibraryTaxCalc.CreateTaxSetup();
             LibraryTaxCalc.CreateTaxGroup(TaxGroup);
 
-            DeletePOSPostedEntries();
-
             Initialized := true;
         end;
-
+        DeletePOSPostedEntries();
         Commit();
     end;
 

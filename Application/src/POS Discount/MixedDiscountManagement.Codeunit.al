@@ -546,7 +546,7 @@
                 TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal";
                 TempSaleLinePOSApplyNew.Insert();
 
-                InvQtyDict.Set(TempSaleLinePOSApplyCopy.SystemId, TempSaleLinePOSApplyNew."MR Anvendt antal");
+                InvQtyDict.Set(TempSaleLinePOSApplyNew.SystemId, TempSaleLinePOSApplyNew."MR Anvendt antal");
 
                 QtyToApply -= TempSaleLinePOSApplyCopy."MR Anvendt antal";
             end;
@@ -1042,13 +1042,14 @@
         if SaleLinePOS.IsTemporary() then
             SaleLinePOS."Variant Code" := SaleLinePOS2."Variant Code";
         SaleLinePOS."Line No." := LastLineNo + 10000;
-        SaleLinePOS.Validate(Quantity, Qty);
+        SaleLinePOS.Insert();
         SaleLinePOS."Discount Type" := DiscountType;
         SaleLinePOS."Discount Code" := DiscountCode;
         SaleLinePOS."Discount %" := 0;
         SaleLinePOS."Discount Amount" := 0;
         SaleLinePOS."Custom Disc Blocked" := false;
-        SaleLinePOS.Insert();
+        SaleLinePOS.Validate(Quantity, Qty);
+        SaleLinePOS.Modify();
 
         LastLineNo := SaleLinePOS."Line No.";
     end;
