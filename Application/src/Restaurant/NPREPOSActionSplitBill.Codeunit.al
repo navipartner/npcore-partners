@@ -1,19 +1,7 @@
 codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 {
-    SingleInstance = true;
-
     var
-        Text000: Label 'Split Bill (Waiter Pad) into multiple Bills';
-        CurrNPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        [WithEvents]
-        Model: DotNet NPRNetModel;
-        ActiveModelID: Guid;
-        Text001: Label 'Split Bill';
-        Text002: Label 'Bill';
-        Text003: Label 'Add new Bill';
-        Text004: Label 'Approve';
-        Text005: Label 'Cancel';
-        ReadingErr: Label 'reading in %1';
+        ReadingErr: Label 'reading in %1 of %2';
 
     local procedure ActionCode(): Text
     begin
@@ -22,456 +10,499 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        exit('2.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        ActionDescriptionLbl: Label 'This built-in action splits waiter pads (bills). It can be run from both Sale and Restaurant View';
     begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
-            Sender.RegisterWorkflowStep('seatingInput',
-          'if (!context.seatingCode) {' +
-          '  if (param.FixedSeatingCode) {' +
-          '    context.seatingCode = param.FixedSeatingCode;' +
-          '    respond();' +
-          '  } else {' +
-          '    switch(param.InputType + "") {' +
-          '      case "0":' +
-          '        stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-          '        break;' +
-          '      case "1":' +
-          '        intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-          '        break;' +
-          '      case "2":' +
-          '        respond();' +
-          '        break;' +
-          '    }' +
-          '  }' +
-          '}'
-        );
-            Sender.RegisterWorkflowStep('selectWaiterPad',
-              'if (!context.waiterPadNo) {' +
-              '  if (context.seatingCode) {' +
-              '    respond();' +
-              '  }' +
-              '}'
-            );
-            Sender.RegisterWorkflowStep('splitWaiterPad',
-              'if (context.waiterPadNo) {' +
-              '  respond();' +
-              '}'
-            );
-            Sender.RegisterWorkflow(false);
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+            Sender.RegisterWorkflow20(
+                'await workflow.respond("AddPresetValuesToContext");' +
 
-            Sender.RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
-            Sender.RegisterTextParameter('FixedSeatingCode', '');
+                //Select seating
+                'if (!$context.seatingCode) {' +
+                '  if ($parameters.SeatingCode) {' +
+                '    $context.seatingCode = $parameters.SeatingCode;' +
+                '  } else {' +
+                '    switch($parameters.SeatingSelectionMethod + "") {' +
+                '      case "0":' +
+                '        $context.seatingCode = await popup.stringpad({caption: $labels.SeatingIDLbl});' +
+                '        break;' +
+                '      case "1":' +
+                '        $context.seatingCode = await popup.intpad({caption: $labels.SeatingIDLbl});' +
+                '        break;' +
+                '      case "2":' +
+                '        await workflow.respond("SelectSeating");' +
+                '        break;' +
+                '    }' +
+                '  }' +
+                '};' +
+                'if (!$context.seatingCode) {return};' +
+
+                //Select waiter pad
+                'if (!$context.waiterPadNo) {' +
+                '    await workflow.respond("SelectWaiterPad");' +
+                '};' +
+                'if (!$context.waiterPadNo) {return};' +
+
+                //Split waiter pads/bills
+                'await workflow.respond("GenerateSplitBillContext");' +
+                'console.log("Context: " + JSON.stringify($context));' +
+                'result = ' +
+                '  await popup.hospitality.splitBill({' +
+                '    caption: $labels.PopupCaption,' +
+                '    items: $context.items,' +
+                '    bills: $context.bills' +
+                '  });' +
+                'if (result) {await workflow.respond("DoSplit", result)};');
+
+            Sender.RegisterOptionParameter('SeatingSelectionMethod', 'stringPad,intPad,List', 'stringPad');
+            Sender.RegisterTextParameter('WaiterPadCode', '');
+            Sender.RegisterTextParameter('SeatingCode', '');
             Sender.RegisterTextParameter('SeatingFilter', '');
             Sender.RegisterTextParameter('LocationFilter', '');
+            Sender.RegisterOptionParameter('IncludeAllWPads', 'No,Yes,Ask', 'Yes');
+            Sender.RegisterBooleanParameter('ReturnToDefaultView', false);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
+    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        NPRESeating: Record "NPR NPRE Seating";
-    begin
-        Captions.AddActionCaption(ActionCode(), 'InputTypeLabel', NPRESeating.TableCaption);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
+        CurrentWaiterPad: Record "NPR NPRE Waiter Pad";
+        NothingToDoErr: Label 'Nothing has been changed';
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        case WorkflowStep of
-            'addPresetValuesToContext':
-                OnActionAddPresetValuesToContext(JSON, FrontEnd, POSSession);
-            'seatingInput':
-                OnActionSeatingInput(JSON, FrontEnd);
-            'selectWaiterPad':
-                OnActionSelectWaiterPad(JSON, FrontEnd);
-            'splitWaiterPad':
-                OnActionSplitWaiterPad(JSON, FrontEnd);
-        end;
-
         Handled := true;
+
+        CASE WorkflowStep OF
+            'AddPresetValuesToContext':
+                AddPresetValuesToContext(Context, POSSession);
+            'SelectSeating':
+                SelectSeating(Context);
+            'SelectWaiterPad':
+                SelectWaiterPad(Context);
+            'GenerateSplitBillContext':
+                begin
+                    SaveChangesToWaiterPad(POSSession);
+                    GenerateSplitBillContext(Context);
+                end;
+            'DoSplit':
+                begin
+                    CleanupSale(POSSession);
+                    if not ProcessWaiterPadSplit(Context, CurrentWaiterPad) then
+                        Error(NothingToDoErr);
+                    UpdateFrontEndView(CurrentWaiterPad, Context, POSSession);
+                end;
+        end;
     end;
 
-    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
+        Seating: Record "NPR NPRE Seating";
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
+        RestaurantContextUpdated: Boolean;
+        SeatingContextUpdated: Boolean;
+        WPadContextUpdated: Boolean;
+    begin
+        POSSession.GetSetup(POSSetup);
+        Seating.Code := Context.GetStringParameter('SeatingCode');
+        if Seating.Code <> '' then
+            if Seating.Find() then begin
+                Context.SetContext('seatingCode', Seating.Code);
+                SeatingContextUpdated := true;
+                SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
+            end;
+        WaiterPad."No." := Context.GetStringParameter('WaiterPadCode');
+        if WaiterPad."No." <> '' then
+            if WaiterPad.Find() then begin
+                Context.SetContext('waiterPadNo', WaiterPad."No.");
+                WPadContextUpdated := true;
+                SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
+                if not SeatingWaiterPadLink.IsEmpty then begin
+                    RestaurantContextUpdated := UpdateRestaurantContext(Context, SeatingWaiterPadLink, POSSetup.RestaurantCode());
+                    if not RestaurantContextUpdated then
+                        RestaurantContextUpdated := UpdateRestaurantContext(Context, SeatingWaiterPadLink, '');
+                end;
+            end;
+
+        if not RestaurantContextUpdated then
+            Context.SetContext('restaurantCode', POSSetup.RestaurantCode());
+
+        if not (SeatingContextUpdated and WPadContextUpdated) then begin
+            POSSession.GetSale(POSSale);
+            POSSale.GetCurrentSale(SalePOS);
+
+            if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
+                Seating.Get(SalePOS."NPRE Pre-Set Seating Code");
+                Context.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
+            end;
+
+            if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
+                WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
+                if SalePOS."NPRE Pre-Set Seating Code" <> '' then
+                    if not SeatingWaiterPadLink.Get(Seating.Code, WaiterPad."No.") then
+                        WaiterPadMgt.AddNewWaiterPadForSeating(Seating.Code, WaiterPad, SeatingWaiterPadLink);
+                WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false);
+                Context.SetContext('waiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
+            end;
+        end;
+    end;
+
+    local procedure UpdateRestaurantContext(Context: Codeunit "NPR POS JSON Management"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"; POSRestaurantCode: Code[20]): Boolean
+    var
+        Seating: Record "NPR NPRE Seating";
+        SeatingLocation: Record "NPR NPRE Seating Location";
+    begin
+        if not SeatingWaiterPadLink.FindSet() then
+            exit(false);
+        repeat
+            if Seating.Get(SeatingWaiterPadLink."Seating Code") and (Seating."Seating Location" <> '') then
+                if SeatingLocation.Get(Seating."Seating Location") and (SeatingLocation."Restaurant Code" <> '') and
+                   ((SeatingLocation."Restaurant Code" = POSRestaurantCode) or (POSRestaurantCode = ''))
+                then begin
+                    Context.SetContext('restaurantCode', SeatingLocation."Restaurant Code");
+                    exit(true);
+                end;
+        until SeatingWaiterPadLink.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure SelectSeating(Context: Codeunit "NPR POS JSON Management")
+    var
+        Seating: Record "NPR NPRE Seating";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        WaiterPadPOSMgt.FindSeating(Context, Seating);
+        Context.SetContext('seatingCode', Seating.Code);
+    end;
+
+    local procedure SelectWaiterPad(Context: Codeunit "NPR POS JSON Management")
+    var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        WaiterPadPOSMgt.FindSeating(Context, Seating);
+        if not WaiterPadPOSMgt.SelectWaiterPad(Seating, WaiterPad) then
+            exit;
+        Context.SetContext('waiterPadNo', WaiterPad."No.");
+    end;
+
+    local procedure GenerateSplitBillContext(Context: Codeunit "NPR POS JSON Management")
+    var
+        SeatingWPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        SeatingCode: Code[20];
+        WaiterPadCode: Code[20];
+        IncludeAllWPads: Option No,Yes,Ask;
+        IncludeAllWPadsQ: Label 'There are multiple waiter pads assigned to the seating %1. Do you want them all to be included in the scope?';
+    begin
+        WaiterPadCode := Context.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        IncludeAllWPads := Context.GetIntegerParameter('IncludeAllWPads');
+        if IncludeAllWPads IN [IncludeAllWPads::Yes, IncludeAllWPads::Ask] then begin
+            SeatingCode := Context.GetString('seatingCode');
+            if SeatingCode = '' then
+                IncludeAllWPads := IncludeAllWPads::No
+            else begin
+                SeatingWPadLink.SetRange("Seating Code", SeatingCode);
+                SeatingWPadLink.SetFilter("Waiter Pad No.", '<>%1', WaiterPadCode);
+                SeatingWPadLink.SetRange(Closed, false);
+                if SeatingWPadLink.IsEmpty then
+                    IncludeAllWPads := IncludeAllWPads::No;
+            end;
+            if IncludeAllWPads = IncludeAllWPads::Ask then
+                if Confirm(IncludeAllWPadsQ, true, SeatingCode) then
+                    IncludeAllWPads := IncludeAllWPads::Yes
+                else
+                    IncludeAllWPads := IncludeAllWPads::No;
+        end;
+
+        AddCurrentWaiterPadToContext(Context, WaiterPadCode);
+
+        if IncludeAllWPads = IncludeAllWPads::Yes then
+            AddOtherWaiterPadsToContext(Context, SeatingWPadLink);
+    end;
+
+    local procedure AddCurrentWaiterPadToContext(Context: Codeunit "NPR POS JSON Management"; WaiterPadCode: Code[20])
+    var
+        WPadLineCollection: JsonArray;
+    begin
+        GetWaiterPadLines(WPadLineCollection, WaiterPadCode);
+        //Context.GetContextObject().Add('items', WPadLineCollection);
+        Context.SetContext('items', WPadLineCollection);
+    end;
+
+    local procedure AddOtherWaiterPadsToContext(Context: Codeunit "NPR POS JSON Management"; var SeatingWPadLink: Record "NPR NPRE Seat.: WaiterPadLink")
+    var
+        BillCollection: JsonArray;
+        BillContent: JsonObject;
+        WPadLineCollection: JsonArray;
+    begin
+        if SeatingWPadLink.FindSet() then begin
+            repeat
+                GetWaiterPadLines(WPadLineCollection, SeatingWPadLink."Waiter Pad No.");
+                if WPadLineCollection.Count() > 0 then begin
+                    Clear(BillContent);
+                    BillContent.Add('id', SeatingWPadLink."Waiter Pad No.");
+                    BillContent.Add('items', WPadLineCollection);
+                    BillCollection.Add(BillContent);
+                end;
+            until SeatingWPadLink.Next() = 0;
+
+            //Context.GetContextObject().Add('bills', BillCollection);
+            Context.SetContext('bills', BillCollection);
+        end;
+    end;
+
+    local procedure GetWaiterPadLines(var WPadLineCollection: JsonArray; WaiterPadCode: Code[20])
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        WPadLineContent: JsonObject;
+    begin
+        Clear(WPadLineCollection);
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadCode);
+        WaiterPadLine.SetRange(Type, WaiterPadLine.Type::Item);
+        if WaiterPadLine.FindSet() then
+            repeat
+                if WaiterPadLine.Quantity - WaiterPadLine."Billed Quantity" > 0 then begin
+                    Clear(WPadLineContent);
+                    WPadLineContent.Add('key', WaiterPadLine.GetPosition(false));
+                    WPadLineContent.Add('no', WaiterPadLine."No.");
+                    WPadLineContent.Add('caption', WaiterPadLine.Description + WaiterPadLine."Description 2");
+                    WPadLineContent.Add('qty', WaiterPadLine.Quantity - WaiterPadLine."Billed Quantity");
+                    WPadLineCollection.Add(WPadLineContent);
+                end;
+            until WaiterPadLine.Next() = 0;
+    end;
+
+    local procedure SaveChangesToWaiterPad(POSSession: Codeunit "NPR POS Session")
+    var
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSale: Codeunit "NPR POS Sale";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSSession.GetSetup(POSSetup);
-
-        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
-
-        if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
-            NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
-            JSON.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
-        end;
-
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
-            NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-            if SalePOS."NPRE Pre-Set Seating Code" <> '' then
-                if not NPRESeatingWaiterPadLink.Get(NPRESeating.Code, NPREWaiterPad."No.") then
-                    WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
-            WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, false);
-            JSON.SetContext('waiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
-        end;
-
-        FrontEnd.SetActionContext(ActionCode(), JSON);
-    end;
-
-    local procedure OnActionSeatingInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-    begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-
-        JSON.SetContext('seatingCode', NPRESeating.Code);
-
-        FrontEnd.SetActionContext(ActionCode(), JSON);
-    end;
-
-    local procedure OnActionSelectWaiterPad(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-    begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        if not NPREWaiterPadPOSMgt.SelectWaiterPad(NPRESeating, NPREWaiterPad) then
-            exit;
-
-        JSON.SetContext('waiterPadNo', NPREWaiterPad."No.");
-
-        FrontEnd.SetActionContext(ActionCode(), JSON);
-    end;
-
-    local procedure OnActionSplitWaiterPad(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        WaiterPadNo: Code[20];
-    begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScopeRoot();
-        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
-        NPREWaiterPad.Get(WaiterPadNo);
-
-        CreateUserInterface(NPREWaiterPad);
-        ActiveModelID := FrontEnd.ShowModel(Model);
-    end;
-
-    local procedure CreateUserInterface(NPREWaiterPad: Record "NPR NPRE Waiter Pad")
-    begin
-        CurrNPREWaiterPad := NPREWaiterPad;
-        CurrNPREWaiterPad.CalcFields("Current Seating FF");
-
-        Model := Model.Model();
-        Model.AddHtml(InitHtml());
-        Model.AddStyle(InitCss());
-        Model.AddScript(InitScript());
-    end;
-
-    local procedure InitCss() Css: Text
-    var
-        WebClientDependency: Record "NPR Web Client Dependency";
-        InStr: InStream;
-    begin
-        if WebClientDependency.Get(WebClientDependency.Type::CSS, ActionCode()) and WebClientDependency.BLOB.HasValue() then begin
-            WebClientDependency.CalcFields(BLOB);
-            WebClientDependency.BLOB.CreateInStream(InStr);
-            InStr.Read(Css);
-
-            exit(Css);
+            WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
+            WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false);
+            Commit();
         end;
     end;
 
-    local procedure InitHtml() Html: Text
+    local procedure CleanupSale(POSSession: Codeunit "NPR POS Session")
     var
-        WebClientDependency: Record "NPR Web Client Dependency";
-        InStr: InStream;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
-        if WebClientDependency.Get(WebClientDependency.Type::HTML, ActionCode()) and WebClientDependency.BLOB.HasValue() then begin
-            WebClientDependency.CalcFields(BLOB);
-            WebClientDependency.BLOB.CreateInStream(InStr);
-            InStr.Read(Html);
-
-            exit(Html);
-        end;
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.DeleteAll();
     end;
 
-    local procedure InitScript() Script: Text
+    local procedure ProcessWaiterPadSplit(Context: Codeunit "NPR POS JSON Management"; var CurrentWaiterPad: Record "NPR NPRE Waiter Pad") ChangesFound: Boolean
     var
-        RetailModelScriptLibrary: Codeunit "NPR Retail Model Script Lib.";
-    begin
-        Script := RetailModelScriptLibrary.InitAngular();
-        Script += RetailModelScriptLibrary.InitJQueryUi();
-        Script += RetailModelScriptLibrary.InitTouchPunch();
-        Script += RetailModelScriptLibrary.InitEscClose();
-        Script += InitScriptData();
-
-        exit(Script);
-    end;
-
-    local procedure InitScriptData() Script: Text
-    begin
-        Script := '$(function () {' +
-          'var appElement = document.querySelector(''[ng-app=navApp]'');' +
-          'var $scope = angular.element(appElement).scope();' +
-          '$scope.$apply(function() {';
-
-        Script += InitScriptBillLines();
-        Script += InitScriptLabels();
-
-        Script += '});' +
-          '});';
-    end;
-
-    local procedure InitScriptBillLines() Script: Text
-    var
-        NPREWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        BillLine: Text;
-        ArrayIndex: Integer;
-        i: Integer;
-    begin
-        Script := '$scope.bill_lines = [';
-
-        NPREWaiterPadLine.SetRange("Waiter Pad No.", CurrNPREWaiterPad."No.");
-        if NPREWaiterPadLine.FindSet() then
-            repeat
-                if NPREWaiterPadLine.RemainingQtyToBill() > 0 then
-                    for i := 1 to NPREWaiterPadLine.RemainingQtyToBill() do begin
-                        BillLine := '{ bill_id: 1';
-                        BillLine += ', array_index: ' + Format(ArrayIndex);
-                        BillLine += ', line_no: ' + Format(NPREWaiterPadLine."Line No.");
-                        BillLine += ', item_no: "' + Format(NPREWaiterPadLine."No.") + '"';
-                        BillLine += ', variant_code: "' + NPREWaiterPadLine."Variant Code" + '"';
-                        BillLine += ', description: "' + NPREWaiterPadLine.Description + '"';
-                        BillLine += ', qty: 1 },';
-                        Script += BillLine;
-
-                        ArrayIndex += 1;
-                    end;
-            until NPREWaiterPadLine.Next() = 0;
-
-        Script += '];';
-        exit(Script);
-    end;
-
-    local procedure InitScriptLabels() Script: Text
-    var
-        NPREWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-    begin
-        Script := '$scope.labels = ' +
-          '{ ' +
-            ' title: "' + Text001 + '"' +
-            ', bill: "' + Text002 + '"' +
-            ', quantity: "' + NPREWaiterPadLine.FieldCaption(Quantity) + '"' +
-            ', add_new_bill: "' + Text003 + '"' +
-            ', approve: "' + Text004 + '"' +
-            ', cancel: "' + Text005 + '" ' +
-          '}';
-
-        exit(Script);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnProtocolUIResponse', '', true, true)]
-    local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
-    begin
-        if ModelID <> ActiveModelID then
-            exit;
-
-        Handled := true;
-
-        case Sender of
-            'approve':
-                begin
-                    Approve(EventName, FrontEnd);
-                    FrontEnd.CloseModel(ModelID);
-                end;
-            'cancel', 'close':
-                begin
-                    FrontEnd.CloseModel(ModelID);
-                end;
-        end;
-    end;
-
-    local procedure Approve(JsonText: Text; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        TempNPREWaiterPad: Record "NPR NPRE Waiter Pad" temporary;
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR POS Sale";
+        FromWaiterPad: Record "NPR NPRE Waiter Pad";
+        FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        TouchedWaiterPad: Record "NPR NPRE Waiter Pad" temporary;
+        ToWaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSSession: Codeunit "NPR POS Session";
-        POSJavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
-        BillLines: JsonToken;
+        Bills: JsonArray;
+        BillLines: JsonArray;
+        Bill: JsonToken;
         BillLine: JsonToken;
-        BillLine2: JsonToken;
-        BillLineList: JsonArray;
-        JObject: JsonObject;
+        ContextJToken: JsonToken;
+        MoveQty: Decimal;
     begin
-        BillLines.ReadFrom(JsonText);
-        BillLineList := BillLines.AsArray();
-        JObject := BillLine.AsObject();
-        if JObject.Get('bill_id', BillLine2) and (BillLine2.AsValue().AsInteger() > 1) then begin
-            foreach BillLine in BillLineList do begin
-                FindBill(BillLine, TempNPREWaiterPad, NPREWaiterPad);
-                ApproveBillLine(BillLine, NPREWaiterPad);
+        ChangesFound := false;
+        ContextJToken.ReadFrom(Context.ToString());
+        if ContextJToken.SelectToken('bills', ContextJToken) then
+            if ContextJToken.IsArray then begin
+                CurrentWaiterPad.Get(Context.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, 'OnAction', ActionCode())));
+                Bills := ContextJToken.AsArray();
+                foreach Bill in Bills do begin
+                    Bill.AsObject().Get('items', ContextJToken);
+                    if ContextJToken.IsArray then begin
+                        BillLines := ContextJToken.AsArray();
+                        if BillLines.Count > 0 then begin
+                            Bill.AsObject().Get('id', ContextJToken);
+                            ToWaiterPad."No." := CopyStr(ContextJToken.AsValue().AsText(), 1, MaxStrLen(ToWaiterPad."No."));
+                            FindWaiterPad(CurrentWaiterPad, ToWaiterPad);
+
+                            foreach BillLine in BillLines do begin
+                                BillLine.AsObject().Get('qty', ContextJToken);
+                                MoveQty := ContextJToken.AsValue().AsDecimal();
+                                if MoveQty > 0 then begin
+                                    BillLine.AsObject().Get('key', ContextJToken);
+                                    FromWaiterPadLine.SetPosition(ContextJToken.AsValue().AsText());
+                                    if FromWaiterPadLine."Waiter Pad No." <> ToWaiterPad."No." then begin
+                                        FromWaiterPad.Get(FromWaiterPadLine."Waiter Pad No.");
+                                        FromWaiterPadLine.Find();
+                                        WaiterPadPOSMgt.SplitWaiterPadLine(FromWaiterPad, FromWaiterPadLine, MoveQty, ToWaiterPad);
+
+                                        TouchedWaiterPad := FromWaiterPad;
+                                        if not TouchedWaiterPad.Find() then
+                                            TouchedWaiterPad.Insert();
+                                        ChangesFound := true;
+                                    end;
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+
+        if TouchedWaiterPad.FindSet() then
+            repeat
+                FromWaiterPad.Get(TouchedWaiterPad."No.");
+                WaiterPadMgt.CloseWaiterPad(FromWaiterPad, false);
+            until TouchedWaiterPad.Next() = 0;
+    end;
+
+    local procedure FindWaiterPad(var CurrentWaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+    begin
+        WaiterPad.TestField("No.");
+        if WaiterPad.Find() then
+            exit;
+
+        Clear(WaiterPad);
+        WaiterPadMgt.DuplicateWaiterPadHdr(CurrentWaiterPad, WaiterPad);
+        WaiterPadMgt.MoveNumberOfGuests(CurrentWaiterPad, WaiterPad, 1);
+    end;
+
+    local procedure UpdateFrontEndView(CurrentWaiterPad: Record "NPR NPRE Waiter Pad"; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    var
+        SalePOS: Record "NPR POS Sale";
+        CurrentView: Codeunit "NPR POS View";
+        POSSale: Codeunit "NPR POS Sale";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        ReturnToDefaultView: Boolean;
+    begin
+        POSSession.GetSale(POSSale);
+        POSSession.GetCurrentView(CurrentView);
+        if CurrentView.Type() = CurrentView.Type() ::Sale then begin
+            POSSale.GetCurrentSale(SalePOS);
+            WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, false);
+            POSSale.Refresh(SalePOS);
+            POSSale.Modify(true, false);
+        end;
+
+        ReturnToDefaultView := Context.GetBooleanParameter('ReturnToDefaultView');
+        if ReturnToDefaultView then
+            POSSale.SelectViewForEndOfSale(POSSession)
+        else begin
+            if CurrentView.Type() = CurrentView.Type() ::Sale then begin
+                CurrentWaiterPad.Find();
+                if not CurrentWaiterPad.Closed then
+                    WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(CurrentWaiterPad, POSSession);
             end;
         end;
 
-        FrontEnd.GetSession(POSSession);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.DeleteAll();
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, false);
-        POSSale.Refresh(SalePOS);
-        POSSale.Modify(true, false);
-
-        WaiterPadMgt.CloseWaiterPad(CurrNPREWaiterPad, false);
-        if not CurrNPREWaiterPad.Closed then
-            WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(CurrNPREWaiterPad, POSSession);
         POSSession.RequestRefreshData();
-        POSJavaScriptInterface.RefreshData(POSSession, FrontEnd);
     end;
 
-    local procedure ApproveBillLine(BillLine: JsonToken; NPREWaiterPad: Record "NPR NPRE Waiter Pad")
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
-        NPREWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        Qty: Decimal;
-        LineNo: Integer;
+        CaptionIncludeAllWPads: Label 'All Waiter Pads';
+        CaptionLocationFilter: Label 'Location Filter';
+        CaptionReturnToDefaultView: Label 'Return to Default View on Finish';
+        CaptionSeatingCode: Label 'Seating Code';
+        CaptionSeatingFilter: Label 'Seating Filter';
+        CaptionSeatingSelectionMethod: Label 'Seating Selection Method';
+        CaptionWaiterPadCode: Label 'Waiter Pad Code';
     begin
-        LineNo := GetValueAsInt(BillLine, 'line_no');
-        if not NPREWaiterPadLine.Get(CurrNPREWaiterPad."No.", LineNo) then
+        if POSParameterValue."Action Code" <> ActionCode() then
             exit;
-        Qty := GetValueAsDec(BillLine, 'qty');
 
-        WaiterPadPOSMgt.SplitWaiterPadLine(CurrNPREWaiterPad, NPREWaiterPadLine, Qty, NPREWaiterPad);
-    end;
-
-    local procedure FindBill(BillLine: JsonToken; var TempNPREWaiterPad: Record "NPR NPRE Waiter Pad" temporary; var NPREWaiterPad: Record "NPR NPRE Waiter Pad")
-    var
-        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
-        BillId: Code[20];
-    begin
-        BillId := GetValueAsString(BillLine, 'bill_id');
-        if TempNPREWaiterPad.Get(BillId) then begin
-            NPREWaiterPad.Get(TempNPREWaiterPad.Description);
-            exit;
+        CASE POSParameterValue.Name OF
+            'IncludeAllWPads':
+                Caption := CaptionIncludeAllWPads;
+            'LocationFilter':
+                Caption := CaptionLocationFilter;
+            'ReturnToDefaultView':
+                Caption := CaptionReturnToDefaultView;
+            'SeatingCode':
+                Caption := CaptionSeatingCode;
+            'SeatingFilter':
+                Caption := CaptionSeatingFilter;
+            'SeatingSelectionMethod':
+                Caption := CaptionSeatingSelectionMethod;
+            'WaiterPadCode':
+                Caption := CaptionWaiterPadCode;
         end;
-
-        Clear(NPREWaiterPad);
-        WaiterPadMgt.DuplicateWaiterPadHdr(CurrNPREWaiterPad, NPREWaiterPad);
-        WaiterPadMgt.MoveNumberOfGuests(CurrNPREWaiterPad, NPREWaiterPad, 1);
-        TempNPREWaiterPad.Init();
-        TempNPREWaiterPad."No." := BillId;
-        TempNPREWaiterPad.Description := NPREWaiterPad."No.";
-        TempNPREWaiterPad.Insert();
     end;
 
-    local procedure GetValueAsString(JToken: JsonToken; JPath: Text): Text
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
-        JToken2: JsonToken;
+        DescIncludeAllWPads: Label 'Specifies whether all assigned to a seating waiter pads should be included in the scope';
+        DescLocationFilter: Label 'Specifies a filter for seating location';
+        DescReturnToDefaultView: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed';
+        DescSeatingCode: Label 'Specifies seating number the action is to be run upon';
+        DescSeatingFilter: Label 'Specifies a filter for seating';
+        DescSeatingSelectionMethod: Label 'Specifies seating selection method';
+        DescWaiterPadCode: Label 'Defines waiter pad number the action is to be run upon. The parameter is set automatically by the system and should not be preset manually';
     begin
-        JToken.SelectToken(JPath, JToken2);
-        if JToken2.AsValue().IsNull() then
-            exit('');
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
 
-        exit(Format(JToken2));
+        CASE POSParameterValue.Name OF
+            'IncludeAllWPads':
+                Caption := DescIncludeAllWPads;
+            'LocationFilter':
+                Caption := DescLocationFilter;
+            'ReturnToDefaultView':
+                Caption := DescReturnToDefaultView;
+            'SeatingCode':
+                Caption := DescSeatingCode;
+            'SeatingFilter':
+                Caption := DescSeatingFilter;
+            'SeatingSelectionMethod':
+                Caption := DescSeatingSelectionMethod;
+            'WaiterPadCode':
+                Caption := DescWaiterPadCode;
+        end;
     end;
 
-    local procedure GetValueAsInt(JToken: JsonToken; JPath: Text) IntValue: Integer
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
+    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
-        JToken2: JsonToken;
+        OptionIncludeAllWPads: Label 'No,Yes,Ask';
+        OptionSeatingSelectionMethod: Label 'StringPad,IntPad,Select from List';
     begin
-        JToken.SelectToken(JPath, JToken2);
-        if JToken2.AsValue().IsNull() then
-            exit(0);
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
 
-        if not Evaluate(IntValue, Format(JToken2), 9) then
-            exit(0);
-
-        exit(IntValue);
+        CASE POSParameterValue.Name OF
+            'IncludeAllWPads':
+                Caption := OptionIncludeAllWPads;
+            'SeatingSelectionMethod':
+                Caption := OptionSeatingSelectionMethod;
+        end;
     end;
 
-    local procedure GetValueAsDec(JToken: JsonToken; JPath: Text) DecValue: Decimal
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, false)]
+    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        JToken2: JsonToken;
+        //MoreInfoReqLbl: Label 'We need more information';
+        PopupCaptionLbl: Label 'Please configure your bills';
+        SeatingIDLbl: Label 'Seating Code';
     begin
-        JToken.SelectToken(JPath, JToken2);
-        if JToken2.AsValue().IsNull() then
-            exit(0);
-
-        if not Evaluate(DecValue, Format(JToken2), 9) then
-            exit(0);
-
-        exit(DecValue);
-    end;
-
-    local procedure GetAddOnQty(SaleLinePOS: Record "NPR POS Sale Line"; ItemAddOnLine: Record "NPR NpIa Item AddOn Line") Qty: Decimal
-    var
-        SaleLinePOS2: Record "NPR POS Sale Line";
-        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
-    begin
-        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
-        SaleLinePOSAddOn.SetFilter("Sale Line No.", '<>%1', SaleLinePOS."Line No.");
-        SaleLinePOSAddOn.SetRange("Applies-to Line No.", SaleLinePOS."Line No.");
-        SaleLinePOSAddOn.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
-        if not SaleLinePOSAddOn.FindFirst() then
-            exit(0);
-
-        if SaleLinePOS2.Get(
-          SaleLinePOSAddOn."Register No.",
-          SaleLinePOSAddOn."Sales Ticket No.",
-          SaleLinePOSAddOn."Sale Date",
-          SaleLinePOSAddOn."Sale Type",
-          SaleLinePOSAddOn."Sale Line No.")
-        then
-            Qty := SaleLinePOS2.Quantity;
-
-        exit(Qty);
-    end;
-
-    local procedure GetNextPOSAddOnLineNo(SaleLinePOS: Record "NPR POS Sale Line") LineNo: Integer
-    var
-        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
-    begin
-        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
-        if SaleLinePOSAddOn.FindLast() then;
-        LineNo := SaleLinePOSAddOn."Line No." + 10000;
-
-        exit(LineNo);
+        Captions.AddActionCaption(ActionCode(), 'PopupCaption', PopupCaptionLbl);
+        //Captions.AddActionCaption(ActionCode(), 'WindowTitle', MoreInfoReqLbl);
+        Captions.AddActionCaption(ActionCode(), 'SelectSeatingID', SeatingIDLbl);
     end;
 }

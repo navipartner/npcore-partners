@@ -153,6 +153,12 @@ table 6150660 "NPR NPRE Waiter Pad"
             Caption = 'Pre-receipt Printed';
             DataClassification = CustomerContent;
         }
+        field(80; "Assigned Waiter Code"; Code[20])
+        {
+            Caption = 'Assigned Waiter Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser";
+        }
         field(100; "Print Category Filter"; Code[20])
         {
             Caption = 'Print Category Filter';

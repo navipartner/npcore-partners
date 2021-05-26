@@ -90,6 +90,17 @@
         end;
     end;
 
+    procedure CreateNewWaiterPad(SeatingCode: Code[10]; NumberOfGuests: Integer; AssignedWaiterCode: Code[20]; Description: Text; var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
+    var
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+    begin
+        Clear(WaiterPad);
+        WaiterPad."Number of Guests" := NumberOfGuests;
+        WaiterPad."Assigned Waiter Code" := AssignedWaiterCode;
+        WaiterPad.Description := CopyStr(Description, 1, MaxStrLen(WaiterPad.Description));
+        exit(AddNewWaiterPadForSeating(SeatingCode, WaiterPad, SeatingWaiterPadLink));
+    end;
+
     procedure InsertWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; RunInsert: Boolean)
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
@@ -107,7 +118,7 @@
         if RunInsert then WaiterPad.Insert(true);
     end;
 
-    procedure AddNewWaiterPadForSeating(SeatingCode: Code[20]; var WaiterPad: Record "NPR NPRE Waiter Pad"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink") OK: Boolean
+    procedure AddNewWaiterPadForSeating(SeatingCode: Code[10]; var WaiterPad: Record "NPR NPRE Waiter Pad"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"): Boolean
     var
         Seating: Record "NPR NPRE Seating";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
@@ -433,7 +444,7 @@
         AssignedPrintCategory.SetRange("Record ID", AppliesToRecID);
     end;
 
-    procedure AssignedFlowStatusesAsFilterString(AppliesToRecID: RecordID; StatusObject: Option; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status"): Text
+    procedure AssignedFlowStatusesAsFilterString(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status"): Text
     var
         AssignedFlowStatuses: Text;
     begin
@@ -450,7 +461,7 @@
         exit(AssignedFlowStatuses);
     end;
 
-    procedure FilterAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status")
+    procedure FilterAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status")
     begin
         AssignedFlowStatus.Reset();
         AssignedFlowStatus.SetRange("Table No.", AppliesToRecID.TableNo);
@@ -622,7 +633,7 @@
         ClearAssignedPrintCategories(FromRecId);
     end;
 
-    procedure SelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status")
+    procedure SelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status")
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         FlowStatusList: Page "NPR NPRE Select Flow Status";
@@ -719,7 +730,7 @@
             AssignedFlowStatus.Insert();
     end;
 
-    procedure ClearAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option)
+    procedure ClearAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object")
     var
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
@@ -728,7 +739,7 @@
             AssignedFlowStatus.DeleteAll(true);
     end;
 
-    procedure CopyAssignedFlowStatuses(FromRecId: RecordID; ToRecId: RecordID; StatusObject: Option)
+    procedure CopyAssignedFlowStatuses(FromRecId: RecordID; ToRecId: RecordID; StatusObject: Enum "NPR NPRE Status Object")
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
@@ -742,7 +753,7 @@
             until AssignedFlowStatus.Next() = 0;
     end;
 
-    procedure MoveAssignedFlowStatuses(FromRecId: RecordID; ToRecId: RecordID; StatusObject: Option)
+    procedure MoveAssignedFlowStatuses(FromRecId: RecordID; ToRecId: RecordID; StatusObject: Enum "NPR NPRE Status Object")
     begin
         CopyAssignedFlowStatuses(FromRecId, ToRecId, StatusObject);
         ClearAssignedFlowStatuses(FromRecId, StatusObject);
@@ -764,12 +775,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnBeforeSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
+    procedure OnBeforeSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
+    procedure OnAfterSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Enum "NPR NPRE Status Object"; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
     begin
     end;
 

@@ -263,13 +263,13 @@ page 6150689 "NPR NPRE Kitchen Req."
         if IsExpediteMode then begin
             if Rec.GetFilter("Restaurant Code") = '' then
                 if not Restaurant.IsEmpty then begin
-                    if PAGE.RunModal(0, Restaurant) <> ACTION::LookupOK then
+                    if Page.RunModal(0, Restaurant) <> Action::LookupOK then
                         Error('');
                     Rec.SetRange("Restaurant Code", Restaurant.Code);
                 end;
             Rec.SetRange("Line Status", Rec."Line Status"::"Ready for Serving", Rec."Line Status"::Planned);
         end;
-        CurrPage."Kitchen Stations".PAGE.SetViewMode(ViewMode);
+        CurrPage."Kitchen Stations".Page.SetViewMode(ViewMode);
     end;
 
     var

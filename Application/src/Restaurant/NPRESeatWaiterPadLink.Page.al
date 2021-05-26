@@ -4,8 +4,7 @@ page 6150662 "NPR NPRE Seat.: WaiterPadLink"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR NPRE Seat.: WaiterPadLink";
 
     layout

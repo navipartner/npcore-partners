@@ -34,15 +34,20 @@
                     Editable = false;
                     ToolTip = 'Specifies the value of the Seating Description field';
                 }
-                field("Number of Guests"; Rec."Number of Guests")
+                field("Assigned Waiter Code"; Rec."Assigned Waiter Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Number of Guests field';
+                    ToolTip = 'Specifies the waiter assigned to the waiterpad';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
+                }
+                field("Number of Guests"; Rec."Number of Guests")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Number of Guests field';
                 }
                 field(Status; Rec.Status)
                 {
@@ -340,7 +345,7 @@
         end;
     end;
 
-    local procedure LookupFlowStatus(StatusObjectType: Integer; var StatusCode: Code[10]): Boolean
+    local procedure LookupFlowStatus(StatusObjectType: Enum "NPR NPRE Status Object"; var StatusCode: Code[10]): Boolean
     var
         FlowStatus: Record "NPR NPRE Flow Status";
     begin

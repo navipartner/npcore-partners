@@ -15,12 +15,11 @@ table 6150674 "NPR NPRE Assigned Flow Status"
             Caption = 'Record ID';
             DataClassification = CustomerContent;
         }
-        field(3; "Flow Status Object"; Option)
+        field(3; "Flow Status Object"; Enum "NPR NPRE Status Object")
         {
             Caption = 'Flow Status Object';
             DataClassification = CustomerContent;
-            OptionCaption = ',,WaiterPadLineMealFlow';
-            OptionMembers = ,,WaiterPadLineMealFlow;
+            //OptionMembers = ,,WaiterPadLineMealFlow;
         }
         field(4; "Flow Status Code"; Code[10])
         {

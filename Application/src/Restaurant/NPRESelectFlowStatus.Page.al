@@ -71,16 +71,16 @@ page 6150633 "NPR NPRE Select Flow Status"
                 field(Color; Rec.Color)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the color of the status in restaurant view';
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Color field';
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the icon of the status in restaurant view';
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Icon Class field';
                 }
             }
         }

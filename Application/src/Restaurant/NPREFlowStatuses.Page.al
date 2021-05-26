@@ -58,17 +58,22 @@ page 6150679 "NPR NPRE Flow Statuses"
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Available in Front-End field';
+                    ToolTip = 'Specifies whether this status will be visible in restaurant view';
                 }
                 field(Color; Rec.Color)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Color field';
+                    ToolTip = 'Specifies the color of the status in restaurant view';
+                }
+                field("Status Color Priority"; Rec."Status Color Priority")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the priority this status''s color will take, when defining table colors in restaurant view. Higher number means higher priority';
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Icon Class field';
+                    ToolTip = 'Specifies the icon of the status in restaurant view';
                 }
             }
         }

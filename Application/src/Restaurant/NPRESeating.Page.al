@@ -60,11 +60,17 @@
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.CalcFields("Status Description FF");
+                    end;
                 }
                 field("Status Description FF"; Rec."Status Description FF")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    DrillDown = false;
                     ToolTip = 'Specifies the value of the Status Description field';
                 }
             }
