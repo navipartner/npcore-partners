@@ -159,4 +159,39 @@ table 6150665 "NPR NPRE Seating"
         DimMgt.SaveDefaultDim(DATABASE::"NPR NPRE Seating", Code, FieldNumber, ShortcutDimCode);
         Modify();
     end;
+
+    procedure RgbColorCodeHex(): Text
+    var
+        ColorTable: Record "NPR NPRE Color Table";
+        FlowStatus: Record "NPR NPRE Flow Status";
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        CurrentColorPriority: Integer;
+        HasBeenAssigned: Boolean;
+    begin
+        Clear(ColorTable);
+        CurrentColorPriority := 0;
+        HasBeenAssigned := false;
+        if FlowStatus.get(Status, FlowStatus."Status Object"::Seating) then begin
+            if ColorTable.Get(FlowStatus.Color) then;
+            CurrentColorPriority := FlowStatus."Status Color Priority";
+            HasBeenAssigned := true;
+        end;
+
+        SeatingWaiterPadLink.SetRange("Seating Code", Code);
+        SeatingWaiterPadLink.SetRange(Closed, false);
+        if SeatingWaiterPadLink.FindSet() then
+            repeat
+                if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then
+                    if FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow) then
+                        if (CurrentColorPriority < FlowStatus."Status Color Priority") or not HasBeenAssigned then begin
+                            CurrentColorPriority := FlowStatus."Status Color Priority";
+                            HasBeenAssigned := true;
+                            if not ColorTable.Get(FlowStatus.Color) then
+                                Clear(ColorTable);
+                        end;
+            until SeatingWaiterPadLink.Next() = 0;
+
+        exit(ColorTable."RGB Color Code (Hex)");
+    end;
 }

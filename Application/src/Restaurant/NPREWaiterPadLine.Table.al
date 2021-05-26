@@ -500,14 +500,14 @@
         exit(AssignedPrintCategory.Count());
     end;
 
-    procedure AssignedFlowStatusesAsString(StatusObject: Option): Text
+    procedure AssignedFlowStatusesAsString(StatusObject: Enum "NPR NPRE Status Object"): Text
     var
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
         exit(WaiterPadMgt.AssignedFlowStatusesAsFilterString(RecordId, StatusObject, AssignedFlowStatus));
     end;
 
-    procedure ShowFlowStatuses(StatusObject: Option)
+    procedure ShowFlowStatuses(StatusObject: Enum "NPR NPRE Status Object")
     var
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin

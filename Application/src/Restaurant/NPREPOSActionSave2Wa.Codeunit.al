@@ -99,7 +99,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
             'seatingInput':
                 OnActionSeatingInput(JSON, FrontEnd);
             'createNewWaiterPad':
-                OnActionCreateNewWaiterPad(JSON);
+                OnActionCreateNewWaiterPad(JSON, POSSession);
             'selectWaiterPad':
                 OnActionSelectWaiterPad(JSON, FrontEnd);
             'saveSale2Pad':
@@ -164,16 +164,20 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionCreateNewWaiterPad(JSON: Codeunit "NPR POS JSON Management")
+    local procedure OnActionCreateNewWaiterPad(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        SalePOS: Record "NPR POS Sale";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSale: Codeunit "NPR POS Sale";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        WaiterPadPOSMgt.FindSeating(JSON, Seating);
+        WaiterPadMgt.CreateNewWaiterPad(Seating.Code, SalePOS."NPRE Number of Guests", SalePOS."Salesperson Code", '', WaiterPad);
     end;
 
     local procedure OnActionSelectWaiterPad(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")

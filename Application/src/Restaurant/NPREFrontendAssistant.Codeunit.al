@@ -204,7 +204,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                                     WaiterPadContent.Add('caption', WaiterPad."No.");
                                 WaiterPadContent.Add('statusId', WaiterPad.Status);
                                 WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
-                                WaiterPadContent.Add('servingStepColor', 'yellow');
+                                WaiterPadContent.Add('servingStepColor', GetFlowStatusRgbColorHex(WaiterPad."Serving Step Code", 2));
                                 WaiterPadList.Add(WaiterPadContent);
                             until SeatingWaiterPadLink.Next() = 0;
                     until Seating.Next() = 0;
@@ -294,6 +294,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                                         ComponentContent.Add('blocked', Seating.Blocked);
                                         ComponentContent.Add('statusId', Seating.Status);
                                         ComponentContent.Add('capacity', Seating.Capacity);
+                                        ComponentContent.Add('color', Seating.RgbColorCodeHex());
                                     end;
                                 end else
                                     AddToList := true;
@@ -356,7 +357,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                     WaiterPadContent.Add('caption', WaiterPad."No.");
                 WaiterPadContent.Add('statusId', WaiterPad.Status);
                 WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
-                WaiterPadContent.Add('servingStepColor', 'yellow');
+                WaiterPadContent.Add('servingStepColor', GetFlowStatusRgbColorHex(WaiterPad."Serving Step Code", 2));
 
                 // links to tables
                 Clear(WaiterPadSeatingList);
@@ -484,5 +485,17 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                 StatusObjectContent.Add('icon', NPREFlowStatus."Icon Class");
                 StatusObjectList.Add(StatusObjectContent);
             until NPREFlowStatus.Next() = 0;
+    end;
+
+    local procedure GetFlowStatusRgbColorHex(StatusCode: Code[10]; StatusObject: Integer): Text
+    var
+        ColorTable: Record "NPR NPRE Color Table";
+        FlowStatus: Record "NPR NPRE Flow Status";
+    begin
+        if not FlowStatus.get(StatusCode, StatusObject) then
+            exit('');
+        if not ColorTable.get(FlowStatus.Color) then
+            ColorTable.Init();
+        exit(ColorTable."RGB Color Code (Hex)");
     end;
 }
