@@ -29,6 +29,7 @@ codeunit 6014468 "NPR UPG Item Group"
         TempItem: Record Item temporary;
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
     begin
+        Database.SelectLatestVersion();
         ItemGroup.Reset();
         if not ItemGroup.FindSet() then
             exit;
@@ -74,6 +75,7 @@ codeunit 6014468 "NPR UPG Item Group"
             CopyDefaultDimensions(ItemGroup, ItemCategory);
         until ItemGroup.Next() = 0;
 
+        ItemCategory.Reset();
         if ItemCategory.FindSet(true) then
             repeat
                 DoItemCategoryPresentation(ItemCategory);
@@ -115,6 +117,7 @@ codeunit 6014468 "NPR UPG Item Group"
     var
         Item: Record Item;
     begin
+        Database.SelectLatestVersion();
         Item.SetFilter("NPR Item Group", '<>%1', '');
         if not Item.FindSet(true) then
             exit;

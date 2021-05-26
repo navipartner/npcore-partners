@@ -64,8 +64,10 @@ codeunit 6150923 "NPR UPG Gift Voucher"
                         RetailVoucher.Init();
                         RetailVoucher.validate("Voucher Type", RetailVoucherType.Code);
                         RetailVoucher.Description := CopyStr(RetailVoucherDescLbl, 1, MaxStrLen(RetailVoucher.Description));
-                        RetailVoucher."Starting Date" := CreateDateTime(GiftVoucher."Issue Date", Time());
-                        RetailVoucher."Ending Date" := CreateDateTime(GiftVoucher."Expire Date", Time());
+                        if GiftVoucher."Issue Date" <> 0D then
+                            RetailVoucher."Starting Date" := CreateDateTime(GiftVoucher."Issue Date", Time());
+                        if GiftVoucher."Expire Date" <> 0D then
+                            RetailVoucher."Ending Date" := CreateDateTime(GiftVoucher."Expire Date", Time());
                         RetailVoucher."Reference No." := GiftVoucher."No.";
                         RetailVoucher."Customer No." := GiftVoucher."Customer No.";
                         RetailVoucher.Address := CopyStr(GiftVoucher.Address, 1, MaxStrLen(RetailVoucher.Address));
