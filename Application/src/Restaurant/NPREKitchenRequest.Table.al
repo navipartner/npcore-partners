@@ -290,7 +290,7 @@ table 6150678 "NPR NPRE Kitchen Request"
     begin
         KitchenReqSourceLink.SetCurrentKey("Request No.");
         KitchenReqSourceLink.SetRange("Request No.", Rec."Request No.");
-        if FindLast() then
+        if KitchenReqSourceLink.FindLast() then
             case KitchenReqSourceLink."Source Document Type" of
                 KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
                     begin

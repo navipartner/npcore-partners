@@ -3,8 +3,14 @@ codeunit 6014539 "NPR UPG Pos Menus"
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()
+    var
+        UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
         ReplaceItemAddonPOSAction();
+        if not UpgradeTagMgt.HasUpgradeTag(GetUpgradeTag()) then begin
+            AdjustSplitBillPOSActionParameters();
+            UpgradeTagMgt.SetUpgradeTag(GetUpgradeTag());
+        end;
     end;
 
     local procedure ReplaceItemAddonPOSAction()
@@ -46,5 +52,63 @@ codeunit 6014539 "NPR UPG Pos Menus"
                         ParamValue2.Modify();
                     end;
             until POSMenuButton.Next() = 0;
+    end;
+
+    local procedure AdjustSplitBillPOSActionParameters()
+    var
+        POSAction: Record "NPR POS Action";
+        POSMenuButton: Record "NPR POS Menu Button";
+        ParamValue: Record "NPR POS Parameter Value";
+        ParamValueTmp: Record "NPR POS Parameter Value" temporary;
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+    begin
+        if not ParamValueTmp.IsTemporary then
+            exit;
+        if not POSAction.Get('SPLIT_BILL') then
+            exit;
+        POSMenuButton.SetRange("Action Type", POSMenuButton."Action Type"::Action);
+        POSMenuButton.SetRange("Action Code", POSAction.Code);
+        if POSMenuButton.FindSet() then
+            repeat
+                ParamValueTmp.DeleteAll();
+                ParamValue.SetRange("Table No.", Database::"NPR POS Menu Button");
+                ParamValue.SetRange(Code, POSMenuButton."Menu Code");
+                ParamValue.SetRange("Record ID", POSMenuButton.RecordId);
+                ParamValue.SetRange(ID, POSMenuButton.ID);
+                if ParamValue.FindSet() then
+                    repeat
+                        ParamValueTmp := ParamValue;
+                        ParamValueTmp.Insert();
+                    until ParamValue.Next() = 0;
+
+                ParamMgt.ClearParametersForRecord(POSMenuButton.RecordId, 0);
+                ParamMgt.CopyFromActionToMenuButton(POSMenuButton."Action Code", POSMenuButton);
+
+                if ParamValueTmp.FindSet() then
+                    repeat
+                        ParamValue := ParamValueTmp;
+                        case ParamValueTmp.Name of
+                            'InputType':
+                                ParamValue.Name := 'SeatingSelectionMethod';
+                            'FixedSeatingCode':
+                                ParamValue.Name := 'SeatingCode';
+                        end;
+                        if ParamValue.Find() then begin
+                            ParamValue.Value := ParamValueTmp.Value;
+                            ParamValue.Modify();
+                        end;
+                    until ParamValueTmp.Next() = 0;
+            until POSMenuButton.Next() = 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerCompanyUpgradeTags', '', false, false)]
+    local procedure OnGetPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]]);
+    begin
+        PerCompanyUpgradeTags.Add(GetUpgradeTag());
+    end;
+
+    procedure GetUpgradeTag(): Text
+    begin
+        exit(CopyStr(CompanyName() + ' NPRSplitBillActionToWF2 ' + Format(Today(), 0, 9), 1, 250));
     end;
 }

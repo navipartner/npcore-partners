@@ -13,12 +13,10 @@ table 6150664 "NPR NPRE Flow Status"
             DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(2; "Status Object"; Option)
+        field(2; "Status Object"; Enum "NPR NPRE Status Object")
         {
             Caption = 'Status Object';
             DataClassification = CustomerContent;
-            OptionCaption = 'Seating,Waiter Pad,Waiter Pad Line Meal Flow,Waiter Pad Line Status';
-            OptionMembers = Seating,WaiterPad,WaiterPadLineMealFlow,WaiterPadLineStatus;
             trigger OnValidate()
             begin
                 IF "Status Object" <> "Status Object"::WaiterPadLineMealFlow THEN
@@ -40,6 +38,7 @@ table 6150664 "NPR NPRE Flow Status"
             Caption = 'Waiter Pad Status Code';
             DataClassification = CustomerContent;
             TableRelation = if ("Status Object" = CONST(WaiterPadLineMealFlow)) "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPad));
+
             trigger OnValidate()
             begin
                 if "Waiter Pad Status Code" <> '' then
@@ -56,6 +55,12 @@ table 6150664 "NPR NPRE Flow Status"
             Caption = 'Color';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Color Table".Description;
+        }
+        field(105; "Status Color Priority"; Integer)
+        {
+            Caption = 'Status Color Priority';
+            DataClassification = CustomerContent;
+            MinValue = 0;
         }
         field(110; "Icon Class"; Text[30])
         {

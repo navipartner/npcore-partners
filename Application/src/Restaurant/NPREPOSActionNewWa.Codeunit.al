@@ -7,7 +7,6 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         Text003: Label 'Open new waiter pad?';
         Text004: Label 'New Waiter Pad';
         NumberOfGuestsLbl: Label 'Number of guests';
-        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -119,14 +118,14 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
     local procedure OnActionSeatingInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         ConfirmString: Text;
     begin
-        NPREWaiterPadPOSManagement.FindSeating(JSON, NPRESeating);
+        WaiterPadPOSManagement.FindSeating(JSON, Seating);
 
-        JSON.SetContext('seatingCode', NPRESeating.Code);
-        ConfirmString := GetConfirmString(NPRESeating);
+        JSON.SetContext('seatingCode', Seating.Code);
+        ConfirmString := GetConfirmString(Seating);
         if ConfirmString <> '' then
             JSON.SetContext('confirmString', ConfirmString);
 
@@ -141,9 +140,8 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
     local procedure OnActionNewWaiterPad(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         WaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
@@ -151,20 +149,20 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         SeatingCode: Code[20];
         NumberOfGuests: Integer;
         OpenWaiterPad: Boolean;
+        NoSeatingInContextErr: Label 'SeatingCode was not found in context';
     begin
-        SeatingCode := JSON.GetStringOrFail('seatingCode', StrSubstNo(ReadingErr, ActionCode()));
+        SeatingCode := JSON.GetStringOrFail('seatingCode', NoSeatingInContextErr);
         NumberOfGuests := JSON.GetInteger('numberOfGuests');
-        NPRESeating.Get(SeatingCode);
-
-        WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
-        NPREWaiterPad."Number of Guests" := NumberOfGuests;
-        NPREWaiterPad.Modify();
+        Seating.Get(SeatingCode);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
+
+        WaiterPadMgt.CreateNewWaiterPad(Seating.Code, NumberOfGuests, SalePOS."Salesperson Code", '', WaiterPad);
+
         SalePOS.Find();
         SalePOS."NPRE Number of Guests" := NumberOfGuests;
-        SalePOS."NPRE Pre-Set Waiter Pad No." := NPREWaiterPad."No.";
+        SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
         SalePOS.Validate("NPRE Pre-Set Seating Code", SeatingCode);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
@@ -172,11 +170,11 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         Commit();
 
         if OpenWaiterPad then begin
-            WaiterPadPOSManagement.UIShowWaiterPad(NPREWaiterPad);
+            WaiterPadPOSManagement.UIShowWaiterPad(WaiterPad);
             exit;
         end;
 
-        JSON.SetContext('actionMessage', StrSubstNo(Text002, NPRESeating.Description));
+        JSON.SetContext('actionMessage', StrSubstNo(Text002, Seating.Description));
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
@@ -203,26 +201,26 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
     local procedure GetConfirmString(NPRESeating: Record "NPR NPRE Seating") ConfirmString: Text
     var
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        NPRESeatingWaiterPadLink.SetCurrentKey(Closed);
-        NPRESeatingWaiterPadLink.SetRange(Closed, false);
-        NPRESeatingWaiterPadLink.SetRange("Seating Code", NPRESeating.Code);
-        if NPRESeatingWaiterPadLink.IsEmpty then
+        SeatingWaiterPadLink.SetCurrentKey(Closed);
+        SeatingWaiterPadLink.SetRange(Closed, false);
+        SeatingWaiterPadLink.SetRange("Seating Code", NPRESeating.Code);
+        if SeatingWaiterPadLink.IsEmpty then
             exit('');
 
-        NPRESeatingWaiterPadLink.FindSet();
+        SeatingWaiterPadLink.FindSet();
         ConfirmString := StrSubstNo(Text001, NPRESeating.Code);
         ConfirmString += '\';
         repeat
-            if NPREWaiterPad.Get(NPRESeatingWaiterPadLink."Waiter Pad No.") then
-                ConfirmString += '\  - ' + NPREWaiterPad."No.";
-            ConfirmString += ' ' + Format(NPREWaiterPad."Start Date");
-            ConfirmString += ' ' + Format(NPREWaiterPad."Start Time");
-            if NPREWaiterPad.Description <> '' then
-                ConfirmString += ' ' + NPREWaiterPad.Description;
-        until NPRESeatingWaiterPadLink.Next() = 0;
+            if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then
+                ConfirmString += '\  - ' + WaiterPad."No.";
+            ConfirmString += ' ' + Format(WaiterPad."Start Date");
+            ConfirmString += ' ' + Format(WaiterPad."Start Time");
+            if WaiterPad.Description <> '' then
+                ConfirmString += ' ' + WaiterPad.Description;
+        until SeatingWaiterPadLink.Next() = 0;
 
         exit(ConfirmString);
     end;
@@ -262,33 +260,39 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         DataSource.AddColumn('TableStatus', 'Seating (table) status', DataType::String, true);
         DataSource.AddColumn('WPadStatus', 'Waiter pad status', DataType::String, true);
         DataSource.AddColumn('MealFlowStatus', 'Meal flow status', DataType::String, true);
+        DataSource.AddColumn('AssignedWaiter', 'Assigned Waiter', DataType::String, true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalePOS: Record "NPR POS Sale";
+        Salesperson: Record "Salesperson/Purchaser";
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
-        POSSale: Codeunit "NPR POS Sale";
     begin
         if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
 
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
+        if RecRef.Number <> Database::"NPR POS Sale" then
+            exit;
+
+        RecRef.SetTable(SalePOS);
 
         if Seating.Get(SalePOS."NPRE Pre-Set Seating Code") then
             Seating.CalcFields("Status Description FF")
         else
             Seating.Init();
+
         if WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.") then
             WaiterPad.CalcFields("Status Description FF", "Serving Step Description")
         else
             WaiterPad.Init();
 
+        if not Salesperson.get(WaiterPad."Assigned Waiter Code") then
+            Salesperson.Init();
 
         DataRow.Add('TableNo', SalePOS."NPRE Pre-Set Seating Code");
         DataRow.Add('WaiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
@@ -296,5 +300,6 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         DataRow.Add('TableStatus', Seating."Status Description FF");
         DataRow.Add('WPadStatus', WaiterPad."Status Description FF");
         DataRow.Add('MealFlowStatus', WaiterPad."Serving Step Description");
+        DataRow.Add('AssignedWaiter', StrSubstNo('%1 %2', WaiterPad."Assigned Waiter Code", Salesperson.Name));
     end;
 }

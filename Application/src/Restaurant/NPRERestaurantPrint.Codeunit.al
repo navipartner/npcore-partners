@@ -565,7 +565,7 @@
             PrintCategoryTmp.Insert();
     end;
 
-    procedure InitTempFlowStatusList(var FlowStatusTmp: Record "NPR NPRE Flow Status"; StatusObject: Option)
+    procedure InitTempFlowStatusList(var FlowStatusTmp: Record "NPR NPRE Flow Status"; StatusObject: Enum "NPR NPRE Status Object")
     var
         FlowStatus: Record "NPR NPRE Flow Status";
     begin

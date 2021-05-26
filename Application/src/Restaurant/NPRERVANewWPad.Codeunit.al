@@ -49,11 +49,11 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         SalePOS: Record "NPR POS Sale";
         NPREFrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
         POSSale: Codeunit "NPR POS Sale";
+        Setup: Codeunit "NPR POS Setup";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         SeatingCode: Code[20];
         Description: Text;
@@ -71,10 +71,8 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         if not Evaluate(NumberOfGuests, GetConfigurableOption(Context, 'waiterpadInfo', 'guests')) then
             NumberOfGuests := 1;
 
-        WaiterPadMgt.AddNewWaiterPadForSeating(Seating.Code, WaiterPad, SeatingWaiterPadLink);
-        WaiterPad."Number of Guests" := NumberOfGuests;
-        WaiterPad.Description := CopyStr(Description, 1, MaxStrLen(WaiterPad.Description));
-        WaiterPad.Modify();
+        POSSession.GetSetup(Setup);
+        WaiterPadMgt.CreateNewWaiterPad(Seating.Code, NumberOfGuests, Setup.Salesperson(), Description, WaiterPad);
 
         SeatingLocation.Get(Seating."Seating Location");
         NPREFrontendAssistant.RefreshWaiterPadData(POSSession, FrontEnd, SeatingLocation."Restaurant Code", '');
