@@ -203,7 +203,6 @@
         repeat
             if TempSaleLinePOS."Discount Calculated" or RecalculateAllLines then begin
                 TempSaleLinePOS."Discount Calculated" := false;
-                TempSaleLinePOS.UpdateAmounts(TempSaleLinePOS);
                 if SaleLinePOS.Get(TempSaleLinePOS."Register No.", TempSaleLinePOS."Sales Ticket No.", TempSaleLinePOS.Date, TempSaleLinePOS."Sale Type", TempSaleLinePOS."Line No.") then begin
                     if (SaleLinePOS."Discount Type" <> TempSaleLinePOS."Discount Type")
                         or (SaleLinePOS."Discount %" <> TempSaleLinePOS."Discount %")
@@ -215,8 +214,10 @@
                 end else begin
                     SaleLinePOS.Init();
                     SaleLinePOS := TempSaleLinePOS;
-                    SaleLinePOS.Insert(false, true);
+                    SaleLinePOS.Insert(false);
                 end;
+                TempSaleLinePOS.Delete();
+                SaleLinePOS.UpdateAmounts(SaleLinePOS);
 
                 SaleLinePOS.CreateDim(
                   NPRDimMgt.TypeToTableNPR(SaleLinePOS.Type), SaleLinePOS."No.",
@@ -323,9 +324,6 @@
                 TempSaleLinePOS."MR Anvendt antal" := 0;
                 TempSaleLinePOS."Custom Disc Blocked" := false;
                 TempSaleLinePOS.Insert();
-                if (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::" ") or (SaleLinePOS."Discount %" <> 0) then
-                    TempSaleLinePOS.UpdateLineVatAmounts(TempSaleLinePOS);
-                TempSaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
     end;
 
