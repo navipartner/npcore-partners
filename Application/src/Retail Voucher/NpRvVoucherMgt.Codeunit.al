@@ -663,6 +663,8 @@
     var
         ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
     begin
+        SelectLatestVersion();
+
         ArchVoucherEntry.Init();
         ArchVoucherEntry."Entry No." := 0;
         ArchVoucherEntry."Original Entry No." := VoucherEntry."Entry No.";

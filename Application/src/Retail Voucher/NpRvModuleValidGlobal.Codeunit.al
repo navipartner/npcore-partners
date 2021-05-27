@@ -5,6 +5,11 @@
         Text001: Label 'Voucher is being used';
         Text005: Label 'Invalid Reference No. %1';
 
+        ErrorXmlDoc: XmlDocument;
+        ErrorXmlElement: XmlElement;
+        ErrorXmlNode: XmlNode;
+        XmlDOMMgt: codeunit "XML DOM Management";
+
     [EventSubscriber(ObjectType::Table, 6151024, 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertPartner(var Rec: Record "NPR NpRv Partner"; RunTrigger: Boolean)
     begin
@@ -50,6 +55,7 @@
         Node: XmlNode;
         RequestXmlText: Text;
         ErrorMessage: Text;
+        ResponseText: Text;
     begin
         NpRvVoucherType.Get(NpRvGlobalVoucherSetup."Voucher Type");
         if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
@@ -94,8 +100,14 @@
         Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
         Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
 
-        if not Response.IsSuccessStatusCode() then
-            Error(Response.ReasonPhrase);
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
@@ -179,6 +191,7 @@
         Document: XmlDocument;
         RequestXmlText: Text;
         ErrorMessage: Text;
+        ResponseText: Text;
     begin
         if not NpRvVoucherType.Get(NpRvSaleLinePOSVoucher."Voucher Type") then
             exit;
@@ -222,8 +235,14 @@
         Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
         Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
 
-        if not Response.IsSuccessStatusCode() then
-            Error(Response.ReasonPhrase);
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6151014, 'OnAfterInsertEvent', '', true, true)]
@@ -276,6 +295,7 @@
         Document: XmlDocument;
         RequestXmlText: Text;
         ErrorMessage: Text;
+        ResponseText: Text;
     begin
         Voucher.CalcFields("Validate Voucher Module");
         if Voucher."Validate Voucher Module" <> ModuleCode() then
@@ -335,8 +355,14 @@
         Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
         Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
 
-        if not Response.IsSuccessStatusCode() then
-            Error(Response.ReasonPhrase);
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+        end;
     end;
 
     procedure ReserveVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
@@ -408,8 +434,14 @@
         Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
         Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
 
-        if not Response.IsSuccessStatusCode() then
-            Error(Response.ReasonPhrase);
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+        end;
 
         Response.Content.ReadAs(ResponseText);
         ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
@@ -482,6 +514,7 @@
         Document: XmlDocument;
         RequestXmlText: Text;
         ErrorMessage: Text;
+        ResponseText: Text;
     begin
         if VoucherEntry."Entry Type" <> VoucherEntry."Entry Type"::Payment then
             exit;
@@ -528,8 +561,14 @@
         Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
         Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
 
-        if not Response.IsSuccessStatusCode() then
-            Error(Response.ReasonPhrase);
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+        end;
     end;
 
     procedure RedeemPartnerVouchers(NpRvVoucherEntry: Record "NPR NpRv Voucher Entry")
@@ -550,6 +589,7 @@
         Document: XmlDocument;
         RequestXmlText: Text;
         ErrorMessage: Text;
+        ResponseText: Text;
     begin
         if not (NpRvVoucherEntry."Entry Type" in [NpRvVoucherEntry."Entry Type"::Payment, NpRvVoucherEntry."Entry Type"::"Partner Payment"]) then
             exit;
@@ -605,8 +645,14 @@
         Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
         Client.Post(NpRvPartner."Service Url", RequestContent, Response);
 
-        if not Response.IsSuccessStatusCode() then
-            Error(Response.ReasonPhrase);
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDOMMgt.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
+            ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
+            ErrorXmlElement := ErrorXmlNode.AsXmlElement();
+            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+        end;
     end;
 
     local procedure CurrCodeunitId(): Integer
