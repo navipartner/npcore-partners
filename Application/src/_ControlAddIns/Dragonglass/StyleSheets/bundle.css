@@ -9941,7 +9941,7 @@ body {
       width: fit-content;
       width: 100%; }
       .counting-backdrop .counting .inline-property--disabled {
-        background: unset; }
+        background: var(--color-secondary-200); }
       .counting-backdrop .counting .inline-property--focused {
         border-color: var(--color-primary-100);
         box-shadow: none; }
@@ -10201,12 +10201,7 @@ body {
     transition: all 0.3s ease-in-out;
     align-items: center; }
     .counting .counting-numpad .button--secondary {
-      background: transparent;
-      border: 2px solid var(--color-primary-100);
-      color: var(--color-text-100);
-      box-shadow: none; }
-      .counting .counting-numpad .button--secondary:hover {
-        border-color: var(--color-primary-200); }
+      background: var(--color-primary-400); }
     .counting .counting-numpad .button--transparent {
       background: transparent;
       color: var(--color-primary-300);
