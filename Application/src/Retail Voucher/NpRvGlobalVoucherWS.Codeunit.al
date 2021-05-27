@@ -260,9 +260,12 @@
             RedeemVoucher(NpRvVoucherBuffer);
         until NpRvVoucherBuffer.Next() = 0;
 
+        Commit();
+
         NpRvVoucherBuffer.FindSet();
         repeat
             InvokeRedeemPartnerVouchers(NpRvVoucherBuffer);
+            SelectLatestVersion();
         until NpRvVoucherBuffer.Next() = 0;
     end;
 
@@ -334,6 +337,7 @@
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
+        RequesHeader: HttpHeaders;
         Response: HttpResponseMessage;
         Document: XmlDocument;
         Node: XmlNode;
@@ -373,14 +377,18 @@
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
         ContentHeader.Add('SOAPAction', 'RedeemPartnerVouchers');
-        ContentHeader.Remove('Connection');
+
+        RequesHeader := Client.DefaultRequestHeaders();
+        if RequesHeader.Contains('Connection') then
+            ContentHeader.Remove('Connection');
+
         ContentHeader := Client.DefaultRequestHeaders();
 
         Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
         Client.Post(NpRvPartner."Service Url", RequestContent, Response);
 
         if not Response.IsSuccessStatusCode then begin
-            ErrorMessage := Response.ReasonPhrase;
+            Response.Content.ReadAs(ErrorMessage);
             if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
                     ErrorMessage := Node.AsXmlElement().InnerText();
@@ -441,10 +449,10 @@
         NpRvVoucherEntry.Insert();
 
         NpRvVoucherMgt.ApplyEntry(NpRvVoucherEntry);
+
         NpRvVoucher.CalcFields(Open);
         if not NpRvVoucher.Open then
             NpRvVoucherMgt.ArchiveVouchers(NpRvVoucher);
-
         InUseQty := NpRvVoucher.CalcInUseQty();
         if InUseQty > 0 then begin
             NpRvSalesLine.SetRange("Register No.", NpRvVoucherBuffer."Redeem Register No.");
