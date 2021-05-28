@@ -1,8 +1,5 @@
 ﻿codeunit 6060071 "NPR Map Incom. Item Lines"
 {
-    // NPR5.27/BR /20160924 CASE 252817 New Object created based on Codeunit 1218
-    // NPR5.29/BR /20161124 CASE 259274 Updated to reflect upgrade to NAV 2017 in Codeunit 1218
-    // NPR5.50/ZESO/20190430 CASE 353383 Rename function GetValue to GetValue2 to avoid compilation issue in BC
 
     Permissions = TableData "Data Exch." = rimd,
                   TableData "Data Exch. Field" = rimd;
@@ -13,7 +10,7 @@
         ErrorMessage: Record "Error Message";
         IncomingDocument: Record "Incoming Document";
     begin
-        IncomingDocument.Get("Incoming Entry No.");
+        IncomingDocument.Get(Rec."Incoming Entry No.");
 
         ErrorMessage.SetContext(IncomingDocument);
         if ErrorMessage.HasErrors(false) then

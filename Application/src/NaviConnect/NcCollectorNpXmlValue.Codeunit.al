@@ -6,7 +6,7 @@
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        NpXmlTemplate.Get("Xml Template Code");
+        NpXmlTemplate.Get(Rec."Xml Template Code");
         if NpXmlTemplate."Table No." = DATABASE::"NPR Nc Collection" then begin
             SetBufferCollectionToProcessed(Rec);
         end;

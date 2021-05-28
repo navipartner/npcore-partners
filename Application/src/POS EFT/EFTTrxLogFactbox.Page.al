@@ -24,7 +24,7 @@ page 6184473 "NPR EFT Trx Log Factbox"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logged At field';
                 }
-                field("Log.HASVALUE"; Log.HasValue)
+                field("Log.HASVALUE"; Rec.Log.HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Has Log File';
@@ -54,10 +54,10 @@ page 6184473 "NPR EFT Trx Log Factbox"
                     InStream: InStream;
                     FileName: Text;
                 begin
-                    if not Log.HasValue() then
+                    if not Rec.Log.HasValue() then
                         exit;
                     Rec.CalcFields(Log);
-                    Log.CreateInStream(InStream);
+                    Rec.Log.CreateInStream(InStream);
                     FileName := StrSubstNo('EFT_Log_%1_%2', Rec."Transaction Entry No.", Rec."Log Entry No.");
                     DownloadFromStream(InStream, 'Log Download', '', 'All Files (*.*)|*.*', FileName);
                 end;

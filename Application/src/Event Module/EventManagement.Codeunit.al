@@ -553,21 +553,19 @@
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
         JobPlanningLineInvoice2: Record "Job Planning Line Invoice";
     begin
-        with JobPlanningLineInvoice do begin
-            SetRange("NPR POS Unit No.", POSQuoteEntry."Register No.");
-            SetRange("NPR POS Store Code", SalePOS."POS Store Code");
-            if not JobPlanningLineInvoiceExists(DATABASE::"NPR POS Sale", Enum::"Sales Document Type".FromInteger(0), POSQuoteEntry."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
-                exit;
-            if FindSet() then
-                repeat
-                    JobPlanningLineInvoice2.Get("Job No.", "Job Task No.", "Job Planning Line No.", "Document Type", "Document No.", "Line No.");
-                    JobPlanningLineInvoice2.Delete(true);
-                    JobPlanningLineInvoice2."Document No." := SalePOS."Sales Ticket No.";
-                    JobPlanningLineInvoice2."NPR POS Unit No." := SalePOS."Register No.";
-                    JobPlanningLineInvoice2."NPR POS Store Code" := SalePOS."POS Store Code";
-                    JobPlanningLineInvoice2.Insert(true);
-                until Next() = 0;
-        end;
+        JobPlanningLineInvoice.SetRange("NPR POS Unit No.", POSQuoteEntry."Register No.");
+        JobPlanningLineInvoice.SetRange("NPR POS Store Code", SalePOS."POS Store Code");
+        if not JobPlanningLineInvoiceExists(DATABASE::"NPR POS Sale", Enum::"Sales Document Type".FromInteger(0), POSQuoteEntry."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType) then
+            exit;
+        if JobPlanningLineInvoice.FindSet() then
+            repeat
+                JobPlanningLineInvoice2.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.", JobPlanningLineInvoice."Document Type", JobPlanningLineInvoice."Document No.", JobPlanningLineInvoice."Line No.");
+                JobPlanningLineInvoice2.Delete(true);
+                JobPlanningLineInvoice2."Document No." := SalePOS."Sales Ticket No.";
+                JobPlanningLineInvoice2."NPR POS Unit No." := SalePOS."Register No.";
+                JobPlanningLineInvoice2."NPR POS Store Code" := SalePOS."POS Store Code";
+                JobPlanningLineInvoice2.Insert(true);
+            until JobPlanningLineInvoice.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Page, 463, 'OnAfterActionEvent', 'NPR SetStatusToBlockEventDelete', true, true)]
@@ -1343,7 +1341,7 @@
         ShortcutDimCode2: Code[20];
         DimSetID: Integer;
 #if not BC17
-        OrdinalValue : Integer;
+        OrdinalValue: Integer;
 #endif
     begin
         JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
@@ -1450,9 +1448,9 @@
 #if BC17
                     JobJnlLine."Line Type" := JobPlanningLine."Line Type" + 1;
 #else
-                        OrdinalValue := JobPlanningLine."Line Type".AsInteger();
-                        OrdinalValue := OrdinalValue + 1;
-                        JobJnlLine."Line Type" := "Job Line Type".FromInteger(OrdinalValue);
+                    OrdinalValue := JobPlanningLine."Line Type".AsInteger();
+                    OrdinalValue := OrdinalValue + 1;
+                    JobJnlLine."Line Type" := "Job Line Type".FromInteger(OrdinalValue);
 #endif
                     JobJnlLine."Source Code" := SourceCodeSetup.Sales;
                 end;

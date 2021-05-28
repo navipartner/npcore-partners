@@ -13,11 +13,11 @@ codeunit 6060050 "NPR NpXml Value Item Worksh."
         Item: Record Item;
         GLSetup: Record "General Ledger Setup";
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
         if not RecRef.Find() then
             exit;
 
@@ -54,9 +54,9 @@ codeunit 6060050 "NPR NpXml Value Item Worksh."
 
         Clear(RecRef);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify();
+        Rec.Modify();
     end;
 
     var

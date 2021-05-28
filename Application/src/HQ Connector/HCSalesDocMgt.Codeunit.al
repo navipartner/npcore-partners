@@ -6,7 +6,7 @@
     var
         Document: XmlDocument;
     begin
-        if LoadXmlDoc(Document) then
+        if Rec.LoadXmlDoc(Document) then
             UpdateSales(Document);
     end;
 

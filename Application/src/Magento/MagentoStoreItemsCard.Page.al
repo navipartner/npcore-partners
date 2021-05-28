@@ -170,7 +170,7 @@ page 6014425 "NPR Magento Store Items Card"
                 }
                 grid(WebshopDescriptionGrid)
                 {
-                    field("FORMAT(""Webshop Description"".HASVALUE)"; Format("Webshop Description".HasValue))
+                    field("FORMAT(""Webshop Description"".HASVALUE)"; Format(Rec."Webshop Description".HasValue()))
                     {
                         ApplicationArea = All;
                         Caption = 'Description';
@@ -201,7 +201,7 @@ page 6014425 "NPR Magento Store Items Card"
 
                 grid(WebshopShortDescGrid)
                 {
-                    field("FORMAT(""Webshop Short Desc."".HASVALUE)"; Format("Webshop Short Desc.".HasValue))
+                    field("FORMAT(""Webshop Short Desc."".HASVALUE)"; Format(Rec."Webshop Short Desc.".HasValue()))
                     {
                         ApplicationArea = All;
                         Caption = 'Short Description';
@@ -249,7 +249,7 @@ page 6014425 "NPR Magento Store Items Card"
                 }
                 grid(DisplayOnlyTextGrid)
                 {
-                    field("Display Only Text"; "Display Only Text")
+                    field("Display Only Text"; Rec."Display Only Text")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Display Only Text field';

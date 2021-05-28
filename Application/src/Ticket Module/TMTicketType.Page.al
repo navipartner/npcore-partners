@@ -220,9 +220,9 @@ page 6059784 "NPR TM Ticket Type"
                     TemplateOutStream: outstream;
                 begin
                     Rec.CalcFields("eTicket Template");
-                    if (not "eTicket Template".HasValue()) then begin
+                    if (not Rec."eTicket Template".HasValue()) then begin
                         PassData := TicketRequestManager.GetDefaultTemplate();
-                        "eTicket Template".CreateOutStream(TemplateOutStream);
+                        Rec."eTicket Template".CreateOutStream(TemplateOutStream);
                         TemplateOutStream.Write(PassData);
                         Rec.Modify();
                         Rec.CalcFields("eTicket Template");

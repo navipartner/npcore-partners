@@ -93,7 +93,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Passes API field';
                 }
-                field("""PUT Passes Template"".HASVALUE()"; "PUT Passes Template".HasValue())
+                field("""PUT Passes Template"".HASVALUE()"; Rec."PUT Passes Template".HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Have Template';
@@ -188,9 +188,9 @@ page 6060142 "NPR MM Member Notific. Setup"
                     TemplateOutStream: outstream;
                 begin
                     Rec.CalcFields("PUT Passes Template");
-                    if (not "PUT Passes Template".HasValue()) then begin
+                    if (not Rec."PUT Passes Template".HasValue()) then begin
                         PassData := MemberNotification.GetDefaultWalletTemplate();
-                        "PUT Passes Template".CreateOutStream(TemplateOutStream);
+                        Rec."PUT Passes Template".CreateOutStream(TemplateOutStream);
                         TemplateOutStream.Write(PassData);
                         Rec.Modify();
                         Rec.CalcFields("PUT Passes Template");
