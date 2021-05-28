@@ -431,7 +431,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
 
     trigger OnAfterGetCurrRecord()
     begin
-        HasCallback := "Callback Data".HasValue;
+        HasCallback := Rec."Callback Data".HasValue();
     end;
 
     var

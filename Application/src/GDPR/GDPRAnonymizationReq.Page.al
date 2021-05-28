@@ -147,7 +147,7 @@
                                     GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
                                     GDPRAnonymizationRequest.Modify();
                                 end else begin
-                                    Reason := 'Customer not found.';
+                                    Rec.Reason := 'Customer not found.';
                                     GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
                                     GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
                                     GDPRAnonymizationRequest.Modify();

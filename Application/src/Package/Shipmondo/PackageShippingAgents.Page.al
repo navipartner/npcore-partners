@@ -17,7 +17,7 @@ page 6014569 "NPR Package Shipping Agents"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
@@ -32,12 +32,12 @@ page 6014569 "NPR Package Shipping Agents"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Automatic Drop Point Service field';
                 }
-                field("Email Mandatory"; "Email Mandatory")
+                field("Email Mandatory"; Rec."Email Mandatory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies if the E-mail is mandatory';
                 }
-                field("Phone Mandatory"; "Phone Mandatory")
+                field("Phone Mandatory"; Rec."Phone Mandatory")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies if the Phone Number is mandatory';

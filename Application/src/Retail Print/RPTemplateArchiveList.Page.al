@@ -40,7 +40,7 @@ page 6014631 "NPR RP Template Archive List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version Comments field';
                 }
-                field("Template.HASVALUE"; Template.HasValue)
+                field("Template.HASVALUE"; Rec.Template.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Archived Data';

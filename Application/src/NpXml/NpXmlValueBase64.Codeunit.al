@@ -9,11 +9,11 @@ codeunit 6151560 "NPR NpXml Value Base64"
         CustomValue: Text;
         OutStr: OutStream;
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
         if not RecRef.Find() then
             exit;
 
@@ -22,9 +22,9 @@ codeunit 6151560 "NPR NpXml Value Base64"
 
         Clear(RecRef);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify();
+        Rec.Modify();
     end;
 
     local procedure GetBase64(RecRef: RecordRef; FieldNo: Integer) Value: Text

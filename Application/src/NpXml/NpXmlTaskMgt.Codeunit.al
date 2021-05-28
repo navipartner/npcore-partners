@@ -12,40 +12,40 @@ codeunit 6151550 "NPR NpXml Task Mgt."
         PrevRecRef: RecordRef;
         ProcessComplete: Boolean;
     begin
-        TaskProcessor.Get("Task Processor Code");
+        TaskProcessor.Get(Rec."Task Processor Code");
         NpXmlTriggerMgt.ResetOutput();
         Clear(RecRef);
         Clear(PrevRecRef);
-        NcTaskMgt.RestoreRecord("Entry No.", PrevRecRef);
+        NcTaskMgt.RestoreRecord(Rec."Entry No.", PrevRecRef);
         ProcessComplete := true;
-        case Type of
-            Type::Insert:
+        case Rec.Type of
+            Rec.Type::Insert:
                 begin
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
                         NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, false, false, UniqueTaskBuffer);
                         ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;
-            Type::Modify:
+            Rec.Type::Modify:
                 begin
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
                         NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, false, true, false, UniqueTaskBuffer);
                         ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;
-            Type::Delete:
+            Rec.Type::Delete:
                 begin
                     RecRef2 := PrevRecRef.Duplicate();
-                    if NcTaskMgt.RecExists(RecRef2, "Company Name") then
+                    if NcTaskMgt.RecExists(RecRef2, Rec."Company Name") then
                         RecRef2.Find();
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
                     ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                 end;
-            Type::Rename:
+            Rec.Type::Rename:
                 begin
                     RecRef2 := PrevRecRef.Duplicate();
-                    if NcTaskMgt.RecExists(RecRef2, "Company Name") then
+                    if NcTaskMgt.RecExists(RecRef2, Rec."Company Name") then
                         RecRef2.Find();
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);

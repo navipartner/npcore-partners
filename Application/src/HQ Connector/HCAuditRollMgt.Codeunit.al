@@ -6,7 +6,7 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
     var
         Document: XmlDocument;
     begin
-        if LoadXmlDoc(Document) then
+        if Rec.LoadXmlDoc(Document) then
             UpdateAuditRolls(Document);
     end;
 
