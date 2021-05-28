@@ -62,7 +62,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                     ImportGetMembershipMembers(XmlDoc, Rec."Document ID"); // Same as GetMembershipMembers
 
                 'CreateWalletMemberPass':
-                    CreateWallet(XmlDoc, "Document ID");
+                    CreateWallet(XmlDoc, Rec."Document ID");
 
                 'GetSetAutoRenewOption':
                     ; // Do nothing, handled by xmlport
@@ -70,7 +70,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                     ; // Do nothing, handled by xmlport */
 
                 else
-                    Error(MISSING_CASE, "Import Type", FunctionName);
+                    Error(MISSING_CASE, Rec."Import Type", FunctionName);
             end;
 
         end;

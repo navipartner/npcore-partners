@@ -1,14 +1,5 @@
 codeunit 6059903 "NPR Task Queue Execute"
 {
-    // TQ1.15/JDH /20140909 CASE 179044 Reports can be executed without a printer setup
-    // TQ1.18/JDH /20141126 CASE 198170 Fix object reference for call of function taskgenerateoutput (no code changes)
-    // TQ1.21/JDH /20141219 CASE 202183 added functionality for disabling of file logging (added to save HD space)
-    // TQ1.24/JDH /20150320 CASE 209090 Possible to set the language on the task line
-    // TQ1.27/MH  /20150409 CASE 210797 NPR8.00 specific version due to changed parameters for REPORT.SAVEXML
-    // TQ1.28/MHA /20151216 CASE 229609 Task Queue
-    // TQ1.29/JDH /20161101 CASE 242044 Possible to run with requestpage setting from Blob field + cleanup of unused vars
-    // NPR5.29/MHA /20161221  CASE 258841 Updated Parameters for REPORT.SAVEASHTML to match with NAV2017
-
     TableNo = "NPR Task Line";
 
     trigger OnRun()
@@ -23,178 +14,105 @@ codeunit 6059903 "NPR Task Queue Execute"
         OutStr: OutStream;
     begin
         //Cleanup
-        if TaskUsesPrinter() then begin
-            Printer.Get("Printer Name");//needs for testing if it exists
+        if Rec.TaskUsesPrinter() then begin
+            Printer.Get(Rec."Printer Name");//needs for testing if it exists
         end;
 
-        //-TQ1.29
-        //IF TaskGenerateOutput THEN BEGIN
-        //  CurrentFileName := GetFileName(Rec);
-        //  CurrentFilePath := GetFilePath(Rec);
-        //  IF EXISTS(CurrentFilePath + CurrentFileName) THEN
-        //    ERASE(CurrentFilePath + CurrentFileName);
-        //END;
+        Rec.SetRecFilter();
 
-        //TaskTemplate.GET("Journal Template Name");
-        //+TQ1.29
-
-        SetRecFilter();
-
-        if ("Language ID" <> 0) and ("Language ID" <> GlobalLanguage) then begin
+        if (Rec."Language ID" <> 0) and (Rec."Language ID" <> GlobalLanguage) then begin
             CurrLangID := GlobalLanguage;
-            GlobalLanguage("Language ID");
+            GlobalLanguage(Rec."Language ID");
         end;
 
-        //-TQ1.29
-        //  "Object Type"::Report:
-        //    BEGIN
-        //      CASE "Type Of Output" OF
-        //        "Type Of Output"::" ",
-        //        "Type Of Output"::Paper:
-        //          BEGIN
-        //            IF "Call Object With Task Record" THEN
-        //              REPORT.RUNMODAL("Object No.", FALSE, FALSE, Rec)
-        //            ELSE
-        //              REPORT.RUNMODAL("Object No.", FALSE, FALSE);
-        //          END;
-        //        "Type Of Output"::XMLFile:
-        //          BEGIN
-        //            IF "Call Object With Task Record" THEN
-        //              REPORT.SAVEASXML("Object No.",CurrentFilePath + CurrentFileName,Rec)
-        //            ELSE
-        //              REPORT.SAVEASXML("Object No.",CurrentFilePath + CurrentFileName);
-        //          END;
-        //        "Type Of Output"::HTMLFile:
-        //          BEGIN
-        //            IF "Call Object With Task Record" THEN
-        //              REPORT.SAVEASHTML("Object No.", CurrentFilePath + CurrentFileName, FALSE, Rec)
-        //            ELSE
-        //              REPORT.SAVEASHTML("Object No.", CurrentFilePath + CurrentFileName, FALSE);
-        //          END;
-        //        "Type Of Output"::PDFFile:
-        //          BEGIN
-        //            IF "Call Object With Task Record" THEN
-        //              REPORT.SAVEASPDF("Object No.", CurrentFilePath + CurrentFileName, Rec)
-        //            ELSE
-        //              REPORT.SAVEASPDF("Object No.", CurrentFilePath + CurrentFileName);
-        //          END;
-        //        "Type Of Output"::Excel:
-        //          BEGIN
-        //            IF "Call Object With Task Record" THEN
-        //              REPORT.SAVEASEXCEL("Object No.", CurrentFilePath + CurrentFileName, Rec)
-        //            ELSE
-        //              REPORT.SAVEASEXCEL("Object No.", CurrentFilePath + CurrentFileName);
-        //          END;
-        //        "Type Of Output"::Word:
-        //          BEGIN
-        //            IF "Call Object With Task Record" THEN
-        //              REPORT.SAVEASWORD("Object No.", CurrentFilePath + CurrentFileName, Rec)
-        //            ELSE
-        //              REPORT.SAVEASWORD("Object No.", CurrentFilePath + CurrentFileName);
-        //          END;
-        //
-        //      END;
-        //    END;
-        //  "Object Type"::Codeunit:
-        //    BEGIN
-        //      IF "Call Object With Task Record" THEN
-        //        CODEUNIT.RUN("Object No.", Rec)
-        //      ELSE
-        //        CODEUNIT.RUN("Object No.");
-        //    END;
-        case "Object Type" of
-            "Object Type"::Report:
+        case Rec."Object Type" of
+            Rec."Object Type"::Report:
                 begin
-                    if "Call Object With Task Record" then begin
+                    if Rec."Call Object With Task Record" then begin
                         RecRef.GetTable(Rec);
                         RecRef.SetRecFilter();
                         RunOnRecRef := true;
                     end;
 
-                    if TaskGenerateOutput() then begin
+                    if Rec.TaskGenerateOutput() then begin
                         TaskOutputLog.InitRecord(Rec);
                         TaskOutputLog.File.CreateOutStream(OutStr);
                         TaskOutputLog.Insert();
                     end;
 
-                    case "Type Of Output" of
-                        "Type Of Output"::" ":
+                    case Rec."Type Of Output" of
+                        Rec."Type Of Output"::" ":
                             begin
                                 if RunOnRecRef then
-                                    REPORT.Execute("Object No.", GetReportParameters(), RecRef)
+                                    REPORT.Execute(Rec."Object No.", Rec.GetReportParameters(), RecRef)
                                 else
-                                    REPORT.Execute("Object No.", GetReportParameters());
+                                    REPORT.Execute(Rec."Object No.", Rec.GetReportParameters());
                             end;
-                        "Type Of Output"::Paper:
+                        Rec."Type Of Output"::Paper:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.Print("Object No.", GetReportParameters(), "Printer Name", RecRef)
+                                    REPORT.Print(Rec."Object No.", Rec.GetReportParameters(), Rec."Printer Name", RecRef)
                                 else
-                                    REPORT.Print("Object No.", GetReportParameters(), "Printer Name");
+                                    REPORT.Print(Rec."Object No.", Rec.GetReportParameters(), Rec."Printer Name");
                             end;
-                        "Type Of Output"::XMLFile:
+                        Rec."Type Of Output"::XMLFile:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Xml, OutStr, RecRef)
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Xml, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Xml, OutStr);
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Xml, OutStr);
                             end;
-                        "Type Of Output"::HTMLFile:
+                        Rec."Type Of Output"::HTMLFile:
                             begin
                                 if RunOnRecRef then
                                     Error('Not Supported')
                                 else
-                                    //-#258841 [258841]
-                                    //REPORT.SAVEASHTML("Object No.", CurrentFilePath + CurrentFileName, FALSE);
-                                    REPORT.SaveAsHtml("Object No.", CurrentFilePath + CurrentFileName);
-                                //+#258841 [258841]
+                                    REPORT.SaveAsHtml(Rec."Object No.", CurrentFilePath + CurrentFileName);
                             end;
-                        "Type Of Output"::PDFFile:
+                        Rec."Type Of Output"::PDFFile:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Pdf, OutStr, RecRef)
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Pdf, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Pdf, OutStr);
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Pdf, OutStr);
                             end;
-                        "Type Of Output"::Excel:
+                        Rec."Type Of Output"::Excel:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Excel, OutStr, RecRef)
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Excel, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Excel, OutStr);
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Excel, OutStr);
                             end;
-                        "Type Of Output"::Word:
+                        Rec."Type Of Output"::Word:
                             begin
                                 if RunOnRecRef then
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Word, OutStr, RecRef)
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Word, OutStr, RecRef)
                                 else
-                                    REPORT.SaveAs("Object No.", GetReportParameters(), REPORTFORMAT::Word, OutStr);
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Word, OutStr);
                             end;
                     end;
                 end;
-            "Object Type"::Codeunit:
+            Rec."Object Type"::Codeunit:
                 begin
-                    if "Call Object With Task Record" then
-                        CODEUNIT.Run("Object No.", Rec)
+                    if Rec."Call Object With Task Record" then
+                        CODEUNIT.Run(Rec."Object No.", Rec)
                     else
-                        CODEUNIT.Run("Object No.");
+                        CODEUNIT.Run(Rec."Object No.");
                 end;
         end;
 
         if (CurrLangID <> 0) then
             GlobalLanguage(CurrLangID);
 
-        //-TQ1.29 [242044]
-        if TaskGenerateOutput() then begin
-            CalcFields("Report Name");
-            TaskOutputLog."File Name" := DelChr("Report Name", '=', '\/:*?"<>|') + Suffix(Rec);
+        if Rec.TaskGenerateOutput() then begin
+            Rec.CalcFields("Report Name");
+            TaskOutputLog."File Name" := DelChr(Rec."Report Name", '=', '\/:*?"<>|') + Suffix(Rec);
             TaskOutputLog.Modify();
         end;
-        //+TQ1.29 [242044]
 
         Clear(Printer);
         //import files generated
-        if not "Disable File Logging" then
+        if not Rec."Disable File Logging" then
             if CurrentFileName <> '' then
                 TaskOutputLog.AddFile(Rec, CurrentFilePath + CurrentFileName);
     end;
@@ -330,7 +248,6 @@ codeunit 6059903 "NPR Task Queue Execute"
 
     local procedure Suffix(TaskLine: Record "NPR Task Line"): Text
     begin
-        //-TQ1.29
         case TaskLine."Type Of Output" of
             TaskLine."Type Of Output"::PDFFile:
                 exit('.pdf');
@@ -341,7 +258,6 @@ codeunit 6059903 "NPR Task Queue Execute"
             TaskLine."Type Of Output"::XMLFile:
                 exit('.XML');
         end;
-        //+TQ1.29
     end;
 }
 

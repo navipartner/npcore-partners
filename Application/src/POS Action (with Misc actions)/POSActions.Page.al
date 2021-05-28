@@ -1,10 +1,5 @@
 page 6150703 "NPR POS Actions"
 {
-    // NPR5.32.11/VB /20170621  CASE 281618 Added "Blocking UI" and "Codeunit ID" fields. Added codeunit detection initialization.
-    // NPR5.39/MMV /20180209  CASE 299114 Added call to publish any auto updated actions
-    // NPR5.40/VB  /20180228  CASE 306347 Modifying how action discovery works to allow actions to be discovered whenever needed.
-    // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
-
     Caption = 'POS Actions';
     InsertAllowed = false;
     ModifyAllowed = false;
@@ -44,7 +39,7 @@ page 6150703 "NPR POS Actions"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Workflow.HASVALUE()"; Workflow.HasValue())
+                field("Workflow.HASVALUE()"; Rec.Workflow.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Workflow Defined';

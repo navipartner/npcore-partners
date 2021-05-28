@@ -6,7 +6,7 @@ codeunit 6060062 "NPR Process Catalog File"
 
     trigger OnRun()
     begin
-        case GetExtension("Document Name") of
+        case GetExtension(Rec."Document Name") of
             'CSV':
                 ProcessCSVFile(Rec);
             'ZIP', '':

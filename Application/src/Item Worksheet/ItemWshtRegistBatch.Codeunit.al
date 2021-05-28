@@ -6,7 +6,7 @@ codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
     begin
         ItemWkshLine.Copy(Rec);
         Code();
-        Copy(ItemWkshLine);
+        Rec.Copy(ItemWkshLine);
     end;
 
     var

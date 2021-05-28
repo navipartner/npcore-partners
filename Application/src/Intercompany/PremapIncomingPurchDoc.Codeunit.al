@@ -17,11 +17,11 @@
         repeat
             CurrRecNo := TempIntegerHeaderRecords.Number;
 
-            ValidateCompanyInfo("Entry No.", CurrRecNo);
-            ValidateCurrency("Entry No.", CurrRecNo);
-            SetDocumentType("Entry No.", ParentRecNo, CurrRecNo);
+            ValidateCompanyInfo(Rec."Entry No.", CurrRecNo);
+            ValidateCurrency(Rec."Entry No.", CurrRecNo);
+            SetDocumentType(Rec."Entry No.", ParentRecNo, CurrRecNo);
 
-            CorrectHeaderData("Entry No.", CurrRecNo);
+            CorrectHeaderData(Rec."Entry No.", CurrRecNo);
             BuyFromVendorNo := FindBuyFromVendor(Rec."Entry No.", CurrRecNo);
             PayToVendorNo := FindPayToVendor(Rec."Entry No.", CurrRecNo);
             FindInvoiceToApplyTo(Rec."Entry No.", CurrRecNo);

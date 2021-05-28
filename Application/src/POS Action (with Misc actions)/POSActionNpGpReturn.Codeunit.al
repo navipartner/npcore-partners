@@ -357,46 +357,45 @@
 
         UpdateLineNos(SalePOS, TempNpGpPOSSalesLine);
 
-        with TempNpGpPOSSalesLine do
-            repeat
-                SaleLinePOS.Init();
-                SaleLinePOS.Validate("Register No.", SalePOS."Register No.");
-                SaleLinePOS.Validate("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        repeat
+            SaleLinePOS.Init();
+            SaleLinePOS.Validate("Register No.", SalePOS."Register No.");
+            SaleLinePOS.Validate("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
-                SaleLinePOS."Line No." := TempNpGpPOSSalesLine."Line No.";
-                SaleLinePOS.Validate("Sale Type", SalePOS."Sale type");
-                SaleLinePOS.Date := SalePOS.Date;
-                SaleLinePOS.Insert(true);
+            SaleLinePOS."Line No." := TempNpGpPOSSalesLine."Line No.";
+            SaleLinePOS.Validate("Sale Type", SalePOS."Sale type");
+            SaleLinePOS.Date := SalePOS.Date;
+            SaleLinePOS.Insert(true);
 
-                SaleLinePOS.Type := SaleLinePOS.Type::Item;
-                SaleLinePOS."VAT Bus. Posting Group" := SalePOS."VAT Bus. Posting Group";
-                SaleLinePOS."Gen. Bus. Posting Group" := NpGpCrossCompanySetup."Gen. Bus. Posting Group";
+            SaleLinePOS.Type := SaleLinePOS.Type::Item;
+            SaleLinePOS."VAT Bus. Posting Group" := SalePOS."VAT Bus. Posting Group";
+            SaleLinePOS."Gen. Bus. Posting Group" := NpGpCrossCompanySetup."Gen. Bus. Posting Group";
 
-                if NpGpCrossCompanySetup."Use Original Item No." then
-                    Item.Get("No.")
-                else
-                    Item.Get(NpGpCrossCompanySetup."Generic Item No.");
+            if NpGpCrossCompanySetup."Use Original Item No." then
+                Item.Get(TempNpGpPOSSalesLine."No.")
+            else
+                Item.Get(NpGpCrossCompanySetup."Generic Item No.");
 
-                SaleLinePOS."No." := Item."No.";
-                SaleLinePOS.Description := Description;
-                SaleLinePOS."Description 2" := "Description 2";
-                if FullSale then
-                    SaleLinePOS.Validate(Quantity, Quantity)
-                else
-                    SaleLinePOS.Validate(Quantity, -1);
-                SaleLinePOS.Validate("Unit Price", "Unit Price");
-                SaleLinePOS."Unit of Measure Code" := "Unit of Measure Code";
-                SaleLinePOS."Currency Code" := "Currency Code";
-                SaleLinePOS.Cost := SaleLinePOS.Amount;
-                SaleLinePOS."Location Code" := NpGpCrossCompanySetup."Location Code";
-                SaleLinePOS."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
-                SaleLinePOS."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
-                SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
-                SaleLinePOS."Return Reason Code" := ReturnReasonCode;
-                SaleLinePOS.Modify(true);
+            SaleLinePOS."No." := Item."No.";
+            SaleLinePOS.Description := TempNpGpPOSSalesLine.Description;
+            SaleLinePOS."Description 2" := TempNpGpPOSSalesLine."Description 2";
+            if FullSale then
+                SaleLinePOS.Validate(Quantity, TempNpGpPOSSalesLine.Quantity)
+            else
+                SaleLinePOS.Validate(Quantity, -1);
+            SaleLinePOS.Validate("Unit Price", TempNpGpPOSSalesLine."Unit Price");
+            SaleLinePOS."Unit of Measure Code" := TempNpGpPOSSalesLine."Unit of Measure Code";
+            SaleLinePOS."Currency Code" := TempNpGpPOSSalesLine."Currency Code";
+            SaleLinePOS.Cost := SaleLinePOS.Amount;
+            SaleLinePOS."Location Code" := NpGpCrossCompanySetup."Location Code";
+            SaleLinePOS."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
+            SaleLinePOS."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
+            SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
+            SaleLinePOS."Return Reason Code" := ReturnReasonCode;
+            SaleLinePOS.Modify(true);
 
-                POSCrossRefMgt.InitReference(SaleLinePOS.SystemId, TempNpGpPOSSalesLine."Global Reference", SaleLinePOS.TableName(), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
-            until not FullSale or (TempNpGpPOSSalesLine.Next() = 0);
+            POSCrossRefMgt.InitReference(SaleLinePOS.SystemId, TempNpGpPOSSalesLine."Global Reference", SaleLinePOS.TableName(), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
+        until not FullSale or (TempNpGpPOSSalesLine.Next() = 0);
 
         POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
         POSSale.RefreshCurrent();

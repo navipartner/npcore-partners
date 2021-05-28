@@ -6,7 +6,7 @@ codeunit 6014676 "NPR NpXml Value Endp. Batch"
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        NpXmlTemplate.Get("Xml Template Code");
+        NpXmlTemplate.Get(Rec."Xml Template Code");
         if NpXmlTemplate."Table No." = DATABASE::"NPR Endpoint Request Batch" then begin
             SetEndPointToProcessed(Rec);
         end;

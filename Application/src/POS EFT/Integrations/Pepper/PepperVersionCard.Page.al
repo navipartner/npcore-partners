@@ -1,11 +1,5 @@
 page 6184497 "NPR Pepper Version Card"
 {
-    // NPR5.20\BR\20160316  CASE 231481 Object Created
-    // NPR5.22\BR\20160412  CASE 231481 Page Actions updated
-    // NPR5.25\BR\20160504  CASE 231481 Added Codeunit Install fields
-    // NPR5.29\BR\20161206  CASE 260315 Improve Performance of Blob
-    // NPR5.48/BHR /20181206 CASE 338656 Added Missing Picture to Action
-
     Caption = 'Pepper Version Card';
     PageType = Card;
     UsageCategory = Administration;
@@ -249,10 +243,7 @@ page 6184497 "NPR Pepper Version Card"
 
     local procedure UpdateBLOBCheck()
     begin
-        //-NPR5.29 [260315]
-        //CALCFIELDS("Install Zip File");
-        //+NPR5.29 [260315]
-        HasZipFile := "Install Zip File".HasValue;
+        HasZipFile := Rec."Install Zip File".HasValue();
     end;
 }
 

@@ -198,229 +198,224 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         VATPostingSetup: Record "VAT Posting Setup";
         AuditRollComment: Record "NPR Audit Roll";
     begin
-        with POSSalesLine do begin
-            Init();
-            "POS Entry No." := POSEntry."Entry No.";
-            "Line No." := AuditRoll."Line No.";
-            "POS Store Code" := POSEntry."POS Store Code";
-            "POS Unit No." := AuditRoll."Register No.";
-            "Document No." := AuditRoll."Sales Ticket No.";
-            "POS Period Register No." := POSEntry."POS Period Register No.";
-            "Customer No." := AuditRoll."Customer No.";
-            "Salesperson Code" := AuditRoll."Salesperson Code";
+        POSSalesLine.Init();
+        POSSalesLine."POS Entry No." := POSEntry."Entry No.";
+        POSSalesLine."Line No." := AuditRoll."Line No.";
+        POSSalesLine."POS Store Code" := POSEntry."POS Store Code";
+        POSSalesLine."POS Unit No." := AuditRoll."Register No.";
+        POSSalesLine."Document No." := AuditRoll."Sales Ticket No.";
+        POSSalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        POSSalesLine."Customer No." := AuditRoll."Customer No.";
+        POSSalesLine."Salesperson Code" := AuditRoll."Salesperson Code";
 
-            case AuditRoll.Type of
-                AuditRoll.Type::Item:
-                    Type := Type::Item;
-                AuditRoll.Type::"G/L":
-                    Type := Type::"G/L Account";
-                AuditRoll.Type::Comment:
-                    Type := Type::Comment;
-                AuditRoll.Type::Customer:
-                    Type := Type::Customer;
-                AuditRoll.Type::"Debit Sale":
-                    begin
-                        POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::"Not To Be Posted";
-                        POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted";
-                        POSEntry.Description := 'Debit sale';
-                        case AuditRoll."Customer Type" of
-                            AuditRoll."Customer Type"::"Ord.":
-                                POSEntry."Customer No." := AuditRoll."Customer No.";
-                            AuditRoll."Customer Type"::Cash:
-                                POSEntry."Contact No." := AuditRoll."Customer No.";
-                        end;
+        case AuditRoll.Type of
+            AuditRoll.Type::Item:
+                POSSalesLine.Type := POSSalesLine.Type::Item;
+            AuditRoll.Type::"G/L":
+                POSSalesLine.Type := POSSalesLine.Type::"G/L Account";
+            AuditRoll.Type::Comment:
+                POSSalesLine.Type := POSSalesLine.Type::Comment;
+            AuditRoll.Type::Customer:
+                POSSalesLine.Type := POSSalesLine.Type::Customer;
+            AuditRoll.Type::"Debit Sale":
+                begin
+                    POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::"Not To Be Posted";
+                    POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted";
+                    POSEntry.Description := 'Debit sale';
+                    case AuditRoll."Customer Type" of
+                        AuditRoll."Customer Type"::"Ord.":
+                            POSEntry."Customer No." := AuditRoll."Customer No.";
+                        AuditRoll."Customer Type"::Cash:
+                            POSEntry."Contact No." := AuditRoll."Customer No.";
                     end;
-                else
-                    Error('Sales Line Type %1 not implemented in migration (%2 %3 %4)', AuditRoll.Type, AuditRoll.TableName, AuditRoll.FieldName("Clustered Key"), AuditRoll."Clustered Key");
-            end;
-            "Exclude from Posting" := ExcludeFromPosting(AuditRoll);
-            "No." := AuditRoll."No.";
-            "Variant Code" := AuditRoll."Variant Code";
-            "Location Code" := AuditRoll.Lokationskode;
-            "Posting Group" := AuditRoll."Posting Group";
-            Description := AuditRoll.Description;
-
-            //Description 2?
-
-            if Type = Type::"G/L Account" then
-                if GLAccount.Get("No.") then
-                    "Gen. Posting Type" := GLAccount."Gen. Posting Type";
-            "Gen. Bus. Posting Group" := AuditRoll."Gen. Bus. Posting Group";
-            "VAT Bus. Posting Group" := AuditRoll."VAT Bus. Posting Group";
-            "Gen. Prod. Posting Group" := AuditRoll."Gen. Prod. Posting Group";
-            "VAT Prod. Posting Group" := AuditRoll."VAT Prod. Posting Group";
-            "Tax Area Code" := AuditRoll."Tax Area Code";
-            "Tax Liable" := AuditRoll."Tax Liable";
-            "Tax Group Code" := AuditRoll."Tax Group Code";
-            "Use Tax" := AuditRoll."Use Tax";
-            if VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then begin
-                "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
-                "VAT Identifier" := VATPostingSetup."VAT Identifier";
-            end;
-            "Unit of Measure Code" := AuditRoll."Unit of Measure Code";
-            Quantity := AuditRoll.Quantity;
-            if (Type = Type::Item) then begin
-                if Item.Get("No.") then begin
-                    "Item Category Code" := Item."Item Category Code";
                 end;
-                if IUoM.Get("No.", "Unit of Measure Code") then
-                    "Qty. per Unit of Measure" := IUoM."Qty. per Unit of Measure";
-            end;
-            if "Qty. per Unit of Measure" = 0 then
-                "Qty. per Unit of Measure" := 1;
-            "Quantity (Base)" := Round("Qty. per Unit of Measure" * Quantity, 0.00001);
-            "Unit Price" := AuditRoll."Unit Price";
-            "Unit Cost (LCY)" := AuditRoll."Unit Cost (LCY)";
-            "VAT %" := AuditRoll."VAT %";
-            "Discount Type" := "Discount Type";
-            "Discount Code" := "Discount Code";
-            "Discount Authorised by" := "Discount Authorised by";
-            "Reason Code" := "Reason Code";
-            "Line Discount Amount Excl. VAT" := Round(AuditRoll."Line Discount Amount" / (1 + AuditRoll."VAT %" / 100)); //Assuming Line Disc. Amount was alwas incl. VAYT
-            "Line Discount Amount Incl. VAT" := AuditRoll."Line Discount Amount";
-            "Amount Excl. VAT" := AuditRoll.Amount;
-            "Amount Incl. VAT" := AuditRoll."Amount Including VAT";
-            "VAT Base Amount" := AuditRoll."VAT Base Amount";
-
-            //Special handling of Outpayments
-            if AuditRoll."Sale Type" = AuditRoll."Sale Type"::"Out payment" then begin
-                if ("Amount Incl. VAT" <> 0) and ("Amount Excl. VAT" = 0) then
-                    "Amount Excl. VAT" := "Amount Incl. VAT"; //Probably payment roundings
-                "Unit Price" := -"Unit Price";
-                "Amount Excl. VAT" := -"Amount Excl. VAT";
-                "Amount Incl. VAT" := -"Amount Incl. VAT";
-            end;
-
-            //LCY amounts are copied directly since old auditroll was always in LCY
-            "Amount Excl. VAT (LCY)" := "Amount Excl. VAT";
-            "Amount Incl. VAT (LCY)" := "Amount Incl. VAT";
-            "Line Dsc. Amt. Excl. VAT (LCY)" := "Line Discount Amount Excl. VAT";
-            "Line Dsc. Amt. Incl. VAT (LCY)" := "Line Discount Amount Incl. VAT";
-
-            "Orig. POS Sale ID" := AuditRoll."Orig. POS Sale ID";
-            "Orig. POS Line No." := AuditRoll."Orig. POS Line No.";
-
-            //TODO: Implement these and consider Item Group
-            //POSSalesLine."Item Category Code" :=
-            //POSSalesLine.Nonstock :=
-            //POSSalesLine."BOM Item No." :=
-            "Serial No." := AuditRoll."Serial No.";
-            "Return Reason Code" := AuditRoll."Return Reason Code";
-
-            "Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
-            "Dimension Set ID" := AuditRoll."Dimension Set ID";
-
-            if not Insert() then begin
-                "Line No." := "Line No." + 1000000; //Fix error with duplicate Line No.'s in migration
-                Insert();
-            end;
-            AuditRolltoPOSEntryLink.Init();
-            AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
-            AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
-            AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
-            AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Sale;
-            AuditRolltoPOSEntryLink."Line No." := "Line No.";
-            AuditRolltoPOSEntryLink.Insert();
-
-            //Update POS Entry
-            case AuditRoll."Sale Type" of
-                AuditRoll."Sale Type"::"Debit Sale":
-                    begin
-                        POSEntry."Entry Type" := POSEntry."Entry Type"::"Credit Sale";
-                        AuditRollComment.Reset();
-                        AuditRollComment.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-                        AuditRollComment.SetRange(Type, AuditRollComment.Type::Comment);
-                        if AuditRollComment.FindFirst() then
-                            POSEntry.Description := AuditRollComment.Description;
-                    end;
-                AuditRoll."Sale Type"::Sale:
-                    begin
-                        POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
-                        POSEntry.Description := 'Sales Ticket ' + Format(AuditRoll."Sales Ticket No.");
-                    end;
-                AuditRoll."Sale Type"::Deposit, AuditRoll."Sale Type"::"Out payment":
-                    begin
-                        POSEntry.Description := AuditRoll.Description;
-                    end;
-            end;
-
-            if POSEntry."Dimension Set ID" = 0 then begin
-                POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
-                POSEntry."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
-                POSEntry."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
-            end;
-            if AuditRoll."Item Entry Posted" then
-                POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::Posted;
-            if AuditRoll."Salgspris inkl. moms" then
-                POSEntry."Prices Including VAT" := true;
-            //Update measures
-            if Type = Type::Item then begin
-                POSEntry."Item Sales (LCY)" += "Amount Incl. VAT";
-                POSEntry."Discount Amount" += "Line Discount Amount Excl. VAT";
-                if Quantity < 0 then
-                    POSEntry."Return Sales Quantity" -= Quantity
-                else
-                    POSEntry."Sales Quantity" += Quantity;
-            end;
-            POSEntry."Amount Excl. Tax" += "Amount Excl. VAT";
-            POSEntry."Tax Amount" += "Amount Incl. VAT" - "Amount Excl. VAT";
-            POSEntry."Amount Incl. Tax" += "Amount Incl. VAT";
+            else
+                Error('Sales Line Type %1 not implemented in migration (%2 %3 %4)', AuditRoll.Type, AuditRoll.TableName, AuditRoll.FieldName("Clustered Key"), AuditRoll."Clustered Key");
         end;
+        POSSalesLine."Exclude from Posting" := ExcludeFromPosting(AuditRoll);
+        POSSalesLine."No." := AuditRoll."No.";
+        POSSalesLine."Variant Code" := AuditRoll."Variant Code";
+        POSSalesLine."Location Code" := AuditRoll.Lokationskode;
+        POSSalesLine."Posting Group" := AuditRoll."Posting Group";
+        POSSalesLine.Description := AuditRoll.Description;
+
+        //Description 2?
+
+        if POSSalesLine.Type = POSSalesLine.Type::"G/L Account" then
+            if GLAccount.Get(POSSalesLine."No.") then
+                POSSalesLine."Gen. Posting Type" := GLAccount."Gen. Posting Type";
+        POSSalesLine."Gen. Bus. Posting Group" := AuditRoll."Gen. Bus. Posting Group";
+        POSSalesLine."VAT Bus. Posting Group" := AuditRoll."VAT Bus. Posting Group";
+        POSSalesLine."Gen. Prod. Posting Group" := AuditRoll."Gen. Prod. Posting Group";
+        POSSalesLine."VAT Prod. Posting Group" := AuditRoll."VAT Prod. Posting Group";
+        POSSalesLine."Tax Area Code" := AuditRoll."Tax Area Code";
+        POSSalesLine."Tax Liable" := AuditRoll."Tax Liable";
+        POSSalesLine."Tax Group Code" := AuditRoll."Tax Group Code";
+        POSSalesLine."Use Tax" := AuditRoll."Use Tax";
+        if VATPostingSetup.Get(POSSalesLine."VAT Bus. Posting Group", POSSalesLine."VAT Prod. Posting Group") then begin
+            POSSalesLine."VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+            POSSalesLine."VAT Identifier" := VATPostingSetup."VAT Identifier";
+        end;
+        POSSalesLine."Unit of Measure Code" := AuditRoll."Unit of Measure Code";
+        POSSalesLine.Quantity := AuditRoll.Quantity;
+        if (POSSalesLine.Type = POSSalesLine.Type::Item) then begin
+            if Item.Get(POSSalesLine."No.") then begin
+                POSSalesLine."Item Category Code" := Item."Item Category Code";
+            end;
+            if IUoM.Get(POSSalesLine."No.", POSSalesLine."Unit of Measure Code") then
+                POSSalesLine."Qty. per Unit of Measure" := IUoM."Qty. per Unit of Measure";
+        end;
+        if POSSalesLine."Qty. per Unit of Measure" = 0 then
+            POSSalesLine."Qty. per Unit of Measure" := 1;
+        POSSalesLine."Quantity (Base)" := Round(POSSalesLine."Qty. per Unit of Measure" * POSSalesLine.Quantity, 0.00001);
+        POSSalesLine."Unit Price" := AuditRoll."Unit Price";
+        POSSalesLine."Unit Cost (LCY)" := AuditRoll."Unit Cost (LCY)";
+        POSSalesLine."VAT %" := AuditRoll."VAT %";
+        POSSalesLine."Discount Type" := POSSalesLine."Discount Type";
+        POSSalesLine."Discount Code" := POSSalesLine."Discount Code";
+        POSSalesLine."Discount Authorised by" := POSSalesLine."Discount Authorised by";
+        POSSalesLine."Reason Code" := POSSalesLine."Reason Code";
+        POSSalesLine."Line Discount Amount Excl. VAT" := Round(AuditRoll."Line Discount Amount" / (1 + AuditRoll."VAT %" / 100)); //Assuming Line Disc. Amount was alwas incl. VAYT
+        POSSalesLine."Line Discount Amount Incl. VAT" := AuditRoll."Line Discount Amount";
+        POSSalesLine."Amount Excl. VAT" := AuditRoll.Amount;
+        POSSalesLine."Amount Incl. VAT" := AuditRoll."Amount Including VAT";
+        POSSalesLine."VAT Base Amount" := AuditRoll."VAT Base Amount";
+
+        //Special handling of Outpayments
+        if AuditRoll."Sale Type" = AuditRoll."Sale Type"::"Out payment" then begin
+            if (POSSalesLine."Amount Incl. VAT" <> 0) and (POSSalesLine."Amount Excl. VAT" = 0) then
+                POSSalesLine."Amount Excl. VAT" := POSSalesLine."Amount Incl. VAT"; //Probably payment roundings
+            POSSalesLine."Unit Price" := -POSSalesLine."Unit Price";
+            POSSalesLine."Amount Excl. VAT" := -POSSalesLine."Amount Excl. VAT";
+            POSSalesLine."Amount Incl. VAT" := -POSSalesLine."Amount Incl. VAT";
+        end;
+
+        //LCY amounts are copied directly since old auditroll was always in LCY
+        POSSalesLine."Amount Excl. VAT (LCY)" := POSSalesLine."Amount Excl. VAT";
+        POSSalesLine."Amount Incl. VAT (LCY)" := POSSalesLine."Amount Incl. VAT";
+        POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := POSSalesLine."Line Discount Amount Excl. VAT";
+        POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := POSSalesLine."Line Discount Amount Incl. VAT";
+
+        POSSalesLine."Orig. POS Sale ID" := AuditRoll."Orig. POS Sale ID";
+        POSSalesLine."Orig. POS Line No." := AuditRoll."Orig. POS Line No.";
+
+        //TODO: Implement these and consider Item Group
+        //POSSalesLine."Item Category Code" :=
+        //POSSalesLine.Nonstock :=
+        //POSSalesLine."BOM Item No." :=
+        POSSalesLine."Serial No." := AuditRoll."Serial No.";
+        POSSalesLine."Return Reason Code" := AuditRoll."Return Reason Code";
+
+        POSSalesLine."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+        POSSalesLine."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
+        POSSalesLine."Dimension Set ID" := AuditRoll."Dimension Set ID";
+
+        if not POSSalesLine.Insert() then begin
+            POSSalesLine."Line No." := POSSalesLine."Line No." + 1000000; //Fix error with duplicate Line No.'s in migration
+            POSSalesLine.Insert();
+        end;
+        AuditRolltoPOSEntryLink.Init();
+        AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
+        AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
+        AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
+        AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Sale;
+        AuditRolltoPOSEntryLink."Line No." := POSSalesLine."Line No.";
+        AuditRolltoPOSEntryLink.Insert();
+
+        //Update POS Entry
+        case AuditRoll."Sale Type" of
+            AuditRoll."Sale Type"::"Debit Sale":
+                begin
+                    POSEntry."Entry Type" := POSEntry."Entry Type"::"Credit Sale";
+                    AuditRollComment.Reset();
+                    AuditRollComment.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
+                    AuditRollComment.SetRange(Type, AuditRollComment.Type::Comment);
+                    if AuditRollComment.FindFirst() then
+                        POSEntry.Description := AuditRollComment.Description;
+                end;
+            AuditRoll."Sale Type"::Sale:
+                begin
+                    POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
+                    POSEntry.Description := 'Sales Ticket ' + Format(AuditRoll."Sales Ticket No.");
+                end;
+            AuditRoll."Sale Type"::Deposit, AuditRoll."Sale Type"::"Out payment":
+                begin
+                    POSEntry.Description := AuditRoll.Description;
+                end;
+        end;
+
+        if POSEntry."Dimension Set ID" = 0 then begin
+            POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
+            POSEntry."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+            POSEntry."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
+        end;
+        if AuditRoll."Item Entry Posted" then
+            POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::Posted;
+        if AuditRoll."Salgspris inkl. moms" then
+            POSEntry."Prices Including VAT" := true;
+        //Update measures
+        if POSSalesLine.Type = POSSalesLine.Type::Item then begin
+            POSEntry."Item Sales (LCY)" += POSSalesLine."Amount Incl. VAT";
+            POSEntry."Discount Amount" += POSSalesLine."Line Discount Amount Excl. VAT";
+            if POSSalesLine.Quantity < 0 then
+                POSEntry."Return Sales Quantity" -= POSSalesLine.Quantity
+            else
+                POSEntry."Sales Quantity" += POSSalesLine.Quantity;
+        end;
+        POSEntry."Amount Excl. Tax" += POSSalesLine."Amount Excl. VAT";
+        POSEntry."Tax Amount" += POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT";
+        POSEntry."Amount Incl. Tax" += POSSalesLine."Amount Incl. VAT";
     end;
 
     local procedure InsertPOSPaymentLine(var AuditRoll: Record "NPR Audit Roll"; var POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Entry Payment Line")
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
     begin
-        with POSPaymentLine do begin
-            Init();
-            "POS Entry No." := POSEntry."Entry No.";
-            "Line No." := AuditRoll."Line No.";
-            "POS Store Code" := POSEntry."POS Store Code";
-            "POS Unit No." := AuditRoll."Register No.";
-            "Document No." := AuditRoll."Sales Ticket No.";
-            "POS Period Register No." := POSEntry."POS Period Register No.";
-            case AuditRoll.Type of
-                AuditRoll.Type::Payment:
+        POSPaymentLine.Init();
+        POSPaymentLine."POS Entry No." := POSEntry."Entry No.";
+        POSPaymentLine."Line No." := AuditRoll."Line No.";
+        POSPaymentLine."POS Store Code" := POSEntry."POS Store Code";
+        POSPaymentLine."POS Unit No." := AuditRoll."Register No.";
+        POSPaymentLine."Document No." := AuditRoll."Sales Ticket No.";
+        POSPaymentLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        case AuditRoll.Type of
+            AuditRoll.Type::Payment:
 #pragma warning disable AA0139
-                    "POS Payment Method Code" := AuditRoll."No.";
+                POSPaymentLine."POS Payment Method Code" := AuditRoll."No.";
 #pragma warning restore
-                else
-                    Error('Payment Line Type %1 not implemented in migration (%2 %3 %4)', AuditRoll.Type, AuditRoll.TableName, AuditRoll.FieldName("Clustered Key"), AuditRoll."Clustered Key");
-            end;
-            "POS Payment Bin Code" := "POS Unit No."; //POS Unit = POS Payment Bin default for now
-            Description := AuditRoll.Description;
-            Amount := AuditRoll."Amount Including VAT";
-            "Payment Amount" := AuditRoll."Amount Including VAT";
-            "Amount (LCY)" := AuditRoll."Amount Including VAT";
-            "Amount (Sales Currency)" := AuditRoll."Amount Including VAT";
+            else
+                Error('Payment Line Type %1 not implemented in migration (%2 %3 %4)', AuditRoll.Type, AuditRoll.TableName, AuditRoll.FieldName("Clustered Key"), AuditRoll."Clustered Key");
+        end;
+        POSPaymentLine."POS Payment Bin Code" := POSPaymentLine."POS Unit No."; //POS Unit = POS Payment Bin default for now
+        POSPaymentLine.Description := AuditRoll.Description;
+        POSPaymentLine.Amount := AuditRoll."Amount Including VAT";
+        POSPaymentLine."Payment Amount" := AuditRoll."Amount Including VAT";
+        POSPaymentLine."Amount (LCY)" := AuditRoll."Amount Including VAT";
+        POSPaymentLine."Amount (Sales Currency)" := AuditRoll."Amount Including VAT";
 
-            "Orig. POS Sale ID" := AuditRoll."Orig. POS Sale ID";
-            "Orig. POS Line No." := AuditRoll."Orig. POS Line No.";
-            EFT := AuditRoll."Cash Terminal Approved";
+        POSPaymentLine."Orig. POS Sale ID" := AuditRoll."Orig. POS Sale ID";
+        POSPaymentLine."Orig. POS Line No." := AuditRoll."Orig. POS Line No.";
+        POSPaymentLine.EFT := AuditRoll."Cash Terminal Approved";
 
-            "Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
-            "Dimension Set ID" := AuditRoll."Dimension Set ID";
+        POSPaymentLine."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+        POSPaymentLine."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
+        POSPaymentLine."Dimension Set ID" := AuditRoll."Dimension Set ID";
 
-            Insert();
-            AuditRolltoPOSEntryLink.Init();
-            AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
-            AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
-            AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
-            AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Payment;
-            AuditRolltoPOSEntryLink."Line No." := "Line No.";
-            AuditRolltoPOSEntryLink.Insert();
+        POSPaymentLine.Insert();
+        AuditRolltoPOSEntryLink.Init();
+        AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
+        AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
+        AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
+        AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Payment;
+        AuditRolltoPOSEntryLink."Line No." := POSPaymentLine."Line No.";
+        AuditRolltoPOSEntryLink.Insert();
 
-            //Update POS Entry
-            POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale"; //If any payment line its a Sale
-            if (AuditRoll."Dimension Set ID" <> 0) and (POSEntry."Dimension Set ID" <> AuditRoll."Dimension Set ID") then begin //Favor payment line dims over sales lines for the header
-                POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
-                POSEntry."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
-                POSEntry."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
-            end;
-
+        //Update POS Entry
+        POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale"; //If any payment line its a Sale
+        if (AuditRoll."Dimension Set ID" <> 0) and (POSEntry."Dimension Set ID" <> AuditRoll."Dimension Set ID") then begin //Favor payment line dims over sales lines for the header
+            POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
+            POSEntry."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+            POSEntry."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
         end;
     end;
 
@@ -430,66 +425,64 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         CashRegister: Record "NPR Register";
         CashRegPeriod: Record "NPR Period";
     begin
-        with POSBalancingLine do begin
-            Init();
-            "POS Entry No." := POSEntry."Entry No.";
-            "Line No." := AuditRoll."Line No.";
-            "POS Store Code" := POSEntry."POS Store Code";
-            "POS Unit No." := AuditRoll."Register No.";
-            "Document No." := AuditRoll."Sales Ticket No.";
-            "POS Period Register No." := POSEntry."POS Period Register No.";
-            "POS Payment Bin Code" := "POS Unit No.";  //POS Unit = POS Payment Bin default for now
+        POSBalancingLine.Init();
+        POSBalancingLine."POS Entry No." := POSEntry."Entry No.";
+        POSBalancingLine."Line No." := AuditRoll."Line No.";
+        POSBalancingLine."POS Store Code" := POSEntry."POS Store Code";
+        POSBalancingLine."POS Unit No." := AuditRoll."Register No.";
+        POSBalancingLine."Document No." := AuditRoll."Sales Ticket No.";
+        POSBalancingLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        POSBalancingLine."POS Payment Bin Code" := POSBalancingLine."POS Unit No.";  //POS Unit = POS Payment Bin default for now
 
-            if CashRegister.Get(AuditRoll."Register No.") then
-                "POS Payment Method Code" := CashRegister."Primary Payment Type";
+        if CashRegister.Get(AuditRoll."Register No.") then
+            POSBalancingLine."POS Payment Method Code" := CashRegister."Primary Payment Type";
 
-            Description := CopyStr(AuditRoll.Description, 1, MaxStrLen(Description));
+        POSBalancingLine.Description := CopyStr(AuditRoll.Description, 1, MaxStrLen(POSBalancingLine.Description));
 
-            CashRegPeriod.SetRange("Register No.", AuditRoll."Register No.");
-            CashRegPeriod.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-            if CashRegPeriod.FindLast() then begin
-                "Calculated Amount" := CashRegPeriod."Balanced Cash Amount" + CashRegPeriod.Difference;
-                "Balanced Amount" := CashRegPeriod."Balanced Cash Amount";
-                "Balanced Diff. Amount" := CashRegPeriod.Difference;
-                "New Float Amount" := CashRegPeriod."Closing Cash";
-                "Deposit-To Bin Amount" := CashRegPeriod."Deposit in Bank";
-            end else begin //Fall back to Audit Roll values
-                "Calculated Amount" := AuditRoll."Closing Cash" + AuditRoll."Transferred to Balance Account" + AuditRoll.Difference;
-                "Balanced Amount" := AuditRoll."Closing Cash" + AuditRoll."Transferred to Balance Account";
-                "Balanced Diff. Amount" := AuditRoll.Difference;
-                "New Float Amount" := AuditRoll."Closing Cash";
-                "Deposit-To Bin Amount" := AuditRoll."Transferred to Balance Account";
-            end;
-
-            "Orig. POS Sale ID" := AuditRoll."Orig. POS Sale ID";
-            "Orig. POS Line No." := AuditRoll."Orig. POS Line No.";
-
-            "Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
-            "Dimension Set ID" := AuditRoll."Dimension Set ID";
-
-            Insert();
-            AuditRolltoPOSEntryLink.Init();
-            AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
-            AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
-            AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
-            AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Balancing;
-            AuditRolltoPOSEntryLink."Line No." := "Line No.";
-            AuditRolltoPOSEntryLink.Insert();
-            POSEntry."Entry Type" := POSEntry."Entry Type"::Balancing;
-            POSEntry.Description := AuditRoll.Description;
-            if POSEntry."Dimension Set ID" = 0 then begin
-                POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
-                POSEntry."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
-                POSEntry."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
-            end;
-
-            //Close the current POS Ledger Register
-            POSLedgerRegister."Document No." := AuditRoll."Posted Doc. No.";
-            POSLedgerRegister."Closing Entry No." := "POS Entry No.";
-            POSLedgerRegister.Status := POSLedgerRegister.Status::CLOSED;
-            POSLedgerRegister.Modify();
+        CashRegPeriod.SetRange("Register No.", AuditRoll."Register No.");
+        CashRegPeriod.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
+        if CashRegPeriod.FindLast() then begin
+            POSBalancingLine."Calculated Amount" := CashRegPeriod."Balanced Cash Amount" + CashRegPeriod.Difference;
+            POSBalancingLine."Balanced Amount" := CashRegPeriod."Balanced Cash Amount";
+            POSBalancingLine."Balanced Diff. Amount" := CashRegPeriod.Difference;
+            POSBalancingLine."New Float Amount" := CashRegPeriod."Closing Cash";
+            POSBalancingLine."Deposit-To Bin Amount" := CashRegPeriod."Deposit in Bank";
+        end else begin //Fall back to Audit Roll values
+            POSBalancingLine."Calculated Amount" := AuditRoll."Closing Cash" + AuditRoll."Transferred to Balance Account" + AuditRoll.Difference;
+            POSBalancingLine."Balanced Amount" := AuditRoll."Closing Cash" + AuditRoll."Transferred to Balance Account";
+            POSBalancingLine."Balanced Diff. Amount" := AuditRoll.Difference;
+            POSBalancingLine."New Float Amount" := AuditRoll."Closing Cash";
+            POSBalancingLine."Deposit-To Bin Amount" := AuditRoll."Transferred to Balance Account";
         end;
+
+        POSBalancingLine."Orig. POS Sale ID" := AuditRoll."Orig. POS Sale ID";
+        POSBalancingLine."Orig. POS Line No." := AuditRoll."Orig. POS Line No.";
+
+        POSBalancingLine."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+        POSBalancingLine."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
+        POSBalancingLine."Dimension Set ID" := AuditRoll."Dimension Set ID";
+
+        POSBalancingLine.Insert();
+        AuditRolltoPOSEntryLink.Init();
+        AuditRolltoPOSEntryLink."Link Entry No." := 0; //AutoIncr.
+        AuditRolltoPOSEntryLink."Audit Roll Clustered Key" := AuditRoll."Clustered Key";
+        AuditRolltoPOSEntryLink."POS Entry No." := POSEntry."Entry No.";
+        AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Balancing;
+        AuditRolltoPOSEntryLink."Line No." := POSBalancingLine."Line No.";
+        AuditRolltoPOSEntryLink.Insert();
+        POSEntry."Entry Type" := POSEntry."Entry Type"::Balancing;
+        POSEntry.Description := AuditRoll.Description;
+        if POSEntry."Dimension Set ID" = 0 then begin
+            POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
+            POSEntry."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+            POSEntry."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
+        end;
+
+        //Close the current POS Ledger Register
+        POSLedgerRegister."Document No." := AuditRoll."Posted Doc. No.";
+        POSLedgerRegister."Closing Entry No." := POSBalancingLine."POS Entry No.";
+        POSLedgerRegister.Status := POSLedgerRegister.Status::CLOSED;
+        POSLedgerRegister.Modify();
     end;
 
     local procedure InitDatamodel()
@@ -642,39 +635,37 @@ codeunit 6014442 "NPR UPG RetDataMod AR Upgr."
         POSEntry := POSEntryIn;
         VATAmountLine.DeleteAll();
 
-        with POSSalesLine do begin
-            SetRange("POS Entry No.", POSEntryIn."Entry No.");
-            SetFilter(Type, '<>%1', Type::Rounding);
-            SetRange("Exclude from Posting", false);
-            if FindSet() then
-                repeat
-                    if (("Unit Price" <> 0) and (Quantity <> 0)) or ("Amount Excl. VAT" <> 0) then begin
-                        if ("VAT Calculation Type" in
-                           ["VAT Calculation Type"::"Reverse Charge VAT", "VAT Calculation Type"::"Sales Tax"])
-                        then
-                            "VAT %" := 0;
-                        if not VATAmountLine.Get(
-                             "VAT Identifier", "VAT Calculation Type", "Tax Group Code", false, "Amount Excl. VAT" >= 0)
-                        then begin
-                            VATAmountLine.Init();
-                            VATAmountLine."VAT Identifier" := "VAT Identifier";
-                            VATAmountLine."VAT Calculation Type" := "VAT Calculation Type";
-                            VATAmountLine."Tax Group Code" := "Tax Group Code";
-                            VATAmountLine."VAT %" := "VAT %";
-                            VATAmountLine.Modified := true;
-                            VATAmountLine.Positive := "Amount Excl. VAT" >= 0;
-                            VATAmountLine.Insert();
-                        end;
-                        VATAmountLine.Quantity := VATAmountLine.Quantity + "Quantity (Base)";
-                        VATAmountLine."Line Amount" := VATAmountLine."Line Amount" + "Amount Excl. VAT";
-                        VATAmountLine."VAT Difference" := VATAmountLine."VAT Difference" + "VAT Difference";
-                        VATAmountLine."VAT Base" := VATAmountLine."VAT Base" + "Amount Excl. VAT";
-                        VATAmountLine."Amount Including VAT" := VATAmountLine."Amount Including VAT" + "Amount Incl. VAT";
-                        VATAmountLine."VAT Amount" := VATAmountLine."VAT Amount" + ("Amount Incl. VAT" - "Amount Excl. VAT");
-                        VATAmountLine.Modify();
+        POSSalesLine.SetRange("POS Entry No.", POSEntryIn."Entry No.");
+        POSSalesLine.SetFilter(Type, '<>%1', POSSalesLine.Type::Rounding);
+        POSSalesLine.SetRange("Exclude from Posting", false);
+        if POSSalesLine.FindSet() then
+            repeat
+                if ((POSSalesLine."Unit Price" <> 0) and (POSSalesLine.Quantity <> 0)) or (POSSalesLine."Amount Excl. VAT" <> 0) then begin
+                    if (POSSalesLine."VAT Calculation Type" in
+                       [POSSalesLine."VAT Calculation Type"::"Reverse Charge VAT", POSSalesLine."VAT Calculation Type"::"Sales Tax"])
+                    then
+                        POSSalesLine."VAT %" := 0;
+                    if not VATAmountLine.Get(
+                         POSSalesLine."VAT Identifier", POSSalesLine."VAT Calculation Type", POSSalesLine."Tax Group Code", false, POSSalesLine."Amount Excl. VAT" >= 0)
+                    then begin
+                        VATAmountLine.Init();
+                        VATAmountLine."VAT Identifier" := POSSalesLine."VAT Identifier";
+                        VATAmountLine."VAT Calculation Type" := POSSalesLine."VAT Calculation Type";
+                        VATAmountLine."Tax Group Code" := POSSalesLine."Tax Group Code";
+                        VATAmountLine."VAT %" := POSSalesLine."VAT %";
+                        VATAmountLine.Modified := true;
+                        VATAmountLine.Positive := POSSalesLine."Amount Excl. VAT" >= 0;
+                        VATAmountLine.Insert();
                     end;
-                until Next() = 0;
-        end;
+                    VATAmountLine.Quantity := VATAmountLine.Quantity + POSSalesLine."Quantity (Base)";
+                    VATAmountLine."Line Amount" := VATAmountLine."Line Amount" + POSSalesLine."Amount Excl. VAT";
+                    VATAmountLine."VAT Difference" := VATAmountLine."VAT Difference" + POSSalesLine."VAT Difference";
+                    VATAmountLine."VAT Base" := VATAmountLine."VAT Base" + POSSalesLine."Amount Excl. VAT";
+                    VATAmountLine."Amount Including VAT" := VATAmountLine."Amount Including VAT" + POSSalesLine."Amount Incl. VAT";
+                    VATAmountLine."VAT Amount" := VATAmountLine."VAT Amount" + (POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT");
+                    VATAmountLine.Modify();
+                end;
+            until POSSalesLine.Next() = 0;
     end;
 
     #region **************** Upgrade from AuditRoll to POS Entry

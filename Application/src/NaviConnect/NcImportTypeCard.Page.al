@@ -161,7 +161,7 @@ page 6151509 "NPR Nc Import Type Card"
 
                     trigger OnValidate()
                     begin
-                        if "XML Stylesheet".HasValue() then begin
+                        if Rec."XML Stylesheet".HasValue() then begin
                             Rec.CalcFields("XML Stylesheet");
                             Clear(Rec."XML Stylesheet");
                             Rec.Modify(false);
@@ -169,7 +169,7 @@ page 6151509 "NPR Nc Import Type Card"
 
                         if XMLStylesheetData <> '' then begin
                             Request.AddText(XMLStylesheetData);
-                            "XML Stylesheet".CreateOutStream(OStream);
+                            Rec."XML Stylesheet".CreateOutStream(OStream);
                             Request.Write(OStream);
                             Rec.Modify(false);
                         end;
@@ -248,10 +248,10 @@ page 6151509 "NPR Nc Import Type Card"
     begin
         Rec.CalcFields("XML Stylesheet");
 
-        if not "XML Stylesheet".HasValue() then
+        if not Rec."XML Stylesheet".HasValue() then
             XMLStylesheetData := ''
         else begin
-            "XML Stylesheet".CreateInStream(IStream);
+            Rec."XML Stylesheet".CreateInStream(IStream);
             IStream.Read(XMLStylesheetData, MaxStrLen(XMLStylesheetData));
         end;
     end;

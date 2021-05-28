@@ -28,7 +28,7 @@ page 6184477 "NPR EFTType POSUnit BLOB Param"
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("FORMAT(Value.HASVALUE)"; Format(Value.HasValue))
+                field("FORMAT(Value.HASVALUE)"; Format(Rec.Value.HasValue()))
                 {
                     ApplicationArea = All;
                     AssistEdit = true;

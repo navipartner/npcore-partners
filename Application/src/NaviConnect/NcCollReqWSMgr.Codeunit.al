@@ -8,13 +8,13 @@
         FunctionName: Text[100];
     begin
 
-        if LoadXmlDoc(XmlDoc) then begin
-            FunctionName := GetWebserviceFunction("Import Type");
+        if Rec.LoadXmlDoc(XmlDoc) then begin
+            FunctionName := GetWebserviceFunction(Rec."Import Type");
             case FunctionName of
                 'Createcollectorrequest':
                     CreateCollectorRequests(XmlDoc);
                 else
-                    Error(MISSING_CASE, "Import Type", FunctionName);
+                    Error(MISSING_CASE, Rec."Import Type", FunctionName);
             end;
 
         end;

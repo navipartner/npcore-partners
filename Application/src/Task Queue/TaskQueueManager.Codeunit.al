@@ -11,29 +11,12 @@ codeunit 6059901 "NPR Task Queue Manager"
     //  - Execute a Task
     //  - Logout
     // 
-    // TQ1.15/JDH/20140908 CASE 179044
-    // TQ1.18/JDH/20141126 CASE 198170 MASTER Task worker group discontinued - handling of max threads moved to individual Worker Group
-    // TQ1.18.01/JDH/20141124 CASE 198851 Task Line not set correctly when running task manually (printer not found correct)
-    // TQ1.24/JDH/20150317 CASE 209090 Function Logout made global
-    // TQ1.25/MH/20150410  CASE 210797 A Task Worker (Session) only performs the first task and Children Tasks, if any
-    //                                 Removed Keep Alive functionality
-    //                                 Renamed function Code() to ExecuteTasks() and update functionality to only execute directly assigned tasks
-    // TQ1.28/RMT/20150807 CASE 219795 Added explicit locking and release for tables to reduce dealocks
-    //                                 No global record variables for better scoping
-    //                                 Removed function "GetTaskWorkerGroup"
-    //                                 Function LoginService moved to Master (codeunit 6059904)
-    // TQ1.29/JDH/20160729 CASE 242044 Changed CU to NOT beeing single instance + restructured code for better performance
-    // TQ1.29/BR /20161031 CASE 256917 Set Heartbeat when inserting Task Worker
-    // TQ1.31/JDH /20180116 CASE 301695 Removed a findlast, since it could cause a deadlock with another process that used findset
-    // NPR5.45/JDH /20180508 CASE 313269 SELECTLATESTVERSION removed, since its only possible to have 1 Master Thread (and thereby everything is on 1 NST)
-    // NPR5.45/MHA /20180829 CASE 326707 Removed unnecessary LOCKTABLE in LoginTaskWorker()
-    // TQ1.34/JDH /20181011 CASE 326930 New key for better performance
 
     TableNo = "NPR Task Queue";
 
     trigger OnRun()
     begin
-        LoginTaskWorker("Task Worker Group");
+        LoginTaskWorker(Rec."Task Worker Group");
         ExecuteTasks(Rec);
         LogoutAuto();
     end;
@@ -48,21 +31,10 @@ codeunit 6059901 "NPR Task Queue Manager"
         NextTaskQueue: Record "NPR Task Queue";
     begin
         GetMySession();
-        //-TQ1.29
-        //TaskWorker.GET(ActiveSession."Server Instance ID", ActiveSession."Session ID");
-        //+TQ1.29
-
         NextTaskQueue := TaskQueue;
         repeat
-            //-TQ1.29
-            //SELECTLATESTVERSION;
-            //TaskLine.GET(NextTaskQueue."Task Template", NextTaskQueue."Task Batch", NextTaskQueue."Task Line No.");
-            //+TQ1.29
             TaskQueueProcessor.Run(NextTaskQueue);
-            //-TQ1.34 [326930]
-            //HeartBeat;//Has a COMMIT
             HeartBeat(0);//Has a COMMIT
-                         //+TQ1.34 [326930]
             TaskWorker.Get(ActiveSession."Server Instance ID", ActiveSession."Session ID");
         until (not TaskWorker.Active) or (not GetNextTask(TaskWorker, NextTaskQueue));
     end;
@@ -73,11 +45,6 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskWorkerGroup: Record "NPR Task Worker Group";
     begin
         if not TaskWorker.Get(ServiceInstanceId(), SessionId()) then begin
-            //-NPR5.45 [326707]
-            // LOCKTABLE;
-            // IF FINDLAST THEN; //force a read lock
-            //+NPR5.45 [326707]
-
             GetMySession();
 
             TaskWorkerGroup.Get(TaskWorkerGroupCode);
@@ -96,29 +63,14 @@ codeunit 6059901 "NPR Task Queue Manager"
             TaskWorker."Current Check Interval" := TaskWorkerGroup."Min Interval Between Check";
             TaskWorker."Current Language ID" := GlobalLanguage;
             TaskWorker.Active := true;
-            //-TQ1.29 [256917]
             TaskWorker."Last HeartBeat (When Idle)" := CurrentDateTime;
-            //+TQ1.29 [256917]
             TaskWorker.Insert();
         end;
-
-        //-TQ1.28
-        //TaskLog.AddLoginThread(TaskWorker);
-        //-TQ1.29
-        //TaskLogMaster.AddLoginThread(TaskWorker);
-        //+TQ1.29
-        //-TQ1.28
-
         Commit();
     end;
 
     procedure LogoutAuto()
     begin
-        //-TQ1.29
-        //IF NOT ActiveSession.READPERMISSION THEN
-        //  EXIT;
-        //+TQ1.29
-
         GetMySession();
         Logout(ActiveSession."Server Instance ID", ActiveSession."Session ID");
     end;
@@ -128,20 +80,12 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskQueue2: Record "NPR Task Queue";
         TaskWorker: Record "NPR Task Worker";
     begin
-        //-TQ1.29
         TaskWorker.LockTable();
-        //+TQ1.29
         if not TaskWorker.Get(ServerInstanceID, SessionID) then
             exit;
 
         TaskQueue2.LockTable();
-
-        //-NPR5.45 [313269]
-        //-TQ1.34 [326930]
-        //TaskQueue2.SETCURRENTKEY("Task Worker Group","Assigned to Service Inst.ID","Assigned to Session ID",Enabled,Company,"Next Run time");
         TaskQueue2.SetCurrentKey("Assigned to Service Inst.ID", "Assigned to Session ID", Enabled, "Task Worker Group", Company, "Next Run time");
-        //+TQ1.34 [326930]
-        //+NPR5.45 [313269]
 
         TaskQueue2.SetRange("Assigned to Service Inst.ID", ServerInstanceID);
         TaskQueue2.SetRange("Assigned to Session ID", SessionID);
@@ -149,19 +93,7 @@ codeunit 6059901 "NPR Task Queue Manager"
             TaskQueue2.Validate(Status, TaskQueue2.Status::Awaiting);
             TaskQueue2.Modify();
         end;
-
-        //-TQ1.29
-        //-TQ1.28
-        //TaskLog.AddLogout(TaskWorker);
-        //TaskLogMaster.AddLogout(TaskWorker);
-        //+TQ1.28
-        //+TQ1.29
-
         TaskWorker.Delete();
-        //-TQ1.29
-        //CLEAR(TaskLine);
-        //+TQ1.29
-
         Commit();
     end;
 
@@ -177,19 +109,12 @@ codeunit 6059901 "NPR Task Queue Manager"
     var
         TaskWorker: Record "NPR Task Worker";
     begin
-        //-TQ1.28
         TaskWorker.LockTable();
-        //-TQ1.31 [301695]
-        //IF TaskWorker.FindLast() THEN;
-        //+TQ1.31 [301695]
-        //+TQ1.28
         GetMySession();
 
         TaskWorker.Get(ActiveSession."Server Instance ID", ActiveSession."Session ID");
         TaskWorker."Last HeartBeat (When Idle)" := CurrentDateTime;
-        //-TQ1.34 [326930]
         TaskWorker."Current Check Interval" := CurrentCheckInterval;
-        //+TQ1.34 [326930]
         TaskWorker.Modify();
 
         Commit();
@@ -202,15 +127,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         if not TaskWorker.Active then
             exit(false);
 
-        //-NPR5.45 [313269]
-        //SELECTLATESTVERSION;
-        //CLEAR(TaskQueue);
-        //-TQ1.34 [326930]
-        //TaskQueue2.SETCURRENTKEY("Task Worker Group","Assigned to Service Inst.ID","Assigned to Session ID",Enabled,Company,"Next Run time");
         TaskQueue2.SetCurrentKey("Assigned to Service Inst.ID", "Assigned to Session ID", Enabled, "Task Worker Group", Company, "Next Run time");
-        //+TQ1.34 [326930]
-        //+NPR5.45 [313269]
-
         TaskQueue2.SetRange(Company, TaskWorker."Current Company");
         TaskQueue2.SetRange("Assigned to Service Inst.ID", ServiceInstanceId());
         TaskQueue2.SetRange("Assigned to Session ID", SessionId());
@@ -227,10 +144,8 @@ codeunit 6059901 "NPR Task Queue Manager"
         TaskQueueProcessor: Codeunit "NPR Task Queue Processor";
         TaskLine: Record "NPR Task Line";
     begin
-        //-TQ1.18.01
         TaskLine.Get(TaskLineParm."Journal Template Name", TaskLineParm."Journal Batch Name", TaskLineParm."Line No.");
         TaskQueueProcessor.CodeManualRun(TaskLine);
-        //+TQ1.18.01
     end;
 }
 

@@ -186,12 +186,12 @@ page 6151510 "NPR Nc Task Output List"
         Path: Text;
     begin
         Rec.CalcFields(Data);
-        if not Data.HasValue() then begin
+        if not Rec.Data.HasValue() then begin
             Message(Text000);
             exit;
         end;
 
-        Data.CreateInStream(InStr, TEXTENCODING::UTF8);
+        Rec.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
         Path := TemporaryPath + Rec.Name;
         DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(Rec.Name), Path);
         HyperLink(Path);

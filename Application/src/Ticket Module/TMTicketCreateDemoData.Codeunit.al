@@ -215,18 +215,13 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
     begin
 
         if (not Admission.get(AdmissionCode)) then begin
-            WITH Admission DO
-                CreateAdmissionCode(AdmissionCode, AdmissionDescription, Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
+            CreateAdmissionCode(AdmissionCode, AdmissionDescription, Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
 
-            WITH AdmissionSchedule DO BEGIN
-                CreateSchedule(StrSubstNo('%1-WD', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-                CreateSchedule(StrSubstNo('%1-WE', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
-            END;
+            CreateSchedule(StrSubstNo('%1-WD', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+            CreateSchedule(StrSubstNo('%1-WE', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
 
-            WITH ScheduleLine DO BEGIN
-                CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WD', AdmissionCode), 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
-                CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WE', AdmissionCode), 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
-            END;
+            CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WD', AdmissionCode), 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+            CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WE', AdmissionCode), 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
         end;
 
         CreateTicketType('MM-AUTO', 'Members and Member Guests', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);

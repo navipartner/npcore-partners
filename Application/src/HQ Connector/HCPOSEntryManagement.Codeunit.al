@@ -6,7 +6,7 @@ codeunit 6150915 "NPR HC POS Entry Management"
     var
         Document: XmlDocument;
     begin
-        if LoadXmlDoc(Document) then
+        if Rec.LoadXmlDoc(Document) then
             ProcessPOSTransaction(Document);
     end;
 

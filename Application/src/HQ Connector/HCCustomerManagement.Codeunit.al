@@ -6,7 +6,7 @@ codeunit 6150907 "NPR HC Customer Management"
     var
         Document: XmlDocument;
     begin
-        if LoadXmlDoc(Document) then
+        if Rec.LoadXmlDoc(Document) then
             CustomerAction(Document);
     end;
 

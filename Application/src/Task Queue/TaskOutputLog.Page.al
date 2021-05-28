@@ -1,8 +1,5 @@
 page 6059911 "NPR Task Output Log"
 {
-    // TQ1.29/JDH /20161101 CASE 242044 Possible to show the log
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
 
     Caption = 'Task Output Log';
     PageType = List;
@@ -77,12 +74,12 @@ page 6059911 "NPR Task Output Log"
                     Downloaded: Boolean;
                 begin
                     Rec.CalcFields(File);
-                    if not File.HasValue() then begin
+                    if not Rec.File.HasValue() then begin
                         Message(ReportIsEmptyMsg);
                         exit;
                     end;
 
-                    File.CreateInStream(Instr);
+                    Rec.File.CreateInStream(Instr);
                     Downloaded := DownloadFromStream(Instr, FileDownLoadTxt, '', '', Rec."File Name");
                 end;
             }

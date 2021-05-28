@@ -117,7 +117,7 @@ page 6014645 "NPR Tax Free Requests"
                     InStream: InStream;
                     Filename: Variant;
                 begin
-                    if not Request.HasValue() then
+                    if not Rec.Request.HasValue() then
                         exit;
                     Rec.CalcFields(Request);
                     TempBLOB.FromRecord(Rec, Rec.FieldNo(Request));

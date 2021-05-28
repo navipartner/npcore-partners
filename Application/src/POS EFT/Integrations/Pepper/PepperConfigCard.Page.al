@@ -418,8 +418,8 @@ page 6184490 "NPR Pepper Config. Card"
     local procedure UpdateBLOBCheck()
     begin
         Rec.CalcFields("License File", "Additional Parameters");
-        HasLicense := "License File".HasValue;
-        HasAdditionalParameters := "Additional Parameters".HasValue;
+        HasLicense := Rec."License File".HasValue();
+        HasAdditionalParameters := Rec."Additional Parameters".HasValue();
     end;
 }
 

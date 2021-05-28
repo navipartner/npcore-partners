@@ -1,12 +1,10 @@
 ﻿codeunit 6059973 "NPR Variety Lookup Functions"
 {
-    // NPR5.28/JDH /20161128 CASE 255961 Lookup of Inventory per Variant added
-
     TableNo = "NPR Variety Field Setup";
 
     trigger OnRun()
     begin
-        case "Function Identifier" of
+        case Rec."Function Identifier" of
             'ITEM_PER_LOCATION':
                 ItemPerLocation(Rec);
         end;
@@ -74,12 +72,10 @@
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownEvent', '', false, false)]
     local procedure CU6059971_OnDrillDown(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup")
     begin
-        //-NPR5.28 [255961]
         if not (VrtFieldSetup."OnDrillDown Codeunit ID" = CODEUNIT::"NPR Variety Lookup Functions") then
             exit;
 
         DrillDownItemsPerLocation(TMPVrtBuffer."Item No.", TMPVrtBuffer."Variant Code");
-        //+NPR5.28 [255961]
     end;
 
     local procedure DrillDownItemsPerLocation(ItemNo: Code[20]; VariantCode: Code[10])
@@ -88,7 +84,6 @@
         Location: Record Location;
         Item: Record Item;
     begin
-        //-NPR5.28 [255961]
         Item.Get(ItemNo);
         Item.SetRange("Variant Filter", VariantCode);
         if Location.FindSet(false, false) then
@@ -113,7 +108,6 @@
             TMPInvBuffer.Insert();
         end;
         PAGE.RunModal(6059976, TMPInvBuffer);
-        //+NPR5.28 [255961]
     end;
 }
 

@@ -34,7 +34,7 @@ page 6059940 "NPR SMS Template List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Caption field';
                 }
-                field("""Table Filters"".HASVALUE"; "Table Filters".HasValue)
+                field("""Table Filters"".HASVALUE"; Rec."Table Filters".HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Filters on Table';

@@ -250,22 +250,20 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest2.SetFilter("Processing Type", '=%1|%2', EFTTransactionRequest2."Processing Type"::PAYMENT, EFTTransactionRequest2."Processing Type"::REFUND);
         if (EFTTransactionRequest2.FindSet()) then begin
             repeat
-                with TmpRegisterPaymentLines do begin
-                    TmpRegisterPaymentLines.Init();
-                    TmpRegisterPaymentLines."Entry No." := TmpRegisterPaymentLines.Count() + 1;
-                    case (EFTTransactionRequest2."Processing Type") of
-                        EFTTransactionRequest2."Processing Type"::PAYMENT:
-                            TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::PAYMENT;
-                        EFTTransactionRequest2."Processing Type"::REFUND:
-                            TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::REFUND;
-                    end;
-                    TmpRegisterPaymentLines.Description := EFTTransactionRequest2."POS Description";
-                    TmpRegisterPaymentLines."Authorization Code" := EFTTransactionRequest2."Authorisation Number";
-                    TmpRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
-                    TmpRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
-                    TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
-                    TmpRegisterPaymentLines.Insert();
+                TmpRegisterPaymentLines.Init();
+                TmpRegisterPaymentLines."Entry No." := TmpRegisterPaymentLines.Count() + 1;
+                case (EFTTransactionRequest2."Processing Type") of
+                    EFTTransactionRequest2."Processing Type"::PAYMENT:
+                        TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::PAYMENT;
+                    EFTTransactionRequest2."Processing Type"::REFUND:
+                        TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::REFUND;
                 end;
+                TmpRegisterPaymentLines.Description := EFTTransactionRequest2."POS Description";
+                TmpRegisterPaymentLines."Authorization Code" := EFTTransactionRequest2."Authorisation Number";
+                TmpRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
+                TmpRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
+                TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
+                TmpRegisterPaymentLines.Insert();
             until (EFTTransactionRequest2.Next() = 0);
         end;
 

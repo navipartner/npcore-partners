@@ -342,12 +342,10 @@ page 6184493 "NPR Pepper Terminal Card"
 
     local procedure UpdateBLOBCheck()
     begin
-        //-NPR5.25 [231481]
-        //CALCFIELDS("Additional Parameters File");
+
         Rec.CalcFields("Additional Parameters File", "License File");
-        HasLicense := "License File".HasValue;
-        //+NPR5.25 [231481]
-        HasAdditionalParameters := "Additional Parameters File".HasValue;
+        HasLicense := Rec."License File".HasValue;
+        HasAdditionalParameters := Rec."Additional Parameters File".HasValue();
     end;
 }
 
