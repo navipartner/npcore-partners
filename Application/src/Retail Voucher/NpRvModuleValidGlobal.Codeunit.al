@@ -44,17 +44,12 @@
     var
         NpRvPartner: Record "NPR NpRv Partner";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         RequestHeader: HttpHeaders;
         Response: HttpResponseMessage;
-        Document: XmlDocument;
-        Node: XmlNode;
         RequestXmlText: Text;
-        ErrorMessage: Text;
         ResponseText: Text;
     begin
         NpRvVoucherType.Get(NpRvGlobalVoucherSetup."Voucher Type");
@@ -181,16 +176,12 @@
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDomManagement: Codeunit "XML DOM Management";
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         RequestHeader: HttpHeaders;
         Response: HttpResponseMessage;
-        Document: XmlDocument;
         RequestXmlText: Text;
-        ErrorMessage: Text;
         ResponseText: Text;
     begin
         if not NpRvVoucherType.Get(NpRvSaleLinePOSVoucher."Voucher Type") then
@@ -285,16 +276,12 @@
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDomManagement: Codeunit "XML DOM Management";
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         RequestHeader: HttpHeaders;
         Response: HttpResponseMessage;
-        Document: XmlDocument;
         RequestXmlText: Text;
-        ErrorMessage: Text;
         ResponseText: Text;
     begin
         Voucher.CalcFields("Validate Voucher Module");
@@ -382,7 +369,6 @@
         Document: XmlDocument;
         Node: XmlNode;
         RequestXmlText: Text;
-        ErrorMessage: Text;
         ReferenceNo: Text;
         ResponseText: Text;
     begin
@@ -504,16 +490,12 @@
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         RequestHeader: HttpHeaders;
         Response: HttpResponseMessage;
-        Document: XmlDocument;
         RequestXmlText: Text;
-        ErrorMessage: Text;
         ResponseText: Text;
     begin
         if VoucherEntry."Entry Type" <> VoucherEntry."Entry Type"::Payment then
@@ -579,16 +561,12 @@
         NpRvVoucherEntry2: Record "NPR NpRv Voucher Entry";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         RequestHeader: HttpHeaders;
         Response: HttpResponseMessage;
-        Document: XmlDocument;
         RequestXmlText: Text;
-        ErrorMessage: Text;
         ResponseText: Text;
     begin
         if not (NpRvVoucherEntry."Entry Type" in [NpRvVoucherEntry."Entry Type"::Payment, NpRvVoucherEntry."Entry Type"::"Partner Payment"]) then
