@@ -142,8 +142,8 @@
     procedure InsertNote(Element: XmlElement; var SalesHeader: Record "Sales Header")
     var
         RecordLink: Record "Record Link";
+        RecordLinkManagement: Codeunit "Record Link Management";
         Node: XmlNode;
-        OutStr: OutStream;
         Note: Text;
         LinkID: Integer;
     begin
@@ -158,8 +158,7 @@
         LinkID := SalesHeader.AddLink('', SalesHeader."No.");
         RecordLink.Get(LinkID);
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Note.CreateOutStream(OutStr);
-        OutStr.WriteText(Note);
+        RecordLinkManagement.WriteNote(RecordLink, Note);
         RecordLink."User ID" := '';
         RecordLink.Modify(true);
     end;

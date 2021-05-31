@@ -30,8 +30,8 @@ codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
     procedure InsertNote(Element: XmlElement; var PurchHeader: Record "Purchase Header")
     var
         RecordLink: Record "Record Link";
+        RecordLinkManagement: Codeunit "Record Link Management";
         Node: XmlNode;
-        OutStr: OutStream;
         Note: Text;
         LinkID: Integer;
     begin
@@ -46,8 +46,7 @@ codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
         LinkID := PurchHeader.AddLink('', PurchHeader."No.");
         RecordLink.Get(LinkID);
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Note.CreateOutStream(OutStr);
-        OutStr.WriteText(Note);
+        RecordLinkManagement.WriteNote(RecordLink, Note);
         RecordLink."User ID" := '';
         RecordLink.Modify(true);
     end;
