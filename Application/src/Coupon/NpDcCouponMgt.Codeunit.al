@@ -891,6 +891,7 @@
             EanBoxEvent.Code := EventCodeRefNo();
             EanBoxEvent."Module Name" := Text002;
             EanBoxEvent.Description := CopyStr(NpDcCoupon.FieldCaption("Reference No."), 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
