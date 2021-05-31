@@ -15,8 +15,10 @@ codeunit 6014405 "NPR UPG Aux. Tables"
         if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
             exit;
 
-        UpgradeValueEntry();
-        UpgradeItemLedgerEntry();
+        // "Aux. Value Entry" and "Aux. Item Ledger Entry" must be upgraded on sql side.
+        //
+        // UpgradeValueEntry();
+        // UpgradeItemLedgerEntry();
         UpgradeGLAccount();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
