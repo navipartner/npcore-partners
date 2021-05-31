@@ -533,12 +533,11 @@ codeunit 6060132 "NPR MM Import Members"
     local procedure MakeNote(Member: Record "NPR MM Member"; CommentText: Text)
     var
         RecordLink: Record "Record Link";
-        OutStr: OutStream;
+        RecordLinkManagement: Codeunit "Record Link Management";
     begin
         RecordLink.Get(Member.AddLink('', 'Notes'));
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Note.CreateOutStream(OutStr, TextEncoding::UTF8);
-        OutStr.WriteText(CommentText);
+        RecordLinkManagement.WriteNote(RecordLink, CommentText);
         RecordLink.Modify();
     end;
 
