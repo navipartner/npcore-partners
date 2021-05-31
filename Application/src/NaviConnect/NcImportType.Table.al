@@ -198,25 +198,12 @@ table 6151505 "NPR Nc Import Type"
 
     procedure UpdateWebservice()
     var
-        WebService: Record "Web Service";
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
     begin
         if not ("Webservice Enabled" and (Description = '') and ("Webservice Codeunit ID" > 0)) then
             exit;
 
-        if WebService.Get("Webservice Codeunit ID", Description) then begin
-            WebService."Object Type" := WebService."Object Type"::Codeunit;
-            WebService."Object ID" := "Webservice Codeunit ID";
-            WebService."Service Name" := Description;
-            WebService.Published := true;
-            WebService.Modify(true);
-            exit;
-        end;
-
-        WebService.Init();
-        WebService."Object Type" := WebService."Object Type"::Codeunit;
-        WebService."Object ID" := "Webservice Codeunit ID";
-        WebService."Service Name" := Description;
-        WebService.Published := true;
-        WebService.Insert(true);
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, "Webservice Codeunit ID", Description, true);
     end;
 }

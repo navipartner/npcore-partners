@@ -43,11 +43,14 @@ table 6060090 "NPR MM Admis. Service Setup"
         }
         field(16; "Web Service Is Published"; Boolean)
         {
-            CalcFormula = Exist("Web Service" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Exist("Web Service Aggregate" WHERE("Object Type" = CONST(Codeunit),
                                                      "Service Name" = CONST('admission_service')));
             Caption = 'Web Service Is Published';
             Editable = false;
             FieldClass = FlowField;
+
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Web Service is not in use any more by Cloud and Web Service Aggregate is Temp table. This logic is moved on Page Field.';
         }
         field(17; "Validate Scanner Station"; Boolean)
         {

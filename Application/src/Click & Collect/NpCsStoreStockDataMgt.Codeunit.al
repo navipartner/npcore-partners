@@ -39,26 +39,15 @@
     var
         Company: Record Company;
         NpCsStore: Record "NPR NpCs Store";
-        WebService: Record "Web Service";
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
         PrevRec: Text;
     begin
-        if (GetStoreStockItemUrl(CompanyName) = '') and not WebService.Get(WebService."Object Type"::Page, 'collect_store_stock_items') then begin
-            WebService.Init();
-            WebService."Object Type" := WebService."Object Type"::Page;
-            WebService."Object ID" := PAGE::"NPR NpCs Store Stock Items";
-            WebService."Service Name" := 'collect_store_stock_items';
-            WebService.Published := true;
-            WebService.Insert(true);
-        end;
+        if (GetStoreStockItemUrl(CompanyName) = '') then
+            WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Page, PAGE::"NPR NpCs Store Stock Items", 'collect_store_stock_items', true);
 
-        if (GetStoreStockStatusUrl(CompanyName) = '') and not WebService.Get(WebService."Object Type"::Query, 'collect_store_stock_status') then begin
-            WebService.Init();
-            WebService."Object Type" := WebService."Object Type"::Query;
-            WebService."Object ID" := QUERY::"NPR NpCs Store Stock Status";
-            WebService."Service Name" := 'collect_store_stock_status';
-            WebService.Published := true;
-            WebService.Insert(true);
-        end;
+        if (GetStoreStockStatusUrl(CompanyName) = '') then
+            WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Query, QUERY::"NPR NpCs Store Stock Status", 'collect_store_stock_status', true);
 
         if NpCsStore.FindSet() then
             repeat

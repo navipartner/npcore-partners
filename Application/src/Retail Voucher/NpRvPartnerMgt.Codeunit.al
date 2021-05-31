@@ -13,8 +13,8 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
 
     local procedure InitGlobalVoucherService()
     var
-        WebService: Record "Web Service";
-        PrevRec: Text;
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
     begin
         if not WebService.ReadPermission then
             exit;
@@ -22,20 +22,7 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
         if not WebService.WritePermission then
             exit;
 
-        if not WebService.Get(WebService."Object Type"::Codeunit, 'global_voucher_service') then begin
-            WebService.Init();
-            WebService."Object Type" := WebService."Object Type"::Codeunit;
-            WebService."Object ID" := GlobalVoucherWsCodeunitId();
-            WebService."Service Name" := 'global_voucher_service';
-            WebService.Published := true;
-            WebService.Insert(true);
-        end;
-
-        PrevRec := Format(WebService);
-        WebService."Object ID" := GlobalVoucherWsCodeunitId();
-        WebService.Published := true;
-        if PrevRec <> Format(WebService) then
-            WebService.Modify(true);
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, GlobalVoucherWsCodeunitId(), 'global_voucher_service', true);
     end;
 
     [TryFunction]
