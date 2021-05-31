@@ -16,6 +16,7 @@ page 6151128 "NPR NpIa ItemAddOn Line Opt."
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
+                    ShowMandatory = true;
                     ToolTip = 'Specifies the number of an item.';
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -26,6 +27,7 @@ page 6151128 "NPR NpIa ItemAddOn Line Opt."
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ShowMandatory = true;
                     ToolTip = 'Specifies a description of the entry of the product to be sold.';
                 }
                 field("Description 2"; Rec."Description 2")

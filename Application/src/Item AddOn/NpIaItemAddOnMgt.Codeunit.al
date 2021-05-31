@@ -152,8 +152,8 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
             repeat
                 ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
                 ItemAddOnLineOption.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
-                ItemAddOnLineOption.SetFilter(Description, '<>%1', '');
-                if (ItemAddOnLine.Type = ItemAddOnLine.Type::Quantity) or
+                ItemAddOnLineOption.SetFilter("Item No.", '<>%1', '');
+                if ((ItemAddOnLine.Type = ItemAddOnLine.Type::Quantity) and (ItemAddOnLine."Item No." <> '')) or
                    ((ItemAddOnLine.Type = ItemAddOnLine.Type::Select) and ItemAddOnLineOption.FindSet())
                 then begin
                     CommentText := '';
@@ -213,6 +213,9 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
                                     ValueJObject.Add('variant', ItemAddOnLineOption."Variant Code");
 
                                     Clear(ItemAddOn_LineOptionJObject);
+                                    if ItemAddOnLineOption.Description = '' then
+                                        ItemAddOnLineOption.Description :=
+                                            CopyStr(ItemNoAndVariantCodeAsDescription(ItemAddOnLineOption."Item No.", ItemAddOnLineOption."Variant Code"), 1, MaxStrLen(ItemAddOnLineOption.Description));
                                     ItemAddOn_LineOptionJObject.Add('caption', ItemAddOnLineOption.Description);
                                     ItemAddOn_LineOptionJObject.Add('value', ValueJObject);
                                     ItemAddOn_LineOptionsJArray.Add(ItemAddOn_LineOptionJObject);
@@ -256,8 +259,9 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
 
     local procedure GetLineCaption(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; UseField: Option Description,"Description 2",Both) LineCaption: Text
     var
-        QuantityLbl: Label 'quantity';
         PerUnitLbl: Label 'per unit';
+        QuantityLbl: Label 'quantity';
+        SelectOptionsLbl: Label 'Select one';
     begin
         case UseField of
             UseField::Description:
@@ -275,10 +279,30 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
                         LineCaption := LineCaption + ' ' + ItemAddOnLine."Description 2";
                 end;
         end;
+        if LineCaption = '' then begin
+            case ItemAddOnLine.Type of
+                ItemAddOnLine.Type::Quantity:
+                    LineCaption := ItemNoAndVariantCodeAsDescription(ItemAddOnLine."Item No.", ItemAddOnLine."Variant Code");
+                ItemAddOnLine.Type::Select:
+                    LineCaption := SelectOptionsLbl;
+            end;
+        end;
         if ItemAddOnLine."Fixed Quantity" then
             LineCaption := LineCaption + StrSubstNo('; %1 = %2', QuantityLbl, ItemAddOnLine.Quantity);
         if ItemAddOnLine."Per Unit" then
             LineCaption := LineCaption + '/' + PerUnitLbl;
+    end;
+
+    local procedure ItemNoAndVariantCodeAsDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text
+    var
+        ItemNoLbl: Label 'Item: %1';
+        VariantCodeLbl: Label '%1, Variant %2';
+        Description: Text;
+    begin
+        Description := StrSubstNo(ItemNoLbl, ItemNo);
+        if VariantCode <> '' then
+            Description := StrSubstNo(VariantCodeLbl, Description, VariantCode);
+        exit(Description);
     end;
 
     local procedure CommentLineID(LineNo: Integer): Text

@@ -21,18 +21,20 @@ page 6151127 "NPR NpIa Item AddOn Subform"
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
-                    Enabled = (Rec.Type = 0);
+                    Enabled = (Rec.Type = Rec.Type::Quantity);
+                    ShowMandatory = (Rec.Type = Rec.Type::Quantity);
                     ToolTip = 'Specifies the number of an item.';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
-                    Enabled = (Rec.Type = 0);
+                    Enabled = (Rec.Type = Rec.Type::Quantity);
                     ToolTip = 'Specifies the variant of the item on the line.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ShowMandatory = true;
                     ToolTip = 'Specifies a description of the entry of the product to be sold.';
                 }
                 field("Description 2"; Rec."Description 2")
