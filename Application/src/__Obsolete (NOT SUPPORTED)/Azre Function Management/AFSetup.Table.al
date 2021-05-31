@@ -25,7 +25,7 @@ table 6151570 "NPR AF Setup"
         }
         field(12; "Web Service Is Published"; Boolean)
         {
-            CalcFormula = Exist("Web Service" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Exist("Web Service Aggregate" WHERE("Object Type" = CONST(Codeunit),
                                                      "Service Name" = CONST('azurefunction_service')));
             Caption = 'Web Service Is Published';
             Editable = false;

@@ -198,8 +198,8 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
 
     procedure InitGlobalPosSalesService()
     var
-        WebService: Record "Web Service";
-        PrevRec: Text;
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
     begin
         if not WebService.ReadPermission then
             exit;
@@ -207,20 +207,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         if not WebService.WritePermission then
             exit;
 
-        if not WebService.Get(WebService."Object Type"::Codeunit, 'global_pos_sales_service') then begin
-            WebService.Init();
-            WebService."Object Type" := WebService."Object Type"::Codeunit;
-            WebService."Object ID" := GlobalPosSalesCodeunitId();
-            WebService."Service Name" := 'global_pos_sales_service';
-            WebService.Published := true;
-            WebService.Insert(true);
-        end;
-
-        PrevRec := Format(WebService);
-        WebService."Object ID" := GlobalPosSalesCodeunitId();
-        WebService.Published := true;
-        if PrevRec <> Format(WebService) then
-            WebService.Modify(true);
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, GlobalPosSalesCodeunitId(), 'global_pos_sales_service', true);
     end;
 
     local procedure GetServiceName(Url: Text) ServiceName: Text

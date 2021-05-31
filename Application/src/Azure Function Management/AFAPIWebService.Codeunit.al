@@ -2,18 +2,10 @@ codeunit 6151572 "NPR AF API WebService"
 {
     trigger OnRun()
     var
-        WebService: Record "Web Service";
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
     begin
-        Clear(WebService);
-
-        if not WebService.Get(WebService."Object Type"::Codeunit, 'azurefunction_service') then begin
-            WebService.Init();
-            WebService."Object Type" := WebService."Object Type"::Codeunit;
-            WebService."Service Name" := 'azurefunction_service';
-            WebService."Object ID" := Codeunit::"NPR AF API WebService";
-            WebService.Published := true;
-            WebService.Insert();
-        end;
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF API WebService", 'azurefunction_service', true);
     end;
 
     var

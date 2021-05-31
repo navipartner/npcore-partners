@@ -20,8 +20,8 @@
 
     procedure InitCollectInStoreService()
     var
-        WebService: Record "Web Service";
-        PrevRec: Text;
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
     begin
         if not WebService.ReadPermission then
             exit;
@@ -29,20 +29,7 @@
         if not WebService.WritePermission then
             exit;
 
-        if not WebService.Get(WebService."Object Type"::Codeunit, 'collect_in_store_service') then begin
-            WebService.Init();
-            WebService."Object Type" := WebService."Object Type"::Codeunit;
-            WebService."Object ID" := CollectInStoreWsCodeunitId();
-            WebService."Service Name" := 'collect_in_store_service';
-            WebService.Published := true;
-            WebService.Insert(true);
-        end;
-
-        PrevRec := Format(WebService);
-        WebService."Object ID" := CollectInStoreWsCodeunitId();
-        WebService.Published := true;
-        if PrevRec <> Format(WebService) then
-            WebService.Modify(true);
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, CollectInStoreWsCodeunitId(), 'collect_in_store_service', true);
     end;
 
     procedure InitSendToStoreDocument(SalesHeader: Record "Sales Header"; NpCsStore: Record "NPR NpCs Store"; NpCsWorkflow: Record "NPR NpCs Workflow"; var NpCsDocument: Record "NPR NpCs Document")

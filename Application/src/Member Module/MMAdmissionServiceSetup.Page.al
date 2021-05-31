@@ -39,8 +39,9 @@ page 6060090 "NPR MM Admission Service Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allowed Re-Scan Interval field';
                 }
-                field("Web Service Is Published"; Rec."Web Service Is Published")
+                field(WebServiceIsPublished; WebServiceIsPublished)
                 {
+                    Caption = 'Web Service Is Published';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Web Service Is Published field';
                 }
@@ -91,5 +92,18 @@ page 6060090 "NPR MM Admission Service Setup"
             }
         }
     }
-}
 
+    trigger OnAfterGetRecord()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        WebServiceIsPublished := false;
+        WebServiceManagement.LoadRecords(WebService);
+        if WebService.Get(WebService."Object Type"::Codeunit, 'admission_service') then
+            WebServiceIsPublished := true;
+    end;
+
+    var
+        WebServiceIsPublished: Boolean;
+}
