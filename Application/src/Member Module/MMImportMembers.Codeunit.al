@@ -555,20 +555,13 @@ codeunit 6060132 "NPR MM Import Members"
     local procedure MakeNote(Member: Record "NPR MM Member"; CommentText: Text)
     var
         RecordLink: Record "Record Link";
-        OutStr: OutStream;
-        BinaryWriter: DotNet NPRNetBinaryWriter;
-        Encoding: DotNet NPRNetEncoding;
+        RecordLinkManagement: Codeunit "Record Link Management";
     begin
 
         RecordLink.Get(Member.AddLink('', 'Notes'));
 
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Note.CreateOutStream(OutStr);
-
-        Encoding := Encoding.UTF8;
-        BinaryWriter := BinaryWriter.BinaryWriter(OutStr, Encoding);
-        BinaryWriter.Write(CommentText);
-
+        RecordLinkManagement.WriteNote(RecordLink, CommentText);
         RecordLink.Modify();
     end;
 

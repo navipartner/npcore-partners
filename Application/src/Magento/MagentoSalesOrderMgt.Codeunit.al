@@ -146,9 +146,10 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
     local procedure InsertCommentLine(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
         RecordLink: Record "Record Link";
+        RecordLinkManagement: Codeunit "Record Link Management";
         CommentLine: Text;
         CommentType: Text;
-        OutStream: OutStream;
+        Note: Text;
         LinkID: Integer;
     begin
         CommentType := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'type', false);
@@ -160,12 +161,13 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
                 LinkID := SalesHeader.AddLink('', SalesHeader."No.");
             RecordLink.Get(LinkID);
             RecordLink.Type := RecordLink.Type::Note;
-            RecordLink.Note.CreateOutStream(OutStream, TextEncoding::UTF8);
             RecordLink."User ID" := '';
             if CommentType <> '' then
-                OutStream.Write(CommentType + ': ' + CommentLine)
+                Note := CommentType + ': ' + CommentLine
             else
-                OutStream.Write(CommentLine);
+                Note := CommentLine;
+
+            RecordLinkManagement.WriteNote(RecordLink, Note);
             RecordLink.Modify(true);
             OnAfterInsertCommentLine(CurrImportType, CurrImportEntry, XmlElement, SalesHeader, RecordLink);
         end;
