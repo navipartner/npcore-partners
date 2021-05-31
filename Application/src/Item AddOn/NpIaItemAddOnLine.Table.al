@@ -26,10 +26,8 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
             trigger OnValidate()
             begin
-                if Type = Type::Select then begin
-                    "Item No." := '';
-                    "Variant Code" := '';
-                end;
+                if Type = Type::Select then
+                    validate("Item No.", '');
             end;
         }
         field(15; "Item No."; Code[20])
@@ -46,6 +44,7 @@ table 6151126 "NPR NpIa Item AddOn Line"
                     Init();
                     exit;
                 end;
+                TestField(Type, Type::Quantity);
                 Item.Get("Item No.");
 
                 "Unit Price" := Item."Unit Price";
@@ -63,9 +62,10 @@ table 6151126 "NPR NpIa Item AddOn Line"
             var
                 ItemVariant: Record "Item Variant";
             begin
-                if "Variant Code" <> '' then
+                if "Variant Code" <> '' then begin
+                    TestField("Item No.");
                     ItemVariant.Get("Item No.", "Variant Code")
-                else
+                end else
                     Clear(ItemVariant);
                 "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
             end;
@@ -126,7 +126,8 @@ table 6151126 "NPR NpIa Item AddOn Line"
                 if Quantity = 0 then begin
                     "Fixed Quantity" := false;
                     Mandatory := false;
-                end;
+                end else
+                    TestField("Item No.");
             end;
         }
         field(110; "Fixed Quantity"; Boolean)
@@ -144,6 +145,12 @@ table 6151126 "NPR NpIa Item AddOn Line"
         {
             Caption = 'Per unit';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Per Unit" then
+                    TestField(Quantity);
+            end;
         }
         field(130; Mandatory; Boolean)
         {
