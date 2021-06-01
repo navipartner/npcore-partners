@@ -128,16 +128,7 @@ then begin
                     case (EndOfDayType) of
                         EndOfDayTypeOption::"Z-Report":
                             begin
-                                if (FinalEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID", BalanceEntryToPrint)) then begin
-                                    ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnit."No.", SalespersonPurchaser.Code);
-                                    POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
-
-                                    Commit();
-                                    POSSession.ChangeViewLogin();
-                                    PrintEndOfDayReport(POSUnit."No.", BalanceEntryToPrint);
-                                end else begin
-                                    POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
-                                end;
+                                CreateZReport(POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession);
                             end;
 
                         EndOfDayTypeOption::CloseWorkshift:
@@ -392,7 +383,6 @@ then begin
         POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS);
     end;
 
-
     procedure LineExists(var SalePOS: Record "NPR POS Sale"): Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -401,5 +391,26 @@ then begin
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         exit(not SaleLinePOS.IsEmpty());
+    end;
+
+    procedure CreateZReport(POSUnitNo: Code[10]; SalespersonPurchaserCode: Text; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"): Integer
+    var
+        ClosingEntryNo: Integer;
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
+        BalanceEntryToPrint: Integer;
+    begin
+        if (FinalEndOfDay(POSUnitNo, SaleDimSetID, BalanceEntryToPrint)) then begin
+            ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnitNo, SalespersonPurchaserCode);
+            POSManagePOSUnit.ClosePOSUnitNo(POSUnitNo, ClosingEntryNo);
+
+            Commit();
+            POSSession.ChangeViewLogin();
+            PrintEndOfDayReport(POSUnitNo, BalanceEntryToPrint);
+        end else begin
+            POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnitNo);
+        end;
+
+        exit(BalanceEntryToPrint);
     end;
 }

@@ -4,8 +4,7 @@ page 6184850 "NPR FR Audit Setup"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR FR Audit Setup";
 
     layout

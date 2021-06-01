@@ -517,6 +517,8 @@
                 POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
                 POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::WORKSHIFT_END, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
 
+                OnAfterCreateBalancingEntry(POSWorkshiftCheckpoint);
+
                 Commit();
             end;
 
@@ -1418,7 +1420,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostWorkshift(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure OnAfterCreateBalancingEntry(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     begin
     end;
 

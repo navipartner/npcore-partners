@@ -111,7 +111,6 @@ table 6150650 "NPR POS Audit Profile"
         {
             Caption = 'Allow Printing Receipt Copy';
             DataClassification = CustomerContent;
-            Description = 'NPR5.51';
             OptionCaption = 'Always,Only Once,Never';
             OptionMembers = Always,"Only Once",Never;
         }
@@ -119,14 +118,17 @@ table 6150650 "NPR POS Audit Profile"
         {
             Caption = 'Do Not Print Receipt on Sale';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52';
         }
         field(110; "Sales Ticket No. Series"; Code[20])
         {
             Caption = 'Sales Ticket No. Series';
             DataClassification = CustomerContent;
-            Description = 'NPR5.53';
             TableRelation = "No. Series";
+        }
+        field(120; "Require Item Return Reason"; Boolean)
+        {
+            Caption = 'Require Item Return Reason';
+            DataClassification = CustomerContent;
         }
     }
 
