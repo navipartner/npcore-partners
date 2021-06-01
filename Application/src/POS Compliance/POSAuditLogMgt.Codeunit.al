@@ -74,7 +74,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
 
             POSAuditLog."Active POS Unit No." := POSSetup.GetPOSUnitNo();
             POSAuditLog."Active Salesperson Code" := POSSetup.Salesperson();
-            POSAuditLog.SystemId := SalePOS.SystemId;
+            POSAuditLog."Active POS Sale SystemId" := SalePOS.SystemId;
         end;
 
         if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then

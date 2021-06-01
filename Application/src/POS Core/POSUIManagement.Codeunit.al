@@ -664,7 +664,6 @@ codeunit 6150702 "NPR POS UI Management"
         POSSetup: Record "NPR POS Setup";
         POSViewProfile: Record "NPR POS View Profile";
         POSActionParameterMgt: Codeunit "NPR POS Action Param. Mgt.";
-        LicenseInformation: Codeunit "NPR License Information";
         Options: JsonObject;
     begin
         Options.Add('itemWorkflow', Setup.ActionCode_Item());
@@ -681,7 +680,7 @@ codeunit 6150702 "NPR POS UI Management"
         Options.Add('adminMenuWorkflow', Setup.ActionCode_AdminMenu());
         Setup.GetNamedActionSetup(POSSetup);
         Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));
-        Options.Add('nprVersion', LicenseInformation.GetRetailVersion());
+        Options.Add('nprVersion', GetDisplayVersion());
         Setup.GetPOSViewProfile(POSViewProfile);
         Options.Add('taxationType', Format(POSViewProfile."Tax Type", 0, 9));
         Options.Add('lineOrderOnScreen', POSViewProfile."Line Order on Screen");
@@ -689,6 +688,21 @@ codeunit 6150702 "NPR POS UI Management"
         OnSetOptions(Setup, Options);
 
         FrontEnd.SetOptions(Options);
+    end;
+
+    local procedure GetDisplayVersion(): Text
+    var
+        versionNumber: Text;
+        LicenseInformation: Codeunit "NPR License Information";
+    begin
+        versionNumber := LicenseInformation.GetRetailVersion();
+        OnGetDisplayVersion(versionNumber);
+        exit(versionNumber);
+    end;
+
+    [InternalEvent(false)]
+    local procedure OnGetDisplayVersion(var displayVersion: Text)
+    begin
     end;
 
     procedure AddActionCaption(Captions: Dictionary of [Text, Text]; ActionCode: Text; CaptionId: Text; CaptionText: Text)

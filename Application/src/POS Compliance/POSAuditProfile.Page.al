@@ -77,6 +77,11 @@ page 6150626 "NPR POS Audit Profile"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Do Not Print Receipt on Sale field';
                 }
+                field("Require Item Return Reason"; Rec."Require Item Return Reason")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Prompts for return reason when returning items in POS';
+                }
             }
         }
     }

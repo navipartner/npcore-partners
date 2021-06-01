@@ -396,10 +396,6 @@ dotnet
         {
         }
 
-        type("System.Security.Cryptography.SHA1CryptoServiceProvider"; "NPRNetSHA1CryptoServiceProvider")
-        {
-        }
-
         type("System.Security.Cryptography.KeyedHashAlgorithm"; "NPRNetKeyedHashAlgorithm")
         {
         }
@@ -831,6 +827,10 @@ dotnet
         type("System.Collections.Generic.HashSet`1+Enumerator"; "NPRNetHashSet_Of_T_Enumerator")
         {
         }
+
+        type("System.Security.Cryptography.SHA256CryptoServiceProvider"; "NPRNetSHA256CryptoServiceProvider")
+        {
+        }
     }
 
     assembly("System.Web")
@@ -1244,13 +1244,6 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.PdfWriter")
     {
-#if BC17
-        Version = '17.0.0.0';
-#endif
-
-#if BC18
-        Version = '18.0.0.0';
-#endif
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 

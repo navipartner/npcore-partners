@@ -14,7 +14,7 @@
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.7');
+        exit('1.8');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -43,6 +43,7 @@ then begin
             Sender.RegisterOptionParameter('SelectionDialogType', 'TextField,List', 'List');
             Sender.RegisterOptionParameter('ObfuscationMethod', 'None,MI', 'None');
             Sender.RegisterBooleanParameter('Print Tax Free Voucher', false);
+            Sender.RegisterBooleanParameter('Print Retail Voucher', false);
         end;
     end;
 
@@ -218,7 +219,7 @@ then begin
         if JSON.GetBooleanOrFail('Print Memberships', StrSubstNo(ReadingErr, ActionCode())) then
             MMMemberRetailIntegration.PrintMembershipOnEndOfSales(SalesTicketNo);
 
-        if JSON.GetBooleanOrFail('Print Credit Voucher', StrSubstNo(ReadingErr, ActionCode())) then begin
+        if JSON.GetBooleanOrFail('Print Retail Voucher', StrSubstNo(ReadingErr, ActionCode())) then begin
             NpRvVoucher.SetRange("Issue Document Type", NpRvVoucher."Issue Document Type"::"Audit Roll");
             NpRvVoucher.SetRange("Issue Document No.", SalesTicketNo);
             if NpRvVoucher.FindSet() then

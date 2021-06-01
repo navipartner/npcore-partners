@@ -91,10 +91,13 @@ codeunit 6150808 "NPR POS Action: Quantity"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, false)]
-    local procedure OnBeforeWorkflow(Action: Record "NPR POS Action"; Parameters: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnBeforeWorkflow(Action: Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "NPR POS JSON Management";
         NegativeInput: Boolean;
+        POSSetup: Codeunit "NPR POS Setup";
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -107,7 +110,10 @@ codeunit 6150808 "NPR POS Action: Quantity"
         if not NegativeInput then
             exit;
 
-        Context.SetContext('PromptForReason', true);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        Context.SetContext('PromptForReason', POSAuditProfile."Require Item Return Reason");
 
         FrontEnd.SetActionContext(ActionCode(), Context);
     end;

@@ -54,13 +54,19 @@ then begin
     var
         Setup: Codeunit "NPR POS Setup";
         Context: Codeunit "NPR POS JSON Management";
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
         POSSession.GetSetup(Setup);
 
-        Context.SetContext('PromptForReason', true);
+        POSSession.GetSession(POSSession, true);
+        POSSession.GetSetup(Setup);
+        Setup.GetPOSUnit(POSUnit);
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        Context.SetContext('PromptForReason', POSAuditProfile."Require Item Return Reason");
 
         FrontEnd.SetActionContext(ActionCode(), Context);
         Handled := true;
@@ -159,16 +165,12 @@ then begin
 
         JSON.SetScopeRoot();
 
-        //This function heavily used audit roll and tried to do too much. It should just reverse the simple types like Item, GL. 
-        //Any aux module needs to subscribe and handle itself like retail voucher etc.
-        //RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);
         ReturnReasonCode := JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode()));
         ReverseSalesTicket(SalePOS, SalesTicketNo, ReturnReasonCode);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
-        SaleLinePOS.ModifyAll("Return Sale Sales Ticket No.", SalesTicketNo);
         if not SaleLinePOS.IsEmpty then
             POSSaleLine.SetLast();
 
@@ -214,6 +216,7 @@ then begin
                 if ReturnReasonCode <> '' then
                     SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
+                SaleLinePOS."Return Sale Sales Ticket No." := SalesTicketNo;
                 SaleLinePOS.Modify(true);
             until POSSalesLine.Next() = 0;
     end;

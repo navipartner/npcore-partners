@@ -109,7 +109,8 @@ codeunit 85003 "NPR Library - POS Mock"
         if not POSSale.TryEndSale(POSSession, false) then
             exit(false);
 
-        exit(TryPOSPost(SalePOS));
+        POSPost(SalePOS);
+        exit(true);
     end;
 
     procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text): Boolean
@@ -135,16 +136,14 @@ codeunit 85003 "NPR Library - POS Mock"
         if VoucherNo <> '' then
             IssueReturnVoucherFromPaymentMethod(POSSession, VoucherNo);
 
-
-        POSActionPayment.TryEndSale(POSPaymentMethod, POSSession); //TryEndSale step of payment action
-
-        if not TryPOSPost(SalePOS) then
-            exit(false);
+        POSActionPayment.TryEndSale(POSPaymentMethod, POSSession); //TryEndSale step of payment action        
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(NewSalePOS);
         if NewSalePOS.SystemId = SalePOS.SystemId then
             exit(false); //Sale did not end. This is not an error, it happens in prod whenever you pay less than full amount.
+
+        POSPost(SalePOS);
 
         if IsNullGuid(NewSalePOS.SystemId) then begin
             //Sale ended, but new one did not start automatically (depends on setup)
@@ -255,7 +254,9 @@ codeunit 85003 "NPR Library - POS Mock"
         if not EndSale(POSSession, VoucherType) then
             exit(false);
 
-        exit(TryPOSPost(SalePOS));
+        POSPost(SalePOS);
+
+        exit(true);
     end;
 
 
@@ -287,7 +288,6 @@ codeunit 85003 "NPR Library - POS Mock"
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         if VoucherNo = '' then exit;
-
 
         NpRvVoucherMgt.TopUpVoucher(POSSession, VoucherNo, DiscountType, VoucherAmount, 0, 0);
     end;
@@ -362,13 +362,13 @@ codeunit 85003 "NPR Library - POS Mock"
             IssueReturnVoucher(POSSession, NpRvVoucher."Voucher Type");
     end;
 
-    local procedure TryPOSPost(SalePOS: Record "NPR POS Sale"): Boolean
+    local procedure POSPost(SalePOS: Record "NPR POS Sale")
     var
         POSPostMock: Codeunit "NPR Library - POS Post Mock";
     begin
         // Used to be triggered automatically
         Commit();
         POSPostMock.Initialize(true, true);
-        exit(POSPostMock.Run(SalePOS));
+        POSPostMock.Run(SalePOS);
     end;
 }

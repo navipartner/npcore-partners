@@ -21,10 +21,12 @@ codeunit 6014451 "NPR POS Setup Safety Check"
         //We have fiscal receipt number when sale ENDS for numbering without gaps, not when sale starts!                
         ValidateSalesTicketNumberSeriesGapAllowed();
 
-        //Automatic item costing can batch up and cause huge slowdowns for customers that mainly use the POS with rare sales document export+post
-        //as the trigger for adjusting many items at once, blocking the POS in the process.
-        //Should always be via job queue
-        ValidateNotAutoAdjustCost();
+        //Automatic item costing and adjusting can both batch up and cause huge slowdowns for customers that mainly use the POS with rare sales document export+post
+        //as the trigger blocking the POS in the process.
+        //Both should always be via job queue, report 795 and 1002
+        ValidateNotAutoCostMgt();
+
+        OnAfterValidateSetup();
     end;
 
     local procedure ValidateSalesTicketNumberSeriesGapAllowed()
@@ -51,13 +53,18 @@ codeunit 6014451 "NPR POS Setup Safety Check"
         NoSeriesLine.TestField("Allow Gaps in Nos.", true);
     end;
 
-    local procedure ValidateNotAutoAdjustCost()
+    local procedure ValidateNotAutoCostMgt()
     var
         InventorySetup: Record "Inventory Setup";
     begin
         if InventorySetup.Get() then begin
             InventorySetup.TestField("Automatic Cost Posting", false);
+            InventorySetup.TestField("Automatic Cost Adjustment", InventorySetup."Automatic Cost Adjustment"::Never);
         end
+    end;
 
+    [InternalEvent(false)]
+    local procedure OnAfterValidateSetup()
+    begin
     end;
 }

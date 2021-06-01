@@ -14,11 +14,15 @@ table 6184850 "NPR FR Audit Setup"
         {
             Caption = 'Certification No.';
             DataClassification = CustomerContent;
+            InitValue = '0274';
+            Editable = false;
         }
         field(3; "Certification Category"; Text[30])
         {
             Caption = 'Certification Category';
             DataClassification = CustomerContent;
+            InitValue = 'B';
+            Editable = false;
         }
         field(4; "Signing Certificate"; BLOB)
         {
