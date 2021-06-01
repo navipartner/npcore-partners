@@ -180,6 +180,11 @@ table 6150637 "NPR POS Audit Log"
             Caption = 'Action Custom Subtype';
             DataClassification = CustomerContent;
         }
+        field(34; "Active POS Sale SystemId"; Guid)
+        {
+            Caption = 'Active POS Sale SystemId';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

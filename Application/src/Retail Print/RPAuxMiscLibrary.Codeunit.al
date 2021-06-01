@@ -256,6 +256,28 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         exit(PadStr('', Length - ValueLength, PadChar) + Value);
     end;
 
+    local procedure GetReceiptPrintCount(var ProcessingValue: Text[250]; var RecID: RecordId; IncludeFirstPrint: Boolean)
+    var
+        POSEntryOutputLog: Record "NPR POS Entry Output Log";
+        POSEntryOutputLog2: Record "NPR POS Entry Output Log";
+        RecRef: RecordRef;
+    begin
+        RecRef := RecID.GetRecord();
+        RecRef.SetTable(POSEntryOutputLog);
+        POSEntryOutputLog.Find();
+
+        POSEntryOutputLog2.SetRange("POS Entry No.", POSEntryOutputLog."POS Entry No.");
+        POSEntryOutputLog2.SetRange("Output Method", POSEntryOutputLog2."Output Method"::Print);
+        POSEntryOutputLog2.SetFilter("Output Type", '=%1|=%2', POSEntryOutputLog2."Output Type"::SalesReceipt, POSEntryOutputLog2."Output Type"::LargeSalesReceipt);
+
+        //Since POSEntryOutputLog is populated after the print, not before, we have to +1 to count the first print:
+        if IncludeFirstPrint then begin
+            ProcessingValue := Format(POSEntryOutputLog2.Count() + 1);
+        end else begin
+            ProcessingValue := Format(POSEntryOutputLog2.Count());
+        end;
+    end;
+
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionCodeunitList', '', false, false)]
     local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
@@ -310,6 +332,8 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         AddFunction(tmpRetailList, 'OBFUSCATE_MI');
 
         AddFunction(tmpRetailList, 'CALC_DATE');
+        AddFunction(tmpRetailList, 'RECEIPT_PRINT_COUNT');
+        AddFunction(tmpRetailList, 'RECEIPT_REPRINT_COUNT');
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnFunction', '', false, false)]
@@ -385,6 +409,10 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                 FormatNumberSeparator(TemplateLine."Processing Value");
             'DECTOINT_WITHSEP':
                 FormatNumberSeperatorAndRound(TemplateLine."Processing Value");
+            'RECEIPT_PRINT_COUNT':
+                GetReceiptPrintCount(TemplateLine."Processing Value", RecID, true);
+            'RECEIPT_REPRINT_COUNT':
+                GetReceiptPrintCount(TemplateLine."Processing Value", RecID, false);
             else
                 case true of
                     CopyStr(TemplateLine."Processing Function ID", 1, 7) = 'CONVERT':

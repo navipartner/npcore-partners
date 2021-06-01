@@ -140,6 +140,11 @@ page 6150673 "NPR POS Audit Log"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handled by External Impl. field';
                 }
+                field("Active POS Sale SystemId"; Rec."Active POS Sale SystemId")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'SystemID of the active POS sale header. Is transferred to POS Entry header SystemID when sale is completed';
+                }
                 field("Acted on POS Unit No."; Rec."Acted on POS Unit No.")
                 {
                     ApplicationArea = All;
