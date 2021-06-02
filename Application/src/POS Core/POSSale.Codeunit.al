@@ -363,14 +363,10 @@
         StartTime := CurrentDateTime;
 
         ValidateSaleBeforeEnd(Rec);
-        POSCreateEntry.Run(Rec);
 
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.DeleteAll();
-        Rec.Delete();
-
+        EndSaleTransaction(SalePOS);
         Commit(); // Sale is now committed to POS entry
+
         Ended := true;
 
         LogStopwatch('FINISH_SALE', CurrentDateTime - StartTime);
@@ -380,6 +376,20 @@
         if StartNew then begin
             SelectViewForEndOfSale(POSSession);
         end;
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    local procedure EndSaleTransaction(SalePOS: Record "NPR POS Sale")
+    var
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        POSCreateEntry.Run(Rec);
+
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.DeleteAll();
+        Rec.Delete();
     end;
 
     local procedure IsPaymentValidForEndingSale(POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
