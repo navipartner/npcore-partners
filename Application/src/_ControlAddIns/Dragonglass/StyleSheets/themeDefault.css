@@ -13,7 +13,8 @@
   --color-text-400: #a7a7a7;
   --color-accent-100: #f64e00;
   --color-accent-200: #f9834d;
-  --color-danger: #db3439;
+  --color-danger-100: #f64e00;
+  --color-danger-200: #f9834d;
   --box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
   --box-shadow-light: rgba(60, 64, 67, 0.15) 0px 1px 2px 0px, rgba(60, 64, 67, 0.07) 0px 1px 3px 1px;
   --box-shadow-top: rgba(60, 64, 67, 0.3) 0px -1px 2px 0px, rgba(60, 64, 67, 0.15) 0px -1px 3px 1px;
