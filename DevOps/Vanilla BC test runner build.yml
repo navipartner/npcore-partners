@@ -29,8 +29,8 @@ jobs:
     artifactUrl: https://bcartifacts.blob.core.windows.net/onprem/17.0.16993.0/w1
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
-    containerAdminUsername: $(containerAdminUsername) 
-    containerAdminPassword: $(containerAdminPassword)
+    containerAdminUsername: $(username) 
+    containerAdminPassword: $(password)
     licenseSecureFileName: 'DEV_BC OP 17.flf'
     scriptsRepo: ScriptsRepo
     stepList:
@@ -47,8 +47,8 @@ jobs:
     - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
       parameters:
         serverInstanceName: $(serverInstanceName)
-        username: $(containerAdminUsername)
-        password: $(containerAdminPassword)
+        username: $(username)
+        password: $(password)
         testRunName: 'Microsoft Base App tests'
         testApps:
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
