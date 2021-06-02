@@ -237,7 +237,7 @@ codeunit 6150707 "NPR POS Payment Line"
             SaleLinePOS.Validate("Amount Including VAT", Round(SaleLinePOS."Currency Amount" * POSPaymentMethod."Fixed Rate" / 100, 0.01, POSPaymentMethod.GetRoundingType()));
     end;
 
-    local procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "NPR POS Sale Line")
+    procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         Currency: Record Currency;

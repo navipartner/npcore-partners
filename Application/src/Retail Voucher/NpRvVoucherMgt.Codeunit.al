@@ -974,12 +974,14 @@
     var
         NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";
+        Voucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        GLAcc: Record "G/L Account";
+
     begin
         VoucherType.Get(VoucherTypeCode);
-        NpRvVoucherMgt.PrepareVoucherBuffer(NpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
-        NpRvVoucherMgt.ValidateVoucher(NpRvVoucherBuffer);
+        PrepareVoucherBuffer(NpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
+        ValidateVoucher(NpRvVoucherBuffer);
 
         POSLine."No." := VoucherType."Payment Type";
         POSLine."Register No." := SalePOS."Register No.";
@@ -989,13 +991,30 @@
         POSPaymentLine.InsertPaymentLine(POSLine, 0);
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
         PaymentLine."Discount Code" := NpRvVoucherBuffer."No.";
+        if FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", Voucher) then begin
+            if GLAcc.get(Voucher."Account No.") then begin
+                POSLine."VAT Prod. Posting Group" := GLAcc."VAT Prod. Posting Group";
+                UpdateTaxSetup(POSLine, SalePOS);
+                POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
+                POSLine.Modify();
+            end;
+        end;
 
         POSSession.RequestRefreshData();
-        NpRvVoucherMgt.InsertNpRvSalesLine(NpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
+        InsertNpRvSalesLine(NpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
 
-        NpRvVoucherMgt.ApplyPayment(FrontEnd, POSSession, NpRvSalesLine);
+        ApplyPayment(FrontEnd, POSSession, NpRvSalesLine);
     end;
 
+
+    local procedure UpdateTaxSetup(var Line: Record "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale")
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+    begin
+        VATPostingSetup.Get(Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group");
+        POSSaleTaxCalc.UpdateSourceTaxSetup(Line, VATPostingSetup, SalePOS, 0);
+    end;
 
     procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean)
     var
