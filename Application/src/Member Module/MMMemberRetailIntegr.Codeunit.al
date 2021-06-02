@@ -686,7 +686,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
-        ResponseMessage: Text;
     begin
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
@@ -708,61 +707,47 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             MemberInfoCapture.Modify();
         until (MemberInfoCapture.Next() = 0);
 
-        Commit();
         CreateMembership.SetCreateMembership();
-        if (not CreateMembership.run(MemberInfoCapture)) then begin
-            Message('There was a issue when handling the membership on sales line %1 during end-of-sales: %2', ReceiptLine, GetLastErrorText());
-            exit;
-        end;
+        CreateMembership.run(MemberInfoCapture);
 
-        if (not AdmitMembersOnEndOfSalesWorker(MemberInfoCapture, ResponseMessage)) then begin
-            Message(ResponseMessage);
-            exit;
-        end;
-
+        AdmitMembersOnEndOfSalesWorker(MemberInfoCapture);
         MemberInfoCapture.DeleteAll();
-        Commit();
     end;
 
 
-    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ReasonText: Text): Boolean;
+    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         MemberCard: Record "NPR MM Member Card";
         AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         LogEntryNo: Integer;
         ReasonCode: Integer;
+        ReasonText: Text;
     begin
 
         MemberInfoCapture.FindSet();
 
         if (not MemberInfoCapture."Auto-Admit Member") then
-            exit(true); // Must be consistent for all members on the same sales line
+            exit; // Must be consistent for all members on the same sales line
 
         if (not (MemberInfoCapture."Information Context" in [MemberInfoCapture."Information Context"::NEW,
                                               MemberInfoCapture."Information Context"::RENEW,
                                               MemberInfoCapture."Information Context"::UPGRADE,
                                               MemberInfoCapture."Information Context"::EXTEND])) then
-            exit(true); // Nothing to do
+            exit; // Nothing to do
 
         // Check that member limitations allow arrival
         repeat
             MemberCard.Get(MemberInfoCapture."Card Entry No.");
             MemberLimitationMgr.POS_CheckLimitMemberCardArrival(MemberCard."External Card No.", '', '<auto>', LogEntryNo, ReasonText, ReasonCode);
             if (ReasonCode <> 0) then
-                exit(false);
+                Error(ReasonText);
         until (MemberInfoCapture.Next() = 0);
 
-        // Batch register arrival creating tickets.
-        Commit();
+        // Batch register arrival creating tickets.        
         AttemptArrival.AttemptMemberArrival(MemberInfoCapture, '', '<auto>');
-        if (not AttemptArrival.Run()) then begin
-            ReasonCode := AttemptArrival.GetAttemptMemberArrivalResponse(ReasonText);
-            MemberLimitationMgr.UpdateLogEntry(LogEntryNo, ReasonCode, ReasonText); // TODO: Add LogEntryNo to InfoCapture and update all entries ... 
-            exit(false);
-        end;
-
-        exit(true);
+        AttemptArrival.Run();
+        exit;
 
     end;
 
