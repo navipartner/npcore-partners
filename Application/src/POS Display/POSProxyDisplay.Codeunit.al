@@ -10,10 +10,10 @@
         ReceiptContent: Text;
         DisplaySetup: Record "NPR Display Setup";
         DisplayContent: Record "NPR Display Content";
-        MediaDictionary: DotNet NPRNetDictionary_Of_T_U;
-        Base64Dictionary: DotNet NPRNetDictionary_Of_T_U;
+        MediaDictionary: JsonObject;
+        Base64Dictionary: JsonObject;
         ContentType: Option Image,Video,Html;
-        SecondaryMonitorRequest: DotNet NPRNetSecondaryMonitorRequest;
+        SecondaryMonitorRequest: JsonObject;
         CaptionCancelledSale: Label 'Cancelled sale';
         CaptionPaymentTotal: Label 'Total Paid';
         CaptionChangeTotal: Label 'Total Change';
@@ -46,7 +46,6 @@
         CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
         if DisplayIsActivated then
@@ -84,6 +83,7 @@
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
+
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
 
@@ -91,11 +91,9 @@
             exit;
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
-
         CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
@@ -119,7 +117,6 @@
     begin
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
-
         CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
@@ -641,13 +638,11 @@
                     ReceiptText := ReceiptText +
                                  '#NEWLINE#' +
                                  '#NEWLINE#' +
-                                 PadStr(CaptionTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(GrandTotalTxt)) + GrandTotalTxt +
+                                PadStr(CaptionTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(GrandTotalTxt)) + GrandTotalTxt +
                                  '#NEWLINE#' +
                                  PadStr(CaptionPaymentTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(PaymentTxt)) + PaymentTxt +
-                               //-NPR5.51 [321307]
                                '#NEWLINE#' +
                                PadStr(CaptionRemaningAmt, DisplaySetup."Receipt GrandTotal Padding" - StrLen(RemainingAmtTxt)) + RemainingAmtTxt +
-                                 //+NPR5.51 [321307]
                                  '#NEWLINE#' +
                                  PadStr(CaptionChangeTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(ChangeTxt)) + ChangeTxt;
                 end;
@@ -702,17 +697,20 @@
     local procedure Login(var FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSSession: Codeunit "NPR POS Session";
+        Request: Codeunit "NPR Front-End: HWC";
     begin
         if DisplaySetup."Media Downloaded" then
             SetAction(0)
         else
             SetAction(6);
-
         SetRegister();
         SetReceiptCloseDuration(0);
         DisplayHandler();
+        Request.SetHandler('Display');
+        Request.SetRequest(SecondaryMonitorRequest);
         if (POSSession.IsActiveSession(FrontEnd)) then
-            FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'LOGIN');
+            FrontEnd.InvokeFrontEndMethod(Request);
+
 
         case DisplayHandlerAction of
             DisplayHandlerAction::OpenDisplay:
@@ -728,43 +726,53 @@
     end;
 
     procedure Closed(var FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        Request: Codeunit "NPR Front-End: HWC";
     begin
         SetAction(5);
         DisplayHandler();
-
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'CLOSED');
+        Request.SetHandler('Display');
+        Request.SetRequest(SecondaryMonitorRequest);
+        FrontEnd.InvokeFrontEndMethod(Request);
     end;
 
     procedure EndSale(var FrontEnd: Codeunit "NPR POS Front End Management"; EndSaleDescription: Text; RegisterNo: Code[10])
+    var
+        Request: Codeunit "NPR Front-End: HWC";
     begin
         SetRegister();
         SetAction(4);
         SetReceiptContent(EndSaleDescription);
-        DisplayHandler();
-
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'ENDSALE');
-
         SetReceiptCloseDuration(DisplaySetup."Receipt Duration");
         DisplayHandler();
-
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'RECEIPTCLOSEDURATION');
+        Request.SetHandler('Display');
+        Request.SetRequest(SecondaryMonitorRequest);
+        FrontEnd.InvokeFrontEndMethod(Request);
     end;
 
     procedure Payments(var FrontEnd: Codeunit "NPR POS Front End Management"; PaymentDescription: Text)
+    var
+        Request: Codeunit "NPR Front-End: HWC";
     begin
         SetAction(4);
         SetReceiptContent(PaymentDescription);
         DisplayHandler();
 
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'PAYMENT');
+        Request.SetHandler('Display');
+        Request.SetRequest(SecondaryMonitorRequest);
+        FrontEnd.InvokeFrontEndMethod(Request);
+
     end;
 
     procedure CloseReceipt(var FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        Request: Codeunit "NPR Front-End: HWC";
     begin
         SetAction(5);
         DisplayHandler();
-
-        FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName(), 'CLEAR');
+        Request.SetHandler('Display');
+        Request.SetRequest(SecondaryMonitorRequest);
+        FrontEnd.InvokeFrontEndMethod(Request);
     end;
 
     local procedure SetAction(ActionIn: Option OpenDisplay,CloseDisplay,UpdateDisplay,ShowReceipt,UpdateReceipt,CloseReceipt,DownloadFiles,DownloadHtmlFile)
@@ -789,34 +797,22 @@
     end;
 
     local procedure DisplayHandler()
+    var
+        jsonobj: JsonObject;
     begin
-        CreateDotNetDict(MediaDictionary);
-        CreateDotNetDict(Base64Dictionary);
+        jsonobj.Add('ScreenNo', DisplaySetup."Screen No.");
+        jsonobj.Add('ReceiptWidthPct', DisplaySetup."Receipt Width Pct.");
+        jsonobj.Add('ReceiptPlacement', DisplaySetup."Receipt Placement");
+        jsonobj.Add('DisplayAction', DisplayHandlerAction);
+        jsonobj.Add('ReceiptDuration', ReceiptCloseDuration);
+        jsonobj.Add('ReceiptContent', ReceiptContent);
+        jsonobj.Add('ContentType', ContentType);
+        jsonobj.Add('DisplayContentHtml', SetContentHtml());
+        jsonobj.Add('MediaDictionary', MediaDictionary);
+        jsonobj.Add('Base64Dictionary', Base64Dictionary);
+        jsonobj.Add('DisplayContentUrl', '');
+        SecondaryMonitorRequest := jsonobj;
 
-        SecondaryMonitorRequest := SecondaryMonitorRequest.SecondaryMonitorRequest();
-
-        SecondaryMonitorRequest.DisplayAction := DisplayHandlerAction;
-        SecondaryMonitorRequest.ReceiptDuration := ReceiptCloseDuration;
-        SecondaryMonitorRequest.ScreenNo := DisplaySetup."Screen No.";
-        SecondaryMonitorRequest.ReceiptWidthPct := DisplaySetup."Receipt Width Pct.";
-        SecondaryMonitorRequest.ReceiptContent := ReceiptContent;
-        SecondaryMonitorRequest.ReceiptPlacement := DisplaySetup."Receipt Placement";
-        SecondaryMonitorRequest.DisplayContentUrl := '';
-        SecondaryMonitorRequest.ContentType := ContentType;
-
-        case DisplayHandlerAction of
-            DisplayHandlerAction::DownloadFiles:
-                SecondaryMonitorRequest.DisplayContentHtml := SetContentHtml();
-        end;
-
-        SecondaryMonitorRequest.MediaDictionary := MediaDictionary;
-        SecondaryMonitorRequest.Base64Dictionary := Base64Dictionary;
-
-    end;
-
-    local procedure SetMediaDictionary(MediaDictionaryIn: DotNet NPRNetDictionary_Of_T_U)
-    begin
-        MediaDictionary := MediaDictionaryIn;
     end;
 
     local procedure SetContentHtml(): Text
@@ -881,8 +877,10 @@
             repeat
                 GetImageContentAndExtension(DisplayContentLines, CurrBase64, CurrExtension);
                 ContentHtml += '    <img class="imageCarousel" src="' + Format(ImageCounter) + '.' + CurrExtension + '" style="width:100%; height: 100%;">';
-                MediaDictionary.Add(ImageCounter, Format(ImageCounter) + '.' + CurrExtension);
-                Base64Dictionary.Add(ImageCounter, CurrBase64);
+                if not MediaDictionary.Contains(Format(ImageCounter)) then
+                    MediaDictionary.Add(Format(ImageCounter), Format(ImageCounter) + '.' + CurrExtension);
+                if not Base64Dictionary.Contains(Format(ImageCounter)) then
+                    Base64Dictionary.Add(Format(ImageCounter), CurrBase64);
                 ImageCounter += 1;
             until DisplayContentLines.Next() = 0;
             ContentHtml += '  </div>';
@@ -930,7 +928,7 @@
             VideoCounter := 1;
             repeat
                 ContentHtml += '    <source src="video' + Format(VideoCounter) + '.mp4" type="video/mp4">';
-                MediaDictionary.Add(VideoCounter, DisplayContentLines.Url);
+                MediaDictionary.Add(Format(VideoCounter), DisplayContentLines.Url);
                 VideoCounter += 1;
             until DisplayContentLines.Next() = 0;
             ContentHtml += '  </video>';
@@ -952,79 +950,26 @@
         exit(ContentHtml);
     end;
 
-    local procedure CreateDotNetDict(Dict: DotNet NPRNetDictionary_Of_T_U)
-    var
-        Type: DotNet NPRNetType;
-        Activator: DotNet NPRNetActivator;
-        Arr: DotNet NPRNetArray;
-        String: Text;
-        Int: Integer;
-    begin
-        Arr := Arr.CreateInstance(GetDotNetType(Type), 2);
-        Arr.SetValue(GetDotNetType(Int), 0);
-        Arr.SetValue(GetDotNetType(String), 1);
-
-        Type := GetDotNetType(Dict);
-        Type := Type.MakeGenericType(Arr);
-
-        Dict := Activator.CreateInstance(Type);
-    end;
-
     local procedure GetImageContentAndExtension(DisplayContentLines: Record "NPR Display Content Lines"; var Base64: Text; var Extension: Text[10])
     var
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
         InS: InStream;
-        Convert: DotNet NPRNetConvert;
-        Bytes: DotNet NPRNetArray;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
-        Converter: DotNet NPRNetImageConverter;
+        OutS: OutStream;
+        base64Convert: Codeunit "Base64 Convert";
+        blobber: Codeunit "Temp Blob";
+        filenameindex: Integer;
+        med: Record "Tenant Media";
+
     begin
         if DisplayContentLines.Picture.HasValue() then begin
-            TempBlob.CreateOutStream(OutStr);
-            DisplayContentLines.Picture.ExportStream(OutStr);
-            TempBlob.CreateInStream(InS);
+            blobber.CreateOutStream(OutS);
+            DisplayContentLines.Picture.ExportStream(OutS);
+            blobber.CreateInStream(InS);
+            Base64 := base64Convert.ToBase64(InS);
+            if (med.Get(DisplayContentLines.Picture.MediaId())) then begin
+                filenameindex := med.Description.LastIndexOf('.') + 1;
+                Extension := med.Description.Substring(filenameindex);
+            end;
 
-            MemoryStream := MemoryStream.MemoryStream();
-            CopyStream(MemoryStream, InS);
-
-            Bytes := MemoryStream.ToArray();
-
-            Converter := Converter.ImageConverter();
-            Image := Converter.ConvertFrom(Bytes);
-
-            //Image.FromStream(MemoryStream);
-
-            if (ImageFormat.Jpeg.Equals(Image.RawFormat)) then
-                Extension := 'jpeg'
-            else
-                if (ImageFormat.Png.Equals(Image.RawFormat)) then
-                    Extension := 'png'
-                else
-                    if (ImageFormat.Gif.Equals(Image.RawFormat)) then
-                        Extension := 'gif'
-                    else
-                        if (ImageFormat.Bmp.Equals(Image.RawFormat)) then
-                            Extension := 'bmp'
-                        else
-                            if (ImageFormat.Tiff.Equals(Image.RawFormat)) then
-                                Extension := 'tiff'
-                            else
-                                if (ImageFormat.Emf.Equals(Image.RawFormat)) then
-                                    Extension := 'emf'
-                                else
-                                    if (ImageFormat.Icon.Equals(Image.RawFormat)) then
-                                        Extension := 'icon'
-                                    else
-                                        if (ImageFormat.Exif.Equals(Image.RawFormat)) then
-                                            Extension := 'exif'
-                                        else
-                                            if (ImageFormat.Wmf.Equals(Image.RawFormat)) then
-                                                Extension := 'wmf';
-
-            Base64 := Convert.ToBase64String(Bytes);
         end;
     end;
 
