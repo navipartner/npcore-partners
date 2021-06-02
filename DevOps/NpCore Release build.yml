@@ -49,8 +49,8 @@ jobs:
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         containerName: $(containerName)
-        containerAdminUsername: $(username)
-        containerAdminPassword: $(password)
+        containerAdminUsername: $(containerAdminUsername)
+        containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
